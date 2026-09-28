@@ -1,0 +1,15 @@
+{
+  "id": "T1",
+  "title": "Enforce the exit-code and error-output contract",
+  "goal": "Failures have to behave predictably for a tool that gets used in scripts: the right exit code, the explanation on stderr, and nothing at all on stdout. A caller piping stdout must never receive an error message mixed into its data.",
+  "files": ["src/runstat/cli.py"],
+  "depends_on": [],
+  "acceptance": [
+    "A missing or malformed run directory exits 2",
+    "A readable but empty run exits 1",
+    "On every failing path stdout is completely empty",
+    "On every failing path the explanation goes to stderr",
+    "No traceback reaches the user"
+  ],
+  "verify": "uv run pytest -q tests/test_errors.py"
+}

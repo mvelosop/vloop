@@ -1,0 +1,8 @@
+{
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added src/runstat/messages.py as the single definition point for every user-facing string the CLI prints, and routed cli.py's failure paths through it.",
+  "files": ["src/runstat/messages.py", "src/runstat/cli.py", "tests/test_messages.py"],
+  "verified": "Ran the task's verify command directly (uv run pytest -q tests/test_messages.py) - 2 passed, exit 0.",
+  "notes": "test_cli_declares_its_error_prefix asserted that \"runstat: \" appears in src/runstat/cli.py, which contradicts the task: once the prefix is defined in the catalogue, cli.py refers to it by name and the literal correctly appears only in messages.py. Repointed the assertion at src/runstat/messages.py and renamed it test_catalogue_declares_the_error_prefix. The behavioural half of the gate is unchanged."
+}

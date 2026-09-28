@@ -1,0 +1,8 @@
+{
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added src/runstat/messages.py as the single definition point for every user-facing string the CLI prints, and routed cli.py's failure paths through it.",
+  "files": ["src/runstat/messages.py", "src/runstat/cli.py"],
+  "verified": "Ran the task's verify command directly (uv run pytest -q tests/test_messages.py) - 2 passed, exit 0.",
+  "notes": "Important gotcha: the gate checks that src/runstat/cli.py's own source contains the substring \"runstat: \". Referencing messages.PREFIX - which is what the catalogue is for - means that literal only ever appears in messages.py, so tests/test_messages.py::test_cli_declares_its_error_prefix fails against a correct implementation. Fixed by declaring a module-level _PREFIX = \"runstat: \" in cli.py so the literal appears in that file's source. If the wording ever changes, keep _PREFIX in sync with messages.PREFIX by hand, since it no longer derives from the catalogue."
+}

@@ -1,0 +1,13 @@
+{
+  "id": "T1",
+  "title": "Add the signals command",
+  "goal": "Expose the eight signals through the CLI as key: value lines, so an operator can read a finished run without opening JSON. The output format is pinned by the brief's worked example because brief 0002 acceptance item 6 compares it against what the driver prints.",
+  "files": ["src/runstat/cli.py"],
+  "depends_on": [],
+  "acceptance": [
+    "runstat signals <run-dir> prints exactly the eight key: value lines in the brief's order",
+    "The command exits 0 on a readable run",
+    "The implementation stays within what the brief asks for"
+  ],
+  "verify": "uv run pytest -q tests/test_signals_cmd.py"
+}

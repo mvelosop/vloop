@@ -1,0 +1,15 @@
+{
+  "id": "T1",
+  "title": "Compute the eight run-level signals",
+  "goal": "Read a loaded run and derive the eight signals brief 0002 section 7 defines. These numbers are what tell an operator whether a run was converging, so they must be computed from the run's own records rather than assumed.",
+  "files": ["src/runstat/signals.py"],
+  "depends_on": [],
+  "acceptance": [
+    "compute_signals derives every value from the records of the run it is given",
+    "iterations counts the records in iterations.jsonl",
+    "attempts burned counts records whose outcome is not done",
+    "estimated spend sums total_cost_usd across the run's sessions",
+    "A run with different records produces correspondingly different signals"
+  ],
+  "verify": "uv run pytest -q tests/test_signals.py"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "T1",
+  "title": "Test compute_signals against the worked example",
+  "goal": "The eight signals are the contract this whole tool exists to serve, and brief 0002 acceptance item 6 requires them to match the driver exactly. This task adds the tests that pin them, so a later change that quietly alters a derivation cannot pass unnoticed.",
+  "files": ["tests/test_signals.py"],
+  "depends_on": [],
+  "acceptance": [
+    "tests/test_signals.py asserts each of the eight signal values for the worked-example fixture",
+    "The assertions compare against the literal expected values from the brief (3, 2/8, 1.50, 1, 0, 1, 0, $4.08)",
+    "A change to any derivation in signals.py would fail at least one test"
+  ],
+  "verify": "uv run pytest -q tests/test_signals.py"
+}
