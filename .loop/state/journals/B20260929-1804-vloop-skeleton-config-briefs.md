@@ -94,3 +94,10 @@ I left the generator and fixture scripts in `.loop/tmp/`, which is gitignored.
 - **Summary:** Added a 128-line root README.md (what vloop is, the loop, brief lifecycle/depends-on/Binding references, commands and flags, config keys and env vars, .vloop/ layout, exit codes, roadmap pointer) and internal/cli/readme_test.go that holds it against the cobra tree and config.Keys.
 - **Files:** README.md, internal/cli/readme_test.go
 - **Notes for next iteration:** The test walks NewRoot's tree (skipping help/completion, which cobra adds lazily). It requires every leaf command as 'vloop <path>', every flag as --name, and every config key in backticks. It rejects unknown --flags, unknown 'vloop <words>' mentions in backticks or after '$ ', unknown model.*/effort.* keys and unknown VLOOP_* names. Do not write a bare 'VLOOP_' in the README: the gate's grep treats it as an unknown variable. Nothing from B2-B4 is mentioned; the README describes the loop but says running it is not yet part of vloop.
+
+## T9 — Close: end-to-end worked example, full suite, vet, gofmt and cross-builds
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added cmd/vloop/e2e_test.go: builds the binary in TestMain and replays the worked example (English session, ready Spanish brief with consumed dependency, six planted failures) in temp scratch git repos with a temp HOME, asserting stdout, stderr and exit code.
+- **Files:** cmd/vloop/e2e_test.go
+- **Notes for next iteration:** No product changes; no wiring fixes were needed. Generated values (timestamp, Go version, OS, arch) come from the binary's output or the runtime. The env is scrubbed of VLOOP_*/NO_COLOR and HOME/USERPROFILE/XDG/APPDATA point at temp dirs. In the planted-failure tests the 'already run' problem line carries a trailing '; this brief declares itself plannable and is not', so the test matches the line with an optional '; ...' suffix; 'brief list' on a cycle starts the cycle from the list's own ordering (b -> a -> b), so the test only asserts the 'depends-on cycle: ' prefix, as the gate does.

@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **8/9 done** · iteration 8
+**Status:** running · **9/9 done** · iteration 9
 
-**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:57:39Z
+**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:59:22Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T6** — `depends-on`: resolution, cycles, and `vloop brief list`
 - [x] **T7** — `vloop brief new <slug>` with embedded en and es templates
 - [x] **T8** — Root README.md for a first-time reader, tested against the command tree
-- [ ] **T9** — Close: end-to-end worked example, full suite, vet, gofmt and cross-builds
+- [x] **T9** — Close: end-to-end worked example, full suite, vet, gofmt and cross-builds
 
 ## Tasks
 
@@ -245,7 +245,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T9 — Close: end-to-end worked example, full suite, vet, gofmt and cross-builds
 
-`pending` · depends on: T8
+`done` · depends on: T8
 
 **Files:** `cmd/vloop/e2e_test.go`
 

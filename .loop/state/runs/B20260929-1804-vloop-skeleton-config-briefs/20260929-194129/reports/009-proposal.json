@@ -1,0 +1,8 @@
+{
+  "task": "T9",
+  "outcome": "done",
+  "summary": "Added cmd/vloop/e2e_test.go: builds the binary in TestMain and replays the worked example (English session, ready Spanish brief with consumed dependency, six planted failures) in temp scratch git repos with a temp HOME, asserting stdout, stderr and exit code.",
+  "files": ["cmd/vloop/e2e_test.go"],
+  "verified": "The task's verify command exited 0 (gofmt, vet, linux/windows/host builds, go test ./..., shell replay of the worked example all passed).",
+  "notes": "No product changes; no wiring fixes were needed. Generated values (timestamp, Go version, OS, arch) come from the binary's output or the runtime. The env is scrubbed of VLOOP_*/NO_COLOR and HOME/USERPROFILE/XDG/APPDATA point at temp dirs. In the planted-failure tests the 'already run' problem line carries a trailing '; this brief declares itself plannable and is not', so the test matches the line with an optional '; ...' suffix; 'brief list' on a cycle starts the cycle from the list's own ordering (b -> a -> b), so the test only asserts the 'depends-on cycle: ' prefix, as the gate does."
+}

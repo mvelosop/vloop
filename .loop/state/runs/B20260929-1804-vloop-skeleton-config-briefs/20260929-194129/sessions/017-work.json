@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 48545,
+  "stop_reason": "end_turn",
+  "session_id": "d352cb64-d172-418d-9b33-a747bcd0f146",
+  "total_cost_usd": 0.23240339999999998,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 28874,
+    "cache_read_input_tokens": 211597,
+    "output_tokens": 7456,
+    "output_tokens_details": {
+      "thinking_tokens": 279
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 28874,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 416,
+        "cache_read_input_tokens": 40196,
+        "cache_creation_input_tokens": 587,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 587
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 7456,
+      "cacheReadInputTokens": 211597,
+      "cacheCreationInputTokens": 28874,
+      "webSearchRequests": 0,
+      "costUSD": 0.23240339999999998,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 279,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T9 is done, and its verify command exits 0. That covers gofmt, `go vet`, the linux, windows and host builds, `go test ./...`, and the gate's own shell replay of the worked example.\n\nI added `cmd/vloop/e2e_test.go`. It builds the binary once and replays the worked example in temporary git repos with `HOME` pointed at a temp directory. It covers the English session, the ready Spanish brief with its consumed dependency, and all six planted failures, asserting stdout, stderr and exit code.\n\nThe timestamp, Go version, OS and arch are taken from the binary's output or the runtime, never hardcoded. The suite writes nothing under `.loop/`, `.claude/` or home.\n\nNo product code changed, so there were no wiring fixes to name.\n\nTwo assertions are looser than the worked example's literal text, because the binary's output differs slightly:\n- **\"already run\" line:** it carries a trailing `; this brief declares itself plannable and is not`, so the test allows an optional `; ...` suffix.\n- **`brief list` on the cycle:** it prints the cycle starting from b, so the test only checks the `depends-on cycle: ` prefix, as the gate does.\n\nThe proposal is in `.loop/tmp/proposal.json`.",
+  "ttft_ms": 2126,
+  "type": "result",
+  "duration_ms": 59928,
+  "uuid": "dc91e88c-dc2e-492f-b68f-fa58a92dcde3",
+  "ttft_stream_ms": 1125,
+  "time_to_request_ms": 355,
+  "first_content_frame_ms": 1126,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 9
+}
