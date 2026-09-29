@@ -81,19 +81,22 @@ for item in "$SRC"/.loop/*; do
     [[ "$name" == "$keep" ]] && continue 2
   done
   for internal in "${NOT_SHIPPED[@]}"; do
-    if [[ "$name" == "$internal" ]]; then
-      # Reported, never removed. An install before this change left a copy
-      # behind, and by then the consumer may have written entries of their own
-      # in it — the installer cannot tell those from the ones it shipped, and
-      # deleting a directory it cannot read is not a repair. So it says so once
-      # and leaves the decision where it belongs.
-      [[ -e "$TARGET/.loop/$name" ]] && warn \
-        ".loop/$name is in the target from an earlier install. It is the loop's own bookkeeping and is no longer shipped — delete it if you did not write it."
-      continue 2
-    fi
+    [[ "$name" == "$internal" ]] && continue 2
   done
   rm -rf "$TARGET/.loop/$name"
   cp -R "$item" "$TARGET/.loop/$name"
+done
+
+# Reported, never removed. An install before this change left a copy behind,
+# and by then the consumer may have written entries of their own in it — the
+# installer cannot tell those from the ones it shipped, and deleting a
+# directory it cannot read is not a repair. So it says so once and leaves the
+# decision where it belongs. Checked against the target on its own, not inside
+# the copy loop above: an installed copy has no .loop/todo/ to iterate over, so
+# an install from one never mentioned a stale copy in its target.
+for internal in "${NOT_SHIPPED[@]}"; do
+  [[ -e "$TARGET/.loop/$internal" ]] && warn \
+    ".loop/$internal is in the target from an earlier install. It is the loop's own bookkeeping and is no longer shipped — delete it if you did not write it."
 done
 chmod +x "$TARGET"/.loop/*.sh
 

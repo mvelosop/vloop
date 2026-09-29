@@ -132,10 +132,16 @@ note "── the loop's own bookkeeping is not shipped ──"
 # LEAVE ALONE, so a new mechanism file is never silently missed, which is the
 # right default and cannot tell bookkeeping from mechanism. This is the control
 # on the exception: the source repo HAS the directory, and a fresh install must
-# not produce one.
-[[ -d "$REPO_ROOT/.loop/todo" ]] \
-  && ok "the source repo has .loop/todo/ (so this asserts something)" \
-  || bad "no .loop/todo/ in the source — this assertion proves nothing"
+# not produce one. An installed copy -- where the installer runs this suite as
+# its proof -- never has one, by design, so there the control cannot hold and
+# the check below is still worth running on its own.
+if [[ -f "$REPO_ROOT/.loop/.installed" ]]; then
+  note "installed copy: no .loop/todo/ in the source, by design"
+else
+  [[ -d "$REPO_ROOT/.loop/todo" ]] \
+    && ok "the source repo has .loop/todo/ (so this asserts something)" \
+    || bad "no .loop/todo/ in the source — this assertion proves nothing"
+fi
 [[ ! -e "$TGT/.loop/todo" ]] && ok ".loop/todo/ was not installed" \
   || bad ".loop/todo/ was shipped into the target"
 

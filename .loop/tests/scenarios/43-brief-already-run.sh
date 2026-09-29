@@ -10,8 +10,24 @@
 set -uo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
+# check-brief.sh runs in a throwaway repo too, never against this repo's own
+# docs/briefs/ and journals: those exist only in the loop's source, so an
+# installed copy -- where the installer runs this suite as its proof -- failed
+# here on every install. The brief body is a real one, so the never-run case
+# proves a brief that passes on its merits is not caught by the journal check.
+# It is staged into examples/ once installed; the source still has it in
+# docs/briefs/.
+real_brief="$REPO_ROOT/.loop/examples/0003-runstat-cli.md"
+[[ -f "$real_brief" ]] || real_brief="$REPO_ROOT/docs/briefs/0003-runstat-cli.md"
+fixture_cleanup; fixture_new
+cp "$REPO_ROOT/.loop/check-brief.sh" "$FX_REPO/.loop/"
+cp "$real_brief" "$FX_REPO/docs/briefs/0003-runstat-cli.md"
+cp "$real_brief" "$FX_REPO/docs/briefs/0009-fresh.md"
+mkdir -p "$FX_REPO/.loop/state/journals"
+echo '# Journal' >"$FX_REPO/.loop/state/journals/0003-runstat-cli.md"
+
 note "── check-brief.sh: an already-run brief is reported ──"
-out="$( (cd "$REPO_ROOT" && .loop/check-brief.sh docs/briefs/0003-runstat-cli.md) 2>&1 )"
+out="$( (cd "$FX_REPO" && .loop/check-brief.sh docs/briefs/0003-runstat-cli.md) 2>&1 )"
 rc=$?
 [[ $rc -eq 1 ]] && ok "check-brief: an already-run brief exits 1" \
   || bad "check-brief on an already-run brief exited $rc"
@@ -21,7 +37,7 @@ case "$out" in
 esac
 
 note "── check-brief.sh: a never-run plannable brief is unaffected ──"
-( cd "$REPO_ROOT" && .loop/check-brief.sh docs/briefs/0005-production-and-insights.md ) >/dev/null 2>&1 \
+( cd "$FX_REPO" && .loop/check-brief.sh docs/briefs/0009-fresh.md ) >/dev/null 2>&1 \
   && ok "a never-run brief still passes" \
   || bad "a never-run plannable brief fails check-brief"
 
