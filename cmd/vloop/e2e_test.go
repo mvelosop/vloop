@@ -131,7 +131,8 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 
 	expect(t, s.run(nil, "config", "list"), 0,
 		"language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\n"+
-			"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n", "")
+			"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n"+
+			"shell="+defaultShell()+" (default)\nareas= (default)\n", "")
 	expect(t, s.run(nil, "config", "set", "language", "es"), 0, "", "")
 	expect(t, s.run(nil, "config", "set", "effort.review", "high"), 0, "", "")
 	expect(t, s.run([]string{"VLOOP_MODEL_WORK=opus"}, "config", "get", "model.work", "--json"), 0,
@@ -253,4 +254,11 @@ func TestWorkedExamplePlantedFailures(t *testing.T) {
 			}
 		})
 	}
+}
+
+func defaultShell() string {
+	if runtime.GOOS == "windows" {
+		return "pwsh"
+	}
+	return "sh"
 }

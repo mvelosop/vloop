@@ -4,15 +4,15 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **2/9 done** · iteration 4
+**Status:** running · **3/9 done** · iteration 5
 
-**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:28:07Z
+**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:30:36Z
 
 ## Progress
 
 - [x] **T1** — Embed the five JSON Schemas and add `vloop schema list|show|validate`
 - [x] **T2** — Load and save `.vloop/state/state.json`, and add `vloop status` (text, --json, --markdown)
-- [ ] **T3** — Add the `shell` and `areas` config keys, and `vloop task list|show` with model/effort resolution
+- [x] **T3** — Add the `shell` and `areas` config keys, and `vloop task list|show` with model/effort resolution
 - [ ] **T4** — Add `vloop task validate` with every structural rule
 - [ ] **T5** — Add `vloop task reset|note|drop|set`, each refusing an invalid plan or result
 - [ ] **T6** — Add `vloop task verify` with gate_history, and `vloop task gate` in the plan's shell
@@ -89,7 +89,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T3 — Add the `shell` and `areas` config keys, and `vloop task list|show` with model/effort resolution
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 **Files:** `internal/config/config.go`, `internal/config/config_test.go`, `internal/cli/config.go`, `internal/cli/config_test.go`, `cmd/vloop/e2e_test.go`, `internal/cli/task.go`, `internal/cli/task_list_test.go`, `internal/cli/root.go`
 

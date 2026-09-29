@@ -106,5 +106,6 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 	root.AddCommand(newBrief(g))
 	root.AddCommand(newSchema(g))
 	root.AddCommand(newStatus(g))
+	root.AddCommand(newTask(g))
 	return root, g
 }
