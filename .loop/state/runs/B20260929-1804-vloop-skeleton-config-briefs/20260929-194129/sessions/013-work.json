@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 95219,
+  "stop_reason": "end_turn",
+  "session_id": "a546fe71-b5bb-4008-b62f-d4b632360f08",
+  "total_cost_usd": 0.3846570000000001,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 42511,
+    "cache_read_input_tokens": 385115,
+    "output_tokens": 13755,
+    "output_tokens_details": {
+      "thinking_tokens": 636
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 42511,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 625,
+        "cache_read_input_tokens": 53792,
+        "cache_creation_input_tokens": 628,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 628
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 13755,
+      "cacheReadInputTokens": 385115,
+      "cacheCreationInputTokens": 42511,
+      "webSearchRequests": 0,
+      "costUSD": 0.3846570000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 636,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 11,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T7 is done: `vloop brief new <slug>` now exists, with embedded English and Spanish templates. The T7 verify command exits 0. That covers `gofmt`, `go vet`, the linux/windows/host builds, the unit tests, and the scratch-repo scenarios in both languages. I wrote the proposal to `.loop/tmp/proposal.json`.\n\n- **What it does:**\n  - Writes `docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md` in local time and prints that path.\n  - Fills `name`, `kind: brief`, `status: draft`, `created` and `depends-on: []`.\n  - A fresh brief checks as `skipped: status is draft` in both `en` and `es`.\n- **Templates:** They are adapted from `.loop/loop-brief.template.md`. The body `**Status:**` line and the `.loop/check-brief.sh` instructions are gone. The Spanish template is a full translation, not English with Spanish headings.\n- **Error cases:**\n  - An invalid or missing slug exits 2 and writes nothing.\n  - An existing file prints `vloop: brief exists: <path>` and exits 1 with the file untouched.\n  - `--dry-run` prints the path and writes nothing.\n- **`--json` output:** The spec didn't fix these shapes, so I chose them. Success prints `{\"path\",\"created\"}`, and `created` is false for a dry run. \"Exists\" prints `{\"error\"}` on stdout, plus the stderr line.\n- **Other file touched:** `internal/cli/brief.go` changed only to register the new command.\n- **Tests:** The new tests are `internal/brief/new_test.go` and `internal/cli/new_test.go`. They cover both templates, the slug rule, exists and dry-run.\n\nI didn't touch `state.json`, commit, or start T8.",
+  "ttft_ms": 2551,
+  "type": "result",
+  "duration_ms": 100866,
+  "uuid": "edd811b7-f967-43ea-a65a-0511d45c29e1",
+  "ttft_stream_ms": 1791,
+  "time_to_request_ms": 357,
+  "first_content_frame_ms": 1793,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 7
+}

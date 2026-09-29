@@ -29,6 +29,7 @@ func newBrief(g *Globals) *cobra.Command {
 		RunE:  func(cmd *cobra.Command, args []string) error { return runBriefCheck(g, cmd, args) },
 	})
 	cmd.AddCommand(newBriefList(g))
+	cmd.AddCommand(newBriefNew(g))
 	return cmd
 }
 

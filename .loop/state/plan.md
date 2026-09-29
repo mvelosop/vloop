@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **6/9 done** · iteration 6
+**Status:** running · **7/9 done** · iteration 7
 
-**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:53:47Z
+**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:56:01Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T4** — Spanish heading set and the language switch for `brief check`
 - [x] **T5** — Frontmatter validity and `## Binding references` rules
 - [x] **T6** — `depends-on`: resolution, cycles, and `vloop brief list`
-- [ ] **T7** — `vloop brief new <slug>` with embedded en and es templates
+- [x] **T7** — `vloop brief new <slug>` with embedded en and es templates
 - [ ] **T8** — Root README.md for a first-time reader, tested against the command tree
 - [ ] **T9** — Close: end-to-end worked example, full suite, vet, gofmt and cross-builds
 
@@ -193,7 +193,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T7 — `vloop brief new <slug>` with embedded en and es templates
 
-`pending` · depends on: T6
+`done` · depends on: T6
 
 **Files:** `internal/brief/templates/en.md`, `internal/brief/templates/es.md`, `internal/brief/new.go`, `internal/brief/new_test.go`, `internal/cli/new.go`, `internal/cli/new_test.go`
 
