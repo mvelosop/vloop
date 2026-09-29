@@ -20,10 +20,10 @@ feature B1 builds — so from B2 on, `vloop brief list` shows this order.
 | # | Brief | Owns | Depends on |
 | --- | --- | --- | --- |
 | B1 | `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` — **consumed, merged in `8da6c95`** | Go module and command skeleton, global flags, exit codes 0/1/2, `version`, embedded plugin manifest, `.vloop/config.toml` + `config`, the loop-brief format (English and Spanish), `brief check`, `brief new`, `brief list`, `depends-on`, the root README | — |
-| B2 | not written | `schemas/`: state, proposal (with `gate_dispute`), verdict, run telemetry, metrics snapshot, defect record. `task …` (including `task gate`), `status [--json]`. Per task: `model`/`effort` overrides resolved over B1's per-kind config, `area` from the repo's `areas` list, `kind` from the fixed list; `task validate` enforces both | B1 |
-| B3 | not written | Metrics and defects: `vloop metrics [<brief>] [--by task] [--json]`, line classification (config globs, per-language defaults), delivered vs churn, the per-iteration snapshot format, `vloop defect add\|list` with `--blame`, `vloop brief close`, release detection, `vloop metrics export` (JSON Lines), `vloop metrics --workspace`. Reads the shell loop's run folders too, so B1–B4 have metrics — B1 is the first fixture. **May split in two** (metrics + close; defects + export + workspace) — decided when it is written | B2 |
+| B2 | `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` — **consumed** | `schemas/`: state, proposal (with `gate_dispute`), verdict, session and iteration telemetry. `task …` (including `task verify`, which records gate history, and `task gate`, which runs a gate), `status [--json]`. Per task: `model`/`effort` overrides resolved over B1's per-kind config, `area` from the repo's `areas` list, `kind` from the fixed list; `task validate` enforces both | B1 |
+| B3 | not written | Metrics and defects, with their schemas (metrics snapshot, defect record — moved here from B2, since their shape follows from what B3 computes): `vloop metrics [<brief>] [--by task] [--json]`, line classification (config globs, plus built-in **stack presets** chosen with `metrics.stacks`, listed by `vloop metrics stacks`), delivered vs churn, the per-iteration snapshot format, `vloop defect add\|list` with `--blame`, `vloop brief close`, release detection, `vloop metrics export` (JSON Lines), `vloop metrics --workspace`. **Documentation**: a `docs/guide/` set beside the README (concepts, metrics reference, defects guide, configuration reference including the presets) and a command reference generated from the binary, with a test that fails when it is stale; exact contents settled when B3 is written. Reads the shell loop's run folders too, so B1–B4 have metrics — B1 is the first fixture. **May split in two** (metrics + close; defects + export + workspace) — decided when it is written | B2 |
 | B4 | not written | `init`, `upgrade`, `doctor`; extracting the embedded plugin; `--plugin-dir` handshake; skill prose for `/vloop:plan`, `/vloop:work`, `/vloop:review` (as `[hygiene]` edits, not loop tasks) — the planner assigns `area` and `kind`, the work skill can raise `gate_dispute`; the skills write journals, notes and verdict reasons in the configured `language` | B3 |
-| B5 | not written | `run` — the driver port, passing the shell loop's scenarios; `run`'s exit codes 0–7; passes model and effort per session to `claude`. Records what the shell loop does not: gate duration, wall time, configured effort; writes the metrics snapshot after every iteration; blocks a task on `gate_dispute`; classifies flakes; prints the summary on completion | B4 |
+| B5 | not written | `run` — the driver port, passing the shell loop's scenarios; `run`'s exit codes 0–7; passes model and effort per session to `claude`. Records what the shell loop does not: gate duration, wall time, configured effort; writes the metrics snapshot after every iteration; blocks a task on `gate_dispute`; classifies flakes; prints the summary on completion. **Work starts on a work branch**: on the default branch, `run` creates a branch named for the run id and switches to it before planning, so the plan commit never lands on the default branch | B4 |
 
 After B5: v1.0 is `vloop run` building its own next patch release (design
 session, section 6). **`.loop/` is kept, not deleted**: its state, journals and
@@ -54,6 +54,15 @@ evidence, not the driver.
   way a document binds a task; there is no knowledge-roots file and no
   preflight scan.
 - **vloop ships no gates.** It runs the verify commands a plan names.
+- **A run never commits to the default branch.** Planning and every iteration
+  happen on a work branch named for the run id; the branch is kept after the
+  squash-merge as the record of the run. `vloop run` enforces it (B5); until
+  then the operator creates the branch before running `.loop/run.sh`.
+- **Gates run in the OS's shell, not only POSIX.** A `shell` setting (`sh`,
+  `bash`, `pwsh`, `powershell`, `cmd`; default `sh` on macOS and Linux, `pwsh`
+  on Windows) says which shell gates are written for. The plan records it, the
+  planner writes every `verify` in that shell's syntax, and gates run in the
+  plan's shell. From B2.
 - **Cross-OS by cross-compiling.** Every Go task's gate builds for `windows`
   and `linux` as well as the host.
 - **Metrics are vloop's, not the shell loop's.** `.loop/` gets none of this; vloop
@@ -61,8 +70,9 @@ evidence, not the driver.
 
 ## Metrics and defects
 
-Decided with the operator on 2026-09-29. B3 and B5 build this; B2 defines its
-schemas. Sample outputs, mostly from B1's real telemetry:
+Decided with the operator on 2026-09-29. B2 defines the telemetry schemas and
+records gate history; B3 and B5 build the rest. Sample outputs, mostly from
+B1's real telemetry:
 `docs/additional-context-files/20260929-2143-vloop-metrics-sample-outputs.md`.
 
 **Always calculated and saved.** The driver recomputes after every iteration and
@@ -74,12 +84,23 @@ folder: one brief can span several runs (a refused resume, a halt and resume).
 
 **Per brief and per task**
 
-- **Size.** Lines are classified by path globs in config — `code`, `test`,
-  `docs`, `other`, `excluded` — with per-language defaults `init` seeds (Go:
-  `**/*_test.go`, `**/testdata/**`; .NET: `**/*.Tests/**`, `**/*Tests.cs`;
-  excluded: lockfiles, `go.sum`, generated files, `.vloop/**`, `.loop/**`).
-  Extension alone is not enough: embedded templates are `.md` files that are
-  product. Count added non-blank lines; report deletions separately.
+- **Size.** Lines are classified by path globs — `code`, `test`, `docs`,
+  `other`, `excluded`. **Stack presets** supply the globs: `metrics.stacks` in
+  config lists the ones a repo uses (e.g. `["csharp", "react"]`), their globs
+  merge, and the repo's own globs in config are layered on top and win.
+  `vloop metrics stacks` lists the presets and shows each one's globs. Presets:
+  **Go** (`**/*_test.go`, `**/testdata/**`; excluded `go.sum`), **TypeScript**
+  and **JavaScript/Node** (`**/*.test.ts`, `**/*.spec.ts`, `**/__tests__/**`,
+  the `.js` equivalents; excluded lockfiles, `dist/**`, `node_modules/**`),
+  **React** (adds `.tsx`/`.jsx` tests and `**/*.stories.*`), **C#/.NET**
+  (`**/*.Tests/**`, `**/*Tests.cs`; excluded `bin/**`, `obj/**`,
+  `*.Designer.cs`), **Python** (`**/test_*.py`, `**/*_test.py`, `**/tests/**`;
+  excluded `__pycache__/**`, `*.lock`), **Java** and **Kotlin**
+  (`src/test/**`; excluded `build/**`, `target/**`), **Rust** (`tests/**`,
+  `benches/**`; excluded `target/**`, `Cargo.lock`). Every preset also excludes
+  `.vloop/**` and `.loop/**`. Extension alone is not enough — embedded templates
+  are `.md` files that are product — which is why the repo's own globs win.
+  Count added non-blank lines; report deletions separately.
   - **Delivered**: the diff from the plan's base to the close, per category.
   - **Churn**: every iteration's diff summed, rejected attempts included.
     **Rework** = churn / delivered.
@@ -114,8 +135,9 @@ Caught by: `gate`, `review`, `operator` (before merge), `user` (after release).
   driver against the task and attempt. A gate failure starts as `origin: work`.
 - **A gate can be the defect.** The work session may report `gate_dispute` with
   evidence; the task blocks instead of burning attempts, and the operator rules
-  with `vloop task gate <id>`. Amending the gate reclassifies that failure, and
-  every later one on the task, as `origin: plan`.
+  with `vloop task verify <id>` (replacing the gate, with a reason). Amending
+  the gate reclassifies that failure, and every later one on the task, as
+  `origin: plan`.
 - A gate that passes on retry with no code change is classified `env` by the
   driver.
 - A gate that passes while review or the operator finds the behaviour wrong is

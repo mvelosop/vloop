@@ -1,0 +1,8 @@
+{
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Added config keys shell (sh|bash|pwsh|powershell|cmd, OS default, VLOOP_SHELL) and areas (list, TOML array, validated entries), plus `vloop task list` and `vloop task show <id>` with model/effort resolution (text and --json).",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/cli/config.go", "internal/cli/config_test.go", "cmd/vloop/e2e_test.go", "internal/cli/task.go", "internal/cli/task_list_test.go", "internal/cli/root.go"],
+  "verified": "The task's verify command exited 0 (unit tests ok for config, cli, cmd/vloop; all scratch-repo checks passed).",
+  "notes": "Beyond the pinned `config list` expectations, I also had to extend the row table in internal/config TestDefaultsEveryRow (it asserts len(vals)==len(want), which cannot hold once Keys grows) and add SHELL/AREAS to scratchRepo's env scrub in internal/cli/config_test.go; no assertion was loosened. TestReadmeMatchesCommandTree fails now (README lacks status, schema, task, shell, areas) and the gate skips it; a later task must document them. config.Key gained a List flag and Value gained List []string (the areas entries); InvalidValueError keeps its shape and special-cases list keys in Error(). task show --json marshals the plan's task then adds `resolved`, so keys come out alphabetical. Resolution reuses config.Get for env/file/default, so a bad config file surfaces as a config problem (exit 1)."
+}

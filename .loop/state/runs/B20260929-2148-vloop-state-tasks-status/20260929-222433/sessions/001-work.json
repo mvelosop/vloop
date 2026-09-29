@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 16399,
+  "stop_reason": "end_turn",
+  "session_id": "a75fbd29-0df6-4e64-8df8-10bb8d72dbca",
+  "total_cost_usd": 0.1641122,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 31710,
+    "cache_read_input_tokens": 117131,
+    "output_tokens": 1383,
+    "output_tokens_details": {
+      "thinking_tokens": 150
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 31710,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 271,
+        "cache_read_input_tokens": 43046,
+        "cache_creation_input_tokens": 680,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 680
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1383,
+      "cacheReadInputTokens": 117131,
+      "cacheCreationInputTokens": 31710,
+      "webSearchRequests": 0,
+      "costUSD": 0.1641122,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 150,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is done, and its verify command now exits 0. I ran it in the foreground, and the Go tests for the root package, `internal/schema` and `internal/cli` all passed.\n\n- **What changed:** nothing in the code this attempt. The implementation was already in the branch from earlier attempts.\n- **Why the earlier blocks cleared:** the operator amended the gate. The old line used an empty alternative in a regex, which macOS grep rejects. It now uses `'/?'`.\n- **What T1 contains:** the five embedded schemas in `schemas/`, the validator in `internal/schema`, and `vloop schema list|show|validate`, with fixtures and tests.\n- **Proposal:** I wrote `.loop/tmp/proposal.json` with outcome `done`. I did not touch `state.json` or commit.",
+  "ttft_ms": 2044,
+  "type": "result",
+  "duration_ms": 19953,
+  "uuid": "aa733e37-1695-4e73-993c-51a7e03d554d",
+  "ttft_stream_ms": 1648,
+  "time_to_request_ms": 363,
+  "first_content_frame_ms": 1649,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 3
+}

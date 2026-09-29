@@ -1,0 +1,8 @@
+{
+  "task": "T9",
+  "outcome": "done",
+  "summary": "Added cmd/vloop/b2_e2e_test.go: TestWorkedExampleB2Commands and TestWorkedExampleB2PlantedFailures build on B1's harness and replay the brief's worked example and all six planted failures against the built binary. Also fixed a stale expectation in B1's e2e test that T7 had broken.",
+  "files": ["cmd/vloop/b2_e2e_test.go", "cmd/vloop/e2e_test.go"],
+  "verified": "The task's verify command exits 0 (gofmt, vet, tidy, linux/windows/host builds, go test ./..., worked-example replay).",
+  "notes": "T7 changed the cycle text to start at the smallest brief name, which broke the existing TestWorkedExamplePlantedFailures/cycle in cmd/vloop/e2e_test.go (it expected a -> b -> a; the correct text is b -> a -> b). I updated that one expected string, because go test ./... could not pass otherwise. Gate durations are matched by regex. The pwsh case passes a stripped PATH (a temp dir, and Path= for Windows). Tests skip when sh is absent."
+}

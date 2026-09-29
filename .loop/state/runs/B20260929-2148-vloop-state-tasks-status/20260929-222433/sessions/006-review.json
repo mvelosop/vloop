@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 24635,
+  "stop_reason": "end_turn",
+  "session_id": "e64f80d9-da08-468a-b972-72c6a704771a",
+  "total_cost_usd": 0.1540726,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 24912,
+    "cache_read_input_tokens": 162453,
+    "output_tokens": 2191,
+    "output_tokens_details": {
+      "thinking_tokens": 162
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 24912,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 237,
+        "cache_read_input_tokens": 35637,
+        "cache_creation_input_tokens": 1291,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1291
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 2191,
+      "cacheReadInputTokens": 162453,
+      "cacheCreationInputTokens": 24912,
+      "webSearchRequests": 0,
+      "costUSD": 0.1540726,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 162,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 6,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T3 passes. I wrote the verdict to `.loop/tmp/verdict.json`.\n\nI checked all 11 acceptance criteria against the diff and the committed tests. B1's tests changed only by extending the `config list` expectations, adding a helper and clearing `VLOOP_SHELL` and `VLOOP_AREAS` in the scratch env. No test or product code touches `.loop/`, `.claude/` or the home directory.\n\n`TestReadmeMatchesCommandTree` currently fails because the README doesn't document `schema`, `status`, `task`, `shell` or `areas`. The gate skips that test, so this doesn't block T3. I noted in the verdict that a later task needs to cover the README.",
+  "ttft_ms": 4025,
+  "type": "result",
+  "duration_ms": 27091,
+  "uuid": "3053820a-c6ea-4d4e-91c5-b56f54727319",
+  "ttft_stream_ms": 2461,
+  "time_to_request_ms": 356,
+  "first_content_frame_ms": 2462,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 5
+}

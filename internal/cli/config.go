@@ -41,6 +41,9 @@ func configErr(g *Globals, out io.Writer, err error) error {
 }
 
 func jsonValue(v config.Value) any {
+	if k, err := config.Lookup(v.Key); err == nil && k.List {
+		return v.List
+	}
 	if !v.Set {
 		return nil
 	}

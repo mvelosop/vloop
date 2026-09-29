@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -28,25 +30,39 @@ type Key struct {
 	Name    string
 	Default string // empty means unset
 	Valid   []string
+	List    bool // a list of strings, stored as a TOML array and given as comma-joined text
+}
+
+var areaName = regexp.MustCompile(`^[a-z0-9-]+$`)
+
+func defaultShell() string {
+	if runtime.GOOS == "windows" {
+		return "pwsh"
+	}
+	return "sh"
 }
 
 // Keys lists every key, in display order.
 var Keys = []Key{
-	{"language", "en", []string{"en", "es"}},
-	{"model.plan", "opus", nil},
-	{"model.work", "sonnet", nil},
-	{"model.review", "sonnet", nil},
-	{"effort.plan", "", efforts},
-	{"effort.work", "", efforts},
-	{"effort.review", "", efforts},
+	{Name: "language", Default: "en", Valid: []string{"en", "es"}},
+	{Name: "model.plan", Default: "opus"},
+	{Name: "model.work", Default: "sonnet"},
+	{Name: "model.review", Default: "sonnet"},
+	{Name: "effort.plan", Valid: efforts},
+	{Name: "effort.work", Valid: efforts},
+	{Name: "effort.review", Valid: efforts},
+	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
+	{Name: "areas", List: true},
 }
 
-// Value is a resolved key. Set is false for an unset effort.
+// Value is a resolved key. Set is false for an unset effort. For a list key
+// Value is the comma-joined text and List the entries (never nil).
 type Value struct {
 	Key    string
 	Value  string
 	Set    bool
 	Source string
+	List   []string
 }
 
 // UnknownKeyError and InvalidValueError are usage errors (exit 2).
@@ -61,7 +77,9 @@ type InvalidValueError struct {
 
 func (e *InvalidValueError) Error() string {
 	want := "a non-empty string"
-	if e.Valid != nil {
+	if k, err := Lookup(e.Key); err == nil && k.List {
+		want = "a comma-separated list of names made of lower-case letters, digits and hyphens"
+	} else if e.Valid != nil {
 		want = "one of " + strings.Join(e.Valid, ", ")
 	}
 	return fmt.Sprintf("invalid value %q for %s: want %s", e.Value, e.Key, want)
@@ -96,6 +114,14 @@ func EnvVar(name string) string {
 func (k Key) Validate(value string) error {
 	if value == "" {
 		return &InvalidValueError{k.Name, value, k.Valid}
+	}
+	if k.List {
+		for _, a := range strings.Split(value, ",") {
+			if !areaName.MatchString(a) {
+				return &InvalidValueError{k.Name, value, nil}
+			}
+		}
+		return nil
 	}
 	if k.Valid == nil {
 		return nil
@@ -141,7 +167,43 @@ func fileValue(m map[string]any, name string) (any, bool) {
 	return cur, true
 }
 
+func resolveList(k Key, file map[string]any) (Value, error) {
+	v := Value{Key: k.Name, Source: SourceDefault, List: []string{}}
+	set := func(text, source string) { v = Value{k.Name, text, true, source, strings.Split(text, ",")} }
+	if fv, ok := fileValue(file, k.Name); ok {
+		arr, isArr := fv.([]any)
+		if !isArr {
+			return v, &SourceError{FilePath, fmt.Errorf("%s must be an array of strings", k.Name)}
+		}
+		var names []string
+		for _, e := range arr {
+			s, isStr := e.(string)
+			if !isStr {
+				return v, &SourceError{FilePath, fmt.Errorf("%s must be an array of strings", k.Name)}
+			}
+			names = append(names, s)
+		}
+		if len(names) > 0 {
+			text := strings.Join(names, ",")
+			if err := k.Validate(text); err != nil {
+				return v, &SourceError{FilePath, err}
+			}
+			set(text, SourceFile)
+		}
+	}
+	if ev := os.Getenv(EnvVar(k.Name)); ev != "" {
+		if err := k.Validate(ev); err != nil {
+			return v, &SourceError{EnvVar(k.Name), err}
+		}
+		set(ev, SourceEnv)
+	}
+	return v, nil
+}
+
 func resolve(k Key, file map[string]any) (Value, error) {
+	if k.List {
+		return resolveList(k, file)
+	}
 	v := Value{Key: k.Name, Value: k.Default, Set: k.Default != "", Source: SourceDefault}
 	if fv, ok := fileValue(file, k.Name); ok {
 		s, isStr := fv.(string)
@@ -151,13 +213,13 @@ func resolve(k Key, file map[string]any) (Value, error) {
 		if err := k.Validate(s); err != nil {
 			return v, &SourceError{FilePath, err}
 		}
-		v = Value{k.Name, s, true, SourceFile}
+		v = Value{Key: k.Name, Value: s, Set: true, Source: SourceFile}
 	}
 	if ev := os.Getenv(EnvVar(k.Name)); ev != "" {
 		if err := k.Validate(ev); err != nil {
 			return v, &SourceError{EnvVar(k.Name), err}
 		}
-		v = Value{k.Name, ev, true, SourceEnv}
+		v = Value{Key: k.Name, Value: ev, Set: true, Source: SourceEnv}
 	}
 	return v, nil
 }
@@ -210,8 +272,21 @@ func Set(root, name, value string) error {
 		return err
 	}
 	cur, present := fileValue(file, name)
-	if value == "" && !present || value != "" && present && cur == value {
+	if value == "" && !present {
 		return nil
+	}
+	if value != "" && present {
+		if arr, ok := cur.([]any); k.List && ok {
+			var names []string
+			for _, e := range arr {
+				names = append(names, fmt.Sprint(e))
+			}
+			if strings.Join(names, ",") == value {
+				return nil
+			}
+		} else if cur == value {
+			return nil
+		}
 	}
 	table, leaf, _ := strings.Cut(name, ".")
 	if leaf == "" {
@@ -232,7 +307,11 @@ func Set(root, name, value string) error {
 			delete(file, table)
 		}
 	} else {
-		dst[leaf] = value
+		if k.List {
+			dst[leaf] = strings.Split(value, ",")
+		} else {
+			dst[leaf] = value
+		}
 	}
 	var buf bytes.Buffer
 	if err := toml.NewEncoder(&buf).Encode(file); err != nil {

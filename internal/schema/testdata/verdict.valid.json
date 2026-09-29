@@ -1,0 +1,1 @@
+{"schema":"verdict/v1","task":"T1","verdict":"PASS","criteria":[{"criterion":"c","met":true,"evidence":"e"}],"findings":[{"summary":"s","kind":"bug"}],"notes":"none"}

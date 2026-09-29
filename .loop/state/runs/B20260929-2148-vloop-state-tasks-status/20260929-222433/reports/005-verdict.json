@@ -1,0 +1,19 @@
+{
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "config.Keys gains shell then areas ... VLOOP_SHELL overrides it.", "met": true, "evidence": "internal/config/config.go Keys, defaultShell(); invalid-value message lists sh, bash, pwsh, powershell, cmd; TestConfigAreasAndShell"},
+    {"criterion": "areas defaults to an empty list; config set/get/list/--json; validation; '' removes", "met": true, "evidence": "resolveList, Key.Validate List branch, Set stores array; jsonValue returns [] ; tests in cli/config_test.go and TestAreasKey"},
+    {"criterion": "The only changes to B1's tests are the pinned config list expectations", "met": true, "evidence": "e2e_test.go and config_test.go diffs only extend list/json expectations, add a helper and clear SHELL/AREAS env in scratchRepo; no assertion loosened"},
+    {"criterion": "task list prints exactly status task lines; --json same array", "met": true, "evidence": "task.go reuses taskLines/writeTaskLines; TestTaskListText, TestTaskListJSONMatchesStatus"},
+    {"criterion": "task show prints whole task and two resolution lines", "met": true, "evidence": "showTask text form; TestTaskShowTextSources"},
+    {"criterion": "Resolution order task, env, file, default", "met": true, "evidence": "resolveSession: task value first, then config.Get (env over file over default); TestTaskShowEnvAndFileAndTask"},
+    {"criterion": "task show --json prints task plus resolved, effort null when unset", "met": true, "evidence": "showTask JSON merges marshalled task with resolved; Effort *string; TestTaskShowJSON"},
+    {"criterion": "Unknown id is 'vloop: no task <id>' exit 1; missing plan is T2 error", "met": true, "evidence": "jsonProblem(Problem) in show; loadPlan reused; TestTaskShowUnknownAndNoPlan"},
+    {"criterion": "Committed tests for Areas, TestTaskList*, TestTaskShow*", "met": true, "evidence": "TestAreasKey in internal/config; TestTaskList*/TestTaskShow* in internal/cli/task_list_test.go"},
+    {"criterion": "No product code or test reads or writes this repo's .loop/ or .claude/ or home", "met": true, "evidence": "grep of task.go and task_list_test.go finds no such references; scratch repos"},
+    {"criterion": "gofmt, vet, tidy, cross builds", "met": true, "evidence": "driver gate already ran these; no new dependencies in diff"}
+  ],
+  "findings": [],
+  "notes": "TestReadmeMatchesCommandTree fails (README lacks schema/status/task/shell/areas); the gate skips it, so it looks deliberate for a later docs task. Make sure a later task covers the README."
+}

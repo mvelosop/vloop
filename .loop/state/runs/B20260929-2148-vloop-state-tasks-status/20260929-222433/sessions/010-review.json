@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 19037,
+  "stop_reason": "end_turn",
+  "session_id": "5cba6ecb-a6ad-4cc4-be48-7e7eef3b4f76",
+  "total_cost_usd": 0.1691224,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 30751,
+    "cache_read_input_tokens": 129392,
+    "output_tokens": 2022,
+    "output_tokens_details": {
+      "thinking_tokens": 131
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 30751,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 233,
+        "cache_read_input_tokens": 41494,
+        "cache_creation_input_tokens": 1273,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1273
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 2022,
+      "cacheReadInputTokens": 129392,
+      "cacheCreationInputTokens": 30751,
+      "webSearchRequests": 0,
+      "costUSD": 0.1691224,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 131,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T5. I wrote the verdict to `.loop/tmp/verdict.json`.\n\nAll nine acceptance criteria are met, and the committed tests cover each command, each refusal and the file being left untouched. I didn't re-run the verify command. I read the diff and the tests, and ran `go test ./internal/...`.\n\n`TestReadmeMatchesCommandTree` still fails because the README doesn't list the new commands. That failure was already known, and the verify command skips it. A later docs task needs to cover it.\n\n`validate.go` and `task.go` changed outside the task's file list. Both are needed: the first adds `CheckBytes`, which checks a result before it is written, and the second registers the commands.",
+  "ttft_ms": 2586,
+  "type": "result",
+  "duration_ms": 21536,
+  "uuid": "dc7bd579-a0c2-4429-9da1-69c2754eb640",
+  "ttft_stream_ms": 1358,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1358,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 7
+}

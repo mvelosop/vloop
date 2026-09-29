@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 86565,
+  "stop_reason": "end_turn",
+  "session_id": "4ddb148d-ea5a-4553-a7fc-5d2d485db4ff",
+  "total_cost_usd": 0.3989574,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 45188,
+    "cache_read_input_tokens": 399027,
+    "output_tokens": 13836,
+    "output_tokens_details": {
+      "thinking_tokens": 1341
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 45188,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 555,
+        "cache_read_input_tokens": 56605,
+        "cache_creation_input_tokens": 599,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 599
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 13836,
+      "cacheReadInputTokens": 399027,
+      "cacheCreationInputTokens": 45188,
+      "webSearchRequests": 0,
+      "costUSD": 0.3989574,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1341,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 10,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T2 is done: the plan layer and `vloop status` now exist. The verify command, run in the foreground, exited 0, and I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **`internal/state`**\n  - **Load and validate:** `Load` reads `.vloop/state/state.json` without validating, so a plan that parses but fails its schema still reads. `Validate` checks it against the embedded state/v1 schema.\n  - **Save:** `Save` writes 2-space JSON in schema key order, with `<`, `>` and `&` literal and a trailing newline. It writes a temp file beside the plan, renames it over it, and sets `updated` in UTC.\n  - **Markdown:** `Markdown` renders the same content as `render-plan.sh`.\n- **`vloop status`** (`internal/cli/status.go`): text, `--json` and `--markdown`, working from a subdirectory. A missing plan prints `vloop: no plan: .vloop/state/state.json` and exits 1, and under `--json` stdout still carries a JSON document.\n- **Tests:** a byte-for-byte round-trip, a save that leaves no temp file, and `TestStatus*` covering text, `--json`, `--markdown` and the missing plan.\n\nI also made `--json` with `--markdown` a usage error (exit 2), which the brief doesn't spell out. I didn't touch the README, so `TestReadmeMatchesCommandTree` (skipped in this gate) will need the new command documented in the later README task.\n\nBecause the structs follow the schema, saving drops any unknown keys; the brief leaves that open. The full account is in the proposal's `notes`.",
+  "ttft_ms": 2413,
+  "type": "result",
+  "duration_ms": 93377,
+  "uuid": "c0d9db85-b015-4850-b67b-d89761eb77c9",
+  "ttft_stream_ms": 1082,
+  "time_to_request_ms": 348,
+  "first_content_frame_ms": 1082,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 4
+}

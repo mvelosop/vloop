@@ -1,0 +1,8 @@
+{
+  "task": "T1",
+  "outcome": "blocked",
+  "summary": "Implemented everything: five schemas in schemas/, embedded via embed.go, internal/schema (jsonschema/v6, embedded FS only, no loader), `vloop schema list|show|validate`, fixtures and tests. gofmt, vet, tidy, builds and unit tests pass. The verify command fails at one line that is a gate defect on this host.",
+  "files": ["go.mod", "go.sum", "embed.go", "embed_test.go", "schemas/state.v1.json", "schemas/proposal.v1.json", "schemas/verdict.v1.json", "schemas/session.v1.json", "schemas/iteration.v1.json", "internal/schema/schema.go", "internal/schema/schema_test.go", "internal/schema/testdata/", "internal/cli/schema.go", "internal/cli/schema_test.go", "internal/cli/root.go"],
+  "verified": "verify exits 1: 'GATE FAIL: state/v1 with del(.base): no stdout line matching /^b\\.json: (|/): .+/ -- got: b.json: : missing property base'. With only that one assertion's pointer regex relaxed in a temp copy of the gate, the whole gate exits 0.",
+  "notes": "Gate defect: badp 'del(.base)' '(|/)' builds the ERE ^b\\.json: (|/): .+ which contains an empty alternative. macOS/BSD grep -E rejects it ('empty (sub)expression'), so it can never match on this host; GNU grep accepts it. The output is right (missing top-level property reports pointer \"\", line 'b.json: : missing property base'). Fix in the gate: use '' or '(/.*)?' style pattern without an empty alternative, e.g. lre '^b\\.json: : .+' for the root pointer. Nothing in the implementation needs to change. Also: session/v1 uses if/then/else on phase for the task rule; state.json base is a plain string. golang.org/x/text is now a direct require (needed for the validator's message printer); it was already a transitive dependency of jsonschema/v6."
+}

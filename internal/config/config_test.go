@@ -44,7 +44,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
 		{"model.review", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false},
+		{"effort.review", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -204,5 +204,72 @@ func TestRejectedSetLeavesFileUntouched(t *testing.T) {
 	_ = Set(root, "colour", "red")
 	if got := readCfg(t, root); got != "language = \"es\"\n" {
 		t.Errorf("file changed: %q", got)
+	}
+}
+
+func TestShellKey(t *testing.T) {
+	root := scratch(t)
+	if v, _ := Get(root, "shell"); v.Value != defaultShell() || v.Source != SourceDefault {
+		t.Errorf("default: %+v", v)
+	}
+	for _, s := range []string{"sh", "bash", "pwsh", "powershell", "cmd"} {
+		if err := Set(root, "shell", s); err != nil {
+			t.Errorf("shell %s: %v", s, err)
+		}
+	}
+	err := Set(root, "shell", "zsh")
+	if err == nil || err.Error() != `invalid value "zsh" for shell: want one of sh, bash, pwsh, powershell, cmd` {
+		t.Errorf("zsh: %v", err)
+	}
+	t.Setenv("VLOOP_SHELL", "cmd")
+	if v, _ := Get(root, "shell"); v.Value != "cmd" || v.Source != SourceEnv {
+		t.Errorf("env: %+v", v)
+	}
+}
+
+func TestAreasKey(t *testing.T) {
+	root := scratch(t)
+	v, err := Get(root, "areas")
+	if err != nil || v.Value != "" || v.Source != SourceDefault || v.List == nil || len(v.List) != 0 {
+		t.Fatalf("default: %+v %v", v, err)
+	}
+	if err := Set(root, "areas", "cli,brief,config"); err != nil {
+		t.Fatal(err)
+	}
+	if got := readCfg(t, root); got != "areas = [\"cli\", \"brief\", \"config\"]\n" {
+		t.Errorf("file: %q", got)
+	}
+	v, _ = Get(root, "areas")
+	if v.Value != "cli,brief,config" || v.Source != SourceFile || len(v.List) != 3 || v.List[1] != "brief" {
+		t.Errorf("file value: %+v", v)
+	}
+	before := readCfg(t, root)
+	for _, bad := range []string{"cli,Bad_Area", "cli,", ",cli", "a b", "Cli"} {
+		var iv *InvalidValueError
+		if err := Set(root, "areas", bad); !errors.As(err, &iv) {
+			t.Errorf("%q accepted: %v", bad, err)
+		}
+	}
+	if readCfg(t, root) != before {
+		t.Error("refused value changed the file")
+	}
+	if err := Set(root, "areas", "cli,brief,config"); err != nil || readCfg(t, root) != before {
+		t.Errorf("idempotent set: %v", err)
+	}
+	t.Setenv("VLOOP_AREAS", "x,y")
+	if v, _ := Get(root, "areas"); v.Source != SourceEnv || len(v.List) != 2 {
+		t.Errorf("env: %+v", v)
+	}
+	t.Setenv("VLOOP_AREAS", "")
+	if err := Set(root, "areas", ""); err != nil {
+		t.Fatal(err)
+	}
+	if v, _ := Get(root, "areas"); v.Source != SourceDefault || len(v.List) != 0 {
+		t.Errorf("removed: %+v", v)
+	}
+	writeCfg(t, root, "areas = \"cli\"\n")
+	var se *SourceError
+	if _, err := Get(root, "areas"); !errors.As(err, &se) {
+		t.Errorf("non-array: %v", err)
 	}
 }

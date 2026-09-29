@@ -1,0 +1,8 @@
+{
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Added `vloop task validate`: state.Check runs the state/v1 schema plus duplicate-id, dangling-dependency, cycle, reference, area and gate_history rules; the CLI prints ✗/! lines then `plan ok` or `<n> problem(s)`, with --json.",
+  "files": ["internal/state/validate.go", "internal/state/validate_test.go", "internal/state/testdata/validate/", "internal/cli/task_validate.go", "internal/cli/task_validate_test.go", "internal/cli/task.go"],
+  "verified": "Ran the task's verify command in the foreground; it exited 0.",
+  "notes": "Cycle check ignores repeat occurrences of a duplicated id (first task speaks for it) so a duplicate does not also read as a bogus self-cycle. Problems exit 1 via Problem(errors.New(\"\")): Execute prints nothing for an empty message. --json shape is {ok, problems, warnings} with the lines lacking the ✗/! prefix. Reference reasons are whitespace-trimmed before the empty check. README still does not cover task validate (later task)."
+}

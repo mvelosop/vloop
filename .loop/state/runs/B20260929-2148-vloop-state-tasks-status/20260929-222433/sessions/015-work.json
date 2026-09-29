@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 30451,
+  "stop_reason": "end_turn",
+  "session_id": "1a753062-3b6e-42e6-9dc6-6a000209972a",
+  "total_cost_usd": 0.1641324,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 22003,
+    "cache_read_input_tokens": 217192,
+    "output_tokens": 3265,
+    "output_tokens_details": {
+      "thinking_tokens": 169
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 22003,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 349,
+        "cache_read_input_tokens": 33648,
+        "cache_creation_input_tokens": 371,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 371
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 3265,
+      "cacheReadInputTokens": 217192,
+      "cacheCreationInputTokens": 22003,
+      "webSearchRequests": 0,
+      "costUSD": 0.1641324,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 169,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T8 is finished. `README.md` now covers everything the README test was missing, and the task's verify command exits 0.\n\n- **Commands:** `vloop schema list|show|validate`, `vloop status` with `--markdown`, and every `vloop task` subcommand, with `--reason` on `task verify`.\n- **Config keys:** `shell` and `areas`, with their defaults, accepted values and `VLOOP_SHELL` / `VLOOP_AREAS`.\n- **Plan file:** `.vloop/state/state.json`.\n- **Test and size:** `internal/cli/readme_test.go` is untouched and `TestReadmeMatchesCommandTree` passes. The README is 155 lines, under the 200 cap.\n\nI also reworded the intro and the Files paragraph. They said only `vloop config set` and `vloop brief new` write anything, which is no longer true now that `task reset`, `note`, `drop`, `set` and `verify` write to the plan.\n\nNo code changed. The proposal is in `.loop/tmp/proposal.json`.",
+  "ttft_ms": 2158,
+  "type": "result",
+  "duration_ms": 37031,
+  "uuid": "f57ea339-5ff5-4155-bd92-07309268a6be",
+  "ttft_stream_ms": 1067,
+  "time_to_request_ms": 360,
+  "first_content_frame_ms": 1068,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 10
+}

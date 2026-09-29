@@ -1,0 +1,8 @@
+{
+  "task": "T1",
+  "outcome": "blocked",
+  "summary": "Implementation from the prior attempt is intact in the working tree (five schemas, embed.go, internal/schema, `vloop schema list|show|validate`, tests). gofmt, vet, tidy, builds and unit tests pass; the verify command still fails on one gate line.",
+  "files": ["go.mod", "go.sum", "embed.go", "embed_test.go", "schemas/state.v1.json", "schemas/proposal.v1.json", "schemas/verdict.v1.json", "schemas/session.v1.json", "schemas/iteration.v1.json", "internal/schema/schema.go", "internal/schema/schema_test.go", "internal/schema/testdata/", "internal/cli/schema.go", "internal/cli/schema_test.go", "internal/cli/root.go"],
+  "verified": "Ran the verify command: fails with `grep: empty (sub)expression` then `GATE FAIL: state/v1 with del(.base): no stdout line matching /^b\\.json: (|/): .+/ -- got: b.json: : missing property 'base'`.",
+  "notes": "Gate defect, unchanged since the last attempt and not fixable from a work session: badp 'del(.base)' '(|/)' builds an ERE with an empty alternative, which BSD/macOS grep -E rejects (GNU grep accepts it). The implementation's output `b.json: : missing property 'base'` is correct per the brief (root pointer is \"\"). Operator fix: replace that badp call with lre-style check `bad state/v1 'del(.base)' st.json ''` (pattern `^b\\.json: : .+`), or use `(/.*)?`-free pattern without an empty alternative. No implementation change needed; once the gate is amended, re-run T1 and it should pass."
+}

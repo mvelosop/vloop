@@ -1,0 +1,5 @@
+ok  	github.com/mvelosop/vloop	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	(cached)
+grep: empty (sub)expression
+GATE FAIL: state/v1 with del(.base): no stdout line matching /^b\.json: (|/): .+/ -- got: b.json: : missing property 'base'

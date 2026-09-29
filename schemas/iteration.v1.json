@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "iteration/v1",
+  "description": "One iteration's record",
+  "type": "object",
+  "required": ["schema", "run_id", "iteration", "task", "attempt", "outcome", "gate", "started", "ended"],
+  "properties": {
+    "schema": { "const": "iteration/v1" },
+    "run_id": { "type": "string" },
+    "iteration": { "type": "integer" },
+    "task": { "type": "string" },
+    "attempt": { "type": "integer" },
+    "outcome": { "enum": ["done", "gate_failed", "rejected", "blocked", "session_error"] },
+    "gate": {
+      "type": ["object", "null"],
+      "required": ["exit", "duration_ms"],
+      "properties": {
+        "exit": { "type": "integer" },
+        "duration_ms": { "type": "integer" }
+      }
+    },
+    "started": { "type": "string", "format": "date-time" },
+    "ended": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "cmd/vloop/b2_e2e_test.go has a TestWorkedExampleB2* test that builds the binary, creates a scratch git repo with the worked example's config and fixture plan, and plays every command and every planted failure, asserting stdout, stderr and exit code line for line.", "met": true, "evidence": "TestWorkedExampleB2Commands and TestWorkedExampleB2PlantedFailures reuse newScratch (B1 harness, binary built in TestMain); config has effort.review=high and areas cli/config/docs; every command plus the six planted failures are asserted via expect() on exit code, stdout and stderr."},
+    {"criterion": "Durations are matched by pattern and threaded from what the command printed, never hardcoded; the pwsh-not-on-PATH case uses a stripped PATH.", "met": true, "evidence": "gate lines matched by regex `\\([^)]+\\)`; pwsh case passes PATH= and Path= set to empty temp dirs."},
+    {"criterion": "`go test ./...`, `go vet ./...`, `gofmt -l .` (empty), `go mod tidy -diff` (empty) and the linux, windows and host builds all pass.", "met": true, "evidence": "The driver's verify gate covers these and exits 0 (T9.log). I did not re-run it."},
+    {"criterion": "Nothing in this run adds metrics, defect records, `brief close`, a run lock, a driver, a `claude` invocation, or reads the shell loop's `.loop/state/`.", "met": true, "evidence": "Diff outside .loop is one new test file and a one-line edit to e2e_test.go; nothing else."},
+    {"criterion": "No product code or test reads or writes this repo's `.loop/` or `.claude/`, or the home directory; tests work in `t.TempDir()` scratch repos.", "met": true, "evidence": "The new test only uses scratch dirs from newScratch; no /Users paths in cmd/."}
+  ],
+  "findings": [],
+  "notes": "The edit to B1's e2e_test.go (cycle expectation changed from a->b->a to b->a->b) is a justified consequence of T7 starting the cycle at the smallest brief name (nameB=0800 < nameA=0900). It is one line and needed for go test ./... to pass, so it is not scope creep. Gap in plan: T9's files list did not name e2e_test.go."
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "state/v1",
+  "run_id": "B20260101-0900-a",
+  "brief": "docs/briefs/b.loop-brief.md",
+  "base": "0000000000000000000000000000000000000000",
+  "branch": "B20260101-0900-a",
+  "status": "running",
+  "iteration": 1,
+  "created": "2026-01-01T09:00:00Z",
+  "updated": "2026-01-01T09:00:00Z",
+  "shell": "sh",
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Task 1",
+      "goal": "g",
+      "kind": "feature",
+      "area": "cli",
+      "files": [
+        "f1.txt"
+      ],
+      "references": [],
+      "depends_on": [],
+      "acceptance": [
+        "ok"
+      ],
+      "verify": "true",
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T2",
+      "title": "Task 2",
+      "goal": "g",
+      "kind": "feature",
+      "area": "config",
+      "files": [
+        "f2.txt"
+      ],
+      "references": [
+        {
+          "path": "docs/x.md",
+          "why": "the contract"
+        }
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "acceptance": [
+        "ok"
+      ],
+      "verify": "true",
+      "status": "pending",
+      "attempts": 0,
+      "notes": "",
+      "effort": {
+        "work": "turbo"
+      }
+    },
+    {
+      "id": "T3",
+      "title": "Task 3",
+      "goal": "g",
+      "kind": "feature",
+      "area": "docs",
+      "files": [
+        "f3.txt"
+      ],
+      "references": [
+        {
+          "path": "docs/",
+          "why": "the folder binds"
+        }
+      ],
+      "depends_on": [
+        "T2"
+      ],
+      "acceptance": [
+        "ok"
+      ],
+      "verify": "true",
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    }
+  ]
+}

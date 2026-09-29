@@ -3,13 +3,14 @@ package cli
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
 
 func scratchRepo(t *testing.T) string {
 	t.Helper()
-	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW"} {
+	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW", "SHELL", "AREAS"} {
 		t.Setenv("VLOOP_"+v, "")
 	}
 	d := t.TempDir()
@@ -23,7 +24,8 @@ func TestConfigListDefaults(t *testing.T) {
 	d := scratchRepo(t)
 	code, out, _ := run(t, "-C", d, "config", "list")
 	want := "language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\n" +
-		"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n"
+		"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n" +
+		"shell=" + defaultShellForTest() + " (default)\nareas= (default)\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d out %q", code, out)
 	}
@@ -35,7 +37,8 @@ func TestConfigListJSONOrderAndNull(t *testing.T) {
 	want := `{"language":{"value":"en","source":"default"},"model.plan":{"value":"opus","source":"default"},` +
 		`"model.work":{"value":"sonnet","source":"default"},"model.review":{"value":"sonnet","source":"default"},` +
 		`"effort.plan":{"value":null,"source":"default"},"effort.work":{"value":null,"source":"default"},` +
-		`"effort.review":{"value":null,"source":"default"}}` + "\n"
+		`"effort.review":{"value":null,"source":"default"},` +
+		`"shell":{"value":"` + defaultShellForTest() + `","source":"default"},"areas":{"value":[],"source":"default"}}` + "\n"
 	if out != want {
 		t.Fatalf("got %s", out)
 	}
@@ -108,5 +111,48 @@ func TestConfigBadSourceExit1(t *testing.T) {
 	code, out, e := run(t, "-C", d, "config", "list", "--json")
 	if code != 1 || !strings.Contains(e, "config.toml") || strings.Count(out, "\n") != 1 || !strings.HasPrefix(out, `{"error":`) {
 		t.Errorf("file: %d out %q err %q", code, out, e)
+	}
+}
+
+func defaultShellForTest() string {
+	if runtime.GOOS == "windows" {
+		return "pwsh"
+	}
+	return "sh"
+}
+
+func TestConfigAreasAndShell(t *testing.T) {
+	d := scratchRepo(t)
+	if code, _, e := run(t, "-C", d, "config", "set", "areas", "cli,brief,config"); code != 0 || e != "" {
+		t.Fatalf("set areas: %d %q", code, e)
+	}
+	if code, out, _ := run(t, "-C", d, "config", "get", "areas"); code != 0 || out != "cli,brief,config\n" {
+		t.Errorf("get areas: %d %q", code, out)
+	}
+	if _, out, _ := run(t, "-C", d, "config", "get", "areas", "--json"); out != `{"key":"areas","value":["cli","brief","config"],"source":"file"}`+"\n" {
+		t.Errorf("get areas --json: %q", out)
+	}
+	if _, out, _ := run(t, "-C", d, "config", "list"); !strings.Contains(out, "areas=cli,brief,config (file)\n") {
+		t.Errorf("list: %q", out)
+	}
+	before, _ := os.ReadFile(filepath.Join(d, ".vloop", "config.toml"))
+	code, out, e := run(t, "-C", d, "config", "set", "areas", "cli,Bad_Area")
+	if code != 2 || out != "" || !strings.HasPrefix(e, `vloop: invalid value "cli,Bad_Area" for areas: want `) {
+		t.Errorf("bad area: %d %q %q", code, out, e)
+	}
+	if after, _ := os.ReadFile(filepath.Join(d, ".vloop", "config.toml")); string(after) != string(before) {
+		t.Error("refused set changed the file")
+	}
+	run(t, "-C", d, "config", "set", "areas", "")
+	if _, out, _ := run(t, "-C", d, "config", "get", "areas", "--json"); out != `{"key":"areas","value":[],"source":"default"}`+"\n" {
+		t.Errorf("cleared: %q", out)
+	}
+	code, _, e = run(t, "-C", d, "config", "set", "shell", "zsh")
+	if code != 2 || e != "vloop: invalid value \"zsh\" for shell: want one of sh, bash, pwsh, powershell, cmd\n" {
+		t.Errorf("shell zsh: %d %q", code, e)
+	}
+	t.Setenv("VLOOP_SHELL", "cmd")
+	if _, out, _ := run(t, "-C", d, "config", "get", "shell", "--json"); out != `{"key":"shell","value":"cmd","source":"env"}`+"\n" {
+		t.Errorf("env shell: %q", out)
 	}
 }

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 81924,
+  "stop_reason": "end_turn",
+  "session_id": "fd6b3e54-eaba-4ebd-83e0-4ed119202e7a",
+  "total_cost_usd": 0.38409400000000005,
+  "usage": {
+    "input_tokens": 24,
+    "cache_creation_input_tokens": 43632,
+    "cache_read_input_tokens": 484290,
+    "output_tokens": 11266,
+    "output_tokens_details": {
+      "thinking_tokens": 1168
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 43632,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 561,
+        "cache_read_input_tokens": 55095,
+        "cache_creation_input_tokens": 553,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 553
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 24,
+      "outputTokens": 11266,
+      "cacheReadInputTokens": 484290,
+      "cacheCreationInputTokens": 43632,
+      "webSearchRequests": 0,
+      "costUSD": 0.38409400000000005,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1168,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 13,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 is done: `vloop task validate` exists, and the task's verify command exits 0. I ran it in the foreground. I did not commit or touch `state.json`.\n\n- **Rules:** `state.Check` (`internal/state/validate.go`) runs the schema check first, then the structural rules.\n  - **Problems:** duplicate ids, dangling dependencies, cycles, unresolved references, references with no reason, and the area rules.\n  - **Warning:** empty `gate_history` reasons.\n  - **Area rules:** they apply only when `areas` is set in config.\n  - **Cycles:** a cycle is reported as the loop itself, starting from its lowest task id.\n- **Command:** `internal/cli/task_validate.go` prints `✗` and `!` lines, then `plan ok` or `<n> problem(s)`. It exits 1 on any problem and never writes. `--json` prints `{ok, problems, warnings}`.\n- **Tests:** there are 13 committed fixtures under `internal/state/testdata/validate/`, one passing plan and one for each rule that fires. `internal/state/validate_test.go` and `internal/cli/task_validate_test.go` exercise them, including the `TestTaskValidate*` tests. Tests use `t.TempDir()` scratch repos.\n- **Duplicate ids:** the cycle check skips repeat occurrences of a duplicated id, so a duplicate doesn't also show up as a bogus self-cycle.\n\nThe README doesn't cover `task validate` yet; that is left to a later task, and the gate skips `TestReadmeMatchesCommandTree` as before. The proposal is in `.loop/tmp/proposal.json`.",
+  "ttft_ms": 2459,
+  "type": "result",
+  "duration_ms": 90711,
+  "uuid": "74af67d9-1284-41bd-8dd5-279b0ed16a56",
+  "ttft_stream_ms": 1248,
+  "time_to_request_ms": 349,
+  "first_content_frame_ms": 1249,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 6
+}
