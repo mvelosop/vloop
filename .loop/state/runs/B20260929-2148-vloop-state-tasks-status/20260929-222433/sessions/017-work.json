@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 71640,
+  "stop_reason": "end_turn",
+  "session_id": "86e720d7-a3e0-461a-8d02-f255e6509e6a",
+  "total_cost_usd": 0.24341220000000002,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 28677,
+    "cache_read_input_tokens": 326321,
+    "output_tokens": 6340,
+    "output_tokens_details": {
+      "thinking_tokens": 632
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 28677,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 348,
+        "cache_read_input_tokens": 40130,
+        "cache_creation_input_tokens": 563,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 563
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 6340,
+      "cacheReadInputTokens": 326321,
+      "cacheCreationInputTokens": 28677,
+      "webSearchRequests": 0,
+      "costUSD": 0.24341220000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 632,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 10,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T9 is done and its verify command exits 0. That covers gofmt, vet, `go mod tidy -diff`, the linux/windows/host builds, `go test ./...`, and the replay of the worked example.\n\n- **New test:** `cmd/vloop/b2_e2e_test.go` has `TestWorkedExampleB2Commands` and `TestWorkedExampleB2PlantedFailures`. They reuse the B1 harness and play every command and all six planted failures against the built binary. Durations are matched by regex, and the pwsh case runs with a stripped PATH. Both skip if `sh` isn't available.\n- **Existing test changed:** T7 made cycle text start at the smallest brief name, which broke the \"cycle\" case in `cmd/vloop/e2e_test.go`. It expected `a -> b -> a`. The correct text is `b -> a -> b`, so I updated that one expected string. `go test ./...` could not pass otherwise.\n\nThe proposal is written to `.loop/tmp/proposal.json`, and nothing is committed.",
+  "ttft_ms": 2048,
+  "type": "result",
+  "duration_ms": 82486,
+  "uuid": "997cbd00-ba0d-4eec-ac15-d38af4549ce4",
+  "ttft_stream_ms": 1005,
+  "time_to_request_ms": 362,
+  "first_content_frame_ms": 1005,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 11
+}

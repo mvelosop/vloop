@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **8/9 done** · iteration 10
+**Status:** running · **9/9 done** · iteration 11
 
-**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:40:13Z
+**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:42:28Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T6** — Add `vloop task verify` with gate_history, and `vloop task gate` in the plan's shell
 - [x] **T7** — F1: report a depends-on cycle from its smallest brief name in `brief check` and `brief list`
 - [x] **T8** — Document the schema, status and task commands, the new config keys and the plan file in the README
-- [ ] **T9** — Close: play the worked example end to end, plus go test ./..., vet, gofmt, tidy and the three builds
+- [x] **T9** — Close: play the worked example end to end, plus go test ./..., vet, gofmt, tidy and the three builds
 
 ## Tasks
 
@@ -250,7 +250,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T9 — Close: play the worked example end to end, plus go test ./..., vet, gofmt, tidy and the three builds
 
-`pending` · depends on: T7, T8
+`done` · depends on: T7, T8
 
 **Files:** `cmd/vloop/b2_e2e_test.go`
 

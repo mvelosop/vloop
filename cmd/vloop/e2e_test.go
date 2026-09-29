@@ -228,7 +228,7 @@ func TestWorkedExamplePlantedFailures(t *testing.T) {
 		}, "binding reference has no reason: docs/x.md"},
 		{"cycle", func(s *scratch) {
 			s.write(pb, strings.Replace(s.read(pb), "depends-on: []", "depends-on: ["+nameA+"]", 1))
-		}, "depends-on cycle: " + nameA + " -> " + nameB + " -> " + nameA},
+		}, "depends-on cycle: " + nameB + " -> " + nameA + " -> " + nameB},
 		{"already run", func(s *scratch) {
 			s.write(".vloop/state/journals/B20260101-0900-a.md", "")
 		}, "already run — .vloop/state/journals/B20260101-0900-a.md exists"},

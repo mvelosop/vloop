@@ -130,3 +130,10 @@ I left my gate-drafting scratch in `.loop/tmp/gates/`. It's git-ignored, and my 
 - **Summary:** README.md now documents schema list|show|validate, status (--markdown), every task subcommand (--reason on verify), the shell and areas keys with their env vars, and the plan file .vloop/state/state.json.
 - **Files:** README.md
 - **Notes for next iteration:** README only, no code. Also reworded the intro and the Files paragraph, since the old text said only config set and brief new write anything; task reset|note|drop|set|verify now write too.
+
+## T9 — Close: play the worked example end to end, plus go test ./..., vet, gofmt, tidy and the three builds
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added cmd/vloop/b2_e2e_test.go: TestWorkedExampleB2Commands and TestWorkedExampleB2PlantedFailures build on B1's harness and replay the brief's worked example and all six planted failures against the built binary. Also fixed a stale expectation in B1's e2e test that T7 had broken.
+- **Files:** cmd/vloop/b2_e2e_test.go, cmd/vloop/e2e_test.go
+- **Notes for next iteration:** T7 changed the cycle text to start at the smallest brief name, which broke the existing TestWorkedExamplePlantedFailures/cycle in cmd/vloop/e2e_test.go (it expected a -> b -> a; the correct text is b -> a -> b). I updated that one expected string, because go test ./... could not pass otherwise. Gate durations are matched by regex. The pwsh case passes a stripped PATH (a temp dir, and Path= for Windows). Tests skip when sh is absent.
