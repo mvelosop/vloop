@@ -67,7 +67,9 @@ func Execute(b Build, args []string, stdout, stderr io.Writer) int {
 	if err == nil {
 		return ExitOK
 	}
-	fmt.Fprintf(stderr, "vloop: %s\n", oneLine(err.Error()))
+	if err.Error() != "" { // an empty message exits non-zero having already reported
+		fmt.Fprintf(stderr, "vloop: %s\n", oneLine(err.Error()))
+	}
 	var pe *ProblemError
 	if errors.As(err, &pe) {
 		return ExitProblems
@@ -101,5 +103,6 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 	pf.BoolVarP(&g.Verbose, "verbose", "v", false, "print more")
 	root.AddCommand(newVersion(b, g))
 	root.AddCommand(newConfig(g))
+	root.AddCommand(newBrief(g))
 	return root, g
 }

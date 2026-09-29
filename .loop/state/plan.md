@@ -4,15 +4,15 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **2/9 done** · iteration 2
+**Status:** running · **3/9 done** · iteration 3
 
-**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:45:01Z
+**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:47:51Z
 
 ## Progress
 
 - [x] **T1** — Go module skeleton: command tree, global flags, exit codes, version, embedded plugin
 - [x] **T2** — Repo root resolution and `vloop config get|set|list|path`
-- [ ] **T3** — Brief parsing and the English `vloop brief check` (port of check-brief.sh)
+- [x] **T3** — Brief parsing and the English `vloop brief check` (port of check-brief.sh)
 - [ ] **T4** — Spanish heading set and the language switch for `brief check`
 - [ ] **T5** — Frontmatter validity and `## Binding references` rules
 - [ ] **T6** — `depends-on`: resolution, cycles, and `vloop brief list`
@@ -86,7 +86,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T3 — Brief parsing and the English `vloop brief check` (port of check-brief.sh)
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 **Files:** `internal/brief/brief.go`, `internal/brief/check.go`, `internal/brief/check_test.go`, `internal/brief/testdata/en/`, `internal/cli/brief.go`, `internal/cli/brief_test.go`
 
