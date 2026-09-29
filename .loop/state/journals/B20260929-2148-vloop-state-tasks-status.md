@@ -123,3 +123,10 @@ I left my gate-drafting scratch in `.loop/tmp/gates/`. It's git-ignored, and my 
 - **Summary:** graphProblems now always reports the loop itself, rotated to start at its lexicographically smallest brief name, so `brief check` and `brief list` print the same cycle text.
 - **Files:** internal/brief/deps.go, internal/brief/deps_test.go
 - **Notes for next iteration:** Removed graphProblems' cycleOnly parameter (new cycleText helper does the rotation); `brief check` no longer prints the lead-in path before the loop, only the loop. Only change to an existing test: the graphProblems call in deps_test.go lost its trailing bool arg; assertions untouched. Added TestCycleStartIsSmallestName.
+
+## T8 — Document the schema, status and task commands, the new config keys and the plan file in the README
+
+- **Outcome:** done (review: PASS)
+- **Summary:** README.md now documents schema list|show|validate, status (--markdown), every task subcommand (--reason on verify), the shell and areas keys with their env vars, and the plan file .vloop/state/state.json.
+- **Files:** README.md
+- **Notes for next iteration:** README only, no code. Also reworded the intro and the Files paragraph, since the old text said only config set and brief new write anything; task reset|note|drop|set|verify now write too.

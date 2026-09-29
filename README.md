@@ -4,7 +4,8 @@ vloop is a command-line tool for running autonomous Claude loops: a plan is cut
 from a written **brief**, and then each task in the plan is worked by Claude,
 checked, and reviewed without a human in between. This version (0.x) covers the
 part you need before any loop runs: repo-local configuration and the format,
-checking and ordering of briefs. Running a loop is not part of it yet.
+checking and ordering of briefs, and reading and checking the plan a loop runs
+from. Running a loop is not part of it yet.
 
 Build it with `go build -o vloop ./cmd/vloop` and put the binary on your `PATH`.
 
@@ -62,8 +63,24 @@ does not exist, or an item with no reason, is a problem.
 | `vloop brief check <path>...` | check that ready briefs are fit to plan |
 | `vloop brief new <slug>` | write a draft brief from the template |
 | `vloop brief list` | list briefs in dependency order, ready or blocked |
+| `vloop schema list` | print the names of the embedded JSON Schemas |
+| `vloop schema show <name>` | print one schema document |
+| `vloop schema validate <name> <file>` | validate a JSON file against a schema |
+| `vloop status` | show the plan's progress |
+| `vloop task list` | print one line per task |
+| `vloop task show <id>` | print a task and the model and effort its sessions resolve to |
+| `vloop task validate` | check the plan's structure |
+| `vloop task reset <id>` | set a task back to pending with no attempts |
+| `vloop task note <id> <text>` | replace a task's notes |
+| `vloop task drop <id>` | remove a task nothing depends on |
+| `vloop task set <id> <field> <value>` | set a task's `area`, `kind`, `model.work`, `model.review`, `effort.work` or `effort.review` (`''` clears it) |
+| `vloop task verify <id> <command>` | replace a task's verify command; needs `--reason` |
+| `vloop task gate <id>` | run a task's verify command in the plan's shell |
 
 `vloop brief new` takes `--dry-run`: print the path and write nothing.
+`vloop status` takes `--markdown`: print the plan as Markdown (not with `--json`).
+`vloop task verify` takes `--reason <text>`: why the gate is being replaced. It
+is required, and is recorded in the task's `gate_history`.
 
 These flags work on every command:
 
@@ -89,11 +106,16 @@ the file, and the file over the default.
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` |
+| `shell` | `sh` (`cmd` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` |
+| `areas` | unset | a TOML array of names | `VLOOP_AREAS` |
 
 `language` chooses the language of a brief's section headings and of the template
 `vloop brief new` writes. It applies to briefs only: commands, flags, keys, JSON
 and vloop's own messages are always English. The `model.*` and `effort.*` keys
 choose the model and the effort for each kind of session (plan, work, review).
+`shell` is the shell `vloop task gate` runs a verify command in. `areas` lists
+the names a task's `area` may take; when set, `vloop task validate` reports any
+other. In the file it is an array, for example `areas = ["cli", "docs"]`.
 For example:
 
 ```
@@ -108,9 +130,14 @@ vloop keeps its files under `.vloop/` in the repo root (the nearest parent with 
 `.vloop/` folder, else the nearest with `.git`, else the current directory):
 
 - `.vloop/config.toml`: the settings above, written by `vloop config set`.
+- `.vloop/state/state.json`: the plan, the task list a loop works through. It
+  follows the `state/v1` schema; `vloop status` reads it and `vloop task validate`
+  checks it.
 
-Briefs live in `docs/briefs/`. Only `vloop config set` and `vloop brief new`
-write anything; every path vloop prints is relative to the repo root.
+Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new` and
+the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`,
+`verify`) write anything, and each refuses a plan or result that fails
+`vloop task validate`. Every path vloop prints is relative to the repo root.
 
 ## Exit codes
 

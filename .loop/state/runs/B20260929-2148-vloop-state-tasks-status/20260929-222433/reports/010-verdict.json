@@ -1,0 +1,11 @@
+{
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "README.md documents `vloop schema list|show|validate`, `vloop status` (with --markdown), every `vloop task` subcommand (with --reason), the `shell` and `areas` keys, and the plan file `.vloop/state/state.json`, in B1's style.", "met": true, "evidence": "README diff adds command table rows for schema/status/task list|show|validate|reset|note|drop|set|verify|gate, --markdown and --reason paragraphs, shell/areas config rows with env vars, and the .vloop/state/state.json file entry."},
+    {"criterion": "internal/cli/readme_test.go is unchanged and passes; README.md stays under its 200-line cap.", "met": true, "evidence": "git status shows only README.md changed outside .loop; README is 155 lines; driver gate checks the test hash and runs the test."},
+    {"criterion": "No code changes: this task edits README.md only.", "met": true, "evidence": "git status --short outside .loop/ lists only README.md."}
+  ],
+  "findings": [],
+  "notes": "none"
+}

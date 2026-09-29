@@ -1,0 +1,8 @@
+{
+  "task": "T8",
+  "outcome": "done",
+  "summary": "README.md now documents schema list|show|validate, status (--markdown), every task subcommand (--reason on verify), the shell and areas keys with their env vars, and the plan file .vloop/state/state.json.",
+  "files": ["README.md"],
+  "verified": "The task's verify command exits 0; TestReadmeMatchesCommandTree passes unmodified, README is 155 lines (cap under 200).",
+  "notes": "README only, no code. Also reworded the intro and the Files paragraph, since the old text said only config set and brief new write anything; task reset|note|drop|set|verify now write too."
+}
