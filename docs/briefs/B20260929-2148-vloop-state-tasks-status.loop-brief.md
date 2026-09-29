@@ -2,14 +2,16 @@
 name: B20260929-2148-vloop-state-tasks-status.loop-brief
 description: Give vloop its file contracts as JSON Schemas, and the commands that read and amend a plan — task list/show/validate/verify/gate/reset/note/drop/set and status
 kind: brief
-status: ready
+status: consumed
 created: 2026-09-29
 seeds: A `.loop/run.sh` plan + run that builds slice B2 in docs/design-notes/vloop-roadmap.md
 depends-on: [B20260929-1804-vloop-skeleton-config-briefs.loop-brief]
 ---
 # Brief — vloop B2: schemas, tasks and status
 
-- **Status:** ready to plan
+- **Status:** consumed — planned and run as
+  `B20260929-2148-vloop-state-tasks-status`, 9/9 tasks, on branch
+  `B20260929-2148-vloop-state-tasks-status`. **Do not re-plan from this brief.**
 - **Starting point:** extends `main` at the commit that adds this brief. The
   planner pins that SHA as the base every gate compares against.
 - **Produced by:** operator decision, 2026-09-29, from the B2 row of
@@ -429,3 +431,40 @@ load-bearing:
 
 The worked example needs its own gate (task 9): the unit tests can all pass
 while flags, exit codes or stdout vs stderr are wired wrong.
+
+## Run record
+
+**Outcome.** Complete: 9/9 tasks done, 0 blocked. Two runs: the first stalled
+(exit 3) after T1 was reported blocked twice on a gate defect; after the
+operator amended the gate, the second closed all nine tasks in one iteration
+each, with 0 gate failures and 0 review rejections.
+
+**Spend.** Plan $3.76 (opus). Work $0.61 (the two blocked T1 attempts) + $2.92.
+Review $1.06 — one review's cost was not recorded (below). About $8.35.
+
+**Verified outside the loop.** `go test -count=1 ./...` (7 packages), `go vet`,
+`gofmt -l .`, `go mod tidy -diff`, and the windows and linux builds pass. The
+worked example and every planted failure were replayed by hand in a scratch
+repo and matched. B1's README test is byte-for-byte unchanged; B1's other two
+test files changed only for the new config keys, the new env vars, and F1's
+cycle start.
+
+**Changed by hand.** T1's gate, with `.loop/amend.sh verify`: the planner wrote
+`badp 'del(.base)' '(|/)'`, an ERE with an empty alternative that GNU grep
+accepts and macOS's BSD grep rejects, so the gate could never pass on the
+host. Replaced with `'/?'`, same intent. The work session diagnosed it exactly.
+As a B3 defect record: origin `plan`, kind `gate`, caught by the gate, ruled by
+the operator.
+
+**Still open.**
+
+- Gates must be portable to the host's tools. Until vloop's planner knows the
+  host, briefs should say so — BSD grep on macOS.
+- One review session (T2) wrote its verdict but `claude` printed nothing on
+  stdout, and the shell driver skipped its telemetry record silently. B5's
+  driver must flag a missing session record, not skip it.
+- This brief contradicted itself: `task set … ''` clears, yet "an empty model is
+  exit 2". The planner took `''` as always clearing, which is right.
+- `task reset` does not clear notes (`amend.sh` does); `Save` drops keys unknown
+  to the structs. Both were left open by the brief.
+- Merge to `main`.
