@@ -16,8 +16,8 @@ Replace these with yours. Declare a path as a backticked directory ending in
 
 | Surface | Path | How to find what is in it |
 | --- | --- | --- |
-| Example — architecture decisions | `docs/decisions/` | Index at `README.md` |
-| Example — domain model | `docs/domain/` | Every file carries a `description:` frontmatter line |
+| vloop design notes (roadmap, inherited decisions) | `docs/design-notes/` | Every file carries a `description:` frontmatter line |
+| Design-session records the notes derive from | `docs/additional-context-files/` | Every file carries a `description:` frontmatter line |
 
 ## What "discoverable" means
 
