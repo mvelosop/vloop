@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 46868,
+  "stop_reason": "end_turn",
+  "session_id": "faa6f486-4ed3-44b9-b885-3e4083a3ebbf",
+  "total_cost_usd": 0.2029226,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 25576,
+    "cache_read_input_tokens": 181303,
+    "output_tokens": 6433,
+    "output_tokens_details": {
+      "thinking_tokens": 432
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 25576,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 440,
+        "cache_read_input_tokens": 35076,
+        "cache_creation_input_tokens": 734,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 734
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 6433,
+      "cacheReadInputTokens": 181303,
+      "cacheCreationInputTokens": 25576,
+      "webSearchRequests": 0,
+      "costUSD": 0.2029226,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 432,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is finished. Its verify command exits 0 when run in the foreground, and I wrote the proposal to `.loop/tmp/proposal.json` with outcome `done`.\n\nWhat now exists:\n- **Module and command tree:** a cobra tree with the five global flags, and the exit-code mapping. Any error a command returns exits 2 unless it is wrapped with `cli.Problem`, which exits 1. Later commands must wrap their \"found problems\" errors that way.\n- **`vloop version`:** it prints the text form and the `--json` form. `version` and `commit` come from `main.version` and `main.commit`. The plugin version is read from the embedded copy, never the working tree.\n- **Embed:** `embed.go` uses `//go:embed all:plugin`, and `embed_test.go` fails without the `all:` prefix.\n- **Manifests:** `plugin/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`. No skills, agents, hooks or schemas were added.\n\nThe root command has no `Args` validator on purpose. Cobra only reports \"unknown command\" for a root that isn't runnable when `Args` is nil.\n\nThe colour helper `Globals.Color` is not exercised by any test yet, since no command colours its output.\n\nI didn't commit, touch `state.json`, or start T2.",
+  "ttft_ms": 2559,
+  "type": "result",
+  "duration_ms": 66233,
+  "uuid": "e0d42f31-85de-4572-a11b-bd3ea8d180e3",
+  "ttft_stream_ms": 1179,
+  "time_to_request_ms": 355,
+  "first_content_frame_ms": 1180,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 1
+}

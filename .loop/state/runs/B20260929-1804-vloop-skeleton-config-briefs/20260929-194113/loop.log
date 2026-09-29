@@ -1,0 +1,13 @@
+[36m[loop][0m preflight
+[36m[loop][0m   [x] jq
+[36m[loop][0m   [x] claude
+[36m[loop][0m   [x] git
+[36m[loop][0m   [x] uv
+[36m[loop][0m   [x] workspace trusted
+[36m[loop][0m   [x] .loop/settings.json parses — 19 allow, 16 deny rules
+[36m[loop][0m   [x] 2 knowledge root(s) scannable
+[36m[loop][0m   [x] git identity (mvelosop@gmail.com)
+[36m[loop][0m   [x] masking active ($HOME and username)
+[36m[loop][0m   [x] telemetry dir .loop/state/runs/B20260929-1804-vloop-skeleton-config-briefs/20260929-194113
+[36m[loop][0m   [x] state.json valid — 9 pending
+[36m[loop][0m preflight ok

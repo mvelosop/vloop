@@ -1,0 +1,18 @@
+// Command vloop is the vloop CLI.
+package main
+
+import (
+	"os"
+
+	"github.com/mvelosop/vloop/internal/cli"
+)
+
+// Stamped at build time with -ldflags "-X main.version=… -X main.commit=…".
+var (
+	version = "0.0.0-dev"
+	commit  = "unknown"
+)
+
+func main() {
+	os.Exit(cli.Execute(cli.Build{Version: version, Commit: commit}, os.Args[1:], os.Stdout, os.Stderr))
+}

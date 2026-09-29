@@ -15,3 +15,11 @@
 [36m[loop][0m cost=$2.9372888 turns=21 dur=739s error=false
 [33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
 [36m[loop][0m planned: B20260929-1804-vloop-skeleton-config-briefs — 9 tasks
+[36m[loop][0m committed the plan
+[36m[loop][0m 
+[36m[loop][0m ═══ plan only ═══
+[36m[loop][0m plan:   B20260929-1804-vloop-skeleton-config-briefs — 9 task(s)
+[36m[loop][0m first:  T1
+[36m[loop][0m read:   .loop/state/plan.md   (verify commands are in .loop/state/state.json)
+[36m[loop][0m adjust: .loop/amend.sh
+[36m[loop][0m run it: .loop/run.sh

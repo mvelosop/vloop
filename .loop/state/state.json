@@ -2,9 +2,9 @@
   "run_id": "B20260929-1804-vloop-skeleton-config-briefs",
   "brief": "docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-09-29T18:29:06Z",
-  "updated": "2026-09-29T18:29:06Z",
+  "updated": "2026-09-29T18:43:00Z",
   "tasks": [
     {
       "id": "T1",
@@ -48,7 +48,7 @@
         "`gofmt -l .` prints nothing, `go vet ./...` passes, and the module builds for linux, windows and the host."
       ],
       "verify": "unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_EFFORT_PLAN VLOOP_EFFORT_WORK VLOOP_EFFORT_REVIEW NO_COLOR; fail(){ echo \"GATE FAIL: $*\" >&2; exit 1; }; t=$(mktemp -d) || fail mktemp; trap 'rm -rf \"$t\"' EXIT; test -z \"$(gofmt -l .)\" || fail \"gofmt -l . lists files\"; go vet ./... || fail \"go vet ./...\"; GOOS=linux GOARCH=amd64 go build ./... || fail \"linux cross-build\"; GOOS=windows GOARCH=amd64 go build ./... || fail \"windows cross-build\"; go build -o \"$t/bin/vloop\" ./cmd/vloop || fail \"host build of ./cmd/vloop\"; V=\"$t/bin/vloop\"; r(){ \"$V\" \"$@\" >\"$t/o\" 2>\"$t/e\"; rc=$?; O=$(cat \"$t/o\"); E=$(cat \"$t/e\"); }; e1(){ [ \"$(wc -l <\"$t/e\" | tr -d ' ')\" = 1 ] && [ \"${E#vloop: }\" != \"$E\" ]; }; has(){ printf '%s\\n' \"$O\" | grep -qE -- \"$1\"; }; nocol(){ ! LC_ALL=C grep -q \"$(printf '\\033')\" \"$t/o\" \"$t/e\"; }; hastests(){ go test -list . \"$1\" 2>/dev/null | grep -q '^Test' || fail \"no committed tests in $1\"; }; ns(){ s=\"$t/$1\"; mkdir -p \"$s/docs\" && cd \"$s\" && git init -q . && printf 'x\\n' >docs/x.md || fail \"scratch $1\"; }; go test . ./cmd/vloop ./internal/cli || fail \"unit tests\"; hastests .; hastests ./internal/cli; jq -e '.name==\"vloop\" and .version==\"0.0.0-dev\"' plugin/.claude-plugin/plugin.json >/dev/null || fail \"plugin manifest name/version\"; jq -e '.name==\"vloop\" and (.plugins|length)==1 and .plugins[0].name==\"vloop\" and .plugins[0].source==\"./plugin\"' .claude-plugin/marketplace.json >/dev/null || fail \"marketplace manifest\"; GV=$(go env GOVERSION); GOS=$(go env GOOS); GA=$(go env GOARCH); go build -ldflags \"-X main.version=9.8.7 -X main.commit=abc1234\" -o \"$t/bin/vloop-stamped\" ./cmd/vloop || fail \"stamped build\"; ns s; r version --json; [ $rc = 0 ] || fail \"version --json exit $rc: $E\"; [ \"$(jq -s length \"$t/o\")\" = 1 ] || fail \"version --json is not exactly one JSON document: $O\"; jq -e --arg g \"$GV\" --arg o \"$GOS\" --arg a \"$GA\" 'keys_unsorted==[\"version\",\"commit\",\"plugin\",\"go\",\"os\",\"arch\"] and .version==\"0.0.0-dev\" and .commit==\"unknown\" and .plugin==\"0.0.0-dev\" and .go==$g and .os==$o and .arch==$a' \"$t/o\" >/dev/null || fail \"version --json fields/order: $O\"; r version; [ $rc = 0 ] && [ \"$O\" = \"vloop 0.0.0-dev (commit unknown, plugin 0.0.0-dev, $GV $GOS/$GA)\" ] && nocol || fail \"version text: [$O]\"; \"$t/bin/vloop-stamped\" version --json | jq -e '.version==\"9.8.7\" and .commit==\"abc1234\" and .plugin==\"0.0.0-dev\"' >/dev/null || fail \"-ldflags -X main.version/main.commit not honoured\"; r nosuch; [ $rc = 2 ] && [ -z \"$O\" ] && e1 || fail \"unknown command: want exit 2, empty stdout, one stderr line starting 'vloop: '; rc=$rc out=$O err=$E\"; r version --nosuchflag; [ $rc = 2 ] && [ -z \"$O\" ] && e1 || fail \"unknown flag: rc=$rc out=$O err=$E\"; r --json nosuch; [ $rc = 2 ] && [ -z \"$O\" ] && e1 || fail \"usage error under --json must print to stderr only: rc=$rc out=$O err=$E\"; for f in \"-C $t/s\" \"--dir $t/s\" --no-color -q --quiet -v --verbose --json; do r version $f; [ $rc = 0 ] || fail \"version $f: rc=$rc err=$E\"; done; (cd / && \"$V\" -C \"$t/s\" version >/dev/null) || fail \"-C from another directory\"; NO_COLOR=1 \"$V\" version >/dev/null || fail \"NO_COLOR=1 version\"",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
@@ -354,5 +354,5 @@
       "notes": ""
     }
   ],
-  "branch": "main"
+  "branch": "B20260929-1804-vloop-skeleton-config-briefs"
 }

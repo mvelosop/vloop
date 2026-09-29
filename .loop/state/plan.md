@@ -4,13 +4,13 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **0/9 done** · iteration 0
+**Status:** running · **1/9 done** · iteration 1
 
-**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:29:06Z
+**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:43:00Z
 
 ## Progress
 
-- [ ] **T1** — Go module skeleton: command tree, global flags, exit codes, version, embedded plugin
+- [x] **T1** — Go module skeleton: command tree, global flags, exit codes, version, embedded plugin
 - [ ] **T2** — Repo root resolution and `vloop config get|set|list|path`
 - [ ] **T3** — Brief parsing and the English `vloop brief check` (port of check-brief.sh)
 - [ ] **T4** — Spanish heading set and the language switch for `brief check`
@@ -24,7 +24,7 @@
 
 ### T1 — Go module skeleton: command tree, global flags, exit codes, version, embedded plugin
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `go.mod`, `go.sum`, `embed.go`, `embed_test.go`, `cmd/vloop/main.go`, `internal/cli/root.go`, `internal/cli/version.go`, `internal/cli/root_test.go`, `plugin/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
 

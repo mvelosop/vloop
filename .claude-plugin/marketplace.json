@@ -1,0 +1,6 @@
+{
+  "name": "vloop",
+  "plugins": [
+    { "name": "vloop", "source": "./plugin" }
+  ]
+}

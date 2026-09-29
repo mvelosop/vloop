@@ -38,3 +38,10 @@ The plan is written to `.loop/state/state.json`. It's valid JSON, passes `.loop/
 
 I left the generator and fixture scripts in `.loop/tmp/`, which is gitignored.
 
+
+## T1 — Go module skeleton: command tree, global flags, exit codes, version, embedded plugin
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Go module github.com/mvelosop/vloop now exists with a cobra tree (global flags, 0/1/2 exit mapping), `vloop version` (text and --json), and the plugin skeleton embedded via `//go:embed all:plugin`.
+- **Files:** go.mod, go.sum, embed.go, embed_test.go, cmd/vloop/main.go, internal/cli/root.go, internal/cli/version.go, internal/cli/root_test.go, plugin/.claude-plugin/plugin.json, .claude-plugin/marketplace.json
+- **Notes for next iteration:** cli.Execute(Build, args, stdout, stderr) returns the exit code. Any error returned from a command is exit 2 (usage) unless wrapped with cli.Problem(err), which gives exit 1; later commands must wrap their 'found problems' errors. Root has no Args validator, on purpose: cobra only reports 'unknown command' for a non-runnable root when Args is nil. Cobra's usage and error printing are silenced and Execute prints the single 'vloop: ' line itself, first line of the error only. Globals (Dir, JSON, NoColor, Quiet, Verbose) are returned from NewRoot and have a Color(w) helper covering NO_COLOR and TTY detection. It is untested, since no command colours output yet. main.version and main.commit are passed into cli as cli.Build. Cobra v1.10.2, go directive from go 1.27.1.
