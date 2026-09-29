@@ -1,0 +1,8 @@
+{
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Spanish heading set and Spanish task-count/exit-code phrasings now live in internal/brief/headings.go beside English; `brief check` selects the set by resolved language, with committed Spanish fixtures and cross-language tests.",
+  "files": ["internal/brief/headings.go", "internal/brief/brief.go", "internal/brief/lang_test.go", "internal/brief/testdata/es/"],
+  "verified": "bash of T4's verify command: go tests for ./internal/brief and ./internal/cli ok, no GATE FAIL printed.",
+  "notes": "HeadingSet/English/sets/SetFor moved from brief.go to headings.go; added a Sections field (full eight-heading table) and a Spanish entry. SetFor still returns English for an unknown language, but config only admits en/es so there is no cross-language fallback. Spanish ExitCodes keeps the numeric HTTP-status alternation but not English 'exit code'. Spanish fixtures in testdata/es are one pass file plus one mutation per rule; the home-path fixture contains a literal /Users/alguien path on purpose."
+}

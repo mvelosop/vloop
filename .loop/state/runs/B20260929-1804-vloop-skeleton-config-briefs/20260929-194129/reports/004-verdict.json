@@ -1,0 +1,15 @@
+{
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The Spanish heading set lives in a non-test product file beside the English one", "met": true, "evidence": "internal/brief/headings.go defines Spanish with all eight headings next to English"},
+    {"criterion": "The heading set used is the resolved language; other-language headings read as missing, no fallback", "met": true, "evidence": "internal/cli/brief.go:73 calls brief.SetFor(lang.Value); TestCrossLanguage covers es/en both ways; config admits only en/es"},
+    {"criterion": "Matching is case-insensitive and accent-sensitive, with trailing text allowed", "met": true, "evidence": "TestSpanishMatchingIsAccentSensitive asserts 'QUÉ ES' matches, 'Que es' does not, trailing text ok"},
+    {"criterion": "In an es repo the task-count rule accepts N a M tareas and N tareas, and exit-code rule accepts código de salida N and sale con N", "met": true, "evidence": "Spanish.TaskCount / ExitCodes regexes in headings.go; single-task-count and exit-sale-con fixtures pass"},
+    {"criterion": "Every message, summary line and JSON key stays English in an es repo", "met": true, "evidence": "No message strings touched; TestMessagesStayEnglish; verify script asserts English output"},
+    {"criterion": "Committed Spanish fixtures: passing and firing brief per rule, plus cross-language cases", "met": true, "evidence": "testdata/es has pass plus one mutation per rule, english-headings; TestSpanishFixtures and TestCrossLanguage"},
+    {"criterion": "gofmt clean, go vet passes, builds for linux, windows and host", "met": true, "evidence": "Driver gate passed; go test ./internal/... ok"}
+  ],
+  "findings": [],
+  "notes": "The Sections field on HeadingSet is currently unused by product code. The home-path fixture contains a literal /Users/alguien path on purpose, as the fixture for that rule."
+}
