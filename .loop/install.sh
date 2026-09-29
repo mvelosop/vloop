@@ -75,6 +75,14 @@ CONSUMER_OWNED=(state tmp)
 # glob, and a second entry here is worth arguing about before it is added.
 NOT_SHIPPED=(todo)
 
+# Mechanism files that were renamed, as old:new. The old name is never shipped
+# -- an installed copy that was upgraded still carries it, and without this an
+# install FROM that copy would hand the stale file on, over whatever the next
+# target had -- and a target that has one is told what replaced it, below.
+RETIRED=(
+  "brief-template.md:loop-brief.template.md"
+)
+
 for item in "$SRC"/.loop/*; do
   name="$(basename "$item")"
   for keep in "${CONSUMER_OWNED[@]}"; do
@@ -82,6 +90,9 @@ for item in "$SRC"/.loop/*; do
   done
   for internal in "${NOT_SHIPPED[@]}"; do
     [[ "$name" == "$internal" ]] && continue 2
+  done
+  for pair in "${RETIRED[@]}"; do
+    [[ "$name" == "${pair%%:*}" ]] && continue 2
   done
   rm -rf "$TARGET/.loop/$name"
   cp -R "$item" "$TARGET/.loop/$name"
@@ -97,6 +108,16 @@ done
 for internal in "${NOT_SHIPPED[@]}"; do
   [[ -e "$TARGET/.loop/$internal" ]] && warn \
     ".loop/$internal is in the target from an earlier install. It is the loop's own bookkeeping and is no longer shipped — delete it if you did not write it."
+done
+
+# The same gap, for a mechanism file that is RENAMED: the copy only ever
+# replaces names the source has, so the old name survives every upgrade beside
+# the new one. Reported, never removed, for the reason above: the consumer may
+# have edited their copy.
+for pair in "${RETIRED[@]}"; do
+  old="${pair%%:*}"; new="${pair#*:}"
+  [[ -e "$TARGET/.loop/$old" ]] && warn \
+    ".loop/$old is from an earlier install and was renamed to .loop/$new — delete it once nothing of yours points at it."
 done
 chmod +x "$TARGET"/.loop/*.sh
 

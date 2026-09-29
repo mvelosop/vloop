@@ -4,7 +4,7 @@ Reference for the machinery. For how to *use* it end to end, see the
 [USER MANUAL](manual.md).
 
 ```
-docs/briefs/NNNN-*.md
+docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md
         │
         │  .loop/run.sh — plan phase, once, opus
         ▼

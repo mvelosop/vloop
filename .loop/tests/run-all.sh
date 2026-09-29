@@ -34,7 +34,7 @@ done
 # skipped. Free and offline, so it belongs in the same gate.
 if compgen -G "../../docs/briefs/*.md" >/dev/null 2>&1; then
   printf '\n\033[1mcheck-brief\033[0m\n'
-  brief_out="$(cd ../.. && .loop/check-brief.sh .loop/brief-template.md docs/briefs/*.md 2>&1)"
+  brief_out="$(cd ../.. && .loop/check-brief.sh .loop/loop-brief.template.md docs/briefs/*.md 2>&1)"
   # Nothing retires a brief (item 8 of B20260924-1947 refuses to PLAN from one,
   # it does not stamp it), so this repo's own already-run briefs -- including
   # this run's own -- report "already run" forever and check-brief.sh must

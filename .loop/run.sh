@@ -800,8 +800,11 @@ fi
 
 if [[ ! -f "$STATE" ]]; then
   if [[ -z "$BRIEF" ]]; then
-    BRIEF="$(ls -1 docs/briefs/*.md 2>/dev/null | tail -1)"
-    [[ -n "$BRIEF" ]] || die "no state and no brief. usage: .loop/run.sh docs/briefs/NNNN-slug.md"
+    # Only a loop brief. docs/briefs/ also holds architect briefs and an index,
+    # and "the last *.md" there was an index README as often as a brief. With
+    # timestamped names, the last one sorted is the newest.
+    BRIEF="$(ls -1 docs/briefs/*.loop-brief.md 2>/dev/null | tail -1)"
+    [[ -n "$BRIEF" ]] || die "no state and no loop brief in docs/briefs/. usage: .loop/run.sh docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md"
   fi
   [[ -f "$BRIEF" ]] || die "brief not found: $BRIEF"
 

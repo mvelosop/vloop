@@ -341,16 +341,24 @@ becomes a measurable finding rather than a matter of taste.
 
 **Say roughly how many tasks you expect.** It calibrates decomposition.
 
-Start from the template, which is a filled-in skeleton of the shape below:
+**Write down what was rejected.** Every session downstream is fresh and did not
+see the discussion, so a settled fork that is not written down gets reopened —
+by the planner, or by a work session mid-task. The template's *Why this shape,
+and what was rejected* section is where it goes.
+
+Start from the template, which is a filled-in skeleton of the shape below.
+Number briefs by creation time rather than a counter — two people drafting on
+different branches never collide on a timestamp — and name the consumer in the
+suffix:
 
 ```bash
-cp .loop/brief-template.md docs/briefs/0001-my-thing.md
+cp .loop/loop-brief.template.md docs/briefs/B$(date +%Y%m%d-%H%M)-my-thing.loop-brief.md
 ```
 
 Check it before you spend anything:
 
 ```bash
-.loop/check-brief.sh docs/briefs/0001-your-brief.md
+.loop/check-brief.sh docs/briefs/B<YYYYMMDD-HHMM>-my-thing.loop-brief.md
 ```
 
 It verifies the structure a brief needs: a worked example with concrete values,
@@ -373,10 +381,16 @@ Everything above assumes a blank page. In a repo that already has a design
 practice — ADRs, design notes, use-case entries, flow docs, a tracker — you are
 not writing a brief so much as **translating** one, and that is a different act
 with its own failure modes. This is the shape of the consumer-side skill that
-does it: the loop ships the contract (`.loop/brief-template.md`) and the
+does it: the loop ships the contract (`.loop/loop-brief.template.md`) and the
 checker (`.loop/check-brief.sh`); how *your* design surfaces map onto them is
 yours, because the moment the loop names your tracker it stops being
 stack-independent.
+
+The act has an input of its own, and `.loop/architect-brief.template.md` is its
+shape: what you want, what you already know, the forks you have already settled,
+and a `## Consumed` section the act fills in with what it decided and found. It
+is deliberately not plannable — no `**Status:** ready to plan` — so the checker
+skips it; its output is a loop brief that is.
 
 Four rules, and the first is the one that actually bites.
 
@@ -498,10 +512,15 @@ Continue with no state edit:
 ## 6. Running
 
 ```bash
-.loop/run.sh docs/briefs/000N-....md              # plan, then iterate
-.loop/run.sh --plan-only docs/briefs/000N-....md  # plan, commit it, stop
-.loop/run.sh                                      # resume
+.loop/run.sh docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md              # plan, then iterate
+.loop/run.sh --plan-only docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md  # plan, commit it, stop
+.loop/run.sh                                                               # resume
 ```
+
+With no state and no brief, `run.sh` plans from the newest
+`docs/briefs/*.loop-brief.md`. Nothing else in that folder is a candidate — not
+an architect brief, not an index, and not a brief under the older `NNNN-slug.md`
+naming, which you pass explicitly.
 
 **`--plan-only` is worth making a habit.** The plan is the highest-leverage
 artefact the loop produces: every gate the rest of the run is measured against

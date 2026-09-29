@@ -78,7 +78,7 @@ grep -q 'Bash(git commit:\*)' "$TGT/.loop/settings.json" \
 grep -q STALE "$TGT/.loop/run.sh" && bad "run.sh was not replaced" || ok "run.sh replaced"
 missing=0
 for f in run.sh amend.sh check-brief.sh render-plan.sh install.sh \
-         manual.md README.md brief-template.md settings.json; do
+         manual.md README.md loop-brief.template.md architect-brief.template.md settings.json; do
   [[ -s "$TGT/.loop/$f" ]] || { bad "mechanism file missing: .loop/$f"; missing=1; }
 done
 [[ $missing -eq 0 ]] && ok "every mechanism file shipped"
@@ -159,6 +159,18 @@ grep -q 'no longer shipped' "$TGT/install2.log" \
   && ok "and the install says so once" || bad "the install said nothing about it"
 rm -rf "$TGT/.loop/todo"
 
+# A renamed mechanism file: the copy only replaces names the source has, so the
+# old name survives an upgrade. Kept, never deleted, and named with its successor.
+printf 'mine, from an earlier install\n' >"$TGT/.loop/brief-template.md"
+"$REPO_ROOT/.loop/install.sh" --no-proof "$TGT" >"$TGT/install3.log" 2>&1
+[[ "$(cat "$TGT/.loop/brief-template.md" 2>/dev/null)" == 'mine, from an earlier install' ]] \
+  && ok "a retired .loop/brief-template.md is left byte-for-byte alone" \
+  || bad "the installer wrote or deleted a retired file"
+grep -q 'renamed to .loop/loop-brief.template.md' "$TGT/install3.log" \
+  && ok "and the install names its replacement" || bad "the install said nothing about the retired file"
+# Left in place on purpose: the chained install below is from THIS copy, which
+# now looks exactly like an upgraded consumer, and must not hand the file on.
+
 note "── an installed copy installs onward ──"
 TGT2="$(mktemp -d "${TMPDIR:-/tmp}/loopinst2.XXXXXX")"
 TGT2="$(cd "$TGT2" && pwd -P)"
@@ -175,6 +187,9 @@ git -C "$TGT2" config user.email t@t && git -C "$TGT2" config user.name t
 [[ -s "$TGT2/.loop/examples/0003-runstat-cli.md" && -s "$TGT2/.loop/examples/0004-runstat-review.md" ]] \
   && ok "example briefs chained — they live in examples/ once installed" \
   || bad "example briefs did not survive a chained install"
+[[ ! -e "$TGT2/.loop/brief-template.md" ]] \
+  && ok "a retired file in the source copy is not shipped onward" \
+  || bad "a chained install shipped a retired file from the copy it ran from"
 
 # 7. Provenance survives the hop, rather than being re-derived from the wrong
 #    repo. At the second hop SRC's git history is the FIRST target's, so a
