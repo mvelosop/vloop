@@ -3,6 +3,7 @@ package brief
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -24,8 +25,15 @@ func scratch(t *testing.T) (root, path, text string) {
 	return root, "docs/briefs/B20260101-0900-a.loop-brief.md", string(data)
 }
 
+// parseFit parses text after pointing the frontmatter name at path's file, as a
+// real brief's must be.
+func parseFit(path, text string) *Brief {
+	name := strings.TrimSuffix(filepath.Base(path), ".md")
+	return Parse(path, regexp.MustCompile(`(?m)^name: .*$`).ReplaceAllString(text, "name: "+name))
+}
+
 func run(root, path, text string) *Result {
-	return Check(root, Parse(path, text), SetFor("en"))
+	return Check(root, parseFit(path, text), SetFor("en"))
 }
 
 func has(lines []string, prefix string) bool {

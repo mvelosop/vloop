@@ -13,7 +13,7 @@ func esRun(t *testing.T, root, lang, file string) *Result {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return Check(root, Parse("docs/briefs/B20260101-0900-a.loop-brief.md", string(data)), SetFor(lang))
+	return Check(root, parseFit("docs/briefs/B20260101-0900-a.loop-brief.md", string(data)), SetFor(lang))
 }
 
 func esRoot(t *testing.T) string {
@@ -63,7 +63,7 @@ func TestCrossLanguage(t *testing.T) {
 		t.Errorf("%v", res.Lines)
 	}
 	data, _ := os.ReadFile(filepath.Join("testdata", "en", "pass.loop-brief.md"))
-	res = Check(root, Parse("docs/briefs/B20260101-0900-a.loop-brief.md", string(data)), SetFor("es"))
+	res = Check(root, parseFit("docs/briefs/B20260101-0900-a.loop-brief.md", string(data)), SetFor("es"))
 	if !has(res.Problems(), "no worked example section") || !has(res.Problems(), "no out-of-scope section") ||
 		!has(res.Warnings(), "no constraints section") {
 		t.Errorf("English brief in es: %v", res.Lines)

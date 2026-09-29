@@ -92,15 +92,21 @@ func heading(name string) *regexp.Regexp {
 // status is not "ready" is skipped.
 func Check(root string, b *Brief, set *HeadingSet) *Result {
 	res := &Result{Path: b.Path, Status: b.Status}
+	add := func(m Marker, format string, a ...any) {
+		res.Lines = append(res.Lines, Line{m, fmt.Sprintf(format, a...)})
+	}
+	fmProblems := frontmatterProblems(b.Path, b.fm)
+	for _, p := range fmProblems {
+		add(Problem, "%s", p)
+	}
 	if b.Status != "ready" {
-		res.Skipped = true
-		if res.Status == "" {
-			res.Status = "missing"
+		if len(fmProblems) == 0 {
+			res.Skipped = true
 		}
 		return res
 	}
-	add := func(m Marker, format string, a ...any) {
-		res.Lines = append(res.Lines, Line{m, fmt.Sprintf(format, a...)})
+	if len(fmProblems) == 0 {
+		add(Pass, "frontmatter is valid")
 	}
 	body := b.Body
 
@@ -158,6 +164,8 @@ func Check(root string, b *Brief, set *HeadingSet) *Result {
 	if n := len(symbolRe.FindAllString(body, -1)); n > 2 {
 		add(Warning, "names %d internal symbols — pinning mechanics, not decisions?", n)
 	}
+
+	res.Lines = append(res.Lines, bindingRefLines(root, body, set)...)
 
 	dead := 0
 	for _, p := range citedPaths(withoutSection(body, heading(set.BindingRefs))) {

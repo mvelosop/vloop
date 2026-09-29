@@ -8,12 +8,15 @@ import (
 	"testing"
 )
 
-const briefText = "---\nname: B20260101-0900-a.loop-brief\nstatus: %s\n---\n# a\n\n## Worked example\n\n```\n$ a\n```\n\n## Out of scope\n\n- one\n- two\n\n## Constraints\n\n- Go.\n\n6 to 9 tasks. Exits 1.\n"
+const briefText = "---\nname: B20260101-0900-a.loop-brief\nstatus: %s\n---\n# a\n\n## Binding references\n\n- `docs/x.md` — the error contract\n\n## Worked example\n\n```\n$ a\n```\n\n## Out of scope\n\n- one\n- two\n\n## Constraints\n\n- Go.\n\n6 to 9 tasks. Exits 1.\n"
 
 func writeBrief(t *testing.T, root, status string) string {
 	t.Helper()
 	rel := "docs/briefs/B20260101-0900-a.loop-brief.md"
 	if err := os.MkdirAll(filepath.Join(root, "docs", "briefs"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "docs", "x.md"), []byte("x\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	text := strings.Replace(briefText, "%s", status, 1)

@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **4/9 done** · iteration 4
+**Status:** running · **5/9 done** · iteration 5
 
-**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:49:11Z
+**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:51:31Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T2** — Repo root resolution and `vloop config get|set|list|path`
 - [x] **T3** — Brief parsing and the English `vloop brief check` (port of check-brief.sh)
 - [x] **T4** — Spanish heading set and the language switch for `brief check`
-- [ ] **T5** — Frontmatter validity and `## Binding references` rules
+- [x] **T5** — Frontmatter validity and `## Binding references` rules
 - [ ] **T6** — `depends-on`: resolution, cycles, and `vloop brief list`
 - [ ] **T7** — `vloop brief new <slug>` with embedded en and es templates
 - [ ] **T8** — Root README.md for a first-time reader, tested against the command tree
@@ -140,7 +140,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T5 — Frontmatter validity and `## Binding references` rules
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 **Files:** `internal/brief/frontmatter.go`, `internal/brief/refs.go`, `internal/brief/frontmatter_test.go`, `internal/brief/refs_test.go`, `internal/brief/testdata/refs/`
 
