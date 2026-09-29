@@ -70,7 +70,7 @@ func TestDanglingAndCycle(t *testing.T) {
 	if _, err := Order(es); err == nil || !strings.HasPrefix(err.Error(), "depends-on cycle: B") {
 		t.Fatalf("cycle: %v", err)
 	}
-	p := graphProblems(es, "B1-a.loop-brief", []string{"B2-b.loop-brief"}, false)
+	p := graphProblems(es, "B1-a.loop-brief", []string{"B2-b.loop-brief"})
 	if len(p) != 1 || p[0] != "depends-on cycle: B1-a.loop-brief -> B2-b.loop-brief -> B1-a.loop-brief" {
 		t.Fatalf("%v", p)
 	}
@@ -95,5 +95,20 @@ func TestCheckReportsDependencyProblems(t *testing.T) {
 	res := Check(root, Parse(path, text), SetFor("en"))
 	if !has(res.Problems(), "depends-on does not resolve: ghost.loop-brief") {
 		t.Fatalf("%v", res.Lines)
+	}
+}
+
+func TestCycleStartIsSmallestName(t *testing.T) {
+	es := []Entry{
+		{Name: "a.loop-brief", DependsOn: []string{"b.loop-brief"}},
+		{Name: "b.loop-brief", DependsOn: []string{"a.loop-brief"}},
+	}
+	want := "depends-on cycle: a.loop-brief -> b.loop-brief -> a.loop-brief"
+	p := graphProblems(es, "b.loop-brief", es[1].DependsOn)
+	if len(p) != 1 || p[0] != want {
+		t.Errorf("check from b: %q, want %q", p, want)
+	}
+	if _, err := Order(es); err == nil || err.Error() != want {
+		t.Errorf("list: %v, want %q", err, want)
 	}
 }

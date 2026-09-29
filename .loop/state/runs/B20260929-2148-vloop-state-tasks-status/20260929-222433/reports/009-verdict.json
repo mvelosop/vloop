@@ -1,0 +1,14 @@
+{
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`brief check <b>` and `brief list` report the same cycle as the same text, starting from the lexicographically smallest brief name", "met": true, "evidence": "deps.go: graphProblems now always emits cycleText(stack[i:]), which rotates the loop to its smallest name; both dependencyLines and Order use it (cycleOnly flag removed)"},
+    {"criterion": "The rest of each message, the dangling-name problem and `brief list`'s ordering are unchanged", "met": true, "evidence": "Only the cycle-path construction changed; the 'depends-on cycle: ' prefix, dangling logic and Order's traversal are untouched in the diff"},
+    {"criterion": "A committed TestCycleStart* test builds a two-brief cycle where the checked brief is not the smallest and asserts the two commands agree; it fails against B1's code", "met": true, "evidence": "TestCycleStartIsSmallestName checks from b and via Order against the same want string; B1 code would give 'b -> a -> b' for the check"},
+    {"criterion": "No existing test in internal/brief or internal/cli is loosened", "met": true, "evidence": "Only change to an existing test is dropping the removed cycleOnly argument; assertion unchanged"},
+    {"criterion": "No product code or test reads or writes this repo's `.loop/` or `.claude/`, or the home directory", "met": true, "evidence": "New test uses in-memory Entry values; no file access"},
+    {"criterion": "gofmt, go vet, go mod tidy -diff clean and builds for linux, windows and host", "met": true, "evidence": "Driver's verify gate passed; diff touches only two Go files with no new imports"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

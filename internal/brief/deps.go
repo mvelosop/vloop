@@ -53,8 +53,9 @@ func Load(root string) ([]Entry, error) {
 
 // graphProblems reports the dangling names and the first cycle reachable from
 // start, whose own dependencies are deps. Names resolve against entries. A
-// cycle is reported from start unless cycleOnly trims it to the loop.
-func graphProblems(entries []Entry, start string, deps []string, cycleOnly bool) []string {
+// cycle is the loop itself, starting from its smallest name, so every caller
+// reads the same cycle the same way.
+func graphProblems(entries []Entry, start string, deps []string) []string {
 	byName := map[string][]string{}
 	for _, e := range entries {
 		byName[e.Name] = e.DependsOn
@@ -74,11 +75,7 @@ func graphProblems(entries []Entry, start string, deps []string, cycleOnly bool)
 			}
 			for i, s := range stack {
 				if s == d {
-					path := stack
-					if cycleOnly {
-						path = stack[i:] // the loop itself, not the way into it
-					}
-					out = append(out, "depends-on cycle: "+strings.Join(append(path[:len(path):len(path)], d), " -> "))
+					out = append(out, "depends-on cycle: "+cycleText(stack[i:]))
 					return true
 				}
 			}
@@ -92,6 +89,18 @@ func graphProblems(entries []Entry, start string, deps []string, cycleOnly bool)
 	return out
 }
 
+// cycleText writes a loop starting from its smallest name and back to it.
+func cycleText(loop []string) string {
+	min := 0
+	for i, n := range loop {
+		if n < loop[min] {
+			min = i
+		}
+	}
+	path := append(append([]string{}, loop[min:]...), loop[:min]...)
+	return strings.Join(append(path, path[0]), " -> ")
+}
+
 // dependencyLines is the depends-on rule of `brief check`.
 func dependencyLines(root string, b *Brief) []Line {
 	if len(b.fm.DependsOn) == 0 {
@@ -101,7 +110,7 @@ func dependencyLines(root string, b *Brief) []Line {
 	if err != nil {
 		return []Line{{Problem, fmt.Sprintf("cannot read %s: %v", Dir, err)}}
 	}
-	probs := graphProblems(entries, strings.TrimSuffix(pathBase(b.Path), ".md"), b.fm.DependsOn, false)
+	probs := graphProblems(entries, strings.TrimSuffix(pathBase(b.Path), ".md"), b.fm.DependsOn)
 	if len(probs) == 0 {
 		return []Line{{Pass, "depends-on resolves"}}
 	}
@@ -117,7 +126,7 @@ func dependencyLines(root string, b *Brief) []Line {
 // filled in. The error is the first problem found, worded as in `brief check`.
 func Order(entries []Entry) ([]Entry, error) {
 	for _, e := range entries {
-		if p := graphProblems(entries, e.Name, e.DependsOn, true); len(p) > 0 {
+		if p := graphProblems(entries, e.Name, e.DependsOn); len(p) > 0 {
 			return nil, fmt.Errorf("%s", p[0])
 		}
 	}

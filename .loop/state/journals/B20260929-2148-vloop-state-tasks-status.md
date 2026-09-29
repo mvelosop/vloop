@@ -116,3 +116,10 @@ I left my gate-drafting scratch in `.loop/tmp/gates/`. It's git-ignored, and my 
 - **Summary:** Added `vloop task gate <id>` (runs verify from the repo root in the plan's shell, text and --json) and `vloop task verify <id> <cmd> --reason` (appends to gate_history via state.ReplaceGate through the existing amend path).
 - **Files:** internal/state/gate.go, internal/state/gate_test.go, internal/cli/task_gate.go, internal/cli/task_gate_test.go, internal/cli/task.go
 - **Notes for next iteration:** internal/cli/task.go changed too, to register the two commands. Gate failure exits 1 through Problem(errors.New("")) as in task validate, so nothing extra is printed. A gate killed by a signal reports exit 1. Missing shell is state.ShellMissingError, mapped by jsonProblem. task verify reuses amend(), so an invalid plan or result refuses with the usual messages; an empty command exits 1. Tests use PATH doubles for bash/pwsh/powershell/cmd and skip when sh is absent. README does not yet document task gate/verify, and TestReadmeMatchesCommandTree is skipped by the gate; a later task must cover them.
+
+## T7 — F1: report a depends-on cycle from its smallest brief name in `brief check` and `brief list`
+
+- **Outcome:** done (review: PASS)
+- **Summary:** graphProblems now always reports the loop itself, rotated to start at its lexicographically smallest brief name, so `brief check` and `brief list` print the same cycle text.
+- **Files:** internal/brief/deps.go, internal/brief/deps_test.go
+- **Notes for next iteration:** Removed graphProblems' cycleOnly parameter (new cycleText helper does the rotation); `brief check` no longer prints the lead-in path before the loop, only the loop. Only change to an existing test: the graphProblems call in deps_test.go lost its trailing bool arg; assertions untouched. Added TestCycleStartIsSmallestName.
