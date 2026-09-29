@@ -4,15 +4,15 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **2/10 done** · iteration 2
+**Status:** running · **3/10 done** · iteration 3
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:01:55Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:05:08Z
 
 ## Progress
 
 - [x] **T1** — Add the `defect/v1` and `metrics/v1` schemas and the five `metrics.*` config keys
 - [x] **T2** — Build line classification: the stack presets, the layers, `vloop metrics stacks` and `vloop metrics classify`
-- [ ] **T3** — Read the shell-loop and vloop run layouts and the git history into one model per brief
+- [x] **T3** — Read the shell-loop and vloop run layouts and the git history into one model per brief
 - [ ] **T4** — Count lines: delivered and churn per category, deletions, rework and test:code
 - [ ] **T5** — Compute time, cost, tokens, models, task counts, first-pass and missing records
 - [ ] **T6** — Detect release and add `vloop defect add|list|set` with `--blame` attribution
@@ -75,7 +75,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T3 — Read the shell-loop and vloop run layouts and the git history into one model per brief
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 **Files:** `internal/runs/`
 

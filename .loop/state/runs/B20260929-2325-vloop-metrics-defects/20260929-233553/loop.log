@@ -39,3 +39,19 @@
 [36m[loop][0m cost=$0.1352264 turns=5 dur=25s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T2 done
+[36m[loop][0m    committed 69a3439
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            2
+[36m[loop][0m   tasks closed:          2/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $6.84 (estimate, not a bill)
+[36m[loop][0m ── iteration 3 (3/30 this run) · T3 · 2/10 done ──
+[36m[loop][0m    Read the shell-loop and vloop run layouts and the git history into one model per brief
+[36m[loop][0m cost=$0.5790292 turns=12 dur=162s error=false
+[36m[loop][0m cost=$0.14536200000000002 turns=5 dur=22s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T3 done

@@ -1,0 +1,13 @@
+{
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A package `internal/runs` resolves a brief (path or name) to its run id and collects every run folder that belongs to it (shell-loop by loop.log planning/resuming with ANSI stripped, vloop by run id folder)", "met": true, "evidence": "runs.go RunID/BriefPath/logOwns/shellFolders/vloopFolders; TestShellLoopFolders covers other-brief, resuming, resuming B1-xyz (rejected), no-log folders"},
+    {"criterion": "Reads sessions, iterations and verdicts into one model; a session's task comes from the iteration it names", "met": true, "evidence": "readFolder/readSession/readIterations/readVerdict handle both shell-loop and v1 shapes; taskOf map from iterations; TestShellLoopSessionsIterationsVerdicts and TestVloopLayoutFolders assert values"},
+    {"criterion": "Owned commits from every local ref: latest plan, last run commit after it, task commits between; plan read via git", "met": true, "evidence": "commits.go OwnedCommits uses log --all, ancestry-path; PlanAt uses git show; TestOwnedCommitsLatestPlanOnly (re-plan), ...AnyRefAndNoRunCommit, ...PlanReadFromGit"},
+    {"criterion": "Nothing under .loop/ or .vloop/ is written; / separators, no case-sensitivity assumption", "met": true, "evidence": "only reads in the code; path package and ToSlash used; test asserts .vloop is not created"},
+    {"criterion": "Committed tests TestShellLoop…, TestVloopLayout…, TestOwnedCommits… build fixtures in temp dirs", "met": true, "evidence": "runs_test.go uses t.TempDir fixtures and temp git repos with GIT_CONFIG_GLOBAL=/dev/null; no repo .loop/home reads"}
+  ],
+  "findings": [],
+  "notes": "Minor: the 'plan session in another branch's folder' case is only exercised via ownership being independent of the group folder name (other-branch resuming folder), not a separate planning-from fixture. No absolute paths found."
+}
