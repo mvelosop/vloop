@@ -8,3 +8,9 @@ import "embed"
 //
 //go:embed all:plugin
 var Plugin embed.FS
+
+// Schemas are the JSON Schema documents for vloop's file contracts. They are
+// the authority: Go reads them only from here, never from disk.
+//
+//go:embed schemas/*.json
+var Schemas embed.FS

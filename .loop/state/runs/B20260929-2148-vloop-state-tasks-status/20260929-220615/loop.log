@@ -17,3 +17,8 @@
 [36m[loop][0m cost=$3.764245400000001 turns=41 dur=860s error=false
 [33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
 [36m[loop][0m planned: B20260929-2148-vloop-state-tasks-status — 9 tasks
+[36m[loop][0m committed the plan
+[36m[loop][0m ── iteration 1 (1/30 this run) · T1 · 0/9 done ──
+[36m[loop][0m    Embed the five JSON Schemas and add `vloop schema list|show|validate`
+[36m[loop][0m cost=$0.49808180000000013 turns=15 dur=138s error=false
+[36m[loop][0m    work session reported blocked

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 116907,
+  "stop_reason": "end_turn",
+  "session_id": "17beba30-3bce-4dfc-a3cd-2b46cfe2ae0f",
+  "total_cost_usd": 0.49808180000000013,
+  "usage": {
+    "input_tokens": 28,
+    "cache_creation_input_tokens": 48410,
+    "cache_read_input_tokens": 601579,
+    "output_tokens": 18407,
+    "output_tokens_details": {
+      "thinking_tokens": 1833
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 48410,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 534,
+        "cache_read_input_tokens": 57807,
+        "cache_creation_input_tokens": 944,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 944
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 28,
+      "outputTokens": 18407,
+      "cacheReadInputTokens": 601579,
+      "cacheCreationInputTokens": 48410,
+      "webSearchRequests": 0,
+      "costUSD": 0.49808180000000013,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1833,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 15,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is blocked: the implementation is finished, but its verify command fails on this machine because of one assertion in the gate itself.\n\n**What fails:** the assertion for `del(.base)` builds the grep pattern `^b\\.json: (|/): .+`. That has an empty alternative, which macOS grep rejects (`empty (sub)expression`), so it can never match here. GNU grep accepts it. The output is correct: `b.json: : missing property 'base'`, with pointer `\"\"` as the brief requires. I did not touch the gate.\n\n**How I checked:** a temp copy of the gate with only that pointer pattern relaxed exits 0. That copy runs every other check, including gofmt, vet, `go mod tidy -diff`, the three builds, the unit tests and all the CLI assertions. The fix for the operator is to replace the pattern with something like `lre '^b\\.json: : .+'`, which has no empty alternative.\n\n**What now exists:**\n- The five schemas are in `schemas/`, embedded via `embed.go`.\n- `internal/schema` validates against the embedded documents with `santhosh-tekuri/jsonschema/v6`. It loads nothing from disk or the network.\n- `vloop schema list|show|validate` is wired in `internal/cli/root.go`.\n- The fixtures and tests are committed.\n\n`golang.org/x/text` is now a direct dependency, because the validator needs it to format messages. It was already pulled in by `jsonschema/v6`.\n\n`.loop/tmp/proposal.json` is written with outcome `blocked` and these details. I did not touch `state.json` or commit anything.",
+  "ttft_ms": 2343,
+  "type": "result",
+  "duration_ms": 137753,
+  "uuid": "14d48b5c-6259-407c-a123-745b15b17e9e",
+  "ttft_stream_ms": 1398,
+  "time_to_request_ms": 359,
+  "first_content_frame_ms": 1399,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 1
+}

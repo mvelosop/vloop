@@ -4,13 +4,13 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **0/9 done** · iteration 0
+**Status:** running · **0/9 done** · iteration 1
 
-**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:18:02Z
+**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:22:58Z
 
 ## Progress
 
-- [ ] **T1** — Embed the five JSON Schemas and add `vloop schema list|show|validate`
+- [ ] **T1** — Embed the five JSON Schemas and add `vloop schema list|show|validate` · 1 attempt(s)
 - [ ] **T2** — Load and save `.vloop/state/state.json`, and add `vloop status` (text, --json, --markdown)
 - [ ] **T3** — Add the `shell` and `areas` config keys, and `vloop task list|show` with model/effort resolution
 - [ ] **T4** — Add `vloop task validate` with every structural rule
@@ -24,7 +24,7 @@
 
 ### T1 — Embed the five JSON Schemas and add `vloop schema list|show|validate`
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 **Files:** `go.mod`, `go.sum`, `embed.go`, `embed_test.go`, `schemas/state.v1.json`, `schemas/proposal.v1.json`, `schemas/verdict.v1.json`, `schemas/session.v1.json`, `schemas/iteration.v1.json`, `internal/schema/schema.go`, `internal/schema/schema_test.go`, `internal/schema/testdata/`, `internal/cli/schema.go`, `internal/cli/schema_test.go`, `internal/cli/root.go`
 
@@ -48,6 +48,8 @@ The schemas are the contract every other file in the loop is judged against: Go 
 - Committed tests: internal/schema has, for every schema, at least one fixture under internal/schema/testdata/ that validates and one that fails at a named pointer, exercised by a test; internal/cli has TestSchema* tests covering list, show, validate and the unknown-name error.
 - No product code or test reads or writes this repo's `.loop/` or `.claude/`, or the home directory; tests work in `t.TempDir()` scratch repos.
 - `gofmt -l .` prints nothing, `go vet ./...` passes, `go mod tidy -diff` prints nothing, and the module builds with CGO_ENABLED=0 for linux and windows and for the host.
+
+**From the last attempt:** Implemented everything: five schemas in schemas/, embedded via embed.go, internal/schema (jsonschema/v6, embedded FS only, no loader), `vloop schema list|show|validate`, fixtures and tests. gofmt, vet, tidy, builds and unit tests pass. The verify command fails at one line that is a gate defect on this host.
 
 <details><summary>verify command</summary>
 

@@ -1,0 +1,1 @@
+{"schema":"session/v1","run_id":"r","iteration":1,"phase":"work","task":"T1","model":"sonnet","effort":null,"models_used":{"m":{"input_tokens":1,"output_tokens":2,"cache_read_input_tokens":3,"cache_creation_input_tokens":4,"cost_usd":0.5}},"started":"2026-01-01T09:00:00Z","duration_ms":10,"cost_usd":0.5,"turns":1,"is_error":"no","permission_denials":[]}

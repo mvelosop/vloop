@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "proposal/v1",
+  "description": "A work session's report: .loop/tmp/proposal.json",
+  "type": "object",
+  "required": ["schema", "task", "outcome", "summary", "files", "verified", "notes"],
+  "properties": {
+    "schema": { "const": "proposal/v1" },
+    "task": { "type": "string" },
+    "outcome": { "enum": ["done", "blocked"] },
+    "summary": { "type": "string" },
+    "files": { "type": "array", "items": { "type": "string" } },
+    "verified": { "type": "string" },
+    "notes": { "type": "string" },
+    "gate_dispute": {
+      "type": "object",
+      "required": ["reason", "evidence"],
+      "properties": {
+        "reason": { "type": "string" },
+        "evidence": { "type": "string" }
+      }
+    }
+  }
+}
