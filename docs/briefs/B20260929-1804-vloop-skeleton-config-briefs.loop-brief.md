@@ -2,13 +2,16 @@
 name: B20260929-1804-vloop-skeleton-config-briefs.loop-brief
 description: Build the vloop Go CLI skeleton — version, repo-local config with language and per-kind model/effort, and the bilingual brief format with check, new, list and depends-on
 kind: brief
-status: draft
+status: consumed
 created: 2026-09-29
 seeds: A `.loop/run.sh` plan + run that builds the first slice of vloop (B1 in docs/design-notes/vloop-roadmap.md)
 ---
 # Brief — vloop B1: CLI skeleton, config, and the bilingual brief format
 
-- **Status:** ready to plan
+- **Status:** consumed — planned and run as
+  `B20260929-1804-vloop-skeleton-config-briefs`, 9/9 tasks, on branch
+  `B20260929-1804-vloop-skeleton-config-briefs` (run commit `228b13f`), not yet
+  merged. **Do not re-plan from this brief.**
 - **Starting point:** greenfield Go code; extends `main` at the commit that adds
   this brief. The planner pins that SHA as the base every gate compares against.
 - **Produced by:** the design act on
@@ -486,3 +489,32 @@ load-bearing:
 
 The worked example needs its own gate (task 9): the unit tests in 1–8 can all
 pass while the binary's wiring — flags, exit codes, stdout vs stderr — is wrong.
+
+## Run record
+
+**Outcome.** Complete: 9/9 tasks done, 0 blocked, each closed in one
+iteration — 0 gate failures, 0 review rejections. Run
+`B20260929-1804-vloop-skeleton-config-briefs/20260929-194129`, 9 iterations.
+
+**Spend.** Plan $2.94 (opus, 1 session). Work $3.37 (9 sessions, 94 turns),
+review $1.10 (9 sessions, 46 turns), both sonnet. Total $7.41.
+
+**Verified by the operator's session, outside the loop.** `go test -count=1 ./...`,
+`go vet ./...`, `gofmt -l .` and both cross-builds pass. The worked example was
+replayed by hand in a scratch repo: every line, exit code and planted failure
+matches. Also checked: `--json` output, `brief check` on a non-loop-brief
+(exit 2), an unknown command (exit 2), repo-root discovery from a subdirectory.
+
+**Changed by hand.** `go mod tidy`: the TOML library was imported directly but
+listed as `// indirect`. No gate checked module tidiness.
+
+**Still open.**
+
+- `brief list` reports a cycle starting from the first brief in its order
+  (b → a → b), `brief check` from the checked brief (a → b → a). Within the
+  contract, which pinned only the message; worth pinning one rule in B2.
+- A tidy check (`go mod tidy -diff`) belongs in future gates.
+- The plan's permission fence denied the planner a `python3` fixture self-check;
+  harmless, but a planner that cannot run its fixtures authored them blind.
+- The README (128 lines) passed review; a first-time reader's read is the real test.
+- Merge to `main`; `main` also carries the plan commit `454f4da`.
