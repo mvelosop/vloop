@@ -70,6 +70,7 @@ does not exist, or an item with no reason, is a problem.
 | `vloop task list` | print one line per task |
 | `vloop task show <id>` | print a task and the model and effort its sessions resolve to |
 | `vloop task validate` | check the plan's structure |
+| `vloop metrics [<brief>…] [--by task]` | summarise a brief's size, time, cost and defects from its runs and commits; with no brief, one row per brief; `--by task` gives one row per task |
 | `vloop metrics stacks [name]` | print the built-in stack presets, or one preset's globs |
 | `vloop metrics classify <path>…` | print each path's category and the layer and glob that decided it |
 | `vloop defect add "<summary>"` | record a defect as `.vloop/defects/D<stamp>-<slug>.md` and print its path |

@@ -76,3 +76,6 @@ func Release(root, briefPath string) (string, error) {
 	}
 	return "", nil
 }
+
+// FrontmatterStatus reads `status:` from a document's frontmatter; "" if none.
+func FrontmatterStatus(text string) string { return frontmatterStatus(text) }

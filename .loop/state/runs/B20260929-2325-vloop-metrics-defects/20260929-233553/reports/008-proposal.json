@@ -1,0 +1,8 @@
+{
+  "task": "T8",
+  "outcome": "done",
+  "summary": "Added `vloop metrics [<brief>…] [--by task] [--json]`: metrics.Build assembles a metrics/v1 Report per brief from tasks 3–7, and the CLI prints the summary, the --by task table, the cross-brief table, or the JSON.",
+  "files": ["internal/metrics/metrics.go", "internal/runs/release.go", "internal/cli/metrics.go", "internal/cli/metrics_print.go", "internal/cli/metrics_test.go", "README.md"],
+  "verified": "T8 verify command run in the foreground: printed `gate T8 ok`.",
+  "notes": "metrics.Build(root, brief, classifier) returns nil (not an error) when the brief has no runs; the CLI turns that into `vloop: no runs for <name>` exit 1. Status is read from the working-tree brief; merged/lead_time come from runs.Release (a missing default branch means not merged). Added runs.FrontmatterStatus, a one-line exported wrapper, outside the listed files. JSON removal_efficiency is the exact fraction (0..1) while the text shows a whole percentage from DefectCounts.RemovalEfficiency. Gates shows minutes with no unit (`gates 0.5`). Cross-brief mode ignores --by. Unknown --by value is a usage error (exit 2). Brief paths passed to Build must contain `/` or end in .md (BriefPath treats bare names as docs/briefs names). Tests reuse gitIn/write/runCLI from other cli test files."
+}

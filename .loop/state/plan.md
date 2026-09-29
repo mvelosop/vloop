@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **7/10 done** · iteration 7
+**Status:** running · **8/10 done** · iteration 8
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:16:05Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:20:39Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T5** — Compute time, cost, tokens, models, task counts, first-pass and missing records
 - [x] **T6** — Detect release and add `vloop defect add|list|set` with `--blame` attribution
 - [x] **T7** — Derive defects from runs, reclassify through `gate_history`, and print the origin × catcher matrix
-- [ ] **T8** — Add `vloop metrics`: the per-brief summary, `--by task`, the cross-brief table and `--json`
+- [x] **T8** — Add `vloop metrics`: the per-brief summary, `--by task`, the cross-brief table and `--json`
 - [ ] **T9** — Write docs/guide/metrics.md and docs/guide/defects.md and bring the README up to date
 - [ ] **T10** — Close: the end-to-end worked example and the real-data check on this repository
 
@@ -195,7 +195,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T8 — Add `vloop metrics`: the per-brief summary, `--by task`, the cross-brief table and `--json`
 
-`pending` · depends on: T4, T5, T7
+`done` · depends on: T4, T5, T7
 
 **Files:** `internal/metrics/metrics.go`, `internal/metrics/metrics_test.go`, `internal/cli/metrics.go`, `internal/cli/metrics_test.go`, `README.md`
 

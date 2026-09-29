@@ -3,23 +3,110 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/metrics"
 )
 
 func newMetrics(g *Globals) *cobra.Command {
+	var by string
 	cmd := &cobra.Command{
-		Use:   "metrics",
-		Short: "Line classification and brief metrics",
-		Args:  cobra.NoArgs,
-		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+		Use:   "metrics [<brief>…]",
+		Short: "Summarise what a brief cost and delivered, from its runs and commits",
+		Args:  cobra.ArbitraryArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if by != "" && by != "task" {
+				return fmt.Errorf("unknown --by %q: want task", by)
+			}
+			root, err := g.root()
+			if err != nil {
+				return err
+			}
+			out := cmd.OutOrStdout()
+			c, err := newClassifier(g, out, root)
+			if err != nil {
+				return err
+			}
+			var reports []*metrics.Report
+			for _, b := range args {
+				r, err := metrics.Build(root, b, c)
+				if err != nil {
+					return Problem(err)
+				}
+				if r == nil {
+					return Problem(fmt.Errorf("no runs for %s", defect.BriefName(b)))
+				}
+				reports = append(reports, r)
+			}
+			if len(args) == 0 {
+				if reports, err = allReports(root, c); err != nil {
+					return Problem(err)
+				}
+			}
+			if g.JSON {
+				if len(args) == 1 {
+					return json.NewEncoder(out).Encode(reports[0])
+				}
+				if reports == nil {
+					reports = []*metrics.Report{}
+				}
+				return json.NewEncoder(out).Encode(reports)
+			}
+			switch {
+			case len(args) == 0:
+				printBriefTable(out, reports)
+			case by == "task":
+				for i, r := range reports {
+					if i > 0 {
+						fmt.Fprintln(out)
+					}
+					printByTask(out, r)
+				}
+			default:
+				for i, r := range reports {
+					if i > 0 {
+						fmt.Fprintln(out)
+					}
+					printSummary(out, r)
+				}
+			}
+			return nil
+		},
 	}
+	cmd.Flags().StringVar(&by, "by", "", "break the summary down by `task`")
 	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g))
 	return cmd
+}
+
+// allReports reports every brief in docs/briefs that has runs, in name order.
+func allReports(root string, c *classify.Classifier) ([]*metrics.Report, error) {
+	ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(defect.BriefsDir)))
+	if err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+	var out []*metrics.Report
+	for _, e := range ents {
+		n := e.Name()
+		if e.IsDir() || !strings.HasSuffix(n, ".loop-brief.md") {
+			continue
+		}
+		r, err := metrics.Build(root, defect.BriefsDir+"/"+n, c)
+		if err != nil {
+			return nil, err
+		}
+		if r != nil {
+			out = append(out, r)
+		}
+	}
+	return out, nil
 }
 
 func newMetricsStacks(g *Globals) *cobra.Command {
@@ -62,6 +149,29 @@ func newMetricsStacks(g *Globals) *cobra.Command {
 	}
 }
 
+// newClassifier builds the classifier from the repo's metrics.* config keys.
+func newClassifier(g *Globals, out io.Writer, root string) (*classify.Classifier, error) {
+	get := func(k string) ([]string, error) {
+		v, err := config.Get(root, k)
+		return v.List, err
+	}
+	var repo classify.Preset
+	for _, r := range []struct {
+		key string
+		dst *[]string
+	}{{"metrics.excluded", &repo.Excluded}, {"metrics.test", &repo.Test}, {"metrics.docs", &repo.Docs}, {"metrics.code", &repo.Code}} {
+		var err error
+		if *r.dst, err = get(r.key); err != nil {
+			return nil, configErr(g, out, err)
+		}
+	}
+	stacks, err := get("metrics.stacks")
+	if err != nil {
+		return nil, configErr(g, out, err)
+	}
+	return classify.New(repo, stacks), nil
+}
+
 type classifyLine struct {
 	Path     string  `json:"path"`
 	Category string  `json:"category"`
@@ -80,24 +190,10 @@ func newMetricsClassify(g *Globals) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			get := func(k string) ([]string, error) {
-				v, err := config.Get(root, k)
-				return v.List, err
-			}
-			var repo classify.Preset
-			for _, r := range []struct {
-				key string
-				dst *[]string
-			}{{"metrics.excluded", &repo.Excluded}, {"metrics.test", &repo.Test}, {"metrics.docs", &repo.Docs}, {"metrics.code", &repo.Code}} {
-				if *r.dst, err = get(r.key); err != nil {
-					return configErr(g, out, err)
-				}
-			}
-			stacks, err := get("metrics.stacks")
+			c, err := newClassifier(g, out, root)
 			if err != nil {
-				return configErr(g, out, err)
+				return err
 			}
-			c := classify.New(repo, stacks)
 			var lines []classifyLine
 			for _, p := range args {
 				r := c.Classify(strings.ReplaceAll(p, "\\", "/"))

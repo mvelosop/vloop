@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 192789,
+  "stop_reason": "end_turn",
+  "session_id": "0333366c-9dce-4a40-943c-6610f9846167",
+  "total_cost_usd": 1.0729431999999999,
+  "usage": {
+    "input_tokens": 48,
+    "cache_creation_input_tokens": 105031,
+    "cache_read_input_tokens": 1934816,
+    "output_tokens": 26576,
+    "output_tokens_details": {
+      "thinking_tokens": 6570
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 105031,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 471,
+        "cache_read_input_tokens": 116302,
+        "cache_creation_input_tokens": 745,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 745
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 48,
+      "outputTokens": 26576,
+      "cacheReadInputTokens": 1934816,
+      "cacheCreationInputTokens": 105031,
+      "webSearchRequests": 0,
+      "costUSD": 1.0729431999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 6570,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 26,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T8 is finished and its verify command passes: run in the foreground, it printed `gate T8 ok`.\n\n`vloop metrics [<brief>…]` now prints the summary for a brief given as a name or a path. With no brief it prints one row per brief that has runs. `--by task` gives one row per task, and `--json` prints a metrics/v1 document (an array when several briefs). A brief with no runs gives `vloop: no runs for <name>` and exit 1.\n\n- **Verification:** the `TestMetricsCommand…` tests cover each mode on a temporary copy of the brief's worked example. `go test ./internal/...` passes.\n- **Undeclared change:** I added `runs.FrontmatterStatus`, a one-line exported wrapper in `internal/runs/release.go`, so the metrics code can read a brief's status. It isn't in T8's file list.\n- **Choices to know about:**\n  - The gates figure prints in minutes with no unit (`gates 0.5`).\n  - `--by` with no brief is ignored, and a `--by` value other than `task` is a usage error (exit 2).\n  - In `--json`, `removal_efficiency` is the exact fraction (0–1), while the text shows a whole percentage.\n\n`.loop/tmp/proposal.json` is written with outcome `done` and the notes for the next iteration. I didn't touch `state.json`, commit, or write under `.loop/` beyond that file.",
+  "ttft_ms": 1801,
+  "type": "result",
+  "duration_ms": 220400,
+  "uuid": "0078b443-5f85-4ed3-898d-54d4880371ec",
+  "ttft_stream_ms": 1227,
+  "time_to_request_ms": 363,
+  "first_content_frame_ms": 1227,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 8
+}
