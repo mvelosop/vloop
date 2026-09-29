@@ -106,3 +106,9 @@ The file names in each task's `files` list only suggest where code goes; no gate
 - **Summary:** Added cmd/vloop/b3_e2e_test.go (TestWorkedExampleB3Commands and ...PlantedFailures build the binary and replay the brief's fixture, every command and the six planted failures) and .vloop/config.toml (metrics.stacks = go, metrics.code = the brief templates' glob). Real-data check on B1 and B2 passes read-only.
 - **Files:** cmd/vloop/b3_e2e_test.go, .vloop/config.toml, embed_test.go
 - **Notes for next iteration:** go test ./... failed on a stale expectation in embed_test.go (TestSchemasAreEmbedded wanted 5 embedded schemas; T1 added defect/v1 and metrics/v1, so 7). Updated that one number; it is the required 'schema list gains two' change, not a weakening. The fixture builder takes b3Opts (noTrailer, gateHistory, logNames) so each planted failure is a variant of one repo; a later notes.txt commit on main is the 'neither trailer nor consumed' blame target, and the squash sha is taken before it. gate_history entry is dated 09:05, between the gate_fail (09:04) and done (09:06) commits. .vloop/config.toml uses dotted keys.
+
+## Run ended — complete
+
+- **Run:** `20260929-233553` · 10 iteration(s) this run
+- **Plan:** 10/10 done, 0 blocked
+- **Signals:** 10 iterations · 1.00 per closed · 0 gate failure(s) · 0 review rejection(s) · 0 attempt(s) burned · streak 0 · ~$12.31

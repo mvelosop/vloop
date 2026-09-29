@@ -168,3 +168,33 @@
 [36m[loop][0m cost=$0.10642560000000001 turns=5 dur=19s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T10 done
+[36m[loop][0m    committed 03356d4
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            10
+[36m[loop][0m   tasks closed:          10/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $12.31 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m ═══ complete ═══
+[36m[loop][0m run:    B20260929-2325-vloop-metrics-defects/20260929-233553  (10 iteration(s) this run)
+[36m[loop][0m plan:   10/10 done, 0 blocked
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            10
+[36m[loop][0m   tasks closed:          10/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $12.31 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m per-phase cost:
+[36m[loop][0m plan: 1 session(s), $5.72, 64 turns
+[36m[loop][0m work: 10 session(s), $5.3, 148 turns
+[36m[loop][0m review: 10 session(s), $1.3, 48 turns
+[36m[loop][0m 
+[36m[loop][0m plan complete. journal: .loop/state/journals/B20260929-2325-vloop-metrics-defects.md

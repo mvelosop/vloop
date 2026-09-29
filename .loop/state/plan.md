@@ -4,7 +4,7 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **10/10 done** · iteration 10
+**Status:** complete · **10/10 done** · iteration 10
 
 **Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:25:36Z
 
