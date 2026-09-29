@@ -1,0 +1,8 @@
+{
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Added `vloop task reset|note|drop|set`, backed by state.Amend, which refuses an already-invalid plan and any result that would fail task validate, and saves atomically in T2's stable format.",
+  "files": ["internal/state/amend.go", "internal/state/amend_test.go", "internal/state/validate.go", "internal/cli/task_amend.go", "internal/cli/task_amend_test.go", "internal/cli/task.go"],
+  "verified": "The T5 verify command exited 0 (gofmt, vet, tidy, three builds, unit tests, and every scripted reset/note/drop/set check).",
+  "notes": "state.Check is now a thin wrapper over the new state.CheckBytes(root, data, areas), so a result can be validated before it is written. Files outside the task's list that changed: internal/state/validate.go and internal/cli/task.go (registers the commands). A result the check rejects prints `vloop: refusing to write a plan that fails task validate: <first problem>` and exits 1. A plan that already has structural problems (not just schema ones) also refuses every write, because its result would still fail. `task reset` leaves notes alone, as the brief says; amend.sh cleared them. Saving still drops unknown keys, as T2 recorded. Clearing model.* or effort.* removes the whole object once both keys are empty. Successful writes print nothing. Tests write timestamps at 1-second resolution, so they only assert `updated` differs from the fixture's, not from the previous write."
+}

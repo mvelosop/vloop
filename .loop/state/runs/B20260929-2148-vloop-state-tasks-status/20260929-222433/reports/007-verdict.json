@@ -1,0 +1,17 @@
+{
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "task reset/note/drop semantics, drop refuses with `vloop: <dependent> depends on <id>` exit 1", "met": true, "evidence": "state.Reset/SetNote/Drop in internal/state/amend.go; Drop returns \"%s depends on %s\" mapped to Problem (exit 1); TestTaskDropRefusals"},
+    {"criterion": "task set accepts the six fields, '' clears (removes key), other field exit 2", "met": true, "evidence": "settableFields whitelist returns a plain usage error (exit 2); setSession collapses empty Sessions to nil; TestTaskSetChanges/TestTaskSetClears"},
+    {"criterion": "task set validates kind/effort/area with B1's message, exit 2, nothing written", "met": true, "evidence": "checkFieldValue returns config.InvalidValueError before SetField; TestTaskSetRefusals"},
+    {"criterion": "Every write refuses an already-invalid plan (exit 1) and a result that fails task validate; file untouched", "met": true, "evidence": "state.Amend validates schema first (ErrInvalidPlan), then CheckBytes on the marshalled result before Save; TestTaskAmendInvalidPlan, TestTaskSetClearAreaRefusedWhenAreasSet, TestAmendRefusesInvalidResult"},
+    {"criterion": "A write changes only state.json, prior plan plus the change and new updated, stable format", "met": true, "evidence": "changed() test helper compares against state.Marshal of the mutated prior plan and checks .vloop/state holds exactly one file; verify script diffs the file set"},
+    {"criterion": "Unknown task id is `vloop: no task <id>`, exit 1, nothing written", "met": true, "evidence": "NoTaskError mapped to Problem; TestTaskNoteUnknownTask; scripted gate check"},
+    {"criterion": "Committed TestTaskReset*, TestTaskNote*, TestTaskDrop*, TestTaskSet* tests", "met": true, "evidence": "internal/cli/task_amend_test.go lines 88-169, with real assertions on plan bytes and stderr"},
+    {"criterion": "No product code or test touches .loop/, .claude/ or home", "met": true, "evidence": "tests use taskRepo temp repos; grep for /Users finds only pre-existing brief tests"},
+    {"criterion": "gofmt, vet, tidy, cross builds clean", "met": true, "evidence": "driver's verify passed; go test ./internal/state passes"}
+  ],
+  "findings": [],
+  "notes": "TestReadmeMatchesCommandTree still fails (README lacks the new commands); it is a known failure the gate skips, and a later docs task must cover it. validate.go and task.go changed outside the listed files, but both are needed (CheckBytes refactor, command registration) and are minimal."
+}

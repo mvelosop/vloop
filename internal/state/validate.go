@@ -1,12 +1,17 @@
 package state
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/mvelosop/vloop/internal/schema"
 )
 
 // Report is what Check found: problems fail the plan, warnings do not.
@@ -20,7 +25,19 @@ type Report struct {
 // area list; when empty, a task's area is optional and unchecked. It never
 // writes. A missing plan is ErrNoPlan.
 func Check(root string, areas []string) (*Report, error) {
-	violations, err := Validate(root)
+	data, err := os.ReadFile(Path(root))
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil, ErrNoPlan
+	}
+	if err != nil {
+		return nil, err
+	}
+	return CheckBytes(root, data, areas)
+}
+
+// CheckBytes is Check for plan bytes not (yet) on disk.
+func CheckBytes(root string, data []byte, areas []string) (*Report, error) {
+	violations, err := schema.Validate(SchemaName, data)
 	if err != nil {
 		return nil, err
 	}
@@ -28,18 +45,18 @@ func Check(root string, areas []string) (*Report, error) {
 	for _, v := range violations {
 		r.Problems = append(r.Problems, fmt.Sprintf("schema: %s: %s", v.Pointer, v.Message))
 	}
-	p, err := Load(root)
-	if err != nil {
+	var p Plan
+	if err := json.Unmarshal(data, &p); err != nil {
 		if len(violations) > 0 {
 			return r, nil // unparseable; the schema violations say so
 		}
 		return nil, err
 	}
-	r.checkIDs(p)
-	r.checkCycles(p)
-	r.checkReferences(root, p)
-	r.checkAreas(p, areas)
-	r.checkHistory(p)
+	r.checkIDs(&p)
+	r.checkCycles(&p)
+	r.checkReferences(root, &p)
+	r.checkAreas(&p, areas)
+	r.checkHistory(&p)
 	return r, nil
 }
 
