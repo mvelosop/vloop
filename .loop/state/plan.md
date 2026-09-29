@@ -4,14 +4,14 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **1/9 done** · iteration 1
+**Status:** running · **2/9 done** · iteration 2
 
-**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:43:00Z
+**Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` · **Updated:** 2026-09-29T18:45:01Z
 
 ## Progress
 
 - [x] **T1** — Go module skeleton: command tree, global flags, exit codes, version, embedded plugin
-- [ ] **T2** — Repo root resolution and `vloop config get|set|list|path`
+- [x] **T2** — Repo root resolution and `vloop config get|set|list|path`
 - [ ] **T3** — Brief parsing and the English `vloop brief check` (port of check-brief.sh)
 - [ ] **T4** — Spanish heading set and the language switch for `brief check`
 - [ ] **T5** — Frontmatter validity and `## Binding references` rules
@@ -55,7 +55,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T2 — Repo root resolution and `vloop config get|set|list|path`
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 **Files:** `internal/config/config.go`, `internal/config/root.go`, `internal/config/config_test.go`, `internal/config/root_test.go`, `internal/cli/config.go`, `internal/cli/config_test.go`, `go.mod`, `go.sum`
 

@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 83909,
+  "stop_reason": "end_turn",
+  "session_id": "0b58ceea-caf4-45f1-aaa6-dd036d2511e4",
+  "total_cost_usd": 0.4074857999999999,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 50205,
+    "cache_read_input_tokens": 346519,
+    "output_tokens": 13733,
+    "output_tokens_details": {
+      "thinking_tokens": 1247
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 50205,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 530,
+        "cache_read_input_tokens": 61472,
+        "cache_creation_input_tokens": 642,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 642
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 13733,
+      "cacheReadInputTokens": 346519,
+      "cacheCreationInputTokens": 50205,
+      "webSearchRequests": 0,
+      "costUSD": 0.4074857999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1247,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 9,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T2 is finished and its verify command exits 0. I ran it in the foreground, along with `gofmt`, `go vet` and the unit tests. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n**What now exists:**\n- **`internal/config`:** repo-root discovery (nearest `.vloop`, else nearest `.git`, else the start directory). It also holds the seven-key table and env-over-file-over-default resolution. `Set` validates the value, keeps other keys, and removes a key when the value is `''`. It leaves the file byte-for-byte unchanged when the value is already set.\n- **`internal/cli/config.go`:** the `config list`, `get`, `set` and `path` subcommands, registered from `internal/cli/root.go`, plus `Globals.root()` for later commands to reuse.\n- **Dependency:** BurntSushi/toml, the one new module.\n- **Exit codes:** unknown key or invalid value exits 2. A bad value from the environment or file, or a malformed file, exits 1 and names its source.\n\n**Things the next iteration can't see from the code:**\n- **`--json` on exit 1:** it also prints `{\"error\":\"...\"}` to stdout, so stdout carries one document. The brief didn't specify that shape.\n- **Empty variables:** an empty `VLOOP_*` variable counts as unset.\n- **Rewrites:** a real change to the file re-encodes it, so comments and hand formatting are lost. An unchanged value or removing an absent key never rewrites it.\n\nI did not commit, edit `state.json`, or start T3.",
+  "ttft_ms": 1887,
+  "type": "result",
+  "duration_ms": 89990,
+  "uuid": "f6739f18-ae93-47a4-ba9c-f27e8ec59a80",
+  "ttft_stream_ms": 1216,
+  "time_to_request_ms": 365,
+  "first_content_frame_ms": 1217,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 2
+}

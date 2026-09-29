@@ -100,5 +100,6 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 	pf.BoolVarP(&g.Quiet, "quiet", "q", false, "print less")
 	pf.BoolVarP(&g.Verbose, "verbose", "v", false, "print more")
 	root.AddCommand(newVersion(b, g))
+	root.AddCommand(newConfig(g))
 	return root, g
 }
