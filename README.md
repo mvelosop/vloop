@@ -72,6 +72,9 @@ does not exist, or an item with no reason, is a problem.
 | `vloop task validate` | check the plan's structure |
 | `vloop metrics stacks [name]` | print the built-in stack presets, or one preset's globs |
 | `vloop metrics classify <path>…` | print each path's category and the layer and glob that decided it |
+| `vloop defect add "<summary>"` | record a defect as `.vloop/defects/D<stamp>-<slug>.md` and print its path |
+| `vloop defect list` | print the recorded defects, sorted by id |
+| `vloop defect set <id> <field> <value>` | set a defect's `status`, `fixed-by`, `case`, `severity`, `origin`, `kind` or `task` |
 | `vloop task reset <id>` | set a task back to pending with no attempts |
 | `vloop task note <id> <text>` | replace a task's notes |
 | `vloop task drop <id>` | remove a task nothing depends on |
@@ -83,6 +86,14 @@ does not exist, or an item with no reason, is a problem.
 `vloop status` takes `--markdown`: print the plan as Markdown (not with `--json`).
 `vloop task verify` takes `--reason <text>`: why the gate is being replaced. It
 is required, and is recorded in the task's `gate_history`.
+
+`vloop defect add` needs `--found-by gate|review|operator|user` and a brief:
+`--brief <name>`, or `--blame <file>:<line>` to attribute the line on the default
+branch (origin/HEAD's target, else `main`, else `master`) through its
+`Vloop-Brief:` trailer or the commit that consumed a brief. It also takes
+`--task <id>`, `--origin` (default `work`), `--kind` (default `bug`),
+`--severity` (default `medium`) and `--case <path>`. `vloop defect list` takes
+`--brief <name>`. There is no delete, and the description cannot be edited.
 
 These flags work on every command:
 
@@ -146,8 +157,8 @@ vloop keeps its files under `.vloop/` in the repo root (the nearest parent with 
   follows the `state/v1` schema; `vloop status` reads it and `vloop task validate`
   checks it.
 
-Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new` and
-the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`,
+Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new`, `vloop defect add|set` (in
+`.vloop/defects/`) and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`,
 `verify`) write anything, and each refuses a plan or result that fails
 `vloop task validate`. Every path vloop prints is relative to the repo root.
 

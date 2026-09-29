@@ -108,5 +108,6 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 	root.AddCommand(newStatus(g))
 	root.AddCommand(newTask(g))
 	root.AddCommand(newMetrics(g))
+	root.AddCommand(newDefect(g))
 	return root, g
 }

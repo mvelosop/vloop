@@ -1,0 +1,4 @@
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	(cached)
+gate T6 ok

@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **5/10 done** · iteration 5
+**Status:** running · **6/10 done** · iteration 6
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:09:26Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:12:53Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T3** — Read the shell-loop and vloop run layouts and the git history into one model per brief
 - [x] **T4** — Count lines: delivered and churn per category, deletions, rework and test:code
 - [x] **T5** — Compute time, cost, tokens, models, task counts, first-pass and missing records
-- [ ] **T6** — Detect release and add `vloop defect add|list|set` with `--blame` attribution
+- [x] **T6** — Detect release and add `vloop defect add|list|set` with `--blame` attribution
 - [ ] **T7** — Derive defects from runs, reclassify through `gate_history`, and print the origin × catcher matrix
 - [ ] **T8** — Add `vloop metrics`: the per-brief summary, `--by task`, the cross-brief table and `--json`
 - [ ] **T9** — Write docs/guide/metrics.md and docs/guide/defects.md and bring the README up to date
@@ -146,7 +146,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T6 — Detect release and add `vloop defect add|list|set` with `--blame` attribution
 
-`pending` · depends on: T1, T3
+`done` · depends on: T1, T3
 
 **Files:** `internal/defect/`, `internal/runs/release.go`, `internal/runs/release_test.go`, `internal/cli/defect.go`, `internal/cli/defect_test.go`, `internal/cli/root.go`, `README.md`
 

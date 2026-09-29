@@ -1,0 +1,8 @@
+{"task":"T6","verdict":"PASS","criteria":[
+{"criterion":"defect add writes D<stamp>-<slug>.md with flags, slug, collision, prints path","met":true,"evidence":"internal/defect/defect.go, gate exercises slug/40-cap/collision/all flags"},
+{"criterion":"--blame on default branch, trailer or consumed-in commit, stderr lines, unattributable exit 1","met":true,"evidence":"internal/defect/blame.go; gate fixtures for trailer, consumed-in, master, origin/HEAD"},
+{"criterion":"invalid --brief/--task exit 1, invalid enum exit 2, nothing written","met":true,"evidence":"gate checks exit codes, messages and unchanged tree"},
+{"criterion":"defect list/--json and defect set with validation, byte-identical on refusal","met":true,"evidence":"gate cmp of file before/after refused sets; schema validate of listed object"},
+{"criterion":"Release detection reusable, with TestRelease/TestAdd/TestBlame tests","met":true,"evidence":"internal/runs/release.go and release_test.go; internal/defect/defect_test.go"},
+{"criterion":"Writes only in .vloop/defects, no delete/edit, README documents commands","met":true,"evidence":"README diff; no .loop references in defect code; gate checks tree"}],
+"findings":[],"notes":"none"}

@@ -1,0 +1,8 @@
+{
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Added runs.Release/DefaultBranch/StatusAt, the internal/defect package (add, list, set, blame) and `vloop defect add|list|set` with --blame attribution; README documents them.",
+  "files": ["internal/runs/release.go", "internal/runs/release_test.go", "internal/defect/defect.go", "internal/defect/blame.go", "internal/defect/defect_test.go", "internal/cli/defect.go", "internal/cli/defect_test.go", "internal/cli/root.go", "README.md"],
+  "verified": "The task's verify command ran in the foreground and printed 'gate T6 ok'.",
+  "notes": "runs.Release(root, briefPath) returns the full SHA or '' (error only when there is no default branch); runs.DefaultBranch returns refs/remotes/origin/<x> for origin/HEAD, else main, else master. runs.StatusAt reads a committed brief's frontmatter status; task 8 can reuse all three. defect.CheckTask reads the plan at the last run commit, else the last task commit, else the plan commit. Blame reads a trailer via git show %(trailers) and falls back to the docs/briefs/*.loop-brief.md file changed in that commit that became consumed relative to its first parent. `defect set task ''` removes the task line; fixed-by and case are written quoted when empty or containing : # or quotes. Missing --found-by, and neither --brief nor --blame, are usage errors (exit 2). `defect list --matrix` and derived defects are not done here; they belong to task 8."
+}
