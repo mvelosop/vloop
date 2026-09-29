@@ -135,3 +135,20 @@
 [36m[loop][0m cost=$0.17954579999999998 turns=5 dur=24s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T8 done
+[36m[loop][0m    committed a365d94
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            8
+[36m[loop][0m   tasks closed:          8/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $11.24 (estimate, not a bill)
+[36m[loop][0m ── iteration 9 (9/30 this run) · T9 · 8/10 done ──
+[36m[loop][0m    Write docs/guide/metrics.md and docs/guide/defects.md and bring the README up to date
+[36m[loop][0m cost=$0.3717668 turns=12 dur=97s error=false
+[33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
+[36m[loop][0m cost=$0.1071938 turns=5 dur=19s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T9 done

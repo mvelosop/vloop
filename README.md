@@ -168,6 +168,13 @@ Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new`, `vloo
 `verify`) write anything, and each refuses a plan or result that fails
 `vloop task validate`. Every path vloop prints is relative to the repo root.
 
+## Guides
+
+- [docs/guide/metrics.md](docs/guide/metrics.md): every `vloop metrics` number, the
+  classification layers and the stack presets, and the `metrics/v1` keys.
+- [docs/guide/defects.md](docs/guide/defects.md): origin and catcher, derived and
+  recorded defects, `--blame`, the `.vloop/defects/` format and the matrix.
+
 ## Exit codes
 
 - `0`: success.
