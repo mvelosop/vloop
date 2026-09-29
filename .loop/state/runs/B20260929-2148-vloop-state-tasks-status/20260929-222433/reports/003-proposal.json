@@ -1,0 +1,8 @@
+{
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Five embedded JSON Schemas (schemas/*.v1.json via root embed.go), internal/schema validator on jsonschema/v6, and `vloop schema list|show|validate` with fixtures and tests. No code change this attempt: the operator-amended gate now passes on the existing implementation.",
+  "files": ["go.mod", "go.sum", "embed.go", "embed_test.go", "schemas/state.v1.json", "schemas/proposal.v1.json", "schemas/verdict.v1.json", "schemas/session.v1.json", "schemas/iteration.v1.json", "internal/schema/schema.go", "internal/schema/schema_test.go", "internal/schema/testdata/", "internal/cli/schema.go", "internal/cli/schema_test.go", "internal/cli/root.go"],
+  "verified": "Ran T1's verify command from state.json in the foreground: exit 0 (go test . ./internal/schema ./internal/cli ok).",
+  "notes": "The earlier blocker (BSD grep rejecting an empty ERE alternative) is gone because the gate now uses badp 'del(.base)' '/?'. The implementation was already in the branch from prior attempts. session/v1 uses if/then/else on phase for the task rule; golang.org/x/text is a direct require because the validator's message printer needs it (already transitive)."
+}

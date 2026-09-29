@@ -74,3 +74,10 @@ I left my gate-drafting scratch in `.loop/tmp/gates/`. It's git-ignored, and my 
 - **Run:** `20260929-220615` · 2 iteration(s) this run
 - **Plan:** 0/9 done, 0 blocked
 - **Signals:** 2 iterations · n/a per closed · 0 gate failure(s) · 0 review rejection(s) · 2 attempt(s) burned · streak 2 · ~$4.38
+
+## T1 — Embed the five JSON Schemas and add `vloop schema list|show|validate`
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Five embedded JSON Schemas (schemas/*.v1.json via root embed.go), internal/schema validator on jsonschema/v6, and `vloop schema list|show|validate` with fixtures and tests. No code change this attempt: the operator-amended gate now passes on the existing implementation.
+- **Files:** go.mod, go.sum, embed.go, embed_test.go, schemas/state.v1.json, schemas/proposal.v1.json, schemas/verdict.v1.json, schemas/session.v1.json, schemas/iteration.v1.json, internal/schema/schema.go, internal/schema/schema_test.go, internal/schema/testdata/, internal/cli/schema.go, internal/cli/schema_test.go, internal/cli/root.go
+- **Notes for next iteration:** The earlier blocker (BSD grep rejecting an empty ERE alternative) is gone because the gate now uses badp 'del(.base)' '/?'. The implementation was already in the branch from prior attempts. session/v1 uses if/then/else on phase for the task rule; golang.org/x/text is a direct require because the validator's message printer needs it (already transitive).
