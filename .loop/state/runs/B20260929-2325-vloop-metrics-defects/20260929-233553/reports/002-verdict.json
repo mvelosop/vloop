@@ -1,0 +1,9 @@
+{"task":"T2","verdict":"PASS","criteria":[
+{"criterion":"internal/classify holds the nine presets as Go data in non-test code; stacks and guide read from there","met":true,"evidence":"internal/classify/presets.go with Names()/Lookup(); TestPresetNames/TestPresetFixtures cover all nine"},
+{"criterion":"Classification uses doublestar/v4 against repo-relative / path; always layer, repo layer, then presets by excluded/test/docs/code in stacks order; else other (none)","met":true,"evidence":"classify.go Classify(): always, then repo steps, then per-step loop over presets; go.mod adds only doublestar"},
+{"criterion":"vloop metrics stacks output, --json, unknown name exit 2 with stderr message","met":true,"evidence":"internal/cli/metrics.go newMetricsStacks; TestMetricsStacks asserts exact output and error"},
+{"criterion":"vloop metrics classify prints per-path lines matching the worked example","met":true,"evidence":"newMetricsClassify format strings; TestMetricsClassify; driver gate ran worked example"},
+{"criterion":"config set metrics.stacks cobol exits 2 with invalid-value message, writes nothing; valid names from classify","met":true,"evidence":"config.go Keys uses classify.Names() as Valid; Validate rejects unknown; TestConfigSetUnknownStack"},
+{"criterion":"Committed TestPreset/TestLayer tests, CLI tests, README documents both commands","met":true,"evidence":"classify_test.go has TestPreset* and TestLayer{Always,Repo,PresetOrder}; classify_test.go in cli; README rows added"}],
+"findings":[],
+"notes":"Plan listed internal/config/stacks_test.go but no such file exists; the unknown-stack rejection is covered via the CLI test instead. No absolute paths in the diff."}

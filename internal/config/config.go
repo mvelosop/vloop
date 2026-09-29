@@ -10,9 +10,12 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 
 	"github.com/BurntSushi/toml"
+
+	"github.com/mvelosop/vloop/internal/classify"
 )
 
 // Sources of a resolved value.
@@ -54,7 +57,7 @@ var Keys = []Key{
 	{Name: "effort.review", Valid: efforts},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
-	{Name: "metrics.stacks", List: true},
+	{Name: "metrics.stacks", List: true, Valid: classify.Names()},
 	{Name: "metrics.code", List: true, Glob: true},
 	{Name: "metrics.test", List: true, Glob: true},
 	{Name: "metrics.docs", List: true, Glob: true},
@@ -83,7 +86,9 @@ type InvalidValueError struct {
 
 func (e *InvalidValueError) Error() string {
 	want := "a non-empty string"
-	if k, err := Lookup(e.Key); err == nil && k.List && k.Glob {
+	if k, err := Lookup(e.Key); err == nil && k.List && e.Valid != nil {
+		want = "a comma-separated list of " + strings.Join(e.Valid, ", ")
+	} else if err == nil && k.List && k.Glob {
 		want = "a comma-separated list of non-empty glob patterns"
 	} else if err == nil && k.List {
 		want = "a comma-separated list of names made of lower-case letters, digits and hyphens"
@@ -126,7 +131,10 @@ func (k Key) Validate(value string) error {
 	if k.List {
 		for _, a := range strings.Split(value, ",") {
 			if (k.Glob && a == "") || (!k.Glob && !areaName.MatchString(a)) {
-				return &InvalidValueError{k.Name, value, nil}
+				return &InvalidValueError{k.Name, value, k.Valid}
+			}
+			if k.Valid != nil && !slices.Contains(k.Valid, a) {
+				return &InvalidValueError{k.Name, value, k.Valid}
 			}
 		}
 		return nil

@@ -1,0 +1,8 @@
+{
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Added internal/classify (nine presets as Go data, layered Classifier), `vloop metrics stacks` and `vloop metrics classify` (with --json), and metrics.stacks validation against the preset names; README documents both commands.",
+  "files": ["go.mod", "go.sum", "internal/classify/presets.go", "internal/classify/classify.go", "internal/classify/classify_test.go", "internal/config/config.go", "internal/cli/metrics.go", "internal/cli/classify_test.go", "internal/cli/root.go", "README.md"],
+  "verified": "T2 verify command ran in foreground; printed 'gate T2 ok'.",
+  "notes": "config imports classify for Names() (Key.Valid on metrics.stacks); List keys with Valid now check each entry against it and the error reads 'want a comma-separated list of <names>'. Classifier.Classify returns Result{Category,Layer,Glob}; later tasks should build it via classify.New(repoPreset, stacks) from the five metrics.* keys (see newMetricsClassify in internal/cli/metrics.go for loading). Root-package TestSchemasAreEmbedded (embed_test.go) expects 5 schema files but T1 made it 7; it is outside every verify command and I did not touch it (pre-existing test file) -- needs an operator/plan fix. The test files internal/config/stacks_test.go listed in the task was not created; stacks validation is tested in internal/cli/classify_test.go."
+}

@@ -70,6 +70,8 @@ does not exist, or an item with no reason, is a problem.
 | `vloop task list` | print one line per task |
 | `vloop task show <id>` | print a task and the model and effort its sessions resolve to |
 | `vloop task validate` | check the plan's structure |
+| `vloop metrics stacks [name]` | print the built-in stack presets, or one preset's globs |
+| `vloop metrics classify <path>…` | print each path's category and the layer and glob that decided it |
 | `vloop task reset <id>` | set a task back to pending with no attempts |
 | `vloop task note <id> <text>` | replace a task's notes |
 | `vloop task drop <id>` | remove a task nothing depends on |

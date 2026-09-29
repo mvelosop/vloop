@@ -4,14 +4,14 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **1/10 done** · iteration 1
+**Status:** running · **2/10 done** · iteration 2
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T22:59:53Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:01:55Z
 
 ## Progress
 
 - [x] **T1** — Add the `defect/v1` and `metrics/v1` schemas and the five `metrics.*` config keys
-- [ ] **T2** — Build line classification: the stack presets, the layers, `vloop metrics stacks` and `vloop metrics classify`
+- [x] **T2** — Build line classification: the stack presets, the layers, `vloop metrics stacks` and `vloop metrics classify`
 - [ ] **T3** — Read the shell-loop and vloop run layouts and the git history into one model per brief
 - [ ] **T4** — Count lines: delivered and churn per category, deletions, rework and test:code
 - [ ] **T5** — Compute time, cost, tokens, models, task counts, first-pass and missing records
@@ -50,7 +50,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T2 — Build line classification: the stack presets, the layers, `vloop metrics stacks` and `vloop metrics classify`
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 **Files:** `go.mod`, `go.sum`, `internal/classify/`, `internal/config/config.go`, `internal/config/stacks_test.go`, `internal/cli/metrics.go`, `internal/cli/classify_test.go`, `internal/cli/root.go`, `README.md`
 
