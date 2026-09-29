@@ -1,0 +1,16 @@
+{
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A `depends-on` name with no loop brief in docs/briefs/ is the problem `depends-on does not resolve: <name>` (a name matching a non-loop-brief file does not resolve).", "met": true, "evidence": "graphProblems in deps.go resolves only against Load entries (*.loop-brief.md only); TestDanglingAndCycle and TestCheckReportsDependencyProblems assert the message."},
+    {"criterion": "A cycle is the problem `depends-on cycle: <a> -> <b> -> <a>`, starting from the checked brief.", "met": true, "evidence": "dependencyLines calls graphProblems with cycleOnly=false and the checked brief as start; test asserts 'B1-a -> B2-b -> B1-a'."},
+    {"criterion": "`brief list` prints `<name>  <status>  <ready>  <depends-on>` in dependency order, ties by name; ready column rules.", "met": true, "evidence": "Order() uses lowest-name-first Kahn; Ready set to '-' for consumed, blocked if any dep not consumed; list.go format string; TestOrderAndReady and TestBriefListOrderAndJSON assert exact output."},
+    {"criterion": "`brief list --json` is an array of `{name, path, status, ready, depends_on}` in that key order, `depends_on` an array.", "met": true, "evidence": "listJSON struct field order; DependsOn copied with non-nil slice; test checks key-order prefix and '[]' for empty."},
+    {"criterion": "A cycle or dangling dependency makes `brief list` exit 1 with the same message on stderr (prefixed `vloop: `) and nothing on stdout.", "met": true, "evidence": "TestBriefListDanglingAndCycle asserts code 1, empty stdout, 'vloop: ' prefixed stderr."},
+    {"criterion": "Files in docs/briefs/ not named `*.loop-brief.md` are invisible to list and check.", "met": true, "evidence": "Load filters on Suffix; tests include notes.md and architect-brief files with dangling deps that don't affect output."},
+    {"criterion": "Committed tests cover resolution, dangling names, cycles, ordering and the ready column.", "met": true, "evidence": "internal/brief/deps_test.go and internal/cli/list_test.go; assertions compare exact values."},
+    {"criterion": "`gofmt -l .` prints nothing, `go vet ./...` passes, and the module builds for linux, windows and the host.", "met": true, "evidence": "Driver gate passed; go test of internal packages ok on re-run."}
+  ],
+  "findings": [],
+  "notes": "Dependency check in `brief check` only runs for briefs that reach the rule (ready ones), per the work session; brief left this open. No absolute paths in the diff."
+}

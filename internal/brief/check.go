@@ -166,6 +166,7 @@ func Check(root string, b *Brief, set *HeadingSet) *Result {
 	}
 
 	res.Lines = append(res.Lines, bindingRefLines(root, body, set)...)
+	res.Lines = append(res.Lines, dependencyLines(root, b)...)
 
 	dead := 0
 	for _, p := range citedPaths(withoutSection(body, heading(set.BindingRefs))) {

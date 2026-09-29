@@ -17,6 +17,8 @@ type frontmatter struct {
 	Name   string
 	Status string
 	Keys   map[string]string
+	// DependsOn is the names listed under depends-on, inline or as a block list.
+	DependsOn []string
 }
 
 // parseFrontmatter reads the leading `---` block: `key: value` lines, comments,
@@ -29,6 +31,8 @@ func parseFrontmatter(text string) frontmatter {
 		return fm
 	}
 	closed := false
+	cur := ""
+	var block []string
 	for i, l := range lines[1:] {
 		if strings.TrimSpace(l) == "---" {
 			closed = true
@@ -39,6 +43,11 @@ func parseFrontmatter(text string) frontmatter {
 			continue
 		}
 		if strings.HasPrefix(l, " ") || strings.HasPrefix(l, "\t") || strings.HasPrefix(t, "- ") || t == "-" {
+			if cur == "depends-on" && strings.HasPrefix(t, "-") {
+				if v := strings.Trim(stripComment(strings.TrimSpace(strings.TrimPrefix(t, "-"))), `"'`); v != "" {
+					block = append(block, v)
+				}
+			}
 			continue // continuation or block-list item of the previous key
 		}
 		m := fmKeyRe.FindStringSubmatch(l)
@@ -52,6 +61,7 @@ func parseFrontmatter(text string) frontmatter {
 			return fm
 		}
 		fm.Keys[m[1]] = strings.Trim(v, `"'`)
+		cur = m[1]
 	}
 	if !closed {
 		fm.Err = "unparseable frontmatter: no closing ---"
@@ -59,6 +69,7 @@ func parseFrontmatter(text string) frontmatter {
 	}
 	fm.Name = fm.Keys["name"]
 	fm.Status = fm.Keys["status"]
+	fm.DependsOn = parseNames(strings.TrimSpace(stripComment(fm.Keys["depends-on"])), block)
 	return fm
 }
 
@@ -129,4 +140,20 @@ func pathBase(p string) string {
 		return p[i+1:]
 	}
 	return p
+}
+
+// parseNames reads a depends-on value: an inline `[a, b]` list, a single bare
+// name, or (when the value is empty) the block-list items.
+func parseNames(v string, block []string) []string {
+	if v == "" {
+		return block
+	}
+	v = strings.TrimSuffix(strings.TrimPrefix(v, "["), "]")
+	var out []string
+	for _, n := range strings.Split(v, ",") {
+		if n = strings.Trim(strings.TrimSpace(n), `"'`); n != "" {
+			out = append(out, n)
+		}
+	}
+	return out
 }
