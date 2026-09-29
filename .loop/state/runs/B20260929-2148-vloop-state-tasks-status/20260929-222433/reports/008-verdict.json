@@ -1,0 +1,17 @@
+{
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`task gate <id>` runs the task's verify from the repo root in the plan's `shell` ... exits 0/1 with pass/fail line", "met": true, "evidence": "state.RunGate: LookPath(shell), GateArgs per shell, c.Dir=root, own exit code; task_gate.go prints 'gate <id>: pass (<d>)' / 'fail (exit n, <d>)'; TestTaskGateShPassFail, TestTaskGateShellInvocation"},
+    {"criterion": "`task gate <id> --json` prints only {task,passed,exit,duration_ms} on stdout, gate output to stderr", "met": true, "evidence": "task_gate.go: struct field order task/passed/exit/duration_ms; gateOut=stderr when g.JSON; TestTaskGateJSON"},
+    {"criterion": "Plan's shell not on PATH: message, exit 1, writes nothing", "met": true, "evidence": "ShellMissingError message matches; RunGate returns before running; TestTaskGateShellMissing"},
+    {"criterion": "`task verify` appends {verify, replaced_at RFC3339 UTC, reason, by operator} and sets new command; only `updated` else changes", "met": true, "evidence": "state.ReplaceGate appends GateReplace with UTC RFC3339 and by=operator, via existing amend path; TestTaskVerifyReplaces"},
+    {"criterion": "Without --reason exit 2 with required-flag message; same command exit 1; neither/empty/invalid plan writes anything", "met": true, "evidence": "MarkFlagRequired; ReplaceGate refuses same/empty; amend validates before write; TestTaskVerifyRefusals; gate script exercises these"},
+    {"criterion": "Tests of `task gate` use sh where it exists and skip other shells when absent, saying so; PATH doubles allowed", "met": true, "evidence": "t.Skip(\"sh is not on PATH...\") in task_gate_test.go; doubles for bash/pwsh/powershell/cmd"},
+    {"criterion": "Committed tests: internal/cli has TestTaskVerify* and TestTaskGate*", "met": true, "evidence": "TestTaskVerifyReplaces, TestTaskVerifyRefusals, TestTaskGate* in task_gate_test.go; plus state/gate_test.go"},
+    {"criterion": "No product code or test reads or writes this repo's .loop/ or .claude/, or the home directory; tests use t.TempDir()", "met": true, "evidence": "grep of new files finds no .loop/.claude/UserHomeDir; tests use gateRepo/t.TempDir"},
+    {"criterion": "gofmt, go vet, go mod tidy -diff clean; builds for linux, windows, host", "met": true, "evidence": "driver ran verify (exit 0), which checks all of these; no new dependencies in diff"}
+  ],
+  "findings": [],
+  "notes": "Only internal/cli/task.go touched beyond planned files (command registration) — necessary. README does not yet document task gate/verify and TestReadmeMatchesCommandTree is skipped in the gate; a later task must cover the docs."
+}

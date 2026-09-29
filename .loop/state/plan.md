@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **5/9 done** · iteration 7
+**Status:** running · **6/9 done** · iteration 8
 
-**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:35:21Z
+**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:37:37Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T3** — Add the `shell` and `areas` config keys, and `vloop task list|show` with model/effort resolution
 - [x] **T4** — Add `vloop task validate` with every structural rule
 - [x] **T5** — Add `vloop task reset|note|drop|set`, each refusing an invalid plan or result
-- [ ] **T6** — Add `vloop task verify` with gate_history, and `vloop task gate` in the plan's shell
+- [x] **T6** — Add `vloop task verify` with gate_history, and `vloop task gate` in the plan's shell
 - [ ] **T7** — F1: report a depends-on cycle from its smallest brief name in `brief check` and `brief list`
 - [ ] **T8** — Document the schema, status and task commands, the new config keys and the plan file in the README
 - [ ] **T9** — Close: play the worked example end to end, plus go test ./..., vet, gofmt, tidy and the three builds
@@ -175,7 +175,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T6 — Add `vloop task verify` with gate_history, and `vloop task gate` in the plan's shell
 
-`pending` · depends on: T5
+`done` · depends on: T5
 
 **Files:** `internal/state/gate.go`, `internal/state/gate_test.go`, `internal/cli/task_gate.go`, `internal/cli/task_gate_test.go`
 

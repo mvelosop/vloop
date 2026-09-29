@@ -138,6 +138,7 @@ func newTask(g *Globals) *cobra.Command {
 	})
 	cmd.AddCommand(newTaskValidate(g))
 	cmd.AddCommand(newTaskAmend(g)...)
+	cmd.AddCommand(newTaskGate(g), newTaskVerify(g))
 	return cmd
 }
 

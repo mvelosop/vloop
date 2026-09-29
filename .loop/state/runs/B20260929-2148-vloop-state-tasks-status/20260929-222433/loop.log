@@ -81,3 +81,19 @@
 [36m[loop][0m cost=$0.1691224 turns=5 dur=22s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T5 done
+[36m[loop][0m    committed 70f604a
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            5
+[36m[loop][0m   tasks closed:          5/9
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $2.62 (estimate, not a bill)
+[36m[loop][0m ── iteration 8 (6/30 this run) · T6 · 5/9 done ──
+[36m[loop][0m    Add `vloop task verify` with gate_history, and `vloop task gate` in the plan's shell
+[36m[loop][0m cost=$0.3775954 turns=13 dur=92s error=false
+[36m[loop][0m cost=$0.1214174 turns=5 dur=22s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T6 done
