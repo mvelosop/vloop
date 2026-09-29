@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 17472,
+  "stop_reason": "end_turn",
+  "session_id": "438aeabb-16db-47b5-9217-f58266449011",
+  "total_cost_usd": 0.1127372,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 18314,
+    "cache_read_input_tokens": 108406,
+    "output_tokens": 1778,
+    "output_tokens_details": {
+      "thinking_tokens": 124
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 18314,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 343,
+        "cache_read_input_tokens": 29400,
+        "cache_creation_input_tokens": 930,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 930
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 1778,
+      "cacheReadInputTokens": 108406,
+      "cacheCreationInputTokens": 18314,
+      "webSearchRequests": 0,
+      "costUSD": 0.1127372,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 124,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 6,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T4. All four acceptance criteria are met, and I wrote the verdict to `.loop/tmp/verdict.json`.\n\n- **Counting rules:** blank and whitespace-only lines, deletions, binary files, renames, and excluded paths are each covered by a test with a case where the rule applies and one where it doesn't.\n- **Worked example:** `TestReworkWorkedExample` builds the history from commits and gets delivered code 15, test 6, docs 3, churn code 17 (T1 10, T2 7), rework 17/15 and test:code 0.4. The numbers come from the counting code, not from hardcoded values.\n- **Zero denominator:** rework and test:code return nil when nothing was delivered.\n- **Test isolation:** the tests use temp directories, fixed dates and an isolated git config, and I found no absolute paths.\n\nOne note for the next task: the exported JSON field names on `Counts` and `Lines` are provisional, so whichever task renders the output has to map them to the metrics/v1 schema.",
+  "ttft_ms": 2276,
+  "type": "result",
+  "duration_ms": 18658,
+  "uuid": "14051ace-be0c-4905-806e-df5f08838ec8",
+  "ttft_stream_ms": 1285,
+  "time_to_request_ms": 350,
+  "first_content_frame_ms": 1286,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 4
+}

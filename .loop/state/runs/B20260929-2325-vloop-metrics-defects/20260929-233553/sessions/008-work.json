@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 64748,
+  "stop_reason": "end_turn",
+  "session_id": "7b9897e3-65d4-4c54-a87e-f8081e7265e2",
+  "total_cost_usd": 0.26691940000000003,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 30746,
+    "cache_read_input_tokens": 245917,
+    "output_tokens": 9472,
+    "output_tokens_details": {
+      "thinking_tokens": 1274
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 30746,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 447,
+        "cache_read_input_tokens": 42136,
+        "cache_creation_input_tokens": 626,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 626
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 9472,
+      "cacheReadInputTokens": 245917,
+      "cacheCreationInputTokens": 30746,
+      "webSearchRequests": 0,
+      "costUSD": 0.26691940000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1274,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 is finished and its verify command exits 0, printing `gate T4 ok`.\n\nI added `internal/metrics/lines.go` and `internal/metrics/lines_test.go`. The tests cover the counting rules on their own and replay the worked example:\n\n- **Counting rules:** only non-blank added lines count, and deletions are reported separately per category. Binary files aren't counted, renames count only their content change, and excluded paths (`.loop/`, `.vloop/`, `go.sum`) are dropped. Each rule has a fixture where it applies and one where it doesn't.\n- **Delivered and churn:** delivered is the diff from the plan commit's parent to the last run commit. Churn is summed over the `<task>:` commits, in total and per task.\n- **Worked example:** it gives delivered code 15, test 6, docs 3, and churn code 17 (T1 10, T2 7 across its two commits).\n- **Ratios:** rework comes out as 17/15 (about 1.13) and test:code as 0.40. Both return null when the denominator is zero.\n\nThe tests build their own repositories in temp directories with fixed dates and never read this repo's history.\n\nIf there's no run commit yet, delivered uses the last task commit, then the plan commit.\n\nThe proposal is at `.loop/tmp/proposal.json`. I didn't commit or touch `state.json`.",
+  "ttft_ms": 2172,
+  "type": "result",
+  "duration_ms": 71608,
+  "uuid": "778bdfe6-0b60-40f7-b499-e75e81da6183",
+  "ttft_stream_ms": 1102,
+  "time_to_request_ms": 347,
+  "first_content_frame_ms": 1103,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 4
+}

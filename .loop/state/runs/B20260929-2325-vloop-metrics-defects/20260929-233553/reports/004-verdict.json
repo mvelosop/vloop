@@ -1,0 +1,12 @@
+{
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Lines are added non-blank lines of a git diff, classified per path; deleted separate; binary not counted; rename content change only; excluded never counted.", "met": true, "evidence": "lines.go countPatch skips whitespace-only lines, classifies via Classify, separate Deleted counts, git diff -M -U0; TestLinesBlankAndWhitespaceOnly/CategoriesAndDeletions/BinaryNotCounted/RenameCountsContentChangeOnly/ExcludedPathsNeverCounted with positive and negative controls."},
+    {"criterion": "Delivered = plan parent to last run commit; churn = sum over task commits per task and total; rework and test:code nil on zero denominator.", "met": true, "evidence": "Measure() in lines.go; ratio() returns nil on zero; TestReworkZeroDeliveredCodeIsUnknown."},
+    {"criterion": "Worked example gives delivered code 15, test 6, docs 3 and churn code 17 (T1 10, T2 4+3); committed test proves each rule with applying and non-applying fixtures.", "met": true, "evidence": "TestReworkWorkedExample builds the history from commits and asserts 15/6/3, 17, per-task 10 and 7 (2 commits), rework 17/15, test:code 0.4. The .vloop path is covered in the excluded test (.vloop/config.toml). Result comes from the counting rule, not hardcoded."},
+    {"criterion": "Committed TestLines… and TestRework… build repos in temp dirs with fixed dates and never read this repo's history.", "met": true, "evidence": "newRepo uses t.TempDir(), fixed GIT_AUTHOR/COMMITTER_DATE, isolated git config; tests pass."}
+  ],
+  "findings": [],
+  "notes": "Exported Counts/Lines json field names are provisional; the rendering task must map them to the metrics/v1 schema."
+}

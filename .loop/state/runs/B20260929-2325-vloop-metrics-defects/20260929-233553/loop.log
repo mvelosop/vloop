@@ -55,3 +55,19 @@
 [36m[loop][0m cost=$0.14536200000000002 turns=5 dur=22s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T3 done
+[36m[loop][0m    committed cc0a6cc
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            3
+[36m[loop][0m   tasks closed:          3/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $7.56 (estimate, not a bill)
+[36m[loop][0m ── iteration 4 (4/30 this run) · T4 · 3/10 done ──
+[36m[loop][0m    Count lines: delivered and churn per category, deletions, rework and test:code
+[36m[loop][0m cost=$0.26691940000000003 turns=8 dur=72s error=false
+[36m[loop][0m cost=$0.1127372 turns=6 dur=19s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T4 done
