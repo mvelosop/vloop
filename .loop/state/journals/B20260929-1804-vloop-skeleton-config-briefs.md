@@ -101,3 +101,9 @@ I left the generator and fixture scripts in `.loop/tmp/`, which is gitignored.
 - **Summary:** Added cmd/vloop/e2e_test.go: builds the binary in TestMain and replays the worked example (English session, ready Spanish brief with consumed dependency, six planted failures) in temp scratch git repos with a temp HOME, asserting stdout, stderr and exit code.
 - **Files:** cmd/vloop/e2e_test.go
 - **Notes for next iteration:** No product changes; no wiring fixes were needed. Generated values (timestamp, Go version, OS, arch) come from the binary's output or the runtime. The env is scrubbed of VLOOP_*/NO_COLOR and HOME/USERPROFILE/XDG/APPDATA point at temp dirs. In the planted-failure tests the 'already run' problem line carries a trailing '; this brief declares itself plannable and is not', so the test matches the line with an optional '; ...' suffix; 'brief list' on a cycle starts the cycle from the list's own ordering (b -> a -> b), so the test only asserts the 'depends-on cycle: ' prefix, as the gate does.
+
+## Run ended — complete
+
+- **Run:** `20260929-194129` · 9 iteration(s) this run
+- **Plan:** 9/9 done, 0 blocked
+- **Signals:** 9 iterations · 1.00 per closed · 0 gate failure(s) · 0 review rejection(s) · 0 attempt(s) burned · streak 0 · ~$4.47
