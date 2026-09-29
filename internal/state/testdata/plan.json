@@ -1,0 +1,72 @@
+{
+  "schema": "state/v1",
+  "run_id": "B20260101-0900-a",
+  "brief": "docs/briefs/B20260101-0900-a.loop-brief.md",
+  "base": "0123456789abcdef0123456789abcdef01234567",
+  "branch": "B20260101-0900-a",
+  "status": "running",
+  "iteration": 2,
+  "created": "2026-01-01T09:00:00Z",
+  "updated": "2026-01-01T09:00:00Z",
+  "shell": "sh",
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Skeleton <a> & b",
+      "goal": "Build the skeleton.",
+      "kind": "feature",
+      "area": "cli",
+      "files": [
+        "skeleton.txt"
+      ],
+      "references": [],
+      "depends_on": [],
+      "acceptance": [
+        "skeleton.txt exists"
+      ],
+      "verify": "[ -f skeleton.txt ] && echo ok >/dev/null",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T2",
+      "title": "Config",
+      "goal": "Add the config.",
+      "kind": "feature",
+      "files": [
+        "config.txt"
+      ],
+      "references": [
+        {
+          "path": "docs/x.md",
+          "why": "the config contract"
+        }
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "acceptance": [
+        "config.txt exists"
+      ],
+      "verify": "test -f config.txt",
+      "status": "pending",
+      "attempts": 1,
+      "notes": "watch the path",
+      "model": {
+        "work": "opus"
+      },
+      "effort": {
+        "review": "high"
+      },
+      "gate_history": [
+        {
+          "verify": "true",
+          "replaced_at": "2026-01-01T10:00:00Z",
+          "reason": "wrong file",
+          "by": "operator"
+        }
+      ]
+    }
+  ]
+}

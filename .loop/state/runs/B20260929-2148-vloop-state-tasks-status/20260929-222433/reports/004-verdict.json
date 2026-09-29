@@ -1,0 +1,19 @@
+{
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Package internal/state loads the plan under the repo root and validates it against the embedded state/v1 schema; the schema decides validity.", "met": true, "evidence": "state.Load/Validate in internal/state/state.go; Validate calls schema.Validate(\"state/v1\"); cli uses g.root()"},
+    {"criterion": "Missing plan is `vloop: no plan: .vloop/state/state.json`, exit 1, nothing on stdout; with --json one JSON document.", "met": true, "evidence": "ErrNoPlan + loadPlan; verify gate checks stderr/exit/JSON; TestStatusMissingPlan"},
+    {"criterion": "A plan failing its schema but parsing is still readable; status exits 0.", "met": true, "evidence": "Load only unmarshals; TestStatusSchemaInvalidPlanStillReads and gate step"},
+    {"criterion": "Atomic save, byte-stable format, literal <>&, updated set to RFC 3339 UTC.", "met": true, "evidence": "Save uses CreateTemp in plan dir + Rename; Marshal SetEscapeHTML(false), indent 2; TestRoundTripByteForByte, TestSaveSetsUpdatedAndLeavesNoTempFile"},
+    {"criterion": "status text format with aligned columns, attempts suffix, -/<kind>, no trailing spaces.", "met": true, "evidence": "writeTaskLines in status.go; gate compares exact output"},
+    {"criterion": "status --json shape and key order; area null when absent.", "met": true, "evidence": "struct field order in status.go, *string Area; gate jq checks"},
+    {"criterion": "status --markdown prints render-plan.sh content to stdout, no file.", "met": true, "evidence": "Plan.Markdown mirrors render-plan.sh; gate line checks; file count unchanged"},
+    {"criterion": "status never modifies the plan or writes any file.", "met": true, "evidence": "only Load used; gate cmp and file count checks"},
+    {"criterion": "Committed tests: state round-trip and no-temp-file; TestStatus* for text, json, markdown, missing plan.", "met": true, "evidence": "state_test.go, status_test.go with testdata/plan.json"},
+    {"criterion": "No product code or test touches this repo's .loop/ or .claude/ or home; tests use t.TempDir().", "met": true, "evidence": "grep of internal/state and status*.go shows no such paths; scratch() uses t.TempDir()"},
+    {"criterion": "gofmt, go vet, go mod tidy -diff clean; builds for linux, windows, host.", "met": true, "evidence": "verify command exited 0 on rerun"}
+  ],
+  "findings": [],
+  "notes": "TestReadmeMatchesCommandTree fails (README lacks schema list/validate/show, status, --markdown); the gate skips it, and the schema failures predate this task. README is a later task. Save drops keys unknown to the structs; the brief left this open."
+}
