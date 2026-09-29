@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 57321,
+  "stop_reason": "end_turn",
+  "session_id": "0d125421-9dce-4638-a1f1-a54a48c8ea1e",
+  "total_cost_usd": 0.23078139999999997,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 28779,
+    "cache_read_input_tokens": 226667,
+    "output_tokens": 7030,
+    "output_tokens_details": {
+      "thinking_tokens": 843
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 28779,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 435,
+        "cache_read_input_tokens": 40087,
+        "cache_creation_input_tokens": 601,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 601
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 7030,
+      "cacheReadInputTokens": 226667,
+      "cacheCreationInputTokens": 28779,
+      "webSearchRequests": 0,
+      "costUSD": 0.23078139999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 843,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T8 is done and its verify command exits 0. That covers gofmt, vet, the linux, windows and host builds, `go test ./internal/cli`, and the README checks.\n\n- **`README.md`:** 128 lines. It covers:\n  - what vloop is;\n  - the loop in one paragraph;\n  - a brief's lifecycle, `depends-on` and `## Binding references`;\n  - the commands and global flags;\n  - the config keys and their `VLOOP_*` variables;\n  - the `.vloop/` layout;\n  - the exit codes;\n  - a pointer to `docs/design-notes/vloop-roadmap.md`.\n\n  It documents nothing from B2–B4 and says running a loop is not part of this version yet.\n- **`internal/cli/readme_test.go`:** it walks the cobra command tree and fails if the README omits a command, flag or config key the binary has. It also fails if the README names one the binary lacks, or reaches 200 lines.\n- **Gate quirk:** the gate's grep reads a bare `VLOOP_` in the README as an unknown variable, so I worded the env-var explanation around the table instead.\n\nWhether the README reads well to a newcomer is left to the review. I wrote the proposal to `.loop/tmp/proposal.json`. I did not touch `state.json` or commit.",
+  "ttft_ms": 2468,
+  "type": "result",
+  "duration_ms": 64048,
+  "uuid": "ed5455ae-1d98-4017-9585-86c5fd7bab43",
+  "ttft_stream_ms": 1152,
+  "time_to_request_ms": 365,
+  "first_content_frame_ms": 1153,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 8
+}

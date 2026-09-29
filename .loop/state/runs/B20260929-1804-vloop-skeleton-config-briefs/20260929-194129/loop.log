@@ -114,3 +114,19 @@
 [36m[loop][0m cost=$0.1088682 turns=5 dur=16s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T7 done
+[36m[loop][0m    committed b5a599f
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            7
+[36m[loop][0m   tasks closed:          7/9
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $3.80 (estimate, not a bill)
+[36m[loop][0m ── iteration 8 (8/30 this run) · T8 · 7/9 done ──
+[36m[loop][0m    Root README.md for a first-time reader, tested against the command tree
+[36m[loop][0m cost=$0.23078139999999997 turns=8 dur=64s error=false
+[36m[loop][0m cost=$0.088559 turns=4 dur=15s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T8 done
