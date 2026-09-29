@@ -68,3 +68,9 @@ I left my gate-drafting scratch in `.loop/tmp/gates/`. It's git-ignored, and my 
 - **Summary:** Implementation from the prior attempt is intact in the working tree (five schemas, embed.go, internal/schema, `vloop schema list|show|validate`, tests). gofmt, vet, tidy, builds and unit tests pass; the verify command still fails on one gate line.
 - **Files:** go.mod, go.sum, embed.go, embed_test.go, schemas/state.v1.json, schemas/proposal.v1.json, schemas/verdict.v1.json, schemas/session.v1.json, schemas/iteration.v1.json, internal/schema/schema.go, internal/schema/schema_test.go, internal/schema/testdata/, internal/cli/schema.go, internal/cli/schema_test.go, internal/cli/root.go
 - **Notes for next iteration:** Gate defect, unchanged since the last attempt and not fixable from a work session: badp 'del(.base)' '(|/)' builds an ERE with an empty alternative, which BSD/macOS grep -E rejects (GNU grep accepts it). The implementation's output `b.json: : missing property 'base'` is correct per the brief (root pointer is ""). Operator fix: replace that badp call with lre-style check `bad state/v1 'del(.base)' st.json ''` (pattern `^b\.json: : .+`), or use `(/.*)?`-free pattern without an empty alternative. No implementation change needed; once the gate is amended, re-run T1 and it should pass.
+
+## Run ended — stalled
+
+- **Run:** `20260929-220615` · 2 iteration(s) this run
+- **Plan:** 0/9 done, 0 blocked
+- **Signals:** 2 iterations · n/a per closed · 0 gate failure(s) · 0 review rejection(s) · 2 attempt(s) burned · streak 2 · ~$4.38

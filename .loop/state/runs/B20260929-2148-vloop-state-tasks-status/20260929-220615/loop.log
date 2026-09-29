@@ -37,3 +37,34 @@
 [36m[loop][0m    Embed the five JSON Schemas and add `vloop schema list|show|validate`
 [36m[loop][0m cost=$0.1167344 turns=4 dur=19s error=false
 [36m[loop][0m    work session reported blocked
+[36m[loop][0m    committed 405efc8
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            2
+[36m[loop][0m   tasks closed:          0/9
+[36m[loop][0m   iterations per closed: n/a
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       2
+[36m[loop][0m   no-progress streak:    2
+[36m[loop][0m   estimated spend:       $4.38 (estimate, not a bill)
+[33m[loop][0m    no recorded progress (2/2)
+[36m[loop][0m 
+[36m[loop][0m ═══ stalled ═══
+[36m[loop][0m run:    B20260929-2148-vloop-state-tasks-status/20260929-220615  (2 iteration(s) this run)
+[36m[loop][0m plan:   0/9 done, 0 blocked
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            2
+[36m[loop][0m   tasks closed:          0/9
+[36m[loop][0m   iterations per closed: n/a
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       2
+[36m[loop][0m   no-progress streak:    2
+[36m[loop][0m   estimated spend:       $4.38 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m per-phase cost:
+[36m[loop][0m plan: 1 session(s), $3.76, 41 turns
+[36m[loop][0m work: 2 session(s), $0.61, 19 turns
+[36m[loop][0m review: 0 session(s), $0, 0 turns
+[36m[loop][0m 
+[36m[loop][0m no recorded progress twice running — read .loop/state/runs/B20260929-2148-vloop-state-tasks-status/20260929-220615/

@@ -1,10 +1,10 @@
 {
   "run_id": "B20260929-2148-vloop-state-tasks-status",
   "brief": "docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md",
-  "status": "running",
+  "status": "stalled",
   "iteration": 2,
   "created": "2026-09-29T21:18:02Z",
-  "updated": "2026-09-29T21:23:21Z",
+  "updated": "2026-09-29T21:23:22Z",
   "tasks": [
     {
       "id": "T1",
