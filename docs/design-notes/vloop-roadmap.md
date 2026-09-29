@@ -13,19 +13,20 @@ vendored shell loop in `.loop/`. Derived from section 5 of
 amended by the architect act recorded in
 `docs/briefs/B20260929-1222-initial-setup-for-vloop-cli.architect-brief.md`.
 
-Every brief is planned and run by the shell loop (`.loop/run.sh`) until B5
+Every brief is planned and run by the shell loop (`.loop/run.sh`) until B6
 lands. Each one names its predecessors in `depends-on:` frontmatter — the
 feature B1 builds — so from B2 on, `vloop brief list` shows this order.
 
 | # | Brief | Owns | Depends on |
 | --- | --- | --- | --- |
 | B1 | `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md` — **consumed, merged in `8da6c95`** | Go module and command skeleton, global flags, exit codes 0/1/2, `version`, embedded plugin manifest, `.vloop/config.toml` + `config`, the loop-brief format (English and Spanish), `brief check`, `brief new`, `brief list`, `depends-on`, the root README | — |
-| B2 | `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` — **consumed** | `schemas/`: state, proposal (with `gate_dispute`), verdict, session and iteration telemetry. `task …` (including `task verify`, which records gate history, and `task gate`, which runs a gate), `status [--json]`. Per task: `model`/`effort` overrides resolved over B1's per-kind config, `area` from the repo's `areas` list, `kind` from the fixed list; `task validate` enforces both | B1 |
-| B3 | not written | Metrics and defects, with their schemas (metrics snapshot, defect record — moved here from B2, since their shape follows from what B3 computes): `vloop metrics [<brief>] [--by task] [--json]`, line classification (config globs, plus built-in **stack presets** chosen with `metrics.stacks`, listed by `vloop metrics stacks`), delivered vs churn, the per-iteration snapshot format, `vloop defect add\|list` with `--blame`, `vloop brief close`, release detection, `vloop metrics export` (JSON Lines), `vloop metrics --workspace`. **Documentation**: a `docs/guide/` set beside the README (concepts, metrics reference, defects guide, configuration reference including the presets) and a command reference generated from the binary, with a test that fails when it is stale; exact contents settled when B3 is written. Reads the shell loop's run folders too, so B1–B4 have metrics — B1 is the first fixture. **May split in two** (metrics + close; defects + export + workspace) — decided when it is written | B2 |
-| B4 | not written | `init`, `upgrade`, `doctor`; extracting the embedded plugin; `--plugin-dir` handshake; skill prose for `/vloop:plan`, `/vloop:work`, `/vloop:review` (as `[hygiene]` edits, not loop tasks) — the planner assigns `area` and `kind`, the work skill can raise `gate_dispute`; the skills write journals, notes and verdict reasons in the configured `language` | B3 |
-| B5 | not written | `run` — the driver port, passing the shell loop's scenarios; `run`'s exit codes 0–7; passes model and effort per session to `claude`. Records what the shell loop does not: gate duration, wall time, configured effort; writes the metrics snapshot after every iteration; blocks a task on `gate_dispute`; classifies flakes; prints the summary on completion. **Work starts on a work branch**: on the default branch, `run` creates a branch named for the run id and switches to it before planning, so the plan commit never lands on the default branch | B4 |
+| B2 | `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` — **consumed, merged in `6de9cfc`** | `schemas/`: state, proposal (with `gate_dispute`), verdict, session and iteration telemetry. `task …` (including `task verify`, which records gate history, and `task gate`, which runs a gate), `status [--json]`. Per task: `model`/`effort` overrides resolved over B1's per-kind config, `area` from the repo's `areas` list, `kind` from the fixed list; `task validate` enforces both | B1 |
+| B3 | `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` — draft | Metrics and defects, first half of the split: the `metrics/v1` and `defect/v1` schemas; line classification (config globs plus the built-in **stack presets** chosen with `metrics.stacks`; `vloop metrics stacks`, `vloop metrics classify`); reading the shell loop's run folders and vloop's own layout; delivered vs churn, time, cost, tokens, models, missing records; `vloop metrics [<brief>] [--by task] [--json]` and the cross-brief table; release detection; `vloop defect add\|list\|set` with `--blame`; derived defects and `gate_history` reclassification; `docs/guide/metrics.md` and `docs/guide/defects.md`. B1 and B2 are its real-data check | B2 |
+| B4 | not written | Close and consolidate, second half of the split: `vloop brief close` (the run record between generated markers, operator findings as defects, `status: consumed`), the saved snapshot `.vloop/state/metrics/<run-id>.json`, `vloop metrics export` (JSON Lines), `vloop metrics --workspace`; the rest of the guide — concepts, the configuration reference including the presets, and a command reference generated from the binary with a test that fails when it is stale | B3 |
+| B5 | not written | `init`, `upgrade`, `doctor`; extracting the embedded plugin; `--plugin-dir` handshake; skill prose for `/vloop:plan`, `/vloop:work`, `/vloop:review` (as `[hygiene]` edits, not loop tasks) — the planner assigns `area` and `kind`, the work skill can raise `gate_dispute`; the skills write journals, notes and verdict reasons in the configured `language` | B4 |
+| B6 | not written | `run` — the driver port, passing the shell loop's scenarios; `run`'s exit codes 0–7; passes model and effort per session to `claude`. Records what the shell loop does not: gate duration, wall time, configured effort; writes the metrics snapshot after every iteration; blocks a task on `gate_dispute`; classifies flakes; prints the summary on completion. **Work starts on a work branch**: on the default branch, `run` creates a branch named for the run id and switches to it before planning, so the plan commit never lands on the default branch | B5 |
 
-After B5: v1.0 is `vloop run` building its own next patch release (design
+After B6: v1.0 is `vloop run` building its own next patch release (design
 session, section 6). **`.loop/` is kept, not deleted**: its state, journals and
 per-iteration commits are the record of how vloop was built. From then on it is
 evidence, not the driver.
@@ -40,7 +41,7 @@ evidence, not the driver.
   `VLOOP_*` environment variables, overridden by flags. Nothing is read from or
   written to `~/.config` or any global location.
 - **Language.** One `language` per repo, `en` or `es`. It selects the heading set
-  a brief is written in, the templates `vloop` generates, and (from B4) the
+  a brief is written in, the templates `vloop` generates, and (from B5) the
   language the skills write prose in. Keys, frontmatter properties,
   `state.json`, JSON output, flag names and vloop's own CLI messages stay
   English.
@@ -56,7 +57,7 @@ evidence, not the driver.
 - **vloop ships no gates.** It runs the verify commands a plan names.
 - **A run never commits to the default branch.** Planning and every iteration
   happen on a work branch named for the run id; the branch is kept after the
-  squash-merge as the record of the run. `vloop run` enforces it (B5); until
+  squash-merge as the record of the run. `vloop run` enforces it (B6); until
   then the operator creates the branch before running `.loop/run.sh`.
 - **Gates run in the OS's shell, not only POSIX.** A `shell` setting (`sh`,
   `bash`, `pwsh`, `powershell`, `cmd`; default `sh` on macOS and Linux, `pwsh`
@@ -71,7 +72,8 @@ evidence, not the driver.
 ## Metrics and defects
 
 Decided with the operator on 2026-09-29. B2 defines the telemetry schemas and
-records gate history; B3 and B5 build the rest. Sample outputs, mostly from
+records gate history; B3 and B4 build the rest, and B6's driver writes
+the telemetry they read. Sample outputs, mostly from
 B1's real telemetry:
 `docs/additional-context-files/20260929-2143-vloop-metrics-sample-outputs.md`.
 
