@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **6/10 done** · iteration 6
+**Status:** running · **7/10 done** · iteration 7
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:12:53Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:16:05Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T4** — Count lines: delivered and churn per category, deletions, rework and test:code
 - [x] **T5** — Compute time, cost, tokens, models, task counts, first-pass and missing records
 - [x] **T6** — Detect release and add `vloop defect add|list|set` with `--blame` attribution
-- [ ] **T7** — Derive defects from runs, reclassify through `gate_history`, and print the origin × catcher matrix
+- [x] **T7** — Derive defects from runs, reclassify through `gate_history`, and print the origin × catcher matrix
 - [ ] **T8** — Add `vloop metrics`: the per-brief summary, `--by task`, the cross-brief table and `--json`
 - [ ] **T9** — Write docs/guide/metrics.md and docs/guide/defects.md and bring the README up to date
 - [ ] **T10** — Close: the end-to-end worked example and the real-data check on this repository
@@ -171,7 +171,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T7 — Derive defects from runs, reclassify through `gate_history`, and print the origin × catcher matrix
 
-`pending` · depends on: T6
+`done` · depends on: T6
 
 **Files:** `internal/metrics/defects.go`, `internal/metrics/defects_test.go`, `internal/cli/defect.go`, `internal/cli/matrix_test.go`, `README.md`
 

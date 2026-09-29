@@ -39,6 +39,14 @@ type PlanTask struct {
 	Kind     string `json:"kind"`
 	Status   string `json:"status"`
 	Attempts int    `json:"attempts"`
+
+	GateHistory []GateEntry `json:"gate_history"`
+}
+
+// GateEntry is one replaced gate in a task's gate_history.
+type GateEntry struct {
+	ReplacedAt string `json:"replaced_at"`
+	By         string `json:"by"`
 }
 
 // PlanDoc is the plan at a commit.

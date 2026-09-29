@@ -93,7 +93,12 @@ branch (origin/HEAD's target, else `main`, else `master`) through its
 `Vloop-Brief:` trailer or the commit that consumed a brief. It also takes
 `--task <id>`, `--origin` (default `work`), `--kind` (default `bug`),
 `--severity` (default `medium`) and `--case <path>`. `vloop defect list` takes
-`--brief <name>`. There is no delete, and the description cannot be edited.
+`--brief <name>`, and `--matrix`, which prints the origin (brief, plan, work,
+env) × catcher (gate, review, operator, user) counts instead: the recorded
+defects plus the ones vloop derives from the runs on every call and never
+stores (each failed gate, and each finding of a rejected review). A gate failure
+before an operator's `task verify` on that task counts as origin plan. With no
+`--brief` it covers every brief that has runs. There is no delete, and the description cannot be edited.
 
 These flags work on every command:
 

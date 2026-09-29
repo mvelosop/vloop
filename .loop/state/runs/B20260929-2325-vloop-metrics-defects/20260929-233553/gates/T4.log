@@ -1,4 +1,4 @@
-ok  	github.com/mvelosop/vloop/internal/metrics	1.355s
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
 gate T4 ok

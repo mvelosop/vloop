@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -12,6 +14,8 @@ import (
 
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/metrics"
+	"github.com/mvelosop/vloop/internal/runs"
 )
 
 func newDefect(g *Globals) *cobra.Command {
@@ -110,20 +114,32 @@ func newDefectAdd(g *Globals) *cobra.Command {
 
 func newDefectList(g *Globals) *cobra.Command {
 	var brief string
+	var matrix bool
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "Print the recorded defects",
+		Short: "Print the recorded defects, or with --matrix the origin × catcher counts",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			root, err := g.root()
 			if err != nil {
 				return err
 			}
+			out := cmd.OutOrStdout()
+			if matrix {
+				x, err := defectMatrix(root, brief)
+				if err != nil {
+					return Problem(err)
+				}
+				if g.JSON {
+					return json.NewEncoder(out).Encode(x)
+				}
+				fmt.Fprint(out, x.String())
+				return nil
+			}
 			ds, err := defect.List(root, brief)
 			if err != nil {
 				return Problem(err)
 			}
-			out := cmd.OutOrStdout()
 			if g.JSON {
 				return json.NewEncoder(out).Encode(ds)
 			}
@@ -138,7 +154,56 @@ func newDefectList(g *Globals) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&brief, "brief", "", "only defects of this loop brief")
+	cmd.Flags().BoolVar(&matrix, "matrix", false, "print origin × catcher counts, derived defects included")
 	return cmd
+}
+
+// defectMatrix counts the derived and recorded defects of one brief, or of
+// every brief with runs when brief is empty.
+func defectMatrix(root, brief string) (metrics.Matrix, error) {
+	var x metrics.Matrix
+	var briefs []string
+	if brief != "" {
+		briefs = []string{defect.BriefsDir + "/" + defect.BriefName(brief) + ".md"}
+	} else {
+		ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(defect.BriefsDir)))
+		if err != nil && !os.IsNotExist(err) {
+			return x, err
+		}
+		for _, e := range ents {
+			if n := e.Name(); !e.IsDir() && strings.HasSuffix(n, ".loop-brief.md") {
+				briefs = append(briefs, defect.BriefsDir+"/"+n)
+			}
+		}
+	}
+	for _, b := range briefs {
+		m, err := runs.Read(root, b)
+		if err != nil {
+			return x, err
+		}
+		if len(m.Folders) == 0 {
+			continue
+		}
+		var plan *runs.PlanDoc
+		if o := m.Owned; o != nil {
+			sha := o.Plan.SHA
+			if o.Run != nil {
+				sha = o.Run.SHA
+			} else if n := len(o.Tasks); n > 0 {
+				sha = o.Tasks[n-1].SHA
+			}
+			if plan, err = runs.PlanAt(root, o.Layout, sha); err != nil {
+				return x, err
+			}
+		}
+		x.AddDerived(metrics.Derive(m, plan))
+	}
+	ds, err := defect.List(root, brief)
+	if err != nil {
+		return x, err
+	}
+	x.AddRecorded(ds)
+	return x, nil
 }
 
 func newDefectSet(g *Globals) *cobra.Command {
