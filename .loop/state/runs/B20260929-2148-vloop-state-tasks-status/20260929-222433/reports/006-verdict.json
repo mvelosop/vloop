@@ -1,0 +1,11 @@
+{"task":"T4","verdict":"PASS","criteria":[
+{"criterion":"Output format, exit codes, never writes","met":true,"evidence":"cli/task_validate.go writeReport: ✗/! lines, plan ok / n problem(s), Problem error on n>0; Check only reads"},
+{"criterion":"Problems with exact wording","met":true,"evidence":"state/validate.go format strings match each wording; schema violations mapped to schema: pointer: message"},
+{"criterion":"Cycle reported as loop from lowest id; reference resolves relative to root, may be directory","met":true,"evidence":"checkCycles rotates to lowest idNum; checkReferences uses os.Stat on root-joined path"},
+{"criterion":"Area rules only when areas set","met":true,"evidence":"checkAreas returns early on empty areas; TestCheckAreasUnsetIsUnchecked"},
+{"criterion":"Warning for empty gate_history reason, exit 0","met":true,"evidence":"checkHistory; history-no-reason.json fixture"},
+{"criterion":"Missing plan is no-plan error; --json one document on exit 0 and 1","met":true,"evidence":"writeReport JSON encodes single doc before returning Problem; TestTaskValidateJSON/NoPlan"},
+{"criterion":"Fixture per rule passing and firing, with TestTaskValidate* tests","met":true,"evidence":"testdata/validate has good.json plus one firing fixture per rule; TestCheckRulesFire; 4 TestTaskValidate* tests"},
+{"criterion":"No reads/writes of .loop/.claude/home","met":true,"evidence":"grep of new files finds none; tests use scratch repos"},
+{"criterion":"gofmt/vet/tidy/cross builds","met":true,"evidence":"driver gate passed"}],
+"findings":[],"notes":"none"}

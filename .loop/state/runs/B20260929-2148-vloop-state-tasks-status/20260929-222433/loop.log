@@ -49,3 +49,19 @@
 [36m[loop][0m cost=$0.1540726 turns=6 dur=27s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T3 done
+[36m[loop][0m    committed 98f0945
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            3
+[36m[loop][0m   tasks closed:          3/9
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $1.36 (estimate, not a bill)
+[36m[loop][0m ── iteration 6 (4/30 this run) · T4 · 3/9 done ──
+[36m[loop][0m    Add `vloop task validate` with every structural rule
+[36m[loop][0m cost=$0.38409400000000005 turns=13 dur=91s error=false
+[36m[loop][0m cost=$0.1372684 turns=6 dur=23s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T4 done

@@ -4,16 +4,16 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **3/9 done** · iteration 5
+**Status:** running · **4/9 done** · iteration 6
 
-**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:30:36Z
+**Brief:** `docs/briefs/B20260929-2148-vloop-state-tasks-status.loop-brief.md` · **Updated:** 2026-09-29T21:32:45Z
 
 ## Progress
 
 - [x] **T1** — Embed the five JSON Schemas and add `vloop schema list|show|validate`
 - [x] **T2** — Load and save `.vloop/state/state.json`, and add `vloop status` (text, --json, --markdown)
 - [x] **T3** — Add the `shell` and `areas` config keys, and `vloop task list|show` with model/effort resolution
-- [ ] **T4** — Add `vloop task validate` with every structural rule
+- [x] **T4** — Add `vloop task validate` with every structural rule
 - [ ] **T5** — Add `vloop task reset|note|drop|set`, each refusing an invalid plan or result
 - [ ] **T6** — Add `vloop task verify` with gate_history, and `vloop task gate` in the plan's shell
 - [ ] **T7** — F1: report a depends-on cycle from its smallest brief name in `brief check` and `brief list`
@@ -119,7 +119,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T4 — Add `vloop task validate` with every structural rule
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 **Files:** `internal/state/validate.go`, `internal/state/validate_test.go`, `internal/state/testdata/validate/`, `internal/cli/task_validate.go`, `internal/cli/task_validate_test.go`
 
