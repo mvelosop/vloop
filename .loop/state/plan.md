@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **4/10 done** · iteration 4
+**Status:** running · **5/10 done** · iteration 5
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:06:51Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:09:26Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T2** — Build line classification: the stack presets, the layers, `vloop metrics stacks` and `vloop metrics classify`
 - [x] **T3** — Read the shell-loop and vloop run layouts and the git history into one model per brief
 - [x] **T4** — Count lines: delivered and churn per category, deletions, rework and test:code
-- [ ] **T5** — Compute time, cost, tokens, models, task counts, first-pass and missing records
+- [x] **T5** — Compute time, cost, tokens, models, task counts, first-pass and missing records
 - [ ] **T6** — Detect release and add `vloop defect add|list|set` with `--blame` attribution
 - [ ] **T7** — Derive defects from runs, reclassify through `gate_history`, and print the origin × catcher matrix
 - [ ] **T8** — Add `vloop metrics`: the per-brief summary, `--by task`, the cross-brief table and `--json`
@@ -122,7 +122,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T5 — Compute time, cost, tokens, models, task counts, first-pass and missing records
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 **Files:** `internal/metrics/time.go`, `internal/metrics/time_test.go`
 
