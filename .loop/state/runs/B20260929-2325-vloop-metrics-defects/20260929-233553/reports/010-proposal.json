@@ -1,0 +1,8 @@
+{
+  "task": "T10",
+  "outcome": "done",
+  "summary": "Added cmd/vloop/b3_e2e_test.go (TestWorkedExampleB3Commands and ...PlantedFailures build the binary and replay the brief's fixture, every command and the six planted failures) and .vloop/config.toml (metrics.stacks = go, metrics.code = the brief templates' glob). Real-data check on B1 and B2 passes read-only.",
+  "files": ["cmd/vloop/b3_e2e_test.go", ".vloop/config.toml", "embed_test.go"],
+  "verified": "The task's verify command: printed 'gate T10 ok' (go test ./..., vet, gofmt, tidy, three builds, B1/B2 real-data lines).",
+  "notes": "go test ./... failed on a stale expectation in embed_test.go (TestSchemasAreEmbedded wanted 5 embedded schemas; T1 added defect/v1 and metrics/v1, so 7). Updated that one number; it is the required 'schema list gains two' change, not a weakening. The fixture builder takes b3Opts (noTrailer, gateHistory, logNames) so each planted failure is a variant of one repo; a later notes.txt commit on main is the 'neither trailer nor consumed' blame target, and the squash sha is taken before it. gate_history entry is dated 09:05, between the gate_fail (09:04) and done (09:06) commits. .vloop/config.toml uses dotted keys."
+}

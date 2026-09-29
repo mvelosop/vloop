@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **9/10 done** · iteration 9
+**Status:** running · **10/10 done** · iteration 10
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:23:05Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T23:25:36Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T7** — Derive defects from runs, reclassify through `gate_history`, and print the origin × catcher matrix
 - [x] **T8** — Add `vloop metrics`: the per-brief summary, `--by task`, the cross-brief table and `--json`
 - [x] **T9** — Write docs/guide/metrics.md and docs/guide/defects.md and bring the README up to date
-- [ ] **T10** — Close: the end-to-end worked example and the real-data check on this repository
+- [x] **T10** — Close: the end-to-end worked example and the real-data check on this repository
 
 ## Tasks
 
@@ -243,7 +243,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T10 — Close: the end-to-end worked example and the real-data check on this repository
 
-`pending` · depends on: T9
+`done` · depends on: T9
 
 **Files:** `cmd/vloop/b3_e2e_test.go`, `.vloop/config.toml`
 

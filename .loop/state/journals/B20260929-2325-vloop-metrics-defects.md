@@ -99,3 +99,10 @@ The file names in each task's `files` list only suggest where code goes; no gate
 - **Summary:** Added docs/guide/metrics.md and docs/guide/defects.md, a Guides section in the README linking both, and internal/cli/guide_test.go (TestGuide...) which checks the guides against the embedded schemas and classify presets.
 - **Files:** docs/guide/metrics.md, docs/guide/defects.md, README.md, internal/cli/guide_test.go
 - **Notes for next iteration:** README was already documenting the commands and config keys (T6-T8), so only a 'Guides' section was added (191 lines, cap 200). The guide test walks the schema JSON for every 'properties' key at any depth (plus string enums for defect/v1) and every glob of every classify preset. The preset table in metrics.md is hand-written but the test fails if it drifts. B4's guide parts were not written.
+
+## T10 — Close: the end-to-end worked example and the real-data check on this repository
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added cmd/vloop/b3_e2e_test.go (TestWorkedExampleB3Commands and ...PlantedFailures build the binary and replay the brief's fixture, every command and the six planted failures) and .vloop/config.toml (metrics.stacks = go, metrics.code = the brief templates' glob). Real-data check on B1 and B2 passes read-only.
+- **Files:** cmd/vloop/b3_e2e_test.go, .vloop/config.toml, embed_test.go
+- **Notes for next iteration:** go test ./... failed on a stale expectation in embed_test.go (TestSchemasAreEmbedded wanted 5 embedded schemas; T1 added defect/v1 and metrics/v1, so 7). Updated that one number; it is the required 'schema list gains two' change, not a weakening. The fixture builder takes b3Opts (noTrailer, gateHistory, logNames) so each planted failure is a variant of one repo; a later notes.txt commit on main is the 'neither trailer nor consumed' blame target, and the squash sha is taken before it. gate_history entry is dated 09:05, between the gate_fail (09:04) and done (09:06) commits. .vloop/config.toml uses dotted keys.
