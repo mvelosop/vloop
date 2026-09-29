@@ -1,0 +1,8 @@
+{
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Added internal/brief (frontmatter status parse, English heading set as data, every rule of check-brief.sh ported) and `vloop brief check` with text and --json output.",
+  "files": ["internal/brief/brief.go", "internal/brief/check.go", "internal/brief/check_test.go", "internal/brief/testdata/en/pass.loop-brief.md", "internal/cli/brief.go", "internal/cli/brief_test.go", "internal/cli/root.go"],
+  "verified": "bash of the T3 verify command exited 0 (unit tests, cross-builds, all binary checks passed).",
+  "notes": "brief.HeadingSet holds BindingRefs, WorkedExample, OutOfScope, Constraints plus TaskCount/ExitCodes regexes (matched case-insensitively); T4 adds a Spanish entry to the `sets` map in brief.go (SetFor currently falls back to English for unknown languages; T4 should make cross-language strict). Headings match as `^#+ .*<name>` like the shell. Binding-references section is stripped before the unresolved-path scan. Windows home rule: `[A-Za-z]:\\\\+Users\\\\`. Status other than ready (or absent) is skipped; absent shows `status is missing`; T5 owns frontmatter validity. A brief that fails silently exits 1 via Problem(errors.New(\"\")); Execute in root.go now skips the stderr line when the message is empty. Missing paths also appear in --json as result problems with message `no such brief: <path>`. Fixtures: one passing file in testdata/en plus per-rule mutations in check_test.go. Paths are resolved relative to -C/cwd and printed root-relative."
+}

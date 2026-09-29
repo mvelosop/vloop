@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 130242,
+  "stop_reason": "end_turn",
+  "session_id": "6a67df7c-dc23-435b-bfac-97040b96df9b",
+  "total_cost_usd": 0.5738713999999999,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 66941,
+    "cache_read_input_tokens": 557987,
+    "output_tokens": 19447,
+    "output_tokens_details": {
+      "thinking_tokens": 4536
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 66941,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 419,
+        "cache_read_input_tokens": 77889,
+        "cache_creation_input_tokens": 961,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 961
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 19447,
+      "cacheReadInputTokens": 557987,
+      "cacheCreationInputTokens": 66941,
+      "webSearchRequests": 0,
+      "costUSD": 0.5738713999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 4536,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 11,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T3 is finished: `vloop brief check` now exists in English, and the T3 verify command exits 0 when I run it. The proposal is in `.loop/tmp/proposal.json`.\n\n- **What was added:** a new `internal/brief` package that ports every rule of `.loop/check-brief.sh`, and the `brief check` command with text and `--json` output. The English heading set is product data in `internal/brief/brief.go`, so T4 can add Spanish without touching the rules.\n- **Tests:** I added one passing fixture at `internal/brief/testdata/en/pass.loop-brief.md`. Each firing case is a mutation of that fixture in `check_test.go`, not a separate committed file per rule.\n- **Change outside the task's file list:** I edited `internal/cli/root.go`. It registers the new command, and `Execute` now skips the stderr line when an error message is empty. That is how \"briefs need work\" exits 1 without printing a second stderr line.\n- **Left for T4/T5:** unknown languages fall back to English for now, and a brief with a missing status is skipped with `status is missing`. T5 owns frontmatter validity.\n\nI didn't edit `.loop/state/state.json`, commit, or touch `.loop/` beyond writing the proposal.",
+  "ttft_ms": 2250,
+  "type": "result",
+  "duration_ms": 138267,
+  "uuid": "9d4ebea4-7a24-403d-9c15-8e37019306e4",
+  "ttft_stream_ms": 1550,
+  "time_to_request_ms": 349,
+  "first_content_frame_ms": 1550,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 3
+}

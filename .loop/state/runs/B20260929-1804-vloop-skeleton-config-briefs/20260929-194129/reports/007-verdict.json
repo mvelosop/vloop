@@ -1,0 +1,17 @@
+{
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "brief new writes timestamped path, prints it, writes nothing else", "met": true, "evidence": "internal/brief/new.go NewPath; internal/cli/new.go writes only the one file via O_EXCL"},
+    {"criterion": "frontmatter fields and no body Status line", "met": true, "evidence": "templates carry name/kind/status/created/depends-on; grep finds no **Status:** in either template"},
+    {"criterion": "template carries full heading set, guidance in configured language, embedded", "met": true, "evidence": "es.md is fully Spanish prose; go:embed in new.go"},
+    {"criterion": "invalid slug exits 2, writes nothing", "met": true, "evidence": "ValidSlug checked before any filesystem access; TestBriefNewSlugRule"},
+    {"criterion": "exists: message, exit 1, file untouched, JSON doc under --json", "met": true, "evidence": "O_EXCL with brief exists message and JSON error doc in cli/new.go; TestBriefNewExistsAndDryRun"},
+    {"criterion": "--dry-run prints path, writes nothing", "met": true, "evidence": "dryRun returns report(false) before any write"},
+    {"criterion": "fresh brief checks as skipped draft, exit 0", "met": true, "evidence": "TestBriefNewWritesDraftThatChecksSkipped; gate log ok"},
+    {"criterion": "committed tests cover templates, slug, exists, dry-run", "met": true, "evidence": "internal/brief/new_test.go and internal/cli/new_test.go"},
+    {"criterion": "gofmt, vet, cross-builds", "met": true, "evidence": "driver gate T7.log passed"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

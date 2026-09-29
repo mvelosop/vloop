@@ -1,0 +1,20 @@
+{
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "go.mod declares module github.com/mvelosop/vloop with current go line; only third-party dep is cobra", "met": true, "evidence": "go.mod: module line, go 1.27.1, cobra v1.10.2 (plus its own indirect deps mousetrap/pflag)"},
+    {"criterion": "go build -o <out>/vloop ./cmd/vloop builds binary", "met": true, "evidence": "cmd/vloop/main.go; the gate builds it"},
+    {"criterion": "version text and --json exact format, key order, runtime go/os/arch", "met": true, "evidence": "version.go versionInfo struct field order and Fprintf format; root_test.go TestVersionJSON/TestVersionText check every field and order"},
+    {"criterion": "main.version and main.commit vars default 0.0.0-dev/unknown, ldflags overridable", "met": true, "evidence": "cmd/vloop/main.go var block; passed via cli.Build"},
+    {"criterion": "plugin read at runtime from embedded FS via root embed.go with all:plugin, never from working tree", "met": true, "evidence": "embed.go //go:embed all:plugin; version.go uses vloop.Plugin.ReadFile, no os.ReadFile/os.Open of plugin.json"},
+    {"criterion": "plugin.json and marketplace.json contents; no skills/agents/hooks/schemas", "met": true, "evidence": "manifests match; file listing shows only the two manifests under plugin/ and .claude-plugin/"},
+    {"criterion": "Committed embed test in root and version --json test in internal/cli", "met": true, "evidence": "embed_test.go reads the embedded plugin.json; root_test.go TestVersionJSON asserts each field"},
+    {"criterion": "Global persistent flags -C/--dir, --json, --no-color, -q, -v; NO_COLOR and TTY colour rule", "met": true, "evidence": "root.go NewRoot persistent flags; Globals.Color checks NoColor, NO_COLOR and char device (untested but nothing colours yet)"},
+    {"criterion": "Usage errors exit 2 with one 'vloop: ' stderr line, nothing on stdout; distinct exit 1 path", "met": true, "evidence": "root.go Execute, SilenceUsage/SilenceErrors, oneLine, ProblemError -> 1; TestUsageErrors covers unknown cmd, flag, --json, extra arg"},
+    {"criterion": "No other command added", "met": true, "evidence": "only newVersion is added to the root"},
+    {"criterion": "No product code/test touches .loop/, .claude/ or home", "met": true, "evidence": "grep of the changed files shows no such paths; tests use only in-memory buffers"},
+    {"criterion": "gofmt, go vet, linux/windows/host builds", "met": true, "evidence": "driver's verify gate exited 0, and it covers these"}
+  ],
+  "findings": [],
+  "notes": "Minor: TestProblemErrorExitsOne only checks the error type from root.Execute, not that Execute() maps it to exit 1; the exit-1 code path itself is untested. Test import block in root_test.go is oddly grouped, but gofmt accepts it. Neither is a reason to fail."
+}

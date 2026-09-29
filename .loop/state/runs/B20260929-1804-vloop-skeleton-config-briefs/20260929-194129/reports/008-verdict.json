@@ -1,0 +1,13 @@
+{
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "README.md is under 200 lines and covers: what vloop is; the loop; brief lifecycle, depends-on, Binding references; config; .vloop/ layout; exit codes; roadmap pointer", "met": true, "evidence": "README.md is ~128 lines; has sections for each item, defaults match `vloop config list` output"},
+    {"criterion": "A committed test in internal/cli walks the cobra command tree and fails if the README names a command, flag or config key the binary lacks, or omits any command the binary has", "met": true, "evidence": "internal/cli/readme_test.go walks NewRoot tree and config.Keys, checks both directions for commands, flags, keys, env vars"},
+    {"criterion": "Nothing from B2–B4 is documented as available", "met": true, "evidence": "README says running a loop is not yet part of vloop; no task/status/init/doctor/run/vl mentions"},
+    {"criterion": "A first-time reader can follow it without having read the design session", "met": true, "evidence": "brief, plan, work, gate, review, commit and status values are defined where first used"},
+    {"criterion": "gofmt, go vet, linux/windows/host builds pass", "met": true, "evidence": "driver gate ran verify with exit 0"}
+  ],
+  "findings": [],
+  "notes": "Minor: one long unwrapped line in the Configuration paragraph; not a finding."
+}

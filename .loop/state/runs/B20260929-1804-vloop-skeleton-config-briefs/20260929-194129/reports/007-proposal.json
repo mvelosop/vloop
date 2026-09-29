@@ -1,0 +1,8 @@
+{
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Added embedded en/es brief templates and `vloop brief new <slug>` (timestamped draft in docs/briefs/, slug rule, exists and --dry-run handling) with tests.",
+  "files": ["internal/brief/templates/en.md", "internal/brief/templates/es.md", "internal/brief/new.go", "internal/brief/new_test.go", "internal/cli/new.go", "internal/cli/new_test.go", "internal/cli/brief.go"],
+  "verified": "T7 verify command exits 0 (gofmt, vet, linux/windows/host builds, unit tests, scratch-repo scenarios in en and es).",
+  "notes": "Templates use {{NAME}} and {{CREATED}} placeholders, replaced in brief.Render; the file is created with O_EXCL so an existing brief is never overwritten. Under --json, success prints {\"path\",\"created\"} (dry-run: created=false) and exists prints {\"error\"} on stdout plus the stderr line, exit 1. Invalid slug or missing arg is exit 2. Edited internal/cli/brief.go only to register newBriefNew. Templates drop the body Status line and check-brief.sh text, add depends-on: [] and Binding-references guidance; the Spanish one is a full translation. Placeholder frontmatter values contain no brackets/quotes so the hand-written parser accepts them."
+}

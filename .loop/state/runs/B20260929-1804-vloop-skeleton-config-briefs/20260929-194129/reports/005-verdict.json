@@ -1,0 +1,15 @@
+{
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Missing or unparseable frontmatter, a missing `name`, name mismatch, or bad `status` is a problem for every brief, including drafts (which then exit 1).", "met": true, "evidence": "frontmatter.go frontmatterProblems; check.go emits them before the non-ready skip and un-skips drafts with problems; TestFrontmatterRules and TestFrontmatterAppliesToDraftsAndToleratesOptionalKeys"},
+    {"criterion": "`description`, `kind`, `created`, `seeds` are optional and unknown keys are ignored.", "met": true, "evidence": "only name/status checked; lean-frontmatter test asserts no problems or warnings"},
+    {"criterion": "A missing binding-references section (in the configured language) is the warning `no binding references — nothing binds a task to a document`.", "met": true, "evidence": "refs.go bindingRefLines; refs_test.go missing-section case in en and es"},
+    {"criterion": "Binding reference problems: does not resolve, has no reason, directory has no entry point; a dead reference is not also reported as the generic unresolved-path warning.", "met": true, "evidence": "refs.go; check.go generic scan uses withoutSection; TestBindingRefsFire asserts dead case yields no warnings, in en and es"},
+    {"criterion": "Both ` — ` and ` - ` separators are accepted.", "met": true, "evidence": "reasonSepRe; hyphen case in TestBindingRefsPass"},
+    {"criterion": "Committed fixtures, English and Spanish, for each rule where it passes and where it fires.", "met": true, "evidence": "testdata/refs/en and es.loop-brief.md pass fixtures; fire cases are derived by mutation in tests, in both languages"},
+    {"criterion": "`gofmt -l .` prints nothing, `go vet ./...` passes, and the module builds for linux, windows and the host.", "met": true, "evidence": "driver gate passed; go test of internal packages is ok"}
+  ],
+  "findings": [],
+  "notes": "Existing tests were adjusted (parseFit, briefText gained a binding reference) because the new rules apply to their fixtures; that is a legitimate adaptation, not weakening. Fire cases are built by in-test mutation of one pass fixture rather than by separate committed files; this is acceptable. A ref that is both dead and reasonless reports only 'does not resolve'."
+}

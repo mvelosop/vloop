@@ -1,0 +1,17 @@
+{
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Every rule of `.loop/check-brief.sh` is ported with the same problem/warning split and the same message wording", "met": true, "evidence": "internal/brief/check.go Check() covers journal (.vloop path), worked example, fence, out-of-scope + count, constraints, task count, exit codes, home paths incl. Windows, symbols, path resolution outside Binding references, tracker keys/URLs; check_test.go TestRules asserts each message"},
+    {"criterion": "Only briefs with frontmatter `status: ready` are checked; others print path and skipped line", "met": true, "evidence": "Check() skips when Status != ready; cli/brief.go prints '- skipped: status is <status>'; TestSkipUnlessReady, TestBriefCheckSkipped"},
+    {"criterion": "Headings match the configured language's heading set, case-insensitively, trailing text allowed; English set is product data in a non-test file", "met": true, "evidence": "HeadingSet/English in internal/brief/brief.go; heading() uses (?im)^#+ .*name"},
+    {"criterion": "Output per brief: root-relative path, marker lines, summary; final line; exit 0 iff no problems", "met": true, "evidence": "cli/brief.go runBriefCheck; Problem(errors.New(\"\")) with root.go silencing empty message; TestBriefCheckTextAndExit"},
+    {"criterion": "Missing path / not a loop brief / no path behaviours and exit codes", "met": true, "evidence": "suffix validation loop runs before any check and returns error; MinimumNArgs(1); missing prints 'vloop: no such brief' and counts failed; TestBriefCheckUsageAndMissing"},
+    {"criterion": "--json prints exactly one document with the specified shape", "met": true, "evidence": "briefJSON/struct field order ok,briefs / path,result,problems,warnings; empty slices non-nil; TestBriefCheckJSON"},
+    {"criterion": "Committed fixtures: for every ported rule a passing and a firing brief, exercised by committed tests in scratch repos", "met": true, "evidence": "testdata/en/pass.loop-brief.md plus per-rule mutations in TestRules and TestPassesForEachRule using t.TempDir repos"},
+    {"criterion": "Tests never read `.loop/check-brief.sh` or anything under `.loop/`", "met": true, "evidence": "grep of internal/brief and cli/brief*.go finds only a scratch-repo .loop/state/journals directory created in a temp dir to prove it is ignored"},
+    {"criterion": "gofmt clean, go vet passes, builds for linux, windows and host", "met": true, "evidence": "gofmt -l . empty; driver gate log and go test pass; work session reported verify exit 0"}
+  ],
+  "findings": [],
+  "notes": "T4 should make SetFor strict rather than falling back to English. root.go change (silence empty error message) is a small, justified supporting edit. Fixtures are one file plus in-test mutations rather than paired files; adequate."
+}

@@ -1,0 +1,128 @@
+# vloop
+
+vloop is a command-line tool for running autonomous Claude loops: a plan is cut
+from a written **brief**, and then each task in the plan is worked by Claude,
+checked, and reviewed without a human in between. This version (0.x) covers the
+part you need before any loop runs: repo-local configuration and the format,
+checking and ordering of briefs. Running a loop is not part of it yet.
+
+Build it with `go build -o vloop ./cmd/vloop` and put the binary on your `PATH`.
+
+## The loop in one paragraph
+
+A loop starts with a **plan**: a session reads the brief and splits it into
+tasks, each with acceptance criteria and a verify command. Then, for every task
+in turn, a **work** session does the task, a **gate** runs the verify command,
+a **review** session judges the result independently, and the driver makes one
+**commit**. Every session is a fresh Claude session that remembers nothing; the
+sessions share nothing but files in the repository (the plan, a journal, the
+code). Briefs are the input to this cycle, and they are what vloop handles today.
+
+## Briefs
+
+A brief is a Markdown file named `B<YYYYMMDD-HHMM>-<slug>.loop-brief.md` in
+`docs/briefs/`. Other files in that folder are ignored. It starts with YAML
+frontmatter, for example:
+
+```
+---
+name: B20260929-1804-example.loop-brief   # the filename without .md
+kind: brief
+status: draft                             # draft | ready | consumed
+created: 2026-09-29
+depends-on: []                            # briefs that must be consumed first
+---
+```
+
+**Lifecycle.** A brief's `status` is `draft` while you write it, `ready` once it
+is fit to plan, and `consumed` after a loop has built it. Only `ready` briefs are
+checked; the others are reported as skipped.
+
+**`depends-on`** lists other briefs, by name (filename minus `.md`), that must be
+`consumed` before this one can run. A name that matches no brief, or a cycle, is
+a problem.
+
+**Sections.** A ready brief needs eight sections: What it is; Why this shape, and
+what was rejected; Binding references; Behaviour contract; Worked example; Out of
+scope; Constraints; Shape. `vloop brief new` writes them all with guidance.
+
+**`## Binding references`** lists the files the work is bound by. Each item is a
+backticked repo-relative path, then ` — ` and the reason it binds. A path that
+does not exist, or an item with no reason, is a problem.
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `vloop version` | print the vloop and embedded plugin versions |
+| `vloop config get <key>` | print the resolved value of a key |
+| `vloop config set <key> <value>` | write a key to `.vloop/config.toml` (`''` removes it) |
+| `vloop config list` | print every key with its value and where it came from |
+| `vloop config path` | print the config file path, relative to the repo root |
+| `vloop brief check <path>...` | check that ready briefs are fit to plan |
+| `vloop brief new <slug>` | write a draft brief from the template |
+| `vloop brief list` | list briefs in dependency order, ready or blocked |
+
+`vloop brief new` takes `--dry-run`: print the path and write nothing.
+
+These flags work on every command:
+
+- `-C, --dir <path>`: act as if started in that directory.
+- `--json`: print one machine-readable JSON document on stdout.
+- `--no-color`: disable colour. A non-empty `NO_COLOR` environment variable does
+  the same. Colour is only used when stdout is a terminal.
+- `-q, --quiet` and `-v, --verbose`: print less or more.
+
+## Configuration
+
+Settings are per repository, in `.vloop/config.toml`. Nothing is read from your
+home directory. Each key can be overridden by an environment variable: the key
+in upper case, `.` turned into `_`, with the prefix shown in the table. The environment wins over
+the file, and the file over the default.
+
+| Key | Default | Values | Environment variable |
+| --- | --- | --- | --- |
+| `language` | `en` | `en`, `es` | `VLOOP_LANGUAGE` |
+| `model.plan` | `opus` | any model name | `VLOOP_MODEL_PLAN` |
+| `model.work` | `sonnet` | any model name | `VLOOP_MODEL_WORK` |
+| `model.review` | `sonnet` | any model name | `VLOOP_MODEL_REVIEW` |
+| `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` |
+| `effort.work` | unset | same | `VLOOP_EFFORT_WORK` |
+| `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` |
+
+`language` chooses the language of a brief's section headings and of the template
+`vloop brief new` writes. It applies to briefs only: commands, flags, keys, JSON
+and vloop's own messages are always English. The `model.*` and `effort.*` keys
+choose the model and the effort for each kind of session (plan, work, review).
+For example:
+
+```
+$ vloop config set language es
+$ vloop config set effort.review high
+$ vloop config list
+```
+
+## Files
+
+vloop keeps its files under `.vloop/` in the repo root (the nearest parent with a
+`.vloop/` folder, else the nearest with `.git`, else the current directory):
+
+- `.vloop/config.toml`: the settings above, written by `vloop config set`.
+
+Briefs live in `docs/briefs/`. Only `vloop config set` and `vloop brief new`
+write anything; every path vloop prints is relative to the repo root.
+
+## Exit codes
+
+- `0`: success.
+- `1`: the command ran and found problems or failed (a brief with problems, a
+  malformed config file, a brief that already exists).
+- `2`: usage error: an unknown command, flag or config key, a missing argument,
+  or an invalid value.
+
+Errors go to stderr as one line starting with `vloop: `.
+
+## What comes next
+
+vloop is built as a series of briefs; what each one adds, and in what order, is in
+[docs/design-notes/vloop-roadmap.md](docs/design-notes/vloop-roadmap.md).

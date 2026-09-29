@@ -1,0 +1,8 @@
+{
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Added internal/config (root discovery, key table, env/file/default resolution, Set with removal and byte-for-byte idempotence) and the `vloop config list|get|set|path` commands.",
+  "files": ["internal/config/config.go", "internal/config/root.go", "internal/config/config_test.go", "internal/config/root_test.go", "internal/cli/config.go", "internal/cli/config_test.go", "internal/cli/root.go", "go.mod", "go.sum"],
+  "verified": "Task T2 verify command run in foreground: exit 0.",
+  "notes": "TOML lib is BurntSushi/toml. Errors: config.SourceError (bad env/file value or malformed file) -> cli.Problem exit 1; UnknownKeyError/InvalidValueError -> exit 2. Under --json a SourceError also prints {\"error\":\"...\"} to stdout (shape was unspecified). Empty VLOOP_* env vars count as unset. `get` resolves only the requested key, `list` resolves all. Set re-encodes the whole file via the TOML encoder (comments/formatting are lost on a real change) but skips the write when the key already has that value, or removal of an absent key (no file created). Globals.root() in internal/cli/config.go resolves the repo root from -C or cwd; later commands should reuse it. Small edit to internal/cli/root.go to register newConfig."
+}

@@ -1,0 +1,99 @@
+{
+  "duration_api_ms": 18154,
+  "stop_reason": "end_turn",
+  "session_id": "4daf6073-7aa8-4719-8072-0fb0d8107070",
+  "total_cost_usd": 0.1265796,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 20939,
+    "cache_read_input_tokens": 116368,
+    "output_tokens": 1953,
+    "output_tokens_details": {
+      "thinking_tokens": 121
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 20939,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 250,
+        "cache_read_input_tokens": 31574,
+        "cache_creation_input_tokens": 1274,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1274
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 1953,
+      "cacheReadInputTokens": 116368,
+      "cacheCreationInputTokens": 20939,
+      "webSearchRequests": 0,
+      "costUSD": 0.1265796,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 121,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T6. All eight acceptance criteria are met, and the committed tests assert exact output for resolution, dangling names, cycles, ordering and the ready column. The verdict is in `.loop/tmp/verdict.json`.\n\n- **Gate:** the driver's gate passed, and I re-ran `go test ./internal/...` myself; all three packages were ok, though the `brief` and `cli` results came from the test cache.\n- **Scope and paths:** the diff stays within the task, and I found no absolute paths in it.\n- **Note for later:** the dependency rule in `brief check` only runs for briefs that reach it (the work session's account is that drafts and consumed briefs are skipped before it). The brief left this open, so I didn't count it against the task.",
+  "ttft_ms": 2295,
+  "type": "result",
+  "duration_ms": 19448,
+  "uuid": "221b892d-e8f5-4ad3-b24a-d4324f1741c1",
+  "ttft_stream_ms": 1123,
+  "time_to_request_ms": 369,
+  "first_content_frame_ms": 1124,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 6
+}

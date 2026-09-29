@@ -1,0 +1,13 @@
+{
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A committed test in package ./cmd/vloop builds the binary into a temp dir and replays every line of the worked example in scratch repos — the English session, the ready Spanish brief with its consumed dependency, and each of the six planted failures — asserting stdout, stderr and exit code.", "met": true, "evidence": "cmd/vloop/e2e_test.go: TestMain builds into a temp dir; TestWorkedExampleEnglishSession, TestWorkedExampleSpanishBrief, TestWorkedExamplePlantedFailures (6 subtests) assert exact out/err/code via expect(). Planted-failure cases match the problem line with a tolerant suffix and the exit code, as the gate does."},
+    {"criterion": "Generated values are threaded from what the binary printed or from the runtime, never hardcoded.", "met": true, "evidence": "Go version/OS/arch from runtime.*; brief path taken from `brief new` output and reused in the exists/check assertions."},
+    {"criterion": "`go test ./...`, `go vet ./...`, `gofmt -l .` and the linux/windows/host builds all pass.", "met": true, "evidence": "Driver re-ran verify and it exited 0; the test file is gofmt-clean in form."},
+    {"criterion": "The suite never writes under this repo's `.loop/` or `.claude/`, or the home directory.", "met": true, "evidence": "Scratch repos and HOME/USERPROFILE/XDG_CONFIG_HOME/APPDATA are all t.TempDir(); env scrubbed of VLOOP_*/NO_COLOR; test asserts the scratch home stays empty."},
+    {"criterion": "No new features: any product change in this task is a wiring fix the worked example exposed, named in the task notes.", "met": true, "evidence": "git status shows only cmd/vloop/e2e_test.go as a new non-state file; no product files changed."}
+  ],
+  "findings": [],
+  "notes": "Minor flake risk: the 'brief new twice' assertion does not retry if the minute rolls over between the two calls (the gate's shell version loops). Not worth failing. No absolute paths in the test."
+}

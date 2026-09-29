@@ -1,0 +1,5 @@
+ok  	github.com/mvelosop/vloop	0.294s
+ok  	github.com/mvelosop/vloop/cmd/vloop	1.752s
+ok  	github.com/mvelosop/vloop/internal/brief	0.595s
+ok  	github.com/mvelosop/vloop/internal/cli	1.009s
+ok  	github.com/mvelosop/vloop/internal/config	1.245s
