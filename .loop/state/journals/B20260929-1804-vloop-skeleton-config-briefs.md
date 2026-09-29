@@ -1,0 +1,40 @@
+# Journal — B20260929-1804-vloop-skeleton-config-briefs
+
+Append-only narrative of this plan. Rendered state lives in .loop/state/plan.md.
+
+## Plan — B20260929-1804-vloop-skeleton-config-briefs
+
+- **Brief:** `docs/briefs/B20260929-1804-vloop-skeleton-config-briefs.loop-brief.md`
+- **Tasks:** 9
+
+The plan is written to `.loop/state/state.json`. It's valid JSON, passes `.loop/amend.sh check`, and has no reference that fails to resolve. Every verify command fails right now for the expected reason: there is no Go module yet, so `go vet ./...` fails.
+
+- **Run id:** `B20260929-1804-vloop-skeleton-config-briefs`
+- **Tasks:** 9, in a straight chain T1 → T9, following the brief's Shape list.
+- **First ready task:** T1, the Go module skeleton (command tree, global flags, exit codes, `version`, embedded plugin).
+
+**Gate structure.** Each gate runs the same checks first: `gofmt -l .`, `go vet ./...`, and builds for linux, windows and the host. It then runs the task's committed Go tests and confirms at least one test exists. Last, it builds the binary and runs its own checks against it in a temporary git repo: exact output lines, exit codes, stdout versus stderr, and JSON checked field by field with `jq`. The brief fixtures in the gates are complete, valid briefs, so a later task's rules can't make an earlier gate fail. I ran every English fixture through `.loop/check-brief.sh` and each rule fired, or stayed silent, as intended. Only T9 runs `go test ./...`, and it also checks that the test suite wrote nothing under `.loop/` or `.claude/`.
+
+**Limit:** I could only run each gate as far as its first step, since nothing builds yet. Past that point the gates are syntax-checked, and the fixtures are checked against the shell checker, but the rest of each script has never actually run. If a gate turns out to be wrong, the work session should stop and report it rather than edit the check.
+
+**Names I pinned because a gate needs them:**
+- `main.version` and `main.commit` in `cmd/vloop`, as the `-ldflags -X` targets.
+- The `internal/config` package (the design session already names `internal/cli` and `internal/brief`). The gates run tests per package: T1 runs the root package, `./cmd/vloop` and `./internal/cli`; T2 runs `./internal/config` and `./internal/cli`; T3–T7 run `./internal/brief` and `./internal/cli`.
+- The README test lives in `internal/cli`, and the end-to-end test lives in `./cmd/vloop`.
+- The file names in each task's `files` list are what I expect the task to leave behind, not something the gates enforce.
+
+**Where I had to interpret the brief:**
+1. **No base SHA.** The brief says to pin its starting commit as the base every gate compares against. The driver rejects gates that diff against a fixed commit, so no gate diffs at all; they check the binary's behaviour instead.
+2. **Wording of ported messages.** I required `check-brief.sh`'s exact wording for the ported rules, only swapping the journal path to `.vloop/`, and the gates match on key phrases. In `--json`, messages carry no `✓`/`!`/`✗` marker.
+3. **`brief list` order.** I read "dependency order, ties by name" as: a brief is listed as soon as its dependencies are, lowest name first. A brief with no dependencies shows `ready`.
+4. **Errors with `--json`.** The brief says stdout carries one JSON document even on exit 1. I gated that for config errors and for `brief new` when the file exists, but left the document's shape open.
+5. **`config set` output.** It prints nothing on success, matching the worked example.
+6. **Naming the source of a bad value.** An invalid value from the environment must name the variable (`VLOOP_LANGUAGE`); one from the file must name `config.toml`.
+7. **Not gated:**
+   - An empty `VLOOP_MODEL_*` variable, which conflicts with `set <key> ''` meaning "remove the key".
+   - Whether dependency rules apply to draft briefs.
+   - Which brief the cycle message starts from in `brief list`; the gate accepts either.
+8. **README checks.** Beyond the 200-line cap, T8's gate checks that every `--flag`, backticked `vloop <cmd>`, config key and `VLOOP_*` variable in the README exists in the binary.
+
+I left the generator and fixture scripts in `.loop/tmp/`, which is gitignored.
+
