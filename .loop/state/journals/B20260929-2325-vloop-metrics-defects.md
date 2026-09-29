@@ -36,3 +36,10 @@ I ran every `verify` command and each one fails now for the right reason: a miss
 
 The file names in each task's `files` list only suggest where code goes; no gate depends on them.
 
+
+## T1 — Add the `defect/v1` and `metrics/v1` schemas and the five `metrics.*` config keys
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added the embedded defect/v1 and metrics/v1 schemas with valid/invalid fixtures, and the five metrics.* list config keys (glob-validated), with README documentation.
+- **Files:** schemas/defect.v1.json, schemas/metrics.v1.json, internal/schema/testdata/defect.valid.json, internal/schema/testdata/defect.invalid.json, internal/schema/testdata/metrics.valid.json, internal/schema/testdata/metrics.invalid.json, internal/schema/schema_test.go, internal/config/config.go, internal/config/config_test.go, internal/cli/config_test.go, internal/cli/schema_test.go, cmd/vloop/e2e_test.go, cmd/vloop/b2_e2e_test.go, README.md
+- **Notes for next iteration:** config.Key gained a Glob flag: with List it accepts any non-empty entry instead of lower-case names; metrics.stacks is a plain name list until T2 validates it against presets. Besides the config list/schema list expectations the brief names, internal/config's TestDefaultsEveryRow (the same config list rows) needed the five new rows. metrics/v1 leaf design: tasks{planned,done,blocked,first_pass,estimate{min,max}|null}; size{delivered,churn: lines{code,test,docs,other,deleted{code,test,docs,other}}, test_code_ratio, rework}; time{agent_ms,work_ms,review_ms,plan_ms,gates_ms|null,wall_ms|null}; rate{code_per_min,code_test_per_min}; cost{total_usd,plan_usd,work_usd,review_usd,per_1000_code_lines_usd}; tokens{input,output,cache_read,cache_creation,cache_hit_ratio}; models/effort per phase (models arrays, effort string|null); defects{in_loop,operator,escaped,total,removal_efficiency}; records{missing[{task,phase,iteration}]}; lead_time{plan_to_merge_ms}; merged is a full SHA string or null; by_task rows{id,area,kind,attempts,churn,agent_ms,cost_usd,models[]}. The metrics fixture's invalid case is /tasks/done as a string.

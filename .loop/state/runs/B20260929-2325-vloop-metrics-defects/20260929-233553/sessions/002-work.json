@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 87293,
+  "stop_reason": "end_turn",
+  "session_id": "0182536e-4079-45e6-ad66-51314a4ae795",
+  "total_cost_usd": 0.47596780000000005,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 63124,
+    "cache_read_input_tokens": 502659,
+    "output_tokens": 12290,
+    "output_tokens_details": {
+      "thinking_tokens": 1501
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 63124,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 558,
+        "cache_read_input_tokens": 72467,
+        "cache_creation_input_tokens": 998,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 998
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 12290,
+      "cacheReadInputTokens": 502659,
+      "cacheCreationInputTokens": 63124,
+      "webSearchRequests": 0,
+      "costUSD": 0.47596780000000005,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1501,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 13,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is done and its verify command exits 0; it printed `gate T1 ok`. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **Schemas:** `schemas/defect.v1.json` and `schemas/metrics.v1.json` are embedded like the other five, so `schema list` now shows seven names. Each has a valid and an invalid fixture in `internal/schema/testdata`. The invalid defect has `found-by` set to `martian` and fails at `/found-by`. The invalid metrics document has `tasks.done` as a string.\n- **Metrics leaf keys:** I designed them in the schema: sizes per category with deletions, times in milliseconds with `gates_ms` and `wall_ms` nullable, unrounded USD, tokens, and one row per task. The full list is in the proposal notes for T8 and T9.\n- **Config keys:** the five `metrics.*` keys sit after `areas` as lists. I added a `Glob` flag on `config.Key`. The four glob keys accept any non-empty pattern, `areas` still rejects anything that isn't a lower-case name, and `metrics.stacks` stays a plain name list until T2.\n- **Test expectations:** I updated the `config list` and `schema list` expectations as the brief requires. One more had to change: `TestDefaultsEveryRow` in `internal/config/config_test.go` checks the same `config list` rows, so it needed the five new ones. I added `TestMetricsKeys` alongside it.\n- **README:** the configuration table lists the five keys and their variables, with a short paragraph on them.\n\nI didn't touch `.loop/state/state.json` or commit anything.",
+  "ttft_ms": 2055,
+  "type": "result",
+  "duration_ms": 97618,
+  "uuid": "a94a8abf-ec6e-4dac-98fe-1314a77d582f",
+  "ttft_stream_ms": 1810,
+  "time_to_request_ms": 370,
+  "first_content_frame_ms": 1810,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 1
+}

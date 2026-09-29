@@ -108,6 +108,11 @@ the file, and the file over the default.
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` |
 | `shell` | `sh` (`cmd` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` |
 | `areas` | unset | a TOML array of names | `VLOOP_AREAS` |
+| `metrics.stacks` | unset | a TOML array of stack names | `VLOOP_METRICS_STACKS` |
+| `metrics.code` | unset | a TOML array of glob patterns | `VLOOP_METRICS_CODE` |
+| `metrics.test` | unset | a TOML array of glob patterns | `VLOOP_METRICS_TEST` |
+| `metrics.docs` | unset | a TOML array of glob patterns | `VLOOP_METRICS_DOCS` |
+| `metrics.excluded` | unset | a TOML array of glob patterns | `VLOOP_METRICS_EXCLUDED` |
 
 `language` chooses the language of a brief's section headings and of the template
 `vloop brief new` writes. It applies to briefs only: commands, flags, keys, JSON
@@ -116,6 +121,11 @@ choose the model and the effort for each kind of session (plan, work, review).
 `shell` is the shell `vloop task gate` runs a verify command in. `areas` lists
 the names a task's `area` may take; when set, `vloop task validate` reports any
 other. In the file it is an array, for example `areas = ["cli", "docs"]`.
+The `metrics.*` keys are lists too, set as comma-joined text and stored under
+`[metrics]`: `metrics.stacks` names the language presets used to classify lines
+as code, test, docs or excluded, and the four glob keys hold the repository's
+own doublestar patterns, which win over the presets, for example
+`metrics.code = ["internal/brief/templates/**"]`.
 For example:
 
 ```

@@ -13,6 +13,8 @@ var invalidAt = map[string]string{
 	"verdict":   "/criteria/0/met",
 	"session":   "/is_error",
 	"iteration": "/gate/exit",
+	"defect":    "/found-by",
+	"metrics":   "/tasks/done",
 }
 
 func fixture(t *testing.T, n string) []byte {
@@ -25,7 +27,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"iteration/v1", "proposal/v1", "session/v1", "state/v1", "verdict/v1"}
+	want := []string{"defect/v1", "iteration/v1", "metrics/v1", "proposal/v1", "session/v1", "state/v1", "verdict/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}

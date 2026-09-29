@@ -4,13 +4,13 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **0/10 done** · iteration 0
+**Status:** running · **1/10 done** · iteration 1
 
-**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T22:56:23Z
+**Brief:** `docs/briefs/B20260929-2325-vloop-metrics-defects.loop-brief.md` · **Updated:** 2026-09-29T22:59:53Z
 
 ## Progress
 
-- [ ] **T1** — Add the `defect/v1` and `metrics/v1` schemas and the five `metrics.*` config keys
+- [x] **T1** — Add the `defect/v1` and `metrics/v1` schemas and the five `metrics.*` config keys
 - [ ] **T2** — Build line classification: the stack presets, the layers, `vloop metrics stacks` and `vloop metrics classify`
 - [ ] **T3** — Read the shell-loop and vloop run layouts and the git history into one model per brief
 - [ ] **T4** — Count lines: delivered and churn per category, deletions, rework and test:code
@@ -25,7 +25,7 @@
 
 ### T1 — Add the `defect/v1` and `metrics/v1` schemas and the five `metrics.*` config keys
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `schemas/defect.v1.json`, `schemas/metrics.v1.json`, `internal/schema/`, `internal/config/config.go`, `internal/config/config_test.go`, `internal/cli/config.go`, `internal/cli/config_test.go`, `internal/cli/schema_test.go`, `cmd/vloop/e2e_test.go`, `cmd/vloop/b2_e2e_test.go`, `README.md`
 

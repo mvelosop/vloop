@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "defect/v1",
+  "description": "A recorded defect: the frontmatter of .vloop/defects/D<stamp>-<slug>.md as JSON",
+  "type": "object",
+  "required": ["schema", "id", "brief", "origin", "found-by", "kind", "severity", "status", "fixed-by", "case", "created"],
+  "properties": {
+    "schema": { "const": "defect/v1" },
+    "id": { "type": "string" },
+    "brief": { "type": "string" },
+    "task": { "type": "string" },
+    "origin": { "enum": ["brief", "plan", "work", "env"] },
+    "found-by": { "enum": ["gate", "review", "operator", "user"] },
+    "kind": { "enum": ["bug", "spec-gap", "gate", "gate-gap", "regression"] },
+    "severity": { "enum": ["low", "medium", "high", "critical"] },
+    "status": { "enum": ["open", "fixed", "wontfix"] },
+    "fixed-by": { "type": "string" },
+    "case": { "type": "string" },
+    "created": { "type": "string", "format": "date-time" }
+  }
+}
