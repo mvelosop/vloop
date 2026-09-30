@@ -1,3 +1,37 @@
+# vloop
+
+A Go CLI and Claude Code plugin that packages the autonomous loop: plan a brief
+into tasks, then per task a fresh work session, a gate, an independent review,
+one commit. It is built **by** the shell loop vendored in `.loop/`, one brief at
+a time, following `docs/design-notes/vloop-roadmap.md` — read that first; its
+"Owns" column says what exists and what comes next. The briefs live in
+`docs/briefs/`, each with a `## Run record` once consumed.
+
+## Which rules bind you
+
+- **Started by `.loop/run.sh`** as a plan, work or review session: the loop's
+  rules below bind you, all of them. You do not commit, you do one task, you set
+  no status.
+- **An interactive session with the operator**: you are the operator's hands,
+  not a loop session. Follow `.claude/skills/vloop-operator/SKILL.md` — the
+  playbook for writing, running, verifying and closing briefs. You may commit
+  on work branches; merging, pushing and anything outward-facing wait for the
+  operator's go-ahead. Rules 1, 2 and 8 below bind you too.
+
+## Toolchain
+
+Go, as pinned in `go.mod`; module `github.com/mvelosop/vloop`, binary built from
+`./cmd/vloop`. The checks every change must pass:
+
+```
+go test ./...   go vet ./...   gofmt -l .   go mod tidy -diff
+GOOS=linux go build ./...   GOOS=windows go build ./...
+```
+
+`gofmt -l .` and `go mod tidy -diff` print nothing on success.
+`.vloop/config.toml` is this repo's own vloop config (`metrics.stacks = ["go"]`);
+`.vloop/defects/` holds its recorded defects. The shell loop's own suite is
+`.loop/tests/run-all.sh`.
 
 <!-- loop:begin -->
 ## Rules for any session working here
