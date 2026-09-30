@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **4/8 done** · iteration 4
+**Status:** running · **5/8 done** · iteration 5
 
-**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:47:40Z
+**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:50:25Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T2** — Build the run-record renderer, the marker splice and the metrics snapshot writer
 - [x] **T3** — Add `vloop brief close`: findings, refusals, status lines, run record, snapshot and one commit
 - [x] **T4** — Add `--abandon "<reason>"` and `--dry-run` to `vloop brief close`
-- [ ] **T5** — Add `vloop metrics export`: JSON Lines of briefs, tasks and defects with the repository's identity
+- [x] **T5** — Add `vloop metrics export`: JSON Lines of briefs, tasks and defects with the repository's identity
 - [ ] **T6** — Add `--workspace <file>` to `vloop metrics` and `vloop metrics export`
 - [ ] **T7** — Write the guide: concepts, the configuration reference and a generated command reference
 - [ ] **T8** — Close: the end-to-end B4 worked example and the real-data check on this repository
@@ -130,7 +130,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T5 — Add `vloop metrics export`: JSON Lines of briefs, tasks and defects with the repository's identity
 
-`pending` · depends on: T1, T2
+`done` · depends on: T1, T2
 
 **Files:** `internal/cli/export.go`, `internal/cli/export_test.go`, `internal/cli/metrics.go`, `internal/metrics/`, `internal/runs/`, `README.md`
 

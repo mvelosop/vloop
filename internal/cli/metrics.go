@@ -82,7 +82,7 @@ func newMetrics(g *Globals) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&by, "by", "", "break the summary down by `task`")
-	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g))
+	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g), newMetricsExport(g))
 	return cmd
 }
 

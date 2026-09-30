@@ -71,3 +71,10 @@ I've written the plan to `.loop/state/state.json`: run `B20260930-0929-vloop-clo
 - **Summary:** `vloop brief close` gains `--abandon "<reason>"` (closes an unfinished or finished plan as abandoned) and `--dry-run` (prints the summary with pending findings counted as operator defects plus would-lines, writes nothing); README documents both.
 - **Files:** internal/cli/close.go, internal/cli/close_flags_test.go, README.md
 - **Notes for next iteration:** Metrics are now built before defect files are written; a real close with findings rebuilds after Add so counts include them. Dry-run predicts defect paths in close.go (same D<stamp>-<slug>[-n] scheme as defect.Add, checking existing files) and adjusts Defects counts and removal efficiency in memory. An empty --abandon reason is rejected (exit 1) with its own message. --dry-run ignores --json and prints text. README stays at 192 lines (row extended, no new lines).
+
+## T5 — Add `vloop metrics export`: JSON Lines of briefs, tasks and defects with the repository's identity
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added `vloop metrics export [<brief>…]`: export/v1 JSON Lines of brief, task and defect records with repo identity (origin credentials stripped), read-only; README row added.
+- **Files:** internal/cli/export.go, internal/cli/export_test.go, internal/cli/metrics.go, internal/metrics/defects.go, README.md
+- **Notes for next iteration:** Brief record is the metrics.Report marshalled, by_task deleted, then schema/type/repo set. Task records follow plan order (metrics.PlanOf, new, reads the plan at the last run commit) with by_task rows joined by id; DeriveBrief needs the .md path (Report.Brief has no .md). Origin read via `git config --get remote.origin.url`; only scheme:// authorities are stripped, scp-style git@host:path is left alone. README now 193 lines.

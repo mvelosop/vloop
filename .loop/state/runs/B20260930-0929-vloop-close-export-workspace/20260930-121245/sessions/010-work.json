@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 101462,
+  "stop_reason": "end_turn",
+  "session_id": "0af54223-7210-4ab6-bf44-f07ffda06ae0",
+  "total_cost_usd": 0.5176788,
+  "usage": {
+    "input_tokens": 34,
+    "cache_creation_input_tokens": 56506,
+    "cache_read_input_tokens": 873334,
+    "output_tokens": 11692,
+    "output_tokens_details": {
+      "thinking_tokens": 1994
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 56506,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 482,
+        "cache_read_input_tokens": 68022,
+        "cache_creation_input_tokens": 500,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 500
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 34,
+      "outputTokens": 11692,
+      "cacheReadInputTokens": 873334,
+      "cacheCreationInputTokens": 56506,
+      "webSearchRequests": 0,
+      "costUSD": 0.5176788,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1994,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 17,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T5 is done: `vloop metrics export [<brief>…]` now exists. Its verify command exits 0 and prints `gate T5 ok`. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **Output:** one `export/v1` JSON line per record. That is the brief record (`vloop metrics --json` without `by_task`), then its tasks in plan order, then its derived defects, then its recorded defects. Every record carries `repo`.\n- **Repo identity:** it comes from the `git config` origin URL. For `scheme://` URLs it removes the `user[:password]@` part of the authority. `git@host:path` forms are left as they are.\n- **No runs:** a named brief with no runs prints `vloop: no runs for <name>` and exits 1.\n- **Code changes:**\n  - New `internal/cli/export.go`.\n  - `internal/cli/metrics.go` registers the subcommand.\n  - `internal/metrics/defects.go` gains `PlanOf`, which reads the plan at the last run commit.\n- **Tests:** `internal/cli/export_test.go` has three `TestExport…` tests. They cover record order and fields, derived ids for a gate failure and for review findings, credential stripping with fixtures where it applies and where it must not, no origin, and the no-runs error.\n- **README:** one new row in the commands table; the file is now 193 lines, under the 200 cap.\n\nI did not commit anything.",
+  "ttft_ms": 2418,
+  "type": "result",
+  "duration_ms": 124992,
+  "uuid": "250c163f-91b2-4eab-9d9a-a0e927cee722",
+  "ttft_stream_ms": 1135,
+  "time_to_request_ms": 358,
+  "first_content_frame_ms": 1136,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 5
+}

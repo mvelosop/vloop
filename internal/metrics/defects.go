@@ -202,3 +202,16 @@ func DeriveBrief(root, brief string) ([]Derived, error) {
 	}
 	return Derive(m, plan), nil
 }
+
+// PlanOf reads a brief's plan as committed at its last run commit. It returns
+// nil when the brief has no owned run.
+func PlanOf(root, brief string) (*runs.PlanDoc, error) {
+	m, err := runs.Read(root, brief)
+	if err != nil {
+		return nil, err
+	}
+	if m.Owned == nil {
+		return nil, nil
+	}
+	return runs.PlanAt(root, m.Owned.Layout, planSHA(m.Owned))
+}
