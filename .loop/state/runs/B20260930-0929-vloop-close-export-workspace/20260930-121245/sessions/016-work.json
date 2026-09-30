@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 99422,
+  "stop_reason": "end_turn",
+  "session_id": "ad48652d-1615-4359-8fe8-fa04ce7f9dd3",
+  "total_cost_usd": 0.459866,
+  "usage": {
+    "input_tokens": 32,
+    "cache_creation_input_tokens": 46946,
+    "cache_read_input_tokens": 710890,
+    "output_tokens": 12984,
+    "output_tokens_details": {
+      "thinking_tokens": 1547
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 46946,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 574,
+        "cache_read_input_tokens": 58242,
+        "cache_creation_input_tokens": 720,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 720
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 32,
+      "outputTokens": 12984,
+      "cacheReadInputTokens": 710890,
+      "cacheCreationInputTokens": 46946,
+      "webSearchRequests": 0,
+      "costUSD": 0.459866,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1547,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 17,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T8 is done: the T8 verify command ran in the foreground and printed `gate T8 ok`. That covers `go test ./...`, vet, gofmt, tidy, the linux/windows/host builds and the real-data export and workspace checks on this repository. `.loop/tmp/proposal.json` is written.\n\n- **New tests:** `cmd/vloop/b4_e2e_test.go` has `TestWorkedExampleB4Close`, `TestWorkedExampleB4Workspace` and `TestWorkedExampleB4PlantedFailures`. They run the built binary against fixture repositories in `t.TempDir()` and play the brief's worked example and every planted failure.\n- **Fixture reuse:** In `cmd/vloop/b3_e2e_test.go` I split `b3Fixture` into `b3PreMerge` (the pre-merge prefix) plus the merge, and added a `stalled` option. The fixture's brief body now carries a `**Status:** ready to plan` line. B3's assertions are unchanged and still pass.\n- **Outside the two listed files:** `TestSchemasAreEmbedded` in `embed_test.go` expected 7 schemas, and the export schema added earlier makes 8. It failed `go test ./...`, so I changed 7 to 8 and nothing else. The proposal's notes flag this.\n- **Fixture gotchas (recorded in the notes):**\n  - The \"HEAD on main\" case fast-forwards main to the work branch first. Runs are found from branch history, so otherwise `close` says \"no runs\" instead of the branch refusal.\n  - `brief check` takes the brief's `.md` path, not its name.\n  - `close` needs a local git user in the fixture to commit.",
+  "ttft_ms": 2376,
+  "type": "result",
+  "duration_ms": 143691,
+  "uuid": "ad32fd71-7cb1-4ebd-a30a-7d51344a5d9c",
+  "ttft_stream_ms": 1153,
+  "time_to_request_ms": 396,
+  "first_content_frame_ms": 1154,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 8
+}

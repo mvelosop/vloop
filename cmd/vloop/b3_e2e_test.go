@@ -16,6 +16,7 @@ type b3Opts struct {
 	noTrailer   bool   // squash commit without the Vloop-Brief trailer
 	gateHistory bool   // T2 gets an operator gate_history entry before its done commit
 	logNames    string // the brief loop.log names, when not the brief
+	stalled     bool   // the run ends stalled with T2 pending (read by b3PreMerge)
 }
 
 func b3Git(t *testing.T, dir, date string, args ...string) string {
@@ -35,9 +36,10 @@ func b3Lines(n, blank int) string {
 	return strings.Repeat("x\n", n) + strings.Repeat(" \n", blank)
 }
 
-// b3Fixture builds the brief's worked example and returns the scratch and the
-// squash commit's short SHA.
-func b3Fixture(t *testing.T, o b3Opts) (*scratch, string) {
+// b3PreMerge builds the worked example up to the merge: HEAD on the work
+// branch, the run recorded, the working tree clean. It also returns the
+// brief file's repo-relative path and a function rendering it with a status.
+func b3PreMerge(t *testing.T, o b3Opts) (*scratch, string, func(string) string) {
 	t.Helper()
 	s := &scratch{t: t, dir: t.TempDir(), home: t.TempDir()}
 	at := func(date string, args ...string) string { return b3Git(t, s.dir, date, args...) }
@@ -51,7 +53,7 @@ func b3Fixture(t *testing.T, o b3Opts) (*scratch, string) {
 	}
 	briefFile := "docs/briefs/" + b3Brief + ".loop-brief.md"
 	brief := func(status string) string {
-		return "---\nname: " + b3Brief + ".loop-brief\nstatus: " + status + "\n---\n## Shape\n\n2 to 3 tasks.\n"
+		return "---\nname: " + b3Brief + ".loop-brief\nstatus: " + status + "\n---\n## Shape\n\n- **Status:** ready to plan\n\n2 to 3 tasks.\n"
 	}
 	at("2026-01-01T08:00:00Z", "init", "-q", "-b", "main")
 	s.write(briefFile, brief("ready"))
@@ -106,9 +108,26 @@ func b3Fixture(t *testing.T, o b3Opts) (*scratch, string) {
 	}
 	s.write(folder+"reports/001-verdict.json", `{"task":"T1","verdict":"PASS","findings":[]}`)
 	s.write(folder+"reports/003-verdict.json", `{"task":"T2","verdict":"PASS","findings":[]}`)
-	plan("done", "done", "complete", o.gateHistory)
-	commit("2026-01-01T09:10:00Z", "[loop] run "+b3Brief+"/20260101-090000: complete")
+	if o.stalled {
+		plan("done", "pending", "stalled", false)
+		commit("2026-01-01T09:10:00Z", "[loop] run "+b3Brief+"/20260101-090000: stalled")
+	} else {
+		plan("done", "done", "complete", o.gateHistory)
+		commit("2026-01-01T09:10:00Z", "[loop] run "+b3Brief+"/20260101-090000: complete")
+	}
+	return s, briefFile, brief
+}
 
+// b3Fixture builds the brief's worked example and returns the scratch and the
+// squash commit's short SHA.
+func b3Fixture(t *testing.T, o b3Opts) (*scratch, string) {
+	t.Helper()
+	s, briefFile, brief := b3PreMerge(t, o)
+	at := func(date string, args ...string) string { return b3Git(t, s.dir, date, args...) }
+	commit := func(date, msg string) {
+		at(date, "add", "-A")
+		at(date, "commit", "-q", "--allow-empty", "-m", msg)
+	}
 	at("2026-01-01T09:20:00Z", "checkout", "-q", "main")
 	at("2026-01-01T09:20:00Z", "merge", "-q", "--squash", b3Brief)
 	s.write(briefFile, brief("consumed"))

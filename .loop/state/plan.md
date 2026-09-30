@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **7/8 done** · iteration 7
+**Status:** running · **8/8 done** · iteration 8
 
-**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:56:57Z
+**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T12:00:48Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T5** — Add `vloop metrics export`: JSON Lines of briefs, tasks and defects with the repository's identity
 - [x] **T6** — Add `--workspace <file>` to `vloop metrics` and `vloop metrics export`
 - [x] **T7** — Write the guide: concepts, the configuration reference and a generated command reference
-- [ ] **T8** — Close: the end-to-end B4 worked example and the real-data check on this repository
+- [x] **T8** — Close: the end-to-end B4 worked example and the real-data check on this repository
 
 ## Tasks
 
@@ -209,7 +209,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T8 — Close: the end-to-end B4 worked example and the real-data check on this repository
 
-`pending` · depends on: T7
+`done` · depends on: T7
 
 **Files:** `cmd/vloop/b4_e2e_test.go`, `cmd/vloop/b3_e2e_test.go`
 
