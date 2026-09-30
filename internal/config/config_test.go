@@ -310,3 +310,53 @@ func TestMetricsKeys(t *testing.T) {
 		t.Errorf("areas accepted a glob: %v", err)
 	}
 }
+
+func TestStacksScopeValidation(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, "services", "api"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "file"), nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := Set(root, "metrics.stacks", "go,csharp@services/api"); err != nil {
+		t.Fatal(err)
+	}
+	for _, bad := range []string{"csharp@missing", "csharp@file", "csharp@/services", "csharp@services/", "csharp@./services", "csharp@services/../services", "cobol@services", "@services"} {
+		err := Set(root, "metrics.stacks", "go,"+bad)
+		var iv *InvalidValueError
+		if !errors.As(err, &iv) || iv.Value != bad {
+			t.Errorf("%s: err %v", bad, err)
+			continue
+		}
+		want := "invalid value \"" + bad + "\" for metrics.stacks: want <stack> or <stack>@<existing directory>"
+		if err.Error() != want {
+			t.Errorf("got %q", err.Error())
+		}
+	}
+	v, err := Get(root, "metrics.stacks")
+	if err != nil || v.Value != "go,csharp@services/api" {
+		t.Errorf("file changed: %v %v", v, err)
+	}
+}
+
+func TestStacksScopeReadIgnoresMissingDirectory(t *testing.T) {
+	root := t.TempDir()
+	write := func(s string) {
+		if err := os.MkdirAll(filepath.Join(root, ".vloop"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(root, ".vloop", "config.toml"), []byte(s), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("[metrics]\nstacks = [\"go\", \"csharp@gone\"]\n")
+	if v, err := Get(root, "metrics.stacks"); err != nil || v.Value != "go,csharp@gone" {
+		t.Errorf("%v %v", v, err)
+	}
+	write("[metrics]\nstacks = [\"go\", \"csharp@/abs\"]\n")
+	var se *SourceError
+	if _, err := Get(root, "metrics.stacks"); !errors.As(err, &se) {
+		t.Errorf("want SourceError, got %v", err)
+	}
+}

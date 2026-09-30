@@ -72,3 +72,46 @@ func TestLayerPresetOrder(t *testing.T) {
 		{"a.go", Code, "go", "**/*.go"},
 	})
 }
+
+func TestParseStackScope(t *testing.T) {
+	for _, ok := range []string{"go", "csharp@services/api", "react@web"} {
+		if _, _, err := ParseStack(ok); err != nil {
+			t.Errorf("ParseStack(%q): %v", ok, err)
+		}
+	}
+	n, s, _ := ParseStack("csharp@services/api")
+	if n != "csharp" || s != "services/api" {
+		t.Errorf("got %q %q", n, s)
+	}
+	for _, bad := range []string{"", "@web", "cobol@web", "go@", "go@/a", "go@a/", "go@./a", "go@a/../b", "go@a//b", "go@a\\b", "go@."} {
+		if _, _, err := ParseStack(bad); err == nil {
+			t.Errorf("ParseStack(%q) accepted", bad)
+		}
+	}
+}
+
+func TestClassifyScope(t *testing.T) {
+	c := New(Preset{}, []string{"go@services/x", "csharp@services", "python"})
+	for _, tc := range []struct{ path, cat, layer, glob string }{
+		{"services/x/go.sum", Excluded, "go@services/x", "go.sum"},
+		{"services/x/main.go", Code, "go@services/x", "**/*.go"},
+		{"services/x/a.cs", Other, "", ""},
+		{"services/y/a.cs", Code, "csharp@services", "**/*.cs"},
+		{"web/tests/helpers.ts", Test, "python", "**/tests/**"},
+		{"a/tests/t.py", Test, "python", "**/tests/**"},
+		{"services", Other, "", ""},
+		{".loop/x", Excluded, LayerAlways, ".loop/**"},
+	} {
+		r := c.Classify(tc.path)
+		if r.Category != tc.cat || r.Layer != tc.layer || (tc.glob != "" && r.Glob != tc.glob) {
+			t.Errorf("%s: got %+v", tc.path, r)
+		}
+	}
+}
+
+func TestClassifyScopeRepoGlobsStayRepoRelative(t *testing.T) {
+	c := New(Preset{Test: []string{"services/x/**"}}, []string{"go@services/x"})
+	if r := c.Classify("services/x/main.go"); r.Category != Test || r.Layer != LayerRepo {
+		t.Errorf("got %+v", r)
+	}
+}

@@ -4,16 +4,16 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **3/10 done** · iteration 3
+**Status:** running · **4/10 done** · iteration 4
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:40:05Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:42:37Z
 
 ## Progress
 
 - [x] **T1** — Add the install/v1 schema, the install stamp's read and write, and semantic-version comparison
 - [x] **T2** — Fix F1: a binding reference's reason may wrap onto the lines indented under its list item
 - [x] **T3** — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
-- [ ] **T4** — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
+- [x] **T4** — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
 - [ ] **T5** — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
 - [ ] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
 - [ ] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
@@ -102,7 +102,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T4 — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/config/config.go`, `internal/config/config_test.go`, `internal/classify/classify.go`, `internal/classify/classify_test.go`, `internal/cli/metrics.go`, `internal/cli/config.go`, `internal/cli/classify_test.go`
 

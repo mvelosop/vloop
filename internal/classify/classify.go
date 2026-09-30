@@ -1,6 +1,11 @@
 package classify
 
-import "github.com/bmatcuk/doublestar/v4"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/bmatcuk/doublestar/v4"
+)
 
 // Categories.
 const (
@@ -34,18 +39,53 @@ type Classifier struct {
 }
 
 type namedPreset struct {
-	name string
-	p    Preset
+	name  string
+	scope string // repo-relative directory, "" when unscoped
+	p     Preset
+}
+
+// label is how a match by this preset is named: <stack> or <stack>@<path>.
+func (n namedPreset) label() string {
+	if n.scope == "" {
+		return n.name
+	}
+	return n.name + "@" + n.scope
+}
+
+// ParseStack splits a metrics.stacks entry, <stack> or <stack>@<path>, and
+// checks its form: a known stack, and a path with "/" separators, no leading or
+// trailing "/", no empty, "." or ".." segment. It does not look at the disk.
+func ParseStack(entry string) (name, scope string, err error) {
+	name, scope, scoped := strings.Cut(entry, "@")
+	if _, ok := Lookup(name); !ok {
+		return "", "", fmt.Errorf("unknown stack %q", name)
+	}
+	if !scoped {
+		return name, "", nil
+	}
+	if scope == "" || strings.Contains(scope, "\\") {
+		return "", "", fmt.Errorf("bad scope path %q", scope)
+	}
+	for _, seg := range strings.Split(scope, "/") {
+		if seg == "" || seg == "." || seg == ".." {
+			return "", "", fmt.Errorf("bad scope path %q", scope)
+		}
+	}
+	return name, scope, nil
 }
 
 // New builds a classifier from the repo's globs and the preset names of
-// metrics.stacks. Unknown names are ignored (config validates them).
+// metrics.stacks, each <stack> or <stack>@<path>. Malformed entries are ignored
+// (config validates them).
 func New(repo Preset, stacks []string) *Classifier {
 	c := &Classifier{repo: repo}
 	for _, s := range stacks {
-		if p, ok := Lookup(s); ok {
-			c.presets = append(c.presets, namedPreset{s, p})
+		name, scope, err := ParseStack(s)
+		if err != nil {
+			continue
 		}
+		p, _ := Lookup(name)
+		c.presets = append(c.presets, namedPreset{name, scope, p})
 	}
 	return c
 }
@@ -79,10 +119,23 @@ func (c *Classifier) Classify(path string) Result {
 			return Result{s.cat, LayerRepo, g}
 		}
 	}
+	scope := ""
+	for _, np := range c.presets {
+		if len(np.scope) > len(scope) && strings.HasPrefix(path, np.scope+"/") {
+			scope = np.scope
+		}
+	}
+	rel := path
+	if scope != "" {
+		rel = path[len(scope)+1:]
+	}
 	for _, s := range steps {
 		for _, np := range c.presets {
-			if g, ok := first(s.globs(np.p), path); ok {
-				return Result{s.cat, np.name, g}
+			if np.scope != scope {
+				continue
+			}
+			if g, ok := first(s.globs(np.p), rel); ok {
+				return Result{s.cat, np.label(), g}
 			}
 		}
 	}

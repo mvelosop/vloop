@@ -1,0 +1,8 @@
+{
+  "task": "T4",
+  "outcome": "done",
+  "summary": "metrics.stacks entries may now be <stack>@<path>: classify.ParseStack checks the form, config validates entries (set also requires the directory to exist), and the classifier resolves the longest containing scope, matches scoped presets scope-relative and labels them stack@path.",
+  "files": ["internal/classify/classify.go", "internal/classify/classify_test.go", "internal/config/config.go", "internal/config/config_test.go"],
+  "verified": "The task's verify command ran to 'gate T4 ok'.",
+  "notes": "Key gained a Stacks flag (replaces Valid for metrics.stacks); InvalidValueError for it carries the single bad entry and the message 'want <stack> or <stack>@<existing directory>'. Existence of the directory is checked only in Set (checkScopeDirs), not on read. Classifier stores scope per preset; the label is in Result.Layer, so internal/cli/metrics.go and cli/config.go needed no change. Outside all scopes the unscoped stacks still apply; inside one, only that scope's. Backslashes in a scope path are rejected."
+}

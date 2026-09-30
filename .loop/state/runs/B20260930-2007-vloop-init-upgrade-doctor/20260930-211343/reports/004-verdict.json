@@ -1,0 +1,9 @@
+{"task":"T4","verdict":"PASS","criteria":[
+{"criterion":"Entry form and config set validation (exit 2, message, file untouched)","met":true,"evidence":"classify.ParseStack + config Validate/checkScopeDirs (filepath.Join/FromSlash); InvalidValueError message 'want <stack> or <stack>@<existing directory>'; TestStacksScopeValidation checks message and unchanged file"},
+{"criterion":"Reading checks form only, not directory existence","met":true,"evidence":"checkScopeDirs is called only in Set; TestStacksScopeReadIgnoresMissingDirectory covers vanished dir ok and csharp@/abs as SourceError"},
+{"criterion":"Longest scope wins; inside a scope only its stacks apply","met":true,"evidence":"Classify scope loop by longest prefix, presets filtered by np.scope==scope; TestClassifyScope"},
+{"criterion":"Scoped preset globs match scope-relative; repo globs repo-relative; layer order intact","met":true,"evidence":"rel = path[len(scope)+1:]; repo/always layers untouched before; TestClassifyScopeRepoGlobsStayRepoRelative"},
+{"criterion":"Label (<stack>@<path>: glob) for scoped, unscoped unchanged","met":true,"evidence":"namedPreset.label() used in Result layer; cli prints layer as before"},
+{"criterion":"Unscoped identical to base; scoped differs; existing tests pass","met":true,"evidence":"unscoped path behaves as before (scope=='' matches only unscoped presets); gate builds base and compares"},
+{"criterion":"Committed Scope tests in classify and config; filepath used","met":true,"evidence":"TestParseStackScope, TestClassifyScope*, TestStacksScope* present"}],
+"findings":[],"notes":"none"}
