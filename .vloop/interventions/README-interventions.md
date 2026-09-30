@@ -39,10 +39,15 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | partly | [I20260929-2148-ten-choices-in-the-b2-draft-including-mo](I20260929-2148-ten-choices-in-the-b2-draft-including-mo.md) |
 | design | decision | partly | [I20260929-2330-eleven-choices-in-the-b3-draft-and-real](I20260929-2330-eleven-choices-in-the-b3-draft-and-real.md) |
 | design | decision | partly | [I20260930-0929-seven-choices-in-the-b4-draft](I20260930-0929-seven-choices-in-the-b4-draft.md) |
+| design | decision | partly | [I20260930-2002-four-forks-settled-for-b5](I20260930-2002-four-forks-settled-for-b5.md) |
 | design | direction | no | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
+| design | direction | no | [I20260930-2001-b5-skills-move-to-b6-and-a-b7-review](I20260930-2001-b5-skills-move-to-b6-and-a-b7-review.md) |
+| design | direction | no | [I20260930-2025-monorepos-need-stacks-by-path](I20260930-2025-monorepos-need-stacks-by-path.md) |
 | design | verification-finding | yes | [I20260930-0935-vloop-s-checker-rejected-two-binding-ref](I20260930-0935-vloop-s-checker-rejected-two-binding-ref.md) |
+| design | verification-finding | yes | [I20260930-2003-marketplace-manifest-invalid-since-b1](I20260930-2003-marketplace-manifest-invalid-since-b1.md) |
+| design | verification-finding | yes | [I20260930-2009-checker-rejects-wrapped-binding-reason](I20260930-2009-checker-rejects-wrapped-binding-reason.md) |
 | run | ceremony | yes | [I20260929-1917-the-plan-commit-landed-on-main](I20260929-1917-the-plan-commit-landed-on-main.md) |
 | run | context-supply | partly | [I20260929-1900-go-not-installed-and-the-loop-s-fence-ha](I20260929-1900-go-not-installed-and-the-loop-s-fence-ha.md) |
 | run | halt | yes | [I20260929-1941-the-driver-refused-to-resume-on-the-new](I20260929-1941-the-driver-refused-to-resume-on-the-new.md) |
