@@ -1,0 +1,62 @@
+# Journal — B20260930-2007-vloop-init-upgrade-doctor
+
+Append-only narrative of this plan. Rendered state lives in .loop/state/plan.md.
+
+## Plan — B20260930-2007-vloop-init-upgrade-doctor
+
+- **Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md`
+- **Tasks:** 10
+
+The plan is written to `.loop/state/state.json`. **Run id:** `B20260930-2007-vloop-init-upgrade-doctor`. It has **10 tasks**, and the first ready one is **T1** (T2, T3 and T4 are also ready from the start).
+
+| Task | What it builds | Depends on |
+| --- | --- | --- |
+| T1 | The `install/v1` schema, reading and writing the stamp, and version comparison | — |
+| T2 | F1: a binding reference's reason may wrap onto the next line | — |
+| T3 | Valid manifests, the SessionStart hook, `version --check-plugin`, `plugin path` | — |
+| T4 | F2: stacks scoped by path | — |
+| T5 | Stack detection | T4 |
+| T6 | `vloop init` | T1, T4, T5 |
+| T7 | `vloop upgrade` | T1, T6 |
+| T8 | `vloop doctor` | T1, T3, T4, T6 |
+| T9 | Docs | T2–T8 |
+| T10 | Close: end-to-end test of the worked example, the real-data check, and the real `claude plugin validate .` | all |
+
+**Checks I ran:**
+- **The JSON is valid**, and every task has a goal, acceptance criteria and a `verify` command. Every dependency points to a real task, and there are no cycles.
+- **References:** all 11 cited paths exist.
+- **No absolute paths:** none of the user kind appear anywhere. System paths were replaced with a PATH built from symlinks.
+- **Shape checks:** `.loop/amend.sh check` passes with no warnings.
+- **Every gate fails now, for the right reason.** I ran each stored `verify` the way the driver does.
+- **The gates' fixtures are sound:**
+  - I built the base-commit binary and confirmed it still has the F1 and F2 defects.
+  - The T5 detection harness passes against a throwaway detector in a scratch copy, and catches a deliberately broken one.
+- **Not checked:** I'm not allowed to run `claude`, so the `claude plugin validate .` step in T10 has never actually run.
+
+**Where I had to interpret the brief (please check these before running):**
+1. **Format of `claude plugin list --json`.** I assumed it prints an array of `{"id":"vloop@vloop","version","scope","enabled"}` objects. T8's stub and doctor's plugin check both depend on this, and I couldn't confirm it. Likewise, T10 treats any "warn"/"error" line from `claude plugin validate .` as a failure unless it reads "0" or "no".
+2. **Extracted `plugin.json` carries the binary's version.** The embedded manifest says `0.0.0-dev`, so the worked example (`--check-plugin` on the extracted copy prints nothing at 0.2.0) only works if `plugin path` writes the binary's version into the copy.
+3. **The CLAUDE.md section names the vloop version that wrote it.** Otherwise the 0.1.0 → 0.1.1 upgrade has nothing to change, yet the example prints `updated CLAUDE.md`.
+4. **The worked-example repo already has a `.gitignore`**, because the example prints `updated .gitignore`. When init creates one, it prints `wrote .gitignore`.
+5. **Doctor's `stacks` line appears only when a stack is scoped.** The example's doctor output has no stacks line.
+6. **A scoped stack whose directory has vanished is still a readable config.** `config set` rejects it, but reading it is not an error. Otherwise doctor's `stacks` warning could never appear next to `✓ config`.
+7. **Smaller calls:**
+   - A pre-release version, in either direction, gets the same "may break" refusal.
+   - `typescript` counts as a dependency when it's in `devDependencies`.
+   - The trust check reads `$HOME/.claude.json`, the same file `run.sh` preflight uses.
+   - Self-hosting means `go.mod` declares `github.com/mvelosop/vloop` and the binary's commit is a prefix of HEAD.
+   - `--check-plugin` echoes the directory as given, and a manifest with no version counts as "cannot read".
+   - `upgraded` is a required field that may be null.
+   - The invalid-value message names the one bad stack entry, not the whole list.
+8. **F1 is missing from the brief's Shape list**, so I made it its own task, T2. That keeps the plan within the brief's 9–11.
+9. **The base SHA (05ea997) is only used to build a comparison binary** in the T2 and T4 gates, via `git archive`. Nothing diffs against it, because the driver rejects gates whose `git diff` baseline would go stale.
+10. **README.md is at its line cap: 199 lines, and the test requires fewer than 200.** Each task that adds a command has to tighten existing README text; the goals say the cap must not be raised.
+
+**Names I pinned that the brief doesn't give:**
+- Package `internal/install` and `internal/detect`, with `detect.Stacks(root string) ([]string, error)`. The T5 gate calls that function directly.
+- Test-name patterns the gates look for: `Wrap`, `Hook`, `Scope`, `Init`, `Upgrade`, `Doctor`, `TestWorkedExampleB5`.
+- File names: `plugin_embed_test.go` and `cmd/vloop/b5_e2e_test.go`.
+- The `--json` output of `plugin path` is `{"path": …}`.
+
+As the brief requires, each gate runs `go test` only on the packages its task touches (plus vet, gofmt, tidy and the three builds); only T10 runs `go test ./...`. Most gates also run the `internal/cli` and `cmd/vloop` suites, which covers regressions across tasks.
+
