@@ -88,3 +88,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** metrics.stacks entries may now be <stack>@<path>: classify.ParseStack checks the form, config validates entries (set also requires the directory to exist), and the classifier resolves the longest containing scope, matches scoped presets scope-relative and labels them stack@path.
 - **Files:** internal/classify/classify.go, internal/classify/classify_test.go, internal/config/config.go, internal/config/config_test.go
 - **Notes for next iteration:** Key gained a Stacks flag (replaces Valid for metrics.stacks); InvalidValueError for it carries the single bad entry and the message 'want <stack> or <stack>@<existing directory>'. Existence of the directory is checked only in Set (checkScopeDirs), not on read. Classifier stores scope per preset; the label is in Result.Layer, so internal/cli/metrics.go and cli/config.go needed no change. Outside all scopes the unscoped stacks still apply; inside one, only that scope's. Backslashes in a scope path are rejected.
+
+## T5 — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added internal/detect with Stacks(root): marker table, C# solution rule, skipped directories, depth 3, symlinks never followed, sorted unscoped-first output.
+- **Files:** internal/detect/detect.go, internal/detect/detect_test.go
+- **Notes for next iteration:** Marker filenames are matched case-insensitively. Only regular files count as markers, and symlinked directories are not descended. C#: a *.sln marks its own directory and suppresses csproj entries in every directory below it; a *.csproj with no solution above or beside it marks its own directory. An unreadable or malformed package.json still yields javascript. Output is sorted by the full entry string within each group. The root not being readable returns an error; unreadable subdirectories do too.

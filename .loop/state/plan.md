@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **4/10 done** · iteration 4
+**Status:** running · **5/10 done** · iteration 5
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:42:37Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:44:02Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T2** — Fix F1: a binding reference's reason may wrap onto the lines indented under its list item
 - [x] **T3** — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
 - [x] **T4** — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
-- [ ] **T5** — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
+- [x] **T5** — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
 - [ ] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
 - [ ] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
 - [ ] **T8** — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
@@ -128,7 +128,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T5 — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 **Files:** `internal/detect/detect.go`, `internal/detect/detect_test.go`
 

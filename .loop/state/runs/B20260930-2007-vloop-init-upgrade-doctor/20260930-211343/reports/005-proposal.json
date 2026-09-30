@@ -1,0 +1,8 @@
+{
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Added internal/detect with Stacks(root): marker table, C# solution rule, skipped directories, depth 3, symlinks never followed, sorted unscoped-first output.",
+  "files": ["internal/detect/detect.go", "internal/detect/detect_test.go"],
+  "verified": "The task's verify command: printed 'gate T5 ok'.",
+  "notes": "Marker filenames are matched case-insensitively. Only regular files count as markers, and symlinked directories are not descended. C#: a *.sln marks its own directory and suppresses csproj entries in every directory below it; a *.csproj with no solution above or beside it marks its own directory. An unreadable or malformed package.json still yields javascript. Output is sorted by the full entry string within each group. The root not being readable returns an error; unreadable subdirectories do too."
+}

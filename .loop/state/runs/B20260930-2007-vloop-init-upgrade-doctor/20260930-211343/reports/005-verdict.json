@@ -1,0 +1,14 @@
+{
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Package internal/detect exports `Stacks(root string) ([]string, error)` returning the entries init will write: stacks found at the root unscoped, stacks found in a subdirectory as `<stack>@<dir>` with `/`; unscoped entries first, each group sorted; an empty result when nothing is found.", "met": true, "evidence": "detect.go Stacks/entry: path.Join slash rel, unscoped and scoped sorted separately; 'ordering' and 'nothing' tests"},
+    {"criterion": "Markers: go.mod, package.json (+typescript via tsconfig beside or dep/devDep, +react via dependency only), csproj/sln, python, java, kotlin, rust; tsconfig alone not a marker", "met": true, "evidence": "detect.go walk switch and jsStacks parse only dependencies/devDependencies; tests cover each incl. 'react only mentioned', 'tsconfig elsewhere', 'tsconfig alone', 'kotlin not java'"},
+    {"criterion": "For C#, the stack root is the directory of a *.sln at or above the *.csproj files if there is one, else each *.csproj's own directory; one solution yields one entry", "met": true, "evidence": "walk: hasSln || (hasCsproj && !underSln), underSln propagated to descendants; tests 'csharp solution', 'root solution', 'projects', 'sln beside csproj'"},
+    {"criterion": "The walk covers the root and directories up to three levels below it and skips .git, .vloop, .loop, node_modules, vendor, bin, obj, dist, target, build at any depth.", "met": true, "evidence": "maxDepth=3 check in walk; skipped map; 'depth three' and TestStacksSkippedDirectories"},
+    {"criterion": "Detection only reads: never writes, never follows a symlink out of the repository, and does not assume a case-sensitive filesystem or `/` on disk.", "met": true, "evidence": "only ReadDir/ReadFile; DirEntry.IsDir false for symlinks so not followed; names lowercased for matching; filepath.FromSlash/Join; TestStacksSymlinkNotFollowed"},
+    {"criterion": "internal/detect/detect_test.go covers each marker rule where it applies and where it must not, the solution rule, the skipped directories, the depth limit and the ordering.", "met": true, "evidence": "detect_test.go TestStacks table (26 cases), skipped-dirs and symlink tests; go test passes"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

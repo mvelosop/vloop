@@ -72,3 +72,19 @@
 [36m[loop][0m cost=$0.11673140000000001 turns=4 dur=17s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T4 done
+[36m[loop][0m    committed 4a967cd
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            4
+[36m[loop][0m   tasks closed:          4/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $7.49 (estimate, not a bill)
+[36m[loop][0m ── iteration 5 (5/30 this run) · T5 · 4/10 done ──
+[36m[loop][0m    Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
+[36m[loop][0m cost=$0.1918802 turns=6 dur=49s error=false
+[36m[loop][0m cost=$0.12045840000000001 turns=6 dur=16s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T5 done
