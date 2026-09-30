@@ -70,4 +70,5 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | next | direction | no | [I20260929-2130-the-metrics-and-defects-design-before-b2](I20260929-2130-the-metrics-and-defects-design-before-b2.md) |
 | next | direction | no | [I20260930-0955-a-project-level-driver-over-project-stat](I20260930-0955-a-project-level-driver-over-project-stat.md) |
 | next | direction | no | [I20260930-1654-a-documentation-layer-for-the-design-ste](I20260930-1654-a-documentation-layer-for-the-design-ste.md) |
+| next | direction | no | [I20260930-1956-refocus-on-v1-and-intervention-data](I20260930-1956-refocus-on-v1-and-intervention-data.md) |
 <!-- index:end -->
