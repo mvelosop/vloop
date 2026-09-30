@@ -1,0 +1,18 @@
+---
+id: I20260930-0935-vloop-s-checker-rejected-two-binding-ref
+brief: B20260930-0929-vloop-close-export-workspace.loop-brief
+phase: design
+kind: verification-finding
+automatable: yes
+by: assistant
+occurred: 2026-09-30
+recorded: 2026-09-30T16:54:00Z
+backfilled: true
+---
+vloop's checker rejected two binding references citing two paths each
+
+**Trigger.** running vloop brief check on the draft, besides the shell checker
+
+**Done.** split into one path per entry
+
+**What would automate it.** already a check; run it as part of the design act

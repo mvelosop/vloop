@@ -49,6 +49,14 @@ A `project-state.json` — the roadmap as data — and a driver over it:
 - The operator skill already describes the per-brief loop the project driver
   would repeat.
 
+### Evidence so far
+
+`docs/design-notes/vloop-interventions-b1-b4.md`: 38 operator interventions
+across B1–B4, by kind and by whether a driver could do them. In short: ceremony
+and halts are automatable, verification mostly is (by gates on real data and
+log checks), direction and decisions cluster in the design act and stay human,
+and carrying context forward is the gap.
+
 ### What it has to answer first
 
 - **The human gates between briefs.** A dependency is complete when a brief is

@@ -1,0 +1,18 @@
+---
+id: I20260930-1300-a-rehearsal-clone-took-the-work-branch-a
+brief: B20260930-0929-vloop-close-export-workspace.loop-brief
+phase: verify
+kind: repair
+automatable: yes
+by: assistant
+occurred: 2026-09-30
+recorded: 2026-09-30T16:54:00Z
+backfilled: true
+---
+a rehearsal clone took the work branch as the default branch
+
+**Trigger.** the clone's origin/HEAD pointed at the branch checked out in the source
+
+**Done.** set the clone's origin/HEAD to main
+
+**What would automate it.** the rehearsal script sets it

@@ -112,8 +112,19 @@ Until B4 ships `vloop brief close`, by hand:
 5. `git fetch`, `git switch main`, `git reset --hard origin/main` — after
    checking nothing on local `main` is missing from `origin/main`.
 
-After B4: `vloop brief close <brief> --finding "…"` / `--no-findings` does 2–3
+Since B4: `vloop brief close <brief> --finding "…"` / `--no-findings` does 2–3
 and the commit, and prints the trailer for step 4.
+
+6. **Record the interventions** — everything you or the operator did around the
+   run besides testing — one file each in `.vloop/interventions/`, as
+   `I<YYYYMMDD-HHMM>-<slug>.md` with frontmatter `id`, `brief`, `phase`
+   (setup, design, run, halt, verify, close, next), `kind` (direction, decision,
+   context-supply, halt, verification-finding, repair, carry-forward, ceremony),
+   `automatable` (yes, partly, no), `by` (operator, assistant, both),
+   `occurred`, `recorded`; then the summary, **Trigger.**, **Done.**, **What
+   would automate it.** Record them when they happen, then refresh the
+   index: `tools/interventions-index.sh --write` (`--check` in verification).
+   Why: `docs/design-notes/vloop-interventions-b1-b4.md`.
 
 ## Lessons, where they bite
 
