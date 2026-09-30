@@ -1,0 +1,8 @@
+{
+  "task": "T9",
+  "outcome": "done",
+  "summary": "Added docs/guide/metrics.md and docs/guide/defects.md, a Guides section in the README linking both, and internal/cli/guide_test.go (TestGuide...) which checks the guides against the embedded schemas and classify presets.",
+  "files": ["docs/guide/metrics.md", "docs/guide/defects.md", "README.md", "internal/cli/guide_test.go"],
+  "verified": "T9 verify command run in the foreground; printed 'gate T9 ok'.",
+  "notes": "README was already documenting the commands and config keys (T6-T8), so only a 'Guides' section was added (191 lines, cap 200). The guide test walks the schema JSON for every 'properties' key at any depth (plus string enums for defect/v1) and every glob of every classify preset. The preset table in metrics.md is hand-written but the test fails if it drifts. B4's guide parts were not written."
+}

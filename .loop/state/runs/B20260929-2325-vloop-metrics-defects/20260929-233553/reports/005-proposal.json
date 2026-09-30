@@ -1,0 +1,8 @@
+{
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Added internal/metrics/time.go: Aggregate sums time, rate, cost, tokens, models, effort and gate time from a runs.Model; CountTasks gives planned/done/blocked/first-pass/estimate/iterations per closed; MissingRecords lists iterations lacking work/review session records.",
+  "files": ["internal/metrics/time.go", "internal/metrics/time_test.go"],
+  "verified": "T5 verify command exits 0 (gate T5 ok): go vet ./..., gofmt, go mod tidy -diff clean; go test ./internal/metrics ./internal/runs passes, incl. TestTimeCost*, TestTasks*, TestMissingRecords* (worked example: agent 160000 ms, plan 120000, wall 600000, $2.10, $140/1k, first-pass 1/2).",
+  "notes": "Aggregate(m, delivered Counts) takes delivered lines from Measure; CountTasks(m, plan, briefText) takes the plan from runs.PlanAt at the run commit. Unknowns are nil pointers (gate for shell loop, wall without a run commit, rates/ratios on zero denominators). Session/iteration matching for missing records is per run folder (iteration numbers restart per folder). Missing records are only reported; existing sessions of that iteration are still summed. First-pass = task has iterations and all ended 'done'. Session Model is used for the models list only when modelUsage is empty. Helper is named fratio because lines.go already has an int ratio."
+}

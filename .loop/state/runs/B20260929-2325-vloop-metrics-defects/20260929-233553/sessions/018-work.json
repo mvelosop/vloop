@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 81229,
+  "stop_reason": "end_turn",
+  "session_id": "624c7139-07c2-4ffa-9c18-797773b3f175",
+  "total_cost_usd": 0.3717668,
+  "usage": {
+    "input_tokens": 22,
+    "cache_creation_input_tokens": 45460,
+    "cache_read_input_tokens": 430364,
+    "output_tokens": 10381,
+    "output_tokens_details": {
+      "thinking_tokens": 283
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 45460,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 403,
+        "cache_read_input_tokens": 56999,
+        "cache_creation_input_tokens": 477,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 477
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 22,
+      "outputTokens": 10381,
+      "cacheReadInputTokens": 430364,
+      "cacheCreationInputTokens": 45460,
+      "webSearchRequests": 0,
+      "costUSD": 0.3717668,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 283,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01ASStcPA8561z4VxVKHSzRM",
+      "tool_input": {
+        "command": "f=~/.claude/projects/-Users-USER-source-personal-vloop/624c7139-07c2-4ffa-9c18-797773b3f175/tool-results/bnlz2xp6q.txt; sed -n 25,400p $f | cut -c1-400 | head -330"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 12,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T9 is done and its verify command exits 0. I ran the full gate in the foreground and it printed `gate T9 ok`.\n\n- **Guides:** I wrote `docs/guide/metrics.md` and `docs/guide/defects.md`. They cover what the brief's shape item 9 asks for. I left out B4's parts (concepts, configuration reference, generated command reference).\n- **README:** the earlier tasks had already documented the commands and config keys. I added only a short Guides section linking both files. The README is now 191 lines, under the 200 cap, and `readme_test.go` is untouched.\n- **Test:** `internal/cli/guide_test.go` adds `TestGuideMetricsCoversSchemaAndPresets` and `TestGuideDefectsCoversSchema`. They read the embedded schemas and the classify presets, then fail if the guides miss a `metrics/v1` property, a `defect/v1` field or enum value, a preset name, or a preset glob.\n- **Preset table:** the table in `metrics.md` is hand-written, but the test fails if it drifts from the binary's presets.\n\nThe proposal is at `.loop/tmp/proposal.json`. I did not commit or touch `state.json`.",
+  "ttft_ms": 2407,
+  "type": "result",
+  "duration_ms": 96651,
+  "uuid": "8f1671b2-ea7b-418b-97b8-31a4bc622945",
+  "ttft_stream_ms": 1255,
+  "time_to_request_ms": 361,
+  "first_content_frame_ms": 1256,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 9
+}

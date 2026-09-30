@@ -1,0 +1,8 @@
+{
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Added metrics.Derive (derived gate/review defects with gate_history reclassification), Matrix, DefectCounts and RemovalEfficiency, and `vloop defect list --matrix [--brief]`; README documents it.",
+  "files": ["internal/metrics/defects.go", "internal/metrics/defects_test.go", "internal/cli/defect.go", "internal/cli/matrix_test.go", "internal/runs/commits.go", "README.md"],
+  "verified": "The T7 verify command exited 0 and printed 'gate T7 ok'.",
+  "notes": "Derive(m, plan) takes the plan at the run commit (else last task commit), read with runs.PlanAt. To do that I added GateHistory []GateEntry to runs.PlanTask, a small change outside the listed files. The time of a gate failure is taken from the k-th gate_failed/gate_fail task commit of that task (m.Owned.Tasks), falling back to iteration Ended, because the shell loop's iterations carry no times. A failure of unknown time is never reclassified. Matrix is [4][4]int in defect.Origins x defect.FoundBys order; Matrix.Counts() gives DefectCounts{InLoop,Operator,Escaped} and DefectCounts.RemovalEfficiency() returns *int (nil = n/a) for task 8 to print. --matrix with no --brief covers briefs in docs/briefs that have run folders, plus ALL recorded defects; with --brief only that brief's. --matrix with --json prints the 4x4 array."
+}

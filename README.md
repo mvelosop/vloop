@@ -70,6 +70,12 @@ does not exist, or an item with no reason, is a problem.
 | `vloop task list` | print one line per task |
 | `vloop task show <id>` | print a task and the model and effort its sessions resolve to |
 | `vloop task validate` | check the plan's structure |
+| `vloop metrics [<brief>…] [--by task]` | summarise a brief's size, time, cost and defects from its runs and commits; with no brief, one row per brief; `--by task` gives one row per task |
+| `vloop metrics stacks [name]` | print the built-in stack presets, or one preset's globs |
+| `vloop metrics classify <path>…` | print each path's category and the layer and glob that decided it |
+| `vloop defect add "<summary>"` | record a defect as `.vloop/defects/D<stamp>-<slug>.md` and print its path |
+| `vloop defect list` | print the recorded defects, sorted by id |
+| `vloop defect set <id> <field> <value>` | set a defect's `status`, `fixed-by`, `case`, `severity`, `origin`, `kind` or `task` |
 | `vloop task reset <id>` | set a task back to pending with no attempts |
 | `vloop task note <id> <text>` | replace a task's notes |
 | `vloop task drop <id>` | remove a task nothing depends on |
@@ -81,6 +87,19 @@ does not exist, or an item with no reason, is a problem.
 `vloop status` takes `--markdown`: print the plan as Markdown (not with `--json`).
 `vloop task verify` takes `--reason <text>`: why the gate is being replaced. It
 is required, and is recorded in the task's `gate_history`.
+
+`vloop defect add` needs `--found-by gate|review|operator|user` and a brief:
+`--brief <name>`, or `--blame <file>:<line>` to attribute the line on the default
+branch (origin/HEAD's target, else `main`, else `master`) through its
+`Vloop-Brief:` trailer or the commit that consumed a brief. It also takes
+`--task <id>`, `--origin` (default `work`), `--kind` (default `bug`),
+`--severity` (default `medium`) and `--case <path>`. `vloop defect list` takes
+`--brief <name>`, and `--matrix`, which prints the origin (brief, plan, work,
+env) × catcher (gate, review, operator, user) counts instead: the recorded
+defects plus the ones vloop derives from the runs on every call and never
+stores (each failed gate, and each finding of a rejected review). A gate failure
+before an operator's `task verify` on that task counts as origin plan. With no
+`--brief` it covers every brief that has runs. There is no delete, and the description cannot be edited.
 
 These flags work on every command:
 
@@ -108,6 +127,11 @@ the file, and the file over the default.
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` |
 | `shell` | `sh` (`cmd` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` |
 | `areas` | unset | a TOML array of names | `VLOOP_AREAS` |
+| `metrics.stacks` | unset | a TOML array of stack names | `VLOOP_METRICS_STACKS` |
+| `metrics.code` | unset | a TOML array of glob patterns | `VLOOP_METRICS_CODE` |
+| `metrics.test` | unset | a TOML array of glob patterns | `VLOOP_METRICS_TEST` |
+| `metrics.docs` | unset | a TOML array of glob patterns | `VLOOP_METRICS_DOCS` |
+| `metrics.excluded` | unset | a TOML array of glob patterns | `VLOOP_METRICS_EXCLUDED` |
 
 `language` chooses the language of a brief's section headings and of the template
 `vloop brief new` writes. It applies to briefs only: commands, flags, keys, JSON
@@ -116,6 +140,11 @@ choose the model and the effort for each kind of session (plan, work, review).
 `shell` is the shell `vloop task gate` runs a verify command in. `areas` lists
 the names a task's `area` may take; when set, `vloop task validate` reports any
 other. In the file it is an array, for example `areas = ["cli", "docs"]`.
+The `metrics.*` keys are lists too, set as comma-joined text and stored under
+`[metrics]`: `metrics.stacks` names the language presets used to classify lines
+as code, test, docs or excluded, and the four glob keys hold the repository's
+own doublestar patterns, which win over the presets, for example
+`metrics.code = ["internal/brief/templates/**"]`.
 For example:
 
 ```
@@ -134,10 +163,17 @@ vloop keeps its files under `.vloop/` in the repo root (the nearest parent with 
   follows the `state/v1` schema; `vloop status` reads it and `vloop task validate`
   checks it.
 
-Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new` and
-the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`,
+Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new`, `vloop defect add|set` (in
+`.vloop/defects/`) and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`,
 `verify`) write anything, and each refuses a plan or result that fails
 `vloop task validate`. Every path vloop prints is relative to the repo root.
+
+## Guides
+
+- [docs/guide/metrics.md](docs/guide/metrics.md): every `vloop metrics` number, the
+  classification layers and the stack presets, and the `metrics/v1` keys.
+- [docs/guide/defects.md](docs/guide/defects.md): origin and catcher, derived and
+  recorded defects, `--blame`, the `.vloop/defects/` format and the matrix.
 
 ## Exit codes
 

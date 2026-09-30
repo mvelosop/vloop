@@ -1,0 +1,13 @@
+{
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Each gate_fail / gate_failed iteration is one derived defect: origin work, kind bug, found-by gate. Each review_fail / rejected iteration is one defect per verdict finding (kind mapping), or one when empty; blocked not a defect.", "met": true, "evidence": "internal/metrics/defects.go Derive: gate_failed case, rejected case with spec-gap->brief, gate-gap->plan, empty kind->bug, empty list -> one defect; blocked ignored by switch"},
+    {"criterion": "Gate failure before an operator gate_history entry on that task becomes plan/gate; planner or other-task entries reclassify nothing; recomputed every call, never written.", "met": true, "evidence": "Derive replaced map filters By==operator per task, compares failure time; nothing written to disk; PlanTask.GateHistory added in runs/commits.go"},
+    {"criterion": "`vloop defect list --matrix [--brief <name>]` prints origin x catcher counts for selected briefs (all with runs otherwise), derived included; plain list still recorded only.", "met": true, "evidence": "cli/defect.go defectMatrix + --matrix flag; plain path unchanged"},
+    {"criterion": "Counting: in-loop, operator, escaped; removal efficiency whole percentage or n/a.", "met": true, "evidence": "DefectCounts, Counts(), RemovalEfficiency() returning nil for no defects; TestRemovalEfficiency covers 100/50/67/0/n-a"},
+    {"criterion": "Committed tests TestDerived…, TestMatrix…, TestRemovalEfficiency… plus internal/cli/matrix_test.go; README documents --matrix.", "met": true, "evidence": "defects_test.go TestDerivedGateAndReview, TestDerivedGateHistoryReclassifies, TestMatrixCountsAndLayout, TestRemovalEfficiency; matrix_test.go TestMatrixCommand; README paragraph added; go test passes"}
+  ],
+  "findings": [],
+  "notes": "Minor extras: --matrix also supports --json output (unrequested but harmless). README paragraph has one long line. No absolute paths in changes."
+}

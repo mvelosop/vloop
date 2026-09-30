@@ -25,7 +25,8 @@ func TestConfigListDefaults(t *testing.T) {
 	code, out, _ := run(t, "-C", d, "config", "list")
 	want := "language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\n" +
 		"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n" +
-		"shell=" + defaultShellForTest() + " (default)\nareas= (default)\n"
+		"shell=" + defaultShellForTest() + " (default)\nareas= (default)\n" +
+		"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d out %q", code, out)
 	}
@@ -38,7 +39,10 @@ func TestConfigListJSONOrderAndNull(t *testing.T) {
 		`"model.work":{"value":"sonnet","source":"default"},"model.review":{"value":"sonnet","source":"default"},` +
 		`"effort.plan":{"value":null,"source":"default"},"effort.work":{"value":null,"source":"default"},` +
 		`"effort.review":{"value":null,"source":"default"},` +
-		`"shell":{"value":"` + defaultShellForTest() + `","source":"default"},"areas":{"value":[],"source":"default"}}` + "\n"
+		`"shell":{"value":"` + defaultShellForTest() + `","source":"default"},"areas":{"value":[],"source":"default"},` +
+		`"metrics.stacks":{"value":[],"source":"default"},"metrics.code":{"value":[],"source":"default"},` +
+		`"metrics.test":{"value":[],"source":"default"},"metrics.docs":{"value":[],"source":"default"},` +
+		`"metrics.excluded":{"value":[],"source":"default"}}` + "\n"
 	if out != want {
 		t.Fatalf("got %s", out)
 	}

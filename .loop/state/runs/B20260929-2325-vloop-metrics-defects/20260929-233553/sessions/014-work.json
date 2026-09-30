@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 113873,
+  "stop_reason": "end_turn",
+  "session_id": "cc30a747-f4ad-4b86-8ad2-e262f29ff927",
+  "total_cost_usd": 0.5260874,
+  "usage": {
+    "input_tokens": 28,
+    "cache_creation_input_tokens": 57791,
+    "cache_read_input_tokens": 716237,
+    "output_tokens": 15162,
+    "output_tokens_details": {
+      "thinking_tokens": 2902
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 57791,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 641,
+        "cache_read_input_tokens": 69125,
+        "cache_creation_input_tokens": 682,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 682
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 28,
+      "outputTokens": 15162,
+      "cacheReadInputTokens": 716237,
+      "cacheCreationInputTokens": 57791,
+      "webSearchRequests": 0,
+      "costUSD": 0.5260874,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 2902,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 14,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T7 is finished. `vloop defect list --matrix [--brief <name>]` now prints the origin × catcher matrix with derived defects included, and the T7 verify command exits 0 (\"gate T7 ok\"). I also wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **Derived defects:** `metrics.Derive` computes them from the runs on every call and stores nothing. `gate_fail`/`gate_failed` gives one defect each. `review_fail`/`rejected` gives one per verdict finding, or one if the list is empty. `blocked` gives none.\n- **Reclassification:** a gate failure before an operator's `gate_history` entry on that task becomes origin plan, kind gate. A planner entry, or an entry on another task, reclassifies nothing.\n- **Counting:** `Matrix`, `DefectCounts` and `RemovalEfficiency` are ready for task 8 to print. Removal efficiency is `nil` (n/a) when there are no defects.\n- **Tests and docs:** `TestDerived…`, `TestMatrix…` and `TestRemovalEfficiency…` are in `internal/metrics/defects_test.go`, and `internal/cli/matrix_test.go` covers the command. The README documents `--matrix`.\n\nDesign choices:\n- **Changed outside the listed files:** I added `GateHistory` to `runs.PlanTask` in `internal/runs/commits.go`, since `Derive` needs it and `runs.PlanAt` didn't read it.\n- **When a gate failed:** the shell loop's iteration records have no timestamps, so I take the time from the matching `gate_fail`/`gate_failed` task commit. If neither is known, the failure is not reclassified.\n- **Scope of `--matrix`:** with no `--brief`, it covers the briefs that have run folders plus all recorded defects. With `--brief`, it covers only that brief.",
+  "ttft_ms": 2953,
+  "type": "result",
+  "duration_ms": 141401,
+  "uuid": "76505eba-db36-4d41-b293-a02ac529ff4e",
+  "ttft_stream_ms": 1735,
+  "time_to_request_ms": 356,
+  "first_content_frame_ms": 1735,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 7
+}

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 15867,
+  "stop_reason": "end_turn",
+  "session_id": "380c78c6-184c-4161-bc89-ab4d0a78fdf4",
+  "total_cost_usd": 0.1419348,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 25260,
+    "cache_read_input_tokens": 129174,
+    "output_tokens": 1504,
+    "output_tokens_details": {
+      "thinking_tokens": 101
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 25260,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 120,
+        "cache_read_input_tokens": 36390,
+        "cache_creation_input_tokens": 886,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 886
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 1504,
+      "cacheReadInputTokens": 129174,
+      "cacheCreationInputTokens": 25260,
+      "webSearchRequests": 0,
+      "costUSD": 0.1419348,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 101,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 passes: both schemas, the five `metrics.*` config keys and their tests are in place, and every acceptance criterion is met. I wrote the verdict to `.loop/tmp/verdict.json` and edited nothing else.\n\nI re-ran `go test ./internal/schema`, which passes. I did not re-run the driver's full verify command or the other test packages.",
+  "ttft_ms": 2328,
+  "type": "result",
+  "duration_ms": 17400,
+  "uuid": "f0e3fc77-47bf-42e0-afe4-d68eccfe886f",
+  "ttft_stream_ms": 1165,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1166,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 1
+}

@@ -1,0 +1,12 @@
+{
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "docs/guide/metrics.md explains every metrics/v1 key ... classification layers and the preset table", "met": true, "evidence": "metrics.md (188 lines) exists; gate checks every schema key, preset name/glob and layer term; TestGuideMetricsCoversSchemaAndPresets enforces it"},
+    {"criterion": "docs/guide/defects.md explains origin/catcher, derived vs recorded, gate-as-defect, --blame, file format, matrix and removal efficiency", "met": true, "evidence": "defects.md sections for each; every defect/v1 field and enum value listed"},
+    {"criterion": "README.md documents the new commands and keys and links both guides; readme_test unchanged; under 200 lines", "met": true, "evidence": "README 191 lines; commands/keys at lines 73-78,130-147 from earlier tasks; Guides section links both; readme_test.go not in git status"},
+    {"criterion": "A committed TestGuide… test checks schema keys, presets and defect fields from embedded schemas/classify; no B4 parts", "met": true, "evidence": "internal/cli/guide_test.go reads schema.Document and classify.Names/Lookup; no concepts/config/command reference written"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

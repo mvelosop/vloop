@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 155274,
+  "stop_reason": "end_turn",
+  "session_id": "9d37dd4d-5af1-4cd3-8342-1f3adf10ab4b",
+  "total_cost_usd": 0.5790292,
+  "usage": {
+    "input_tokens": 22,
+    "cache_creation_input_tokens": 62779,
+    "cache_read_input_tokens": 523246,
+    "output_tokens": 22322,
+    "output_tokens_details": {
+      "thinking_tokens": 4843
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 62779,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 612,
+        "cache_read_input_tokens": 74027,
+        "cache_creation_input_tokens": 768,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 768
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 22,
+      "outputTokens": 22322,
+      "cacheReadInputTokens": 523246,
+      "cacheCreationInputTokens": 62779,
+      "webSearchRequests": 0,
+      "costUSD": 0.5790292,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 4843,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 12,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I finished T3 and its verify command exits 0, printing `gate T3 ok`. That covers the `internal/runs` and `internal/state` tests and the three required test-name prefixes. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\nThere is a new package, `internal/runs`:\n\n- **Run folders:** it turns a brief, given as a path or a name, into its run id. It collects the shell-loop folders whose `loop.log` (colour stripped) has `planning from <brief path>` or `resuming <run id>`, plus the folders under `.vloop/state/runs/<run id>/`. From each folder it reads sessions, iterations and verdicts into one model.\n- **Sessions:** a session's task comes from the iteration it names.\n- **Owned commits:** it finds the latest `plan` commit across every local ref, the last `run <run id>/…` commit after it, and the `<task>: <outcome>` commits between them. `PlanAt` reads the plan from a commit via git, not the working tree.\n\nThe tests build fixture folders and git repositories in temp dirs, and never touch this repo's `.loop/` or git history. They include another brief's folder, a `resuming` folder, and a folder with no log. They also cover a plan session under another branch's folder and a re-plan. Nothing under `.loop/` or `.vloop/` is written.\n\nTwo behaviours to know:\n\n- **Iteration outcomes:** `Iteration.Outcome` keeps the raw value; a `Canonical()` helper maps the shell loop's `gate_fail` and `review_fail` to `gate_failed` and `rejected`.\n- **No run commit yet:** when no run commit follows the plan, every task commit descended from it counts.\n\nThe files are `internal/runs/runs.go`, `commits.go` and `runs_test.go`, and I did not commit anything.",
+  "ttft_ms": 2317,
+  "type": "result",
+  "duration_ms": 161529,
+  "uuid": "920d6b4d-3486-4d83-91c0-bd1d61bf1502",
+  "ttft_stream_ms": 2058,
+  "time_to_request_ms": 356,
+  "first_content_frame_ms": 2058,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 3
+}

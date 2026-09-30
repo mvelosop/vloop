@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 82654,
+  "stop_reason": "end_turn",
+  "session_id": "1b90647c-9e2b-4bc7-a6df-08c1b12857c9",
+  "total_cost_usd": 0.48207800000000006,
+  "usage": {
+    "input_tokens": 32,
+    "cache_creation_input_tokens": 54580,
+    "cache_read_input_tokens": 788920,
+    "output_tokens": 10591,
+    "output_tokens_details": {
+      "thinking_tokens": 948
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 54580,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 438,
+        "cache_read_input_tokens": 65915,
+        "cache_creation_input_tokens": 681,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 681
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 32,
+      "outputTokens": 10591,
+      "cacheReadInputTokens": 788920,
+      "cacheCreationInputTokens": 54580,
+      "webSearchRequests": 0,
+      "costUSD": 0.48207800000000006,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 948,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 19,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T10 is done: its verify command prints `gate T10 ok`, and I wrote the proposal to `.loop/tmp/proposal.json`.\n\n- **End-to-end test:** `cmd/vloop/b3_e2e_test.go` builds the binary and the brief's fixture repository in a temp directory. `TestWorkedExampleB3Commands` plays every command of the worked example, with `<sha7>` taken from `git rev-parse --short`. `TestWorkedExampleB3PlantedFailures` plants each of the six failures. It never reads this repo's `.loop/`, `.claude/` or git history.\n- **Config:** `.vloop/config.toml` sets `metrics.stacks = [\"go\"]` and `metrics.code = [\"internal/brief/templates/**\"]`. Nothing else was written under `.vloop/` or `.loop/`.\n- **Real data:** the gate's read-only check of B1 and B2 passes against the numbers in the acceptance criteria.\n- **Extra change:** `go test ./...` failed on `embed_test.go`, which still expected 5 embedded schemas. T1 added `defect/v1` and `metrics/v1`, so I changed it to 7. That is the required \"schema list gains two\" update the brief names, not a weakened check.\n\nI did not commit or touch the state file.",
+  "ttft_ms": 2048,
+  "type": "result",
+  "duration_ms": 98250,
+  "uuid": "d1040a06-70d7-41a2-b7e5-a4a611e34d6a",
+  "ttft_stream_ms": 1002,
+  "time_to_request_ms": 352,
+  "first_content_frame_ms": 1003,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 10
+}

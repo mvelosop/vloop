@@ -1,0 +1,6 @@
+{"task":"T10","verdict":"PASS","criteria":[
+{"criterion":"b3_e2e_test.go has TestWorkedExampleB3 tests replaying the fixture, commands and six planted failures in temp dirs","met":true,"evidence":"TestWorkedExampleB3Commands and ...PlantedFailures cover trailer removed, unattributable blame, missing review record, loop.log other brief, gate_history, unknown stack; fixture built with fixed dates in t.TempDir()"},
+{"criterion":".vloop/config.toml sets metrics.stacks and metrics.code; nothing else under .vloop or .loop","met":true,"evidence":".vloop contains only config.toml with the two keys; git status shows no other .vloop/.loop changes beyond driver logs"},
+{"criterion":"Read-only real-data metrics for B1 and B2 match","met":true,"evidence":"asserted by the verify gate (nl/nre checks, working-tree snapshot compare), which passed"},
+{"criterion":"go test, vet, gofmt, tidy, builds pass; no earlier test weakened","met":true,"evidence":"gate passed; embed_test.go 5->7 matches the 7 schema files in schemas/ (defect and metrics added earlier), a stale count not a weakening"}],
+"findings":[],"notes":"none"}

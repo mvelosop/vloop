@@ -1,0 +1,8 @@
+{
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Added internal/runs: resolves a brief to its run id, collects shell-loop and vloop run folders (sessions, iterations, verdicts) into one model, and finds the commits a brief owns (latest plan, last run commit, task commits between) with the plan read from git.",
+  "files": ["internal/runs/runs.go", "internal/runs/commits.go", "internal/runs/runs_test.go"],
+  "verified": "T3 verify command: exit 0, printed 'gate T3 ok' (go test ./internal/runs ./internal/state pass; TestShellLoop*, TestVloopLayout*, TestOwnedCommits* present).",
+  "notes": "Load(root, brief) reads folders only; Read adds Owned via OwnedCommits(root, runID) (nil if no plan commit). Session.Task comes from the iteration the session names (not for plan sessions). Iteration.Outcome is as written; Canonical() maps gate_fail->gate_failed, review_fail->rejected. Iteration.GateMS is nil unless the record has gate.duration_ms (shell-loop records never do). Shell-loop folder ownership: loop.log with ANSI stripped, 'planning from <repo-relative brief path>' exact or 'resuming <run id>' as a whole word. Latest plan = newest committer time across [loop]/[vloop] plan commits, ties go to the descendant (topo order); run/task commits must use the plan's prefix. Without a run commit, tasks are all descendant task commits of the plan on any ref. PlanDoc/PlanTask read only the fields shell-loop and state/v1 plans share (id,title,area,kind,status,attempts). Tests use only temp dirs and set GIT_CONFIG_GLOBAL=/dev/null."
+}

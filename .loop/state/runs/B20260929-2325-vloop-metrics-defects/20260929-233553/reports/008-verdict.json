@@ -1,0 +1,14 @@
+{
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop metrics <brief>` (path or name) prints the brief's summary template ... matches the brief line for line with spaces collapsed.", "met": true, "evidence": "internal/cli/metrics_print.go printSummary; TestMetricsCommandSummary; gate T8 replays the worked example and passes (name and path forms)"},
+    {"criterion": "`--by task` prints `id  area  kind  att  code+  test+  docs+  other+  agent  cost  model` with one row per task in plan order ...", "met": true, "evidence": "byTask in internal/metrics/metrics.go; TestMetricsCommandByTask; gate checks both fixtures including '-' for missing area/kind"},
+    {"criterion": "With no brief: a header ... and one row per brief that has runs, in name order ... A brief with no runs: `vloop: no runs for <name>` on stderr, exit 1.", "met": true, "evidence": "allReports in internal/cli/metrics.go (os.ReadDir gives name order, skips briefs with no runs); TestMetricsCommandCrossBrief, TestMetricsCommandNoRuns"},
+    {"criterion": "`--json` prints one metrics/v1 document per brief (an array when several), validating against the embedded schema ...", "met": true, "evidence": "Report struct with pointer/null fields, ms durations, unrounded cost; TestMetricsCommandJSON validates via schema.Validate; gate runs `vloop schema validate metrics/v1` on both fixtures"},
+    {"criterion": "Every figure comes from tasks 3–7's rules ... `vloop metrics` writes nothing to the working tree.", "met": true, "evidence": "Build composes Measure/Aggregate/CountTasks/Derive/Matrix from earlier tasks; nothing is written; gate's `same` snapshot check passes on both fixtures"},
+    {"criterion": "Committed `TestMetricsCommand…` tests in internal/cli cover the summary, `--by task`, the cross-brief table, `--json` and `no runs` ...; README documents `vloop metrics` and `--by`; none of B4's work appears.", "met": true, "evidence": "five TestMetricsCommand* tests with real assertions on the collapsed output; README table row added; grep finds no brief close/metrics export/--workspace"}
+  ],
+  "findings": [],
+  "notes": "Plan listed internal/metrics/metrics_test.go but none was written; Build is covered end to end through the CLI tests, so this is only a plan/coverage nit. Added a one-line exported runs.FrontmatterStatus outside the listed files (declared in the proposal, minimal). Cross-brief mode ignores --by; the JSON removal_efficiency is a 0..1 fraction."
+}

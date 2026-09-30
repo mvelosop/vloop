@@ -45,6 +45,8 @@ func TestDefaultsEveryRow(t *testing.T) {
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
 		{"model.review", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
 		{"effort.review", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
+		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -271,5 +273,40 @@ func TestAreasKey(t *testing.T) {
 	var se *SourceError
 	if _, err := Get(root, "areas"); !errors.As(err, &se) {
 		t.Errorf("non-array: %v", err)
+	}
+}
+
+func TestMetricsKeys(t *testing.T) {
+	root := scratch(t)
+	var names []string
+	for _, k := range Keys[len(Keys)-5:] {
+		names = append(names, k.Name)
+		if !k.List {
+			t.Errorf("%s is not a list", k.Name)
+		}
+	}
+	if got := strings.Join(names, " "); got != "metrics.stacks metrics.code metrics.test metrics.docs metrics.excluded" {
+		t.Fatalf("keys after areas: %s", got)
+	}
+	if err := Set(root, "metrics.code", "internal/brief/templates/**,tools/*.go"); err != nil {
+		t.Fatal(err)
+	}
+	if got := readCfg(t, root); got != "[metrics]\n  code = [\"internal/brief/templates/**\", \"tools/*.go\"]\n" {
+		t.Errorf("file: %q", got)
+	}
+	v, _ := Get(root, "metrics.code")
+	if v.Source != SourceFile || len(v.List) != 2 {
+		t.Errorf("value: %+v", v)
+	}
+	t.Setenv("VLOOP_METRICS_TEST", "e2e/**")
+	if v, _ := Get(root, "metrics.test"); v.Source != SourceEnv || v.List[0] != "e2e/**" {
+		t.Errorf("env: %+v", v)
+	}
+	var iv *InvalidValueError
+	if err := Set(root, "metrics.docs", "a,,b"); !errors.As(err, &iv) {
+		t.Errorf("empty pattern accepted: %v", err)
+	}
+	if err := Set(root, "areas", "**"); !errors.As(err, &iv) {
+		t.Errorf("areas accepted a glob: %v", err)
 	}
 }

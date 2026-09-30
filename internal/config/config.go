@@ -10,9 +10,12 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 
 	"github.com/BurntSushi/toml"
+
+	"github.com/mvelosop/vloop/internal/classify"
 )
 
 // Sources of a resolved value.
@@ -31,6 +34,7 @@ type Key struct {
 	Default string // empty means unset
 	Valid   []string
 	List    bool // a list of strings, stored as a TOML array and given as comma-joined text
+	Glob    bool // with List: entries are any non-empty glob pattern rather than lower-case names
 }
 
 var areaName = regexp.MustCompile(`^[a-z0-9-]+$`)
@@ -53,6 +57,11 @@ var Keys = []Key{
 	{Name: "effort.review", Valid: efforts},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
+	{Name: "metrics.stacks", List: true, Valid: classify.Names()},
+	{Name: "metrics.code", List: true, Glob: true},
+	{Name: "metrics.test", List: true, Glob: true},
+	{Name: "metrics.docs", List: true, Glob: true},
+	{Name: "metrics.excluded", List: true, Glob: true},
 }
 
 // Value is a resolved key. Set is false for an unset effort. For a list key
@@ -77,7 +86,11 @@ type InvalidValueError struct {
 
 func (e *InvalidValueError) Error() string {
 	want := "a non-empty string"
-	if k, err := Lookup(e.Key); err == nil && k.List {
+	if k, err := Lookup(e.Key); err == nil && k.List && e.Valid != nil {
+		want = "a comma-separated list of " + strings.Join(e.Valid, ", ")
+	} else if err == nil && k.List && k.Glob {
+		want = "a comma-separated list of non-empty glob patterns"
+	} else if err == nil && k.List {
 		want = "a comma-separated list of names made of lower-case letters, digits and hyphens"
 	} else if e.Valid != nil {
 		want = "one of " + strings.Join(e.Valid, ", ")
@@ -117,8 +130,11 @@ func (k Key) Validate(value string) error {
 	}
 	if k.List {
 		for _, a := range strings.Split(value, ",") {
-			if !areaName.MatchString(a) {
-				return &InvalidValueError{k.Name, value, nil}
+			if (k.Glob && a == "") || (!k.Glob && !areaName.MatchString(a)) {
+				return &InvalidValueError{k.Name, value, k.Valid}
+			}
+			if k.Valid != nil && !slices.Contains(k.Valid, a) {
+				return &InvalidValueError{k.Name, value, k.Valid}
 			}
 		}
 		return nil

@@ -1,0 +1,14 @@
+{
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "vloop schema list prints the seven names; documents in schemas/, draft 2020-12, embedded", "met": true, "evidence": "schemas/defect.v1.json and schemas/metrics.v1.json use the 2020-12 $schema; TestNames and cli TestSchemaList expect the seven names and pass"},
+    {"criterion": "defect/v1 required fields, optional task, schema const, enums", "met": true, "evidence": "schemas/defect.v1.json required list, task declared but not required, enums match the criterion, schema const defect/v1"},
+    {"criterion": "metrics/v1 required top-level keys, all leaves declared, no additionalProperties/unevaluatedProperties false", "met": true, "evidence": "schemas/metrics.v1.json: all 20 required keys, per-category lines with deleted, per-phase ms with gates_ms nullable, cost, tokens, models, effort, defects, records.missing and by_task rows; no closed objects"},
+    {"criterion": "fixtures for each new schema, covered by table-driven tests (found-by martian fails at /found-by)", "met": true, "evidence": "testdata defect.*.json and metrics.*.json added; invalidAt maps defect to /found-by and metrics to /tasks/done; go test ./internal/schema passes"},
+    {"criterion": "five metrics.* config keys: lists, order after areas, glob validation, areas unchanged", "met": true, "evidence": "config.go Keys plus a Glob flag; areas still uses the lower-case name regex; TestMetricsKeys covers file format, env override, empty-pattern rejection and areas rejecting **"},
+    {"criterion": "only config list and schema list expectations changed; README table lists five keys", "met": true, "evidence": "test diffs only add metrics lines/names, plus new tests; README table adds five rows with VLOOP_METRICS_* variables"}
+  ],
+  "findings": [],
+  "notes": "none"
+}
