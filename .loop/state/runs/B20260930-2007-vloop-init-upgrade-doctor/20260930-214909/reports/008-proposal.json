@@ -1,0 +1,8 @@
+{
+  "task": "T6",
+  "outcome": "done",
+  "summary": "`vloop init` exists: writes config (language, detected or given stacks), install stamp, starter brief, .gitignore line and the CLAUDE.md section between markers; refuses initialized or non-git repos; supports --dry-run, --language, --stacks. README at 197 lines; commands.md regenerated.",
+  "files": ["internal/cli/init.go", "internal/cli/init_test.go", "internal/cli/root.go", "internal/install/section.go", "internal/config/config.go", "README.md", "docs/guide/commands.md"],
+  "verified": "Ran the task's verify command in the foreground against the corrected gate; it printed 'gate T6 ok' (exit 0).",
+  "notes": "No code change this attempt: the implementation from the earlier attempt passes the operator-corrected gate (nothing-staged check now uses git diff --cached --quiet). Shared helpers for T7: install.Section, install.MergeClaudeMD, install.MergeGitignore. Existing-config case prints 'suggest metrics.stacks: ...'; init refuses symlinked targets (exit 1) before writing anything."
+}

@@ -115,3 +115,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Run:** `20260930-211343` · 7 iteration(s) this run
 - **Plan:** 5/10 done, 0 blocked
 - **Signals:** 7 iterations · 1.40 per closed · 0 gate failure(s) · 0 review rejection(s) · 2 attempt(s) burned · streak 2 · ~$8.53
+
+## T6 — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
+
+- **Outcome:** done (review: PASS)
+- **Summary:** `vloop init` exists: writes config (language, detected or given stacks), install stamp, starter brief, .gitignore line and the CLAUDE.md section between markers; refuses initialized or non-git repos; supports --dry-run, --language, --stacks. README at 197 lines; commands.md regenerated.
+- **Files:** internal/cli/init.go, internal/cli/init_test.go, internal/cli/root.go, internal/install/section.go, internal/config/config.go, README.md, docs/guide/commands.md
+- **Notes for next iteration:** No code change this attempt: the implementation from the earlier attempt passes the operator-corrected gate (nothing-staged check now uses git diff --cached --quiet). Shared helpers for T7: install.Section, install.MergeClaudeMD, install.MergeGitignore. Existing-config case prints 'suggest metrics.stacks: ...'; init refuses symlinked targets (exit 1) before writing anything.
