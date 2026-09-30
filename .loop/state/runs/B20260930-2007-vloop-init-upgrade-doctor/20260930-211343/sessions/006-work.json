@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 72823,
+  "stop_reason": "end_turn",
+  "session_id": "71bb41e1-850b-4a96-9395-655b55671d79",
+  "total_cost_usd": 0.39288979999999996,
+  "usage": {
+    "input_tokens": 28,
+    "cache_creation_input_tokens": 42769,
+    "cache_read_input_tokens": 590589,
+    "output_tokens": 10364,
+    "output_tokens_details": {
+      "thinking_tokens": 1057
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 42769,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 729,
+        "cache_read_input_tokens": 54129,
+        "cache_creation_input_tokens": 656,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 656
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 28,
+      "outputTokens": 10364,
+      "cacheReadInputTokens": 590589,
+      "cacheCreationInputTokens": 42769,
+      "webSearchRequests": 0,
+      "costUSD": 0.39288979999999996,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1057,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 14,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T3 is finished. The verify command printed `gate T3 ok`, and the proposal is in `.loop/tmp/proposal.json` with outcome `done`.\n\n- **Manifests:** `plugin/.claude-plugin/plugin.json` now has a description and an author. `.claude-plugin/marketplace.json` now has an owner and a description, and still lists vloop at `./plugin`.\n- **Hook:** `plugin/hooks/hooks.json` declares the single SessionStart command hook, `vloop version --check-plugin \"${CLAUDE_PLUGIN_ROOT}\"`. `TestPluginHookIsEmbedded` in `plugin_embed_test.go` checks it is embedded.\n- **`vloop version --check-plugin <dir>`:** it reads only `<dir>/.claude-plugin/plugin.json`, prints the two messages on stdout when the versions differ or the version can't be read, and always exits 0 with nothing on stderr.\n- **`vloop plugin path`:** it extracts the embedded plugin into `.vloop/tmp/plugin/<version>/` and prints that path, or `{\"path\": …}` with `--json`.\n  - **Idempotence:** files that already match are not rewritten, modified files are restored, and stray files and directories are removed.\n  - **Extracted manifest:** its `plugin.json` carries the binary's version but is re-indented and its keys are in alphabetical order, so it is not byte-identical to the embedded one.\n  - **Symlinks:** it refuses a symlink or a file anywhere along `.vloop/tmp/plugin/<version>` and exits 1 without writing outside it.\n- **Docs:** README stays under the cap at 196 lines, and `docs/guide/commands.md` was regenerated with `go generate`.\n- **README wording:** to make room I merged the list of commands that write files into one sentence and dropped a blank line. I also shortened \"refuses a plan or result\" to \"refuses a plan\", which loses \"or result\"; that is noted in the proposal.\n\nThe new tests are in `internal/cli/plugin_test.go`. `embed.go` needed no change, because `all:plugin` already covers `hooks/`.",
+  "ttft_ms": 2059,
+  "type": "result",
+  "duration_ms": 111101,
+  "uuid": "99726ce1-6165-4a3b-be96-72468bfa7a35",
+  "ttft_stream_ms": 1053,
+  "time_to_request_ms": 355,
+  "first_content_frame_ms": 1054,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 3
+}

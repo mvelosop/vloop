@@ -8,7 +8,6 @@ checking and ordering of briefs, and reading and checking the plan a loop runs
 from. Running a loop is not part of it yet.
 
 Build it with `go build -o vloop ./cmd/vloop` and put the binary on your `PATH`.
-
 ## The loop in one paragraph
 
 A loop starts with a **plan**: a session reads the brief and splits it into
@@ -55,7 +54,8 @@ does not exist, or an item with no reason, is a problem.
 
 | Command | What it does |
 | --- | --- |
-| `vloop version` | print the vloop and embedded plugin versions |
+| `vloop version [--check-plugin <dir>]` | print the vloop and embedded plugin versions; `--check-plugin` instead compares the plugin in `<dir>` with this binary, prints a line only on a mismatch or an unreadable manifest, and always exits 0 (the plugin's SessionStart hook runs it) |
+| `vloop plugin path` | extract the embedded plugin into `.vloop/tmp/plugin/<version>/` and print that path; files already matching are left alone, stray ones removed |
 | `vloop config get <key>` | print the resolved value of a key |
 | `vloop config set <key> <value>` | write a key to `.vloop/config.toml` (`''` removes it) |
 | `vloop config list` | print every key with its value and where it came from |
@@ -101,7 +101,7 @@ env) × catcher (gate, review, operator, user) counts instead: the recorded
 defects plus the ones vloop derives from the runs on every call and never
 stores (each failed gate, and each finding of a rejected review). A gate failure
 before an operator's `task verify` on that task counts as origin plan. With no
-`--brief` it covers every brief that has runs. There is no delete, and the description cannot be edited.
+`--brief` it covers every brief that has runs. There is no delete; the description cannot be edited.
 
 These flags work on every command:
 
@@ -165,10 +165,7 @@ vloop keeps its files under `.vloop/` in the repo root (the nearest parent with 
   follows the `state/v1` schema; `vloop status` reads it and `vloop task validate`
   checks it.
 
-Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new`, `vloop defect add|set` (in
-`.vloop/defects/`) and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`,
-`verify`) write anything, and each refuses a plan or result that fails
-`vloop task validate`. Every path vloop prints is relative to the repo root.
+Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new`, `vloop plugin path`, `vloop defect add|set` and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`, `verify`) write anything, and each task command refuses a plan that fails `vloop task validate`. Every path vloop prints is relative to the repo root.
 
 ## Guides
 

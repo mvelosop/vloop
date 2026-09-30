@@ -40,3 +40,19 @@
 [36m[loop][0m cost=$0.0974368 turns=4 dur=16s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T2 done
+[36m[loop][0m    committed e074480
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            2
+[36m[loop][0m   tasks closed:          2/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $6.53 (estimate, not a bill)
+[36m[loop][0m ── iteration 3 (3/30 this run) · T3 · 2/10 done ──
+[36m[loop][0m    Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
+[36m[loop][0m cost=$0.39288979999999996 turns=14 dur=111s error=false
+[36m[loop][0m cost=$0.1382094 turns=5 dur=35s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T3 done

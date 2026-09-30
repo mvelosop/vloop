@@ -4,15 +4,15 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **2/10 done** · iteration 2
+**Status:** running · **3/10 done** · iteration 3
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:37:27Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:40:05Z
 
 ## Progress
 
 - [x] **T1** — Add the install/v1 schema, the install stamp's read and write, and semantic-version comparison
 - [x] **T2** — Fix F1: a binding reference's reason may wrap onto the lines indented under its list item
-- [ ] **T3** — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
+- [x] **T3** — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
 - [ ] **T4** — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
 - [ ] **T5** — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
 - [ ] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
@@ -75,7 +75,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T3 — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `plugin/.claude-plugin/plugin.json`, `plugin/hooks/hooks.json`, `.claude-plugin/marketplace.json`, `embed.go`, `plugin_embed_test.go`, `internal/cli/version.go`, `internal/cli/plugin.go`, `internal/cli/plugin_test.go`, `internal/cli/root.go`, `README.md`, `docs/guide/commands.md`
 

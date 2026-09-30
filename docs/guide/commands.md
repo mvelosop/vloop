@@ -181,6 +181,22 @@ Print the built-in stack presets
 vloop metrics stacks [name]
 ```
 
+## vloop plugin
+
+Work with the plugin embedded in the binary
+
+```
+vloop plugin
+```
+
+## vloop plugin path
+
+Extract the embedded plugin under .vloop/tmp/plugin/ and print its path
+
+```
+vloop plugin path
+```
+
 ## vloop schema
 
 List, print and validate against the embedded JSON Schemas
@@ -310,6 +326,8 @@ vloop task verify <id> <command> [flags]
 Print the vloop and embedded plugin versions
 
 ```
-vloop version
+vloop version [flags]
 ```
+
+- `--check-plugin dir`: compare the plugin in dir with this binary's version; always exits 0
 

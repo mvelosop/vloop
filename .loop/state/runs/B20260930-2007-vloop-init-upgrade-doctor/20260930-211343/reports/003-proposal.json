@@ -1,0 +1,8 @@
+{
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Completed the plugin manifests, added the SessionStart hook, `vloop version --check-plugin <dir>` (always exit 0, stdout only) and `vloop plugin path` (idempotent extraction under .vloop/tmp/plugin/<version>/, symlink-safe); README tightened to 196 lines and commands.md regenerated.",
+  "files": ["plugin/.claude-plugin/plugin.json", "plugin/hooks/hooks.json", ".claude-plugin/marketplace.json", "plugin_embed_test.go", "internal/cli/version.go", "internal/cli/plugin.go", "internal/cli/plugin_test.go", "internal/cli/root.go", "README.md", "docs/guide/commands.md"],
+  "verified": "The task's verify command printed 'gate T3 ok'.",
+  "notes": "plugin path walks each directory component of .vloop/tmp/plugin/<version> with Lstat and refuses a symlink or file in its place (exit 1); stray removal uses WalkDir + RemoveAll, which never follows links. The extracted plugin.json is re-marshalled (indented, key order alphabetical) with the binary's version, so it is not byte-identical to the embedded one. README: merged the writes-list sentence and dropped a blank line to make room; 'or result' was dropped from the 'refuses a plan' sentence. embed.go needed no change (all:plugin already covers hooks/)."
+}

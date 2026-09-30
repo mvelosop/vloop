@@ -1,5 +1,7 @@
 {
   "name": "vloop",
+  "owner": { "name": "Miguel Veloso" },
+  "description": "The vloop plugin: the autonomous loop packaged for Claude Code.",
   "plugins": [
     { "name": "vloop", "source": "./plugin" }
   ]

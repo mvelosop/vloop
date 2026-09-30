@@ -74,3 +74,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** brief check now treats a binding-reference entry as the whole list item (first line plus indented continuation lines), so a reason wrapped onto the next line passes; reasons never carry to the next item.
 - **Files:** internal/brief/refs.go, internal/brief/refs_test.go
 - **Notes for next iteration:** New refEntries groups section lines: an item ends at a blank line, a non-indented line, or the next entry line. Continuation lines are joined with a space onto the text after the path, then matched by the unchanged reasonSepRe. The separator may even start the continuation line. Tests: TestBindingRefsWrap, TestBindingRefsWrapNoReason, TestBindingRefsWrapNextItemBoundary. No testdata files added.
+
+## T3 — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Completed the plugin manifests, added the SessionStart hook, `vloop version --check-plugin <dir>` (always exit 0, stdout only) and `vloop plugin path` (idempotent extraction under .vloop/tmp/plugin/<version>/, symlink-safe); README tightened to 196 lines and commands.md regenerated.
+- **Files:** plugin/.claude-plugin/plugin.json, plugin/hooks/hooks.json, .claude-plugin/marketplace.json, plugin_embed_test.go, internal/cli/version.go, internal/cli/plugin.go, internal/cli/plugin_test.go, internal/cli/root.go, README.md, docs/guide/commands.md
+- **Notes for next iteration:** plugin path walks each directory component of .vloop/tmp/plugin/<version> with Lstat and refuses a symlink or file in its place (exit 1); stray removal uses WalkDir + RemoveAll, which never follows links. The extracted plugin.json is re-marshalled (indented, key order alphabetical) with the binary's version, so it is not byte-identical to the embedded one. README: merged the writes-list sentence and dropped a blank line to make room; 'or result' was dropped from the 'refuses a plan' sentence. embed.go needed no change (all:plugin already covers hooks/).
