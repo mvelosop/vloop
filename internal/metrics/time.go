@@ -216,11 +216,25 @@ type Estimate struct {
 	Max int `json:"max"`
 }
 
-var estimateRe = regexp.MustCompile(`(\d+) to (\d+) tasks`)
+var (
+	estimateRe = regexp.MustCompile(`(\d+) (?:to|a|–|-) (\d+) (?:tasks|tareas)`)
+	shapeRe    = regexp.MustCompile(`(?im)^##[ \t]+(?:shape|forma)\b.*$`)
+	sectionRe  = regexp.MustCompile(`(?m)^##[ \t]`)
+)
 
-// BriefEstimate reads the estimate from a brief's text; nil when it states none.
+// BriefEstimate reads the estimate from the brief's Shape section (Forma in
+// Spanish); nil when it states none. Only that section counts: a worked
+// example may describe a fixture brief with an estimate of its own.
 func BriefEstimate(brief string) *Estimate {
-	m := estimateRe.FindStringSubmatch(brief)
+	loc := shapeRe.FindStringIndex(brief)
+	if loc == nil {
+		return nil
+	}
+	shape := brief[loc[1]:]
+	if next := sectionRe.FindStringIndex(shape); next != nil {
+		shape = shape[:next[0]]
+	}
+	m := estimateRe.FindStringSubmatch(shape)
 	if m == nil {
 		return nil
 	}

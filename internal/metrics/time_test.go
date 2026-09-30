@@ -244,3 +244,29 @@ func TestMissingRecordsNoneWhenComplete(t *testing.T) {
 		t.Errorf("missing = %v", got)
 	}
 }
+
+// The estimate is the Shape section's, not the first "N to M tasks" anywhere:
+// B3's own worked example describes a fixture with "2 to 3 tasks" long before
+// its Shape says "9 to 11", and the summary reported "brief said 2–3".
+func TestBriefEstimateReadsOnlyTheShapeSection(t *testing.T) {
+	cases := []struct {
+		name, text string
+		want       *Estimate
+	}{
+		{"shape after an earlier phrase", "## Worked example\n\nA fixture with Shape `2 to 3 tasks`.\n\n## Shape\n\n9 to 11 tasks, each verifiable.\n", &Estimate{9, 11}},
+		{"spanish forma", "## Ejemplo trabajado\n\n2 a 3 tareas en el fixture.\n\n## Forma\n\n6 a 9 tareas, cada una verificable.\n", &Estimate{6, 9}},
+		{"heading with trailing text", "## Shape — the order\n\n4 to 5 tasks.\n", &Estimate{4, 5}},
+		{"phrase only outside shape", "## Worked example\n\n2 to 3 tasks\n\n## Shape\n\nA handful of tasks.\n", nil},
+		{"no shape section", "8 to 10 tasks\n", nil},
+		{"next section ends shape", "## Shape\n\nSmall.\n\n## Out of scope\n\n- 2 to 3 tasks of polish\n", nil},
+	}
+	for _, c := range cases {
+		got := BriefEstimate(c.text)
+		switch {
+		case c.want == nil && got != nil:
+			t.Errorf("%s: estimate = %v, want none", c.name, *got)
+		case c.want != nil && (got == nil || *got != *c.want):
+			t.Errorf("%s: estimate = %v, want %v", c.name, got, *c.want)
+		}
+	}
+}

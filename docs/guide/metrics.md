@@ -143,8 +143,10 @@ records carry it (`session/v1` does, the shell loop's do not), else `null`.
   at the last run commit.
 - `tasks.first_pass` counts the tasks whose only iteration outcome is `done`:
   nothing failed a gate or a review on the way.
-- `tasks.estimate` is the brief's `<n> to <m> tasks` phrase as `min` and `max`,
-  `null` when the brief states none.
+- `tasks.estimate` is the `<n> to <m> tasks` phrase (`<n> a <m> tareas` in
+  Spanish) in the brief's `## Shape` (`## Forma`) section, as `min` and `max`;
+  `null` when that section states none. Only that section counts: a worked
+  example may describe a fixture brief with an estimate of its own.
 - `iterations` counts all iterations and `iterations_per_closed` = `iterations`
   / `tasks.done`, `null` when none is done.
 
