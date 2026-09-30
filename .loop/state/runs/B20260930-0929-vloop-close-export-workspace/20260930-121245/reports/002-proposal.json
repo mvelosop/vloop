@@ -1,0 +1,8 @@
+{
+  "task": "T2",
+  "outcome": "done",
+  "summary": "New package internal/closing with PutRunRecord, Render (run record) and WriteSnapshot; the summary/table formatters moved from internal/cli to internal/metrics (PrintSummary, PrintByTask, PrintBriefTable) and metrics.DerivedIDs computes derived defect ids.",
+  "files": ["internal/closing/closing.go", "internal/closing/closing_test.go", "internal/metrics/print.go", "internal/metrics/defects.go", "internal/cli/metrics.go", "internal/cli/metrics_print.go"],
+  "verified": "The task's verify command; it printed 'gate T2 ok'.",
+  "notes": "internal/cli/metrics_print.go was git-mv'd to internal/metrics/print.go (cli would be an import cycle for closing/close); cli/metrics.go now calls metrics.Print*. A marker line matches with trailing spaces/tabs/CR tolerated, and is preserved since slicing is by offset. closing.Render takes a Record{Name, Date, Report, Derived, Recorded}; it sorts derived by iteration (stable) and recorded by id, and derives ids via metrics.DerivedIDs(runID, ds) (T5 export must call it on the same ordered list). WriteSnapshot(root, report) returns the repo-relative path; tests use testdata/metrics.valid.json as the report and schema.Validate(metrics.Schema, ...)."
+}

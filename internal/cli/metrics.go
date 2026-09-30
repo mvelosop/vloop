@@ -62,20 +62,20 @@ func newMetrics(g *Globals) *cobra.Command {
 			}
 			switch {
 			case len(args) == 0:
-				printBriefTable(out, reports)
+				metrics.PrintBriefTable(out, reports)
 			case by == "task":
 				for i, r := range reports {
 					if i > 0 {
 						fmt.Fprintln(out)
 					}
-					printByTask(out, r)
+					metrics.PrintByTask(out, r)
 				}
 			default:
 				for i, r := range reports {
 					if i > 0 {
 						fmt.Fprintln(out)
 					}
-					printSummary(out, r)
+					metrics.PrintSummary(out, r)
 				}
 			}
 			return nil

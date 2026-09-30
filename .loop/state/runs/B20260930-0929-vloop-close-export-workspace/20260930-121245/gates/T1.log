@@ -1,5 +1,5 @@
-ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	0.330s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/cli	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	(cached)
+ok  	github.com/mvelosop/vloop/cmd/vloop	4.574s
 gate T1 ok

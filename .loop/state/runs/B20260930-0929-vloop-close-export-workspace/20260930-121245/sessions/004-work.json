@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 86378,
+  "stop_reason": "end_turn",
+  "session_id": "1af09b33-46ae-414e-a5e5-f4a167c54ed6",
+  "total_cost_usd": 0.3286629999999999,
+  "usage": {
+    "input_tokens": 24,
+    "cache_creation_input_tokens": 38482,
+    "cache_read_input_tokens": 448385,
+    "output_tokens": 8501,
+    "output_tokens_details": {
+      "thinking_tokens": 836
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 38482,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 553,
+        "cache_read_input_tokens": 49810,
+        "cache_creation_input_tokens": 688,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 688
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 24,
+      "outputTokens": 8501,
+      "cacheReadInputTokens": 448385,
+      "cacheCreationInputTokens": 38482,
+      "webSearchRequests": 0,
+      "costUSD": 0.3286629999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 836,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 13,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T2 is done and the proposal is written to `.loop/tmp/proposal.json`. The task's verify command printed `gate T2 ok`.\n\n- **New package `internal/closing`:** it holds `PutRunRecord`, `Render` and `WriteSnapshot`.\n  - `PutRunRecord` replaces only the text between the markers, or appends a marker block if there are none.\n  - `Render` builds the run record: heading, Generated line, the summary and `--by task` blocks, and the defect lines.\n  - `WriteSnapshot` saves the metrics/v1 snapshot under `.vloop/state/metrics/`.\n- **Shared formatter:** I moved `internal/cli/metrics_print.go` to `internal/metrics/print.go`. `vloop metrics` and the run record now print through the same `PrintSummary` and `PrintByTask`. `internal/cli/metrics.go` calls them, and `vloop`'s output is unchanged. Keeping them in `internal/cli` would have made `closing` depend on `cli`, and T3's close command will depend on `closing`.\n- **Derived defect ids:** `metrics.DerivedIDs` is the one place they are computed. T5's export should call it on the same ordered list.\n- **Tests:** `TestRunRecord…` and `TestSnapshot…` in `internal/closing/closing_test.go` write only under `t.TempDir()`.\n\nOne behaviour beyond the spec: a marker line still counts as a marker if it has trailing spaces, tabs or a carriage return. The line is kept byte for byte either way.\n\nI didn't commit, touch `state.json` or add a command, as the task rules require.",
+  "ttft_ms": 2625,
+  "type": "result",
+  "duration_ms": 104868,
+  "uuid": "f144ae07-9a4a-441f-93bb-a8b216b5dbc9",
+  "ttft_stream_ms": 1657,
+  "time_to_request_ms": 378,
+  "first_content_frame_ms": 1658,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 2
+}

@@ -1,0 +1,15 @@
+{
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A new package `internal/closing` exports `PutRunRecord(doc, record string) string` ... every byte outside the markers preserved, idempotent", "met": true, "evidence": "internal/closing/closing.go PutRunRecord/findMarkers splice by byte offset; TestRunRecordReplaceKeepsOutside covers trailing spaces and no final newline; gate overlay test passed"},
+    {"criterion": "A renderer produces the record: heading, Generated line, summary fence, --by task fence, defect lines (derived by iteration, then recorded by id)", "met": true, "evidence": "closing.Render; TestRunRecordRendered asserts heading, Generated line, two fences and defect line order/format"},
+    {"criterion": "The summary block and the table come from the same code `vloop metrics` prints with, not a second formatter", "met": true, "evidence": "internal/cli/metrics_print.go moved to internal/metrics/print.go (exported PrintSummary/PrintByTask); cli/metrics.go and Render both call them; no copied format strings"},
+    {"criterion": "Derived defect ids are computed in one place (gate / review-n numbering)", "met": true, "evidence": "metrics.DerivedIDs in internal/metrics/defects.go; Render uses it; test covers i2-gate, i3-review-1, i3-review-2"},
+    {"criterion": "A snapshot writer saves a metrics/v1 document to `.vloop/state/metrics/<run id>.json`, 2-space indented, trailing newline, repo-relative `/` path, filepath for disk", "met": true, "evidence": "closing.WriteSnapshot uses path.Join for the reported path and filepath.Join(FromSlash) for disk, MkdirAll, MarshalIndent + newline"},
+    {"criterion": "Committed tests TestRunRecord… and TestSnapshot… write only under t.TempDir()", "met": true, "evidence": "internal/closing/closing_test.go; TestSnapshotWrite uses t.TempDir and validates against metrics.Schema"},
+    {"criterion": "No command is added or changed; `vloop`'s output is unchanged", "met": true, "evidence": "cli/metrics.go diff only renames calls to the moved printers; existing cli tests pass"}
+  ],
+  "findings": [],
+  "notes": "Marker lines are matched tolerant of trailing spaces/tabs/CR, a small extension beyond the literal spec that does not affect the bytes preserved. Dedicated tests for DerivedIDs live only via the Render test; fine."
+}

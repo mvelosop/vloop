@@ -4,14 +4,14 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **1/8 done** · iteration 1
+**Status:** running · **2/8 done** · iteration 2
 
-**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:39:43Z
+**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:42:05Z
 
 ## Progress
 
 - [x] **T1** — Add the `export/v1` schema and the `abandoned` brief status
-- [ ] **T2** — Build the run-record renderer, the marker splice and the metrics snapshot writer
+- [x] **T2** — Build the run-record renderer, the marker splice and the metrics snapshot writer
 - [ ] **T3** — Add `vloop brief close`: findings, refusals, status lines, run record, snapshot and one commit
 - [ ] **T4** — Add `--abandon "<reason>"` and `--dry-run` to `vloop brief close`
 - [ ] **T5** — Add `vloop metrics export`: JSON Lines of briefs, tasks and defects with the repository's identity
@@ -52,7 +52,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T2 — Build the run-record renderer, the marker splice and the metrics snapshot writer
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 **Files:** `internal/closing/`, `internal/closing/closing_test.go`, `internal/cli/metrics_print.go`, `internal/metrics/`
 
