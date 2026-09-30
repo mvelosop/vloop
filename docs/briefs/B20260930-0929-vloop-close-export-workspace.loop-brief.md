@@ -421,3 +421,35 @@ T8  -     -     1    0      332    0      0       2m58s  $0.61  claude-sonnet-5-
 ```
 
 <!-- vloop:run-record:end -->
+
+### Operator notes
+
+Written by hand, outside the generated markers.
+
+**The first brief vloop closed itself** (`vloop brief close --no-findings`),
+after the run's own close had been rehearsed in a throwaway clone.
+
+**Verified outside the loop.** `go test -count=1 ./...` (13 packages), `go vet`,
+`gofmt -l .`, `go mod tidy -diff`, and the windows and linux builds pass; B1's
+README test is unchanged. In the clone: every `close` refusal with its exit
+code; `--dry-run` wrote nothing; the close made one commit of exactly three
+files with the trailer; the snapshot validates against `metrics/v1`. `metrics
+export`: 47 lines, all valid `export/v1`, credentials stripped from the remote.
+`--workspace`: rows equal `vloop metrics`, a missing repo reported with exit 1.
+The fixed shell loop's refs check stayed quiet: no session moved a ref.
+
+**Changed by hand, on this branch.**
+
+- The loop's fence denied `Bash(git remote:*)`, which also blocked the
+  read-only `git remote -v` the planner needed; now it denies only the
+  subcommands that change something. A loop defect, not this brief's; to carry
+  into the shell loop's own repository.
+- `.vloop/config.toml` classifies `schemas/**` as code (T1's schemas had
+  counted as "other").
+- The operator skill gained two lessons: rehearse commits in a throwaway clone
+  (and set its `origin/HEAD` to `main`), and check the staged list before every
+  commit.
+
+**Still open.** Gate time and effort are still `n/a` until B6's driver records
+them; task `area` and `kind` are `-` until B5's planner assigns them.
+
