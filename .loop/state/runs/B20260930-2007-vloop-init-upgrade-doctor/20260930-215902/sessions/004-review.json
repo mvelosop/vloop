@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 17735,
+  "stop_reason": "end_turn",
+  "session_id": "4341199a-edfc-4171-804a-087e4201b46e",
+  "total_cost_usd": 0.1127772,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 19093,
+    "cache_read_input_tokens": 86896,
+    "output_tokens": 1901,
+    "output_tokens_details": {
+      "thinking_tokens": 75
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 19093,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 281,
+        "cache_read_input_tokens": 29855,
+        "cache_creation_input_tokens": 1254,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1254
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1901,
+      "cacheReadInputTokens": 86896,
+      "cacheCreationInputTokens": 19093,
+      "webSearchRequests": 0,
+      "costUSD": 0.1127772,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 75,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS**: T9 meets all eight acceptance criteria, and I wrote the verdict to `.loop/tmp/verdict.json`.\n\n- **README and `commands.md`:** They were already complete from earlier tasks, so T9 left them unchanged. `README.md` is 199 lines.\n- **Docs:** The configuration guide, metrics guide, concepts guide, M-3 and the measurement Classification section all state the stamp and scoped-stack behaviour.\n- **Test:** The new `TestGuideConfigurationCoversStampAndScopes` checks the `install/v1` keys and the scope strings against the configuration guide.\n- **Scope:** The diff has no absolute paths and doesn't describe B6 or B7 work as built.\n\nI did not re-run the T9 gate. `go test ./internal/cli` passed, from cache.",
+  "ttft_ms": 2688,
+  "type": "result",
+  "duration_ms": 19091,
+  "uuid": "05629958-07ee-4924-804e-d7f79036fe89",
+  "ttft_stream_ms": 1394,
+  "time_to_request_ms": 358,
+  "first_content_frame_ms": 1395,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 13
+}

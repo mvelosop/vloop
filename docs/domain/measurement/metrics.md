@@ -44,6 +44,14 @@ first layer that matches a path (M-3):
    `rust` — merged, in the same order.
 4. Nothing matched: `other`.
 
+**Scopes.** An entry of `metrics.stacks` is `<stack>` or `<stack>@<path>`, with
+a repo-relative path naming an existing directory (`csharp@services/api`). A
+path's scope is the longest scoped path that contains it; with none, the
+unscoped stacks apply. Inside a scope only that scope's stacks apply, and their
+globs match relative to the scope's directory. The repo's own globs (layer 2)
+stay repo-relative and unscoped. `vloop metrics classify` labels a scoped match
+`(<stack>@<path>: <glob>)`.
+
 The repo's globs come first because extension alone lies: vloop's brief
 templates and its schemas are product code in `.md` and `.json` files.
 `vloop metrics classify <path>` shows which layer and glob decided a path.

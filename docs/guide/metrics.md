@@ -49,12 +49,21 @@ patterns matched against the repo-relative `/` path:
    `metrics.test`, `metrics.docs` and `metrics.code`, checked in that order.
 3. **presets**: the built-in presets named in `metrics.stacks`, merged and
    checked in the same order: every preset's `excluded`, then every `test`, then
-   `docs`, then `code`.
+   `docs`, then `code`. Only the presets of the path's **scope** apply (below).
 4. **other**: nothing matched.
 
 File extension alone is not enough, which is why the repo layer wins: a
 project's brief templates can be `.md` files that are product code, so set
 `metrics.code = ["internal/brief/templates/**"]` and they count as code.
+
+**Scopes.** A `metrics.stacks` entry may be scoped to a directory:
+`csharp@services/api`. A path's scope is the longest scoped path containing it.
+Inside a scope only that scope's stacks apply, so another stack's globs never
+classify its files; outside every scope the unscoped stacks apply. A scoped
+preset's globs match the path relative to the scope's directory:
+`services/api/Api.Tests/CalcTests.cs` is tested against `**/*.Tests/**` as
+`Api.Tests/CalcTests.cs`, and `services/api/go.sum` against `go.sum`. The repo's
+own globs stay repo-relative and unscoped.
 
 The config keys are lists of doublestar globs (`metrics.stacks` a list of preset
 names), set with `vloop config set metrics.code a,b`, or from the environment:
@@ -63,6 +72,8 @@ names), set with `vloop config set metrics.code a,b`, or from the environment:
 
 `vloop metrics classify <path>…` prints `<path>  <category>  (<layer>: <glob>)`,
 the layer being `repo`, a preset name or `always`, or `<path>  other  (none)`.
+A match by a scoped preset is labelled `(<stack>@<path>: <glob>)`, for example
+`(csharp@services/api: **/*.Tests/**)`.
 
 ### The presets
 

@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **8/10 done** · iteration 12
+**Status:** running · **9/10 done** · iteration 13
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T21:00:33Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T21:03:13Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
 - [x] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
 - [x] **T8** — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
-- [ ] **T9** — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
+- [x] **T9** — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
 - [ ] **T10** — Close: the end-to-end B5 worked example, the real-data check and `claude plugin validate .`
 
 ## Tasks
@@ -237,7 +237,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T9 — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
 
-`pending` · depends on: T2, T3, T4, T5, T6, T7, T8
+`done` · depends on: T2, T3, T4, T5, T6, T7, T8
 
 **Files:** `README.md`, `docs/guide/commands.md`, `docs/guide/configuration.md`, `docs/guide/metrics.md`, `docs/guide/concepts.md`, `docs/domain/domain-model.md`, `docs/domain/measurement/metrics.md`, `internal/cli/guide_test.go`
 

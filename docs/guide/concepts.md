@@ -76,11 +76,42 @@ branch (`origin/HEAD`'s target, else `main`, else `master`), through that traile
 or the commit that marked the brief `consumed`. That is what lets `vloop defect
 add --blame <file>:<line>` attribute a later bug to the brief that wrote the line.
 
+## Setting up a repository
+
+`vloop init` sets a git repository up and never commits. It writes
+`.vloop/config.toml` with the stacks it detects (a stack in a subdirectory is
+scoped to it, like `csharp@services/api`), the **stamp** `.vloop/install.json`
+(which vloop version set the repository up), a starter brief, the line
+`.vloop/tmp/` in `.gitignore`, and vloop's section of `CLAUDE.md`, between
+`<!-- vloop:begin -->` and `<!-- vloop:end -->` markers; text outside the markers
+is kept. It refuses a repository already set up. `--dry-run` writes nothing.
+
+`vloop upgrade` refreshes that `CLAUDE.md` section and `.gitignore` line and
+rewrites the stamp. It refuses a repository set up by a newer vloop, and a
+breaking jump (a new major version, or a new minor while 0.x) or a pre-release
+needs `--yes`.
+
+`vloop doctor` checks the setup without writing anything: git, the stamp, the
+config, `claude`, workspace trust, the gate shell, the plan, the default branch,
+the plugin version and scoped stacks. It exits 1 on a problem.
+
+The plugin ships inside the binary: `vloop plugin path` extracts it to
+`.vloop/tmp/plugin/<version>/`. To install it in Claude Code, from a session:
+
+```
+claude plugin marketplace add mvelosop/vloop
+```
+
+then install the plugin from that marketplace. `vloop version --check-plugin
+<dir>` compares an installed plugin with the binary.
+
 ## The .vloop/ layout
 
 vloop keeps its files under `.vloop/` in the repository root:
 
 - `.vloop/config.toml`: the settings, written by `vloop config set`.
+- `.vloop/install.json`: the install stamp, written by `vloop init` and `vloop upgrade`.
+- `.vloop/tmp/`: scratch space, git-ignored.
 - `.vloop/state/state.json`: the plan.
 - `.vloop/state/runs/<run id>/`: a run's folders, sessions and iteration records.
 - `.vloop/state/metrics/<run id>.json`: the metrics snapshot `brief close` freezes.

@@ -49,6 +49,35 @@ code = ["internal/brief/templates/**"]
 
 How the globs and presets are layered is in [metrics.md](metrics.md).
 
+### Scoped stacks
+
+An entry of `metrics.stacks` is `<stack>` or `<stack>@<path>`, for example
+`csharp@services/api`. The path is repo-relative, uses `/`, has no leading or
+trailing `/` and no `.` or `..` segment, and must name an existing directory;
+anything else is exit 2 from `config set` (`want <stack> or <stack>@<existing
+directory>`).
+
+```
+[metrics]
+stacks = ["go", "csharp@services/api"]
+```
+
+A path's scope is the **longest** scoped path that contains it. Inside a scope
+only that scope's stacks apply, and their globs match relative to the scope's
+directory; outside every scope the unscoped stacks apply. `vloop init` writes a
+stack found in a subdirectory this way. `vloop doctor` reports a scoped path
+that no longer exists. See [metrics.md](metrics.md).
+
+## The install stamp
+
+`vloop init` writes `.vloop/install.json`, the stamp of the vloop that set the
+repository up, following the `install/v1` schema (`vloop schema show
+install/v1`): `schema`, `version`, `commit`, `initialized` and `upgraded`
+(`null` until the first `vloop upgrade`). `vloop upgrade` and `vloop doctor`
+read it; nothing else does. `vloop init` also adds the line `.vloop/tmp/` to
+`.gitignore`: that folder is scratch space (`vloop plugin path` extracts the
+plugin there) and is never committed. See [concepts.md](concepts.md).
+
 ## Stack presets
 
 `vloop metrics stacks` lists them and `vloop metrics stacks <name>` prints one.

@@ -156,3 +156,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** `vloop doctor` exists: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks (only when scoped) and self-hosting checks, text and --json output, exit 1 on any problem. Read-only; runs only git, claude --version, claude plugin list --json and PATH lookups.
 - **Files:** internal/cli/doctor.go, internal/cli/doctor_test.go, internal/cli/root.go, README.md, docs/guide/commands.md
 - **Notes for next iteration:** No code change this attempt: the implementation from the earlier attempt passes the corrected gate (shell line now placed before the [metrics] table). One line per check; pass lines carry no message; default branch = origin/HEAD target else main/master; plugin is n/a when claude is missing. README is at 199 lines (cap is <200), so any further README addition needs tightening existing text.
+
+## T9 — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Docs now describe setup and scoped stacks as built: configuration guide (scoped stacks, install stamp, .vloop/tmp/), metrics guide scopes, a 'Setting up a repository' concepts section, M-3 and measurement Classification scopes; guide test covers stamp and scopes.
+- **Files:** docs/guide/configuration.md, docs/guide/metrics.md, docs/guide/concepts.md, docs/domain/domain-model.md, docs/domain/measurement/metrics.md, internal/cli/guide_test.go, docs/guide/commands.md
+- **Notes for next iteration:** README.md and commands.md already held every new command from T5-T8 (README at 199 lines); go generate produced no change to commands.md. New guide test TestGuideConfigurationCoversStampAndScopes also checks every install/v1 key is named in configuration.md.
