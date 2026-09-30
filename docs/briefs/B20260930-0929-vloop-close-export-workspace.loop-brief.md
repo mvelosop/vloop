@@ -2,7 +2,7 @@
 name: B20260930-0929-vloop-close-export-workspace.loop-brief
 description: Close a brief with vloop — run record, metrics snapshot, operator findings, consumed status, one commit — and consolidate metrics across repos with a JSON Lines export and a workspace file; finish the guide with concepts, configuration and a generated command reference
 kind: brief
-status: draft
+status: ready
 created: 2026-09-30
 seeds: A `.loop/run.sh` plan + run that builds slice B4 in docs/design-notes/vloop-roadmap.md
 depends-on: [B20260929-2325-vloop-metrics-defects.loop-brief]
