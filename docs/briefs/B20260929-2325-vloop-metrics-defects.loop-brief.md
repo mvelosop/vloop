@@ -2,14 +2,16 @@
 name: B20260929-2325-vloop-metrics-defects.loop-brief
 description: Give vloop its metrics and defect records — line classification with stack presets, per-brief and per-task metrics from the loop's own telemetry and git, defect files with blame attribution, release detection, and their guide docs
 kind: brief
-status: ready
+status: consumed
 created: 2026-09-29
 seeds: A `.loop/run.sh` plan + run that builds slice B3 in docs/design-notes/vloop-roadmap.md
 depends-on: [B20260929-2148-vloop-state-tasks-status.loop-brief]
 ---
 # Brief — vloop B3: metrics and defects
 
-- **Status:** ready to plan
+- **Status:** consumed — planned and run as
+  `B20260929-2325-vloop-metrics-defects`, 10/10 tasks, on branch
+  `B20260929-2325-vloop-metrics-defects`. **Do not re-plan from this brief.**
 - **Starting point:** extends `main` at the commit that adds this brief. The
   planner pins that SHA as the base every gate compares against.
 - **Produced by:** operator decision, 2026-09-29, from the B3 row of
@@ -511,3 +513,59 @@ load-bearing:
 The worked example and the real-data check need their own gate (task 10): unit
 tests on fixtures can all pass while the adapter misreads the real shell-loop
 layout, which only the real run folders exercise.
+
+## Run record
+
+**Outcome.** Complete in one run: 10/10 tasks, each closed in one iteration,
+0 gate failures, 0 review rejections. First brief whose record vloop measured
+itself (`vloop metrics`, before the merge):
+
+```
+B20260929-2325-vloop-metrics-defects  ready · not merged
+ tasks     10 planned (brief said 9–11) · 10 done · 0 blocked · first-pass 10/10
+ size      delivered  code 2,694 · test 1,893 · docs 286 · test:code 0.70
+           churn      code 2,718 · test 1,893 · docs 287 · rework 1.01
+ time      agent 24.6 min (work 21.1 · review 3.5) · plan 22.0 min · gates n/a · wall 27.7 min
+ rate      109.7 code lines/min · 186.8 incl. tests
+ cost      $12.31 · plan 5.72 · work 5.30 · review 1.30 · $4.57 per 1,000 code lines
+ models    plan claude-opus-5-5 · work claude-sonnet-5-5 · review claude-sonnet-5-5
+ defects   in-loop 0 · operator 1 · escaped 0 · removal efficiency 100%
+```
+
+**Verified outside the loop.** `go test -count=1 ./...` (11 packages), `go vet`,
+`gofmt -l .`, `go mod tidy -diff`, and the windows and linux builds pass. The
+real-data check matches every pinned value for B1 ($7.40, 15.8 min, 9/9,
+merged `8da6c95`) and B2 ($8.36, 17.0 min, 8/9, the missing T2 review record,
+merged `6de9cfc`). `defect add --blame` attributed real lines to B1 and B2
+through the consumed-in fallback, and refused a `.loop/` line.
+
+**Changed by hand.**
+
+- The task estimate was read from the first `<n> to <m> tasks` anywhere in the
+  brief, so this brief's own summary said "brief said 2–3" (its worked example
+  describes a fixture first). Fixed to read only `## Shape` / `## Forma`, and
+  the Spanish phrasing, with a test. The brief's "its `<n> to <m> tasks`
+  phrase" left the section open: recorded as a `brief` spec gap.
+- The six known defects of B1–B3 recorded with `vloop defect add`, marked fixed
+  with `vloop defect set`. Three of six originate in the briefs.
+- T10 created `.vloop/config.toml` for this repo (`metrics.stacks = ["go"]`, the
+  brief templates as code); kept — the real-data check needs it.
+
+**Incident — the planning session moved this repo's branches.** At 23:52:54,
+while checking its own gates, the planning session ran fixture git commands in
+the real repository: `main` was renamed `master` and a branch `work` was created
+and checked out. The gates themselves are safe (they build fixtures in temporary
+directories and re-ran every iteration without harm), and no commit was lost,
+but the driver committed every iteration to `work` without noticing. The
+operator restored the refs afterwards (`master` → `main`, the work branch
+fast-forwarded to the run's commits, `work` deleted). Two gaps, neither in this
+slice: the shell loop's fence denies `git commit`/`push`/`reset`/`clean` but not
+`git branch`/`checkout`/`switch`; and its driver never checks that HEAD is still
+on the run's branch before committing. B6's driver must do both.
+
+**Still open.**
+
+- The two loop gaps above, for the shell loop's source repo and for B6.
+- One permission denial (T9): a work session tried to read its own oversized tool
+  output under `~/.claude`; the fence denied it, correctly.
+- Merge to `main`.
