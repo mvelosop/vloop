@@ -64,3 +64,34 @@
 [36m[loop][0m    Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
 [36m[loop][0m cost=$0.14175800000000002 turns=6 dur=33s error=false
 [36m[loop][0m    work session reported blocked
+[36m[loop][0m    committed 74f7bbc
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            4
+[36m[loop][0m   tasks closed:          7/10
+[36m[loop][0m   iterations per closed: 0.57
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       2
+[36m[loop][0m   no-progress streak:    2
+[36m[loop][0m   estimated spend:       $1.48 (estimate, not a bill)
+[33m[loop][0m    no recorded progress (2/2)
+[36m[loop][0m 
+[36m[loop][0m ═══ stalled ═══
+[36m[loop][0m run:    B20260930-2007-vloop-init-upgrade-doctor/20260930-214909  (4 iteration(s) this run)
+[36m[loop][0m plan:   7/10 done, 0 blocked
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            4
+[36m[loop][0m   tasks closed:          7/10
+[36m[loop][0m   iterations per closed: 0.57
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       2
+[36m[loop][0m   no-progress streak:    2
+[36m[loop][0m   estimated spend:       $1.48 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m per-phase cost:
+[36m[loop][0m plan: 0 session(s), $0, 0 turns
+[36m[loop][0m work: 4 session(s), $1.21, 37 turns
+[36m[loop][0m review: 2 session(s), $0.28, 10 turns
+[36m[loop][0m 
+[36m[loop][0m no recorded progress twice running — read .loop/state/runs/B20260930-2007-vloop-init-upgrade-doctor/20260930-214909/

@@ -143,3 +143,9 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** `vloop doctor` is implemented and committed in the working tree (internal/cli/doctor.go, doctor_test.go, root.go, README at 199 lines, commands.md regenerated). go test/vet/gofmt/builds pass and every gate step passes up to one assertion that a correct doctor cannot satisfy.
 - **Files:** internal/cli/doctor.go, internal/cli/doctor_test.go, internal/cli/root.go, README.md, docs/guide/commands.md
 - **Notes for next iteration:** Gate is wrong, not the code; unchanged since the previous blocked attempt. Re-confirmed: `vloop init` in the go.mod fixture writes `language = "en"` then a `[metrics]` table; the gate's `printf 'shell = "pwsh"\n' >>config.toml` lands under [metrics], so `vloop config get shell` still returns `sh` and `vloop config get metrics.shell` is an unknown key. Fix in the gate: put the line before the table, e.g. `{ printf 'shell = "pwsh"\n'; cat "$t/cfg"; } >"$d/.vloop/config.toml"` instead of the `>>` append (previous attempt verified the rest of the gate passes with that change). Design notes: one line per check; stacks check only with a scoped entry; default branch = origin/HEAD target else main/master; plugin n/a when claude is missing; pass lines carry no message.
+
+## Run ended — stalled
+
+- **Run:** `20260930-214909` · 4 iteration(s) this run
+- **Plan:** 7/10 done, 0 blocked
+- **Signals:** 4 iterations · 0.57 per closed · 0 gate failure(s) · 0 review rejection(s) · 2 attempt(s) burned · streak 2 · ~$1.48
