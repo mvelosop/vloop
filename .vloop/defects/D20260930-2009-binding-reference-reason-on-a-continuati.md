@@ -6,8 +6,8 @@ origin: work
 found-by: user
 kind: bug
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20260930-2007-vloop-init-upgrade-doctor.loop-brief
 case: ""
 created: 2026-09-30T19:09:00Z
 ---
