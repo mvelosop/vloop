@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **9/10 done** · iteration 13
+**Status:** running · **10/10 done** · iteration 14
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T21:03:13Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T21:06:32Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
 - [x] **T8** — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
 - [x] **T9** — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
-- [ ] **T10** — Close: the end-to-end B5 worked example, the real-data check and `claude plugin validate .`
+- [x] **T10** — Close: the end-to-end B5 worked example, the real-data check and `claude plugin validate .`
 
 ## Tasks
 
@@ -264,7 +264,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T10 — Close: the end-to-end B5 worked example, the real-data check and `claude plugin validate .`
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9
+`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9
 
 **Files:** `cmd/vloop/b5_e2e_test.go`
 

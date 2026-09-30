@@ -163,3 +163,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** Docs now describe setup and scoped stacks as built: configuration guide (scoped stacks, install stamp, .vloop/tmp/), metrics guide scopes, a 'Setting up a repository' concepts section, M-3 and measurement Classification scopes; guide test covers stamp and scopes.
 - **Files:** docs/guide/configuration.md, docs/guide/metrics.md, docs/guide/concepts.md, docs/domain/domain-model.md, docs/domain/measurement/metrics.md, internal/cli/guide_test.go, docs/guide/commands.md
 - **Notes for next iteration:** README.md and commands.md already held every new command from T5-T8 (README at 199 lines); go generate produced no change to commands.md. New guide test TestGuideConfigurationCoversStampAndScopes also checks every install/v1 key is named in configuration.md.
+
+## T10 — Close: the end-to-end B5 worked example, the real-data check and `claude plugin validate .`
+
+- **Outcome:** done (review: PASS)
+- **Summary:** cmd/vloop/b5_e2e_test.go builds vloop at 0.1.0, 0.1.1 and 0.2.0 and plays the B5 worked example, the monorepo and every planted failure against fixtures with a stub claude and a fake home.
+- **Files:** cmd/vloop/b5_e2e_test.go
+- **Notes for next iteration:** Output lines are compared with runs of spaces collapsed (doctor/init indent differs from the brief's layout). The fixture gets a .gitignore so init prints 'updated .gitignore' as in the brief (absent file prints 'wrote .gitignore'). Advisory plugin-version messages from version --check-plugin go to stdout, not stderr. Test skips on Windows (stub claude is a sh script). Binaries are built into the TestMain temp dir, once per version. Fixtures pass GIT_CONFIG_GLOBAL=/dev/null so the no-user.email case is hermetic.

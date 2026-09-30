@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 96261,
+  "stop_reason": "end_turn",
+  "session_id": "110aa6eb-f42d-4996-9bd2-ea241a391136",
+  "total_cost_usd": 0.3738946,
+  "usage": {
+    "input_tokens": 22,
+    "cache_creation_input_tokens": 41592,
+    "cache_read_input_tokens": 408363,
+    "output_tokens": 12581,
+    "output_tokens_details": {
+      "thinking_tokens": 1107
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 41592,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 518,
+        "cache_read_input_tokens": 53021,
+        "cache_creation_input_tokens": 587,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 587
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 22,
+      "outputTokens": 12581,
+      "cacheReadInputTokens": 408363,
+      "cacheCreationInputTokens": 41592,
+      "webSearchRequests": 0,
+      "costUSD": 0.3738946,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1107,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 12,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T10 is done. I wrote `cmd/vloop/b5_e2e_test.go`, and the T10 verify command passes (`gate T10 ok`). I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\nThe file adds three tests, each against fixtures in `t.TempDir()` with a stub `claude` and a fake home:\n- **`TestWorkedExampleB5Session`:** builds vloop at 0.1.0, 0.1.1 and 0.2.0 and plays the worked example line for line.\n- **`TestWorkedExampleB5Monorepo`:** plays the monorepo fixture.\n- **`TestWorkedExampleB5PlantedFailures`:** covers every planted failure.\n\nThe gate's real-data checks on this repository also pass, including `claude plugin validate .`, and its `git status` is unchanged afterwards.\n\nA few things the test does that you might not expect:\n- **Whitespace:** it compares output with runs of spaces collapsed, because `init` and `doctor` don't indent lines the way the brief's layout does.\n- **`.gitignore`:** the session fixture starts with a `.gitignore`. That's what makes `init` print `updated .gitignore` as the brief shows. Without one it prints `wrote .gitignore`.\n- **Plugin-version message:** `version --check-plugin` prints its mismatch and unreadable-`plugin.json` messages to stdout, not stderr. Both exit 0.\n- **Windows:** the tests skip there, since the stub `claude` is a shell script.",
+  "ttft_ms": 2878,
+  "type": "result",
+  "duration_ms": 129656,
+  "uuid": "f5fb8469-9ae1-40b5-8ca3-ee37b19c6cc6",
+  "ttft_stream_ms": 1383,
+  "time_to_request_ms": 347,
+  "first_content_frame_ms": 1384,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 14
+}
