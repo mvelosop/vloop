@@ -4,13 +4,13 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **0/8 done** · iteration 0
+**Status:** running · **1/8 done** · iteration 1
 
-**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:36:10Z
+**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:39:43Z
 
 ## Progress
 
-- [ ] **T1** — Add the `export/v1` schema and the `abandoned` brief status
+- [x] **T1** — Add the `export/v1` schema and the `abandoned` brief status
 - [ ] **T2** — Build the run-record renderer, the marker splice and the metrics snapshot writer
 - [ ] **T3** — Add `vloop brief close`: findings, refusals, status lines, run record, snapshot and one commit
 - [ ] **T4** — Add `--abandon "<reason>"` and `--dry-run` to `vloop brief close`
@@ -23,7 +23,7 @@
 
 ### T1 — Add the `export/v1` schema and the `abandoned` brief status
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `schemas/export.v1.json`, `internal/schema/`, `internal/brief/frontmatter.go`, `internal/brief/deps.go`, `internal/brief/check.go`, `internal/brief/frontmatter_test.go`, `internal/brief/deps_test.go`, `internal/brief/check_test.go`, `internal/brief/templates/en.md`, `internal/brief/templates/es.md`, `internal/cli/schema_test.go`, `internal/cli/list_test.go`, `internal/cli/brief_test.go`, `internal/cli/metrics_test.go`, `internal/cli/guide_test.go`, `cmd/vloop/e2e_test.go`, `cmd/vloop/b2_e2e_test.go`, `README.md`
 

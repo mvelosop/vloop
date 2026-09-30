@@ -15,6 +15,11 @@ var invalidAt = map[string]string{
 	"iteration": "/gate/exit",
 	"defect":    "/found-by",
 	"metrics":   "/tasks/done",
+
+	// export/v1 has one fixture pair per record type; the name is the part before the dash.
+	"export-brief":  "",
+	"export-task":   "/attempts",
+	"export-defect": "/found_by",
 }
 
 func fixture(t *testing.T, n string) []byte {
@@ -27,7 +32,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"defect/v1", "iteration/v1", "metrics/v1", "proposal/v1", "session/v1", "state/v1", "verdict/v1"}
+	want := []string{"defect/v1", "export/v1", "iteration/v1", "metrics/v1", "proposal/v1", "session/v1", "state/v1", "verdict/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}
@@ -35,7 +40,7 @@ func TestNames(t *testing.T) {
 
 func TestFixturesValidateAndFail(t *testing.T) {
 	for base, ptr := range invalidAt {
-		name := base + "/v1"
+		name := strings.SplitN(base, "-", 2)[0] + "/v1"
 		t.Run(base, func(t *testing.T) {
 			vs, err := Validate(name, fixture(t, base+".valid.json"))
 			if err != nil || len(vs) != 0 {

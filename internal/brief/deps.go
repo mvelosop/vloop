@@ -17,7 +17,7 @@ type Entry struct {
 	Path      string // repo-root-relative, slash-separated
 	Status    string
 	DependsOn []string
-	Ready     string // "ready", "blocked", or "-" once consumed
+	Ready     string // "ready", "blocked", or "-" once consumed or abandoned
 }
 
 // Load reads every *.loop-brief.md directly under docs/briefs, sorted by name.
@@ -159,7 +159,7 @@ func Order(entries []Entry) ([]Entry, error) {
 				e.Ready = "blocked"
 			}
 		}
-		if e.Status == "consumed" {
+		if e.Status == "consumed" || e.Status == "abandoned" {
 			e.Ready = "-"
 		}
 		out = append(out, e)

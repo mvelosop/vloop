@@ -169,7 +169,7 @@ func TestBindingSectionPathsAreNotScannedHere(t *testing.T) {
 
 func TestSkipUnlessReady(t *testing.T) {
 	root, path, text := scratch(t)
-	for _, st := range []string{"draft", "consumed"} {
+	for _, st := range []string{"draft", "consumed", "abandoned"} {
 		res := run(root, path, strings.Replace(text, "status: ready", "status: "+st, 1))
 		if !res.Skipped || res.Status != st {
 			t.Errorf("%s: %+v", st, res)

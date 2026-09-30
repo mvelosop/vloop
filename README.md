@@ -29,15 +29,15 @@ frontmatter, for example:
 ---
 name: B20260929-1804-example.loop-brief   # the filename without .md
 kind: brief
-status: draft                             # draft | ready | consumed
+status: draft                             # draft | ready | consumed | abandoned
 created: 2026-09-29
 depends-on: []                            # briefs that must be consumed first
 ---
 ```
 
 **Lifecycle.** A brief's `status` is `draft` while you write it, `ready` once it
-is fit to plan, and `consumed` after a loop has built it. Only `ready` briefs are
-checked; the others are reported as skipped.
+is fit to plan, `consumed` after a loop has built it, and `abandoned` if you
+drop it. Only `ready` briefs are checked; the others are reported as skipped.
 
 **`depends-on`** lists other briefs, by name (filename minus `.md`), that must be
 `consumed` before this one can run. A name that matches no brief, or a cycle, is

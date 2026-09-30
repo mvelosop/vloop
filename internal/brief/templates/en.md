@@ -21,7 +21,7 @@ depends-on: []
 > and so the journal name, is the filename without it.
 >
 > The frontmatter `status` is the only plannable marker: `draft` while you write,
-> `ready` when it is fit to plan, `consumed` once a run has used it. List the
+> `ready` when it is fit to plan, `consumed` once a run has used it, `abandoned` if you drop it. List the
 > briefs this one builds on in `depends-on`, by name. Run `vloop brief check` on
 > it before you spend anything on it.
 >

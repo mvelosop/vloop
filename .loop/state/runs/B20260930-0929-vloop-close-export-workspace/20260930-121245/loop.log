@@ -17,3 +17,10 @@
 [36m[loop][0m cost=$6.113454 turns=47 dur=1493s error=false
 [33m[loop][0m     3 permission denial(s) — the fence may be in the wrong place
 [36m[loop][0m planned: B20260930-0929-vloop-close-export-workspace — 8 tasks
+[36m[loop][0m committed the plan
+[36m[loop][0m ── iteration 1 (1/30 this run) · T1 · 0/8 done ──
+[36m[loop][0m    Add the `export/v1` schema and the `abandoned` brief status
+[36m[loop][0m cost=$0.4230542 turns=16 dur=88s error=false
+[36m[loop][0m cost=$0.16494940000000002 turns=5 dur=30s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T1 done

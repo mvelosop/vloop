@@ -1,0 +1,1 @@
+{"schema":"export/v1","type":"defect","repo":{"name":"shop","remote":"https://example.com/acme/shop.git"},"brief":"B20260101-0900-a.loop-brief","run_id":"B20260101-0900-a","id":"B20260101-0900-a/i2-gate","task":"T2","origin":"work","found_by":"martian","kind":"bug","severity":null,"status":null,"summary":"gate failed","derived":true}

@@ -1,0 +1,18 @@
+{
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "vloop schema list prints the eight schemas; export/v1 in schemas/export.v1.json, draft 2020-12, embedded, no additionalProperties/unevaluatedProperties false", "met": true, "evidence": "schemas/export.v1.json; schema.go reads the embedded schemas/ dir; cli and cmd/vloop list expectations updated; grep finds no closed-object keywords"},
+    {"criterion": "Every export/v1 record requires schema, type and repo{name,remote}", "met": true, "evidence": "top-level required and repo object in export.v1.json"},
+    {"criterion": "A brief record requires every metrics/v1 key except by_task", "met": true, "evidence": "brief 'then' required list matches metrics.v1.json required minus by_task, including cost and defects"},
+    {"criterion": "A task record requires the listed keys", "met": true, "evidence": "task 'then' required list and churn object shape"},
+    {"criterion": "A defect record requires the listed keys with defect/v1 enums, severity/status nullable", "met": true, "evidence": "defect 'then' block: enums plus null for severity and status, derived boolean"},
+    {"criterion": "Valid and invalid export fixtures per record type, covered by table-driven tests", "met": true, "evidence": "six export-*.json fixtures; invalidAt gained export-brief/task/defect; the test derives the schema name from the part before the dash"},
+    {"criterion": "Frontmatter status accepts abandoned after consumed, with the new error message", "met": true, "evidence": "frontmatter.go Statuses; frontmatter_test expects draft|ready|consumed|abandoned"},
+    {"criterion": "brief check skips abandoned; brief list shows '-'; depending on abandoned is blocked, on consumed is ready", "met": true, "evidence": "deps.go Order: only consumed satisfies a dependency, and consumed or abandoned gives '-'; check_test skip cases include abandoned"},
+    {"criterion": "Wherever consumed is treated specially, abandoned is too (metrics status, defect add --brief)", "met": true, "evidence": "remaining 'consumed' uses in defect/blame.go and runs/release.go are git-history attribution of the consuming commit, not status handling; the gate exercises metrics and defect add on an abandoned brief"},
+    {"criterion": "Only the schema-list and status-list expectations changed; README and templates gain abandoned", "met": true, "evidence": "diff of test files touches only those expectations; README and en/es templates updated; go test passes on internal/... and cmd/..."}
+  ],
+  "findings": [],
+  "notes": "The plan listed deps_test.go, list_test.go, brief_test.go, metrics_test.go and defect tests, but the work session added no test for the abandoned dependency, list or metrics behaviour; the gate script covers it, but no committed test does. This is a gap in the plan, not a failure of the work."
+}

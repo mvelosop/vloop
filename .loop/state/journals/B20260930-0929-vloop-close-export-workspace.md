@@ -43,3 +43,10 @@ I've written the plan to `.loop/state/state.json`: run `B20260930-0929-vloop-clo
 
 **Real-data dependency:** T8's check needs this clone's `origin` to be `https://github.com/mvelosop/vloop.git`. It also expects B4's own in-progress brief to show up in the export and the workspace table, so it only requires records for B1–B3.
 
+
+## T1 — Add the `export/v1` schema and the `abandoned` brief status
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added schemas/export.v1.json (brief, task and defect records via if/then on `type`) with three fixture pairs, and the `abandoned` brief status: accepted by frontmatter, listed as `-` in brief list, skipped by brief check, blocking dependents; README and both templates mention it.
+- **Files:** schemas/export.v1.json, internal/schema/schema_test.go, internal/schema/testdata/export-brief.valid.json, internal/schema/testdata/export-brief.invalid.json, internal/schema/testdata/export-task.valid.json, internal/schema/testdata/export-task.invalid.json, internal/schema/testdata/export-defect.valid.json, internal/schema/testdata/export-defect.invalid.json, internal/brief/frontmatter.go, internal/brief/deps.go, internal/brief/frontmatter_test.go, internal/brief/check_test.go, internal/brief/templates/en.md, internal/brief/templates/es.md, internal/cli/schema_test.go, cmd/vloop/b2_e2e_test.go, README.md
+- **Notes for next iteration:** Brief-record required keys are restated in export/v1 (no cross-schema $ref; the compiler loads nothing), with property types only for scalars and `type: object` for nested blocks. Invalid brief fixture omits `cost`, so its one violation is at pointer "". schema_test.go's fixture map gained export-brief/-task/-defect keys; the schema name is the part before the dash. `consumed` is special-cased only in brief/deps.go, brief/frontmatter.go and merge attribution (runs/release.go, defect/blame.go); the latter two were left alone since abandoned briefs are never merged-as-consumed, and metrics/defect add already handle any status. No new deps_test case for abandoned was added; the gate covers it end to end.
