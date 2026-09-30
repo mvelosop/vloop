@@ -1,2 +1,3 @@
-metrics.stacks = ["go"]
-metrics.code = ["internal/brief/templates/**"]
+[metrics]
+  code = ["internal/brief/templates/**", "schemas/**"]
+  stacks = ["go"]
