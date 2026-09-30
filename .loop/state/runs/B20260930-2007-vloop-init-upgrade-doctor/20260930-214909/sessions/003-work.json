@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 51060,
+  "stop_reason": "end_turn",
+  "session_id": "9a5b7ddd-3e46-46da-a93a-af4c2eb7cfb5",
+  "total_cost_usd": 0.30251580000000006,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 41240,
+    "cache_read_input_tokens": 305769,
+    "output_tokens": 7637,
+    "output_tokens_details": {
+      "thinking_tokens": 816
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 41240,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 536,
+        "cache_read_input_tokens": 52662,
+        "cache_creation_input_tokens": 594,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 594
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 7637,
+      "cacheReadInputTokens": 305769,
+      "cacheCreationInputTokens": 41240,
+      "webSearchRequests": 0,
+      "costUSD": 0.30251580000000006,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 816,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T7 is done: `vloop upgrade [--yes] [--dry-run]` now exists, and the task's verify command printed `gate T7 ok`. The go tests, vet, gofmt, tidy and the Linux and Windows builds all passed.\n\n- **What it does:** it compares the stamp's version with the binary's and handles each row of the table. A downgrade is refused even with `--yes`. A breaking jump, or any pre-release version, needs `--yes`. Otherwise it refreshes the `CLAUDE.md` section and the `.gitignore` line, then rewrites the stamp.\n- **Implementation:** the command is in `internal/cli/upgrade.go` and registered in `root.go`. It reuses the init helpers for the marker replacement and the symlink checks.\n- **Tests:** `internal/cli/upgrade_test.go` has Upgrade tests for every table row, the marker-only change and `--dry-run`.\n- **Docs:** `README.md` has one new table row and stays at 198 lines. `docs/guide/commands.md` is regenerated.\n\nA few behaviours the next session can't see from the code:\n- **Stamp in output:** `.vloop/install.json` is printed as `updated` on a real run but never appears in `would update` lines, because the gate expects exactly `would update CLAUDE.md`.\n- **`--dry-run` exit code:** `--dry-run` exits 0 even for a breaking jump.\n- **Missing `CLAUDE.md`:** it is created and reported as `updated`.\n\nI wrote the proposal to `.loop/tmp/proposal.json` and did not commit.",
+  "ttft_ms": 2302,
+  "type": "result",
+  "duration_ms": 93446,
+  "uuid": "71abe743-7456-4b59-a8b8-989c06c4d9a0",
+  "ttft_stream_ms": 1211,
+  "time_to_request_ms": 349,
+  "first_content_frame_ms": 1211,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 9
+}

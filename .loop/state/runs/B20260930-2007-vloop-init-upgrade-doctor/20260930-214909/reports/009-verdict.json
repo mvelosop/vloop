@@ -1,0 +1,10 @@
+{"task":"T7","verdict":"PASS","criteria":[
+{"criterion":"No stamp → not initialized, exit 1; from = to → already at <to>, exit 0, nothing written","met":true,"evidence":"upgrade.go runUpgrade ErrNotExist and install.Same branches; TestUpgradeNotInitialized, TestUpgradeSameWritesNothing"},
+{"criterion":"from > to refused with exact message, with or without --yes; numeric comparison","met":true,"evidence":"install.FromNewer branch returns before any write or --yes check; TestUpgradeRefusesDowngradeNumerically"},
+{"criterion":"Breaking jump without --yes prints would update lines, then stderr message, exit 1, nothing written; pre-release treated the same","met":true,"evidence":"breaking := rel != install.Newer && !yes; TestUpgradeBreakingNeedsYes, TestUpgradePreReleaseNeedsYes"},
+{"criterion":"Otherwise or with --yes applies, prints updated <path>, rewrites version/commit/upgraded, keeps initialized","met":true,"evidence":"write loop then install.Write with Version, Commit, Upgraded set; Initialized untouched; TestUpgradeApplies"},
+{"criterion":"Changes are exactly the CLAUDE.md section and the .gitignore line","met":true,"evidence":"only MergeClaudeMD and MergeGitignore produce changes; TestUpgradeMarkerOnlyAndGitignore"},
+{"criterion":"Never touches other files, never commits, never follows a symlink out","met":true,"evidence":"only CLAUDE.md, .gitignore and the stamp are written, via readRepoFile/writeRepoFile/checkRepoPath; no git calls; TestUpgradeRefusesSymlink"},
+{"criterion":"--dry-run prints would update and writes nothing","met":true,"evidence":"dryRun branch returns before writes; TestUpgradeDryRun"},
+{"criterion":"README documents vloop upgrade with --yes and --dry-run, under 200 lines; commands.md regenerated; Upgrade tests cover the table","met":true,"evidence":"README row added, 198 lines; commands.md has '## vloop upgrade'; nine TestUpgrade* tests"}
+],"findings":[],"notes":"none"}

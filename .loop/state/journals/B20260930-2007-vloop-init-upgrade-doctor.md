@@ -122,3 +122,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** `vloop init` exists: writes config (language, detected or given stacks), install stamp, starter brief, .gitignore line and the CLAUDE.md section between markers; refuses initialized or non-git repos; supports --dry-run, --language, --stacks. README at 197 lines; commands.md regenerated.
 - **Files:** internal/cli/init.go, internal/cli/init_test.go, internal/cli/root.go, internal/install/section.go, internal/config/config.go, README.md, docs/guide/commands.md
 - **Notes for next iteration:** No code change this attempt: the implementation from the earlier attempt passes the operator-corrected gate (nothing-staged check now uses git diff --cached --quiet). Shared helpers for T7: install.Section, install.MergeClaudeMD, install.MergeGitignore. Existing-config case prints 'suggest metrics.stacks: ...'; init refuses symlinked targets (exit 1) before writing anything.
+
+## T7 — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added `vloop upgrade [--yes] [--dry-run]`: compares stamp and binary versions with install.Compare, refuses downgrades and unconfirmed breaking/pre-release jumps, otherwise refreshes the CLAUDE.md section and .gitignore line and rewrites the stamp.
+- **Files:** internal/cli/upgrade.go, internal/cli/upgrade_test.go, internal/cli/root.go, README.md, docs/guide/commands.md
+- **Notes for next iteration:** The changes list holds only CLAUDE.md and .gitignore, and only when their content would change. The stamp is rewritten and printed as 'updated .vloop/install.json' on a real run, but never appears in 'would update' lines (the gate wants exactly 'would update CLAUDE.md'). --dry-run exits 0 even for a breaking jump. A missing CLAUDE.md is created and reported as 'updated'. Symlinked targets, including the stamp, are refused via checkRepoPath before any write. README is at 198 lines: added one table row and a mention in the 'Only ... write' sentence.

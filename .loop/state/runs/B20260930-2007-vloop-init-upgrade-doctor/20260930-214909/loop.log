@@ -18,3 +18,19 @@
 [36m[loop][0m cost=$0.15870459999999997 turns=6 dur=30s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T6 done
+[36m[loop][0m    committed 6e1ec48
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            1
+[36m[loop][0m   tasks closed:          6/10
+[36m[loop][0m   iterations per closed: 0.17
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $0.28 (estimate, not a bill)
+[36m[loop][0m ── iteration 9 (2/30 this run) · T7 · 6/10 done ──
+[36m[loop][0m    Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
+[36m[loop][0m cost=$0.30251580000000006 turns=8 dur=93s error=false
+[36m[loop][0m cost=$0.11633279999999999 turns=4 dur=19s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T7 done

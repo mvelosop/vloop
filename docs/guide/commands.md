@@ -333,6 +333,17 @@ vloop task verify <id> <command> [flags]
 
 - `--reason string`: why the gate is being replaced (required)
 
+## vloop upgrade
+
+Refresh vloop's parts of a repository set up by an older vloop
+
+```
+vloop upgrade [flags]
+```
+
+- `--dry-run`: print what would be updated and write nothing
+- `--yes`: allow a breaking upgrade
+
 ## vloop version
 
 Print the vloop and embedded plugin versions

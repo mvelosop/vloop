@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **6/10 done** · iteration 8
+**Status:** running · **7/10 done** · iteration 9
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:50:20Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:52:45Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T4** — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
 - [x] **T5** — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
 - [x] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
-- [ ] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
+- [x] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
 - [ ] **T8** — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
 - [ ] **T9** — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
 - [ ] **T10** — Close: the end-to-end B5 worked example, the real-data check and `claude plugin validate .`
@@ -182,7 +182,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T7 — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
 
-`pending` · depends on: T1, T6
+`done` · depends on: T1, T6
 
 **Files:** `internal/cli/upgrade.go`, `internal/cli/upgrade_test.go`, `internal/cli/root.go`, `internal/install/`, `README.md`, `docs/guide/commands.md`
 

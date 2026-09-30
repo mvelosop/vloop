@@ -56,6 +56,7 @@ does not exist, or an item with no reason, is a problem.
 | --- | --- |
 | `vloop version [--check-plugin <dir>]` | print the vloop and embedded plugin versions; `--check-plugin` instead compares the plugin in `<dir>` with this binary, prints a line only on a mismatch or an unreadable manifest, and always exits 0 (the plugin's SessionStart hook runs it) |
 | `vloop init [--language en\|es] [--stacks <a,b>] [--dry-run]` | set a git repository up: config with detected stacks, the install stamp, a starter brief, the `.vloop/tmp/` line in `.gitignore` and vloop's section of `CLAUDE.md`; refuses a repository already set up; never commits; `--dry-run` writes nothing |
+| `vloop upgrade [--yes] [--dry-run]` | refresh vloop's `CLAUDE.md` section and `.gitignore` line and rewrite the stamp; refuses a repository set up by a newer vloop; a breaking jump (or any pre-release) needs `--yes`; never commits; `--dry-run` writes nothing |
 | `vloop plugin path` | extract the embedded plugin into `.vloop/tmp/plugin/<version>/` and print that path; files already matching are left alone, stray ones removed |
 | `vloop config get <key>` | print the resolved value of a key |
 | `vloop config set <key> <value>` | write a key to `.vloop/config.toml` (`''` removes it) |
@@ -166,7 +167,7 @@ vloop keeps its files under `.vloop/` in the repo root (the nearest parent with 
   follows the `state/v1` schema; `vloop status` reads it and `vloop task validate`
   checks it.
 
-Briefs live in `docs/briefs/`. Only `vloop init`, `vloop config set`, `vloop brief new`, `vloop plugin path`, `vloop defect add|set` and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`, `verify`) write anything, and each task command refuses a plan that fails `vloop task validate`. Every path vloop prints is relative to the repo root.
+Briefs live in `docs/briefs/`. Only `vloop init`, `vloop upgrade`, `vloop config set`, `vloop brief new`, `vloop plugin path`, `vloop defect add|set` and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`, `verify`) write anything, and each task command refuses a plan that fails `vloop task validate`. Every path vloop prints is relative to the repo root.
 
 ## Guides
 
