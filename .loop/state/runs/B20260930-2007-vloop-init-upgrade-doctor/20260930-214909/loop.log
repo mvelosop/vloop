@@ -34,3 +34,18 @@
 [36m[loop][0m cost=$0.11633279999999999 turns=4 dur=19s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T7 done
+[36m[loop][0m    committed e3cc556
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            2
+[36m[loop][0m   tasks closed:          7/10
+[36m[loop][0m   iterations per closed: 0.29
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $0.70 (estimate, not a bill)
+[36m[loop][0m ── iteration 10 (3/30 this run) · T8 · 7/10 done ──
+[36m[loop][0m    Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
+[36m[loop][0m cost=$0.6390422000000001 turns=19 dur=199s error=false
+[33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
+[36m[loop][0m    work session reported blocked

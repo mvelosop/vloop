@@ -1,0 +1,8 @@
+{
+  "task": "T8",
+  "outcome": "blocked",
+  "summary": "Implemented `vloop doctor` (internal/cli/doctor.go, doctor_test.go with stub claude + fake home + real git, root.go, README row at 199 lines, commands.md regenerated). go test, vet, gofmt and every gate step pass except one gate assertion that a correct doctor cannot satisfy.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go", "internal/cli/root.go", "README.md", "docs/guide/commands.md"],
+  "verified": "Verify gate fails at: 'no plan and the configured shell is not on PATH: doctor check gate shell must be warning -- got pass'. With that one line corrected (shell line written before the existing config), the whole gate prints 'gate T8 ok'.",
+  "notes": "Gate is wrong, not the code. The fixture config written by `init` ends in a `[metrics]` table (language, then [metrics] stacks). The gate does `printf 'shell = \"pwsh\"\\n' >>config.toml`, which lands under [metrics] as metrics.shell, not the top-level `shell` key, so the configured shell is still the default `sh` and a correct doctor reports pass. Fix in the gate: put the line before the table, e.g. `{ printf 'shell = \"pwsh\"\\n'; cat \"$t/cfg\"; } >\"$d/.vloop/config.toml\"` instead of the `>>` append; I verified the rest of the gate passes with exactly that change. Design: one doctor line per check; stacks check only appears with a scoped entry; default branch = origin/HEAD's target, else main/master; plugin is n/a when claude is missing; pass lines carry no message. README: added one table row (199 lines), no other trimming needed."
+}

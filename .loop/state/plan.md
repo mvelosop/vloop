@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **7/10 done** · iteration 9
+**Status:** running · **7/10 done** · iteration 10
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:52:45Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:56:40Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T5** — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
 - [x] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
 - [x] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
-- [ ] **T8** — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
+- [ ] **T8** — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks · 1 attempt(s)
 - [ ] **T9** — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
 - [ ] **T10** — Close: the end-to-end B5 worked example, the real-data check and `claude plugin validate .`
 
@@ -209,7 +209,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T8 — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
 
-`pending` · depends on: T1, T3, T4, T6
+`pending` · 1 attempt(s) · depends on: T1, T3, T4, T6
 
 **Files:** `internal/cli/doctor.go`, `internal/cli/doctor_test.go`, `internal/cli/root.go`, `README.md`, `docs/guide/commands.md`
 
@@ -226,6 +226,8 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 - stacks: warning `<stack>@<path>: no such directory` for each scoped entry whose directory no longer exists. self-hosting: warning when the repository is vloop's own (go.mod declares module github.com/mvelosop/vloop) and the binary's commit stamp is HEAD (a short stamp matches as a prefix of HEAD's sha).
 - doctor writes nothing anywhere, and runs no command other than git, `claude --version`, `claude plugin list --json` and PATH lookups.
 - README.md documents `vloop doctor` and stays under 200 lines; docs/guide/commands.md is regenerated. Committed tests whose names contain Doctor, using a stub claude and a fake home, cover every check in each of its results.
+
+**From the last attempt:** Implemented `vloop doctor` (internal/cli/doctor.go, doctor_test.go with stub claude + fake home + real git, root.go, README row at 199 lines, commands.md regenerated). go test, vet, gofmt and every gate step pass except one gate assertion that a correct doctor cannot satisfy.
 
 <details><summary>verify command</summary>
 

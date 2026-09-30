@@ -144,6 +144,14 @@ Set status, fixed-by, case, severity, origin, kind, task of a defect
 vloop defect set <id> <field> <value>
 ```
 
+## vloop doctor
+
+Check that the repository, the toolchain and the plugin are ready for a run
+
+```
+vloop doctor
+```
+
 ## vloop init
 
 Set a repository up for vloop
