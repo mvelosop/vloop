@@ -1,0 +1,15 @@
+{
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop schema list` prints exactly defect/v1 ... verdict/v1; install/v1 in schemas/install.v1.json, draft 2020-12, embedded, no additionalProperties/unevaluatedProperties false", "met": true, "evidence": "schemas/install.v1.json has $schema 2020-12 and no closing keywords; list expectations updated in schema_test, cli/schema_test, b2_e2e_test; embed_test count 8->9"},
+    {"criterion": "install/v1 requires schema (const), version, commit, initialized (string), upgraded (string or null); brief example validates", "met": true, "evidence": "required list and property types in schemas/install.v1.json; testdata/install.valid.json is the example stamp"},
+    {"criterion": "testdata install.valid.json and install.invalid.json exist and the table-driven test covers them", "met": true, "evidence": "both files present; invalidAt gains \"install\": \"/version\" (invalid fixture has numeric version); go test ./internal/schema passes"},
+    {"criterion": "internal/install reads/writes .vloop/install.json and exposes shared comparison; tests cover equal, from-newer, numeric compare, breaking rules, non-breaking, pre-release", "met": true, "evidence": "install.go Path const with / separators, filepath.FromSlash on disk; TestCompare covers every listed case incl. 0.1.9 vs 0.1.10, 0.x minor, major change, 0.x patch, same-major minor, 0.0.0-dev -> NeedsYes; Read/Write roundtrip and null-upgraded tests"},
+    {"criterion": "Comparison implemented once in internal/install; no third-party module added", "met": true, "evidence": "hand-written Parse/Compare in install.go; no other semver parsing found; go mod tidy gate green"},
+    {"criterion": "Only pre-existing expectations changed are the schema list outputs and embedded count", "met": true, "evidence": "git diff HEAD shows only those four test edits (list strings, len 8->9, names list, invalidAt entry)"},
+    {"criterion": "No init, upgrade, doctor or plugin command appears", "met": true, "evidence": "diff contains only schema, install package and test changes"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

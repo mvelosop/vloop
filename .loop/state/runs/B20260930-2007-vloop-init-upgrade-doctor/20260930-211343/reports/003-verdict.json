@@ -1,0 +1,10 @@
+{"task":"T3","verdict":"PASS","criteria":[
+{"criterion":"plugin.json gains description and author.name; marketplace.json gains owner.name and description, still lists vloop at ./plugin","met":true,"evidence":"diff of both manifests; names unchanged"},
+{"criterion":"hooks.json declares exactly one SessionStart command hook with the exact command; embedded; Go test with Hook in name","met":true,"evidence":"plugin/hooks/hooks.json; TestPluginHookIsEmbedded reads embed FS and asserts count and command"},
+{"criterion":"version --check-plugin messages, stdout only, exit 0 in every case","met":true,"evidence":"checkPlugin in internal/cli/version.go prints the exact messages with dir as given and returns nil; TestCheckPluginMessages; gate log ok"},
+{"criterion":"check-plugin only reads the one JSON file; plain version unchanged","met":true,"evidence":"os.ReadFile of .claude-plugin/plugin.json only; plain path untouched"},
+{"criterion":"plugin path extracts to .vloop/tmp/plugin/<version>/, prints repo-relative path, --json, version stamped in manifest","met":true,"evidence":"extractPlugin/withVersion in internal/cli/plugin.go; root via g.root(); gate log ok"},
+{"criterion":"plugin path idempotent, restores modified, removes strays","met":true,"evidence":"byte-compare before write; stray walk and RemoveAll; TestPluginPathIdempotentAndClean"},
+{"criterion":"writes nothing outside .vloop/tmp/plugin/, never follows a symlink","met":true,"evidence":"ensureRealDir uses Lstat and refuses links; TestPluginPathRefusesSymlink"},
+{"criterion":"README documents plugin path and --check-plugin, under 200 lines; commands.md regenerated; README/command-reference tests pass","met":true,"evidence":"README 196 lines; commands.md diff; go test ./internal/cli passes"}
+],"findings":[],"notes":"README tightening also removed a blank line before the '## The loop in one paragraph' heading; harmless but worth restoring if line budget allows."}

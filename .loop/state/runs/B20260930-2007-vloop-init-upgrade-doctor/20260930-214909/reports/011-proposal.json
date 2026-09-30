@@ -1,0 +1,8 @@
+{
+  "task": "T8",
+  "outcome": "blocked",
+  "summary": "`vloop doctor` is implemented and committed in the working tree (internal/cli/doctor.go, doctor_test.go, root.go, README at 199 lines, commands.md regenerated). go test/vet/gofmt/builds pass and every gate step passes up to one assertion that a correct doctor cannot satisfy.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go", "internal/cli/root.go", "README.md", "docs/guide/commands.md"],
+  "verified": "Ran the verify command: GATE FAIL: no plan and the configured shell is not on PATH: doctor check gate shell must be warning -- got pass.",
+  "notes": "Gate is wrong, not the code; unchanged since the previous blocked attempt. Re-confirmed: `vloop init` in the go.mod fixture writes `language = \"en\"` then a `[metrics]` table; the gate's `printf 'shell = \"pwsh\"\\n' >>config.toml` lands under [metrics], so `vloop config get shell` still returns `sh` and `vloop config get metrics.shell` is an unknown key. Fix in the gate: put the line before the table, e.g. `{ printf 'shell = \"pwsh\"\\n'; cat \"$t/cfg\"; } >\"$d/.vloop/config.toml\"` instead of the `>>` append (previous attempt verified the rest of the gate passes with that change). Design notes: one line per check; stacks check only with a scoped entry; default branch = origin/HEAD target else main/master; plugin n/a when claude is missing; pass lines carry no message."
+}

@@ -1,0 +1,5 @@
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	(cached)
+ok  	github.com/mvelosop/vloop/cmd/vloop	(cached)
+GATE FAIL: init must not commit or stage

@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 136199,
+  "stop_reason": "end_turn",
+  "session_id": "0f903b53-62bf-417d-843e-41a5d37fadf9",
+  "total_cost_usd": 0.6390422000000001,
+  "usage": {
+    "input_tokens": 36,
+    "cache_creation_input_tokens": 64295,
+    "cache_read_input_tokens": 1027751,
+    "output_tokens": 17624,
+    "output_tokens_details": {
+      "thinking_tokens": 3116
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 64295,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 504,
+        "cache_read_input_tokens": 75507,
+        "cache_creation_input_tokens": 804,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 804
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 36,
+      "outputTokens": 17624,
+      "cacheReadInputTokens": 1027751,
+      "cacheCreationInputTokens": 64295,
+      "webSearchRequests": 0,
+      "costUSD": 0.6390422000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 3116,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01X9oXPe1RvsRg6EqBk12Pfx",
+      "tool_input": {
+        "command": "d=$(mktemp -d) && cd $d && git init -q && printf 'module a\\n' > go.mod && printf '{}' > package.json && go run ~/source/personal/vloop/cmd/vloop init >/dev/null; cat -A .vloop/config.toml; cd /; rm -rf $d; grep -n \"shell\" ~/source/personal/vloop/internal/cli/init.go | head"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 19,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T8 is blocked. `vloop doctor` is written and tested, but the verify gate fails on one assertion that a correct `doctor` can't satisfy.\n\nThe failing step is the \"no plan, configured shell missing\" check. The gate appends `shell = \"pwsh\"` to the config that `vloop init` wrote, and that config ends in a `[metrics]` table. The line therefore lands under `[metrics]` and never becomes the top-level `shell` key. `doctor` correctly sees the default `sh` and reports a pass. The gate expects a warning.\n\nIf that one gate line writes `shell = \"pwsh\"` before the existing config instead of appending it, the whole gate passes. I checked this on a patched copy and it printed `gate T8 ok`. I did not touch the real gate.\n\n- **Code:** `internal/cli/doctor.go` implements the checks in the brief's order, with `--json`. `doctor` is registered in `root.go`.\n- **Tests:** `internal/cli/doctor_test.go` has `TestDoctor…` tests that use a stub `claude`, a fake home and a real `git`. They cover every check in each result, and a test that `doctor` writes nothing. `go test ./internal/cli ./cmd/vloop`, `go vet` and `gofmt` are clean.\n- **Docs:** `README.md` has one new table row and is at 199 lines. `docs/guide/commands.md` is regenerated.\n\nThe proposal is in `.loop/tmp/proposal.json` with the gate fix spelled out.",
+  "ttft_ms": 2290,
+  "type": "result",
+  "duration_ms": 199448,
+  "uuid": "10414445-cb64-4d59-9177-f1ad6baf8f5a",
+  "ttft_stream_ms": 1260,
+  "time_to_request_ms": 350,
+  "first_content_frame_ms": 1261,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 10
+}

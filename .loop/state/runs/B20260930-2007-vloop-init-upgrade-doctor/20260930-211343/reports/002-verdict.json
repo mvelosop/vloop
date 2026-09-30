@@ -1,0 +1,13 @@
+{
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "An entry whose separator ends its first line and whose reason is on the following indented line(s) passes brief check; the same fixture fails against the base commit.", "met": true, "evidence": "refs.go refEntries joins indented continuation lines into rest before reasonSepRe; TestBindingRefsWrap covers em dash and hyphen; gate builds base 05ea997 and asserts failure there"},
+    {"criterion": "An entry with no reason on any of its lines still fails with `binding reference has no reason: <path>`.", "met": true, "evidence": "TestBindingRefsWrapNoReason: blank after separator, no separator, not indented"},
+    {"criterion": "A reason never carries over from one list item to the next; a following line that is not indented is not part of the item.", "met": true, "evidence": "refEntries starts a new entry on each item line and closes on blank or unindented lines; TestBindingRefsWrapNextItemBoundary asserts y reported and x not"},
+    {"criterion": "One-line entries behave exactly as before, in English and Spanish briefs; dead-reference and directory-entry-point checks still apply to wrapped entries.", "met": true, "evidence": "bindingRefLines loop otherwise unchanged; existing tests pass; existence check runs on e.path before reason check"},
+    {"criterion": "internal/brief/refs_test.go gains tests whose names contain Wrap covering the wrapped pass, the no-reason failure and the next-item boundary.", "met": true, "evidence": "TestBindingRefsWrap, TestBindingRefsWrapNoReason, TestBindingRefsWrapNextItemBoundary"}
+  ],
+  "findings": [],
+  "notes": "Planned testdata/refs/ directory was not created; tests build fixtures inline, which is durable enough. Wrap tests only run the English brief for wrapped cases; Spanish unchanged path is shared code."
+}

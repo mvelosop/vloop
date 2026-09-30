@@ -103,3 +103,17 @@ func TestGuideDefectsCoversSchema(t *testing.T) {
 		}
 	}
 }
+
+func TestGuideConfigurationCoversStampAndScopes(t *testing.T) {
+	text := readGuide(t, "configuration.md")
+	for _, w := range guideWords(t, "install/v1", false) {
+		if !strings.Contains(text, w) {
+			t.Errorf("configuration.md does not mention the install/v1 key %q", w)
+		}
+	}
+	for _, s := range []string{".vloop/install.json", "install/v1", "csharp@services/api", "longest", ".vloop/tmp/"} {
+		if !strings.Contains(text, s) {
+			t.Errorf("configuration.md does not mention %q", s)
+		}
+	}
+}

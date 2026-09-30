@@ -14,6 +14,7 @@ var invalidAt = map[string]string{
 	"session":   "/is_error",
 	"iteration": "/gate/exit",
 	"defect":    "/found-by",
+	"install":   "/version",
 	"metrics":   "/tasks/done",
 
 	// export/v1 has one fixture pair per record type; the name is the part before the dash.
@@ -32,7 +33,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"defect/v1", "export/v1", "iteration/v1", "metrics/v1", "proposal/v1", "session/v1", "state/v1", "verdict/v1"}
+	want := []string{"defect/v1", "export/v1", "install/v1", "iteration/v1", "metrics/v1", "proposal/v1", "session/v1", "state/v1", "verdict/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}

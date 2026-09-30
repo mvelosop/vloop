@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 23047,
+  "stop_reason": "end_turn",
+  "session_id": "64441cd5-2f96-4307-ac0d-c912e79616da",
+  "total_cost_usd": 0.15149,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 25904,
+    "cache_read_input_tokens": 128770,
+    "output_tokens": 2210,
+    "output_tokens_details": {
+      "thinking_tokens": 169
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 25904,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 336,
+        "cache_read_input_tokens": 36865,
+        "cache_creation_input_tokens": 1055,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1055
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 2210,
+      "cacheReadInputTokens": 128770,
+      "cacheCreationInputTokens": 25904,
+      "webSearchRequests": 0,
+      "costUSD": 0.15149,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 169,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 6,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS**: `vloop doctor` meets every T8 acceptance criterion, and the verify command prints `gate T8 ok`. The implementation was already committed in `7eaca08`, so the working-tree diff is only state and intervention records. I reviewed the committed `doctor.go` against the criteria instead. I wrote the verdict to `.loop/tmp/verdict.json`.\n\n- **Code and tests:** I read `internal/cli/doctor.go` against each criterion. Nine `TestDoctor*` functions use a stub `claude`; I did not read their assertions.\n- **README:** `vloop doctor` is documented at `README.md` line 60, and the file is at 199 lines.\n- **`commands.md`:** The gate confirmed the `## vloop doctor` heading is present.\n- **Earlier failure:** The earlier blocks came from a gate defect, not from doctor. The operator has since fixed that gate.\n- **Next run:** The README has no room left, so any later addition has to tighten existing text.",
+  "ttft_ms": 2796,
+  "type": "result",
+  "duration_ms": 30799,
+  "uuid": "01a6327d-dd73-4ba6-b97b-a6e3e1e38f70",
+  "ttft_stream_ms": 1693,
+  "time_to_request_ms": 343,
+  "first_content_frame_ms": 1694,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 12
+}

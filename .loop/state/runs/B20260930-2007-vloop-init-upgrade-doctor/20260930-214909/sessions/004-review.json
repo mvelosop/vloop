@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 17923,
+  "stop_reason": "end_turn",
+  "session_id": "6d4b2fbc-1da2-4acf-9709-d9b7f04b36bb",
+  "total_cost_usd": 0.11633279999999999,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 20450,
+    "cache_read_input_tokens": 91184,
+    "output_tokens": 1628,
+    "output_tokens_details": {
+      "thinking_tokens": 237
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 20450,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 150,
+        "cache_read_input_tokens": 31283,
+        "cache_creation_input_tokens": 1183,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1183
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1628,
+      "cacheReadInputTokens": 91184,
+      "cacheCreationInputTokens": 20450,
+      "webSearchRequests": 0,
+      "costUSD": 0.11633279999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 237,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T7. `vloop upgrade` meets every acceptance criterion. The README stays at 198 lines, `docs/guide/commands.md` has the new section, and nine `TestUpgrade*` tests cover the table, marker-only changes, `--dry-run` and the symlink case. I read the diff and the tests but did not re-run them; the driver's gate had already run.\n\nThe verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2563,
+  "type": "result",
+  "duration_ms": 18944,
+  "uuid": "262ffc5f-4c42-4456-b60b-264d9f9656fd",
+  "ttft_stream_ms": 1802,
+  "time_to_request_ms": 368,
+  "first_content_frame_ms": 1802,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 9
+}

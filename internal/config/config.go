@@ -34,6 +34,7 @@ type Key struct {
 	Default string // empty means unset
 	Valid   []string
 	List    bool // a list of strings, stored as a TOML array and given as comma-joined text
+	Stacks  bool // with List: entries are <stack> or <stack>@<path>, see classify.ParseStack
 	Glob    bool // with List: entries are any non-empty glob pattern rather than lower-case names
 }
 
@@ -57,7 +58,7 @@ var Keys = []Key{
 	{Name: "effort.review", Valid: efforts},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
-	{Name: "metrics.stacks", List: true, Valid: classify.Names()},
+	{Name: "metrics.stacks", List: true, Stacks: true},
 	{Name: "metrics.code", List: true, Glob: true},
 	{Name: "metrics.test", List: true, Glob: true},
 	{Name: "metrics.docs", List: true, Glob: true},
@@ -86,7 +87,9 @@ type InvalidValueError struct {
 
 func (e *InvalidValueError) Error() string {
 	want := "a non-empty string"
-	if k, err := Lookup(e.Key); err == nil && k.List && e.Valid != nil {
+	if k, err := Lookup(e.Key); err == nil && k.Stacks {
+		want = "<stack> or <stack>@<existing directory>"
+	} else if err == nil && k.List && e.Valid != nil {
 		want = "a comma-separated list of " + strings.Join(e.Valid, ", ")
 	} else if err == nil && k.List && k.Glob {
 		want = "a comma-separated list of non-empty glob patterns"
@@ -128,6 +131,14 @@ func (k Key) Validate(value string) error {
 	if value == "" {
 		return &InvalidValueError{k.Name, value, k.Valid}
 	}
+	if k.Stacks {
+		for _, a := range strings.Split(value, ",") {
+			if _, _, err := classify.ParseStack(a); err != nil {
+				return &InvalidValueError{k.Name, a, nil}
+			}
+		}
+		return nil
+	}
 	if k.List {
 		for _, a := range strings.Split(value, ",") {
 			if (k.Glob && a == "") || (!k.Glob && !areaName.MatchString(a)) {
@@ -148,6 +159,21 @@ func (k Key) Validate(value string) error {
 		}
 	}
 	return &InvalidValueError{k.Name, value, k.Valid}
+}
+
+// checkScopeDirs requires every scoped entry of a metrics.stacks value to name
+// an existing directory under root. Reading a config does not: doctor warns.
+func checkScopeDirs(root, value string) error {
+	for _, a := range strings.Split(value, ",") {
+		_, scope, _ := classify.ParseStack(a)
+		if scope == "" {
+			continue
+		}
+		if fi, err := os.Stat(filepath.Join(root, filepath.FromSlash(scope))); err != nil || !fi.IsDir() {
+			return &InvalidValueError{"metrics.stacks", a, nil}
+		}
+	}
+	return nil
 }
 
 func filePath(root string) string { return filepath.Join(root, filepath.FromSlash(FilePath)) }
@@ -270,6 +296,22 @@ func List(root string) ([]Value, error) {
 	return out, nil
 }
 
+// Check validates a non-empty value for key name as Set would, without
+// writing anything.
+func Check(root, name, value string) error {
+	k, err := Lookup(name)
+	if err != nil {
+		return err
+	}
+	if err := k.Validate(value); err != nil {
+		return err
+	}
+	if k.Stacks {
+		return checkScopeDirs(root, value)
+	}
+	return nil
+}
+
 // Set validates and writes name=value into the config file under root,
 // preserving every other key. An empty value removes the key. The file is not
 // touched (nor created) when the result would not change the key.
@@ -281,6 +323,11 @@ func Set(root, name, value string) error {
 	if value != "" {
 		if err := k.Validate(value); err != nil {
 			return err
+		}
+		if k.Stacks {
+			if err := checkScopeDirs(root, value); err != nil {
+				return err
+			}
 		}
 	}
 	file, raw, err := readFile(root)

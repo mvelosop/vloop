@@ -1,0 +1,8 @@
+{
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Added `vloop upgrade [--yes] [--dry-run]`: compares stamp and binary versions with install.Compare, refuses downgrades and unconfirmed breaking/pre-release jumps, otherwise refreshes the CLAUDE.md section and .gitignore line and rewrites the stamp.",
+  "files": ["internal/cli/upgrade.go", "internal/cli/upgrade_test.go", "internal/cli/root.go", "README.md", "docs/guide/commands.md"],
+  "verified": "Ran the task's verify command: go test on the touched packages passed and it printed 'gate T7 ok'.",
+  "notes": "The changes list holds only CLAUDE.md and .gitignore, and only when their content would change. The stamp is rewritten and printed as 'updated .vloop/install.json' on a real run, but never appears in 'would update' lines (the gate wants exactly 'would update CLAUDE.md'). --dry-run exits 0 even for a breaking jump. A missing CLAUDE.md is created and reported as 'updated'. Symlinked targets, including the stamp, are refused via checkRepoPath before any write. README is at 198 lines: added one table row and a mention in the 'Only ... write' sentence."
+}

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 55205,
+  "stop_reason": "end_turn",
+  "session_id": "326a1e65-50e5-427a-b16b-39b4ec411f8b",
+  "total_cost_usd": 0.27852520000000003,
+  "usage": {
+    "input_tokens": 22,
+    "cache_creation_input_tokens": 35472,
+    "cache_read_input_tokens": 386716,
+    "output_tokens": 5925,
+    "output_tokens_details": {
+      "thinking_tokens": 211
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 35472,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 614,
+        "cache_read_input_tokens": 46797,
+        "cache_creation_input_tokens": 691,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 691
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 22,
+      "outputTokens": 5925,
+      "cacheReadInputTokens": 386716,
+      "cacheCreationInputTokens": 35472,
+      "webSearchRequests": 0,
+      "costUSD": 0.27852520000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 211,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 12,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T9 is done: the docs now describe `init`, `upgrade`, `doctor`, the install stamp and scoped stacks as built. The T9 verify command exits 0 and prints `gate T9 ok`. The proposal is in `.loop/tmp/proposal.json`.\n\n- **`docs/guide/configuration.md`:** a \"Scoped stacks\" part covers the `<stack>@<path>` form with `csharp@services/api`, the longest-scope rule and the path validation. A new \"The install stamp\" section covers `.vloop/install.json`, `install/v1` and the `.vloop/tmp/` line.\n- **`docs/guide/metrics.md`:** the Line classification section now explains scopes, globs matching relative to the scope's directory, and the `(<stack>@<path>: <glob>)` label.\n- **`docs/guide/concepts.md`:** the new \"Setting up a repository\" section covers init, upgrade and `--yes`, doctor, and the `claude plugin marketplace add mvelosop/vloop` next step. Its `.vloop/` layout list also gained `install.json` and `tmp/`.\n- **Domain docs:** M-3 in `docs/domain/domain-model.md` and the Classification section of `docs/domain/measurement/metrics.md` now state scopes, the `@` syntax and the longest-scope rule.\n- **`internal/cli/guide_test.go`:** a new test checks that `configuration.md` names every `install/v1` key and the scoped-stack terms.\n- **`README.md` and `docs/guide/commands.md`:** no edits were needed. Earlier tasks already added every new command to both, the README is at 199 lines, and `go generate` changed nothing.\n\nNothing in the docs describes `vloop run` or the `/vloop:` skills as existing. I did not commit, per the loop rules.",
+  "ttft_ms": 2301,
+  "type": "result",
+  "duration_ms": 100146,
+  "uuid": "7a6cb18f-1401-498a-82ff-50a2cd62a6c5",
+  "ttft_stream_ms": 1127,
+  "time_to_request_ms": 353,
+  "first_content_frame_ms": 1128,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 13
+}

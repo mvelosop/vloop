@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 34134,
+  "stop_reason": "end_turn",
+  "session_id": "a9ed05ff-aa5e-40a5-9f41-a63864cd382d",
+  "total_cost_usd": 0.1793064,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 25609,
+    "cache_read_input_tokens": 205412,
+    "output_tokens": 3576,
+    "output_tokens_details": {
+      "thinking_tokens": 494
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 25609,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 302,
+        "cache_read_input_tokens": 37132,
+        "cache_creation_input_tokens": 493,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 493
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 3576,
+      "cacheReadInputTokens": 205412,
+      "cacheCreationInputTokens": 25609,
+      "webSearchRequests": 0,
+      "costUSD": 0.1793064,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 494,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T2 is done: a binding reference whose reason wraps onto the next indented line now passes `brief check`. The T2 verify command exited 0 and printed `gate T2 ok`. That run includes the check that the base binary at 05ea997 fails the wrapped fixture and the fixed binary passes it.\n\n- **The fix:** in `internal/brief/refs.go`, an entry is now the whole list item. A blank line, a line that isn't indented, or the next entry ends it. A reason never carries over to the next item.\n- **Tests:** `internal/brief/refs_test.go` gains `TestBindingRefsWrap`, `TestBindingRefsWrapNoReason` and `TestBindingRefsWrapNextItemBoundary`. I added no testdata files.\n- **Proposal:** written to `.loop/tmp/proposal.json` with outcome `done`. I did not commit or touch `state.json`.",
+  "ttft_ms": 2315,
+  "type": "result",
+  "duration_ms": 54801,
+  "uuid": "7f6838c1-d715-4001-9715-dbda39037d87",
+  "ttft_stream_ms": 1210,
+  "time_to_request_ms": 351,
+  "first_content_frame_ms": 1210,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 2
+}

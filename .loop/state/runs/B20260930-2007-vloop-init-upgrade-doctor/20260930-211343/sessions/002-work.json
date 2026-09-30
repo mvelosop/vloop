@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 59429,
+  "stop_reason": "end_turn",
+  "session_id": "91e7d058-1851-45c4-bf16-6fb068f26fe0",
+  "total_cost_usd": 0.2533514,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 30340,
+    "cache_read_input_tokens": 314757,
+    "output_tokens": 6900,
+    "output_tokens_details": {
+      "thinking_tokens": 146
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 30340,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 647,
+        "cache_read_input_tokens": 40048,
+        "cache_creation_input_tokens": 633,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 633
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 6900,
+      "cacheReadInputTokens": 314757,
+      "cacheCreationInputTokens": 30340,
+      "webSearchRequests": 0,
+      "costUSD": 0.2533514,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 146,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 10,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is done and the gate passes: I ran its verify command in the foreground and it printed `gate T1 ok`. I did not commit anything or touch `state.json`.\n\n- **Schema:** `schemas/install.v1.json` is draft 2020-12 and requires `schema`, `version`, `commit`, `initialized` and `upgraded` (string or null). It allows unknown keys. The `install.valid.json` and `install.invalid.json` fixtures and their row in the table-driven schema test are added.\n- **`internal/install`:**\n  - `Read` and `Write` handle `.vloop/install.json`.\n  - `Parse` and `Compare` hold the one semver comparison; `Compare(from, to)` returns `Same`, `Newer`, `Breaking`, `FromNewer` or `NeedsYes`.\n  - Unit tests cover every case in the acceptance criteria.\n- **Pre-release versions:** a suffix on either side gives `NeedsYes`, except that identical strings give `Same`. An unparsable version is an error.\n- **Stamp details:**\n  - `Read` on a missing stamp returns an error satisfying `errors.Is(err, os.ErrNotExist)`.\n  - `Write` always sets `schema` to `install/v1`, writes `upgraded: null` until the first upgrade, and ends the file with a newline.\n- **Existing tests changed:**\n  - The schema list outputs in `internal/schema`, `internal/cli` and `cmd/vloop` now include `install/v1`.\n  - The embedded-schema count in `embed_test.go` goes from 8 to 9.\n  - One check beyond the listed expectations: the `--json` length in `internal/cli/schema_test.go` goes from 8 to 9.\n- **Dependencies and scope:** no third-party module was added, and no init, upgrade, doctor or plugin command appears.\n\nThe proposal is in `.loop/tmp/proposal.json`.",
+  "ttft_ms": 2237,
+  "type": "result",
+  "duration_ms": 97222,
+  "uuid": "2c831fc9-ab39-4f4e-a326-c637b2b67640",
+  "ttft_stream_ms": 1073,
+  "time_to_request_ms": 355,
+  "first_content_frame_ms": 1073,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 1
+}

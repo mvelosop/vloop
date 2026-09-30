@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 60434,
+  "stop_reason": "end_turn",
+  "session_id": "bed91837-4725-4084-a3ca-cfd885332ea8",
+  "total_cost_usd": 0.3035512,
+  "usage": {
+    "input_tokens": 22,
+    "cache_creation_input_tokens": 36889,
+    "cache_read_input_tokens": 402556,
+    "output_tokens": 7544,
+    "output_tokens_details": {
+      "thinking_tokens": 805
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 36889,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 597,
+        "cache_read_input_tokens": 48352,
+        "cache_creation_input_tokens": 553,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 553
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 22,
+      "outputTokens": 7544,
+      "cacheReadInputTokens": 402556,
+      "cacheCreationInputTokens": 36889,
+      "webSearchRequests": 0,
+      "costUSD": 0.3035512,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 805,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 11,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 is done: `metrics.stacks` entries can now be `<stack>@<path>`, and the task's verify command ran through to `gate T4 ok`. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **Parsing and validation:** a new `classify.ParseStack` checks the entry's form: a known stack, and a scope path with no leading or trailing `/`, no `.` or `..` segment, no empty segment and no backslash.\n- **`config set`:** it also requires the scope directory to exist. A bad entry exits 2 with `invalid value \"<entry>\" for metrics.stacks: want <stack> or <stack>@<existing directory>`, names only that entry, and leaves the file untouched.\n- **Reading a config:** reading checks the form but not the directory. A vanished scope still reads fine, and a malformed entry in the file is a config problem (exit 1).\n- **Classification:** the longest scope containing a path wins, and inside it only that scope's stacks apply. Scoped presets match the path relative to the scope's directory. Always-excluded and the repo's own globs are unchanged and repo-relative.\n- **Label:** `metrics classify` already prints the layer name, so `internal/cli/metrics.go` and `internal/cli/config.go` needed no change. Scoped matches show as `(csharp@services/api: **/*.Tests/**)`.\n\nI added `TestParseStackScope`, `TestClassifyScope` and `TestClassifyScopeRepoGlobsStayRepoRelative` in `internal/classify`, and `TestStacksScopeValidation` and `TestStacksScopeReadIgnoresMissingDirectory` in `internal/config`.\n\nI did not touch `internal/cli/classify_test.go` or any other existing test.",
+  "ttft_ms": 2382,
+  "type": "result",
+  "duration_ms": 118494,
+  "uuid": "1f5ebc45-3e7c-4b10-bc9a-d9a06c20c966",
+  "ttft_stream_ms": 1250,
+  "time_to_request_ms": 363,
+  "first_content_frame_ms": 1251,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 4
+}

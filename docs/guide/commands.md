@@ -144,6 +144,26 @@ Set status, fixed-by, case, severity, origin, kind, task of a defect
 vloop defect set <id> <field> <value>
 ```
 
+## vloop doctor
+
+Check that the repository, the toolchain and the plugin are ready for a run
+
+```
+vloop doctor
+```
+
+## vloop init
+
+Set a repository up for vloop
+
+```
+vloop init [flags]
+```
+
+- `--dry-run`: print what would be written and write nothing
+- `--language string`: language of briefs and guidance: en or es (default en)
+- `--stacks string`: metrics.stacks to write, instead of the detected ones
+
 ## vloop metrics
 
 Summarise what a brief cost and delivered, from its runs and commits
@@ -179,6 +199,22 @@ Print the built-in stack presets
 
 ```
 vloop metrics stacks [name]
+```
+
+## vloop plugin
+
+Work with the plugin embedded in the binary
+
+```
+vloop plugin
+```
+
+## vloop plugin path
+
+Extract the embedded plugin under .vloop/tmp/plugin/ and print its path
+
+```
+vloop plugin path
 ```
 
 ## vloop schema
@@ -305,11 +341,24 @@ vloop task verify <id> <command> [flags]
 
 - `--reason string`: why the gate is being replaced (required)
 
+## vloop upgrade
+
+Refresh vloop's parts of a repository set up by an older vloop
+
+```
+vloop upgrade [flags]
+```
+
+- `--dry-run`: print what would be updated and write nothing
+- `--yes`: allow a breaking upgrade
+
 ## vloop version
 
 Print the vloop and embedded plugin versions
 
 ```
-vloop version
+vloop version [flags]
 ```
+
+- `--check-plugin dir`: compare the plugin in dir with this binary's version; always exits 0
 

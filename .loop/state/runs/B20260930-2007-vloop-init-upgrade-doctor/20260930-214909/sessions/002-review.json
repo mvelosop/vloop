@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 25352,
+  "stop_reason": "end_turn",
+  "session_id": "8848bf8f-dfc7-4a13-b011-f6996be77318",
+  "total_cost_usd": 0.15870459999999997,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 25969,
+    "cache_read_input_tokens": 165923,
+    "output_tokens": 2162,
+    "output_tokens_details": {
+      "thinking_tokens": 192
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 25969,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 238,
+        "cache_read_input_tokens": 36797,
+        "cache_creation_input_tokens": 1188,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1188
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 2162,
+      "cacheReadInputTokens": 165923,
+      "cacheCreationInputTokens": 25969,
+      "webSearchRequests": 0,
+      "costUSD": 0.15870459999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 192,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 6,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I'm done with the T6 review and wrote `.loop/tmp/verdict.json` with a PASS.\n\nThe verify gate exits 0 (\"gate T6 ok\"). I checked all ten acceptance criteria against `internal/cli/init.go`, `internal/install/section.go`, the `TestInit*` tests and the gate's fixtures, and each one is met. README is 197 lines, and `commands.md` is regenerated.\n\nThe implementation was committed earlier in the \"T6: blocked\" commit. The current working-tree diff holds only state, defect and intervention files.\n\nI had no findings. The verdict notes say T7 can reuse `install.Section`, `MergeClaudeMD` and `MergeGitignore`.",
+  "ttft_ms": 2216,
+  "type": "result",
+  "duration_ms": 30345,
+  "uuid": "f8809f0b-30d2-4292-8a03-466f84812151",
+  "ttft_stream_ms": 1220,
+  "time_to_request_ms": 366,
+  "first_content_frame_ms": 1220,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 8
+}

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 15895,
+  "stop_reason": "end_turn",
+  "session_id": "27e1a9ff-777c-42bb-b840-c58398fc3574",
+  "total_cost_usd": 0.11673140000000001,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 20914,
+    "cache_read_input_tokens": 90697,
+    "output_tokens": 1492,
+    "output_tokens_details": {
+      "thinking_tokens": 132
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 20914,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 305,
+        "cache_read_input_tokens": 32049,
+        "cache_creation_input_tokens": 881,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 881
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1492,
+      "cacheReadInputTokens": 90697,
+      "cacheCreationInputTokens": 20914,
+      "webSearchRequests": 0,
+      "costUSD": 0.11673140000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 132,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 passes. The scoped-stacks change covers every acceptance criterion, and I've written `.loop/tmp/verdict.json`.\n\n- **Validation:** `classify.ParseStack` and `config.Set` reject bad entries with the exact message and leave the file untouched. Reading a config checks only the entry's form, not the directory.\n- **Classification:** the longest scope wins and only that scope's stacks apply, with scope-relative matching and the `stack@path` label. The repo's own globs and the always-excluded layer keep their order.\n- **Tests:** the new `Scope` tests in `internal/classify` and `internal/config` have real assertions.\n\nI read the diff and did not re-run the gate, since the driver already did. `internal/cli/metrics.go` and `internal/cli/config.go` are listed in the task's files but weren't changed, and the label comes through unchanged because the CLI already prints the classifier's layer.",
+  "ttft_ms": 2111,
+  "type": "result",
+  "duration_ms": 16881,
+  "uuid": "c7c4d684-e067-41dc-953c-51205fa484cf",
+  "ttft_stream_ms": 980,
+  "time_to_request_ms": 351,
+  "first_content_frame_ms": 981,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 4
+}

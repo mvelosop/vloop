@@ -1,0 +1,7 @@
+{"iteration":1,"task":"T1","outcome":"done","attempts":0,"tasks_done":1,"tasks_total":10}
+{"iteration":2,"task":"T2","outcome":"done","attempts":0,"tasks_done":2,"tasks_total":10}
+{"iteration":3,"task":"T3","outcome":"done","attempts":0,"tasks_done":3,"tasks_total":10}
+{"iteration":4,"task":"T4","outcome":"done","attempts":0,"tasks_done":4,"tasks_total":10}
+{"iteration":5,"task":"T5","outcome":"done","attempts":0,"tasks_done":5,"tasks_total":10}
+{"iteration":6,"task":"T6","outcome":"blocked","attempts":1,"tasks_done":5,"tasks_total":10}
+{"iteration":7,"task":"T6","outcome":"blocked","attempts":2,"tasks_done":5,"tasks_total":10}

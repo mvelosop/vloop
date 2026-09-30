@@ -124,7 +124,7 @@ func TestWorkedExampleB2Commands(t *testing.T) {
 		t.Fatalf("task list after reset: %+v", r)
 	}
 
-	expect(t, s.run(nil, "schema", "list"), 0, "defect/v1\nexport/v1\niteration/v1\nmetrics/v1\nproposal/v1\nsession/v1\nstate/v1\nverdict/v1\n", "")
+	expect(t, s.run(nil, "schema", "list"), 0, "defect/v1\nexport/v1\ninstall/v1\niteration/v1\nmetrics/v1\nproposal/v1\nsession/v1\nstate/v1\nverdict/v1\n", "")
 	expect(t, s.run(nil, "schema", "validate", "state/v1", planPath), 0, planPath+": ok\n", "")
 }
 

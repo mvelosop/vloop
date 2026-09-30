@@ -1,0 +1,8 @@
+{
+  "task": "T2",
+  "outcome": "done",
+  "summary": "brief check now treats a binding-reference entry as the whole list item (first line plus indented continuation lines), so a reason wrapped onto the next line passes; reasons never carry to the next item.",
+  "files": ["internal/brief/refs.go", "internal/brief/refs_test.go"],
+  "verified": "T2 verify command exited 0, printing 'gate T2 ok' (base binary at 05ea997 fails the wrapped fixture, fixed binary passes).",
+  "notes": "New refEntries groups section lines: an item ends at a blank line, a non-indented line, or the next entry line. Continuation lines are joined with a space onto the text after the path, then matched by the unchanged reasonSepRe. The separator may even start the continuation line. Tests: TestBindingRefsWrap, TestBindingRefsWrapNoReason, TestBindingRefsWrapNextItemBoundary. No testdata files added."
+}

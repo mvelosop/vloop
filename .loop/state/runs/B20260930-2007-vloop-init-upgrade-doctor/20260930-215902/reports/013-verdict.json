@@ -1,0 +1,16 @@
+{
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "README.md documents vloop init, vloop upgrade, vloop doctor, vloop plugin path and --check-plugin with their flags, stays under 200 lines, and B1's README test passes unchanged.", "met": true, "evidence": "README already holds every command and flag (grep), 199 lines; go test ./internal/cli passes; README test unmodified in the diff."},
+    {"criterion": "docs/guide/commands.md is exactly what `go generate ./...` produces (TestCommandsReferenceIsCurrent passes).", "met": true, "evidence": "commands.md unchanged and contains the new commands and flags; cli tests pass."},
+    {"criterion": "docs/guide/configuration.md documents .vloop/install.json and install/v1, the `<stack>@<path>` form with an example such as csharp@services/api, the longest-scope rule and the .vloop/tmp/ line.", "met": true, "evidence": "'Scoped stacks' and 'The install stamp' sections in the diff."},
+    {"criterion": "docs/guide/metrics.md's Line classification section explains scopes: only a scope's stacks apply inside it, globs match relative to the scope's directory, and the `(<stack>@<path>: <glob>)` label.", "met": true, "evidence": "Scopes paragraph and label sentence added to the section in the diff."},
+    {"criterion": "docs/guide/concepts.md gains a 'Setting up a repository' section covering init (what it writes, the .gitignore line and CLAUDE.md section, the stamp), upgrade and --yes, doctor, and the marketplace install next steps.", "met": true, "evidence": "New section in the diff covers all listed items, including `claude plugin marketplace add mvelosop/vloop`."},
+    {"criterion": "docs/domain/domain-model.md's M-3 and docs/domain/measurement/metrics.md's Classification section state scopes (longest scope wins, only that scope's stacks, the `@` syntax) as built.", "met": true, "evidence": "M-3 extended; a Scopes paragraph added under Classification."},
+    {"criterion": "internal/cli/guide_test.go gains checks that the configuration guide covers the stamp and scoped stacks, so the docs cannot silently drift from the code.", "met": true, "evidence": "TestGuideConfigurationCoversStampAndScopes checks the install/v1 schema keys via guideWords plus the literal strings."},
+    {"criterion": "No absolute paths; nothing describes `vloop run`, the /vloop: skills or the B7 review as existing.", "met": true, "evidence": "The diff has no absolute paths and no mention of run, skills or B7."}
+  ],
+  "findings": [],
+  "notes": "The proposal lists docs/guide/commands.md and README.md as changed, but neither differs from HEAD. That is fine, since earlier tasks had already put the commands in both."
+}

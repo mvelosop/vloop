@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 17031,
+  "stop_reason": "end_turn",
+  "session_id": "56964633-3708-44b0-b1a4-911c0311cb77",
+  "total_cost_usd": 0.120235,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 20131,
+    "cache_read_input_tokens": 115705,
+    "output_tokens": 1655,
+    "output_tokens_details": {
+      "thinking_tokens": 37
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 20131,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 177,
+        "cache_read_input_tokens": 31099,
+        "cache_creation_input_tokens": 1048,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1048
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 1655,
+      "cacheReadInputTokens": 115705,
+      "cacheCreationInputTokens": 20131,
+      "webSearchRequests": 0,
+      "costUSD": 0.120235,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 37,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**T1: PASS.** The install/v1 schema, the `internal/install` package with its tests, and the fixtures are in place, and the only existing expectations changed are the schema list outputs and the embedded count (8 to 9). I ran `go test` on `internal/install` and `internal/schema` and read the diff; I did not re-run the full verify command.\n\nI read `.loop/tmp/proposal.json` last, as instructed, but did not need it for the ruling. The verdict is written to `.loop/tmp/verdict.json` with no findings.",
+  "ttft_ms": 2674,
+  "type": "result",
+  "duration_ms": 18617,
+  "uuid": "0ccc5f03-fa4c-45c4-81dd-dcd40a1222b0",
+  "ttft_stream_ms": 1500,
+  "time_to_request_ms": 358,
+  "first_content_frame_ms": 1501,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 1
+}

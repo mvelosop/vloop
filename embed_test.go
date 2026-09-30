@@ -15,7 +15,7 @@ func TestPluginManifestIsEmbedded(t *testing.T) {
 
 func TestSchemasAreEmbedded(t *testing.T) {
 	ents, err := Schemas.ReadDir("schemas")
-	if err != nil || len(ents) != 8 {
+	if err != nil || len(ents) != 9 {
 		t.Fatalf("embedded schemas: %d entries, err %v", len(ents), err)
 	}
 }

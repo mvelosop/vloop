@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "vloop version --check-plugin \"${CLAUDE_PLUGIN_ROOT}\"" }
+        ]
+      }
+    ]
+  }
+}

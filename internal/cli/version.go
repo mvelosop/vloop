@@ -3,6 +3,9 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/spf13/cobra"
@@ -36,12 +39,36 @@ func pluginVersion() (string, error) {
 	return m.Version, nil
 }
 
+// checkPlugin is the SessionStart hook's handshake. It reads one JSON file and
+// nothing else, prints to stdout only, and never fails: a failing hook would
+// interrupt every session.
+func checkPlugin(out io.Writer, b Build, dir string) {
+	var m struct {
+		Version string `json:"version"`
+	}
+	raw, err := os.ReadFile(filepath.Join(dir, ".claude-plugin", "plugin.json"))
+	if err == nil {
+		err = json.Unmarshal(raw, &m)
+	}
+	switch {
+	case err != nil || m.Version == "":
+		fmt.Fprintf(out, "vloop: cannot read the vloop plugin's version in %s\n", dir)
+	case m.Version != b.Version:
+		fmt.Fprintf(out, "vloop: the vloop plugin is %s but the vloop binary is %s \u2014 update the one that is behind\n", m.Version, b.Version)
+	}
+}
+
 func newVersion(b Build, g *Globals) *cobra.Command {
-	return &cobra.Command{
+	var check string
+	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print the vloop and embedded plugin versions",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			if cmd.Flags().Changed("check-plugin") {
+				checkPlugin(cmd.OutOrStdout(), b, check)
+				return nil
+			}
 			plugin, err := pluginVersion()
 			if err != nil {
 				return Problem(err)
@@ -56,4 +83,6 @@ func newVersion(b Build, g *Globals) *cobra.Command {
 			return err
 		},
 	}
+	cmd.Flags().StringVar(&check, "check-plugin", "", "compare the plugin in `dir` with this binary's version; always exits 0")
+	return cmd
 }

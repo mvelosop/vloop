@@ -201,7 +201,10 @@ marked.
   the brief's last run commit; **churn** is every task commit summed.
 - **M-3** A path's category is decided by the first layer that matches:
   always-excluded (`.vloop/**`, `.loop/**`), the repo's globs, the stack
-  presets, else `other`.
+  presets, else `other`. A stack may be scoped, `<stack>@<path>` (for example
+  `csharp@services/api`): a path's scope is the longest scoped path containing
+  it, and inside a scope only that scope's stacks apply, matched relative to the
+  scope's directory.
 - **M-4** A defect has one origin (`brief`, `plan`, `work`, `env`) and one
   catcher (`gate`, `review`, `operator`, `user`). Derived defects are computed on
   every call, never stored. `found-by: user` is after release; every other

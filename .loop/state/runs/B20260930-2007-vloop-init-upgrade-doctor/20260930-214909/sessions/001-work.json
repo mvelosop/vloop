@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 12700,
+  "stop_reason": "end_turn",
+  "session_id": "b3f8a419-dce8-4578-8735-5ffe3581e576",
+  "total_cost_usd": 0.1250752,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 23342,
+    "cache_read_input_tokens": 101556,
+    "output_tokens": 1138,
+    "output_tokens_details": {
+      "thinking_tokens": 41
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 23342,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 188,
+        "cache_read_input_tokens": 34778,
+        "cache_creation_input_tokens": 580,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 580
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1138,
+      "cacheReadInputTokens": 101556,
+      "cacheCreationInputTokens": 23342,
+      "webSearchRequests": 0,
+      "costUSD": 0.1250752,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 41,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T6 is finished and `.loop/tmp/proposal.json` is written with outcome `done`. I made no code changes this session.\n\n`vloop init` was already implemented from the earlier attempt. The verify gate now checks that nothing is staged with `git diff --cached --quiet`, the fix the earlier block called for, and this time it passed. I ran it in the foreground and it printed `gate T6 ok`.\n\nFor T7, the shared helpers are `install.Section`, `install.MergeClaudeMD` and `install.MergeGitignore`. The proposal notes record them.",
+  "ttft_ms": 2119,
+  "type": "result",
+  "duration_ms": 17862,
+  "uuid": "48156175-3a4b-42a7-aa83-609206c250ef",
+  "ttft_stream_ms": 1045,
+  "time_to_request_ms": 353,
+  "first_content_frame_ms": 1046,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 8
+}

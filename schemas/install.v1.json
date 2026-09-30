@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "install/v1",
+  "description": "The install stamp: .vloop/install.json",
+  "type": "object",
+  "required": ["schema", "version", "commit", "initialized", "upgraded"],
+  "properties": {
+    "schema": { "const": "install/v1" },
+    "version": { "type": "string" },
+    "commit": { "type": "string" },
+    "initialized": { "type": "string" },
+    "upgraded": { "type": ["string", "null"] }
+  }
+}

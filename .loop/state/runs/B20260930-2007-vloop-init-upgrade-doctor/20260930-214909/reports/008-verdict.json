@@ -1,0 +1,18 @@
+{
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Refusals, each writing nothing, --dry-run included", "met": true, "evidence": "internal/cli/init.go runInit checks .git, install.Read, then config.Check before any write; gate snapshots confirm nothing written; TestInitRefusals"},
+    {"criterion": "Worked example prints exactly the listed lines and next: block", "met": true, "evidence": "gate eo comparison of full stdout passed; 'wrote .gitignore' and 'detected stacks: none' cases covered by gate"},
+    {"criterion": "config.toml gets language and metrics.stacks; existing config kept byte for byte, suggestion printed", "met": true, "evidence": "init.go config step; gate cmp of pre-existing config; 'suggest metrics.stacks:' line"},
+    {"criterion": "install.json validates against install/v1 with version, commit, UTC initialized, upgraded null", "met": true, "evidence": "gate schema validate + jq check"},
+    {"criterion": "Starter brief byte-identical to brief new; skipped when a loop brief exists", "met": true, "evidence": "uses brief.Render/NewPath; gate compares against vloop brief new output; kept docs/briefs/ case"},
+    {"criterion": ".gitignore gains .vloop/tmp/ once on its own line; created if absent", "met": true, "evidence": "install.MergeGitignore; gate fixtures with and without final newline"},
+    {"criterion": "CLAUDE.md marker replace / append / create, section content and version", "met": true, "evidence": "install/section.go Section and MergeClaudeMD; gate pre/post byte comparisons; TestInitClaudeMarkers"},
+    {"criterion": "Writes only under allowed paths, no commit/stage/refs, no symlink follow, no paths from unvalidated names", "met": true, "evidence": "checkRepoPath runs over all targets before any write; config.Check validates language/stacks first; gate file-set, refs and symlink checks"},
+    {"criterion": "--dry-run prints would write/update/keep and writes nothing", "met": true, "evidence": "verb mapping in runInit; TestInitDryRun; gate same s3"},
+    {"criterion": "README documents init, under 200 lines; commands.md regenerated; Init tests cover refusals, writes, markers, dry-run", "met": true, "evidence": "README 197 lines; gate greps README and commands.md; TestInit* tests present"}
+  ],
+  "findings": [],
+  "notes": "Implementation was committed with the earlier 'T6: blocked' commit; the working-tree diff holds only state/defect files. Gate passes (exit 0). T7 can reuse install.Section, MergeClaudeMD, MergeGitignore."
+}
