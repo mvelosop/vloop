@@ -1,0 +1,8 @@
+{
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added schemas/install.v1.json with fixtures, and internal/install: stamp Read/Write for .vloop/install.json plus Parse/Compare, the one semver comparison for upgrade and doctor.",
+  "files": ["schemas/install.v1.json", "internal/install/install.go", "internal/install/install_test.go", "internal/schema/schema_test.go", "internal/schema/testdata/install.valid.json", "internal/schema/testdata/install.invalid.json", "embed_test.go", "internal/cli/schema_test.go", "cmd/vloop/b2_e2e_test.go"],
+  "verified": "The task's verify command ran in the foreground and printed 'gate T1 ok'.",
+  "notes": "Compare(from, to) returns a Relation: Same, Newer, Breaking, FromNewer or NeedsYes. A pre-release suffix on either side gives NeedsYes, unless the strings are identical (Same). Unparsable versions give an error. Stamp.Upgraded is *string, written as null; Read returns an error that satisfies errors.Is(err, os.ErrNotExist) when there is no stamp. Write always sets schema to install/v1 and ends the file with a newline. Besides the schema list expectations and the embed count, internal/cli/schema_test.go's --json length check went from 8 to 9. No third-party module added."
+}

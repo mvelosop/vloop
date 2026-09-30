@@ -4,13 +4,13 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **0/10 done** · iteration 0
+**Status:** running · **1/10 done** · iteration 1
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:30:00Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:36:07Z
 
 ## Progress
 
-- [ ] **T1** — Add the install/v1 schema, the install stamp's read and write, and semantic-version comparison
+- [x] **T1** — Add the install/v1 schema, the install stamp's read and write, and semantic-version comparison
 - [ ] **T2** — Fix F1: a binding reference's reason may wrap onto the lines indented under its list item
 - [ ] **T3** — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
 - [ ] **T4** — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
@@ -25,7 +25,7 @@
 
 ### T1 — Add the install/v1 schema, the install stamp's read and write, and semantic-version comparison
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `schemas/install.v1.json`, `internal/install/`, `internal/install/install_test.go`, `internal/schema/`, `internal/schema/schema_test.go`, `internal/schema/testdata/install.valid.json`, `internal/schema/testdata/install.invalid.json`, `embed_test.go`, `internal/cli/schema_test.go`, `cmd/vloop/b2_e2e_test.go`
 

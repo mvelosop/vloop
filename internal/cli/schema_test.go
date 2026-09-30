@@ -10,13 +10,13 @@ import (
 
 func TestSchemaList(t *testing.T) {
 	code, out, _ := run(t, "schema", "list")
-	want := "defect/v1\nexport/v1\niteration/v1\nmetrics/v1\nproposal/v1\nsession/v1\nstate/v1\nverdict/v1\n"
+	want := "defect/v1\nexport/v1\ninstall/v1\niteration/v1\nmetrics/v1\nproposal/v1\nsession/v1\nstate/v1\nverdict/v1\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d out %q", code, out)
 	}
 	code, out, _ = run(t, "schema", "list", "--json")
 	var names []string
-	if code != 0 || json.Unmarshal([]byte(out), &names) != nil || len(names) != 8 || names[0] != "defect/v1" {
+	if code != 0 || json.Unmarshal([]byte(out), &names) != nil || len(names) != 9 || names[0] != "defect/v1" {
 		t.Fatalf("code %d out %q", code, out)
 	}
 }

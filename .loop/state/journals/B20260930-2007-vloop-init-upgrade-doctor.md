@@ -60,3 +60,10 @@ The plan is written to `.loop/state/state.json`. **Run id:** `B20260930-2007-vlo
 
 As the brief requires, each gate runs `go test` only on the packages its task touches (plus vet, gofmt, tidy and the three builds); only T10 runs `go test ./...`. Most gates also run the `internal/cli` and `cmd/vloop` suites, which covers regressions across tasks.
 
+
+## T1 — Add the install/v1 schema, the install stamp's read and write, and semantic-version comparison
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added schemas/install.v1.json with fixtures, and internal/install: stamp Read/Write for .vloop/install.json plus Parse/Compare, the one semver comparison for upgrade and doctor.
+- **Files:** schemas/install.v1.json, internal/install/install.go, internal/install/install_test.go, internal/schema/schema_test.go, internal/schema/testdata/install.valid.json, internal/schema/testdata/install.invalid.json, embed_test.go, internal/cli/schema_test.go, cmd/vloop/b2_e2e_test.go
+- **Notes for next iteration:** Compare(from, to) returns a Relation: Same, Newer, Breaking, FromNewer or NeedsYes. A pre-release suffix on either side gives NeedsYes, unless the strings are identical (Same). Unparsable versions give an error. Stamp.Upgraded is *string, written as null; Read returns an error that satisfies errors.Is(err, os.ErrNotExist) when there is no stamp. Write always sets schema to install/v1 and ends the file with a newline. Besides the schema list expectations and the embed count, internal/cli/schema_test.go's --json length check went from 8 to 9. No third-party module added.

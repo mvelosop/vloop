@@ -17,3 +17,10 @@
 [36m[loop][0m cost=$5.884318 turns=78 dur=1222s error=false
 [33m[loop][0m     4 permission denial(s) — the fence may be in the wrong place
 [36m[loop][0m planned: B20260930-2007-vloop-init-upgrade-doctor — 10 tasks
+[36m[loop][0m committed the plan
+[36m[loop][0m ── iteration 1 (1/30 this run) · T1 · 0/10 done ──
+[36m[loop][0m    Add the install/v1 schema, the install stamp's read and write, and semantic-version comparison
+[36m[loop][0m cost=$0.2533514 turns=10 dur=97s error=false
+[36m[loop][0m cost=$0.120235 turns=5 dur=19s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T1 done
