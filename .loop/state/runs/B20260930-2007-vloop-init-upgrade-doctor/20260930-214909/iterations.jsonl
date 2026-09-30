@@ -1,3 +1,4 @@
 {"iteration":8,"task":"T6","outcome":"done","attempts":0,"tasks_done":6,"tasks_total":10}
 {"iteration":9,"task":"T7","outcome":"done","attempts":0,"tasks_done":7,"tasks_total":10}
 {"iteration":10,"task":"T8","outcome":"blocked","attempts":1,"tasks_done":7,"tasks_total":10}
+{"iteration":11,"task":"T8","outcome":"blocked","attempts":2,"tasks_done":7,"tasks_total":10}
