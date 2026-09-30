@@ -71,10 +71,10 @@ does not exist, or an item with no reason, is a problem.
 | `vloop task list` | print one line per task |
 | `vloop task show <id>` | print a task and the model and effort its sessions resolve to |
 | `vloop task validate` | check the plan's structure |
-| `vloop metrics [<brief>…] [--by task]` | summarise a brief's size, time, cost and defects from its runs and commits; with no brief, one row per brief; `--by task` gives one row per task |
+| `vloop metrics [<brief>…] [--by task \| --workspace <file>]` | summarise a brief's size, time, cost and defects from its runs and commits; with no brief, one row per brief; `--by task` gives one row per task; `--workspace <file>` (a TOML file of `[[repo]]` tables with `path`, relative to the file, and optional `name`, kept in a repository of its own) shows every listed clone's rows under a leading `repo` column, reading only; a listed path that is not a git repository prints `vloop: workspace repo not found: <path>`, the rest still print, exit 1; with `<brief>` arguments it is exit 2 |
 | `vloop metrics stacks [name]` | print the built-in stack presets, or one preset's globs |
 | `vloop metrics classify <path>…` | print each path's category and the layer and glob that decided it |
-| `vloop metrics export [<brief>…]` | print JSON Lines (`export/v1`), one record per line: each brief with runs (default: all), its tasks, its derived then recorded defects, each carrying `repo` (origin with credentials removed); numbers and titles only, no code; writes nothing |
+| `vloop metrics export [<brief>…\| --workspace <file>]` | print JSON Lines (`export/v1`), one record per line: each brief with runs (default: all), its tasks, its derived then recorded defects, each carrying `repo` (origin with credentials removed); numbers and titles only, no code; writes nothing; `--workspace <file>` concatenates the export of every repository the file lists |
 | `vloop defect add "<summary>"` | record a defect as `.vloop/defects/D<stamp>-<slug>.md` and print its path |
 | `vloop defect list` | print the recorded defects, sorted by id |
 | `vloop defect set <id> <field> <value>` | set a defect's `status`, `fixed-by`, `case`, `severity`, `origin`, `kind` or `task` |

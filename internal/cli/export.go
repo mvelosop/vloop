@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -56,54 +57,73 @@ type exportDefect struct {
 }
 
 func newMetricsExport(g *Globals) *cobra.Command {
-	return &cobra.Command{
+	var workspace string
+	cmd := &cobra.Command{
 		Use:   "export [<brief>…]",
 		Short: "Print briefs, tasks and defects as JSON Lines (export/v1), with the repository's identity",
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			out := cmd.OutOrStdout()
+			if workspace != "" {
+				return workspaceExport(g, out, cmd.ErrOrStderr(), workspace, args)
+			}
 			root, err := g.root()
 			if err != nil {
 				return err
 			}
-			out := cmd.OutOrStdout()
-			c, err := newClassifier(g, out, root)
+			s, err := exportRepoLines(g, out, root, "", args)
 			if err != nil {
 				return err
 			}
-			var reports []*metrics.Report
-			for _, b := range args {
-				r, err := metrics.Build(root, b, c)
-				if err != nil {
-					return Problem(err)
-				}
-				if r == nil {
-					return Problem(fmt.Errorf("no runs for %s", defect.BriefName(b)))
-				}
-				reports = append(reports, r)
-			}
-			if len(args) == 0 {
-				if reports, err = allReports(root, c); err != nil {
-					return Problem(err)
-				}
-			}
-			repo := repoIdentity(root)
-			var buf strings.Builder
-			enc := json.NewEncoder(&buf)
-			for _, r := range reports {
-				recs, err := exportRecords(root, repo, r)
-				if err != nil {
-					return Problem(err)
-				}
-				for _, rec := range recs {
-					if err := enc.Encode(rec); err != nil {
-						return Problem(err)
-					}
-				}
-			}
-			_, err = fmt.Fprint(out, buf.String())
+			_, err = fmt.Fprint(out, s)
 			return err
 		},
 	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "export every repository the workspace `file` lists")
+	return cmd
+}
+
+// exportRepoLines is one repository's export as JSON Lines; a non-empty name
+// replaces repo.name.
+func exportRepoLines(g *Globals, out io.Writer, root, name string, args []string) (string, error) {
+	c, err := newClassifier(g, out, root)
+	if err != nil {
+		return "", err
+	}
+	var reports []*metrics.Report
+	for _, b := range args {
+		r, err := metrics.Build(root, b, c)
+		if err != nil {
+			return "", Problem(err)
+		}
+		if r == nil {
+			return "", Problem(fmt.Errorf("no runs for %s", defect.BriefName(b)))
+		}
+		reports = append(reports, r)
+	}
+	if len(args) == 0 {
+		if reports, err = allReports(root, c); err != nil {
+			return "", Problem(err)
+		}
+	}
+	repo := repoIdentity(root)
+	if name != "" {
+		repo.Name = name
+	}
+	var buf strings.Builder
+	enc := json.NewEncoder(&buf)
+	for _, r := range reports {
+		recs, err := exportRecords(root, repo, r)
+		if err != nil {
+			return "", Problem(err)
+		}
+		for _, rec := range recs {
+			if err := enc.Encode(rec); err != nil {
+				return "", Problem(err)
+			}
+		}
+	}
+	return buf.String(), nil
 }
 
 // exportRecords is one brief's records in export order: the brief, its tasks in

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 22223,
+  "stop_reason": "end_turn",
+  "session_id": "329c0fd1-9fb4-4695-9e9c-4f7234164007",
+  "total_cost_usd": 0.1733426,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 30729,
+    "cache_read_input_tokens": 146683,
+    "output_tokens": 2107,
+    "output_tokens_details": {
+      "thinking_tokens": 191
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 30729,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 233,
+        "cache_read_input_tokens": 41493,
+        "cache_creation_input_tokens": 1252,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1252
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 2107,
+      "cacheReadInputTokens": 146683,
+      "cacheCreationInputTokens": 30729,
+      "webSearchRequests": 0,
+      "costUSD": 0.1733426,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 191,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 6,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**T6: PASS.** I wrote `.loop/tmp/verdict.json` with all eight criteria met and no findings. The five `TestWorkspace…` tests check the behaviour by comparing against each repo's own `metrics` and `export` output, and `go test ./internal/cli` passes. I did not re-run the driver's full verify command.\n\nTwo minor notes, neither a failure:\n- **Exit-1 sentinel:** `workspace.go` uses an empty-message `Problem` error to make the command exit 1 after the \"not found\" lines. It is a little fragile but covered by the tests.\n- **`--by` with `--workspace`:** passing both ignores `--by` without an error. The brief left this open.",
+  "ttft_ms": 2659,
+  "type": "result",
+  "duration_ms": 38442,
+  "uuid": "d32e9900-8c72-4daf-9a2e-5d99e57a2bcd",
+  "ttft_stream_ms": 1765,
+  "time_to_request_ms": 357,
+  "first_content_frame_ms": 1766,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 6
+}

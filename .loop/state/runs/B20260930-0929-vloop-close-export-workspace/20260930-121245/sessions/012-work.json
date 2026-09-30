@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 95093,
+  "stop_reason": "end_turn",
+  "session_id": "5ec2baf3-7b61-4d10-96e2-1397124337a0",
+  "total_cost_usd": 0.46763259999999995,
+  "usage": {
+    "input_tokens": 26,
+    "cache_creation_input_tokens": 53587,
+    "cache_read_input_tokens": 632013,
+    "output_tokens": 12683,
+    "output_tokens_details": {
+      "thinking_tokens": 1697
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 53587,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 550,
+        "cache_read_input_tokens": 64907,
+        "cache_creation_input_tokens": 696,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 696
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 26,
+      "outputTokens": 12683,
+      "cacheReadInputTokens": 632013,
+      "cacheCreationInputTokens": 53587,
+      "webSearchRequests": 0,
+      "costUSD": 0.46763259999999995,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1697,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_012qXZ25yZNPJoVmqMQ3mA3f",
+      "tool_input": {
+        "command": "git checkout internal/metrics/print.go && python3 - <<'E'\np='internal/metrics/print.go'\ns=open(p).read()\na=s.index('func PrintBriefTable')\nb=s.index('func dash(')\ns=s[:a]+'''func PrintBriefTable(out io.Writer, rs []*Report) { printBriefTable(out, nil, rs) }\n\n// PrintWorkspaceTable is PrintBriefTable with a leading repo column: repos[i]\n// names the repository of rs[i].\nfunc PrintWorkspaceTable(out io.Writer, repos []string, rs []*Report) {\n\tif repos == nil {\n\t\trepos = []string{}\n\t}\n\tprintBriefTable(out, repos, rs)\n}\n\nfunc printBriefTable(out io.Writer, repos []string, rs []*Report) {\n\tw := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)\n\tlead, head := \"\", \"\"\n\tif repos != nil {\n\t\thead = \"repo\\\\t\"\n\t}\n\tfmt.Fprintln(w, head+\"brief\\\\ttasks\\\\tfirst-pass\\\\tcode\\\\ttest\\\\tt:c\\\\tagent\\\\t$/1k\\\\tin-loop\\\\toperator\\\\tescaped\\\\tefficiency\")\n\tfor i, r := range rs {\n\t\tif repos != nil {\n\t\t\tlead = repos[i] + \"\\\\t\"\n\t\t}\n\t\tper1k := \"n/a\"\n\t\tif r.Cost.Per1000Code != nil {\n\t\t\tper1k = fmt.Sprintf(\"%.2f\", *r.Cost.Per1000Code)\n\t\t}\n\t\tfmt.Fprintf(w, \"%s%s\\\\t%d\\\\t%d/%d\\\\t%s\\\\t%s\\\\t%s\\\\t%s\\\\t%s\\\\t%d\\\\t%d\\\\t%d\\\\t%s\\\\n\", lead, r.RunID, r.Tasks.Planned,\n\t\t\tr.Tasks.FirstPass, r.Tasks.Planned, thousands(r.Size.Delivered.Code), thousands(r.Size.Delivered.Test),\n\t\t\toptFloat(r.Size.TestCodeRatio, \"%.2f\"), minutes(r.Time.AgentMS), per1k,\n\t\t\tr.Defects.InLoop, r.Defects.Operator, r.Defects.Escaped, efficiency(r.Defects))\n\t}\n\tw.Flush()\n}\n\n'''+s[b:]\nopen(p,'w').write(s)\nE\ngofmt -l .; go build ./... && git diff --stat"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 13,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T6 is done: `vloop metrics --workspace <file>` and `vloop metrics export --workspace <file>` now work, and the task's verify command passes (it prints `gate T6 ok`). I wrote the proposal to `.loop/tmp/proposal.json`.\n\n- **Metrics table:** `--workspace` prints the cross-brief table with a leading `repo` column. Each row after that cell matches what that repository's own `vloop metrics` prints. Where the file sets `name`, the column uses it.\n- **Export:** `--workspace` concatenates each repository's export in file order. Where the file sets `name`, it replaces `repo.name`.\n- **Missing repos:** a listed path that doesn't exist or isn't a git repository prints one `vloop: workspace repo not found: <path>` line on stderr. The other repositories are still reported, and the command exits 1.\n- **Usage error:** `--workspace` with `<brief>` arguments exits 2 with nothing on stdout.\n- **Read-only:** nothing is written into any listed repository or beside the workspace file.\n\nA path counts as a git repository only if `<path>/.git` exists. A plain directory inside another repository is therefore reported as not found.\n\n`--workspace` with `--json` on `vloop metrics` emits the reports array without a `repo` field. The task didn't specify JSON behaviour.\n\nI added `TestWorkspace…` tests in `internal/cli/workspace_test.go` and documented the flag in the README, which is still 193 lines. The main code is in `internal/cli/workspace.go`, with small changes to `metrics.go`, `export.go` and `internal/metrics/print.go`.",
+  "ttft_ms": 2685,
+  "type": "result",
+  "duration_ms": 134896,
+  "uuid": "a812731d-111b-4423-8ad1-2b2349e00518",
+  "ttft_stream_ms": 1474,
+  "time_to_request_ms": 363,
+  "first_content_frame_ms": 1475,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 6
+}

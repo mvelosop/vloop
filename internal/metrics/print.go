@@ -115,15 +115,33 @@ func PrintByTask(out io.Writer, r *Report) {
 	w.Flush()
 }
 
-func PrintBriefTable(out io.Writer, rs []*Report) {
+func PrintBriefTable(out io.Writer, rs []*Report) { printBriefTable(out, nil, rs) }
+
+// PrintWorkspaceTable is PrintBriefTable with a leading repo column: repos[i]
+// names the repository of rs[i].
+func PrintWorkspaceTable(out io.Writer, repos []string, rs []*Report) {
+	if repos == nil {
+		repos = []string{}
+	}
+	printBriefTable(out, repos, rs)
+}
+
+func printBriefTable(out io.Writer, repos []string, rs []*Report) {
 	w := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "brief\ttasks\tfirst-pass\tcode\ttest\tt:c\tagent\t$/1k\tin-loop\toperator\tescaped\tefficiency")
-	for _, r := range rs {
+	lead, head := "", ""
+	if repos != nil {
+		head = "repo\t"
+	}
+	fmt.Fprintln(w, head+"brief\ttasks\tfirst-pass\tcode\ttest\tt:c\tagent\t$/1k\tin-loop\toperator\tescaped\tefficiency")
+	for i, r := range rs {
+		if repos != nil {
+			lead = repos[i] + "\t"
+		}
 		per1k := "n/a"
 		if r.Cost.Per1000Code != nil {
 			per1k = fmt.Sprintf("%.2f", *r.Cost.Per1000Code)
 		}
-		fmt.Fprintf(w, "%s\t%d\t%d/%d\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", r.RunID, r.Tasks.Planned,
+		fmt.Fprintf(w, "%s%s\t%d\t%d/%d\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", lead, r.RunID, r.Tasks.Planned,
 			r.Tasks.FirstPass, r.Tasks.Planned, thousands(r.Size.Delivered.Code), thousands(r.Size.Delivered.Test),
 			optFloat(r.Size.TestCodeRatio, "%.2f"), minutes(r.Time.AgentMS), per1k,
 			r.Defects.InLoop, r.Defects.Operator, r.Defects.Escaped, efficiency(r.Defects))
