@@ -50,3 +50,33 @@
 [36m[loop][0m cost=$0.1376242 turns=5 dur=20s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T10 done
+[36m[loop][0m    committed 4e66997
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            3
+[36m[loop][0m   tasks closed:          10/10
+[36m[loop][0m   iterations per closed: 0.30
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $1.18 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m ═══ complete ═══
+[36m[loop][0m run:    B20260930-2007-vloop-init-upgrade-doctor/20260930-215902  (3 iteration(s) this run)
+[36m[loop][0m plan:   10/10 done, 0 blocked
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            3
+[36m[loop][0m   tasks closed:          10/10
+[36m[loop][0m   iterations per closed: 0.30
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $1.18 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m per-phase cost:
+[36m[loop][0m plan: 0 session(s), $0, 0 turns
+[36m[loop][0m work: 3 session(s), $0.78, 28 turns
+[36m[loop][0m review: 3 session(s), $0.4, 15 turns
+[36m[loop][0m 
+[36m[loop][0m plan complete. journal: .loop/state/journals/B20260930-2007-vloop-init-upgrade-doctor.md

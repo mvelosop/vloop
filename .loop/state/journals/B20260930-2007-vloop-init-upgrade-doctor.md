@@ -170,3 +170,9 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** cmd/vloop/b5_e2e_test.go builds vloop at 0.1.0, 0.1.1 and 0.2.0 and plays the B5 worked example, the monorepo and every planted failure against fixtures with a stub claude and a fake home.
 - **Files:** cmd/vloop/b5_e2e_test.go
 - **Notes for next iteration:** Output lines are compared with runs of spaces collapsed (doctor/init indent differs from the brief's layout). The fixture gets a .gitignore so init prints 'updated .gitignore' as in the brief (absent file prints 'wrote .gitignore'). Advisory plugin-version messages from version --check-plugin go to stdout, not stderr. Test skips on Windows (stub claude is a sh script). Binaries are built into the TestMain temp dir, once per version. Fixtures pass GIT_CONFIG_GLOBAL=/dev/null so the no-user.email case is hermetic.
+
+## Run ended — complete
+
+- **Run:** `20260930-215902` · 3 iteration(s) this run
+- **Plan:** 10/10 done, 0 blocked
+- **Signals:** 3 iterations · 0.30 per closed · 0 gate failure(s) · 0 review rejection(s) · 0 attempt(s) burned · streak 0 · ~$1.18
