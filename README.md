@@ -29,15 +29,15 @@ frontmatter, for example:
 ---
 name: B20260929-1804-example.loop-brief   # the filename without .md
 kind: brief
-status: draft                             # draft | ready | consumed
+status: draft                             # draft | ready | consumed | abandoned
 created: 2026-09-29
 depends-on: []                            # briefs that must be consumed first
 ---
 ```
 
 **Lifecycle.** A brief's `status` is `draft` while you write it, `ready` once it
-is fit to plan, and `consumed` after a loop has built it. Only `ready` briefs are
-checked; the others are reported as skipped.
+is fit to plan, `consumed` after a loop has built it, and `abandoned` if you
+drop it. Only `ready` briefs are checked; the others are reported as skipped.
 
 **`depends-on`** lists other briefs, by name (filename minus `.md`), that must be
 `consumed` before this one can run. A name that matches no brief, or a cycle, is
@@ -63,6 +63,7 @@ does not exist, or an item with no reason, is a problem.
 | `vloop brief check <path>...` | check that ready briefs are fit to plan |
 | `vloop brief new <slug>` | write a draft brief from the template |
 | `vloop brief list` | list briefs in dependency order, ready or blocked |
+| `vloop brief close <brief> (--finding "<summary>"… \| --no-findings) [--abandon "<reason>"] [--dry-run]` | on the work branch of a finished run: record your findings as defects, snapshot the metrics, write the run record, mark the brief `consumed` and make one commit with a `Vloop-Brief:` trailer; `--abandon` closes an unfinished plan as `abandoned` instead; `--dry-run` prints what it would do and writes nothing; it never merges or pushes |
 | `vloop schema list` | print the names of the embedded JSON Schemas |
 | `vloop schema show <name>` | print one schema document |
 | `vloop schema validate <name> <file>` | validate a JSON file against a schema |
@@ -70,9 +71,10 @@ does not exist, or an item with no reason, is a problem.
 | `vloop task list` | print one line per task |
 | `vloop task show <id>` | print a task and the model and effort its sessions resolve to |
 | `vloop task validate` | check the plan's structure |
-| `vloop metrics [<brief>…] [--by task]` | summarise a brief's size, time, cost and defects from its runs and commits; with no brief, one row per brief; `--by task` gives one row per task |
+| `vloop metrics [<brief>…] [--by task \| --workspace <file>]` | summarise a brief's size, time, cost and defects from its runs and commits; with no brief, one row per brief; `--by task` gives one row per task; `--workspace <file>` (a TOML file of `[[repo]]` tables with `path`, relative to the file, and optional `name`, kept in a repository of its own) shows every listed clone's rows under a leading `repo` column, reading only; a listed path that is not a git repository prints `vloop: workspace repo not found: <path>`, the rest still print, exit 1; with `<brief>` arguments it is exit 2 |
 | `vloop metrics stacks [name]` | print the built-in stack presets, or one preset's globs |
 | `vloop metrics classify <path>…` | print each path's category and the layer and glob that decided it |
+| `vloop metrics export [<brief>…\| --workspace <file>]` | print JSON Lines (`export/v1`), one record per line: each brief with runs (default: all), its tasks, its derived then recorded defects, each carrying `repo` (origin with credentials removed); numbers and titles only, no code; writes nothing; `--workspace <file>` concatenates the export of every repository the file lists |
 | `vloop defect add "<summary>"` | record a defect as `.vloop/defects/D<stamp>-<slug>.md` and print its path |
 | `vloop defect list` | print the recorded defects, sorted by id |
 | `vloop defect set <id> <field> <value>` | set a defect's `status`, `fixed-by`, `case`, `severity`, `origin`, `kind` or `task` |
@@ -174,6 +176,12 @@ Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new`, `vloo
   classification layers and the stack presets, and the `metrics/v1` keys.
 - [docs/guide/defects.md](docs/guide/defects.md): origin and catcher, derived and
   recorded defects, `--blame`, the `.vloop/defects/` format and the matrix.
+- [docs/guide/concepts.md](docs/guide/concepts.md): the loop, briefs, plans,
+  gates, closing and release, and the flow end to end.
+- [docs/guide/configuration.md](docs/guide/configuration.md): every config key,
+  the stack presets and the workspace file.
+- [docs/guide/commands.md](docs/guide/commands.md): every command and flag,
+  generated from the binary.
 
 ## Exit codes
 

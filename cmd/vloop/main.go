@@ -7,6 +7,8 @@ import (
 	"github.com/mvelosop/vloop/internal/cli"
 )
 
+//go:generate go run ../gendocs ../../docs/guide/commands.md
+
 // Stamped at build time with -ldflags "-X main.version=… -X main.commit=…".
 var (
 	version = "0.0.0-dev"

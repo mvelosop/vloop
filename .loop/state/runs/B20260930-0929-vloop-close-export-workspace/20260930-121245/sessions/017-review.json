@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 23873,
+  "stop_reason": "end_turn",
+  "session_id": "c76b9fff-4e4f-4579-ae37-f09eba101428",
+  "total_cost_usd": 0.15419239999999998,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 25169,
+    "cache_read_input_tokens": 158112,
+    "output_tokens": 2187,
+    "output_tokens_details": {
+      "thinking_tokens": 157
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 25169,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 317,
+        "cache_read_input_tokens": 36172,
+        "cache_creation_input_tokens": 1013,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1013
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 2187,
+      "cacheReadInputTokens": 158112,
+      "cacheCreationInputTokens": 25169,
+      "webSearchRequests": 0,
+      "costUSD": 0.15419239999999998,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 157,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T8. `cmd/vloop/b4_e2e_test.go` plays the brief's worked example and every planted failure against the built binary, and every acceptance criterion is met.\n\n- **Checks:** I re-ran `go test -count=1 ./cmd/vloop .` and it passes.\n- **Not re-run by me:** the other packages' test results came from cached runs. I did not re-run vet, gofmt, mod tidy or the builds myself, and took those from the driver's gate.\n- **B3 fixture:** `b3Fixture` is split into `b3PreMerge` plus the merge step, so B4 reuses it. B3's assertions are unchanged.\n- **Outside the listed files:** `embed_test.go` now expects 8 embedded schemas instead of 7, because `export.v1.json` already exists. I noted in the verdict that the T7 plan missed this test.\n\nThe verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2632,
+  "type": "result",
+  "duration_ms": 34092,
+  "uuid": "e69e3ccf-c505-463f-b7a0-65f6c0435b35",
+  "ttft_stream_ms": 1475,
+  "time_to_request_ms": 359,
+  "first_content_frame_ms": 1476,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 8
+}

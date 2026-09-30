@@ -80,7 +80,9 @@ state_restore_if_touched() {
 # git commands in the real repository -- it renamed `main` to `master`, created
 # and checked out a branch `work`, and planted `origin/trunk` with `origin/HEAD`
 # pointing at it -- and the driver then committed the whole run to `work`
-# without noticing. The fence now denies the obvious commands, but `git -C`,
+# without noticing. The fence now denies the obvious commands (for `git remote`
+# only the subcommands that change something -- `git remote -v` must stay
+# readable, as the planner needs it), but `git -C`,
 # a script, or a test can still reach them, so the driver snapshots every ref
 # and where HEAD points before each session and compares after. Any difference
 # halts the run before anything is committed: putting refs back is not the

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "export/v1",
+  "description": "One line of `vloop metrics export`: a brief, task or defect record, told apart by `type`. A brief record is metrics/v1 minus by_task, with `type` and `repo` added.",
+  "type": "object",
+  "required": ["schema", "type", "repo"],
+  "properties": {
+    "schema": { "const": "export/v1" },
+    "type": { "enum": ["brief", "task", "defect"] },
+    "repo": {
+      "type": "object",
+      "required": ["name", "remote"],
+      "properties": {
+        "name": { "type": "string" },
+        "remote": { "type": ["string", "null"], "description": "the origin remote URL with credentials removed; null when there is none" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "brief" } }, "required": ["type"] },
+      "then": {
+        "required": [
+          "brief", "run_id", "status", "merged", "tasks", "size", "time", "rate", "cost", "tokens",
+          "models", "effort", "defects", "records", "lead_time", "permission_denials", "iterations",
+          "iterations_per_closed"
+        ],
+        "properties": {
+          "brief": { "type": "string", "description": "the loop brief's file name" },
+          "run_id": { "type": "string" },
+          "status": { "type": "string" },
+          "merged": { "type": ["string", "null"] },
+          "tasks": { "type": "object" },
+          "size": { "type": "object" },
+          "time": { "type": "object" },
+          "rate": { "type": "object" },
+          "cost": { "type": "object" },
+          "tokens": { "type": "object" },
+          "models": { "type": "object" },
+          "effort": { "type": "object" },
+          "defects": { "type": "object" },
+          "records": { "type": "object" },
+          "lead_time": { "type": "object" },
+          "permission_denials": { "type": "integer", "minimum": 0 },
+          "iterations": { "type": "integer", "minimum": 0 },
+          "iterations_per_closed": { "type": ["number", "null"] }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "const": "task" } }, "required": ["type"] },
+      "then": {
+        "required": ["brief", "run_id", "id", "title", "area", "kind", "status", "attempts", "churn", "agent_ms", "cost_usd", "models"],
+        "properties": {
+          "brief": { "type": "string" },
+          "run_id": { "type": "string" },
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "area": { "type": ["string", "null"] },
+          "kind": { "type": ["string", "null"] },
+          "status": { "type": "string" },
+          "attempts": { "type": "integer", "minimum": 0 },
+          "churn": {
+            "type": "object",
+            "description": "metrics/v1's by_task churn",
+            "required": ["code", "test", "docs", "other", "deleted"],
+            "properties": {
+              "code": { "type": "integer", "minimum": 0 },
+              "test": { "type": "integer", "minimum": 0 },
+              "docs": { "type": "integer", "minimum": 0 },
+              "other": { "type": "integer", "minimum": 0 },
+              "deleted": {
+                "type": "object",
+                "required": ["code", "test", "docs", "other"],
+                "properties": {
+                  "code": { "type": "integer", "minimum": 0 },
+                  "test": { "type": "integer", "minimum": 0 },
+                  "docs": { "type": "integer", "minimum": 0 },
+                  "other": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          },
+          "agent_ms": { "type": "integer", "minimum": 0 },
+          "cost_usd": { "type": "number", "minimum": 0 },
+          "models": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "const": "defect" } }, "required": ["type"] },
+      "then": {
+        "required": ["brief", "run_id", "id", "task", "origin", "found_by", "kind", "severity", "status", "summary", "derived"],
+        "properties": {
+          "brief": { "type": "string" },
+          "run_id": { "type": "string" },
+          "id": { "type": "string" },
+          "task": { "type": ["string", "null"] },
+          "origin": { "enum": ["brief", "plan", "work", "env"] },
+          "found_by": { "enum": ["gate", "review", "operator", "user"] },
+          "kind": { "enum": ["bug", "spec-gap", "gate", "gate-gap", "regression"] },
+          "severity": { "enum": ["low", "medium", "high", "critical", null], "description": "null for a derived defect: the loop never assigned one" },
+          "status": { "enum": ["open", "fixed", "wontfix", null], "description": "null for a derived defect" },
+          "summary": { "type": "string" },
+          "derived": { "type": "boolean", "description": "true for a gate failure or review finding the loop recorded itself" }
+        }
+      }
+    }
+  ]
+}

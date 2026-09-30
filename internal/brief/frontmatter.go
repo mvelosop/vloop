@@ -7,7 +7,7 @@ import (
 )
 
 // Statuses are the values a brief's frontmatter status may take.
-var Statuses = []string{"draft", "ready", "consumed"}
+var Statuses = []string{"draft", "ready", "consumed", "abandoned"}
 
 var fmKeyRe = regexp.MustCompile(`^([A-Za-z0-9_-]+):(?:\s+(.*)|)$`)
 

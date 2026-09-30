@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 73172,
+  "stop_reason": "end_turn",
+  "session_id": "b83ad22c-b2e9-4a02-aa83-3baea9815ca1",
+  "total_cost_usd": 0.4230542,
+  "usage": {
+    "input_tokens": 32,
+    "cache_creation_input_tokens": 49183,
+    "cache_read_input_tokens": 723341,
+    "output_tokens": 8159,
+    "output_tokens_details": {
+      "thinking_tokens": 688
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 49183,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 434,
+        "cache_read_input_tokens": 58589,
+        "cache_creation_input_tokens": 935,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 935
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 32,
+      "outputTokens": 8159,
+      "cacheReadInputTokens": 723341,
+      "cacheCreationInputTokens": 49183,
+      "webSearchRequests": 0,
+      "costUSD": 0.4230542,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 688,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 16,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is done: its verify command ran to the end and printed `gate T1 ok`. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **`export/v1` schema:** `schemas/export.v1.json` has brief, task and defect records, told apart by `type`. Each record type has valid and invalid fixtures, and `schema_test.go` now runs them. The brief record restates metrics/v1's required keys minus `by_task`, because the schema compiler can't load a cross-schema `$ref`.\n- **`abandoned` status:** frontmatter accepts it, listed after `consumed`. `brief list` shows `-` in the ready column, and a brief that depends on an abandoned one lists as `blocked`. `brief check` already skipped any status that isn't `ready`, so it needed no change.\n- **Existing expectations changed:** only the `schema list` outputs (`export/v1` added) and the status list (`abandoned` added).\n- **Docs:** the README and both brief templates mention `abandoned`.\n- **Not added:** a dedicated `deps_test.go` case for `abandoned`. The gate covers it end to end.\n- **Merge attribution:** I left `runs/release.go` and `defect/blame.go` alone, since abandoned briefs are never merged as consumed.",
+  "ttft_ms": 2103,
+  "type": "result",
+  "duration_ms": 88486,
+  "uuid": "95ce4935-d714-4d13-be7e-97335c3e568b",
+  "ttft_stream_ms": 1484,
+  "time_to_request_ms": 381,
+  "first_content_frame_ms": 1485,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 1
+}

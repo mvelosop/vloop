@@ -1,0 +1,1 @@
+{"schema":"export/v1","type":"task","repo":{"name":"shop","remote":null},"brief":"B20260101-0900-a.loop-brief","run_id":"B20260101-0900-a","id":"T1","title":"Main","area":null,"kind":null,"status":"done","attempts":"one","churn":{"code":10,"test":6,"docs":3,"other":0,"deleted":{"code":0,"test":0,"docs":0,"other":0}},"agent_ms":80000,"cost_usd":0.5,"models":["claude-sonnet-5-5"]}

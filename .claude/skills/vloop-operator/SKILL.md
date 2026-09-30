@@ -128,6 +128,15 @@ and the commit, and prints the trailer for step 4.
 - **Sum unrounded values**; quote `vloop metrics`, not your own arithmetic.
 - **An estimate or phrase in a worked example is read as the brief's own** by
   naive parsers (B3). Say which section a rule reads.
+- **Try commits in a throwaway clone first.** `git clone` of this repo into your
+  scratchpad lets you run `vloop brief close` or `defect add` for real without
+  touching the repo. But a clone's `origin/HEAD` is whatever branch the source
+  had checked out: cloned while on a work branch, vloop takes that branch as the
+  default and `close` refuses. Run `git remote set-head origin main` in the
+  clone first — a clone from GitHub already has it.
+- **Check `git diff --cached --name-only` before every commit.** A file staged
+  earlier, by anyone, rides along otherwise (the B4 draft reached `main` that
+  way).
 - **Your own scratch work stays in your scratchpad.** Never leave temporary
   copies in `docs/briefs/`; check `git status` before and after anything that
   writes.

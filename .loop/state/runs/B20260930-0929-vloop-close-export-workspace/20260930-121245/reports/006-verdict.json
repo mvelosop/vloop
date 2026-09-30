@@ -1,0 +1,16 @@
+{
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A workspace file is TOML: `[[repo]]` tables with `path`, resolved relative to the workspace file's own directory, optional `name`, parsed with the TOML library in go.mod.", "met": true, "evidence": "workspace.go loadWorkspace uses BurntSushi/toml; eachWorkspaceRepo joins relative paths onto the file's directory"},
+    {"criterion": "`vloop metrics --workspace <file>` prints the cross-brief table with a leading `repo` column, rows equal to each repo's own rows, file order, any working directory.", "met": true, "evidence": "PrintWorkspaceTable in print.go; TestWorkspaceMetricsRowsEqualEachRepo compares each row to the repo's own `vloop metrics`, run from an outside temp dir"},
+    {"criterion": "`vloop metrics export --workspace <file>` concatenates each repo's export in file order with repo.name replaced where name is set; the metrics table uses that name too.", "met": true, "evidence": "exportRepoLines(name) in export.go; workspaceMetrics uses r.Name; TestWorkspaceExportNameOverride"},
+    {"criterion": "A missing or non-git listed path prints `vloop: workspace repo not found: <path as written>` per path on stderr; others still reported; exit 1.", "met": true, "evidence": "eachWorkspaceRepo prints r.Path as written and continues; TestWorkspaceMissingAndNonRepository asserts exact stderr, exit 1, non-empty stdout"},
+    {"criterion": "`--workspace` with `<brief>` arguments is a usage error: exit 2, one `vloop: ` line, nothing on stdout.", "met": true, "evidence": "plain error before any output; TestWorkspaceWithBriefIsUsageError covers metrics and export"},
+    {"criterion": "--workspace reads only.", "met": true, "evidence": "only ReadFile/Stat and existing read-only metrics code on the workspace path; the gate's status/ls checks cover writes"},
+    {"criterion": "Committed tests `TestWorkspace…` in internal/cli/workspace_test.go with two fixture repos, row equality, name override, missing and non-repo path, each with a counterpart.", "met": true, "evidence": "five TestWorkspace* tests; assertions compare against the repos' own output; counterparts for no name and all-present; go test ./internal/cli passes"},
+    {"criterion": "README documents `--workspace` and stays under its 200-line cap.", "met": true, "evidence": "README.md diff on the metrics and export rows; wc -l gives 193"}
+  ],
+  "findings": [],
+  "notes": "Minor: the empty-message Problem used as an exit-1 sentinel is a little fragile but tested. --by together with --workspace is silently ignored; the brief left it open."
+}

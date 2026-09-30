@@ -1,0 +1,14 @@
+{
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "cmd/vloop/b4_e2e_test.go holds TestWorkedExampleB4… tests that build the binary and play the brief's worked example line for line (close without findings, dry run, close, second close refused, export five records and repo, --workspace over shop and api)", "met": true, "evidence": "TestWorkedExampleB4Close (lines 53-183) and TestWorkedExampleB4Workspace (185-248) assert each output line, exit code, the trailer, the three files, the snapshot validating, and the five export records with id per type."},
+    {"criterion": "Every planted failure is played: HEAD on main, untracked file, stalled run with --abandon, hand-written paragraph unchanged, workspace listing ../missing", "met": true, "evidence": "TestWorkedExampleB4PlantedFailures subtests (250-324) and the missing-repo case in the Workspace test (234-247); abandon checks status, body line, brief check skipping, and a dependent shown as blocked."},
+    {"criterion": "B3's fixture code is reused or extended rather than copied, and B3's tests still pass unchanged in what they assert", "met": true, "evidence": "b3Fixture was split into b3PreMerge plus the merge step, with a new stalled option; B3 assertions are not changed and go test ./cmd/vloop passes."},
+    {"criterion": "No test reads or writes this repository's .loop/, .claude/, .vloop/, git history or the home directory", "met": true, "evidence": "The new test file uses t.TempDir() fixtures and has no references to this repo's state directories or absolute paths."},
+    {"criterion": "go test, vet, gofmt, mod tidy and the linux/windows/host builds are clean", "met": true, "evidence": "go test -count=1 ./cmd/vloop . passes and the other packages pass; the driver's gate ran before this review."},
+    {"criterion": "No B5 or B6 work appears", "met": true, "evidence": "The diff is limited to b4_e2e_test.go, b3_e2e_test.go and embed_test.go."}
+  ],
+  "findings": [],
+  "notes": "embed_test.go changed 7 to 8 embedded schemas because export.v1.json already exists on disk. This is a minimal fix outside the task's listed files, and the schema count is correct. The plan missed this test in T7."
+}

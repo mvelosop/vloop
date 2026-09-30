@@ -30,6 +30,7 @@ func newBrief(g *Globals) *cobra.Command {
 	})
 	cmd.AddCommand(newBriefList(g))
 	cmd.AddCommand(newBriefNew(g))
+	cmd.AddCommand(newBriefClose(g))
 	return cmd
 }
 

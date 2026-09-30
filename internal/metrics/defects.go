@@ -166,3 +166,52 @@ func (c DefectCounts) RemovalEfficiency() *int {
 	p := (100*(c.InLoop+c.Operator) + c.All()/2) / c.All()
 	return &p
 }
+
+// DerivedIDs is the id of each derived defect, in the order given:
+// `<run id>/i<iteration>-gate` for a gate failure, `<run id>/i<iteration>-review-<n>`
+// for a review finding, n counting from 1 within the iteration.
+func DerivedIDs(runID string, ds []Derived) []string {
+	reviews := map[int]int{}
+	ids := make([]string, len(ds))
+	for i, d := range ds {
+		if d.FoundBy == "gate" {
+			ids[i] = fmt.Sprintf("%s/i%d-gate", runID, d.Iteration)
+			continue
+		}
+		reviews[d.Iteration]++
+		ids[i] = fmt.Sprintf("%s/i%d-review-%d", runID, d.Iteration, reviews[d.Iteration])
+	}
+	return ids
+}
+
+// DeriveBrief computes the derived defects of a brief's runs, exactly as Build
+// counts them. It returns nil when the brief has no runs.
+func DeriveBrief(root, brief string) ([]Derived, error) {
+	m, err := runs.Read(root, brief)
+	if err != nil {
+		return nil, err
+	}
+	if len(m.Folders) == 0 {
+		return nil, nil
+	}
+	var plan *runs.PlanDoc
+	if o := m.Owned; o != nil {
+		if plan, err = runs.PlanAt(root, o.Layout, planSHA(o)); err != nil {
+			return nil, err
+		}
+	}
+	return Derive(m, plan), nil
+}
+
+// PlanOf reads a brief's plan as committed at its last run commit. It returns
+// nil when the brief has no owned run.
+func PlanOf(root, brief string) (*runs.PlanDoc, error) {
+	m, err := runs.Read(root, brief)
+	if err != nil {
+		return nil, err
+	}
+	if m.Owned == nil {
+		return nil, nil
+	}
+	return runs.PlanAt(root, m.Owned.Layout, planSHA(m.Owned))
+}

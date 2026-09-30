@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 23873,
+  "stop_reason": "end_turn",
+  "session_id": "efa9009e-dc4c-4a9b-9b8b-e686c004c1ca",
+  "total_cost_usd": 0.17487080000000002,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 30217,
+    "cache_read_input_tokens": 144664,
+    "output_tokens": 2505,
+    "output_tokens_details": {
+      "thinking_tokens": 220
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 30217,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 298,
+        "cache_read_input_tokens": 40702,
+        "cache_creation_input_tokens": 1531,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1531
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 2505,
+      "cacheReadInputTokens": 144664,
+      "cacheCreationInputTokens": 30217,
+      "webSearchRequests": 0,
+      "costUSD": 0.17487080000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 220,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 6,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T3. I read the diff and the tests against every acceptance criterion, and all nine are met; findings are empty. `go test ./internal/cli` passes. I did not re-run the T3 gate.\n\n`vloop brief close` makes all six refusals before writing anything, and `TestCloseRefusals` checks that HEAD and the tree are unchanged after each. Defects go through `defect.Add`, and the commit is staged by path with the `Vloop-Brief:` trailer. README is at 192 lines, under the 200 cap.\n\nOne addition beyond the task: `metrics.DeriveBrief` in `internal/metrics/defects.go`, so the run record's derived defects match what `Build` counts. It's small and T5 can reuse it. There is also an extra \"a finding must not be empty\" refusal the brief doesn't list. The verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2815,
+  "type": "result",
+  "duration_ms": 25172,
+  "uuid": "6168253d-3835-4ba2-9233-9cb3cdcf294a",
+  "ttft_stream_ms": 1482,
+  "time_to_request_ms": 358,
+  "first_content_frame_ms": 1483,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 3
+}

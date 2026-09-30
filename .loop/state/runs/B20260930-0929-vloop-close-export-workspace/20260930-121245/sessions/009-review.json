@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 17403,
+  "stop_reason": "end_turn",
+  "session_id": "d62190a7-c59e-4f47-93b7-153fdf44e171",
+  "total_cost_usd": 0.14204160000000002,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 25400,
+    "cache_read_input_tokens": 104078,
+    "output_tokens": 1961,
+    "output_tokens_details": {
+      "thinking_tokens": 195
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 25400,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 414,
+        "cache_read_input_tokens": 36406,
+        "cache_creation_input_tokens": 1010,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1010
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1961,
+      "cacheReadInputTokens": 104078,
+      "cacheCreationInputTokens": 25400,
+      "webSearchRequests": 0,
+      "costUSD": 0.14204160000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 195,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 passes: all five acceptance criteria are met. The verdict is in `.loop/tmp/verdict.json`.\n\n- **Abandon:** `--abandon` skips the plan-complete check but keeps every other refusal. It sets the abandoned status, the body status line, the snapshot and the run record. It makes the same single commit. The tests assert the effects, and the gate confirmed the behaviour after abandoning: `brief check` skips it, `brief list` shows it and marks dependents blocked, and `metrics` reports it.\n- **Dry run:** `--dry-run` runs after all the refusals and writes nothing. It prints the summary with the pending findings counted as operator defects, then the four would-lines. The test checks the tree is clean, HEAD is unchanged and no `.vloop` directories exist.\n- **Tests and README:** the `TestCloseAbandon…` and `TestCloseDryRun…` tests each cover a case where the flag applies and one where a refusal still wins. The README is at 192 lines, under the 200 cap, and there are no absolute paths.\n\nTwo minor points went into the notes: `--dry-run` ignores `--json`, and it predicts defect paths by copying `defect.Add`'s naming scheme, which could drift.",
+  "ttft_ms": 2215,
+  "type": "result",
+  "duration_ms": 18694,
+  "uuid": "b1905030-8c15-4984-bbb5-7e5ed600bda1",
+  "ttft_stream_ms": 1194,
+  "time_to_request_ms": 375,
+  "first_content_frame_ms": 1195,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 4
+}

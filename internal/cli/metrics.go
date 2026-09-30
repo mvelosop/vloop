@@ -17,7 +17,7 @@ import (
 )
 
 func newMetrics(g *Globals) *cobra.Command {
-	var by string
+	var by, workspace string
 	cmd := &cobra.Command{
 		Use:   "metrics [<brief>…]",
 		Short: "Summarise what a brief cost and delivered, from its runs and commits",
@@ -26,11 +26,14 @@ func newMetrics(g *Globals) *cobra.Command {
 			if by != "" && by != "task" {
 				return fmt.Errorf("unknown --by %q: want task", by)
 			}
+			out := cmd.OutOrStdout()
+			if workspace != "" {
+				return workspaceMetrics(g, out, cmd.ErrOrStderr(), workspace, args)
+			}
 			root, err := g.root()
 			if err != nil {
 				return err
 			}
-			out := cmd.OutOrStdout()
 			c, err := newClassifier(g, out, root)
 			if err != nil {
 				return err
@@ -62,27 +65,28 @@ func newMetrics(g *Globals) *cobra.Command {
 			}
 			switch {
 			case len(args) == 0:
-				printBriefTable(out, reports)
+				metrics.PrintBriefTable(out, reports)
 			case by == "task":
 				for i, r := range reports {
 					if i > 0 {
 						fmt.Fprintln(out)
 					}
-					printByTask(out, r)
+					metrics.PrintByTask(out, r)
 				}
 			default:
 				for i, r := range reports {
 					if i > 0 {
 						fmt.Fprintln(out)
 					}
-					printSummary(out, r)
+					metrics.PrintSummary(out, r)
 				}
 			}
 			return nil
 		},
 	}
 	cmd.Flags().StringVar(&by, "by", "", "break the summary down by `task`")
-	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g))
+	cmd.Flags().StringVar(&workspace, "workspace", "", "show every repository the workspace `file` lists, with a repo column")
+	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g), newMetricsExport(g))
 	return cmd
 }
 

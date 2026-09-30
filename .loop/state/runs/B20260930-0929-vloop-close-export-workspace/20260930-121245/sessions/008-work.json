@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 64613,
+  "stop_reason": "end_turn",
+  "session_id": "73fa59f0-7877-4488-8af3-0828a3107162",
+  "total_cost_usd": 0.36029799999999995,
+  "usage": {
+    "input_tokens": 24,
+    "cache_creation_input_tokens": 45066,
+    "cache_read_input_tokens": 503080,
+    "output_tokens": 7937,
+    "output_tokens_details": {
+      "thinking_tokens": 847
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 45066,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 491,
+        "cache_read_input_tokens": 56574,
+        "cache_creation_input_tokens": 508,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 508
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 24,
+      "outputTokens": 7937,
+      "cacheReadInputTokens": 503080,
+      "cacheCreationInputTokens": 45066,
+      "webSearchRequests": 0,
+      "costUSD": 0.36029799999999995,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 847,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 12,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 is done: `vloop brief close` now takes `--abandon \"<reason>\"` and `--dry-run`. The task's verify command printed `gate T4 ok`. I did not run the rest of the test suite. I left the changes uncommitted and wrote the proposal to `.loop/tmp/proposal.json`.\n\n- **`--abandon`:** it lets a close go ahead when the plan is unfinished, and still requires `--finding` or `--no-findings`. The brief, snapshot and run record get status `abandoned`, and the body line reads `abandoned — <reason>`. The commit is the usual single one. An empty reason is rejected with its own message and exit 1, which the brief didn't specify.\n- **`--dry-run`:** it applies every refusal first, then prints the summary with the pending findings counted as operator defects. After that come the `would record`, `would write`, `would update` and `would commit` lines, and nothing is written or committed. It ignores `--json` and always prints text.\n- **Tests:** `internal/cli/close_flags_test.go` has the new `TestCloseAbandon…` and `TestCloseDryRun…` tests. Each has a case where the flag applies and one where a refusal still wins.\n- **README:** the `close` row now covers both flags. It is still 192 lines, under the 200 cap.\n\nThe metrics report is now built before the defect files are written. A real close with findings rebuilds it after writing them so the counts include them. The code is in `internal/cli/close.go`.",
+  "ttft_ms": 2254,
+  "type": "result",
+  "duration_ms": 93455,
+  "uuid": "6fed0f0f-94bb-4651-86ec-6b2a987cc5dd",
+  "ttft_stream_ms": 1152,
+  "time_to_request_ms": 364,
+  "first_content_frame_ms": 1153,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 4
+}

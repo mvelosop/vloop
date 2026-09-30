@@ -24,7 +24,7 @@ depends-on: []
 >
 > El `status` del frontmatter es la única marca de planificación: `draft` mientras
 > lo escribes, `ready` cuando está listo para planificar, `consumed` una vez que
-> una ejecución lo ha usado. Enumera en `depends-on`, por nombre, los briefs sobre
+> una ejecución lo ha usado, `abandoned` si lo descartas. Enumera en `depends-on`, por nombre, los briefs sobre
 > los que se apoya este. Pasa `vloop brief check` antes de gastar nada en él.
 >
 > La regla que decide si un brief es bueno: **fija las decisiones, deja abierta la

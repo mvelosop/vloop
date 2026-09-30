@@ -16,7 +16,7 @@ func TestFrontmatterRules(t *testing.T) {
 		{"no closing", func(s string) string { return strings.Replace(s, "---\n# Brief", "# Brief", 1) }, "unparseable frontmatter"},
 		{"no name", func(s string) string { return strings.Replace(s, "name: B20260101-0900-a.loop-brief\n", "", 1) }, "frontmatter has no name"},
 		{"name mismatch", func(s string) string { return strings.Replace(s, "name: pass", "name: other", 1) }, "name other.loop-brief does not match filename B20260101-0900-a.loop-brief"},
-		{"bad status", func(s string) string { return strings.Replace(s, "status: ready", "status: bogus", 1) }, `status "bogus" is not one of draft|ready|consumed`},
+		{"bad status", func(s string) string { return strings.Replace(s, "status: ready", "status: bogus", 1) }, `status "bogus" is not one of draft|ready|consumed|abandoned`},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

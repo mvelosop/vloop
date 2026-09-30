@@ -1,0 +1,16 @@
+{
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop metrics export [<brief>…]` prints JSON Lines on stdout, ordered, no-runs error", "met": true, "evidence": "internal/cli/export.go newMetricsExport/exportRecords (brief, tasks in plan order, derived, recorded); no-runs Problem error; TestExportNoRunsForNamedBrief; gate passes"},
+    {"criterion": "Brief record is metrics/v1 document without by_task, with schema/type/repo", "met": true, "evidence": "exportRecords marshals the metrics.Report, deletes by_task, sets schema/type/repo; gate compares to `metrics --json`"},
+    {"criterion": "Task record fields match by_task row, title/status from plan at last run commit", "met": true, "evidence": "exportTask built from ReportTask rows; metrics.PlanOf reads plan at last run commit (defects.go)"},
+    {"criterion": "Defect record fields, derived ids from task 2 function, derived severity/status null", "met": true, "evidence": "exportDefect; metrics.DerivedIDs used; Severity/Status nil for derived; TestExportRecordOrderAndFields"},
+    {"criterion": "repo.remote strips userinfo, repo.name derivation, no origin -> null, read via git only", "met": true, "evidence": "repoIdentity/stripUserinfo use `git config --get`; TestExportRepoIdentity covers both examples, no-userinfo, no-.git, and no origin"},
+    {"criterion": "Nothing else leaves; every line validates export/v1; writes nothing", "met": true, "evidence": "typed structs only; output buffered and printed; test validates each line via schema.Validate; gate checks tree unchanged and no absolute paths/credentials"},
+    {"criterion": "Committed TestExport… tests covering order, fields, derived ids, credential stripping and no origin", "met": true, "evidence": "internal/cli/export_test.go: three TestExport* tests with real assertions; gate-failure and multiple review-finding ids covered"},
+    {"criterion": "README documents `vloop metrics export` under 200-line cap", "met": true, "evidence": "README.md table row added; file is 193 lines"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

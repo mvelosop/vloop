@@ -1,4 +1,4 @@
-package cli
+package metrics
 
 import (
 	"fmt"
@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
-
-	"github.com/mvelosop/vloop/internal/metrics"
 )
 
 // thousands writes n with `,` separators.
@@ -56,15 +54,15 @@ func dashPtr(s *string) string {
 func joinModels(l []string) string { return dash(strings.Join(l, ",")) }
 
 // efficiency is the removal efficiency as a whole percentage, or n/a.
-func efficiency(d metrics.ReportDefects) string {
-	c := metrics.DefectCounts{InLoop: d.InLoop, Operator: d.Operator, Escaped: d.Escaped}
+func efficiency(d ReportDefects) string {
+	c := DefectCounts{InLoop: d.InLoop, Operator: d.Operator, Escaped: d.Escaped}
 	if p := c.RemovalEfficiency(); p != nil {
 		return fmt.Sprintf("%d%%", *p)
 	}
 	return "n/a"
 }
 
-func printSummary(out io.Writer, r *metrics.Report) {
+func PrintSummary(out io.Writer, r *Report) {
 	merged := "not merged"
 	if r.Merged != nil {
 		merged = "merged " + (*r.Merged)[:min(7, len(*r.Merged))]
@@ -76,7 +74,7 @@ func printSummary(out io.Writer, r *metrics.Report) {
 	}
 	fmt.Fprintf(out, " tasks     %s · %d done · %d blocked · first-pass %d/%d\n",
 		planned, r.Tasks.Done, r.Tasks.Blocked, r.Tasks.FirstPass, r.Tasks.Planned)
-	line := func(prefix, name string, l metrics.JSONLines, tail string) {
+	line := func(prefix, name string, l JSONLines, tail string) {
 		fmt.Fprintf(out, "%s%-10s code %s · test %s · docs %s · %s\n", prefix, name,
 			thousands(l.Code), thousands(l.Test), thousands(l.Docs), tail)
 	}
@@ -106,7 +104,7 @@ func printSummary(out io.Writer, r *metrics.Report) {
 	}
 }
 
-func printByTask(out io.Writer, r *metrics.Report) {
+func PrintByTask(out io.Writer, r *Report) {
 	w := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "id\tarea\tkind\tatt\tcode+\ttest+\tdocs+\tother+\tagent\tcost\tmodel")
 	for _, t := range r.ByTask {
@@ -117,18 +115,43 @@ func printByTask(out io.Writer, r *metrics.Report) {
 	w.Flush()
 }
 
-func printBriefTable(out io.Writer, rs []*metrics.Report) {
+func PrintBriefTable(out io.Writer, rs []*Report) { printBriefTable(out, nil, rs) }
+
+// PrintWorkspaceTable is PrintBriefTable with a leading repo column: repos[i]
+// names the repository of rs[i].
+func PrintWorkspaceTable(out io.Writer, repos []string, rs []*Report) {
+	if repos == nil {
+		repos = []string{}
+	}
+	printBriefTable(out, repos, rs)
+}
+
+func printBriefTable(out io.Writer, repos []string, rs []*Report) {
 	w := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "brief\ttasks\tfirst-pass\tcode\ttest\tt:c\tagent\t$/1k\tin-loop\toperator\tescaped\tefficiency")
-	for _, r := range rs {
+	lead, head := "", ""
+	if repos != nil {
+		head = "repo\t"
+	}
+	fmt.Fprintln(w, head+"brief\ttasks\tfirst-pass\tcode\ttest\tt:c\tagent\t$/1k\tin-loop\toperator\tescaped\tefficiency")
+	for i, r := range rs {
+		if repos != nil {
+			lead = repos[i] + "\t"
+		}
 		per1k := "n/a"
 		if r.Cost.Per1000Code != nil {
 			per1k = fmt.Sprintf("%.2f", *r.Cost.Per1000Code)
 		}
-		fmt.Fprintf(w, "%s\t%d\t%d/%d\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", r.RunID, r.Tasks.Planned,
+		fmt.Fprintf(w, "%s%s\t%d\t%d/%d\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", lead, r.RunID, r.Tasks.Planned,
 			r.Tasks.FirstPass, r.Tasks.Planned, thousands(r.Size.Delivered.Code), thousands(r.Size.Delivered.Test),
 			optFloat(r.Size.TestCodeRatio, "%.2f"), minutes(r.Time.AgentMS), per1k,
 			r.Defects.InLoop, r.Defects.Operator, r.Defects.Escaped, efficiency(r.Defects))
 	}
 	w.Flush()
+}
+
+func dash(s string) string {
+	if s == "" {
+		return "-"
+	}
+	return s
 }

@@ -1,0 +1,8 @@
+{
+  "task": "T4",
+  "outcome": "done",
+  "summary": "`vloop brief close` gains `--abandon \"<reason>\"` (closes an unfinished or finished plan as abandoned) and `--dry-run` (prints the summary with pending findings counted as operator defects plus would-lines, writes nothing); README documents both.",
+  "files": ["internal/cli/close.go", "internal/cli/close_flags_test.go", "README.md"],
+  "verified": "The task's verify command: printed 'gate T4 ok' (exit 0).",
+  "notes": "Metrics are now built before defect files are written; a real close with findings rebuilds after Add so counts include them. Dry-run predicts defect paths in close.go (same D<stamp>-<slug>[-n] scheme as defect.Add, checking existing files) and adjusts Defects counts and removal efficiency in memory. An empty --abandon reason is rejected (exit 1) with its own message. --dry-run ignores --json and prints text. README stays at 192 lines (row extended, no new lines)."
+}
