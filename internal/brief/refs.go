@@ -30,6 +30,32 @@ func sectionLines(body string, re *regexp.Regexp) []string {
 	return out
 }
 
+type refEntry struct {
+	path string
+	rest string // everything after the path, continuation lines joined by a space
+}
+
+// refEntries groups section lines into list items: an entry line plus the
+// non-blank lines indented under it, up to a blank line, the next item or a
+// line that is not indented.
+func refEntries(lines []string) []refEntry {
+	var out []refEntry
+	open := false
+	for _, l := range lines {
+		if m := refEntryRe.FindStringSubmatch(l); m != nil {
+			out = append(out, refEntry{path: m[1], rest: m[2]})
+			open = true
+			continue
+		}
+		if open && strings.TrimSpace(l) != "" && (l[0] == ' ' || l[0] == '\t') {
+			out[len(out)-1].rest += " " + strings.TrimSpace(l)
+			continue
+		}
+		open = false
+	}
+	return out
+}
+
 // bindingRefLines runs the binding-references rules, returning problem lines
 // and a warning when the section is absent. dead lists paths already reported
 // so they are not reported again as generic unresolved paths.
@@ -40,18 +66,14 @@ func bindingRefLines(root, body string, set *HeadingSet) []Line {
 	}
 	var out []Line
 	bad := 0
-	for _, l := range sectionLines(body, re) {
-		m := refEntryRe.FindStringSubmatch(l)
-		if m == nil {
-			continue
-		}
-		p := m[1]
+	for _, e := range refEntries(sectionLines(body, re)) {
+		p := e.path
 		if !exists(filepath.Join(root, filepath.FromSlash(p))) {
 			out = append(out, Line{Problem, "binding reference does not resolve: " + p})
 			bad++
 			continue
 		}
-		if !reasonSepRe.MatchString(m[2]) {
+		if !reasonSepRe.MatchString(e.rest) {
 			out = append(out, Line{Problem, "binding reference has no reason: " + p})
 			bad++
 			continue

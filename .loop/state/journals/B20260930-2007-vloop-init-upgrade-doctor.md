@@ -67,3 +67,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** Added schemas/install.v1.json with fixtures, and internal/install: stamp Read/Write for .vloop/install.json plus Parse/Compare, the one semver comparison for upgrade and doctor.
 - **Files:** schemas/install.v1.json, internal/install/install.go, internal/install/install_test.go, internal/schema/schema_test.go, internal/schema/testdata/install.valid.json, internal/schema/testdata/install.invalid.json, embed_test.go, internal/cli/schema_test.go, cmd/vloop/b2_e2e_test.go
 - **Notes for next iteration:** Compare(from, to) returns a Relation: Same, Newer, Breaking, FromNewer or NeedsYes. A pre-release suffix on either side gives NeedsYes, unless the strings are identical (Same). Unparsable versions give an error. Stamp.Upgraded is *string, written as null; Read returns an error that satisfies errors.Is(err, os.ErrNotExist) when there is no stamp. Write always sets schema to install/v1 and ends the file with a newline. Besides the schema list expectations and the embed count, internal/cli/schema_test.go's --json length check went from 8 to 9. No third-party module added.
+
+## T2 — Fix F1: a binding reference's reason may wrap onto the lines indented under its list item
+
+- **Outcome:** done (review: PASS)
+- **Summary:** brief check now treats a binding-reference entry as the whole list item (first line plus indented continuation lines), so a reason wrapped onto the next line passes; reasons never carry to the next item.
+- **Files:** internal/brief/refs.go, internal/brief/refs_test.go
+- **Notes for next iteration:** New refEntries groups section lines: an item ends at a blank line, a non-indented line, or the next entry line. Continuation lines are joined with a space onto the text after the path, then matched by the unchanged reasonSepRe. The separator may even start the continuation line. Tests: TestBindingRefsWrap, TestBindingRefsWrapNoReason, TestBindingRefsWrapNextItemBoundary. No testdata files added.

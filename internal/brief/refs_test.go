@@ -89,3 +89,53 @@ func TestBindingRefsEntryPoints(t *testing.T) {
 		}
 	}
 }
+
+func TestBindingRefsWrap(t *testing.T) {
+	entry := "- `docs/x.md` — the error contract"
+	sub := func(with string) func(string, string) string {
+		return func(root, s string) string {
+			_ = os.WriteFile(filepath.Join(root, "docs", "y.md"), []byte("y"), 0o644)
+			return strings.Replace(s, entry, with, 1)
+		}
+	}
+	for name, with := range map[string]string{
+		"em dash":     "- `docs/x.md` —\n  the error contract, wrapped",
+		"hyphen":      "- `docs/x.md` -\n    a reason\n    across two lines",
+		"next item":   "- `docs/x.md` —\n  the reason for x\n- `docs/y.md` — y",
+		"spread over": "- `docs/x.md`\n  — the reason",
+	} {
+		if res := refsRun(t, "en", "en", sub(with)); res.Failed() {
+			t.Errorf("%s: %v", name, res.Lines)
+		}
+	}
+}
+
+func TestBindingRefsWrapNoReason(t *testing.T) {
+	entry := "- `docs/x.md` — the error contract"
+	for name, with := range map[string]string{
+		"blank after separator": "- `docs/x.md` —\n\n- `docs/y.md` — y",
+		"no separator":          "- `docs/x.md`\n  continuation text",
+		"not indented":          "- `docs/x.md` —\nnot part of the item",
+	} {
+		mutate := func(root, s string) string {
+			_ = os.WriteFile(filepath.Join(root, "docs", "y.md"), []byte("y"), 0o644)
+			return strings.Replace(s, entry, with, 1)
+		}
+		res := refsRun(t, "en", "en", mutate)
+		if !has(res.Problems(), "binding reference has no reason: docs/x.md") {
+			t.Errorf("%s: %v", name, res.Lines)
+		}
+	}
+}
+
+func TestBindingRefsWrapNextItemBoundary(t *testing.T) {
+	entry := "- `docs/x.md` — the error contract"
+	mutate := func(root, s string) string {
+		_ = os.WriteFile(filepath.Join(root, "docs", "y.md"), []byte("y"), 0o644)
+		return strings.Replace(s, entry, "- `docs/x.md` —\n  the reason for x\n- `docs/y.md`", 1)
+	}
+	res := refsRun(t, "en", "en", mutate)
+	if !has(res.Problems(), "binding reference has no reason: docs/y.md") || has(res.Problems(), "binding reference has no reason: docs/x.md") {
+		t.Errorf("%v", res.Lines)
+	}
+}

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 14808,
+  "stop_reason": "end_turn",
+  "session_id": "adbaef96-8730-4f9a-a870-4a7e500051bd",
+  "total_cost_usd": 0.0974368,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 16305,
+    "cache_read_input_tokens": 86004,
+    "output_tokens": 1500,
+    "output_tokens_details": {
+      "thinking_tokens": 195
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 16305,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 206,
+        "cache_read_input_tokens": 27399,
+        "cache_creation_input_tokens": 922,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 922
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1500,
+      "cacheReadInputTokens": 86004,
+      "cacheCreationInputTokens": 16305,
+      "webSearchRequests": 0,
+      "costUSD": 0.0974368,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 195,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T2 passes. `refEntries` in `internal/brief/refs.go` now joins the indented continuation lines into the entry. The three new `Wrap` tests cover the wrapped pass, the no-reason failure and the next-item boundary. I didn't re-run the gate myself, only `go test ./internal/brief`, which passed (cached).\n\nOne gap: the plan listed `internal/brief/testdata/refs/`, but the tests build their fixtures inline, so that directory doesn't exist. I noted it in the verdict and didn't count it as a failure.\n\nThe verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2543,
+  "type": "result",
+  "duration_ms": 15868,
+  "uuid": "22a4ccd8-6677-4f49-95a2-f3646971866c",
+  "ttft_stream_ms": 1481,
+  "time_to_request_ms": 347,
+  "first_content_frame_ms": 1482,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 2
+}
