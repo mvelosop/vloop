@@ -4,7 +4,8 @@ A Go CLI and Claude Code plugin that packages the autonomous loop: plan a brief
 into tasks, then per task a fresh work session, a gate, an independent review,
 one commit. It is built **by** the shell loop vendored in `.loop/`, one brief at
 a time, following `docs/design-notes/vloop-roadmap.md` — read that first; its
-"Owns" column says what exists and what comes next. The briefs live in
+"Owns" column says what exists and what comes next. The domain — vocabulary,
+invariants, contexts — is `docs/domain/README-domain.md`. The briefs live in
 `docs/briefs/`, each with a `## Run record` once consumed.
 
 ## Which rules bind you
@@ -13,8 +14,9 @@ a time, following `docs/design-notes/vloop-roadmap.md` — read that first; its
   rules below bind you, all of them. You do not commit, you do one task, you set
   no status.
 - **An interactive session with the operator**: you are the operator's hands,
-  not a loop session. Follow `.claude/skills/vloop-operator/SKILL.md` — the
-  playbook for writing, running, verifying and closing briefs. You may commit
+  not a loop session. Writing a brief follows
+  `.claude/skills/vloop-architect/SKILL.md` (the design act); running,
+  verifying and closing one follows `.claude/skills/vloop-operator/SKILL.md`. You may commit
   on work branches; merging, pushing and anything outward-facing wait for the
   operator's go-ahead. Rules 1, 2 and 8 below bind you too.
 

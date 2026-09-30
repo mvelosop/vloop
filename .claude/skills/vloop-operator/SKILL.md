@@ -1,6 +1,6 @@
 ---
 name: vloop-operator
-description: The operator's playbook for this repo — turn the operator's intent into a loop brief, run it with the shell loop on a work branch, handle halts, verify the result independently, record defects, close the brief, and merge. Use in an interactive session whenever the operator asks to write, check, run, resume, verify, close or merge a brief, or asks what the next brief is.
+description: The operator's playbook for this repo — from a ready loop brief, run it with the shell loop on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief, and merge; and use the docs to resolve what comes up. Use in an interactive session whenever the operator asks to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is the vloop-architect skill's.
 ---
 
 # Operating the loop
@@ -15,37 +15,32 @@ the runbook: its rows say what each brief owns, and the next row's out-of-scope
 list is the rows after it. Read the roadmap and the last consumed brief's
 `## Run record` before anything else.
 
-## 1. The design act — intent to brief
+## 1. Where briefs come from, and where rules live
 
-1. **Survey before you ask.** The roadmap row, the previous briefs' run records
-   ("Still open"), the code the brief will touch, and the shell loop's own
-   formats if the brief reads them (`.loop/run.sh`, `.loop/state/runs/`).
-   Measure real numbers from the telemetry rather than quoting old run records —
-   those were hand-rounded.
-2. **Settle forks with the operator**, few at a time, each with a recommendation.
-   Record what you decided yourself as "choices to review" in your reply.
-3. **Write the brief** from `.loop/loop-brief.template.md`, named
-   `docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md`, frontmatter
-   `status: draft` and `depends-on:` the previous brief's name. Pin decisions,
-   leave mechanics open. Every brief so far also carried:
-   - a worked example with exact values, **plus** planted failures;
-   - a real-data check where the slice can read this repo's history;
-   - the constraints section's lessons (below), verbatim where they apply;
-   - an explicit list of earlier tests that *must* change (e.g. `config list`
-     gaining keys) — otherwise "no task may weaken a check" blocks the task.
-4. **Check it twice**: `.loop/check-brief.sh <brief>` (the shell loop plans from
-   it) and `vloop brief check` on a copy with `status: ready` (vloop's rules are
-   stricter: one path per binding reference). Aim for 0 problems, 0 warnings;
-   un-backtick paths that exist only after the run.
-5. Point the roadmap row at the brief. Stop for the operator's review.
+Briefs are written by the design act — the `vloop-architect` skill, or the
+operator — and reach you `ready`. You do not design; when a run or a
+verification raises a question the brief does not answer, you **find the rule**
+and bring the operator a proposal:
 
-**Where defects come from.** Of the six recorded for B1–B3, three are spec gaps
-in the briefs themselves. The review of the brief is the cheapest place to find
-the next one: look for sentences two sessions could read two ways.
+- **Which rule does a failure break?** Walk the domain
+  (`docs/domain/README-domain.md` → `domain-model.md` → the context and entity
+  page) to the invariant that applies. Cite it by ID in what you report
+  (`B-4`, `P-4`, `S-2`, `M-5`…).
+- **Whose defect is it?** If the brief pinned the rule and the work broke it:
+  `origin: work`. If the brief was silent or ambiguous where the domain is clear:
+  `origin: brief`, a spec gap — the fix belongs in the next brief's references,
+  not only in the code. If the domain itself is silent: propose the rule to the
+  operator; it may belong in `domain-model.md`.
+- **Is it a gate problem?** `docs/domain/execution/task.md` → "The gate": a gate
+  that cannot pass for a reason outside the task is a plan defect, and
+  `task verify` (or `.loop/amend.sh verify`) with a reason is the remedy.
+- **What has happened before?** `.vloop/defects/`, the interventions index
+  (`.vloop/interventions/README-interventions.md`) and the run records — the
+  same problem may already have a recorded answer.
 
 ## 2. Running
 
-1. Operator says go: set `status: ready`, then **create the work branch before
+1. The operator says go: set `status: ready`, then **create the work branch before
    anything else** — named for the run id (the brief name minus `.loop-brief`):
    `git switch -c <run id>`, commit the brief there. B1's plan commit landed on
    `main` because the branch came after the planning preview.
