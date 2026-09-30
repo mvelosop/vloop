@@ -1,0 +1,8 @@
+{
+  "task": "T6",
+  "outcome": "blocked",
+  "summary": "`vloop init` is already implemented and on disk (internal/cli/init.go, internal/install/section.go, Init tests, README at 197 lines, commands.md regenerated). go test on the touched packages passes. The verify gate cannot pass for a correct implementation.",
+  "files": ["internal/cli/init.go", "internal/cli/init_test.go", "internal/cli/root.go", "internal/install/section.go", "internal/config/config.go", "README.md", "docs/guide/commands.md"],
+  "verified": "go test ./internal/install ./internal/detect ./internal/cli ./cmd/vloop: ok. Reproduced the gate conflict by hand: after init on a repo whose committed .gitignore lacks the line, `git status --porcelain --untracked-files=no` prints ' M .gitignore' while `git diff --cached --quiet` succeeds (nothing staged).",
+  "notes": "Gate is wrong, not the code. The fixture `ex` commits .gitignore ('node_modules/'), and the gate requires init to append .vloop/tmp/ to it (and the acceptance requires 'updated .gitignore'). The check `[ -z \"$(g status --porcelain --untracked-files=no)\" ]` must therefore fail for any correct init, because a modified tracked file is always listed. Fix in the plan: replace that clause with `g diff --cached --quiet` (nothing staged); the HEAD-equality and for-each-ref checks stay. Gate steps after that line have not been exercised against the implementation; the operator should re-run the corrected gate. Shared helpers for T7: install.Section, install.MergeClaudeMD, install.MergeGitignore."
+}

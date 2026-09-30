@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 21998,
+  "stop_reason": "end_turn",
+  "session_id": "bedf1b03-cca7-4a94-ac24-460597b205b0",
+  "total_cost_usd": 0.1259512,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 21762,
+    "cache_read_input_tokens": 97686,
+    "output_tokens": 1935,
+    "output_tokens_details": {
+      "thinking_tokens": 266
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 21762,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 415,
+        "cache_read_input_tokens": 33013,
+        "cache_creation_input_tokens": 765,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 765
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1935,
+      "cacheReadInputTokens": 97686,
+      "cacheCreationInputTokens": 21762,
+      "webSearchRequests": 0,
+      "costUSD": 0.1259512,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 266,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I've reported T6 as `blocked`. The `vloop init` implementation is already on disk from the previous attempt, but the verify gate can't pass for a correct `init`.\n\n**The gate conflict:**\n- **The check:** after `init`, the gate requires `git status --porcelain --untracked-files=no` to print nothing (\"init must not commit or stage\").\n- **The contradiction:** the gate's fixture commits a `.gitignore`. The same gate also requires `init` to append `.vloop/tmp/` to that file, and the acceptance criteria require printing `updated .gitignore`. A modified tracked file always shows as ` M .gitignore`, so the status check fails.\n- **My repro:** I ran `init` by hand on such a repo. Status printed ` M .gitignore`, and `git diff --cached --quiet` confirmed nothing was staged.\n\n**Suggested fix:** replace the status clause with `git diff --cached --quiet`. The HEAD-equality and refs checks can stay as they are.\n\n**Verification:** `go test` passes on the touched packages. I did not run the full gate, and the steps after the failing check haven't been exercised against the implementation. The README stays at 197 lines. The details are in `.loop/tmp/proposal.json`.",
+  "ttft_ms": 2865,
+  "type": "result",
+  "duration_ms": 24149,
+  "uuid": "cb81482e-9235-4ca4-9aff-f5d158f6e882",
+  "ttft_stream_ms": 1937,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1938,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 7
+}
