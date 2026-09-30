@@ -4,16 +4,16 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **3/8 done** · iteration 3
+**Status:** running · **4/8 done** · iteration 4
 
-**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:45:30Z
+**Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T11:47:40Z
 
 ## Progress
 
 - [x] **T1** — Add the `export/v1` schema and the `abandoned` brief status
 - [x] **T2** — Build the run-record renderer, the marker splice and the metrics snapshot writer
 - [x] **T3** — Add `vloop brief close`: findings, refusals, status lines, run record, snapshot and one commit
-- [ ] **T4** — Add `--abandon "<reason>"` and `--dry-run` to `vloop brief close`
+- [x] **T4** — Add `--abandon "<reason>"` and `--dry-run` to `vloop brief close`
 - [ ] **T5** — Add `vloop metrics export`: JSON Lines of briefs, tasks and defects with the repository's identity
 - [ ] **T6** — Add `--workspace <file>` to `vloop metrics` and `vloop metrics export`
 - [ ] **T7** — Write the guide: concepts, the configuration reference and a generated command reference
@@ -106,7 +106,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T4 — Add `--abandon "<reason>"` and `--dry-run` to `vloop brief close`
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 **Files:** `internal/cli/close.go`, `internal/cli/close_flags_test.go`, `README.md`
 

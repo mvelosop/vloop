@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,7 +25,8 @@ const closeFindingsMsg = `say what you found before merge: --finding "<summary>"
 
 func newBriefClose(g *Globals) *cobra.Command {
 	var findings []string
-	var none bool
+	var none, dry bool
+	var abandon string
 	cmd := &cobra.Command{
 		Use:   "close <brief>",
 		Short: "Record findings, snapshot the metrics, write the run record, mark the brief consumed and commit",
@@ -37,12 +40,23 @@ func newBriefClose(g *Globals) *cobra.Command {
 					return errors.New("a finding must not be empty")
 				}
 			}
-			return runBriefClose(g, cmd, args[0], findings)
+			if cmd.Flags().Changed("abandon") && strings.TrimSpace(abandon) == "" {
+				return errors.New("an abandon needs a reason: --abandon \"<reason>\"")
+			}
+			return runBriefClose(g, cmd, args[0], findings, closeOpts{abandon: cmd.Flags().Changed("abandon"), reason: strings.TrimSpace(abandon), dry: dry})
 		},
 	}
 	cmd.Flags().StringArrayVar(&findings, "finding", nil, "a defect you found in the run, recorded as an operator defect (repeatable)")
 	cmd.Flags().BoolVar(&none, "no-findings", false, "state that you found nothing")
+	cmd.Flags().StringVar(&abandon, "abandon", "", "close a brief whose plan did not complete, as abandoned, with the reason")
+	cmd.Flags().BoolVar(&dry, "dry-run", false, "print what a close would record, write and commit, and write nothing")
 	return cmd
+}
+
+type closeOpts struct {
+	abandon bool
+	reason  string
+	dry     bool
 }
 
 func runGit(root string, args ...string) (string, error) {
@@ -57,7 +71,7 @@ func runGit(root string, args ...string) (string, error) {
 	return strings.TrimRight(string(out), "\n"), nil
 }
 
-func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string) error {
+func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string, opt closeOpts) error {
 	out := cmd.OutOrStdout()
 	root, err := g.root()
 	if err != nil {
@@ -99,7 +113,7 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 	if err != nil {
 		return err
 	}
-	if m.Owned == nil || m.Owned.Run == nil || m.Owned.Run.Outcome != "complete" {
+	if !opt.abandon && (m.Owned == nil || m.Owned.Run == nil || m.Owned.Run.Outcome != "complete") {
 		done, planned := 0, 0
 		if r, err := metrics.Build(root, briefPath, c); err == nil && r != nil {
 			done, planned = r.Tasks.Done, r.Tasks.Planned
@@ -107,8 +121,21 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 		return Problem(fmt.Errorf(`the plan is not complete (%d/%d done) — finish it, or pass --abandon "<reason>"`, done, planned))
 	}
 
+	status, statusText := "consumed", "consumed — closed "+time.Now().Format("2006-01-02")+" as run "+runID+". **Do not re-plan from this brief.**"
+	if opt.abandon {
+		status, statusText = "abandoned", "abandoned — "+opt.reason
+	}
 	now := time.Now()
 	var files []string
+	report, err := metrics.Build(root, briefPath, c)
+	if err != nil {
+		return Problem(err)
+	}
+	report.Status = status
+	subject := "[vloop] close " + runID
+	if opt.dry {
+		return closeDryRun(out, root, briefPath, subject, findings, report, now)
+	}
 	for _, f := range findings {
 		p, err := defect.Add(root, defect.NewInput{Summary: f, FoundBy: "operator", Brief: name, Origin: "work", Kind: "bug", Severity: "medium"}, now)
 		if err != nil {
@@ -116,11 +143,13 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 		}
 		files = append(files, p)
 	}
-	report, err := metrics.Build(root, briefPath, c)
-	if err != nil {
-		return Problem(err)
+	if len(findings) > 0 {
+		// The report above predates the defect files; rebuild so it counts them.
+		if report, err = metrics.Build(root, briefPath, c); err != nil {
+			return Problem(err)
+		}
+		report.Status = status
 	}
-	report.Status = "consumed"
 	snap, err := closing.WriteSnapshot(root, report)
 	if err != nil {
 		return Problem(err)
@@ -133,16 +162,14 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 	if err != nil {
 		return Problem(err)
 	}
-	date := now.Format("2006-01-02")
-	doc = setFrontmatterStatus(doc, "consumed")
-	doc = statusLine.ReplaceAllString(doc, "${1}**Status:** consumed — closed "+date+" as run "+runID+". **Do not re-plan from this brief.**")
+	doc = setFrontmatterStatus(doc, status)
+	doc = statusLine.ReplaceAllString(doc, "${1}**Status:** "+statusText)
 	doc = closing.PutRunRecord(doc, closing.Render(closing.Record{Name: name, Date: now, Report: report, Derived: derived, Recorded: recorded}))
 	if err := os.WriteFile(full, []byte(doc), 0o644); err != nil {
 		return Problem(err)
 	}
 	files = append(files, snap, briefPath)
 
-	subject := "[vloop] close " + runID
 	trailer := "Vloop-Brief: " + name
 	if _, err := runGit(root, append([]string{"add", "--"}, files...)...); err != nil {
 		return Problem(err)
@@ -163,7 +190,7 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 			Files   []string        `json:"files"`
 			Trailer string          `json:"trailer"`
 			Metrics *metrics.Report `json:"metrics"`
-		}{name, "consumed", sha, files, trailer, report})
+		}{name, status, sha, files, trailer, report})
 	}
 	metrics.PrintSummary(out, report)
 	for i, f := range files {
@@ -214,4 +241,35 @@ func setFrontmatterStatus(doc, status string) string {
 		off = end + 1
 	}
 	return doc
+}
+
+// closeDryRun prints what the close would do, counting the pending findings as
+// operator defects in the summary, and touches nothing.
+func closeDryRun(out io.Writer, root, briefPath, subject string, findings []string, report *metrics.Report, now time.Time) error {
+	d := &report.Defects
+	d.Operator += len(findings)
+	d.Total += len(findings)
+	if d.Total > 0 {
+		v := float64(d.InLoop+d.Operator) / float64(d.Total)
+		d.RemovalEfficiency = &v
+	}
+	metrics.PrintSummary(out, report)
+	taken := map[string]bool{}
+	for _, f := range findings {
+		base := "D" + now.Format("20060102-1504") + "-" + defect.Slug(strings.Join(strings.Fields(f), " "))
+		id := base
+		for n := 2; ; n++ {
+			_, err := os.Stat(filepath.Join(root, filepath.FromSlash(defect.Dir), id+".md"))
+			if err != nil && !taken[id] {
+				break
+			}
+			id = base + "-" + strconv.Itoa(n)
+		}
+		taken[id] = true
+		fmt.Fprintf(out, "would record %s/%s.md\n", defect.Dir, id)
+	}
+	fmt.Fprintf(out, "would write %s/%s.json\n", closing.SnapshotDir, report.RunID)
+	fmt.Fprintf(out, "would update %s\n", briefPath)
+	fmt.Fprintf(out, "would commit %s\n", subject)
+	return nil
 }

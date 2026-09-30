@@ -1,0 +1,13 @@
+{
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`--abandon \"<reason>\"` lets close proceed whether or not the last run ended complete; it still requires `--finding` or `--no-findings`. Status becomes abandoned, body line rewritten, snapshot/run record/summary carry abandoned; same one commit.", "met": true, "evidence": "close.go: completeness check skipped under opt.abandon; status/statusText drive frontmatter, body line, report.Status; commit path unchanged. TestCloseAbandonStalledRun and the gate's fx-ab fixture assert these."},
+    {"criterion": "After an abandon, close refuses as already abandoned, brief check skips, brief list shows '-' and blocked dependents, metrics reports abandoned.", "met": true, "evidence": "TestCloseAbandonStalledRun asserts the second-close refusal; the gate exercises check/list/metrics against the abandoned fixture and the gate passed."},
+    {"criterion": "`--dry-run` applies every refusal first with same messages/exit codes, then prints summary, would record/write/update/commit lines, writes nothing.", "met": true, "evidence": "closeDryRun is called after all refusals, before defect.Add; counts findings as operator defects; prints the four would-lines. TestCloseDryRunWritesNothing checks tree clean, HEAD unchanged, no .vloop dirs."},
+    {"criterion": "Committed tests TestCloseAbandon… and TestCloseDryRun… in close_flags_test.go, each with a fixture where the flag applies and one where a refusal still wins.", "met": true, "evidence": "TestCloseAbandonStalledRun / TestCloseAbandonAcceptedOnCompleteRunAndKeepsRefusals; TestCloseDryRunWritesNothing / TestCloseDryRunRefusalsStillWin, with real assertions."},
+    {"criterion": "README documents `--abandon` and `--dry-run` and stays under its 200-line cap.", "met": true, "evidence": "brief close row extended in README.md; wc -l gives 192."}
+  ],
+  "findings": [],
+  "notes": "Minor: --dry-run ignores --json and prints text; dry-run predicts defect paths by duplicating defect.Add's naming scheme, which could drift if that changes. Neither is required by the brief."
+}
