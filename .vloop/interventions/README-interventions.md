@@ -70,6 +70,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | close | ceremony | yes | [I20260929-2321-manual-close-of-b2](I20260929-2321-manual-close-of-b2.md) |
 | close | ceremony | yes | [I20260930-0815-manual-close-of-b3-with-the-vloop-brief](I20260930-0815-manual-close-of-b3-with-the-vloop-brief.md) |
 | close | ceremony | yes | [I20260930-1330-the-first-close-by-vloop-itself-plus-han](I20260930-1330-the-first-close-by-vloop-itself-plus-han.md) |
+| close | ceremony | yes | [I20260930-2215-b5-closed-by-vloop-after-three-runs](I20260930-2215-b5-closed-by-vloop-after-three-runs.md) |
 | close | repair | yes | [I20260929-2048-local-main-reset-to-the-pre-merge-commit](I20260929-2048-local-main-reset-to-the-pre-merge-commit.md) |
 | next | carry-forward | no | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |

@@ -537,3 +537,40 @@ T10  -     -     1    0      325    0      0       2m30s  $0.51  claude-sonnet-5
 - D20260930-2149-t6-gate-required-an-empty-status-while-i — gate, plan, found by gate: T6 gate required an empty status while init must modify tracked .gitignore
 - D20260930-2159-t8-gate-appended-a-top-level-key-after-a — gate, plan, found by gate: T8 gate appended a top-level key after a TOML table
 <!-- vloop:run-record:end -->
+
+### Operator notes
+
+Written by hand, outside the generated markers.
+
+**Three runs.** The run stalled twice (exit 3), each time on a gate the planner
+wrote without executing its fixture edits: T6's gate asserted an empty
+`git status` after requiring `init` to modify a committed `.gitignore`; T8's
+appended `shell = "pwsh"` after a TOML table, where it became `metrics.shell`.
+The work sessions diagnosed both exactly; the operator applied their fixes with
+`.loop/amend.sh verify`, reset the tasks and resumed. Both are recorded as
+`plan`/`gate` defects (fixed) and as interventions.
+
+**Verified outside the loop.** `go test -count=1 ./...` (15 packages), `go
+vet`, `gofmt -l .`, `go mod tidy -diff`, both cross-builds; B1's README test
+unchanged. `claude plugin validate .` passes with no errors or warnings. The
+worked example by hand with binaries at 0.1.0, 0.1.1 and 0.2.0 on a monorepo
+fixture: `init`'s per-directory detection and six scoped classifications,
+`upgrade`'s four cases with the operator's own `CLAUDE.md` text preserved,
+`plugin path` removing a planted file, `version --check-plugin` always exiting
+0, `doctor` clean (exit 0) and with a newer stamp (exit 1). Real data: `init
+--dry-run` on this repository keeps its config and writes nothing; `doctor`
+exits 0 with the two expected warnings. F1 checked against the pre-B5 binary:
+a wrapped reason fails there and passes here.
+
+**Changed by hand.** The two gates above; B1's escaped defects (marketplace
+`owner`, wrapped binding reasons) marked fixed by this brief.
+
+**Still open.**
+
+- The planner writes gates it never runs. Three of this series' gate defects
+  (B2 T1, B5 T6, B5 T8) are that; B6's planner skill should execute each gate
+  against the base commit — it must fail — before handing over the plan.
+- The README is at 199 of its 200-line cap; B6 adds `run` and the skills.
+- Initialising this repository with `vloop init` is the operator's call, best
+  after B6 replaces `.loop/`.
+
