@@ -1,0 +1,17 @@
+{
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Text output is one line per check, then the doctor summary; exit 1 on problem; worked example output", "met": true, "evidence": "writeDoctor in internal/cli/doctor.go; gate prints 'gate T8 ok' including the exact worked-example output"},
+    {"criterion": "--json shape and check order; stacks only when scoped", "met": true, "evidence": "writeDoctor JSON struct; stacks branch only sets scoped entries; gate asserts both orders"},
+    {"criterion": "git, install, config, claude checks", "met": true, "evidence": "doctorGit, install.Read/Compare branches, config.List, exec.LookPath in runDoctor; gate covers each"},
+    {"criterion": "trust check warning, never a problem", "met": true, "evidence": "doctorTrusted returns false on any read/parse failure -> resWarning with the required message"},
+    {"criterion": "gate shell, plan, branch checks", "met": true, "evidence": "runDoctor: plan shell -> problem, configured -> warning; state.Check for plan; branch problem for running/planning on default branch; n/a without plan"},
+    {"criterion": "plugin check", "met": true, "evidence": "doctorPlugin: enabled vloop@* id, version compare, warnings otherwise"},
+    {"criterion": "stacks and self-hosting checks", "met": true, "evidence": "missing scoped dir warning '<entry>: no such directory'; ownModule + HasPrefix(head, b.Commit) warning"},
+    {"criterion": "writes nothing; runs only git, claude --version, claude plugin list --json, PATH lookups", "met": true, "evidence": "code reads only; gate snapshots repo and home before/after and checks the stub's call log"},
+    {"criterion": "README documents doctor, under 200 lines; commands.md regenerated; Doctor tests with stub claude and fake home", "met": true, "evidence": "README.md line 60, 199 lines; nine TestDoctor* functions in internal/cli/doctor_test.go; gate greps '## vloop doctor' in commands.md"}
+  ],
+  "findings": [],
+  "notes": "The implementation was already committed in 7eaca08 (blocked on a gate defect, since corrected by the operator); the working-tree diff is state/intervention records only. I ran the verify command: it passes. README stays at 199 lines; any later README addition must tighten existing text."
+}

@@ -1,0 +1,8 @@
+{
+  "task": "T8",
+  "outcome": "done",
+  "summary": "`vloop doctor` exists: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks (only when scoped) and self-hosting checks, text and --json output, exit 1 on any problem. Read-only; runs only git, claude --version, claude plugin list --json and PATH lookups.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go", "internal/cli/root.go", "README.md", "docs/guide/commands.md"],
+  "verified": "T8 verify command run in the foreground against the operator-corrected gate: printed 'gate T8 ok', exit 0.",
+  "notes": "No code change this attempt: the implementation from the earlier attempt passes the corrected gate (shell line now placed before the [metrics] table). One line per check; pass lines carry no message; default branch = origin/HEAD target else main/master; plugin is n/a when claude is missing. README is at 199 lines (cap is <200), so any further README addition needs tightening existing text."
+}

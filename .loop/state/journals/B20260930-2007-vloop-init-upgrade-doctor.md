@@ -149,3 +149,10 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Run:** `20260930-214909` · 4 iteration(s) this run
 - **Plan:** 7/10 done, 0 blocked
 - **Signals:** 4 iterations · 0.57 per closed · 0 gate failure(s) · 0 review rejection(s) · 2 attempt(s) burned · streak 2 · ~$1.48
+
+## T8 — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
+
+- **Outcome:** done (review: PASS)
+- **Summary:** `vloop doctor` exists: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks (only when scoped) and self-hosting checks, text and --json output, exit 1 on any problem. Read-only; runs only git, claude --version, claude plugin list --json and PATH lookups.
+- **Files:** internal/cli/doctor.go, internal/cli/doctor_test.go, internal/cli/root.go, README.md, docs/guide/commands.md
+- **Notes for next iteration:** No code change this attempt: the implementation from the earlier attempt passes the corrected gate (shell line now placed before the [metrics] table). One line per check; pass lines carry no message; default branch = origin/HEAD target else main/master; plugin is n/a when claude is missing. README is at 199 lines (cap is <200), so any further README addition needs tightening existing text.
