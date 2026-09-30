@@ -22,6 +22,7 @@
 #   2  blocked (needs a human)  6  cost ceiling    (resumable)
 #   3  stalled                  7  session error   (needs a human)
 #   8  repeat blocked, nothing changed since the first diagnosis (needs a human)
+#   9  a session moved git refs (branch, HEAD, remote refs) — nothing committed (needs a human)
 #
 # Env
 #   LOOP_MAX_ITERATIONS   iterations this run may use          (default 30)
@@ -71,6 +72,36 @@ state_restore_if_touched() {
   [[ -f "$STATE" && -s "$STATE_PRE" ]] || return 1
   cmp -s "$STATE" "$STATE_PRE" && return 1
   cp "$STATE_PRE" "$STATE"
+  return 0
+}
+
+# Git refs get the same treatment, with one difference: they are detected, not
+# restored. A planning session checking its own gate fixtures once ran their
+# git commands in the real repository -- it renamed `main` to `master`, created
+# and checked out a branch `work`, and planted `origin/trunk` with `origin/HEAD`
+# pointing at it -- and the driver then committed the whole run to `work`
+# without noticing. The fence now denies the obvious commands, but `git -C`,
+# a script, or a test can still reach them, so the driver snapshots every ref
+# and where HEAD points before each session and compares after. Any difference
+# halts the run before anything is committed: putting refs back is not the
+# driver's call (a moved branch may carry work), and committing onto whatever
+# HEAD now is would put the iteration on the wrong branch.
+REFS_PRE="$(mktemp "${TMPDIR:-/tmp}/loop-refs.XXXXXX")"
+REFS_NOW="$(mktemp "${TMPDIR:-/tmp}/loop-refs.XXXXXX")"
+REFS_MOVED=0
+
+refs_state() {
+  { printf 'HEAD -> %s\n' "$(git symbolic-ref -q HEAD || git rev-parse -q --verify HEAD)"
+    git for-each-ref --format='%(refname) %(objectname) %(symref)'
+  } 2>/dev/null
+}
+refs_snapshot() { refs_state >"$REFS_PRE"; }
+
+# Prints what moved and returns 0 when the session moved a ref; 1 when not.
+refs_moved() {
+  refs_state >"$REFS_NOW"
+  cmp -s "$REFS_PRE" "$REFS_NOW" && return 1
+  diff "$REFS_PRE" "$REFS_NOW" | sed -n 's/^< /     before: /p; s/^> /     after:  /p'
   return 0
 }
 
@@ -546,7 +577,7 @@ acquire_lock() {
   fi
   jq -nc --arg p "$$" --arg b "$BRANCH" --arg t "$(ts)" --arg r "$RUN_PATH" \
     '{pid: $p, branch: $b, started: $t, run: $r}' >"$LOCK"
-  trap 'rm -f "$LOCK" "$STATE_PRE"' EXIT
+  trap 'rm -f "$LOCK" "$STATE_PRE" "$REFS_PRE" "$REFS_NOW"' EXIT
 }
 
 # ------------------------------------------------------------- preflight ----
@@ -707,7 +738,7 @@ entry_point() {
 if [[ "$CHECK_ONLY" -eq 1 ]]; then
   RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/loop-check.XXXXXX")"
   SESSIONS="$RUN_DIR/sessions"
-  trap 'rm -rf "$RUN_DIR" "$STATE_PRE"' EXIT
+  trap 'rm -rf "$RUN_DIR" "$STATE_PRE" "$REFS_PRE" "$REFS_NOW"' EXIT
   preflight
   say ""
   if [[ "$WARN_COUNT" -eq 0 ]]; then
@@ -809,8 +840,14 @@ if [[ ! -f "$STATE" ]]; then
   [[ -f "$BRIEF" ]] || die "brief not found: $BRIEF"
 
   say "planning from $BRIEF using $PLAN_MODEL"
+  refs_snapshot
   run_session plan 0 "$PLAN_MODEL" "/loop-plan $BRIEF" \
     || die "planning session failed — see .loop/state/runs/$RUN_PATH/"
+  if moved="$(refs_moved)"; then
+    printf '\033[31m[loop] REFS MOVED — the planning session changed git refs; nothing was committed:\033[0m\n%s\n' "$moved" >&2
+    printf '\033[31m[loop] restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run\033[0m\n' >&2
+    exit 9
+  fi
 
   [[ -f "$STATE" ]] || die "planning produced no .loop/state/state.json"
   jq -e . "$STATE" >/dev/null 2>&1 || die ".loop/state/state.json is not valid JSON"
@@ -1045,8 +1082,15 @@ while true; do
 
   # 1. work session
   state_snapshot
+  refs_snapshot
   run_session work "$iter" "$WORK_MODEL" "/loop-work $task"
-  if [[ $? -ne 0 && ! -f "$PROPOSAL" ]]; then
+  work_rc=$?
+  if moved="$(refs_moved)"; then
+    warn "   REFS MOVED $task — the work session changed git refs; halting before anything is committed"
+    printf '%s\n' "$moved" | while IFS= read -r l; do warn "$l"; done
+    REFS_MOVED=1; status="refs_moved"; exit_code=9; break
+  fi
+  if [[ $work_rc -ne 0 && ! -f "$PROPOSAL" ]]; then
     status="session_error"; exit_code=7; break
   fi
 
@@ -1147,7 +1191,13 @@ while true; do
   else
     # 3. review session — separate, read-only, sees the diff and not the summary
     state_snapshot
+    refs_snapshot
     run_session review "$iter" "$WORK_MODEL" "/loop-review $task"
+    if moved="$(refs_moved)"; then
+      warn "   REFS MOVED $task — the review session changed git refs; halting before anything is committed"
+      printf '%s\n' "$moved" | while IFS= read -r l; do warn "$l"; done
+      REFS_MOVED=1; status="refs_moved"; exit_code=9; break
+    fi
     if state_restore_if_touched; then
       warn "   STATE TAMPERING $task — review session modified .loop/state/state.json; restored"
       tampered="review session modified .loop/state/state.json — restored by the driver; only the driver makes status transitions"
@@ -1309,6 +1359,7 @@ case "$status" in
   not_converging) say "iterations-per-closed-task exceeded $CONVERGENCE_MAX — the run is not converging." ;;
   session_error)  say "a claude session failed. see .loop/state/runs/$RUN_PATH/" ;;
   repeat_blocked) say "$repeat_blocked_msg" ;;
+  refs_moved)     say "a session moved git refs (above). nothing from this iteration was committed: restore the refs, then re-run" ;;
 esac
 render_plan
 
@@ -1329,7 +1380,10 @@ find "$RUN_DIR" -name '*.stderr' -empty -delete 2>/dev/null
     "$(sig_attempts)" "$(sig_streak)" "$(printf '%.2f' "$(sig_spend)")"
 } >>"$JOURNAL"
 
-git add -A >/dev/null 2>&1
-git diff --cached --quiet 2>/dev/null || git commit -q -m "[loop] run $RUN_PATH: $status"
+# Never commit onto refs a session moved: HEAD may be on another branch now.
+if [[ $REFS_MOVED -eq 0 ]]; then
+  git add -A >/dev/null 2>&1
+  git diff --cached --quiet 2>/dev/null || git commit -q -m "[loop] run $RUN_PATH: $status"
+fi
 
 exit "$exit_code"

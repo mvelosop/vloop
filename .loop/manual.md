@@ -587,9 +587,10 @@ against the point of the run.
 | cost ceiling | 6 | raise `LOOP_COST_CEILING`, re-run |
 | session error | 7 | a `claude` session died; see the run dir |
 | repeat blocked | 8 | a task blocked twice with nothing changed between attempts; read the first diagnosis in its `notes` |
+| refs moved | 9 | a session changed git refs — renamed or created a branch, moved HEAD, planted a remote ref. The log lists each ref before and after; nothing from that iteration was committed. Put the refs back, then re-run |
 
 Complete, max-iterations, stalled and cost-ceiling resume by just re-running.
-Blocked, not-converging, session-error and repeat-blocked want a human first.
+Blocked, not-converging, session-error, repeat-blocked and refs-moved want a human first.
 
 ## 9. Reading what happened
 

@@ -74,6 +74,7 @@ pass. See the [manual](manual.md).
 | cost ceiling | 6 | yes — raise `LOOP_COST_CEILING` |
 | session error | 7 | no — a `claude` session failed |
 | repeat blocked | 8 | no — two identical `blocked` outcomes with nothing changed between them, a human decides |
+| refs moved | 9 | no — a session moved a branch, HEAD or a remote ref; nothing from that iteration was committed. Restore the refs, then re-run |
 
 Budgets are checked **between** iterations and are **per-run**, so raising one
 and re-running needs no state edit. They are runaway backstops; the convergence
