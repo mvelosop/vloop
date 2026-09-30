@@ -296,6 +296,22 @@ func List(root string) ([]Value, error) {
 	return out, nil
 }
 
+// Check validates a non-empty value for key name as Set would, without
+// writing anything.
+func Check(root, name, value string) error {
+	k, err := Lookup(name)
+	if err != nil {
+		return err
+	}
+	if err := k.Validate(value); err != nil {
+		return err
+	}
+	if k.Stacks {
+		return checkScopeDirs(root, value)
+	}
+	return nil
+}
+
 // Set validates and writes name=value into the config file under root,
 // preserving every other key. An empty value removes the key. The file is not
 // touched (nor created) when the result would not change the key.

@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **5/10 done** · iteration 5
+**Status:** running · **5/10 done** · iteration 6
 
-**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:44:02Z
+**Brief:** `docs/briefs/B20260930-2007-vloop-init-upgrade-doctor.loop-brief.md` · **Updated:** 2026-09-30T20:47:01Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T3** — Complete the plugin: valid manifests, the SessionStart hook, `vloop version --check-plugin` and `vloop plugin path`
 - [x] **T4** — Fix F2: stacks scoped by path — parse and validate `stack@path`, resolve scopes, match scope-relative, label scoped matches
 - [x] **T5** — Detect stacks per directory: the marker table, the C# solution rule, skipped directories, sorted scoped output
-- [ ] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
+- [ ] **T6** — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section · 1 attempt(s)
 - [ ] **T7** — Add `vloop upgrade`: refresh vloop's CLAUDE.md section and .gitignore line, refusing downgrades and unconfirmed breaking jumps
 - [ ] **T8** — Add `vloop doctor`: git, install, config, claude, trust, gate shell, plan, branch, plugin, stacks and self-hosting checks
 - [ ] **T9** — Document setup and scoped stacks: README, command reference, configuration, metrics, concepts and the domain docs
@@ -153,7 +153,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T6 — Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
 
-`pending` · depends on: T1, T4, T5
+`pending` · 1 attempt(s) · depends on: T1, T4, T5
 
 **Files:** `internal/cli/init.go`, `internal/cli/init_test.go`, `internal/cli/root.go`, `internal/install/`, `README.md`, `docs/guide/commands.md`
 
@@ -171,6 +171,8 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 - init writes only under .vloop/, docs/briefs/, .gitignore and CLAUDE.md; never .claude/settings.json or .loop/; never commits, stages or creates refs; never follows a symlink out of the repository when writing; and builds no path from an unvalidated language or stack name.
 - --dry-run prints `would write <path>` / `would update <path>` / `would keep <path>` for the same decisions and writes nothing.
 - README.md documents `vloop init` with --language, --stacks and --dry-run and stays under 200 lines; docs/guide/commands.md is regenerated. Committed tests whose names contain Init cover every refusal, every write, the marker cases and --dry-run.
+
+**From the last attempt:** Implemented `vloop init` (internal/cli/init.go, internal/install/section.go, config.Check, Init tests, README row at 197 lines, commands.md regenerated); go test/vet/gofmt/builds and every gate step before the first worked-example assertion pass, but the gate itself fails at 'init must not commit or stage'.
 
 <details><summary>verify command</summary>
 

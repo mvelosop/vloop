@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 120215,
+  "stop_reason": "end_turn",
+  "session_id": "dec8c293-a83a-45a0-a9a4-5142e0672e4a",
+  "total_cost_usd": 0.6048910000000001,
+  "usage": {
+    "input_tokens": 32,
+    "cache_creation_input_tokens": 62799,
+    "cache_read_input_tokens": 849605,
+    "output_tokens": 18371,
+    "output_tokens_details": {
+      "thinking_tokens": 2496
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 62799,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 557,
+        "cache_read_input_tokens": 73938,
+        "cache_creation_input_tokens": 877,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 877
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 32,
+      "outputTokens": 18371,
+      "cacheReadInputTokens": 849605,
+      "cacheCreationInputTokens": 62799,
+      "webSearchRequests": 0,
+      "costUSD": 0.6048910000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 2496,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_0197ZwbUuLfntpdqcNuocEYS",
+      "tool_input": {
+        "command": "cd /tmp && rm -rf fxx && mkdir fxx && cd fxx && git init -q -b main && printf 'module a\\n' >go.mod && printf 'node_modules/\\n' >.gitignore && git add -A && git -c user.name=a -c user.email=a@b commit -qm base && go build -o /tmp/vl ~/source/personal/vloop/cmd/vloop 2>&1; (cd ~/source/personal/vloop && go build -o /tmp/vl ./cmd/vloop) && /tmp/vl init >/dev/null; git status --porcelain --untracked-files=no"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 16,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `vloop init`, but the T6 gate fails, so I reported T6 as `blocked`. The failure is the gate's own assertion, not the code.\n\nThe gate stops at its `init must not commit or stage` check. That check requires `git status --porcelain --untracked-files=no` to print nothing after `init`. The fixture commits `.gitignore`, and a later gate step requires `init` to append `.vloop/tmp/` to it. A tracked file that has been edited always shows as ` M .gitignore`, so no correct `init` can pass this check. The check should assert that nothing is staged (for example `git diff --cached --quiet`). I did not rewrite the gate. The gate steps after that line never ran, so they are unverified by the gate.\n\n- **`vloop init`:** it does the refusals, the five writes, the `would …` dry-run lines and the symlink checks as the brief specifies. Symlinked targets are refused (exit 1) before anything is written.\n- **Shared helpers:** T7's upgrade can reuse `install.Section`, `install.MergeClaudeMD` and `install.MergeGitignore`. I also added `config.Check`, which validates a language or stacks value without writing.\n- **Docs:** README is at 197 lines with the new command and flags. I regenerated `docs/guide/commands.md` with `go generate`.\n- **Checks:** `go vet` and the tests for `internal/cli`, `internal/install` and `internal/config` pass. The new Init tests cover every refusal, the writes, the CLAUDE.md marker cases, `--dry-run` and the symlink case.\n\nThe proposal with these notes is in `.loop/tmp/proposal.json`.",
+  "ttft_ms": 2161,
+  "type": "result",
+  "duration_ms": 158840,
+  "uuid": "72082bf4-9396-4df8-9785-8effc6f46547",
+  "ttft_stream_ms": 1111,
+  "time_to_request_ms": 361,
+  "first_content_frame_ms": 1111,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 6
+}

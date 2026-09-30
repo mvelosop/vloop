@@ -1,0 +1,8 @@
+{
+  "task": "T6",
+  "outcome": "blocked",
+  "summary": "Implemented `vloop init` (internal/cli/init.go, internal/install/section.go, config.Check, Init tests, README row at 197 lines, commands.md regenerated); go test/vet/gofmt/builds and every gate step before the first worked-example assertion pass, but the gate itself fails at 'init must not commit or stage'.",
+  "files": ["internal/cli/init.go", "internal/cli/init_test.go", "internal/cli/root.go", "internal/install/section.go", "internal/config/config.go", "README.md", "docs/guide/commands.md"],
+  "verified": "Ran the T6 verify command: fails with 'GATE FAIL: init must not commit or stage'; go test of the touched packages passes.",
+  "notes": "The gate is wrong, not the code. The fixture (ex) commits .gitignore ('node_modules/'), and the same gate later requires init to append .vloop/tmp/ to it. A tracked file edited in the working tree always shows as ' M .gitignore' in `git status --porcelain --untracked-files=no`, so that check (`-z` on its output) cannot pass for a correct init. HEAD equality and the refs check are fine. It should assert nothing is staged, e.g. `git diff --cached --quiet`, instead of an empty porcelain status. Remaining gate steps after that line were not reached, so they are unverified by the gate. Design: init validates and plans all five writes first, refuses symlinked targets (exit 1) before writing anything; existing-config case prints 'suggest metrics.stacks: ...' for detected stacks the config lacks; starter brief language comes from --language, else the existing config's language. Shared helpers for T7 are install.Section, install.MergeClaudeMD, install.MergeGitignore."
+}

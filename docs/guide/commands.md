@@ -144,6 +144,18 @@ Set status, fixed-by, case, severity, origin, kind, task of a defect
 vloop defect set <id> <field> <value>
 ```
 
+## vloop init
+
+Set a repository up for vloop
+
+```
+vloop init [flags]
+```
+
+- `--dry-run`: print what would be written and write nothing
+- `--language string`: language of briefs and guidance: en or es (default en)
+- `--stacks string`: metrics.stacks to write, instead of the detected ones
+
 ## vloop metrics
 
 Summarise what a brief cost and delivered, from its runs and commits

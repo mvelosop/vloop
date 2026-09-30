@@ -88,3 +88,18 @@
 [36m[loop][0m cost=$0.12045840000000001 turns=6 dur=16s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T5 done
+[36m[loop][0m    committed e294152
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            5
+[36m[loop][0m   tasks closed:          5/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $7.80 (estimate, not a bill)
+[36m[loop][0m ── iteration 6 (6/30 this run) · T6 · 5/10 done ──
+[36m[loop][0m    Add `vloop init`: config with detected stacks, the stamp, a starter brief, the .gitignore line and the CLAUDE.md section
+[36m[loop][0m cost=$0.6048910000000001 turns=16 dur=159s error=false
+[33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
+[36m[loop][0m    work session reported blocked
