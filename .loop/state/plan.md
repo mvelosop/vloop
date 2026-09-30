@@ -4,7 +4,7 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **8/8 done** · iteration 8
+**Status:** complete · **8/8 done** · iteration 8
 
 **Brief:** `docs/briefs/B20260930-0929-vloop-close-export-workspace.loop-brief.md` · **Updated:** 2026-09-30T12:00:48Z
 

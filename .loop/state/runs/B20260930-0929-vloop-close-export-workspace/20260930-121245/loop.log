@@ -137,3 +137,33 @@
 [36m[loop][0m cost=$0.15419239999999998 turns=7 dur=34s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T8 done
+[36m[loop][0m    committed 186d195
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            8
+[36m[loop][0m   tasks closed:          8/8
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $10.92 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m ═══ complete ═══
+[36m[loop][0m run:    B20260930-0929-vloop-close-export-workspace/20260930-121245  (8 iteration(s) this run)
+[36m[loop][0m plan:   8/8 done, 0 blocked
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            8
+[36m[loop][0m   tasks closed:          8/8
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $10.92 (estimate, not a bill)
+[36m[loop][0m 
+[36m[loop][0m per-phase cost:
+[36m[loop][0m plan: 1 session(s), $6.11, 47 turns
+[36m[loop][0m work: 8 session(s), $3.6, 116 turns
+[36m[loop][0m review: 8 session(s), $1.21, 43 turns
+[36m[loop][0m 
+[36m[loop][0m plan complete. journal: .loop/state/journals/B20260930-0929-vloop-close-export-workspace.md

@@ -99,3 +99,9 @@ I've written the plan to `.loop/state/state.json`: run `B20260930-0929-vloop-clo
 - **Summary:** Added cmd/vloop/b4_e2e_test.go: TestWorkedExampleB4Close, ...Workspace and ...PlantedFailures play the brief's worked example and every planted failure against the built binary on fixture repos. b3Fixture was split into b3PreMerge (the pre-merge prefix) plus the merge, so B4 reuses it.
 - **Files:** cmd/vloop/b4_e2e_test.go, cmd/vloop/b3_e2e_test.go, embed_test.go
 - **Notes for next iteration:** Two edits outside the two listed files. (1) embed_test.go: TestSchemasAreEmbedded still expected 7 schemas but export.v1.json (added earlier) makes 8, which failed `go test ./...`; changed 7 to 8, nothing else. (2) b3_e2e_test.go: b3Opts gained `stalled`, b3PreMerge is new, and the fixture's brief body now carries a '- **Status:** ready to plan' line; B3 assertions are unchanged and pass. Fixture gotchas: the 'HEAD on main' plant fast-forwards main to the work branch first, since runs are found from branch history (otherwise close says 'no runs'); `brief check` takes the brief's repo-relative .md path, not the name; the fixture needs a local git user.name/email for close to commit.
+
+## Run ended — complete
+
+- **Run:** `20260930-121245` · 8 iteration(s) this run
+- **Plan:** 8/8 done, 0 blocked
+- **Signals:** 8 iterations · 1.00 per closed · 0 gate failure(s) · 0 review rejection(s) · 0 attempt(s) burned · streak 0 · ~$10.92
