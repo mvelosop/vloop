@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 81075,
+  "stop_reason": "end_turn",
+  "session_id": "1895d728-a8dc-4585-81e0-257fd1b55db3",
+  "total_cost_usd": 0.3576394,
+  "usage": {
+    "input_tokens": 18,
+    "cache_creation_input_tokens": 46602,
+    "cache_read_input_tokens": 361227,
+    "output_tokens": 9895,
+    "output_tokens_details": {
+      "thinking_tokens": 1298
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 46602,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 501,
+        "cache_read_input_tokens": 58006,
+        "cache_creation_input_tokens": 612,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 612
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 18,
+      "outputTokens": 9895,
+      "cacheReadInputTokens": 361227,
+      "cacheCreationInputTokens": 46602,
+      "webSearchRequests": 0,
+      "costUSD": 0.3576394,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1298,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 10,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T7 is done: the T7 gate prints `gate T7 ok`, and the proposal is written to `.loop/tmp/proposal.json`. The gate included the README test and a check that `go generate ./...` reproduces the committed `commands.md`.\n\n- **Guide pages:**\n  - I wrote `docs/guide/concepts.md` and `docs/guide/configuration.md`.\n  - `docs/guide/commands.md` is generated from the cobra command tree by `internal/cli/commands_doc.go`.\n  - The `//go:generate` directive in `cmd/vloop/main.go` runs a small new command, `cmd/gendocs`.\n  - No new module was needed.\n- **Tests:** they are in the new `internal/cli/commands_doc_test.go`.\n  - `TestCommandsReferenceIsCurrent` fails, naming `docs/guide/commands.md`, when the file differs from a fresh generation. It never writes the file.\n  - The configuration test reads `config.Keys` and `classify.Names()` from the code.\n  - I put the configuration test there rather than in `guide_test.go`, because that file already existed and the task rules say not to change existing test files.\n- **README:** it links the three pages and is now 199 lines. One more line would break the under-200 cap.\n- **Windows shell default:** `configuration.md` says `pwsh`, which is what `config.go` sets. The README's config table says `cmd`, which is out of date. I left it alone.\n\nI did not commit anything, per the loop rules.",
+  "ttft_ms": 3002,
+  "type": "result",
+  "duration_ms": 131176,
+  "uuid": "e204482b-1885-452c-9e27-0d7e5b078b99",
+  "ttft_stream_ms": 1576,
+  "time_to_request_ms": 380,
+  "first_content_frame_ms": 1577,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 7
+}

@@ -1,0 +1,9 @@
+{"task":"T7","verdict":"PASS","criteria":[
+{"criterion":"concepts.md covers the loop, briefs lifecycle, depends-on, references, plans/tasks, gates, metrics/defects, closing/release, .vloop layout, flow","met":true,"evidence":"docs/guide/concepts.md, 109 lines; gate greps for the key terms"},
+{"criterion":"configuration.md documents every key, presets with globs, workspace format; committed test reads from code","met":true,"evidence":"TestGuideConfigurationCoversKeysAndPresets iterates config.Keys, classify.Names()/Lookup globs; '[[repo]]' documented"},
+{"criterion":"commands.md generated via //go:generate, header names go generate ./..., lists all commands/flags","met":true,"evidence":"cmd/vloop/main.go go:generate -> cmd/gendocs -> cli.CommandsReference; header lines 3-4; ListsEveryCommand test walks the tree"},
+{"criterion":"TestCommandsReference... fails naming commands.md and never writes","met":true,"evidence":"TestCommandsReferenceIsCurrent only reads and compares; message names docs/guide/commands.md"},
+{"criterion":"README links three pages; readme_test unmodified; under 200 lines","met":true,"evidence":"README diff adds 3 links, 199 lines; readme_test.go not in diff"},
+{"criterion":"No new third-party module","met":true,"evidence":"go.mod/go.sum unchanged"}],
+"findings":[],
+"notes":"README shell-default table says cmd on Windows while configuration.md says pwsh (per work session); worth checking against config.go. README is at 199 lines."}

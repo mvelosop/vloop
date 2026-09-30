@@ -1,0 +1,8 @@
+{
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Added docs/guide/concepts.md, configuration.md and a generated commands.md (internal/cli/commands_doc.go, run by go generate via cmd/gendocs), tests for staleness and config/preset coverage, and README links.",
+  "files": ["docs/guide/concepts.md", "docs/guide/configuration.md", "docs/guide/commands.md", "internal/cli/commands_doc.go", "internal/cli/commands_doc_test.go", "cmd/gendocs/main.go", "cmd/vloop/main.go", "README.md"],
+  "verified": "The task's verify command: prints 'gate T7 ok'.",
+  "notes": "Generator is cmd/gendocs (tiny main calling cli.CommandsReference), reached by a //go:generate line in cmd/vloop/main.go; no new module. TestCommandsReferenceIsCurrent only compares and never writes. The new config/preset test lives in commands_doc_test.go, not guide_test.go, since guide_test.go pre-existed and must stay unmodified; it reads config.Keys and classify.Names. configuration.md states the Windows shell default as pwsh (from config.go); the README table says cmd there, which is stale. README is 199 lines, one under the cap: adding more README lines needs trimming elsewhere."
+}

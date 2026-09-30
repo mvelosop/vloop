@@ -1,5 +1,5 @@
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/cli	(cached)
-ok  	github.com/mvelosop/vloop/internal/closing	0.431s
+ok  	github.com/mvelosop/vloop/internal/closing	0.325s
 gate T2 ok

@@ -176,6 +176,12 @@ Briefs live in `docs/briefs/`. Only `vloop config set`, `vloop brief new`, `vloo
   classification layers and the stack presets, and the `metrics/v1` keys.
 - [docs/guide/defects.md](docs/guide/defects.md): origin and catcher, derived and
   recorded defects, `--blame`, the `.vloop/defects/` format and the matrix.
+- [docs/guide/concepts.md](docs/guide/concepts.md): the loop, briefs, plans,
+  gates, closing and release, and the flow end to end.
+- [docs/guide/configuration.md](docs/guide/configuration.md): every config key,
+  the stack presets and the workspace file.
+- [docs/guide/commands.md](docs/guide/commands.md): every command and flag,
+  generated from the binary.
 
 ## Exit codes
 
