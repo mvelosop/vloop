@@ -63,6 +63,7 @@ does not exist, or an item with no reason, is a problem.
 | `vloop brief check <path>...` | check that ready briefs are fit to plan |
 | `vloop brief new <slug>` | write a draft brief from the template |
 | `vloop brief list` | list briefs in dependency order, ready or blocked |
+| `vloop brief close <brief> (--finding "<summary>"… \| --no-findings)` | on the work branch of a finished run: record your findings as defects, snapshot the metrics, write the run record, mark the brief `consumed` and make one commit with a `Vloop-Brief:` trailer; it never merges or pushes |
 | `vloop schema list` | print the names of the embedded JSON Schemas |
 | `vloop schema show <name>` | print one schema document |
 | `vloop schema validate <name> <file>` | validate a JSON file against a schema |

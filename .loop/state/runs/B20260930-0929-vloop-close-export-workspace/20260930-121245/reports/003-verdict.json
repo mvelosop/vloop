@@ -1,0 +1,17 @@
+{
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "vloop brief close takes name or path; refusals print one stderr line, nothing on stdout, write/stage/commit nothing (all six messages and exit codes)", "met": true, "evidence": "internal/cli/close.go: closeFindingsMsg check (exit 2), then no runs, already consumed/abandoned, default-branch, dirty tree (--untracked-files=all), plan not complete, all before any write. TestCloseRefusals asserts stdout empty, stderr exact, HEAD/status unchanged and no .vloop/defects."},
+    {"criterion": "Each --finding becomes a defect file via the same code as defect add (brief, operator, work, bug, medium, open)", "met": true, "evidence": "close.go calls defect.Add with FoundBy operator, Origin work, Kind bug, Severity medium; no second writer."},
+    {"criterion": "Metrics computed as vloop metrics with the new status and saved with task 2's snapshot writer; snapshot equals metrics --json after close", "met": true, "evidence": "metrics.Build then report.Status=consumed, closing.WriteSnapshot; gate compares against live metrics --json."},
+    {"criterion": "Run record via PutRunRecord and renderer; frontmatter status consumed; body Status line rewritten keeping prefix; nothing else changes", "met": true, "evidence": "setFrontmatterStatus edits only the status line; statusLine regexp keeps ${1} prefix and rewrites first occurrence; closing.PutRunRecord(doc, closing.Render(...)). TestCloseRerenderKeepsTextAfterMarkers covers the byte-for-byte case."},
+    {"criterion": "Commit holds exactly defects, snapshot and brief, staged by path, message '[vloop] close <run id>' + blank + trailer, single-parent, no merge/push/fetch/checkout/ref changes", "met": true, "evidence": "git add -- <files>; git commit -q -m subject -m trailer -- <files>; no other git verbs beyond read-only ones. Committed test checks files, message and trailer."},
+    {"criterion": "Output lines in order matching the worked example", "met": true, "evidence": "PrintSummary, recorded/wrote/updated per file, 'committed <sha7> subject', 'squash-merge with the trailer: ...'; gate T3 replays this line for line and passed."},
+    {"criterion": "--json prints one document {brief,status,commit,files,trailer,metrics}", "met": true, "evidence": "close.go JSON encoder struct with those fields, files in written order; TestCloseJSON."},
+    {"criterion": "Committed TestClose... tests on t.TempDir fixtures with git -C: every refusal plus non-refusal case, re-render preserving hand-written text, commit files/message/trailer", "met": true, "evidence": "close_test.go: TestCloseRefusals (9 refusal cases), TestCloseCommitsFindingsSnapshotAndBrief, TestCloseJSON, TestCloseRerenderKeepsTextAfterMarkers; the success tests are the must-not-refuse cases."},
+    {"criterion": "README documents brief close, --finding, --no-findings, stays under 200 lines", "met": true, "evidence": "README.md diff adds one table row naming all three; file is 192 lines; go test ./internal/cli passes."}
+  ],
+  "findings": [],
+  "notes": "Added metrics.DeriveBrief (internal/metrics/defects.go) so the run record's derived defects match Build's; small, in service of the task and reusable by T5 export. It takes 'plan complete' from the last owned run's outcome. No absolute paths found. The empty-finding refusal (a finding must not be empty) is beyond the spec but harmless."
+}

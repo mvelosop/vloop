@@ -183,3 +183,22 @@ func DerivedIDs(runID string, ds []Derived) []string {
 	}
 	return ids
 }
+
+// DeriveBrief computes the derived defects of a brief's runs, exactly as Build
+// counts them. It returns nil when the brief has no runs.
+func DeriveBrief(root, brief string) ([]Derived, error) {
+	m, err := runs.Read(root, brief)
+	if err != nil {
+		return nil, err
+	}
+	if len(m.Folders) == 0 {
+		return nil, nil
+	}
+	var plan *runs.PlanDoc
+	if o := m.Owned; o != nil {
+		if plan, err = runs.PlanAt(root, o.Layout, planSHA(o)); err != nil {
+			return nil, err
+		}
+	}
+	return Derive(m, plan), nil
+}

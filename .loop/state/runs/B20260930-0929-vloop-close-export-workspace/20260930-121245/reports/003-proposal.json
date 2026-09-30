@@ -1,0 +1,8 @@
+{
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Added `vloop brief close` (internal/cli/close.go): six refusals, defect files via defect.Add, metrics snapshot, run record, consumed status, and one path-staged commit with the Vloop-Brief trailer; README documents it.",
+  "files": ["internal/cli/close.go", "internal/cli/close_test.go", "internal/cli/brief.go", "internal/metrics/defects.go", "README.md"],
+  "verified": "The task's verify command ran to completion and printed 'gate T3 ok'.",
+  "notes": "Added metrics.DeriveBrief(root, brief) so the run record's derived defects match Build's counts; T5 export can reuse it. Report is built after the defect files exist, then Status is overridden to 'consumed' in memory (Build reads the on-disk status, which is still 'ready' at that point). Commit is `git add -- <files>` then `git commit -m subject -m trailer -- <files>`; the dirty-tree refusal guarantees a clean index first. 'Plan complete' means the last owned run commit's outcome is 'complete'. Default-branch check strips refs/remotes/origin/ from runs.DefaultBranch and is skipped if there is no default branch or HEAD is detached. --abandon and --dry-run are not added (T4). Non-test helper is named runGit because the cli tests already define gitIn."
+}
