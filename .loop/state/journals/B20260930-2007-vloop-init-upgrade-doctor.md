@@ -109,3 +109,9 @@ As the brief requires, each gate runs `go test` only on the packages its task to
 - **Summary:** `vloop init` is already implemented and on disk (internal/cli/init.go, internal/install/section.go, Init tests, README at 197 lines, commands.md regenerated). go test on the touched packages passes. The verify gate cannot pass for a correct implementation.
 - **Files:** internal/cli/init.go, internal/cli/init_test.go, internal/cli/root.go, internal/install/section.go, internal/config/config.go, README.md, docs/guide/commands.md
 - **Notes for next iteration:** Gate is wrong, not the code. The fixture `ex` commits .gitignore ('node_modules/'), and the gate requires init to append .vloop/tmp/ to it (and the acceptance requires 'updated .gitignore'). The check `[ -z "$(g status --porcelain --untracked-files=no)" ]` must therefore fail for any correct init, because a modified tracked file is always listed. Fix in the plan: replace that clause with `g diff --cached --quiet` (nothing staged); the HEAD-equality and for-each-ref checks stay. Gate steps after that line have not been exercised against the implementation; the operator should re-run the corrected gate. Shared helpers for T7: install.Section, install.MergeClaudeMD, install.MergeGitignore.
+
+## Run ended — stalled
+
+- **Run:** `20260930-211343` · 7 iteration(s) this run
+- **Plan:** 5/10 done, 0 blocked
+- **Signals:** 7 iterations · 1.40 per closed · 0 gate failure(s) · 0 review rejection(s) · 2 attempt(s) burned · streak 2 · ~$8.53
