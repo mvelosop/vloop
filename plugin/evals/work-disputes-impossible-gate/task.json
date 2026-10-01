@@ -1,0 +1,13 @@
+{
+  "id": "T1",
+  "title": "Add bin/greet, which greets a name",
+  "goal": "The greet command is the whole product. This task adds the script that prints the greeting, so a later task can add the shout option on top of it.",
+  "files": ["bin/greet"],
+  "depends_on": [],
+  "acceptance": [
+    "bin/greet is a new file in the repository",
+    "bin/greet world prints exactly hello, world and exits 0",
+    "bin/greet with no argument prints usage: greet <name> on stderr, prints nothing on stdout and exits 2"
+  ],
+  "verify": "test -z \"$(git status --porcelain -- bin)\" && sh bin/greet world | grep -qx 'hello, world'"
+}

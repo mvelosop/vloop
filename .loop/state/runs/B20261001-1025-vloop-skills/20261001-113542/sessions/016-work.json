@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 276705,
+  "stop_reason": "end_turn",
+  "session_id": "ebc12cdc-4a61-43a1-a908-912690377c00",
+  "total_cost_usd": 1.3087675999999997,
+  "usage": {
+    "input_tokens": 62,
+    "cache_creation_input_tokens": 103139,
+    "cache_read_input_tokens": 2587738,
+    "output_tokens": 37854,
+    "output_tokens_details": {
+      "thinking_tokens": 12830
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 103139,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 858,
+        "cache_read_input_tokens": 114333,
+        "cache_creation_input_tokens": 822,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 822
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 62,
+      "outputTokens": 37854,
+      "cacheReadInputTokens": 2587738,
+      "cacheCreationInputTokens": 103139,
+      "webSearchRequests": 0,
+      "costUSD": 1.3087675999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 12830,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_014hUM8LGyS82f6SAxdCgzYL",
+      "tool_input": {
+        "command": "E=plugin/evals && C=.loop/tests/reviewer-calibration/cases && sed -i.bak '/^true$/d' $E/common/plant-correct.sh $E/common/plant-gamed.sh && rm $E/common/*.bak\nsed -i.bak -e 's#uv run pytest#python3 -m pytest#' $E/common/gate-messages.sh && rm -f $E/common/*.bak\nfor c in 01-hollow-test 02-hardcoded-fixture 03-scope-creep 04-unchecked-criterion 05-gate-gaming 05b-gate-gaming-disclosed 06-gate-rewrite 07-provenance-weak-criteria 07b-provenance-weak-goal; do\n  mkdir -p $E/$c/graders\n  source .loop/tests/../../plugin/evals/common/lib.sh 2>/dev/null\n  port_task $C/$c/task.json $E/$c/task.json\n  [ -f $C/$c/proposal.json ] && sed 's/uv run pytest/python3 -m pytest/g' $C/$c/proposal.json | python3 -c 'import json,sys; p=json.load(sys.stdin); p.pop(\"schema\",None); print(json.dumps(p,indent=2))' > $E/$c/proposal.json\n  case $c in 01*|02*|03*|04*|06*) cp $C/$c/plant.sh $E/$c/plant.sh;; esac\n  cat > $E/$c/prompt.md <<'EOF'\n---\nmax_turns: 40\nallowed_tools: Read, Grep, Glob, Write, Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(vloop task show:*), Bash(vloop schema validate:*)\nsetup: scaffold.sh\n---\n/vloop:review T1\nEOF\ndone\n# fix 06 plant for vloop layout: source the shared correct plant\npython3 - <<'PY'\nimport re\np='plugin/evals/06-gate-rewrite/plant.sh'\ns=open(p).read()\ns=s.replace('bash \"$HERE/plant-correct.sh\"','bash \"$HERE/../common/plant-correct.sh\"')\ns=s.replace(\"loop-plan's\",\"the planner's\").replace(\"T8's own reviewer\",\"The reviewer of the incident this ports\")\nopen(p,'w').write(s)\nPY\nsed -i.bak 's#\"\\$HERE/catalogue.sh\"#\"$HERE/catalogue.sh\"#' $E/06-gate-rewrite/plant.sh; rm -f $E/06-gate-rewrite/*.bak\nsed -i.bak -e 's/loop-plan/the planner/' $E/*/plant.sh $E/common/*.sh; rm -f $E/*/*.bak $E/common/*.bak\nhead -30 $E/06-gate-rewrite/plant.sh | tail -12; cat $E/05b-gate-gaming-disclosed/proposal.json | head -5; grep -rn \"uv run\\|0002\\|loop-review\\|/Users\" $E | head"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 33,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T8 is finished and `.loop/tmp/proposal.json` is written with outcome `done`. The task's verify command printed `GATE OK`. No eval was run and no `claude` call was made.\n\n- **Review cases:** `plugin/evals/` holds the nine calibration cases under their names. Each has a `prompt.md` invoking `/vloop:review T1`, three graders and a `scaffold.sh`. A scaffold builds a git repo and commits the gate before it plants the defect. It writes `.vloop/state/state.json` as `state/v1` and `.vloop/tmp/proposal.json` as `proposal/v1`. It exits non-zero if the planted defect fails its own gate. For 05, 05b, 06, 07 and 07b it also exits non-zero if a correct implementation passes the gate.\n- **Other cases:** `plan-valid-state`, `plan-checks-its-gates`, `work-disputes-impossible-gate` and `language-es` exist with a `prompt.md`, graders and a scaffold.\n- **Bar:** every case must be caught, with 06 allowed to miss. It is stated in `plugin/evals/README.md` and in each `verdict-is-fail` grader, and 06's graders carry the lowest weights.\n- **Extraction:** `vloop plugin path` now skips `evals/` and removes one left in the extracted tree, in `internal/driver/extract.go`. `TestPluginPathLeavesOutEvals` in `internal/cli/plugin_test.go` covers both.\n\nChoices to check:\n- **Shared set-up:** the files beside the cases are `_lib.sh`, `_brief.md`, `_greet-brief.md`, `_catalogue.sh`, `_gate-messages.sh`, `_plant-correct.sh` and `_plant-gamed.sh`. They are flat files because the existing `TestPluginSkills` treats every directory under `evals/` as a case, so a shared directory would have failed it.\n- **Python baseline:** the calibration's runstat baseline no longer exists in the repo, so `_lib.sh` rewrites a small self-contained one. The gates run `python3 -m pytest`, so pytest must be on the operator's machine. I ran all 13 scaffolds with pytest in a temporary venv, and all passed.\n- **Eval format:** I assumed an extra `setup: scaffold.sh` field in the `prompt.md` frontmatter. I also assumed the grader types `command` and `llm`. I could not check either against the real `claude plugin eval` offline, so confirm them before the first run.",
+  "ttft_ms": 2257,
+  "type": "result",
+  "duration_ms": 371095,
+  "uuid": "4c7970b6-798d-4573-b545-6058a5092a4e",
+  "ttft_stream_ms": 1132,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1133,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 8
+}

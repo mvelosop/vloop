@@ -1,0 +1,8 @@
+{
+  "task": "T8",
+  "outcome": "done",
+  "summary": "plugin/evals/ now holds the nine calibration cases plus plan-valid-state, plan-checks-its-gates, work-disputes-impossible-gate and language-es, each with prompt.md, graders and a scaffold; vloop plugin path no longer extracts evals/ and removes a stale one.",
+  "files": ["plugin/evals/", "internal/driver/extract.go", "internal/cli/plugin_test.go"],
+  "verified": "The task's verify command: printed GATE OK.",
+  "notes": "Shared set-up is flat files beside the cases (plugin/evals/_lib.sh, _brief.md, _greet-brief.md, _catalogue.sh, _gate-messages.sh, _plant-correct.sh, _plant-gamed.sh), not a common/ directory, because TestPluginSkills treats every directory under evals/ as a case. The calibration's Python baseline (loader, signals, fixtures) no longer exists in the repo, so _lib.sh rewrites a small self-contained one; gates use python3 -m pytest (needs pytest on the operator's machine). Each scaffold.sh must be run in an empty directory and exits non-zero if the planted defect fails its own gate or, for 05/05b/06/07/07b, if a correct implementation passes the false-failing gate. All 13 scaffolds were run with pytest installed and state.json/proposal.json validate. The prompt.md frontmatter has an extra 'setup: scaffold.sh' field, my assumption of how claude plugin eval is told to build the repo; the real runner's field name was not checkable offline. Grader types used: command (a shell command that must exit 0) and llm (scored 0/1 against the body); likewise an assumption. The suite bar (all caught, 06 allowed to miss) is in plugin/evals/README.md and in each verdict-is-fail grader; 06's graders have the lowest weights. No eval was run and no claude call made."
+}
