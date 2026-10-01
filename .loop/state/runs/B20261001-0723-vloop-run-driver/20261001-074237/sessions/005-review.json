@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 19364,
+  "stop_reason": "end_turn",
+  "session_id": "2008c355-84c1-440f-a0df-48205952ea3c",
+  "total_cost_usd": 0.13597979999999998,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 24105,
+    "cache_read_input_tokens": 100769,
+    "output_tokens": 1939,
+    "output_tokens_details": {
+      "thinking_tokens": 276
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 24105,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 264,
+        "cache_read_input_tokens": 34993,
+        "cache_creation_input_tokens": 1128,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1128
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1939,
+      "cacheReadInputTokens": 100769,
+      "cacheCreationInputTokens": 24105,
+      "webSearchRequests": 0,
+      "costUSD": 0.13597979999999998,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 276,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T2. All six acceptance criteria are met, and the verdict is written to `.loop/tmp/verdict.json`.\n\n- **Config and tests:** The `run.*` keys are in the table with their defaults, `VLOOP_RUN_*` variables, validation and `[run]` storage. Committed tests cover each rule.\n- **Docs:** The README was already at 199 of its 200-line cap, so the work session shortened the config prose to fit the six new rows.\n- **Out-of-list edit:** `internal/cli/commands_doc_test.go` was not in the task's file list. The work session changed it to call `config.EnvVar`, which the new keys needed, so I didn't count it against the task.\n\nI didn't re-run the gate. The driver had already run it, and I reviewed the diff.",
+  "ttft_ms": 2975,
+  "type": "result",
+  "duration_ms": 20370,
+  "uuid": "ca1833f0-6f0d-4d9f-a717-991a4fec3339",
+  "ttft_stream_ms": 1664,
+  "time_to_request_ms": 362,
+  "first_content_frame_ms": 1664,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 2
+}

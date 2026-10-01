@@ -80,7 +80,7 @@ func TestReadmeMatchesCommandTree(t *testing.T) {
 	keys, envs := map[string]bool{}, map[string]bool{}
 	for _, k := range config.Keys {
 		keys[k.Name] = true
-		envs["VLOOP_"+strings.ToUpper(strings.ReplaceAll(k.Name, ".", "_"))] = true
+		envs["VLOOP_"+strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(k.Name))] = true
 		if !strings.Contains(text, "`"+k.Name+"`") {
 			t.Errorf("README does not mention config key %s", k.Name)
 		}

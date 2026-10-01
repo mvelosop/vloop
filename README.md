@@ -118,7 +118,7 @@ These flags work on every command:
 
 Settings are per repository, in `.vloop/config.toml`. Nothing is read from your
 home directory. Each key can be overridden by an environment variable: the key
-in upper case, `.` turned into `_`, with the prefix shown in the table. The environment wins over
+in upper case, `.` and `-` turned into `_`, with the prefix shown in the table. The environment wins over
 the file, and the file over the default.
 
 | Key | Default | Values | Environment variable |
@@ -137,19 +137,19 @@ the file, and the file over the default.
 | `metrics.test` | unset | a TOML array of glob patterns | `VLOOP_METRICS_TEST` |
 | `metrics.docs` | unset | a TOML array of glob patterns | `VLOOP_METRICS_DOCS` |
 | `metrics.excluded` | unset | a TOML array of glob patterns | `VLOOP_METRICS_EXCLUDED` |
+| `run.max-iterations` | `30` | an integer, 0 or more | `VLOOP_RUN_MAX_ITERATIONS` |
+| `run.cost-ceiling` | `40` | a number of dollars above 0 | `VLOOP_RUN_COST_CEILING` |
+| `run.max-attempts` | `3` | an integer, 1 or more | `VLOOP_RUN_MAX_ATTEMPTS` |
+| `run.stall-limit` | `2` | an integer, 1 or more | `VLOOP_RUN_STALL_LIMIT` |
+| `run.convergence-max` | `3.0` | a number above 0 | `VLOOP_RUN_CONVERGENCE_MAX` |
+| `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN` |
 
-`language` chooses the language of a brief's section headings and of the template
-`vloop brief new` writes. It applies to briefs only: commands, flags, keys, JSON
-and vloop's own messages are always English. The `model.*` and `effort.*` keys
-choose the model and the effort for each kind of session (plan, work, review).
-`shell` is the shell `vloop task gate` runs a verify command in. `areas` lists
-the names a task's `area` may take; when set, `vloop task validate` reports any
-other. In the file it is an array, for example `areas = ["cli", "docs"]`.
-The `metrics.*` keys are lists too, set as comma-joined text and stored under
-`[metrics]`: `metrics.stacks` names the language presets used to classify lines
-as code, test, docs or excluded, and the four glob keys hold the repository's
-own doublestar patterns, which win over the presets, for example
-`metrics.code = ["internal/brief/templates/**"]`.
+`language` is the language of a brief's section headings and of the template
+`vloop brief new` writes; commands, flags, keys and JSON are always English.
+The `model.*` and `effort.*` keys choose the model and effort per session kind.
+`areas` lists the names a task's `area` may take. List keys are arrays in the
+file; the `metrics.*` ones (stored under `[metrics]`) classify lines as code, test,
+docs or excluded. The `run.*` budgets (under `[run]`) bound the autonomous run.
 For example:
 
 ```

@@ -31,9 +31,15 @@ environment and in `config set`.
 | `metrics.test` | unset | a list of doublestar globs | `VLOOP_METRICS_TEST` | the repository's own `test` globs |
 | `metrics.docs` | unset | a list of doublestar globs | `VLOOP_METRICS_DOCS` | the repository's own `docs` globs |
 | `metrics.excluded` | unset | a list of doublestar globs | `VLOOP_METRICS_EXCLUDED` | the repository's own `excluded` globs, which are not counted |
+| `run.max-iterations` | `30` | an integer, 0 or more | `VLOOP_RUN_MAX_ITERATIONS`  | iterations a run may take |
+| `run.cost-ceiling` | `40` | a number of dollars above 0 | `VLOOP_RUN_COST_CEILING`  | dollars a run may spend |
+| `run.max-attempts` | `3` | an integer, 1 or more | `VLOOP_RUN_MAX_ATTEMPTS`  | attempts a task gets |
+| `run.stall-limit` | `2` | an integer, 1 or more | `VLOOP_RUN_STALL_LIMIT`  | consecutive iterations without progress that end the run |
+| `run.convergence-max` | `3.0` | a number above 0 | `VLOOP_RUN_CONVERGENCE_MAX`  | iterations per closed task above which a run is not converging (after `run.convergence-min` iterations) |
+| `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN`  | iterations a run must have taken before convergence is judged |
 
 `model.*` and `effort.*` are stored under `[model]` and `[effort]`, the
-`metrics.*` keys under `[metrics]`. For example:
+`metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. For example:
 
 ```
 language = "es"

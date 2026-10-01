@@ -6,11 +6,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -33,9 +35,13 @@ type Key struct {
 	Name    string
 	Default string // empty means unset
 	Valid   []string
-	List    bool // a list of strings, stored as a TOML array and given as comma-joined text
-	Stacks  bool // with List: entries are <stack> or <stack>@<path>, see classify.ParseStack
-	Glob    bool // with List: entries are any non-empty glob pattern rather than lower-case names
+	List    bool    // a list of strings, stored as a TOML array and given as comma-joined text
+	Stacks  bool    // with List: entries are <stack> or <stack>@<path>, see classify.ParseStack
+	Glob    bool    // with List: entries are any non-empty glob pattern rather than lower-case names
+	Int     bool    // a whole number, stored as a TOML integer
+	Num     bool    // a number, stored as a TOML float; a TOML integer is read too
+	Min     float64 // with Int or Num: the smallest valid value
+	MinOpen bool    // with Int or Num: Min itself is not valid
 }
 
 var areaName = regexp.MustCompile(`^[a-z0-9-]+$`)
@@ -63,6 +69,12 @@ var Keys = []Key{
 	{Name: "metrics.test", List: true, Glob: true},
 	{Name: "metrics.docs", List: true, Glob: true},
 	{Name: "metrics.excluded", List: true, Glob: true},
+	{Name: "run.max-iterations", Default: "30", Int: true},
+	{Name: "run.cost-ceiling", Default: "40", Num: true, MinOpen: true},
+	{Name: "run.max-attempts", Default: "3", Int: true, Min: 1},
+	{Name: "run.stall-limit", Default: "2", Int: true, Min: 1},
+	{Name: "run.convergence-max", Default: "3.0", Num: true, MinOpen: true},
+	{Name: "run.convergence-min", Default: "6", Int: true},
 }
 
 // Value is a resolved key. Set is false for an unset effort. For a list key
@@ -95,6 +107,8 @@ func (e *InvalidValueError) Error() string {
 		want = "a comma-separated list of non-empty glob patterns"
 	} else if err == nil && k.List {
 		want = "a comma-separated list of names made of lower-case letters, digits and hyphens"
+	} else if err == nil && (k.Int || k.Num) {
+		want = k.numWant()
 	} else if e.Valid != nil {
 		want = "one of " + strings.Join(e.Valid, ", ")
 	}
@@ -123,7 +137,37 @@ func Lookup(name string) (Key, error) {
 
 // EnvVar is the environment variable overriding a key.
 func EnvVar(name string) string {
-	return "VLOOP_" + strings.ToUpper(strings.ReplaceAll(name, ".", "_"))
+	return "VLOOP_" + strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(name))
+}
+
+func (k Key) numWant() string {
+	kind, min := "a number", strconv.FormatFloat(k.Min, 'f', -1, 64)
+	if k.Int {
+		kind = "an integer"
+	}
+	if k.MinOpen {
+		return kind + " greater than " + min
+	}
+	return kind + " of at least " + min
+}
+
+// parseNum parses text as k's number and reports whether it is valid.
+func (k Key) parseNum(text string) (float64, bool) {
+	var f float64
+	if k.Int {
+		n, err := strconv.ParseInt(text, 10, 64)
+		if err != nil {
+			return 0, false
+		}
+		f = float64(n)
+	} else {
+		var err error
+		f, err = strconv.ParseFloat(text, 64)
+		if err != nil || math.IsNaN(f) || math.IsInf(f, 0) {
+			return 0, false
+		}
+	}
+	return f, f > k.Min || (!k.MinOpen && f == k.Min)
 }
 
 // Validate checks value (non-empty) against the key's valid values.
@@ -147,6 +191,12 @@ func (k Key) Validate(value string) error {
 			if k.Valid != nil && !slices.Contains(k.Valid, a) {
 				return &InvalidValueError{k.Name, value, k.Valid}
 			}
+		}
+		return nil
+	}
+	if k.Int || k.Num {
+		if _, ok := k.parseNum(value); !ok {
+			return &InvalidValueError{k.Name, value, nil}
 		}
 		return nil
 	}
@@ -249,8 +299,24 @@ func resolve(k Key, file map[string]any) (Value, error) {
 	v := Value{Key: k.Name, Value: k.Default, Set: k.Default != "", Source: SourceDefault}
 	if fv, ok := fileValue(file, k.Name); ok {
 		s, isStr := fv.(string)
+		switch n := fv.(type) {
+		case int64:
+			if k.Int || k.Num {
+				s, isStr = strconv.FormatInt(n, 10), true
+			}
+		case float64:
+			if k.Num {
+				s, isStr = strconv.FormatFloat(n, 'f', -1, 64), true
+			}
+		}
 		if !isStr {
-			return v, &SourceError{FilePath, fmt.Errorf("%s must be a string", k.Name)}
+			want := "a string"
+			if k.Int {
+				want = "an integer"
+			} else if k.Num {
+				want = "a number"
+			}
+			return v, &SourceError{FilePath, fmt.Errorf("%s must be %s", k.Name, want)}
 		}
 		if err := k.Validate(s); err != nil {
 			return v, &SourceError{FilePath, err}
@@ -347,7 +413,7 @@ func Set(root, name, value string) error {
 			if strings.Join(names, ",") == value {
 				return nil
 			}
-		} else if cur == value {
+		} else if cur == value || (k.Int || k.Num) && fmt.Sprint(cur) == value {
 			return nil
 		}
 	}
@@ -372,6 +438,10 @@ func Set(root, name, value string) error {
 	} else {
 		if k.List {
 			dst[leaf] = strings.Split(value, ",")
+		} else if k.Int {
+			dst[leaf], _ = strconv.ParseInt(value, 10, 64)
+		} else if k.Num {
+			dst[leaf], _ = strconv.ParseFloat(value, 64)
 		} else {
 			dst[leaf] = value
 		}
