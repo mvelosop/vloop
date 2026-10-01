@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **9/11 done** · iteration 9
+**Status:** running · **10/11 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T08:25:50Z
+**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T08:32:39Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T7** — Halt the run: budgets with flag precedence, convergence, stall, session errors, repeat-blocked and moved refs
 - [x] **T8** — Make the run safe and its records sound: containment, preflight refusals, the run lock, git identity, state tampering, the empty run, rendered views, telemetry and layout
 - [x] **T9** — Snapshot the metrics after every iteration, print the summary at the end, and derive an env defect from a flaky gate
-- [ ] **T10** — Document the driver: exit codes 0–9 in the guide with the README pointer and test change, the run row and keys, F1, the command reference, and the domain docs as built
+- [x] **T10** — Document the driver: exit codes 0–9 in the guide with the README pointer and test change, the run row and keys, F1, the command reference, and the domain docs as built
 - [ ] **T11** — Close: the B6 worked example end to end on the stub, the real-data check on a throwaway clone, and the full suite
 
 ## Tasks
@@ -268,7 +268,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T10 — Document the driver: exit codes 0–9 in the guide with the README pointer and test change, the run row and keys, F1, the command reference, and the domain docs as built
 
-`pending` · depends on: T9
+`done` · depends on: T9
 
 **Files:** `README.md`, `internal/cli/readme_test.go`, `docs/guide/concepts.md`, `docs/guide/commands.md`, `docs/guide/configuration.md`, `docs/guide/defects.md`, `docs/guide/metrics.md`, `docs/domain/execution/run.md`, `docs/domain/execution/plan.md`, `docs/domain/execution/session.md`, `docs/domain/execution/task.md`, `docs/domain/domain-model.md`
 

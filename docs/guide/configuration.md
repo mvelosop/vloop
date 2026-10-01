@@ -39,7 +39,7 @@ environment and in `config set`.
 | `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN`  | iterations a run must have taken before convergence is judged |
 
 `model.*` and `effort.*` are stored under `[model]` and `[effort]`, the
-`metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. For example:
+`metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. `vloop run`'s `--max-iterations`, `--cost-ceiling`, `--max-attempts` and `--stall-limit` flags override the first four `run.*` keys for one run (flag, then environment, then file, then default). For example:
 
 ```
 language = "es"

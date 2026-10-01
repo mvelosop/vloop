@@ -1,0 +1,8 @@
+{
+  "task": "T10",
+  "outcome": "done",
+  "summary": "Exit codes 0-9 now live in docs/guide/concepts.md with a README pointer; the README test checks them against the guide; F1 fixed with a test; run row, run.* flags, flaky env defect and the domain docs state the driver as built.",
+  "files": ["README.md", "internal/cli/readme_test.go", "docs/guide/concepts.md", "docs/guide/configuration.md", "docs/guide/defects.md", "docs/domain/execution/run.md", "docs/domain/execution/plan.md", "docs/domain/execution/session.md", "docs/domain/execution/task.md", "docs/domain/execution/execution-context.md", "docs/domain/domain-model.md"],
+  "verified": "The T10 verify command: printed 'gate T10 ok'.",
+  "notes": "docs/guide/commands.md regenerated with go generate, no diff (already current). New tests in readme_test.go: TestGuideExitCodesMatchDriver (guide rows vs driver.Exit* and cli.ExitProblems/ExitUsage) and TestReadmeShellDefaultMatchesCode (README default per OS vs config.Keys for the running OS and defaultShell's source for the other). Left untouched, outside this task's file list: docs/domain/bounded-contexts.md:46 and docs/domain/measurement/measurement-context.md:42 still carry '(planned, B6)'. internal/runs/runs.go:189 reads ownership from 'loop.log' only, while vloop run writes 'run.log' - check whether metrics find vloop-run folders. Not fixed here (code, not in scope). cmd/vloop TestWorkedExampleEnglishSession still fails for the run.* config lines (not in this gate)."
+}

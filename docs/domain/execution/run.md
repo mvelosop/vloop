@@ -10,16 +10,22 @@ An **iteration** is one pass over one task. *Part of
 
 ## The run folder
 
-`.vloop/state/runs/<run id>/<YYYYMMDD-HHMMSS>/` *(planned, B6; the shell loop's
-is `.loop/state/runs/<branch>/<folder>/`)*:
+`.vloop/state/runs/<run id>/<YYYYMMDD-HHMMSS>/` (the shell loop's is
+`.loop/state/runs/<branch>/<folder>/`):
 
 ```
 sessions/NNN-<phase>.json   one session record each (session/v1)
 iterations.jsonl            one iteration record per line (iteration/v1)
 reports/NNN-verdict.json    the verdict of iteration NNN (verdict/v1)
 gates/T<n>.log              the last gate output per task
-loop.log                    the driver's own log
+run.log                     the driver's own log (the shell loop's is loop.log)
 ```
+
+The driver buffers `run.log` and writes it only just before each commit, and
+the metrics snapshot into the next commit, so no tracked file is dirty while a
+session or a gate runs. Before each commit it checks that HEAD is where it was
+(a session that moved refs halts the run, exit 9). A gate that disputes itself
+(`gate_dispute` in a proposal) blocks its task at once and charges no attempt.
 
 A brief owns every run folder whose log says it planned from the brief or
 resumed its run id; a folder that did neither is ignored.
@@ -27,7 +33,7 @@ resumed its run id; a folder that did neither is ignored.
 ## The iteration record — `iteration/v1`
 
 `run_id`, `iteration`, `task`, `attempt`, `outcome`, `gate` (`{exit,
-duration_ms}`, or null when no gate ran), `started`, `ended`.
+duration_ms, flaky}`, or null when no gate ran; `flaky` is true when the gate failed and then passed on its one immediate re-run, which charges no attempt and yields an `env` defect), `started`, `ended`.
 
 | Outcome | Meaning | Task becomes |
 | --- | --- | --- |
@@ -82,6 +88,5 @@ with one exit code (R-3):
 
 ## Gaps
 
-- `vloop run` *(planned, B6)* will write this layout; until then the shell loop
-  writes its own, which vloop reads (B3).
+- The shell loop writes its own layout, which vloop reads (B3); `vloop run` writes the one above.
 - The shell loop records no gate duration and no wall clock beyond commit times.

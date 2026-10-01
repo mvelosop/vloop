@@ -38,8 +38,9 @@ Commit, set a status, or move a git ref (S-2). The **fence** — the permission
 settings loop sessions run under — denies the commands (`git commit`, `push`,
 `reset`, `clean`, `branch`, `checkout`, `switch`, the mutating `git remote`
 subcommands, `update-ref`, `symbolic-ref`, `tag`, `stash`, `rebase`), web access,
-and reads of the user's global Claude directory. The driver checks anyway: a
-session that edits the plan has it reverted; a session that moves any ref halts
+and reads of the user's global Claude directory. The driver checks anyway, and
+records what it found in `run.log`: a session that edits the plan has it
+reverted (a review session's verdict is then forced to FAIL); a session that moves any ref halts
 the run with exit 9 and nothing is committed.
 
 ## The record it leaves — `session/v1`

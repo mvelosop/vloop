@@ -4,7 +4,7 @@ description: Binds vloop's whole-product model — the aggregates and their rela
 ---
 # Domain model
 
-As built through B4. Planned parts are marked *(planned, Bn)* and listed under
+As built through B6. Planned parts are marked *(planned, Bn)* and listed under
 [Gaps](#gaps).
 
 ## The aggregates
@@ -96,7 +96,7 @@ classDiagram
 | **verdict** | the review session's independent `PASS` or `FAIL`, with findings |
 | **finding** | one problem a verdict names, with a kind |
 | **journal** | the append-only per-brief log of iterations, one entry each |
-| **driver** | the program that owns status, runs gates and commits (`.loop/run.sh`; `vloop run` *(planned, B6)*) |
+| **driver** | the program that owns status, runs gates and commits (`.loop/run.sh`; `vloop run`) |
 | **fence** | the permission settings loop sessions run under |
 | **work branch** | the branch a run happens on, named for the run id |
 | **close** | recording findings, freezing metrics, writing the run record, marking the brief consumed |
@@ -126,9 +126,9 @@ classDiagram
 ```
 docs/briefs/<name>.md                     the briefs
 .vloop/config.toml                        the repo's config
-.vloop/state/state.json                   the plan            (planned, B6; the shell loop's is .loop/state/)
-.vloop/state/journals/<run id>.md         the journal         (planned, B6)
-.vloop/state/runs/<run id>/<folder>/      sessions/, iterations.jsonl, reports/   (planned, B6)
+.vloop/state/state.json                   the plan            (the shell loop's is .loop/state/)
+.vloop/state/journals/<run id>.md         the journal
+.vloop/state/runs/<run id>/<folder>/      sessions/, iterations.jsonl, reports/, run.log
 .vloop/state/metrics/<run id>.json        the snapshot, written by close
 .vloop/defects/<id>.md                    recorded defects
 .vloop/interventions/<id>.md              recorded interventions (data)
@@ -188,7 +188,7 @@ marked.
 - **R-1** The driver makes exactly one commit per iteration, covering code,
   plan, journal and telemetry together.
 - **R-2** A run happens on a work branch named for the run id, never on the
-  default branch. *(Enforced by the operator today; by `vloop run`, planned B6.)*
+  default branch. *(Enforced by `vloop run`, which creates the work branch.)*
 - **R-3** A run ends with one of the driver's exit codes: 0 complete, 1
   preflight, 2 blocked, 3 stalled, 4 max iterations, 5 not converging, 6 cost
   ceiling, 7 session error, 8 repeat blocked, 9 refs moved.
@@ -232,10 +232,8 @@ marked.
 
 ## Gaps
 
-- **The driver is still the shell loop.** `.vloop/state/` (plan, journals, run
-  folders) is the layout `vloop run` will write *(planned, B6)*; today the plan
-  and runs live in `.loop/state/`, and vloop reads them (B3).
-- **R-2** is enforced by the operator until B6.
+- **Shell-loop history.** `.vloop/state/` is the layout `vloop run` writes; the
+  shell loop's plan and runs live in `.loop/state/`, and vloop reads them (B3).
 - **Gate time and configured effort** are not recorded by the shell loop; the
   metrics show them as `n/a`.
 - **`area` and `kind`** exist on tasks but no planner assigns them yet

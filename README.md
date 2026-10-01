@@ -57,7 +57,7 @@ does not exist, or an item with no reason, is a problem.
 | `vloop init [--language en\|es] [--stacks <a,b>] [--dry-run]` | set a git repository up: config with detected stacks, the install stamp, a starter brief, the `.vloop/tmp/` line in `.gitignore` and vloop's section of `CLAUDE.md`; refuses a repository already set up; never commits; `--dry-run` writes nothing |
 | `vloop upgrade [--yes] [--dry-run]` | refresh vloop's `CLAUDE.md` section and `.gitignore` line and rewrite the stamp; refuses a repository set up by a newer vloop; a breaking jump (or any pre-release) needs `--yes`; never commits; `--dry-run` writes nothing |
 | `vloop doctor` | check git, install stamp, config, `claude`, workspace trust, gate shell, plan, branch, plugin version and scoped stacks; writes nothing; exit 1 on a problem; `--json` |
-| `vloop run [<brief>] [--plan-only] [--replan] [--max-iterations N] [--cost-ceiling USD] [--max-attempts N] [--stall-limit N]` | refuse on any `vloop doctor` problem (an untrusted workspace included); on the default branch create and switch to the work branch named for the run id (one that exists is refused: exit 1); run the plan session, check its plan like `vloop task validate` plus the gate-shape rules, stamp it, and commit it as `[vloop] plan <run id>` with its journal, `plan.md` and run folder; `--plan-only` stops there; a brief whose journal exists is refused unless `--replan`; a missing brief is exit 2; each budget flag overrides its `run.*` key; running the tasks is not built yet |
+| `vloop run [<brief>] [--plan-only] [--replan] [--max-iterations N] [--cost-ceiling USD] [--max-attempts N] [--stall-limit N]` | refuse on any `vloop doctor` problem; on the default branch create the work branch named for the run id; plan the brief (checked like `vloop task validate` plus the gate-shape rules), then per task: work session, gates, review, one `[vloop] <task>: <outcome>` commit, and the metrics snapshot; ends with an exit code (see Exit codes); `--plan-only` stops after the plan commit; a brief whose journal exists is refused unless `--replan`; each budget flag overrides its `run.*` key (`run.max-iterations`, `run.cost-ceiling`, `run.max-attempts`, `run.stall-limit`) |
 | `vloop plugin path` | extract the embedded plugin into `.vloop/tmp/plugin/<version>/` and print that path; files already matching are left alone, stray ones removed |
 | `vloop config get <key>` | print the resolved value of a key |
 | `vloop config set <key> <value>` | write a key to `.vloop/config.toml` (`''` removes it) |
@@ -130,7 +130,7 @@ The environment wins over the file, and the file over the default.
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` |
-| `shell` | `sh` (`cmd` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` |
+| `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` |
 | `areas` | unset | a TOML array of names | `VLOOP_AREAS` |
 | `metrics.stacks` | unset | a TOML array of stack names | `VLOOP_METRICS_STACKS` |
 | `metrics.code` | unset | a TOML array of glob patterns | `VLOOP_METRICS_CODE` |
@@ -185,12 +185,9 @@ Briefs live in `docs/briefs/`. Only `vloop run`, `vloop init`, `vloop upgrade`, 
 
 ## Exit codes
 
-- `0`: success.
-- `1`: the command ran and found problems or failed (a brief with problems, a
-  malformed config file, a brief that already exists).
-- `2`: usage error: an unknown command, flag or config key, a missing argument,
-  or an invalid value.
-
+Every command exits `0` on success, `1` on problems or failure, `2` on a usage
+error; `vloop run` also ends with 3–9. All of them, and which a run can resume
+from, are in [docs/guide/concepts.md](docs/guide/concepts.md#exit-codes).
 Errors go to stderr as one line starting with `vloop: `.
 
 ## What comes next

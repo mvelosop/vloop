@@ -32,6 +32,10 @@ recomputed on every call, so a later correction needs no migration:
   it is `bug` for the shell loop's plain-string findings. A `spec-gap` finding is
   `origin: brief` and a `gate-gap` finding `origin: plan`. An empty findings
   list is one defect;
+- an iteration whose gate failed and then passed on its immediate re-run
+  (`gate.flaky` in the iteration record) is one defect: `origin: env`,
+  `kind: bug`, `found-by: gate`. The work is not at fault, so it yields no work
+  defect and charges no attempt;
 - a `blocked` outcome is not a defect by itself.
 
 **Recorded** defects are the ones the loop could not see, one file each, written

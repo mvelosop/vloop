@@ -50,7 +50,10 @@ stateDiagram-v2
   blocks, and the operator replaces the gate with `task verify <id> '<cmd>'
   --reason '<why>'`. The old command goes to `gate_history` with `by: operator`,
   and every earlier gate failure on the task becomes `origin: plan` in the
-  metrics (M-4).
+  metrics (M-4). A dispute charges no attempt. A session that rewrites a gate
+  file has it restored from HEAD and the iteration fails with no review; a gate
+  that fails and passes on its one immediate re-run is flaky (`gate.flaky`), not
+  a failed attempt.
 - Gates must run on the host's tools. On macOS that means BSD `grep`, `sed`,
   `awk`, `date` — B2 stalled on a GNU-only pattern.
 
