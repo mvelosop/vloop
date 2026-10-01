@@ -45,21 +45,26 @@ func TestPluginSkills(t *testing.T) {
 // fixtureWants names, per committed fixture plugin, what its rejection must say.
 // A fixture with no entries is well-formed and must be accepted.
 var fixtureWants = map[string][]string{
-	"good":                  nil,
-	"bad-frontmatter-name":  {"skill review", `"reviewer"`},
-	"bad-frontmatter-field": {"skill plan", "description"},
-	"bad-command":           {"skill work", "frobnicate"},
-	"bad-flag":              {"skill work", "--frobnicate"},
-	"bad-schema-name":       {"skill work", "frobnicate/v1"},
-	"bad-schema-example":    {"skill work", "verified"},
-	"bad-path":              {"skill work", ".vloop/scratch/notes.md"},
-	"bad-fence-denied":      {"skill work", "vloop task verify", "denied"},
-	"bad-fence-not-allowed": {"skill work", "vloop config list", "not allowed"},
-	"bad-eval-no-graders":   {"eval case-b", "graders"},
-	"bad-eval-max-turns":    {"eval case-c", "max_turns"},
-	"bad-eval-weight":       {"eval case-d", "weight"},
-	"operate-exempt":        nil,
-	"bad-operate-command":   {"skill operate", "frobnicate"},
+	"good":                         nil,
+	"bad-frontmatter-name":         {"skill review", `"reviewer"`},
+	"bad-frontmatter-field":        {"skill plan", "description"},
+	"bad-command":                  {"skill work", "frobnicate"},
+	"bad-flag":                     {"skill work", "--frobnicate"},
+	"bad-schema-name":              {"skill work", "frobnicate/v1"},
+	"bad-schema-example":           {"skill work", "verified"},
+	"bad-path":                     {"skill work", ".vloop/scratch/notes.md"},
+	"bad-fence-denied":             {"skill work", "vloop task verify", "denied"},
+	"bad-fence-not-allowed":        {"skill work", "vloop config list", "not allowed"},
+	"bad-eval-no-graders":          {"eval case-b", "graders"},
+	"bad-eval-max-turns":           {"eval case-c", "max_turns"},
+	"bad-eval-weight":              {"eval case-d", "weight"},
+	"bad-eval-unknown-key":         {"eval case-a", "setup", "not one claude plugin eval knows"},
+	"bad-eval-scaffold-undeclared": {"eval case-a", "scaffold_script"},
+	"bad-eval-grader-type":         {"eval case-a", "command", "grader type"},
+	"bad-eval-tools-string":        {"eval case-a", "allowed_tools", "yaml array"},
+	"bad-eval-regex-keys":          {"eval case-a", "regex grader", "match", "target"},
+	"operate-exempt":               nil,
+	"bad-operate-command":          {"skill operate", "frobnicate"},
 }
 
 func TestSkillChecksRejectFixtures(t *testing.T) {
@@ -572,6 +577,58 @@ func (f *fenceRules) judge(cmd string) string {
 	return ""
 }
 
+// The eval case format is claude plugin eval's (code.claude.com/docs/en/plugin-evals),
+// not ours: these lists are its documented keys. A key the tool does not know
+// makes it refuse the case outright — every case B7's run wrote declared its
+// scaffold as `setup:`, and the tool loaded none of them.
+var (
+	evalPromptKeys = []string{"schema_version", "name", "description", "tags", "plugins", "runs",
+		"expected_outcome", "model", "max_turns", "timeout_seconds", "allowed_tools",
+		"artifact_publish", "growthbook_overrides", "append_system_prompt", "env"}
+	evalCaseKeys = []string{"schema_version", "name", "description", "tags", "plugins", "runs",
+		"expected_outcome", "execution", "context", "graders"}
+	// Each grader type and the keys it requires; an llm grader's criteria are
+	// its body. There is no grader that runs a command.
+	evalGraderKeys = map[string][]string{
+		"regex": {"pattern", "match", "target"}, "tool_used": {"tool"},
+		"tool_order": {"before", "after"}, "file_exists": {"path"},
+		"llm": nil, "baseline": {"baseline_file", "criteria"},
+	}
+)
+
+// frontmatterKeys returns every top-level key between the leading --- lines,
+// including keys whose value is a nested block (frontmatter skips those).
+func frontmatterKeys(text string) []string {
+	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
+	if len(lines) == 0 || strings.TrimSpace(lines[0]) != "---" {
+		return nil
+	}
+	var keys []string
+	for _, l := range lines[1:] {
+		if strings.TrimSpace(l) == "---" {
+			break
+		}
+		if k, _, ok := strings.Cut(l, ":"); ok && l != "" && !strings.HasPrefix(l, " ") && !strings.HasPrefix(l, "\t") && !strings.HasPrefix(l, "-") && !strings.HasPrefix(l, "#") {
+			keys = append(keys, strings.TrimSpace(k))
+		}
+	}
+	return keys
+}
+
+// yamlTopKeys returns a YAML document's top-level keys, by indentation.
+func yamlTopKeys(text string) []string {
+	return frontmatterKeys("---\n" + text + "\n---")
+}
+
+func inList(list []string, s string) bool {
+	for _, x := range list {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
 func checkEvals(dir string) []string {
 	var out []string
 	cases, _ := filepath.Glob(filepath.Join(dir, "evals", "*"))
@@ -590,6 +647,37 @@ func checkEvals(dir string) []string {
 					out = append(out, fmt.Sprintf("eval %s: prompt.md frontmatter is missing %s", name, k))
 				}
 			}
+			if v := fm["allowed_tools"]; v != "" && !strings.HasPrefix(v, "[") {
+				out = append(out, fmt.Sprintf("eval %s: prompt.md allowed_tools must be a YAML array, not %q", name, v))
+			}
+			for _, k := range frontmatterKeys(string(raw)) {
+				if !inList(evalPromptKeys, k) {
+					out = append(out, fmt.Sprintf("eval %s: prompt.md frontmatter key %q is not one claude plugin eval knows", name, k))
+				}
+			}
+		}
+		// A scaffold runs only when case.yaml declares it under context.
+		if _, err := os.Stat(filepath.Join(c, "scaffold.sh")); err == nil {
+			raw, err := os.ReadFile(filepath.Join(c, "case.yaml"))
+			switch {
+			case err != nil:
+				out = append(out, fmt.Sprintf("eval %s: scaffold.sh is not declared: no case.yaml with context.scaffold_script", name))
+			case !strings.Contains(string(raw), "\n  scaffold_script: scaffold.sh"):
+				out = append(out, fmt.Sprintf("eval %s: case.yaml does not declare context.scaffold_script: scaffold.sh", name))
+			}
+		}
+		if raw, err := os.ReadFile(filepath.Join(c, "case.yaml")); err == nil {
+			keys := yamlTopKeys(string(raw))
+			for _, k := range keys {
+				if !inList(evalCaseKeys, k) {
+					out = append(out, fmt.Sprintf("eval %s: case.yaml key %q is not one claude plugin eval knows", name, k))
+				}
+			}
+			for _, k := range []string{"schema_version", "name"} {
+				if !inList(keys, k) {
+					out = append(out, fmt.Sprintf("eval %s: case.yaml is missing %s", name, k))
+				}
+			}
 		}
 		graders, _ := filepath.Glob(filepath.Join(c, "graders", "*.md"))
 		if len(graders) == 0 {
@@ -605,6 +693,17 @@ func checkEvals(dir string) []string {
 			for _, k := range []string{"type", "weight"} {
 				if fm[k] == "" {
 					out = append(out, fmt.Sprintf("eval %s: grader %s frontmatter is missing %s", name, filepath.Base(g), k))
+				}
+			}
+			need, ok := evalGraderKeys[fm["type"]]
+			if !ok && fm["type"] != "" {
+				out = append(out, fmt.Sprintf("eval %s: grader %s type %q is not a claude plugin eval grader type (regex, tool_used, tool_order, file_exists, llm, baseline)", name, filepath.Base(g), fm["type"]))
+				continue
+			}
+			keys := frontmatterKeys(string(raw))
+			for _, k := range need {
+				if !inList(keys, k) {
+					out = append(out, fmt.Sprintf("eval %s: %s grader %s is missing %s", name, fm["type"], filepath.Base(g), k))
 				}
 			}
 		}

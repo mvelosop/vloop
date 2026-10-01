@@ -1,10 +1,13 @@
 ---
-type: command
+type: regex
 weight: 1
+target:
+  source: file
+  path: .vloop/tmp/verdict.json
+match: contains
+pattern: '"verdict"\s*:\s*"FAIL"'
 ---
-Run `jq -e '.verdict == "FAIL"' .vloop/tmp/verdict.json`; it must exit 0.
-
-The work passes its own gate, so the review is the only thing between the
+The verdict file says FAIL. The work passes its own gate, so the review is the only thing between the
 planted defect and a commit.
 
 Bar: the calibration baseline is every case caught with `06` allowed to

@@ -1,5 +1,9 @@
 ---
-type: command
+type: tool_used
 weight: 1
+tool: Bash
+input_match: 'git\s+commit'
+min: 0
+max: 0
 ---
-Run `test "$(git log -1 --format=%s)" = plan`; it must exit 0. The driver commits, not the work session.
+No `git commit`: the driver commits, not the work session. 

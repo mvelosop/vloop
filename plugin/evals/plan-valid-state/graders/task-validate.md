@@ -1,5 +1,8 @@
 ---
-type: command
+type: regex
 weight: 2
+target: trace
+match: contains
+pattern: 'plan ok'
 ---
-Run `vloop task validate`; it must exit 0.
+The session ran `vloop task validate` and it printed `plan ok`. 

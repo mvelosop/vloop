@@ -68,6 +68,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | decision | no | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | repair | partly | [I20260930-0805-the-planning-session-moved-this-repo-s-r](I20260930-0805-the-planning-session-moved-this-repo-s-r.md) |
 | verify | repair | yes | [I20260930-1300-a-rehearsal-clone-took-the-work-branch-a](I20260930-1300-a-rehearsal-clone-took-the-work-branch-a.md) |
+| verify | repair | partly | [I20261001-1415-eval-port-fixed-by-hand](I20261001-1415-eval-port-fixed-by-hand.md) |
 | verify | verification-finding | yes | [I20260929-2010-go-mod-not-tidy](I20260929-2010-go-mod-not-tidy.md) |
 | verify | verification-finding | partly | [I20260929-2012-brief-check-and-brief-list-started-a-rep](I20260929-2012-brief-check-and-brief-list-started-a-rep.md) |
 | verify | verification-finding | yes | [I20260929-2245-one-review-session-s-telemetry-record-wa](I20260929-2245-one-review-session-s-telemetry-record-wa.md) |
@@ -75,6 +76,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | [I20260930-1302-the-loop-s-fence-blocked-the-read-only-g](I20260930-1302-the-loop-s-fence-blocked-the-read-only-g.md) |
 | verify | verification-finding | yes | [I20260930-1305-schema-files-counted-as-other-lines](I20260930-1305-schema-files-counted-as-other-lines.md) |
 | verify | verification-finding | partly | [I20261001-1005-plan-md-run-id-wording](I20261001-1005-plan-md-run-id-wording.md) |
+| verify | verification-finding | yes | [I20261001-1338-eval-cases-fail-to-load-setup-key](I20261001-1338-eval-cases-fail-to-load-setup-key.md) |
 | close | carry-forward | partly | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

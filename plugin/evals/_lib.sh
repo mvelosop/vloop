@@ -24,7 +24,15 @@ baseline() {
 [project]
 name = "runstat"
 version = "0.1.0"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

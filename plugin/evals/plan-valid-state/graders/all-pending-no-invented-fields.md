@@ -1,9 +1,8 @@
 ---
-type: command
+type: llm
 weight: 1
+focus:
+  source: file
+  path: .vloop/state/state.json
 ---
-Run
-
-    jq -e '.status == "planning" and all(.tasks[]; .status == "pending" and .attempts == 0 and .notes == "") and .run_id == "" and .branch == ""' .vloop/state/state.json
-
-The planner proposes; the driver stamps `run_id` and `branch` and owns every status.
+PASS if the plan's `status` is `planning`, every task has `status` `pending`, `attempts` 0 and empty `notes`, and `run_id` and `branch` are empty strings — the planner proposes; the driver stamps `run_id` and `branch` and owns every status. FAIL otherwise.

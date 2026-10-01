@@ -11,5 +11,5 @@
     "estimated spend sums total_cost_usd across the run's sessions",
     "A run with different records produces correspondingly different signals"
   ],
-  "verify": "python3 -m pytest -q tests/test_signals.py"
+  "verify": "uv run pytest -q tests/test_signals.py"
 }

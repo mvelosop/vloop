@@ -11,5 +11,5 @@
     "Changing an error's wording requires editing only src/runstat/messages.py",
     "stdout is completely empty on every failing path"
   ],
-  "verify": "python3 -m pytest -q tests/test_messages.py"
+  "verify": "uv run pytest -q tests/test_messages.py"
 }

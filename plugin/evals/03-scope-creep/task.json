@@ -9,5 +9,5 @@
     "The command exits 0 on a readable run",
     "The implementation stays within what the brief asks for"
   ],
-  "verify": "python3 -m pytest -q tests/test_signals_cmd.py"
+  "verify": "uv run pytest -q tests/test_signals_cmd.py"
 }

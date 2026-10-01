@@ -1,5 +1,8 @@
 ---
-type: command
+type: regex
 weight: 1
+target: trace
+match: contains
+pattern: 'proposal\.json: ok'
 ---
-Run `vloop schema validate proposal/v1 .vloop/tmp/proposal.json`; it must exit 0.
+The session validated its proposal with `vloop schema validate` and it passed (vloop prints `<file>: ok`). 

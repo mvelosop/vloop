@@ -1,10 +1,8 @@
 ---
-type: command
+type: llm
 weight: 3
+focus:
+  source: file
+  path: .vloop/state/state.json
 ---
-Run
-
-    jq -e '(.tasks | length > 0) and all(.tasks[]; (.kind | IN("feature","fix","refactor","test","docs","chore")) and (.status == "pending") and (.id | test("^T[0-9]+$")) and has("goal") and has("acceptance") and has("verify"))' .vloop/state/state.json
-
-It must exit 0: language changes the prose a person reads, never keys, enum
-values, ids or commands.
+PASS if the plan has at least one task and every task keeps English keys and values where the format fixes them: `kind` is one of feature, fix, refactor, test, docs, chore; `status` is `pending`; `id` is T followed by digits; and each task has `goal`, `acceptance` and `verify`. Prose may be Spanish; keys, enum values, ids and commands may not. FAIL otherwise.

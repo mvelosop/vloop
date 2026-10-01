@@ -1,5 +1,8 @@
 ---
-type: command
+type: regex
 weight: 3
+target: trace
+match: contains
+pattern: 'state\.json: ok'
 ---
-Run `vloop schema validate state/v1 .vloop/state/state.json`; it must exit 0. A plan that fails its schema is no plan.
+The session validated its state with `vloop schema validate` and it passed (vloop prints `<file>: ok`). 

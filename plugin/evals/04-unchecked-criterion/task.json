@@ -11,5 +11,5 @@
     "On every failing path the explanation goes to stderr",
     "No traceback reaches the user"
   ],
-  "verify": "python3 -m pytest -q tests/test_errors.py"
+  "verify": "uv run pytest -q tests/test_errors.py"
 }

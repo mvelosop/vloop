@@ -1,9 +1,8 @@
 ---
-type: command
+type: llm
 weight: 2
+focus:
+  source: file
+  path: .vloop/state/state.json
 ---
-Run
-
-    jq -e '(.tasks | length > 0) and all(.tasks[]; .kind | IN("feature","fix","refactor","test","docs","chore"))' .vloop/state/state.json
-
-It must exit 0: every task carries a `kind` from the enum, and the plan has tasks.
+PASS if the plan has at least one task and every task's `kind` is exactly one of: feature, fix, refactor, test, docs, chore. FAIL if any task lacks a kind or uses another value.

@@ -14,5 +14,5 @@
     "A missing run directory exits 2, with the catalogue's text on stderr",
     "stdout is completely empty on every failing path"
   ],
-  "verify": "python3 -m pytest -q tests/test_messages.py"
+  "verify": "uv run pytest -q tests/test_messages.py"
 }
