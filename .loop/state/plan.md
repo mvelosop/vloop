@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **9/10 done** · iteration 9
+**Status:** running · **10/10 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:42:12Z
+**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:56:51Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T7** — Write plugin/skills/operate as /vloop:operate, the operator's playbook driven by the CLI
 - [x] **T8** — Port the reviewer calibration and the four skill cases as eval suites, and stop extracting evals
 - [x] **T9** — Document the skills and interventions, and state them as built in the domain docs
-- [ ] **T10** — Close: the worked example on copies of the real plugin, claude plugin validate, and the whole suite
+- [x] **T10** — Close: the worked example on copies of the real plugin, claude plugin validate, and the whole suite
 
 ## Tasks
 
@@ -264,7 +264,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T10 — Close: the worked example on copies of the real plugin, claude plugin validate, and the whole suite
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9
+`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9
 
 **Files:** `cmd/vloop/b7_e2e_test.go`
 

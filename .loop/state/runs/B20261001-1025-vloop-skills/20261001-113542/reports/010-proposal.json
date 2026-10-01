@@ -1,0 +1,8 @@
+{
+  "task": "T10",
+  "outcome": "done",
+  "summary": "cmd/vloop/b7_e2e_test.go now holds TestWorkedExampleB7PluginPath (extracted plugin has exactly operate, plan, review, work and no evals/) and TestWorkedExampleB7Interventions (intervention added, listed and exported with repo.stacks). The gate's fixture-copy checks and claude plugin validate pass.",
+  "files": ["cmd/vloop/b7_e2e_test.go", "cmd/vloop/b4_e2e_test.go"],
+  "verified": "The task's verify command printed GATE OK.",
+  "notes": "Fix outside the new file: cmd/vloop/b4_e2e_test.go TestWorkedExampleB4Close asserted the export repo object as {name,remote}; T6 added repo.stacks to every record, so the expected string gained \"stacks\":[\"go\"] (that scratch repo configures metrics.stacks=go). It belongs to T6's change; no assertion was weakened. T6's own gate did not run ./cmd/vloop. The intervention list prints the id, not the summary; export records use the field type, not record."
+}

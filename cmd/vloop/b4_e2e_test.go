@@ -171,7 +171,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 		t.Fatalf("export records %v, want %v", got, want)
 	}
 	repo, _ := json.Marshal(first["repo"])
-	if string(repo) != `{"name":"shop","remote":"https://example.com/acme/shop.git"}` {
+	if string(repo) != `{"name":"shop","remote":"https://example.com/acme/shop.git","stacks":["go"]}` {
 		t.Fatalf("repo = %s", repo)
 	}
 	if strings.Contains(r.out, "user:") || strings.Contains(r.out, "tok@") || strings.Contains(r.out, s.dir) {
