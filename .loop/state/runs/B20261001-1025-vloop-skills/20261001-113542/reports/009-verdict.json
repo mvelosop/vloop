@@ -1,0 +1,14 @@
+{
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "README.md has a section headed with \"Skills\" naming /vloop:plan, /vloop:work, /vloop:review and /vloop:operate, and stays under its 200-line cap; TestReadmeNamesTheSkills in internal/cli/readme_test.go fails when that heading or one of the four names is missing; B1's README test is otherwise unchanged", "met": true, "evidence": "README.md '## Skills' at line 196 names all four; file is 199 lines; the new test checks a heading regex and each /vloop:<k>; the diff touches no other README test"},
+    {"criterion": "docs/guide/concepts.md explains the four skills: who invokes each, what each reads and writes, and that the evals are run by the operator with claude plugin eval", "met": true, "evidence": "concepts.md '## Skills' section: vloop run starts the first three, /vloop:operate is invoked by the operator; reads and writes listed per skill; evals paragraph names claude plugin eval"},
+    {"criterion": "docs/guide/defects.md gains interventions: the record, its fields and vocabularies, `vloop intervention add`, `list` and `set`, intervention/v1, and the export's intervention records and repo.stacks", "met": true, "evidence": "defects.md '## Interventions' section covers the file layout, every field, all vocabularies, the three commands, intervention/v1, and the export's intervention records plus repo.stacks"},
+    {"criterion": "TestGuideDefectsCoversInterventions in internal/cli/guide_test.go fails when docs/guide/defects.md omits an intervention/v1 field or vocabulary value", "met": true, "evidence": "guide_test.go: the test takes guideWords(t, \"intervention/v1\", true) from the schema and asserts each word appears in defects.md"},
+    {"criterion": "docs/domain/execution/session.md states /vloop:plan, /vloop:work and /vloop:review as built (its gap about planned skills removed) and docs/domain/execution/task.md no longer says no planner assigns area or kind", "met": true, "evidence": "session.md has a 'Skills, as built' section and the 'planned, B5' gap is gone; task.md gap now says /vloop:plan assigns kind, and area when areas is set"},
+    {"criterion": "docs/guide/commands.md is current (TestCommandsReferenceIsCurrent passes)", "met": true, "evidence": "commands.md is not in the diff; the driver gate ran go test ./internal/cli and printed GATE OK"}
+  ],
+  "findings": [],
+  "notes": "The README swapped 'What comes next' for Skills to stay under the cap; the roadmap link survives in the Skills paragraph. No absolute paths in the diff."
+}

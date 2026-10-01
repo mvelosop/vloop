@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 47192,
+  "stop_reason": "end_turn",
+  "session_id": "053e738e-d4c9-4bb8-819b-7fc5f9acfad6",
+  "total_cost_usd": 0.2948895999999999,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 38977,
+    "cache_read_input_tokens": 373508,
+    "output_tokens": 6424,
+    "output_tokens_details": {
+      "thinking_tokens": 601
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 38977,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 475,
+        "cache_read_input_tokens": 50487,
+        "cache_creation_input_tokens": 506,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 506
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 6424,
+      "cacheReadInputTokens": 373508,
+      "cacheCreationInputTokens": 38977,
+      "webSearchRequests": 0,
+      "costUSD": 0.2948895999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 601,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 11,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T9 is finished. The task's verify command printed `GATE OK`, and I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **README:** it has a new Skills section naming `/vloop:plan`, `/vloop:work`, `/vloop:review` and `/vloop:operate`, and it stays at 199 lines. To make room, the Skills section replaces \"What comes next\", and its roadmap link moved into the Skills paragraph.\n- **`docs/guide/concepts.md`:** a new Skills section says who invokes each skill and what each reads and writes. It also says the operator runs the evals with `claude plugin eval`.\n- **`docs/guide/defects.md`:** a new Interventions section covers the record, every `intervention/v1` field and vocabulary, `vloop intervention add`, `list` and `set`, and the export's intervention records and `repo.stacks`.\n- **Domain docs:**\n  - `docs/domain/execution/session.md` now states the three session skills and `/vloop:operate` as built. Its gap about planned skills is gone.\n  - `docs/domain/execution/task.md` no longer says no planner assigns `area` or `kind`.\n- **Tests:** I added `TestReadmeNamesTheSkills` and `TestGuideDefectsCoversInterventions`.\n- **`docs/guide/commands.md`:** it needed no change; `go generate` left it identical.",
+  "ttft_ms": 2468,
+  "type": "result",
+  "duration_ms": 95267,
+  "uuid": "4f7cc54a-2904-47c8-a811-3ac5f1890449",
+  "ttft_stream_ms": 1162,
+  "time_to_request_ms": 349,
+  "first_content_frame_ms": 1163,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 9
+}

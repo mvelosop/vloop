@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **8/10 done** · iteration 8
+**Status:** running · **9/10 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:36:44Z
+**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:42:12Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T6** — Export intervention records and every record's repo.stacks
 - [x] **T7** — Write plugin/skills/operate as /vloop:operate, the operator's playbook driven by the CLI
 - [x] **T8** — Port the reviewer calibration and the four skill cases as eval suites, and stop extracting evals
-- [ ] **T9** — Document the skills and interventions, and state them as built in the domain docs
+- [x] **T9** — Document the skills and interventions, and state them as built in the domain docs
 - [ ] **T10** — Close: the worked example on copies of the real plugin, claude plugin validate, and the whole suite
 
 ## Tasks
@@ -239,7 +239,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T9 — Document the skills and interventions, and state them as built in the domain docs
 
-`pending` · depends on: T5, T6, T7, T8
+`done` · depends on: T5, T6, T7, T8
 
 **Files:** `README.md`, `docs/guide/concepts.md`, `docs/guide/defects.md`, `docs/domain/execution/session.md`, `docs/domain/execution/task.md`, `docs/guide/commands.md`, `internal/cli/guide_test.go`, `internal/cli/readme_test.go`
 

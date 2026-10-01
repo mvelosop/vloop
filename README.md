@@ -193,7 +193,7 @@ error; `vloop run` also ends with 3–9. All of them, and which a run can resume
 from, are in [docs/guide/concepts.md](docs/guide/concepts.md#exit-codes).
 Errors go to stderr as one line starting with `vloop: `.
 
-## What comes next
+## Skills
 
-vloop is built as a series of briefs; what each one adds, and in what order, is in
-[docs/design-notes/vloop-roadmap.md](docs/design-notes/vloop-roadmap.md).
+The plugin carries four skills: `/vloop:plan`, `/vloop:work` and `/vloop:review`
+are the sessions `vloop run` starts; `/vloop:operate` is yours, to run, verify, close and merge a brief ([concepts](docs/guide/concepts.md); [roadmap](docs/design-notes/vloop-roadmap.md)).

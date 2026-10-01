@@ -135,3 +135,52 @@ all defects, shown as a whole percentage, or `n/a` with no defects. It is the
 share of defects removed before users saw them. In `vloop metrics --json` these
 are `defects.in_loop`, `operator`, `escaped`, `total` and `removal_efficiency`
 (a fraction, or `null`).
+
+## Interventions
+
+An intervention is what the operator (or the assistant as their hands) did around
+a run besides testing it: a decision, a halt handled, a repair. Recording them
+shows what a driver could one day do itself. One file each:
+`.vloop/interventions/I<YYYYMMDD-HHMM>-<slug>.md`, YAML frontmatter, then the
+summary line and three sections, **Trigger.**, **Done.** and **What would
+automate it.**
+
+```
+---
+id: I20260101-1000-gate-was-wrong
+brief: B20260101-0900-a.loop-brief   # "" for series-level
+phase: halt          # setup | design | run | halt | verify | close | next
+kind: repair         # direction | decision | context-supply | halt | verification-finding | repair | carry-forward | ceremony
+automatable: partly  # yes | partly | no
+by: operator         # operator | assistant | both
+occurred: 2026-01-01
+recorded: 2026-01-01T10:00:00Z
+---
+```
+
+The frontmatter is the `intervention/v1` schema (`vloop schema show
+intervention/v1`). Every field:
+
+- `schema`: always `intervention/v1` in the JSON form.
+- `id`: the file name without `.md`.
+- `brief`: the loop brief it belongs to, empty for a series-level one.
+- `phase`: `setup`, `design`, `run`, `halt`, `verify`, `close` or `next`.
+- `kind`: `direction`, `decision`, `context-supply`, `halt`,
+  `verification-finding`, `repair`, `carry-forward` or `ceremony`.
+- `automatable`: `yes`, `partly` or `no`: could a driver do it.
+- `by`: `operator`, `assistant` or `both`.
+- `occurred`: the date it happened; `recorded`: an RFC 3339 date-time.
+- `backfilled`: `true` on a record written after the fact.
+- `summary`, `trigger`, `done`, `automation`: the summary line and the three
+  sections, in the JSON form.
+
+`vloop intervention add "<summary>" --phase <p> --kind <k> --automatable <a>
+--by <b>` writes the file and prints its path; it also takes `--brief <name>`,
+`--trigger`, `--done` and `--automation`. `vloop intervention list [--brief
+<name>]` prints `<phase>  <kind>  <automatable>  <id>`, by phase, kind and id.
+`vloop intervention set <id> <field> <value>` changes `brief`, `phase`, `kind`,
+`automatable`, `by` or `occurred`.
+
+`vloop metrics export` emits one intervention record per intervention, after the
+briefs, and every export record's `repo` carries `stacks`: the repository's
+`metrics.stacks`, empty when unset.

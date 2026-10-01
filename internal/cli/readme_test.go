@@ -104,6 +104,24 @@ func TestReadmeMatchesCommandTree(t *testing.T) {
 	}
 }
 
+// TestReadmeNamesTheSkills checks the README has a Skills section naming the
+// four plugin skills.
+func TestReadmeNamesTheSkills(t *testing.T) {
+	b, err := os.ReadFile("../../README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	text := string(b)
+	if !regexp.MustCompile(`(?m)^#+ .*Skills`).MatchString(text) {
+		t.Error("README has no heading with \"Skills\"")
+	}
+	for _, k := range []string{"plan", "work", "review", "operate"} {
+		if !strings.Contains(text, "/vloop:"+k) {
+			t.Errorf("README does not name /vloop:%s", k)
+		}
+	}
+}
+
 // TestReadmeShellDefaultMatchesCode checks the README's stated default for the
 // `shell` key on each OS against config's (F1).
 func TestReadmeShellDefaultMatchesCode(t *testing.T) {

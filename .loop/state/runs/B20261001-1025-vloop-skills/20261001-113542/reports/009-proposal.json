@@ -1,0 +1,8 @@
+{
+  "task": "T9",
+  "outcome": "done",
+  "summary": "README gains a Skills section (still 199 lines), concepts.md explains the four skills, defects.md documents interventions and intervention/v1, and the domain session/task pages state the skills and kind/area as built. Added TestReadmeNamesTheSkills and TestGuideDefectsCoversInterventions.",
+  "files": ["README.md", "docs/guide/concepts.md", "docs/guide/defects.md", "docs/domain/execution/session.md", "docs/domain/execution/task.md", "internal/cli/guide_test.go", "internal/cli/readme_test.go"],
+  "verified": "The task's verify command printed GATE OK.",
+  "notes": "README was at 199 lines, so the Skills section replaced 'What comes next' (its roadmap link moved into the Skills paragraph). docs/guide/commands.md needed no change: go generate left it identical and TestCommandsReferenceIsCurrent passes. session.md gained a 'Skills, as built' section and its Gaps bullet now only says the shell skills still exist."
+}
