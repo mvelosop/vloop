@@ -44,7 +44,8 @@ func newRun(b Build, g *Globals) *cobra.Command {
 				}
 				over[f.key] = budgets[i]
 			}
-			if _, err := driver.ResolveBudgets(root, over); err != nil {
+			budget, err := driver.ResolveBudgets(root, over)
+			if err != nil {
 				return configErr(g, cmd.OutOrStdout(), err)
 			}
 
@@ -69,8 +70,21 @@ func newRun(b Build, g *Globals) *cobra.Command {
 				}
 				return Problem(err)
 			}
-			if !planOnly {
-				return Problem(fmt.Errorf("the plan %s is in place, but running its tasks is not available in this build — use --plan-only", res.Plan.RunID))
+			if planOnly {
+				return nil
+			}
+			it := &driver.Iterator{Root: root, Version: b.Version, RunDir: res.RunDir, Budgets: budget,
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet}
+			end, err := it.Run()
+			if err != nil {
+				var h *driver.Halt
+				if errors.As(err, &h) && h.Code != ExitProblems {
+					return &ExitError{Code: h.Code, Err: err}
+				}
+				return Problem(err)
+			}
+			if end.Code != 0 {
+				return &ExitError{Code: end.Code, Err: errors.New("")}
 			}
 			return nil
 		},

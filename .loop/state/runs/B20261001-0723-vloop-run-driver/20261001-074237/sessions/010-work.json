@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 276737,
+  "stop_reason": "end_turn",
+  "session_id": "e0d001ab-6dbe-4a49-9c86-a25f06410997",
+  "total_cost_usd": 1.3287366,
+  "usage": {
+    "input_tokens": 46,
+    "cache_creation_input_tokens": 126557,
+    "cache_read_input_tokens": 2100533,
+    "output_tokens": 40231,
+    "output_tokens_details": {
+      "thinking_tokens": 11975
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 126557,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 800,
+        "cache_read_input_tokens": 137395,
+        "cache_creation_input_tokens": 1178,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1178
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 46,
+      "outputTokens": 40231,
+      "cacheReadInputTokens": 2100533,
+      "cacheCreationInputTokens": 126557,
+      "webSearchRequests": 0,
+      "costUSD": 1.3287366,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 11975,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 27,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T5 is finished and its verify command exits 0, printing `gate T5 ok`. I wrote the proposal to `.loop/tmp/proposal.json` with outcome `done`.\n\n`vloop run` now runs the plan's tasks, not just the plan:\n- **Iteration:** each pass takes the first ready task, runs the work session, runs the done tasks' gates plus the task's own, runs the review when the gate passes, applies the outcome and commits once.\n- **Gate environment:** each gate is timed and sees `VLOOP_ACTIVE_TASK` and `VLOOP_GATE_TASK`. Sessions never see either, even if the operator's shell has them set.\n- **HEAD check:** the driver checks HEAD is still on the run's branch before every commit. If a gate moves it, the run exits 9 and commits nothing.\n- **Endings:** the run ends `complete` (exit 0) or `blocked` (exit 2), or `halted` (exit 4) when `--max-iterations` is spent. It then makes the closing commit.\n- **Tests:** the nine ported scenarios and `TestRunHeadCheck` pass, along with extra tests for max-iterations, a failing gate and the driver internals.\n\nDecisions you may want to know about:\n- **Run log timing:** the run log is held in memory and written only just before each commit. The plan commit tracks `run.log`, so appending to it mid-iteration made a gate's `git checkout main` fail on a dirty file, and exit 9 could not be reached.\n- **Run folder:** an iterating run reuses the plan session's folder; a resume starts a new one.\n- **Resume on the default branch:** it now creates the work branch.\n- **Regression:** a done task whose gate fails during another task's iteration goes back to pending with an attempt charged, as `run.sh` did. The task didn't list this explicitly.\n\nI left tamper detection, the session-error exit (7), the cost, stall and convergence halts, gate disputes, flaky-gate re-runs, the metrics snapshot and the summary alone, since later tasks own them.\n\nThe full `go test ./...` has one failure that predates this work: `TestWorkedExampleEnglishSession` in `cmd/vloop/e2e_test.go` expects 14 `config` lines, but T2 added six `run.*` keys. It isn't in T5's gate and I didn't touch it; it's flagged in the proposal notes.",
+  "ttft_ms": 2563,
+  "type": "result",
+  "duration_ms": 445990,
+  "uuid": "81ad45f4-f0b4-4ef8-b937-0d4964d09ec5",
+  "ttft_stream_ms": 1361,
+  "time_to_request_ms": 348,
+  "first_content_frame_ms": 1361,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 5
+}

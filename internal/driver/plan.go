@@ -65,7 +65,8 @@ type Planner struct {
 // PlanResult says what the plan phase did.
 type PlanResult struct {
 	Plan    *state.Plan
-	Planned bool // this call ran the plan session and committed its plan
+	Planned bool   // this call ran the plan session and committed its plan
+	RunDir  string // the run folder the plan session used; "" when this call did not plan
 }
 
 func (p *Planner) now() time.Time {
@@ -237,21 +238,17 @@ func (p *Planner) Plan() (*PlanResult, error) {
 			t.show("read:   %s", planMarkdown)
 			return &PlanResult{Plan: existing}, nil
 		}
+		if _, err := p.workBranch(existing.RunID); err != nil {
+			return nil, err
+		}
 		return &PlanResult{Plan: existing}, nil
 	}
 
 	runID := brief.RunID(briefPath)
-	if OnDefaultBranch(root) {
-		if exists := exec.Command("git", "-C", root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
-			return nil, halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
-		}
-		if _, err := git(root, "switch", "-q", "-c", runID); err != nil {
-			return nil, halt(ExitPreflight, "cannot create branch %s: %v", runID, err)
-		}
-		if p.Out != nil && !p.Quiet {
-			fmt.Fprintf(p.Out, "created and switched to branch %s\n", runID)
-		}
-		cur = runID
+	if c, err := p.workBranch(runID); err != nil {
+		return nil, err
+	} else if c != "" {
+		cur = c
 	}
 
 	if hasPlan { // another brief's plan: reset it
@@ -336,7 +333,26 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		t.show("adjust: vloop task set | note | drop")
 		t.show("run it: vloop run")
 	}
-	return &PlanResult{Plan: rendered, Planned: true}, nil
+	return &PlanResult{Plan: rendered, Planned: true, RunDir: runDir}, nil
+}
+
+// workBranch is R-2: on the default branch the run gets a branch named for its
+// run id, and the name is returned; anywhere else it runs where it is and the
+// result is "".
+func (p *Planner) workBranch(runID string) (string, error) {
+	if !OnDefaultBranch(p.Root) {
+		return "", nil
+	}
+	if exists := exec.Command("git", "-C", p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
+		return "", halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
+	}
+	if _, err := git(p.Root, "switch", "-q", "-c", runID); err != nil {
+		return "", halt(ExitPreflight, "cannot create branch %s: %v", runID, err)
+	}
+	if p.Out != nil && !p.Quiet {
+		fmt.Fprintf(p.Out, "created and switched to branch %s\n", runID)
+	}
+	return runID, nil
 }
 
 // bareTerm is a terminal without a run: progress goes to stdout only.

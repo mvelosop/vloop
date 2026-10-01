@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **4/11 done** · iteration 4
+**Status:** running · **5/11 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T07:30:41Z
+**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T07:40:23Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T2** — Add the six run.* budget keys to config, with VLOOP_RUN_* variables, validation and the config list update
 - [x] **T3** — Start sessions: the embedded fence, plugin and fence extraction, the claude invocation, the session/v1 record with masking, and the missing-record warning
 - [x] **T4** — Add `vloop run` with its flags and preflight, the work branch, the plan session, the plan checks and the plan commit
-- [ ] **T5** — Run one iteration end to end: task choice, work, gates with timing and the env ids, review, the outcome, journal, plan.md, and the commit behind a HEAD check
+- [x] **T5** — Run one iteration end to end: task choice, work, gates with timing and the env ids, review, the outcome, journal, plan.md, and the commit behind a HEAD check
 - [ ] **T6** — Handle gates across iterations: regressions, rewrites, blocked tasks whose gate passes, flaky gates and gate disputes
 - [ ] **T7** — Halt the run: budgets with flag precedence, convergence, stall, session errors, repeat-blocked and moved refs
 - [ ] **T8** — Make the run safe and its records sound: containment, preflight refusals, the run lock, git identity, state tampering, the empty run, rendered views, telemetry and layout
@@ -136,7 +136,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T5 — Run one iteration end to end: task choice, work, gates with timing and the env ids, review, the outcome, journal, plan.md, and the commit behind a HEAD check
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 **Files:** `internal/cli/run.go`, `internal/driver/`, `internal/driver/iterate.go`, `internal/driver/iterate_test.go`, `cmd/vloop/run_iterate_test.go`
 

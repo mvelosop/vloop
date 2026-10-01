@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 21728,
+  "stop_reason": "end_turn",
+  "session_id": "0ca0b50f-9509-45f7-bad7-311903e64568",
+  "total_cost_usd": 0.2229652,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 40623,
+    "cache_read_input_tokens": 164516,
+    "output_tokens": 2755,
+    "output_tokens_details": {
+      "thinking_tokens": 344
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 40623,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 297,
+        "cache_read_input_tokens": 51003,
+        "cache_creation_input_tokens": 1636,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1636
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 2755,
+      "cacheReadInputTokens": 164516,
+      "cacheCreationInputTokens": 40623,
+      "webSearchRequests": 0,
+      "costUSD": 0.2229652,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 344,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T5. I wrote `.loop/tmp/verdict.json` with all nine acceptance criteria met, and I didn't re-run the gate or tests myself.\n\n- **Criteria:** `internal/driver/iterate.go` covers task choice, gate environment, absent-report handling, outcomes, records, the HEAD check and the run endings. `TestRun01`, `TestRun16`, `TestRun17` and `TestRun40` assert more than exit codes.\n- **Tests:** all nine ported tests plus `TestRunHeadCheck` exist.\n- **Verify command:** I did not touch it. No absolute paths in the new files.\n- **Notes recorded:**\n  - `TestWorkedExampleEnglishSession` fails for a reason from T2, outside T5's gate.\n  - Session edits to `state.json` are overwritten until T6 adds tamper detection.",
+  "ttft_ms": 2319,
+  "type": "result",
+  "duration_ms": 22858,
+  "uuid": "5209aaf5-78b7-4b5d-928e-a6c0ad96c518",
+  "ttft_stream_ms": 1157,
+  "time_to_request_ms": 358,
+  "first_content_frame_ms": 1157,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 5
+}
