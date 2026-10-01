@@ -68,6 +68,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | [I20260930-0026-the-task-estimate-was-read-from-the-firs](I20260930-0026-the-task-estimate-was-read-from-the-firs.md) |
 | verify | verification-finding | partly | [I20260930-1302-the-loop-s-fence-blocked-the-read-only-g](I20260930-1302-the-loop-s-fence-blocked-the-read-only-g.md) |
 | verify | verification-finding | yes | [I20260930-1305-schema-files-counted-as-other-lines](I20260930-1305-schema-files-counted-as-other-lines.md) |
+| verify | verification-finding | partly | [I20261001-1005-plan-md-run-id-wording](I20261001-1005-plan-md-run-id-wording.md) |
 | close | carry-forward | partly | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
@@ -75,6 +76,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | close | ceremony | yes | [I20260930-0815-manual-close-of-b3-with-the-vloop-brief](I20260930-0815-manual-close-of-b3-with-the-vloop-brief.md) |
 | close | ceremony | yes | [I20260930-1330-the-first-close-by-vloop-itself-plus-han](I20260930-1330-the-first-close-by-vloop-itself-plus-han.md) |
 | close | ceremony | yes | [I20260930-2215-b5-closed-by-vloop-after-three-runs](I20260930-2215-b5-closed-by-vloop-after-three-runs.md) |
+| close | ceremony | yes | [I20261001-1015-b6-closed-with-a-finding](I20261001-1015-b6-closed-with-a-finding.md) |
 | close | repair | yes | [I20260929-2048-local-main-reset-to-the-pre-merge-commit](I20260929-2048-local-main-reset-to-the-pre-merge-commit.md) |
 | next | carry-forward | no | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |

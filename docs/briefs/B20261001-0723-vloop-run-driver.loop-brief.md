@@ -422,3 +422,36 @@ T11  -     -     1    0      234    0      0       7m28s   $0.59  claude-sonnet-
 
 - D20261001-1013-domain-plan-md-said-the-driver-stamps-ru — bug, work, found by operator: domain plan.md said the driver stamps run_id as the brief's name
 <!-- vloop:run-record:end -->
+
+### Operator notes
+
+Written by hand, outside the generated markers.
+
+**One run, no interventions during it** — the first since B4. The constraint
+added from the series' most common stall ("every gate is executed by the
+planner before it hands over the plan") held: no gate defect.
+
+**Verified outside the loop.** `go test -count=1 ./...` (16 packages), `go
+vet`, `gofmt -l .`, `go mod tidy -diff`, both cross-builds; README at 196
+lines. B1's README test grew stricter, not weaker: the one changed line maps the
+`run.*` keys' dashes to their variables, and two checks were added (the README's
+shell default against the code; the guide's exit codes against the driver's).
+`vloop run` replayed by hand with an independently written stub `claude`: branch
+created, plan and two iterations committed with `[vloop]` subjects, the exact
+invocations (plan on `opus`; work on `sonnet` with `--effort high`; review on
+`opus`, its own model; the fence and `--plugin-dir` on every session), every
+record valid against `session/v1` and `iteration/v1`, gate durations, the
+snapshot, a clean tree. Failure cases by hand: a gate dispute blocks with no
+attempt charged (exit 2); a session checking out a branch halts with nothing
+committed (exit 9); a flaky gate is detected on its re-run, recorded as
+`"flaky": true` and counted as an `env` defect. The driver's tamper protection
+also reverted the operator's first attempt to fake a flaky gate by editing the
+plan from a session. Two sessions tried `git stash`; the fence denied it.
+
+**Changed by hand.** One line of `docs/domain/execution/plan.md` (`run_id` is
+the run id), recorded through `close --finding` — its first real use. B2's
+escaped README defect marked fixed by this brief.
+
+**Still open.** Gate time shows `n/a` for this brief because the shell loop ran
+it; B7's run is the first `vloop run` of the series.
+
