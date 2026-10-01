@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **8/11 done** · iteration 8
+**Status:** running · **9/11 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T08:16:02Z
+**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T08:25:50Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T6** — Handle gates across iterations: regressions, rewrites, blocked tasks whose gate passes, flaky gates and gate disputes
 - [x] **T7** — Halt the run: budgets with flag precedence, convergence, stall, session errors, repeat-blocked and moved refs
 - [x] **T8** — Make the run safe and its records sound: containment, preflight refusals, the run lock, git identity, state tampering, the empty run, rendered views, telemetry and layout
-- [ ] **T9** — Snapshot the metrics after every iteration, print the summary at the end, and derive an env defect from a flaky gate
+- [x] **T9** — Snapshot the metrics after every iteration, print the summary at the end, and derive an env defect from a flaky gate
 - [ ] **T10** — Document the driver: exit codes 0–9 in the guide with the README pointer and test change, the run row and keys, F1, the command reference, and the domain docs as built
 - [ ] **T11** — Close: the B6 worked example end to end on the stub, the real-data check on a throwaway clone, and the full suite
 
@@ -245,7 +245,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T9 — Snapshot the metrics after every iteration, print the summary at the end, and derive an env defect from a flaky gate
 
-`pending` · depends on: T6, T7, T8
+`done` · depends on: T6, T7, T8
 
 **Files:** `internal/cli/run.go`, `internal/driver/`, `internal/driver/snapshot.go`, `internal/driver/snapshot_test.go`, `internal/metrics/defects.go`, `internal/metrics/defects_test.go`, `internal/runs/runs.go`, `internal/runs/runs_test.go`, `cmd/vloop/run_snapshot_test.go`
 

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 105095,
+  "stop_reason": "end_turn",
+  "session_id": "32c7ec12-0ba6-44d9-a1da-f942acebc1f4",
+  "total_cost_usd": 0.6769706000000002,
+  "usage": {
+    "input_tokens": 46,
+    "cache_creation_input_tokens": 68919,
+    "cache_read_input_tokens": 1353263,
+    "output_tokens": 13055,
+    "output_tokens_details": {
+      "thinking_tokens": 2151
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 68919,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 646,
+        "cache_read_input_tokens": 80208,
+        "cache_creation_input_tokens": 727,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 727
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 46,
+      "outputTokens": 13055,
+      "cacheReadInputTokens": 1353263,
+      "cacheCreationInputTokens": 68919,
+      "webSearchRequests": 0,
+      "costUSD": 0.6769706000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 2151,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 23,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T9 is finished. The task's verify command exits 0 and prints `gate T9 ok`. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **Snapshot:** after each iteration's commit the driver builds the brief's `metrics/v1`. It builds it with the same `metrics.Build` that `vloop metrics --json` and `brief close` use. It holds the result in memory and writes it to `.vloop/state/metrics/<run id>.json` inside the next commit. The closing commit carries the last one, and the tree is clean at the end of a run. I held it in memory so no tracked file is dirty while sessions and gates run.\n- **Summary:** every run that reaches its closing commit (complete, blocked, stalled, or halted by budget, session error or repeat-blocked) prints the `vloop metrics` summary on stdout after that commit. Runs that halt before the closing commit (moved refs, exit 9, or a failed preflight) print none.\n- **Flaky gate:** `Derive` now yields one `origin: env`, `kind: bug`, `found-by: gate` defect for an iteration whose record has `gate.flaky: true`. That iteration's outcome is not `gate_failed`, so no work defect is added.\n- **Tests added:** `TestRunSnapshot` and `TestRunSummary` (with a halted-run subtest) in `cmd/vloop/run_snapshot_test.go`, `TestDerivedFlakyGate` in `internal/metrics`, and an extra end-to-end test for the flaky env defect.\n- **Refactor:** I moved the classifier setup from `cli.newClassifier` into `metrics.NewClassifier(root)` so the driver can reuse it.\n\n`TestWorkedExampleEnglishSession` in `cmd/vloop` still fails because of the `run.*` config keys. It is the pre-existing failure from earlier tasks and is not in T9's gate.",
+  "ttft_ms": 2422,
+  "type": "result",
+  "duration_ms": 340044,
+  "uuid": "3dc22b88-7566-47b3-8d97-86973fe2f00e",
+  "ttft_stream_ms": 1159,
+  "time_to_request_ms": 353,
+  "first_content_frame_ms": 1160,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 9
+}

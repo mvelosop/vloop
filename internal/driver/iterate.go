@@ -70,6 +70,8 @@ type Iterator struct {
 	r          *Runner
 	log        *lazyLog
 	branch     string
+	snap       []byte // the metrics snapshot waiting for the next commit
+	snapPath   string
 }
 
 // blockedMark is where a task last ended blocked: HEAD before that iteration's
@@ -216,6 +218,7 @@ func (it *Iterator) Run() (Ending, error) {
 	if err := it.finish(end, runIters); err != nil {
 		return Ending{}, err
 	}
+	it.summary()
 	return end, nil
 }
 
@@ -543,7 +546,11 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	}
 
 	// 6. commit: one per iteration
-	return iterResult{outcome: outcome, repeat: repeat}, it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome))
+	if err := it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome)); err != nil {
+		return iterResult{outcome: outcome, repeat: repeat}, err
+	}
+	it.snapshot()
+	return iterResult{outcome: outcome, repeat: repeat}, nil
 }
 
 // repeatBlocked notes where a task ended blocked and says so when it is the
@@ -756,6 +763,9 @@ func (it *Iterator) commit(subject string) error {
 	}
 	if err := it.log.flush(); err != nil {
 		return err
+	}
+	if err := it.writeSnapshot(); err != nil {
+		return halt(ExitPreflight, "%v", err)
 	}
 	if _, err := git(it.Root, "add", "-A"); err != nil {
 		return halt(ExitPreflight, "%v", err)

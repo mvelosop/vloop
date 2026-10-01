@@ -1,0 +1,6 @@
+ok  	github.com/mvelosop/vloop/internal/driver	2.952s
+ok  	github.com/mvelosop/vloop/internal/metrics	1.423s
+ok  	github.com/mvelosop/vloop/internal/runs	2.125s
+ok  	github.com/mvelosop/vloop/internal/cli	20.112s
+ok  	github.com/mvelosop/vloop/cmd/vloop	4.134s
+gate T9 ok

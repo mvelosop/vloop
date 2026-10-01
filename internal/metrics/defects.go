@@ -55,6 +55,10 @@ func Derive(m *runs.Model, plan *runs.PlanDoc) []Derived {
 			verdicts[v.Iteration] = v
 		}
 		for _, it := range f.Iterations {
+			// A flaky gate is the environment's, not the work's.
+			if it.Flaky {
+				out = append(out, Derived{Task: it.Task, Iteration: it.Iteration, Origin: "env", Kind: "bug", FoundBy: "gate", Summary: "flaky gate"})
+			}
 			switch it.Canonical() {
 			case "gate_failed":
 				k := seen[it.Task]
