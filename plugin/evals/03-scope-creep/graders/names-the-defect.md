@@ -1,6 +1,9 @@
 ---
 type: llm
 weight: 2
+focus:
+  source: file
+  path: .vloop/tmp/verdict.json
 ---
 Read `.vloop/tmp/verdict.json`. At least one finding, or the evidence of an
 unmet criterion, must name this planted defect specifically: the signals command ships a `--json` flag, which the brief lists under out of scope.

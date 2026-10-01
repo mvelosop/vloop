@@ -1,6 +1,9 @@
 ---
 type: llm
 weight: 3
+focus:
+  source: file
+  path: .vloop/state/state.json
 ---
 `.vloop/config.toml` sets `language = "es"`. Read every task's `title`, `goal`,
 `acceptance` entries and `notes` in `.vloop/state/state.json`. Score 1 only if all

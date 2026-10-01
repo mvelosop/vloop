@@ -1,6 +1,9 @@
 ---
 type: llm
 weight: 2
+focus:
+  source: file
+  path: .vloop/tmp/verdict.json
 ---
 Read `.vloop/tmp/verdict.json`. At least one finding, or the evidence of an
 unmet criterion, must name this planted defect specifically: cli.py keeps a hand-maintained `_PREFIX = "runstat: "` beside the catalogue (messages.PREFIX is never used), duplicating the prefix to satisfy a gate that greps cli.py.

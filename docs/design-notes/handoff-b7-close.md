@@ -32,7 +32,10 @@ happens (`.vloop/interventions/`, with Context, Suggested and Decided).
   types and their required keys, with five rejecting fixtures. Checked: the tool
   loads all 13 cases at a $0 ceiling; all 13 scaffolds pass by hand with an empty
   `HOME`. Defects recorded: D20261001-1338 (brief spec gap), D20261001-2016 ×2
-  (work); mark them fixed by B7 once the evals run.
+  (work), D20261001-2036 (llm graders without a focus, fixed in 2026-10-01's
+  resumed session); mark them fixed by B7 once the evals run. The probe was
+  first blocked by the Docker credential store (operator to fix; see
+  I20261001-2020); `docs/guide/evals.md` (step 4) is written.
 
 ## What is left, in order
 

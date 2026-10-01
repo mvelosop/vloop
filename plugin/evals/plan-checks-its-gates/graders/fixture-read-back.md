@@ -1,6 +1,7 @@
 ---
 type: llm
 weight: 3
+focus: trace
 ---
 `greet.toml` already ends in a `[style]` table. A gate that appends
 `punctuation = "!"` to it puts the key inside that table, which the brief says is

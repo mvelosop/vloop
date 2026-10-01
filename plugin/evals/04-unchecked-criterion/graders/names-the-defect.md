@@ -1,6 +1,9 @@
 ---
 type: llm
 weight: 2
+focus:
+  source: file
+  path: .vloop/tmp/verdict.json
 ---
 Read `.vloop/tmp/verdict.json`. At least one finding, or the evidence of an
 unmet criterion, must name this planted defect specifically: the error message is printed to stdout as well as stderr, violating "stdout is completely empty on every failing path", which no test asserts.

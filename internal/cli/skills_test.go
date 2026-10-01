@@ -63,6 +63,9 @@ var fixtureWants = map[string][]string{
 	"bad-eval-grader-type":         {"eval case-a", "command", "grader type"},
 	"bad-eval-tools-string":        {"eval case-a", "allowed_tools", "yaml array"},
 	"bad-eval-regex-keys":          {"eval case-a", "regex grader", "match", "target"},
+	"bad-eval-llm-no-focus":        {"eval case-a", "llm grader", ".vloop/tmp/verdict.json", "last message"},
+	"bad-eval-llm-two-files":       {"eval case-a", "llm grader", "docs/briefs/greet.loop-brief.md", "one input"},
+	"bad-eval-llm-transcript":      {"eval case-a", "llm grader", "transcript", "focus: trace"},
 	"operate-exempt":               nil,
 	"bad-operate-command":          {"skill operate", "frobnicate"},
 }
@@ -705,6 +708,59 @@ func checkEvals(dir string) []string {
 				if !inList(keys, k) {
 					out = append(out, fmt.Sprintf("eval %s: %s grader %s is missing %s", name, fm["type"], filepath.Base(g), k))
 				}
+			}
+			if fm["type"] == "llm" {
+				out = append(out, checkLLMFocus(name, filepath.Base(g), string(raw))...)
+			}
+		}
+	}
+	return out
+}
+
+// readPaths finds the backticked paths a grader's body tells the judge to read:
+// "Read `a`" or "Read `a` and `b`".
+var readPaths = regexp.MustCompile("\\bRead ((?:`[^`]+`(?:, | and |,? and )?)+)")
+var backticked = regexp.MustCompile("`([^`]+)`")
+
+// llmFocusFile returns the path of an llm grader's `focus: {source: file, path}`,
+// or "" when its focus is not a file.
+func llmFocusFile(text string) string {
+	in := false
+	for _, l := range strings.Split(text, "\n") {
+		if strings.HasPrefix(l, "focus:") {
+			in = true
+			continue
+		}
+		if in && !strings.HasPrefix(l, " ") {
+			break
+		}
+		if p, ok := strings.CutPrefix(strings.TrimSpace(l), "path:"); in && ok {
+			return strings.Trim(strings.TrimSpace(p), `"'`)
+		}
+	}
+	return ""
+}
+
+// checkLLMFocus rejects an llm grader that asks the judge to read a file it
+// cannot see. The judge sees only its focus — the last message by default — and
+// has no access to the workspace; one focus means one file.
+func checkLLMFocus(name, grader, text string) []string {
+	var out []string
+	body := text
+	if fmEnd := strings.Index(text[3:], "\n---"); strings.HasPrefix(text, "---") && fmEnd >= 0 {
+		body = text[3+fmEnd+4:]
+	}
+	focus := llmFocusFile(text)
+	if strings.Contains(strings.ToLower(body), "transcript") && strings.TrimSpace(frontmatter(text)["focus"]) != "trace" {
+		out = append(out, fmt.Sprintf("eval %s: llm grader %s judges the transcript but has no focus: trace", name, grader))
+	}
+	for _, m := range readPaths.FindAllStringSubmatch(body, -1) {
+		for _, p := range backticked.FindAllStringSubmatch(m[1], -1) {
+			switch {
+			case focus == "":
+				out = append(out, fmt.Sprintf("eval %s: llm grader %s reads %s but has no file focus: the judge sees only the last message", name, grader, p[1]))
+			case p[1] != focus:
+				out = append(out, fmt.Sprintf("eval %s: llm grader %s reads %s but its focus is %s: an llm judge sees one input", name, grader, p[1], focus))
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 ---
 type: llm
 weight: 2
+focus: trace
 ---
 From the transcript: the planner ran `vloop task gate` on the tasks' gates before
 finishing, and where one passed on the base (the `hello` grep against the existing
