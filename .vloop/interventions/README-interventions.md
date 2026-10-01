@@ -66,6 +66,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | halt | partly | [I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table](I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table.md) |
 | verify | decision | partly | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
+| verify | halt | partly | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |
 | verify | repair | partly | [I20260930-0805-the-planning-session-moved-this-repo-s-r](I20260930-0805-the-planning-session-moved-this-repo-s-r.md) |
 | verify | repair | yes | [I20260930-1300-a-rehearsal-clone-took-the-work-branch-a](I20260930-1300-a-rehearsal-clone-took-the-work-branch-a.md) |
 | verify | repair | partly | [I20261001-1415-eval-port-fixed-by-hand](I20261001-1415-eval-port-fixed-by-hand.md) |

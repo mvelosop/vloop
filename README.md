@@ -196,4 +196,4 @@ Errors go to stderr as one line starting with `vloop: `.
 ## Skills
 
 The plugin carries four skills: `/vloop:plan`, `/vloop:work` and `/vloop:review`
-are the sessions `vloop run` starts; `/vloop:operate` is yours, to run, verify, close and merge a brief ([concepts](docs/guide/concepts.md); [roadmap](docs/design-notes/vloop-roadmap.md)).
+are the sessions `vloop run` starts; `/vloop:operate` is yours, to run, verify, close and merge a brief ([concepts](docs/guide/concepts.md); [roadmap](docs/design-notes/vloop-roadmap.md)). Their behaviour is tested by [evals](docs/guide/evals.md).

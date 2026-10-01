@@ -6,10 +6,14 @@ calls. `vloop plugin path` does not extract this directory: sessions never need
 it.
 
 Each case is a directory holding `prompt.md` (the skill invocation, with
-`max_turns` and `allowed_tools` frontmatter), `graders/*.md` (each with `type`
-and `weight`) and a `scaffold.sh` that builds the repository the session runs
-in. Run a scaffold in an **empty** directory; it initialises a git repository
-there. The `_*` files beside the cases are shared set-up, not cases.
+`max_turns` and `allowed_tools` frontmatter), `case.yaml` (declaring
+`context.scaffold_script: scaffold.sh`), `graders/*.md` (each with `type` and
+`weight`) and a `scaffold.sh` that builds the repository the session runs in.
+Run a scaffold in an **empty** directory; it initialises a git repository there.
+The `_*` files beside the cases are shared set-up, not cases.
+
+What an eval is, the grader types, and how to run and read the suite:
+[docs/guide/evals.md](../../docs/guide/evals.md).
 
 ## /vloop:review — the reviewer calibration
 
