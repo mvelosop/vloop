@@ -16,6 +16,6 @@ the one-case eval probe refused to start: the Bash sandbox cannot exclude the Do
 
 **Suggested.** Ask the operator before spending: probe first, report, then ask before the $40 suite; write the evals documentation meanwhile. On the halt: the operator makes the Docker store's contents one plain directory (its root may be a link), then the probe is re-run.
 
-**Decided.** The operator: probe first, then ask. The Docker store is left to the operator.
+**Decided.** The operator: probe first, then ask. The Docker store is left to the operator. Tried at the operator's go-ahead: `DOCKER_CONFIG` pointed at an empty scratch directory for the probe alone; the tool refused again in 3 seconds at $0 with the same message, so it checks `~/.docker` whatever `DOCKER_CONFIG` says. What remains is the operator's: move the links out of `~/.docker` (or replace them).
 
 **What would automate it.** A pre-flight in the evals documentation (or a `vloop` check) that runs one case at a $0 ceiling with Bash granted and reports environment refusals before any spend.
