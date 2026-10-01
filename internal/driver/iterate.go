@@ -18,9 +18,17 @@ import (
 
 // Exit codes of the iterating phase (R-3).
 const (
-	ExitBlocked = 2 // tasks remain but none can run
-	ExitMaxIter = 4 // the iteration budget is spent
+	ExitBlocked       = 2 // tasks remain but none can run
+	ExitStalled       = 3 // iterations in a row closed nothing and charged no attempt
+	ExitMaxIter       = 4 // the iteration budget is spent
+	ExitNotConverging = 5 // too many iterations per closed task
+	ExitCostCeiling   = 6 // the run's sessions cost the ceiling
+	ExitSessionError  = 7 // a session failed to run
+	ExitRepeatBlocked = 8 // a task blocked twice with nothing changed
 )
+
+// errSessionError is a session that failed to run; the run halts, resumable.
+var errSessionError = errors.New("session failed")
 
 const tmpDir = ".vloop/tmp"
 
@@ -36,6 +44,7 @@ const (
 type Ending struct {
 	Status string
 	Code   int
+	Note   string // what the operator reads first; printed with the run's end
 }
 
 // Iterator is the iterating phase of one `vloop run`: it works the plan's
@@ -55,12 +64,17 @@ type Iterator struct {
 	Env    []string
 
 	plan       *state.Plan
-	noProposal []string // tasks whose session died after changing files, with the account
-	gatePasses []string // tasks reported blocked whose own gate passes
+	noProposal []string               // tasks whose session died after changing files, with the account
+	gatePasses []string               // tasks reported blocked whose own gate passes
+	blockedAt  map[string]blockedMark // per task, the last iteration it ended blocked in
 	r          *Runner
 	log        *lazyLog
 	branch     string
 }
+
+// blockedMark is where a task last ended blocked: HEAD before that iteration's
+// commit, and what the session said.
+type blockedMark struct{ head, summary string }
 
 // lazyLog holds the run log in memory and writes it to the run folder just
 // before each commit, so that nothing tracked is modified while a session or a
@@ -135,31 +149,68 @@ func (it *Iterator) Run() (Ending, error) {
 		}
 	}
 
-	runIters := 0
+	runIters, stalls := 0, 0
+	it.blockedAt = map[string]blockedMark{}
 	end := Ending{Status: "halted", Code: ExitMaxIter}
 	for {
 		done, blocked, pending := counts(plan)
 		if pending == 0 {
 			if blocked > 0 {
-				end = Ending{"blocked", ExitBlocked}
+				end = Ending{Status: "blocked", Code: ExitBlocked}
 			} else {
-				end = Ending{"complete", 0}
+				end = Ending{Status: "complete"}
 			}
 			break
 		}
+		// Budgets are checked here, between iterations and never inside one, so
+		// a run always stops with the plan coherent and raising one resumes.
 		if runIters >= it.Budgets.MaxIterations {
-			end = Ending{"halted", ExitMaxIter}
+			end = Ending{Status: "halted", Code: ExitMaxIter}
+			break
+		}
+		if spend := it.spend(); spend >= it.Budgets.CostCeiling {
+			it.warn("cost ceiling reached: $%.2f spent this run, ceiling $%.2f", spend, it.Budgets.CostCeiling)
+			end = Ending{Status: "halted", Code: ExitCostCeiling}
+			break
+		}
+		if runIters >= it.Budgets.ConvergenceMin &&
+			(done == 0 || float64(runIters)/float64(done) > it.Budgets.ConvergenceMax) {
+			it.warn("not converging: %d iteration(s) this run for %d closed task(s), over %.2f per closed task", runIters, done, it.Budgets.ConvergenceMax)
+			end = Ending{Status: "halted", Code: ExitNotConverging}
 			break
 		}
 		task := nextReady(plan)
 		if task == nil {
 			it.warn("%d task(s) pending but none are ready — dependencies cannot be satisfied", pending)
-			end = Ending{"blocked", ExitBlocked}
+			end = Ending{Status: "blocked", Code: ExitBlocked}
 			break
 		}
 		runIters++
-		if err := it.iterate(task, runIters, done, len(plan.Tasks)); err != nil {
+		res, err := it.iterate(task, runIters, done, len(plan.Tasks))
+		if errors.Is(err, errSessionError) {
+			it.warn("a work session for %s failed to run — no attempt charged; see %s", task.ID, relRunDir(it.Root, it.RunDir))
+			end = Ending{Status: "halted", Code: ExitSessionError}
+			break
+		}
+		if err != nil {
 			return Ending{}, err
+		}
+		if res.repeat != "" {
+			it.warn("   %s", res.repeat)
+			end = Ending{Status: "halted", Code: ExitRepeatBlocked, Note: res.repeat}
+			break
+		}
+		// An iteration that closed nothing and charged no attempt made no
+		// recorded progress at all.
+		if nd, _, _ := counts(plan); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected {
+			stalls++
+			it.warn("   no recorded progress (%d/%d)", stalls, it.Budgets.StallLimit)
+			if stalls >= it.Budgets.StallLimit {
+				end = Ending{Status: "stalled", Code: ExitStalled}
+				break
+			}
+		} else {
+			stalls = 0
 		}
 	}
 	if err := it.finish(end, runIters); err != nil {
@@ -222,24 +273,49 @@ func (it *Iterator) readReport(name, schemaName string) ([]byte, bool) {
 	return data, true
 }
 
-func (it *Iterator) gitRefsMoved(before []string) error {
+func (it *Iterator) gitRefsMoved(before []string, task, phase string) error {
 	moved := refsDiff(before, refsState(it.Root))
 	if len(moved) == 0 {
 		return nil
 	}
-	return it.refsMoved(moved)
-}
-
-func (it *Iterator) refsMoved(moved []string) error {
-	it.warn("REFS MOVED — a session changed git refs; halting before anything is committed")
+	it.warn("REFS MOVED %s — the %s session changed git refs; halting before anything is committed", task, phase)
 	for _, l := range moved {
 		it.warn("%s", l)
 	}
+	// The plan says why the run stopped, but nothing is committed: HEAD may be
+	// on another branch now.
+	it.plan.Status = "halted"
+	_ = it.save()
 	_ = it.log.flush()
-	return halt(ExitRefsMoved, "REFS MOVED — a session changed git refs; nothing was committed")
+	return halt(ExitRefsMoved, "REFS MOVED %s — a %s session changed git refs; nothing was committed", task, phase)
 }
 
-func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
+// spend is what this run's sessions cost, from the records in its folder.
+func (it *Iterator) spend() float64 {
+	files, _ := filepath.Glob(filepath.Join(it.RunDir, "sessions", "*.json"))
+	total := 0.0
+	for _, f := range files {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			continue
+		}
+		var rec struct {
+			Cost float64 `json:"cost_usd"`
+		}
+		if json.Unmarshal(data, &rec) == nil {
+			total += rec.Cost
+		}
+	}
+	return total
+}
+
+// iterResult is what the run loop needs of an iteration beyond its commit.
+type iterResult struct {
+	outcome string
+	repeat  string // set when the task blocked twice with nothing changed
+}
+
+func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterResult, error) {
 	root := it.Root
 	plan := it.plan
 	iter := plan.Iteration + 1
@@ -256,20 +332,26 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 	// 1. work session
 	model, effort, err := ModelEffort(root, task, PhaseWork)
 	if err != nil {
-		return halt(ExitPreflight, "%v", err)
+		return iterResult{}, halt(ExitPreflight, "%v", err)
 	}
 	before := refsState(root)
-	if _, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort}); err != nil {
-		return err
+	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort})
+	if err != nil {
+		return iterResult{}, err
 	}
-	if err := it.gitRefsMoved(before); err != nil {
-		return err
+	if err := it.gitRefsMoved(before, id, PhaseWork); err != nil {
+		return iterResult{}, err
 	}
 
 	outcome, summary, notes := OutBlocked, "", "none"
 	var proposalFiles []string
 	var dispute string
-	if data, ok := it.readReport("proposal.json", "proposal/v1"); !ok {
+	data, ok := it.readReport("proposal.json", "proposal/v1")
+	if !ok && (wres.ExitCode != 0 || wres.IsError) {
+		// An infrastructure failure, not the task's: no attempt is charged.
+		return iterResult{}, errSessionError
+	}
+	if !ok {
 		it.warn("work session left no valid proposal")
 		changed := it.sessionTreeChanges()
 		if len(changed) > 0 {
@@ -321,7 +403,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 	for _, gid := range targets {
 		g, err := it.runGateRetry(iter, id, gid)
 		if err != nil {
-			return err
+			return iterResult{}, err
 		}
 		if gid == id {
 			own = g
@@ -362,14 +444,14 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 	default:
 		model, effort, err := ModelEffort(root, task, PhaseReview)
 		if err != nil {
-			return halt(ExitPreflight, "%v", err)
+			return iterResult{}, halt(ExitPreflight, "%v", err)
 		}
 		before := refsState(root)
 		if _, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort}); err != nil {
-			return err
+			return iterResult{}, err
 		}
-		if err := it.gitRefsMoved(before); err != nil {
-			return err
+		if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
+			return iterResult{}, err
 		}
 		if data, ok := it.readReport("verdict.json", "verdict/v1"); !ok {
 			it.warn("   review session left no valid verdict — treating as FAIL")
@@ -403,6 +485,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 	default:
 		it.applyOutcome(task, outcome, summary, findings, tampered, gatePassed)
 	}
+	repeat := it.repeatBlocked(id, outcome, summary)
 	if task.Status == "pending" && task.Attempts >= it.Budgets.MaxAttempts {
 		for i := range plan.Tasks {
 			if t := &plan.Tasks[i]; t.Status == "pending" && t.Attempts >= it.Budgets.MaxAttempts {
@@ -413,7 +496,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 	}
 	plan.Iteration = iter
 	if err := it.save(); err != nil {
-		return err
+		return iterResult{}, err
 	}
 
 	// 5. record
@@ -430,19 +513,52 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 		rec["gate"] = g
 	}
 	if err := it.appendIteration(rec); err != nil {
-		return err
+		return iterResult{}, err
 	}
 	it.copyReport("proposal.json", fmt.Sprintf("%03d-proposal.json", iter))
 	it.copyReport("verdict.json", fmt.Sprintf("%03d-verdict.json", iter))
 	if err := it.appendJournal(task, outcome, verdict, summary, notes, proposalFiles); err != nil {
-		return err
+		return iterResult{}, err
 	}
 	if err := it.render(); err != nil {
-		return err
+		return iterResult{}, err
 	}
 
 	// 6. commit: one per iteration
-	return it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome))
+	return iterResult{outcome: outcome, repeat: repeat}, it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome))
+}
+
+// repeatBlocked notes where a task ended blocked and says so when it is the
+// second time in a row with nothing outside .vloop/state/ changed in between: a
+// memoryless session given identical inputs reaches an identical conclusion, so
+// a third attempt cannot carry new information. It names the first diagnosis.
+// HEAD is read before this iteration's commit, so the diff from the earlier
+// mark is exactly what changed between the starts of the two sessions.
+func (it *Iterator) repeatBlocked(id, outcome, summary string) string {
+	if outcome != OutBlocked {
+		delete(it.blockedAt, id)
+		return ""
+	}
+	head, _ := git(it.Root, "rev-parse", "HEAD")
+	prev, seen := it.blockedAt[id]
+	it.blockedAt[id] = blockedMark{head: head, summary: summary}
+	if !seen {
+		return ""
+	}
+	out, err := git(it.Root, "diff", "--name-only", prev.head, head)
+	if err != nil {
+		return ""
+	}
+	for _, f := range strings.Split(out, "\n") {
+		if f != "" && !strings.HasPrefix(f, ".vloop/state/") {
+			return ""
+		}
+	}
+	first := prev.summary
+	if first == "" {
+		first = "none"
+	}
+	return fmt.Sprintf("%s blocked twice with nothing changed since the first attempt — halting rather than spending a third identical session. First diagnosis: %s", id, first)
 }
 
 // sessionTreeChanges is what a work session that died without a proposal left
@@ -657,8 +773,21 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 		it.say("plan complete. journal: %s/%s.md", journalsDir, plan.RunID)
 	case "blocked":
 		it.say("a human is needed. read the blocked task's notes: vloop status")
+	case "stalled":
+		it.say("no recorded progress %d times running — read %s", it.Budgets.StallLimit, relRunDir(it.Root, it.RunDir))
 	case "halted":
-		it.say("iteration budget spent. resumable: re-run vloop run")
+		switch end.Code {
+		case ExitMaxIter:
+			it.say("iteration budget spent. resumable: raise --max-iterations and re-run vloop run")
+		case ExitCostCeiling:
+			it.say("cost ceiling reached. resumable: raise --cost-ceiling and re-run vloop run")
+		case ExitNotConverging:
+			it.say("iterations per closed task exceeded %g — the run is not converging.", it.Budgets.ConvergenceMax)
+		case ExitSessionError:
+			it.say("a claude session failed. see %s", relRunDir(it.Root, it.RunDir))
+		case ExitRepeatBlocked:
+			it.say("%s", end.Note)
+		}
 	}
 	if len(it.gatePasses) > 0 {
 		it.say("")

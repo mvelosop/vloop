@@ -1,3 +1,3 @@
-ok  	github.com/mvelosop/vloop/internal/driver	2.124s
-ok  	github.com/mvelosop/vloop/cmd/vloop	12.365s
+ok  	github.com/mvelosop/vloop/internal/driver	2.159s
+ok  	github.com/mvelosop/vloop/cmd/vloop	12.513s
 gate T5 ok

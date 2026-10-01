@@ -286,12 +286,12 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return nil, halt(ExitPreflight, "planning session failed: %v", err)
 	}
 	if moved := refsDiff(before, refsState(root)); len(moved) > 0 {
-		t.warn("REFS MOVED — the planning session changed git refs; nothing was committed:")
+		t.warn("REFS MOVED plan — the planning session changed git refs; nothing was committed:")
 		for _, l := range moved {
 			t.warn("%s", l)
 		}
 		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
-		return nil, halt(ExitRefsMoved, "REFS MOVED — the planning session changed git refs; nothing was committed")
+		return nil, halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
 	}
 	if res.ExitCode != 0 {
 		return nil, halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))

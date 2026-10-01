@@ -304,8 +304,9 @@ fi
 
 	t.Run("a blocked proposal without gate_dispute charges an attempt", func(t *testing.T) {
 		r := newRunRepo(t)
-		r.scripted(two(t), defaultScript+strings.Replace(dispute, `,"gate_dispute":{"reason":"the gate reads the wrong file","evidence":"a.txt is written to out/a.txt"}`, "", 1))
-		wantExit(t, r.vloop("run", runBrief), 2)
+		r.scripted(two(t), defaultScript+strings.Replace(dispute, `,"gate_dispute":{"reason":"the gate reads the wrong file","evidence":"a.txt is written to out/a.txt"}`, "", 1)+`if [ "$PHASE" = work ]; then : > "m-$ATTEMPT"; fi
+`)
+		wantExit(t, r.vloop("run", "--stall-limit", "99", runBrief), 2)
 		r.wantTask("T1", "blocked", 3)
 		wantNotIn(t, "task notes", r.task("T1")["notes"].(string), "gate disputed")
 	})

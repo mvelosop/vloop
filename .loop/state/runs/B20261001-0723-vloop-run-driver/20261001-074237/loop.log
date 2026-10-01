@@ -104,3 +104,21 @@
 [36m[loop][0m cost=$0.14992360000000002 turns=5 dur=39s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T6 done
+[36m[loop][0m    committed b7ed9e5
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            6
+[36m[loop][0m   tasks closed:          6/11
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $13.45 (estimate, not a bill)
+[36m[loop][0m ── iteration 7 (7/30 this run) · T7 · 6/11 done ──
+[36m[loop][0m    Halt the run: budgets with flag precedence, convergence, stall, session errors, repeat-blocked and moved refs
+[36m[loop][0m cost=$1.2640836000000002 turns=34 dur=802s error=false
+[33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
+[36m[loop][0m cost=$0.20805000000000004 turns=7 dur=105s error=false
+[33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T7 done

@@ -239,7 +239,7 @@ func TestRun16ReviewFailsClosed(t *testing.T) {
 			r := newRunRepo(t)
 			r.scripted(planJSON(t, planTask("T1", nil)), defaultScript+`if [ "$PHASE" = review ]; then rm -f .vloop/tmp/verdict.json; `+verdict+`; fi
 `)
-			res := r.vloop("run", "--max-attempts", "2", runBrief)
+			res := r.vloop("run", "--max-attempts", "2", "--stall-limit", "99", runBrief)
 			wantExit(t, res, 2)
 			r.wantTask("T1", "blocked", 2)
 			r.wantIterations("T1:rejected", "T1:rejected")
@@ -265,7 +265,7 @@ func TestRun17StaleHandoff(t *testing.T) {
 		`  work) touch "$TASK.out"; mkdir -p .vloop/tmp
     printf`, `  work) touch "$TASK.out"; mkdir -p .vloop/tmp
     [ "$TASK" = T1 ] && printf`, 1))
-	res := r.vloop("run", "--max-attempts", "2", runBrief)
+	res := r.vloop("run", "--max-attempts", "2", "--stall-limit", "99", runBrief)
 	wantExit(t, res, 2)
 	r.wantTask("T1", "done", 0)
 	r.wantIterations("T1:done", "T2:blocked", "T2:blocked")
