@@ -127,11 +127,16 @@ classDiagram
 docs/briefs/<name>.md                     the briefs
 .vloop/config.toml                        the repo's config
 .vloop/state/state.json                   the plan            (the shell loop's is .loop/state/)
+.vloop/state/plan.md                      the plan, rendered for people
 .vloop/state/journals/<run id>.md         the journal
 .vloop/state/runs/<run id>/<folder>/      sessions/, iterations.jsonl, reports/, run.log
 .vloop/state/metrics/<run id>.json        the snapshot, written by close
 .vloop/defects/<id>.md                    recorded defects
 .vloop/interventions/<id>.md              recorded interventions (data)
+.vloop/tmp/proposal.json                  the work session's report, read back by the driver
+.vloop/tmp/verdict.json                   the review session's verdict, read back by the driver
+.vloop/tmp/plugin/<version>/              the plugin extracted for sessions
+.vloop/tmp/fence/<version>/settings.json  the fence extracted for sessions
 ```
 
 ## Invariants

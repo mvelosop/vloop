@@ -4,13 +4,13 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **0/10 done** · iteration 0
+**Status:** running · **1/10 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T10:52:00Z
+**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T10:58:55Z
 
 ## Progress
 
-- [ ] **T1** — Write the structural checks over plugin/, each proven by a fixture it rejects
+- [x] **T1** — Write the structural checks over plugin/, each proven by a fixture it rejects
 - [ ] **T2** — Port loop-plan to plugin/skills/plan as /vloop:plan, with the planner's three gate checks
 - [ ] **T3** — Port loop-work to plugin/skills/work as /vloop:work, with gate_dispute
 - [ ] **T4** — Port loop-review to plugin/skills/review as /vloop:review, failing closed
@@ -25,7 +25,7 @@
 
 ### T1 — Write the structural checks over plugin/, each proven by a fixture it rejects
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/cli/skills_test.go`, `internal/cli/testdata/skillcheck/`, `docs/domain/domain-model.md`
 

@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 214117,
+  "stop_reason": "end_turn",
+  "session_id": "e25ac570-1e54-4245-8ba0-e44d01940da3",
+  "total_cost_usd": 0.9007101999999999,
+  "usage": {
+    "input_tokens": 42,
+    "cache_creation_input_tokens": 80808,
+    "cache_read_input_tokens": 1445921,
+    "output_tokens": 28821,
+    "output_tokens_details": {
+      "thinking_tokens": 10319
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 80808,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 544,
+        "cache_read_input_tokens": 90482,
+        "cache_creation_input_tokens": 667,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 667
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 42,
+      "outputTokens": 28821,
+      "cacheReadInputTokens": 1445921,
+      "cacheCreationInputTokens": 80808,
+      "webSearchRequests": 0,
+      "costUSD": 0.9007101999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 10319,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01Wn3FNfEe5BtiuA3U4XQzzV",
+      "tool_input": {
+        "command": "cd ~/source/personal/vloop/internal/cli && mkdir -p testdata/skillcheck && cd testdata/skillcheck && \nmk(){ p=$1; mkdir -p $p/.claude-plugin $p/skills/work $p/evals/case-a/graders\nprintf '{\"name\":\"vloop\",\"version\":\"0.0.0-dev\"}\\n' >$p/.claude-plugin/plugin.json\ncat >$p/skills/work/SKILL.md <<'EOF'\n---\nname: work\ndescription: Do exactly one task of the plan and report on it.\n---\n# Work\n\nInvoked as `/vloop:work T1`; this is `vloop` at work.\nRead the task with `vloop task show <id> --json`, then `vloop task show T1 --json`.\nWrite `.vloop/tmp/proposal.json`, read `.vloop/state/state.json` and `.vloop/config.toml`, and check it with `vloop schema validate proposal/v1 .vloop/tmp/proposal.json`.\n\n```json\n{\"schema\": \"proposal/v1\", \"task\": \"T1\", \"outcome\": \"done\", \"summary\": \"s\", \"files\": [], \"verified\": \"v\", \"notes\": \"\"}\n```\n\n```json\n{\"note\": \"a block with no schema field is not checked\"}\n```\nEOF\nprintf '%s\\n' '---' 'max_turns: 5' 'allowed_tools: [Read, Bash]' '---' '/vloop:work T1' >$p/evals/case-a/prompt.md\nprintf '%s\\n' '---' 'type: llm' 'weight: 1' '---' 'Passes when the proposal validates.' >$p/evals/case-a/graders/valid.md; }\ncp_(){ rm -rf $1; cp -R good $1; }\nap(){ f=$1; shift; mkdir -p $(dirname $f); printf '%s\\n' \"$@\" >>$f; }\nmk good\ncp_ bad-command; ap bad-command/skills/work/SKILL.md 'Then run `vloop task frobnicate T1`.'\ncp_ bad-flag; ap bad-flag/skills/work/SKILL.md 'Then run `vloop task show T1 --frobnicate`.'\ncp_ bad-schema-example; ap bad-schema-example/skills/work/SKILL.md '```json' '{\"schema\": \"proposal/v1\", \"task\": \"T1\", \"outcome\": \"done\", \"summary\": \"s\", \"files\": [], \"notes\": \"\"}' '```'\ncp_ bad-schema-name; ap bad-schema-name/skills/work/SKILL.md 'Check it with `vloop schema validate frobnicate/v1 x.json`.'\ncp_ bad-path; ap bad-path/skills/work/SKILL.md 'Keep notes in `.vloop/scratch/notes.md`.'\ncp_ bad-fence-denied; ap bad-fence-denied/skills/work/SKILL.md 'Then run `vloop task verify T1 true --reason x`.'\ncp_ bad-fence-not-allowed; ap bad-fence-not-allowed/skills/work/SKILL.md 'Then run `vloop config list`.'\ncp_ bad-frontmatter-name; ap bad-frontmatter-name/skills/review/SKILL.md '---' 'name: reviewer' 'description: Judge one task.' '---' '# Review'\ncp_ bad-frontmatter-field; ap bad-frontmatter-field/skills/plan/SKILL.md '---' 'name: plan' '---' '# Plan'\ncp_ bad-eval-no-graders; ap bad-eval-no-graders/evals/case-b/prompt.md '---' 'max_turns: 5' 'allowed_tools: [Read]' '---' '/vloop:work T1'\ncp_ bad-eval-max-turns; ap bad-eval-max-turns/evals/case-c/prompt.md '---' 'allowed_tools: [Read]' '---' '/vloop:work T1'; ap bad-eval-max-turns/evals/case-c/graders/g.md '---' 'type: llm' 'weight: 1' '---' x\ncp_ bad-eval-weight; ap bad-eval-weight/evals/case-d/prompt.md '---' 'max_turns: 5' 'allowed_tools: [Read]' '---' '/vloop:work T1'; ap bad-eval-weight/evals/case-d/graders/g.md '---' 'type: llm' '---' x\ncp_ operate-exempt; ap operate-exempt/skills/operate/SKILL.md '---' 'name: operate' 'description: The operator playbook.' '---' 'Resolve a dispute with `vloop task verify T1 true --reason x`, then `vloop run`, and record with `vloop defect add`.'\ncp_ bad-operate-command; ap bad-operate-command/skills/operate/SKILL.md '---' 'name: operate' 'description: The operator playbook.' '---' 'Run `vloop task frobnicate T1`.'\ncd ../../../.. && go test -count=1 -run 'TestPluginSkills|TestSkillChecksRejectFixtures' -v ./internal/cli 2>&1 | grep -v \"^=== \" | head -50"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 41,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is done. I ran its verify command and it printed `GATE OK`. I wrote the proposal to `.loop/tmp/proposal.json`.\n\n- **Checks:** `internal/cli/skills_test.go` has `TestPluginSkills`. It covers frontmatter, command tree, schemas, paths, skills against the embedded fence, and eval format. It reads `SKILLCHECK_PLUGIN_DIR`, or `../../plugin` when that is unset or empty. It passes vacuously on the real plugin, since there are no skills yet.\n- **Fixtures:** `TestSkillChecksRejectFixtures` runs 15 committed fixture plugins under `internal/cli/testdata/skillcheck/`. One is well-formed and is accepted, and each defect fixture is rejected with a message naming its defect.\n- **Domain model:** The \"On disk\" block in `docs/domain/domain-model.md` gains `.vloop/state/plan.md`, `.vloop/tmp/proposal.json`, `.vloop/tmp/verdict.json`, `.vloop/tmp/plugin/<version>/` and `.vloop/tmp/fence/<version>/settings.json`. I added lines only and changed no existing ones.\n- **Gotcha:** `task` and `config` are runnable commands that take no arguments, so my first command-tree check missed `vloop task frobnicate`. A word is now unknown when its parent has subcommands and the parent's `Args` validator rejects it.\n- **Name clash:** I named the checker `checkSkillPlugin` because `checkPlugin` already exists in `version.go`.",
+  "ttft_ms": 2109,
+  "type": "result",
+  "duration_ms": 245909,
+  "uuid": "d0fe21e4-3b8f-46c4-9e90-4524316f7bfd",
+  "ttft_stream_ms": 1964,
+  "time_to_request_ms": 365,
+  "first_content_frame_ms": 1964,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 1
+}

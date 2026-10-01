@@ -17,3 +17,11 @@
 [36m[loop][0m cost=$4.3900672 turns=55 dur=1103s error=false
 [33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
 [36m[loop][0m planned: B20261001-1025-vloop-skills — 10 tasks
+[36m[loop][0m committed the plan
+[36m[loop][0m ── iteration 1 (1/30 this run) · T1 · 0/10 done ──
+[36m[loop][0m    Write the structural checks over plugin/, each proven by a fixture it rejects
+[36m[loop][0m cost=$0.9007101999999999 turns=41 dur=246s error=false
+[33m[loop][0m     1 permission denial(s) — the fence may be in the wrong place
+[36m[loop][0m cost=$0.1448162 turns=5 dur=16s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T1 done
