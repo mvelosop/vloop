@@ -15,4 +15,10 @@ the metrics and defects design, before B2
 
 **Done.** a discussion that became the roadmap's Metrics and defects section and a new slice
 
+**Context.** Before B2 the operator asked for metrics always calculated and saved: KLOC code vs tests, time, rate, defects before and after release, model per task, a summary at close, how to close a brief, and consolidation across repos. The discussion produced the roadmap's Metrics and defects section and a new slice.
+
+**Suggested.** metrics keyed by brief, delivered vs churn, defects by origin and catcher, release as the merge, export plus workspace.
+
+**Decided.** the operator agreed, adding that a gate failure may itself be a gate defect, task area/kind, and sample outputs.
+
 **What would automate it.** none: a product direction

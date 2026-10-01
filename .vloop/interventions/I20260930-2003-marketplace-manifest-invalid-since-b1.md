@@ -14,4 +14,10 @@ the marketplace manifest has failed claude plugin validate since B1
 
 **Done.** recorded as an escaped defect against B1; B5 fixes the manifests and gates on the real validate
 
+**Context.** B5's survey ran `claude plugin validate .` for the first time: 'owner: Invalid input: expected object, received undefined'. The marketplace manifest had shipped invalid since B1, whose brief never mentioned owner. Recorded as an escaped defect; B5 fixed the manifests.
+
+**Suggested.** record it and fix it in B5.
+
+**Decided.** the operator accepted it with the B5 brief.
+
 **What would automate it.** a gate running claude plugin validate from the first brief that ships a manifest

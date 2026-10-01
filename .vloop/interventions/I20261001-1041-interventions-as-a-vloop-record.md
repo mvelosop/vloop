@@ -14,4 +14,10 @@ interventions and defects must be recorded by /vloop:operate: the loop will run 
 
 **Done.** interventions become a vloop record with commands, a schema, and export with each repo's stacks; added to B7
 
+**Context.** Reviewing which lessons /vloop:operate dropped, the operator: 'Recording interventions (and defects) is important, because the loop will be used for any kind of project'. Interventions became a vloop record in B7, exported with each repo's stacks.
+
+**Suggested.** leave interventions in this repo until they become a feature.
+
+**Decided.** the operator: /vloop:operate must carry the interventions practice.
+
 **What would automate it.** none: a direction the operator set.

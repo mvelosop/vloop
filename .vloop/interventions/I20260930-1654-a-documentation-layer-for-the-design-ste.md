@@ -15,4 +15,10 @@ a documentation layer for the design step: domain, use cases, decisions
 
 **Done.** this log, then the doc roots
 
+**Context.** Looking at H1, the operator asked what data operators handle between briefs, and whether a docs layer like exploring-claude's README-docs would solve context. Led to this interventions log and the domain root; use cases, ADRs and README-docs were parked.
+
+**Suggested.** an interventions log first, then the docs roots.
+
+**Decided.** the operator agreed, with tweaks: domain and use cases, interventions as data, ADRs with a strict bar.
+
 **What would automate it.** none: a product direction

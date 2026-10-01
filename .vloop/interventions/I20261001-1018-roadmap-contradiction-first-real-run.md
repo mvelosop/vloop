@@ -14,4 +14,10 @@ the roadmap said B7's run would be the first real vloop run, but B7 builds the s
 
 **Done.** raised as a fork; the first real run became an acceptance run at B7's close
 
+**Context.** B7's survey: the roadmap row said B7's run would be the first real vloop run, but B7 builds the skills vloop run invokes. Raised as a fork.
+
+**Suggested.** an acceptance run at B7's close.
+
+**Decided.** the operator agreed and named the url-shortener sample.
+
 **What would automate it.** a check that a brief's run does not depend on what the brief itself builds

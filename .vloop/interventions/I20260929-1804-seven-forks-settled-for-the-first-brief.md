@@ -15,4 +15,10 @@ seven forks settled for the first brief
 
 **Done.** asked in two rounds with recommendations; the operator chose
 
+**Context.** B1's design act from the architect brief: scope (slice 1 plus config), what Spanish covers (headings, templates, prose; keys stay English), model and effort granularity (per kind plus per task), where vloop's files live (.vloop/), brief dependencies, cross-OS proof (cross-compile), libraries (cobra, TOML, stdlib tests). Asked in two rounds with recommendations.
+
+**Suggested.** the recommended option in every fork.
+
+**Decided.** the operator chose the recommendations, adding 'we also need to organise several briefs with dependencies'.
+
 **What would automate it.** the survey and the options can be generated; the choice is the operator's

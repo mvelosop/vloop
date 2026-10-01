@@ -14,4 +14,10 @@ the rest of the series cut into driver (B6), skills (B7) and the v1.0 review (B8
 
 **Done.** four forks settled; roadmap rows B6-B8 rewritten
 
+**Context.** B6's design act: the driver plus four skills was two to three times a normal brief, and each needed the other to be exercised. The operator chose driver then skills then review, scenarios ported to Go, the cut-over after the skills brief — and rejected the driver resolving gate disputes itself.
+
+**Suggested.** driver then skills; port scenarios; the driver checks and the review judges a replacement gate.
+
+**Decided.** the operator took all but the dispute automation: 'Always block for the operator'.
+
 **What would automate it.** none: sequencing and the operator's control over gate changes are the operator's calls

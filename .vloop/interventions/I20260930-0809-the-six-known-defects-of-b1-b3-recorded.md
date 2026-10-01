@@ -15,4 +15,10 @@ the six known defects of B1-B3 recorded
 
 **Done.** recorded with defect add and marked fixed with defect set
 
+**Context.** With `vloop defect add` shipped in B3, the six defects known from B1–B3 were recorded and marked fixed (commit bb94033): untidy go.mod and its gate gap, the cycle start, the GNU grep gate, the empty-model contradiction, the estimate.
+
+**Suggested.** record the six and mark them fixed.
+
+**Decided.** the operator: 'Please proceed with the three items!'.
+
 **What would automate it.** close --finding records operator findings; older ones were a one-off backfill

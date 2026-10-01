@@ -15,4 +15,10 @@ the first close by vloop itself, plus hand-written operator notes and the merge
 
 **Done.** vloop brief close --no-findings, notes outside the markers, PR, squash with the printed trailer
 
+**Context.** B4 was the first brief vloop closed itself: `vloop brief close --no-findings` (commit 4d1cae7), then operator notes outside the generated markers, PR #4, squash-merge (dc5b5ea) with the printed trailer.
+
+**Suggested.** close B4 with vloop itself after the fixes.
+
+**Decided.** the operator: 'go ahead!'.
+
 **What would automate it.** the merge step remains

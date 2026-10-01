@@ -14,4 +14,10 @@ the horizon note reorganised as Now / Next / Later; configurable merge and branc
 
 **Done.** docs/design-notes/vloop-horizon.md rewritten
 
+**Context.** The operator preferred now/next/later to horizon numbering: configurable merge strategy and branch retention as Now ('just not in this brief/project'), the project-level driver as Later. docs/design-notes/vloop-horizon.md rewritten.
+
+**Suggested.** H1/H2 numbered horizons.
+
+**Decided.** the operator: Now / Next / Later.
+
 **What would automate it.** none: a direction the operator set.

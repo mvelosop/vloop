@@ -14,4 +14,10 @@ the reviewer calibration's nine planted-defect cases become /vloop:review's eval
 
 **Done.** B7's eval suites now port the calibration with its baseline as the bar
 
+**Context.** The operator asked how plugin evals relate to an-autonomous-loop-3-calibration. Its reviewer calibration (9 planted defects, baseline 9/9 then 8/9, about $3) became /vloop:review's eval suite; the cost limit starts at run.cost-ceiling.
+
+**Suggested.** six new eval cases, a $10 limit.
+
+**Decided.** the operator: port the calibration; 'use the loop's own for starters'.
+
 **What would automate it.** none: a direction the operator set.

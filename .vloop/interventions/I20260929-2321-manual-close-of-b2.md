@@ -15,4 +15,10 @@ manual close of B2
 
 **Done.** run record, consumed, PR, squash-merge, sync main
 
+**Context.** Closing B2 by hand: run record (the GNU grep stall, the missing record, the contradiction), consumed, PR #2, squash-merge (6de9cfc), branch kept, main synced.
+
+**Suggested.** close as for B1.
+
+**Decided.** the operator: 'Yes please, go ahead!'.
+
 **What would automate it.** vloop brief close plus the merge step

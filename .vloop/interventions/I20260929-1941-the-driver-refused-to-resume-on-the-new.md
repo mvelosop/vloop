@@ -15,4 +15,10 @@ the driver refused to resume on the new work branch
 
 **Done.** re-ran with the brief path, as the refusal said
 
+**Context.** The first `.loop/run.sh` on the new work branch exited 1: 'state.json holds plan … stamped on branch main; you are on B20260929-1804…'. Re-run with the brief path, as the driver's message said; the run then resumed at iteration 1.
+
+**Suggested.** re-run with the brief path.
+
+**Decided.** the assistant, within the operator skill's remit; no operator decision asked.
+
 **What would automate it.** planning on the work branch in the first place removes the case

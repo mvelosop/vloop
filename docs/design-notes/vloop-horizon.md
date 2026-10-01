@@ -42,6 +42,35 @@ will not suit every team.
 
 Not for v1; ready to brief once v1.0 is tagged.
 
+### Interventions that measure the model against the operator, and explain themselves later
+
+*Noted 2026-10-01, by the operator.*
+
+B7 makes interventions a vloop record (`intervention/v1`). Two things it does
+not yet capture, both needed to learn from the data rather than only count it:
+
+- **The model's suggestion, beside the operator's decision.** Each record gains
+  `suggested` — what the model (the assistant acting as the operator's hands, or
+  a session) proposed, in a sentence, or `none` when it proposed nothing — and
+  `decided` — what the operator chose. A derived `agreement` (`same`,
+  `adjusted`, `different`, `no-suggestion`) lets `vloop metrics` report, per kind
+  and phase and across a workspace, how far the model's judgement is from the
+  operator's. That is the evidence for which interventions a driver could take
+  over: the kinds where the model already agrees are the candidates.
+- **Context for review after the fact.** A record read weeks later has to stand
+  on its own. Each gains, where they apply: the run, iteration and task it
+  happened in; the commit or files involved; the triggering message or output,
+  quoted briefly; the alternatives considered; and what changed because of it
+  (a defect recorded, a gate amended, a brief rescoped). `vloop intervention show
+  <id>` prints the record with those links resolved.
+
+Settled with the operator, 2026-10-01: `suggested` is **written at the time** —
+honest, and only what the model actually proposed; a record with no suggestion
+says `none`. The context is **one succinct paragraph**, so records stay cheap
+enough to keep being written. The 61 records to date were given their context,
+suggestion and decision on 2026-10-01, in their bodies, while the session that
+made them still held the history.
+
 ## Next
 
 ### The documentation layer for the design act

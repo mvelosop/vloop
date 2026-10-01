@@ -15,4 +15,10 @@ the BSD-tools lesson into later briefs
 
 **Done.** written into B3's and B4's constraints, then into the operator skill
 
+**Context.** After B2's stall on (|/), the constraint 'Gates run on macOS with its BSD tools' was written into B3's and B4's briefs, then into the operator skill's lessons.
+
+**Suggested.** carry the lesson into every later brief.
+
+**Decided.** the assistant, within the operator skill's remit; no operator decision asked.
+
 **What would automate it.** a lessons store the next brief's design step reads
