@@ -1,0 +1,58 @@
+# Journal — B20261001-0723-vloop-run-driver
+
+Append-only narrative of this plan. Rendered state lives in .loop/state/plan.md.
+
+## Plan — B20261001-0723-vloop-run-driver
+
+- **Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md`
+- **Tasks:** 11
+
+The plan is written to `.loop/state/state.json` and passes `.loop/amend.sh check`.
+
+- **Run id:** `B20261001-0723-vloop-run-driver`
+- **Tasks:** 11 (the brief asked for 11 to 14)
+- **First ready task:** T1, the test harness. T2 (budget keys) and T3 (sessions) have no dependencies either.
+
+| Task | What it builds | Ported scenarios |
+|---|---|---|
+| T1 | Test harness with a stub `claude` | — |
+| T2 | The six `run.*` config keys | — |
+| T3 | Sessions: fence, invocation, `session/v1` record | — |
+| T4 | `vloop run`, work branch, planning, plan checks | 08 25 27 29 35 36 38 43 |
+| T5 | One iteration, plus the HEAD check before each commit | 01 02 09 16 17 21 30 37 40 |
+| T6 | Gates across iterations, flaky gates, disputes | 03 33 39 41 |
+| T7 | Halts and budgets | 04 05 06 07 11 19 42 44 |
+| T8 | Safety and records | 10 13 14 15 18 20 22 23 24 |
+| T9 | Snapshot, summary, flaky-gate defect | — |
+| T10 | Docs, including the README Windows-shell fix (F1) | — |
+| T11 | Close: worked example, real-data check, `go test ./...` | — |
+
+**How far the gates are proven.** I ran all 11 gates against the current tree and each fails for the right reason. For T4–T9 and T11 that failure is `unknown command "run"`, so the checks that come after a run can't execute yet. I tested those checks against a throwaway mock driver for:
+- the worked example, snapshot and summary;
+- containment, the missing session record, and the gate environment variables.
+
+The planted failures in T4 (other than plan-only), T6 and T7 were reviewed by eye only. If one of those gates is wrong, that's where it will be.
+
+That testing caught one real defect: B3's metrics print `gates 0.0 · wall`, with no `min` after the gate figure, though the brief's example shows one. The gates accept both forms; I didn't change the metrics format.
+
+**Names I pinned** (the brief is silent on these):
+- Package `internal/driver`, and the embedded fence at `fence/settings.json`.
+- Test names: `TestRunHarness`, `TestRun<NN><Name>` for the 38 ported scenarios, `TestRunWorkBranch`, `TestRunHeadCheck`, `TestRunFlakyGate`, `TestRunGateDispute`, `TestRunBudgetPrecedence`, `TestRunSessionRecordMissing`, `TestRunSnapshot`, `TestRunSummary`, `TestSession*`, a test named `*Flaky*` in `internal/metrics`, and `TestWorkedExampleB6*`. The test files are `cmd/vloop/run_*_test.go` and `b6_e2e_test.go`.
+- Environment variables replace `-` with `_` as well as `.`, giving `VLOOP_RUN_MAX_ITERATIONS` and so on.
+- The exit codes go in `docs/guide/concepts.md` under `## Exit codes`, and the README links to `#exit-codes`.
+
+**Where I interpreted rather than read** — please correct any of these before the run:
+1. **Scenarios 21 and 30 move from planning (T4) to T5**, because both run full iterations. T5 also enforces `--max-iterations`, which scenarios 39 and 40 need; its "resumable" test (05) stays in T7.
+2. **A missing brief path exits 2**, as scenario 29 and B1's usage convention say, although R-3 lists usage errors under exit 1.
+3. **`vloop run` refuses an untrusted workspace** (scenario 18), even though `vloop doctor` only warns about it. It also warns about an active pre-commit hook (scenario 23).
+4. **The `run.*` keys are documented in T2, and the `vloop run` README row in T4.** The existing README and guide tests fail otherwise.
+5. **Exit codes:** the README only lists the general codes 0–2. I read "move" as: the guide holds those plus `run`'s 0–9, and the README section becomes a pointer.
+6. **Validation ranges:** `max-iterations` may be 0 (scenario 13 uses 0), while `max-attempts` and `stall-limit` must be at least 1.
+7. **The final snapshot goes into the closing commit**, so the working tree is clean when a run ends.
+8. **`.vloop/tmp/` is never committed**, even when `.gitignore` doesn't list it. This repository's `.gitignore` doesn't, which the real-data clone exercises.
+9. **The brief's "no 004-review.json" doesn't match the session numbering** (001-plan, 002-work, 003-review). The gates check that no review record exists for iteration 1, not a filename.
+10. **The fence's allow list is exactly** `.loop/settings.json` plus the four read-only commands. Its deny list must include `.loop/settings.json`'s denials plus every vloop write command. The `--settings` and `--plugin-dir` paths are repo-relative, as the worked example shows.
+11. **Base SHA:** the brief says the plan pins it, but the shell loop's plan format has no field for it, so it isn't recorded. No gate compares against it, since a fixed baseline would trip the decaying-baseline rule.
+
+The gates are long single-line shell commands (2–16 KB). `amend.sh check` raised one advisory: T2 and T4 edit `README.md`, which T10's gate reads. That's expected, because both run before T10 and the README test forces those edits.
+
