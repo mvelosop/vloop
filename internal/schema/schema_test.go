@@ -19,9 +19,10 @@ var invalidAt = map[string]string{
 	"metrics":      "/tasks/done",
 
 	// export/v1 has one fixture pair per record type; the name is the part before the dash.
-	"export-brief":  "",
-	"export-task":   "/attempts",
-	"export-defect": "/found_by",
+	"export-brief":        "",
+	"export-task":         "/attempts",
+	"export-defect":       "/found_by",
+	"export-intervention": "/phase",
 }
 
 func fixture(t *testing.T, n string) []byte {

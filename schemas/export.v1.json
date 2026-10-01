@@ -1,18 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "export/v1",
-  "description": "One line of `vloop metrics export`: a brief, task or defect record, told apart by `type`. A brief record is metrics/v1 minus by_task, with `type` and `repo` added.",
+  "description": "One line of `vloop metrics export`: a brief, task, defect or intervention record, told apart by `type`. A brief record is metrics/v1 minus by_task, with `type` and `repo` added.",
   "type": "object",
   "required": ["schema", "type", "repo"],
   "properties": {
     "schema": { "const": "export/v1" },
-    "type": { "enum": ["brief", "task", "defect"] },
+    "type": { "enum": ["brief", "task", "defect", "intervention"] },
     "repo": {
       "type": "object",
       "required": ["name", "remote"],
       "properties": {
         "name": { "type": "string" },
-        "remote": { "type": ["string", "null"], "description": "the origin remote URL with credentials removed; null when there is none" }
+        "remote": { "type": ["string", "null"], "description": "the origin remote URL with credentials removed; null when there is none" },
+        "stacks": { "type": "array", "items": { "type": "string" }, "description": "metrics.stacks as configured; [] when unset" }
       }
     }
   },
@@ -103,6 +104,23 @@
           "status": { "enum": ["open", "fixed", "wontfix", null], "description": "null for a derived defect" },
           "summary": { "type": "string" },
           "derived": { "type": "boolean", "description": "true for a gate failure or review finding the loop recorded itself" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "const": "intervention" } }, "required": ["type"] },
+      "then": {
+        "required": ["id", "brief", "phase", "kind", "automatable", "by", "occurred", "recorded"],
+        "properties": {
+          "id": { "type": "string" },
+          "brief": { "type": "string" },
+          "phase": { "enum": ["setup", "design", "run", "halt", "verify", "close", "next"] },
+          "kind": { "enum": ["direction", "decision", "context-supply", "halt", "verification-finding", "repair", "carry-forward", "ceremony"] },
+          "automatable": { "enum": ["yes", "partly", "no"] },
+          "by": { "enum": ["operator", "assistant", "both"] },
+          "occurred": { "type": "string" },
+          "recorded": { "type": "string" },
+          "backfilled": { "type": "boolean" }
         }
       }
     }

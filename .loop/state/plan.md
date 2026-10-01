@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **5/10 done** · iteration 5
+**Status:** running · **6/10 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:16:55Z
+**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:22:29Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T3** — Port loop-work to plugin/skills/work as /vloop:work, with gate_dispute
 - [x] **T4** — Port loop-review to plugin/skills/review as /vloop:review, failing closed
 - [x] **T5** — Add interventions as a vloop record: intervention/v1 and vloop intervention add | list | set
-- [ ] **T6** — Export intervention records and every record's repo.stacks
+- [x] **T6** — Export intervention records and every record's repo.stacks
 - [ ] **T7** — Write plugin/skills/operate as /vloop:operate, the operator's playbook driven by the CLI
 - [ ] **T8** — Port the reviewer calibration and the four skill cases as eval suites, and stop extracting evals
 - [ ] **T9** — Document the skills and interventions, and state them as built in the domain docs
@@ -165,7 +165,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T6 — Export intervention records and every record's repo.stacks
 
-`pending` · depends on: T5
+`done` · depends on: T5
 
 **Files:** `internal/cli/export.go`, `internal/cli/export_test.go`, `schemas/export.v1.json`, `internal/schema/testdata/export-intervention.valid.json`, `internal/schema/testdata/export-intervention.invalid.json`
 

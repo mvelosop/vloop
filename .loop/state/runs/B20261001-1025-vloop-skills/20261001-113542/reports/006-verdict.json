@@ -1,0 +1,13 @@
+{
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop metrics export` emits one record per intervention with type \"intervention\", schema export/v1, repo, and the intervention's fields, after the brief groups and in id order", "met": true, "evidence": "export.go exportIntervention struct and loop after brief groups, sorted by ID; TestExportInterventions checks trailing position, id order, fields"},
+    {"criterion": "With no brief named every intervention is exported; with briefs named only the interventions whose brief is one of them; none is dropped", "met": true, "evidence": "export.go filters via named[defect.BriefName(...)] only when args given; test checks filtered result"},
+    {"criterion": "Every export record's repo carries stacks: metrics.stacks as configured, [] when unset; with --workspace each repository's own stacks", "met": true, "evidence": "exportRepoLines reads config.Get(root, \"metrics.stacks\") per repo; repoIdentity defaults to []; TestExportRepoStacks covers set and unset"},
+    {"criterion": "schemas/export.v1.json gains the intervention type and repo.stacks in place (still export/v1), and every line of this repository's export validates against it", "met": true, "evidence": "schema diff adds enum value, intervention branch and stacks property; fixtures valid/invalid added and wired in schema_test.go; gate validates real export"},
+    {"criterion": "Committed tests cover the intervention records, filtering by brief and repo.stacks with and without configured stacks; existing export tests change only to expect the added fields", "met": true, "evidence": "export_test.go adds two new tests; no existing tests modified; go test ./internal/cli ./internal/schema pass"}
+  ],
+  "findings": [],
+  "notes": "Minor gap: no committed test covers --workspace per-repo stacks; implementation is per-repo by construction. Doc string in docs/guide/commands.md updated alongside."
+}

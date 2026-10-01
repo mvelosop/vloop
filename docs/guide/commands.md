@@ -228,7 +228,7 @@ vloop metrics classify <path>…
 
 ## vloop metrics export
 
-Print briefs, tasks and defects as JSON Lines (export/v1), with the repository's identity
+Print briefs, tasks, defects and interventions as JSON Lines (export/v1), with the repository's identity
 
 ```
 vloop metrics export [<brief>…] [flags]
