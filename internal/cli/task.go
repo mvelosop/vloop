@@ -8,33 +8,20 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/driver"
 	"github.com/mvelosop/vloop/internal/state"
 )
-
-// Sources of a resolved model or effort that come from the task itself.
-const sourceTask = "task"
 
 // resolvedValue is what a session kind would run with, and where it came from.
 type resolvedValue struct {
 	value, source string
 }
 
-// resolveSession resolves the model or effort ("model", "effort") for a
-// session kind ("work", "review"): the task's own value, else the environment,
-// else the config file, else the default.
+// resolveSession resolves the model or effort for a session kind: the one
+// resolver, shared with the driver.
 func resolveSession(root, field, kind string, taskValue string) (resolvedValue, error) {
-	if taskValue != "" {
-		return resolvedValue{taskValue, sourceTask}, nil
-	}
-	v, err := config.Get(root, field+"."+kind)
-	if err != nil {
-		return resolvedValue{}, err
-	}
-	if !v.Set {
-		return resolvedValue{"", v.Source}, nil
-	}
-	return resolvedValue{v.Value, v.Source}, nil
+	v, src, err := driver.ResolveSession(root, field, kind, taskValue)
+	return resolvedValue{v, src}, err
 }
 
 type resolvedSession struct {

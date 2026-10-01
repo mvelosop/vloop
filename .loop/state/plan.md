@@ -4,15 +4,15 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **2/11 done** · iteration 2
+**Status:** running · **3/11 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T07:14:57Z
+**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T07:19:06Z
 
 ## Progress
 
 - [x] **T1** — Build the run test harness: scratch repository, fake home, a stub claude scripted by prompt, and a smoke test
 - [x] **T2** — Add the six run.* budget keys to config, with VLOOP_RUN_* variables, validation and the config list update
-- [ ] **T3** — Start sessions: the embedded fence, plugin and fence extraction, the claude invocation, the session/v1 record with masking, and the missing-record warning
+- [x] **T3** — Start sessions: the embedded fence, plugin and fence extraction, the claude invocation, the session/v1 record with masking, and the missing-record warning
 - [ ] **T4** — Add `vloop run` with its flags and preflight, the work branch, the plan session, the plan checks and the plan commit
 - [ ] **T5** — Run one iteration end to end: task choice, work, gates with timing and the env ids, review, the outcome, journal, plan.md, and the commit behind a HEAD check
 - [ ] **T6** — Handle gates across iterations: regressions, rewrites, blocked tasks whose gate passes, flaky gates and gate disputes
@@ -78,7 +78,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T3 — Start sessions: the embedded fence, plugin and fence extraction, the claude invocation, the session/v1 record with masking, and the missing-record warning
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/driver/`, `internal/driver/session.go`, `internal/driver/session_test.go`, `fence/settings.json`, `embed.go`, `embed_test.go`, `internal/cli/plugin.go`
 
