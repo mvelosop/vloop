@@ -170,3 +170,19 @@
 [36m[loop][0m cost=$0.1362982 turns=6 dur=40s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T10 done
+[36m[loop][0m    committed 0e1ace1
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            10
+[36m[loop][0m   tasks closed:          10/11
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $17.43 (estimate, not a bill)
+[36m[loop][0m ── iteration 11 (11/30 this run) · T11 · 10/11 done ──
+[36m[loop][0m    Close: the B6 worked example end to end on the stub, the real-data check on a throwaway clone, and the full suite
+[36m[loop][0m cost=$0.441915 turns=12 dur=432s error=false
+[36m[loop][0m cost=$0.151233 turns=5 dur=16s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T11 done
