@@ -1,0 +1,15 @@
+{
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A done task whose gate fails during another task's iteration goes back to pending with attempts+1 and the run log line `GATE REGRESSION <id>` also names the iteration's task (scenarios 03, 41)", "met": true, "evidence": "TestRun03GateRegression and TestRun41RegressionNamesBoth pass; regression handling from T5 reused, gate sweep now goes through runGateRetry in iterate.go"},
+    {"criterion": "A session that modifies a file its own task's verify names ... is not reverted (scenario 33)", "met": true, "evidence": "internal/driver/gates.go gateFilesMoved: diff vs HEAD, in verify, not in task files, exists at HEAD, not own earlier attempt's commit; restoreGateFiles does git checkout HEAD and logs GATE REWRITE; TestRun33GateRewrite passes"},
+    {"criterion": "A work session that reports blocked while its gate passes is recorded as blocked and its notes, the run log and the run-end report say the gate passes (scenario 39)", "met": true, "evidence": "iterate.go gatePassed -> warn line, notes via applyOutcome, finish() prints gatePasses; TestRun39BlockedGatePasses passes"},
+    {"criterion": "A failing gate is run once more at once with nothing changed; ... a gate that passes first time has no `flaky` key", "met": true, "evidence": "runGateRetry in gates.go; record gate gets flaky:true only when own.flaky; schema updated; TestRunFlakyGate and the task's verify cover pass/fail-twice/first-time-pass"},
+    {"criterion": "A proposal with `gate_dispute` blocks its task at once: status `blocked`, notes exactly `gate disputed: <reason> — <evidence>`, attempts unchanged, no review session; the run continues ... ends `blocked`, exit 2", "met": true, "evidence": "iterate.go dispute branch sets Status blocked, Notes dispute, attempts untouched, own gate and review skipped; TestRunGateDispute and verify's dp fixture assert exit 2 and other task done"},
+    {"criterion": "The driver never edits, replaces or disables a task's `verify`, including on a dispute", "met": true, "evidence": "no write to task.Verify in diff; dispute test asserts verify unchanged"},
+    {"criterion": "Ported tests TestRun03GateRegression, TestRun33GateRewrite, TestRun39BlockedGatePasses, TestRun41RegressionNamesBoth each assert everything their shell scenario asserts; TestRunFlakyGate and TestRunGateDispute each cover a fixture where the behaviour applies and one where it must not", "met": true, "evidence": "cmd/vloop/run_gates_test.go has all six tests, all pass; flaky covers twice-failing, dispute covers a non-disputed case"}
+  ],
+  "findings": [],
+  "notes": "Gap in the plan: files lists internal/driver/gates_test.go and internal/cli/run.go, neither changed; coverage lives in cmd/vloop/run_gates_test.go, which is acceptable. The work session reports TestWorkedExampleEnglishSession in ./cmd/vloop failing from an earlier task's config-list change; it is outside T6's gate and the docs task. Flaky re-run applies to every gate in the sweep, not only the active task's, which is reasonable."
+}

@@ -113,3 +113,24 @@ func TestRemovalEfficiency(t *testing.T) {
 		}
 	}
 }
+
+func TestDerivedFlakyGate(t *testing.T) {
+	m := &runs.Model{Folders: []runs.Folder{{
+		Iterations: []runs.Iteration{
+			{Iteration: 1, Task: "T1", Outcome: "done", Flaky: true},
+			{Iteration: 2, Task: "T2", Outcome: "done"},
+		},
+	}}}
+	got := Derive(m, nil)
+	if len(got) != 1 {
+		t.Fatalf("%d defects, want 1: %+v", len(got), got)
+	}
+	if d := got[0]; d.Task != "T1" || d.Origin != "env" || d.Kind != "bug" || d.FoundBy != "gate" {
+		t.Errorf("flaky defect = %+v", d)
+	}
+	var x Matrix
+	x.AddDerived(got)
+	if x[3][0] != 1 || x[2][0] != 0 {
+		t.Errorf("matrix %v: want env/gate 1 and work/gate 0", x)
+	}
+}

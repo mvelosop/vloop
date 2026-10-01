@@ -1,0 +1,53 @@
+{
+ "task": "T3",
+ "verdict": "PASS",
+ "criteria": [
+  {
+   "criterion": "`fence/settings.json` is `.loop/settings.json` unchanged except: `permissions.allow` gains exactly `Bash(vloop status:*)`, `Bash(vloop task list:*)`, `Bash(vloop task show:*)`, `Bash(vloop schema validate:*)`; `permissions.deny` gains `Bash(vloop run:*)`, `Bash(vloop init:*)`, `Bash(vloop upgrade:*)`, `Bash(vloop brief close:*)`, `Bash(vloop task verify:*)`, `Bash(vloop task reset:*)`, `Bash(vloop task note:*)`, `Bash(vloop task drop:*)`, `Bash(vloop task set:*)`, `Bash(vloop defect add:*)`, `Bash(vloop defect set:*)`, `Bash(vloop config set:*)` and keeps `Bash(.loop/run.sh:*)`. It is embedded in the binary (embed.go), not read from disk at run time",
+   "met": true,
+   "evidence": "fence/settings.json diff vs .loop/settings.json is exactly the listed allow/deny additions; embed.go Fence []byte"
+  },
+  {
+   "criterion": "The driver extracts the plugin exactly as `vloop plugin path` does (to `.vloop/tmp/plugin/<version>`, one shared implementation, not a copy) and the fence to `.vloop/tmp/fence/<version>/settings.json`, refusing to write through a symlink",
+   "met": true,
+   "evidence": "internal/driver/extract.go ExtractPlugin/ExtractFence via EnsureRealDir; cli/plugin.go now calls driver.ExtractPlugin (moved, not copied); TestSessionRefusesSymlink"
+  },
+  {
+   "criterion": "A session is started as `claude -p \"<prompt>\" --model <m> [--effort <e>] --permission-mode auto --setting-sources project --settings <fence> --plugin-dir <plugin> --strict-mcp-config --output-format json`, from the repo root, with the fence and plugin paths repo-relative; `--effort` is absent when effort resolves unset; prompts are `/vloop:plan <brief path>`, `/vloop:work <id>`, `/vloop:review <id>`",
+   "met": true,
+   "evidence": "session.go Args(), cmd.Dir=Root, relative paths from Extract*; TestSessionArgs"
+  },
+  {
+   "criterion": "Model and effort come from P-6 resolution for the session kind (the existing resolver B2's `task show` uses, not a second one); a review uses `model.review`/`effort.review` and any task override for review, never the work model",
+   "met": true,
+   "evidence": "resolve.go ModelEffort uses config.Get via ResolveSession; cli.resolveSession delegates to it; TestSessionReviewModelResolution"
+  },
+  {
+   "criterion": "VLOOP_ACTIVE_TASK and VLOOP_GATE_TASK are removed from every session's environment",
+   "met": true,
+   "evidence": "session.go Run filters VLOOP_ACTIVE_TASK/GATE_TASK; TestSessionInvocationAndEnv"
+  },
+  {
+   "criterion": "The record `sessions/NNN-<phase>.json` (NNN a per-run-folder counter from 001) is `session/v1`: `total_cost_usd`\u2192`cost_usd`, `duration_ms`, `num_turns`\u2192`turns`, `is_error`, `permission_denials`, each `modelUsage` entry \u2192 `models_used` with `inputTokens`\u2192`input_tokens`, `outputTokens`\u2192`output_tokens`, `cacheReadInputTokens`\u2192`cache_read_input_tokens`, `cacheCreationInputTokens`\u2192`cache_creation_input_tokens`, `costUSD`\u2192`cost_usd`; plus `run_id`, `iteration`, `phase`, `task` (absent for plan), the configured `model` and `effort` (null when unset) and `started` (the driver's clock at launch, RFC 3339 UTC)",
+   "met": true,
+   "evidence": "session.go record(): mapping, started UTC RFC3339, task omitted for plan, effort null; TestSessionFieldMapping"
+  },
+  {
+   "criterion": "Every persisted record and log line has `$HOME` replaced by `~` and the user name masked, as the shell driver's mask() does",
+   "met": true,
+   "evidence": "Mask() applied to record, stderr and log lines; TestSessionMasking"
+  },
+  {
+   "criterion": "A session that prints nothing on stdout gets no record file at all, and the run log gets `SESSION RECORD MISSING <phase> <task|-> (iteration <n>)`; no code path writes a record with invented values",
+   "met": true,
+   "evidence": "Run returns without writing record and logs SESSION RECORD MISSING; TestSessionRecordMissing"
+  },
+  {
+   "criterion": "Committed `TestSession*` unit tests in internal/driver cover the argv with and without effort, review model resolution, the full field mapping, masking, and the missing-record path",
+   "met": true,
+   "evidence": "session_test.go has TestSession* covering all listed; go test passes"
+  }
+ ],
+ "findings": [],
+ "notes": "Resolver and extraction moved into internal/driver (cli imports driver); fine. Stdout that is non-JSON is also treated as missing."
+}

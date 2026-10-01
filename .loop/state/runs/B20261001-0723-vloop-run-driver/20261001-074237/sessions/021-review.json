@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 18341,
+  "stop_reason": "end_turn",
+  "session_id": "4b47cc6b-f0c9-48a0-b4e8-56ad29ec3d91",
+  "total_cost_usd": 0.1362982,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 21525,
+    "cache_read_input_tokens": 153471,
+    "output_tokens": 1948,
+    "output_tokens_details": {
+      "thinking_tokens": 143
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 21525,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 231,
+        "cache_read_input_tokens": 32598,
+        "cache_creation_input_tokens": 943,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 943
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 1948,
+      "cacheReadInputTokens": 153471,
+      "cacheCreationInputTokens": 21525,
+      "webSearchRequests": 0,
+      "costUSD": 0.1362982,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 143,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 6,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "PASS. All six acceptance criteria for T10 are met. The guide has the exit-codes table for 0–9, the README points to it, and the two new tests (shell default, guide exit codes) pass. `go test ./internal/cli ./cmd/gendocs` passes. Regenerating `commands.md` with `gendocs` gives an identical file. The verdict is in `.loop/tmp/verdict.json`.\n\nTwo things for the notes: `docs/domain/bounded-contexts.md` and `measurement-context.md` still carry \"(planned, B6)\" markers, and I did not check the `run.md` claim that the snapshot goes into the next commit against the driver code. Both are outside this task's file list.",
+  "ttft_ms": 2425,
+  "type": "result",
+  "duration_ms": 39686,
+  "uuid": "5c175cb3-dbbf-4989-bbfe-c24d2e83cbbf",
+  "ttft_stream_ms": 1211,
+  "time_to_request_ms": 367,
+  "first_content_frame_ms": 1211,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 10
+}

@@ -1,0 +1,14 @@
+{
+  "task": "T10",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "docs/guide/concepts.md has a `## Exit codes` section listing exit codes 0–9 with meanings and resumability", "met": true, "evidence": "concepts.md table rows 0-9 with a Resumable column, plus the general 0/1/2 paragraph"},
+    {"criterion": "README.md's `## Exit codes` section is a pointer to docs/guide/concepts.md#exit-codes (under 200 lines)", "met": true, "evidence": "README diff; the file is 196 lines"},
+    {"criterion": "B1's README test checks the driver's exit codes against the guide page; no other check removed", "met": true, "evidence": "TestGuideExitCodesMatchDriver compares listed rows with the driver.Exit* constants in both directions; the diff only adds tests"},
+    {"criterion": "F1: README shell row says pwsh on Windows; a committed test fails on drift", "met": true, "evidence": "README row changed; TestReadmeShellDefaultMatchesCode parses defaultShell's source and config.Keys"},
+    {"criterion": "README run row and configuration.md describe run.* keys and flags; defects.md adds the flaky env defect; commands.md regenerated", "met": true, "evidence": "diffs of README, configuration.md and defects.md; gendocs output is identical to the committed commands.md"},
+    {"criterion": "run.md and plan.md state the driver as built with no (planned, B6); session.md and task.md updated", "met": true, "evidence": "run.md covers run.log, gate.flaky, the HEAD check and disputes; no 'planned, B6' in run.md or plan.md; the remaining markers in session.md and task.md are B5"}
+  ],
+  "findings": [],
+  "notes": "Minor: docs/domain/bounded-contexts.md:46 and measurement-context.md:42 still carry '(planned, B6)' markers; they are outside this task's files list. The domain-doc diff also adds a few very long lines. The run.md claim that the snapshot goes into the next commit was not checked against the driver code."
+}

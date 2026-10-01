@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 91412,
+  "stop_reason": "end_turn",
+  "session_id": "e65bf040-d8a2-4589-a674-dbe72ddc905d",
+  "total_cost_usd": 0.44960599999999995,
+  "usage": {
+    "input_tokens": 38,
+    "cache_creation_input_tokens": 44387,
+    "cache_read_input_tokens": 804410,
+    "output_tokens": 11110,
+    "output_tokens_details": {
+      "thinking_tokens": 1131
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 44387,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 594,
+        "cache_read_input_tokens": 55735,
+        "cache_creation_input_tokens": 668,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 668
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 38,
+      "outputTokens": 11110,
+      "cacheReadInputTokens": 804410,
+      "cacheCreationInputTokens": 44387,
+      "webSearchRequests": 0,
+      "costUSD": 0.44960599999999995,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1131,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 19,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T2 is finished: the six `run.*` budget keys are in config, and the T2 verify command exits 0 (it printed `gate T2 ok`). I wrote the proposal to `.loop/tmp/proposal.json`.\n\n- **Keys:** `vloop config list` now prints them after `metrics.excluded` with the defaults you specified (30, 40, 3, 2, 3.0, 6). The variables follow `VLOOP_RUN_*`, so `config.EnvVar` now turns `-` into `_` as well as `.`.\n- **Validation and storage:** the integer and number rules are as specified. `config set` writes TOML numbers under `[run]`. A hand-written `[run]` table with `max-attempts = 4` or `convergence-max = 2.5` is read. A string in that table is rejected as a bad file value. Over the JSON output, values stay strings (for example `\"30\"`).\n- **Docs:** README.md and `docs/guide/configuration.md` each gained a row per key. `docs/guide/commands.md` needed no change.\n- **Tests:** I added tests for defaults, order, precedence and each validation rule in `internal/config` and `internal/cli`, and updated the existing list-output expectations.\n\nTwo things outside the plan:\n\n- **`commands_doc_test.go`:** I edited `internal/cli/commands_doc_test.go`, which isn't in the task's file list. It had its own copy of the variable-name rule that ignored `-` and failed on the new keys. It now calls `config.EnvVar`.\n- **README length:** the README was at 199 of its 200-line cap, so I shortened the config prose paragraph to fit the six rows. I also kept `vloop run` out of the README, because its test rejects mentions of commands that don't exist yet (T4 adds `run`).",
+  "ttft_ms": 2729,
+  "type": "result",
+  "duration_ms": 156172,
+  "uuid": "bbc65c7a-1b47-4438-972b-577442911d4a",
+  "ttft_stream_ms": 1398,
+  "time_to_request_ms": 349,
+  "first_content_frame_ms": 1399,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 2
+}

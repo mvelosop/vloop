@@ -1,0 +1,15 @@
+{
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Between iterations the driver checks, per run: iterations ≥ run.max-iterations → exit 4; spend ≥ run.cost-ceiling → exit 6; iterations per closed task > run.convergence-max once iterations ≥ run.convergence-min → exit 5; each budget resolved flag > VLOOP_RUN_* > file > default", "met": true, "evidence": "iterate.go Run() top-of-loop checks (ExitMaxIter, ExitCostCeiling via spend(), ExitNotConverging); TestRunBudgetPrecedence covers file/env/flag/default"},
+    {"criterion": "An iteration that closes nothing and charges no attempt adds to the no-progress streak; reaching run.stall-limit ends the run stalled, exit 3", "met": true, "evidence": "iterate.go stalls counter, excludes OutGateFailed/OutRejected; TestRun11Stall asserts exit 3, status stalled, log text"},
+    {"criterion": "A session that fails to run (non-zero exit or is_error) halts with exit 7 and charges no attempt; a repeated block with nothing changed halts with exit 8 surfacing the first diagnosis (scenario 42)", "met": true, "evidence": "errSessionError path + repeatBlocked(); TestRun19SessionError (both variants, attempts 0, no review) and TestRun42RepeatBlockedHalts"},
+    {"criterion": "Refs and HEAD are snapshotted before every session and compared after; any difference halts with exit 9, the run log says REFS MOVED <task|plan>, and nothing is committed", "met": true, "evidence": "gitRefsMoved(before, task, phase) and plan.go message; TestRun44RefsMovedHalts covers plan/work/review and asserts no [vloop] T1 or run commits"},
+    {"criterion": "Plan status is stalled for exit 3 and halted for 4–9; halts that commit write the closing commit [vloop] run <run id>/<folder>: <status>", "met": true, "evidence": "Ending statuses in Run(); TestRun05 checks the closing commit subject; exit 9 sets halted without committing"},
+    {"criterion": "Re-running after exit 4 or 6 (with a higher limit) resumes the same plan without a new plan session, in a new run folder, and can complete", "met": true, "evidence": "TestRun05 (one plan session, two run folders, complete) and TestRun06"},
+    {"criterion": "Ported tests TestRun04/05/06/07/11/19/42/44 each assert everything their shell scenario asserts; TestRunBudgetPrecedence covers flag over env over file over default", "met": true, "evidence": "cmd/vloop/run_halt_test.go; assertions read as substantive translations (status, task state, exit, log text, cleanliness, commit absence)"}
+  ],
+  "findings": [],
+  "notes": "Full `go test ./...` fails TestWorkedExampleEnglishSession in cmd/vloop (config list now prints run.* keys). Not caused by T7's diff (it touches no config code) and outside this task's gate, but a later task or the operator should update that expected output. Repeat-blocked state is in memory only, so a resumed run starts the pair afresh. TestRun17 and the gate-dispute subtest were adjusted (--stall-limit 99, marker file) because the new halts would otherwise fire; reasonable. internal/driver/halt.go listed in files was not created; the code lives in iterate.go."
+}

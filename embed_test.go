@@ -19,3 +19,9 @@ func TestSchemasAreEmbedded(t *testing.T) {
 		t.Fatalf("embedded schemas: %d entries, err %v", len(ents), err)
 	}
 }
+
+func TestFenceIsEmbedded(t *testing.T) {
+	if len(Fence) == 0 {
+		t.Fatal("embedded fence is empty")
+	}
+}

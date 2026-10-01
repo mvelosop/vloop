@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 31168,
+  "stop_reason": "end_turn",
+  "session_id": "8024f9d2-bdad-444b-92c3-2bedd68c6c89",
+  "total_cost_usd": 0.20805000000000004,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 35865,
+    "cache_read_input_tokens": 190780,
+    "output_tokens": 2641,
+    "output_tokens_details": {
+      "thinking_tokens": 376
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 35865,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 174,
+        "cache_read_input_tokens": 46362,
+        "cache_creation_input_tokens": 1519,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1519
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 2641,
+      "cacheReadInputTokens": 190780,
+      "cacheCreationInputTokens": 35865,
+      "webSearchRequests": 0,
+      "costUSD": 0.20805000000000004,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 376,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01KKQawKjkkkV4o9BHHExetx",
+      "tool_input": {
+        "command": "git stash -q && go test -count=1 -run TestWorkedExampleEnglishSession ./cmd/vloop 2>&1 | tail -5; git stash pop -q && git status --short | grep -v .loop/state | head -3"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**T7: PASS.** I wrote `.loop/tmp/verdict.json`. All seven acceptance criteria are met, and the ported halt tests, including `TestRunBudgetPrecedence`, assert what their shell scenarios assert.\n\nOne failure outside the task: `go test ./...` fails `TestWorkedExampleEnglishSession` in `cmd/vloop`, because `config list` now prints the `run.*` keys. T7's diff touches no config code, so I noted it for the operator rather than failing the task.",
+  "ttft_ms": 2329,
+  "type": "result",
+  "duration_ms": 104587,
+  "uuid": "eacf4c93-7c98-45b2-a01d-b361ce934d45",
+  "ttft_stream_ms": 1220,
+  "time_to_request_ms": 350,
+  "first_content_frame_ms": 1220,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 7
+}

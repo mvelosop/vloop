@@ -2,10 +2,9 @@
 
 vloop is a command-line tool for running autonomous Claude loops: a plan is cut
 from a written **brief**, and then each task in the plan is worked by Claude,
-checked, and reviewed without a human in between. This version (0.x) covers the
-part you need before any loop runs: repo-local configuration and the format,
-checking and ordering of briefs, and reading and checking the plan a loop runs
-from. Running a loop is not part of it yet.
+checked, and reviewed without a human in between. This version (0.x) covers
+repo-local configuration, the format, checking and ordering of briefs, reading
+and checking the plan, and `vloop run` planning a brief; running the tasks is next.
 
 Build it with `go build -o vloop ./cmd/vloop` and put the binary on your `PATH`.
 ## The loop in one paragraph
@@ -58,6 +57,7 @@ does not exist, or an item with no reason, is a problem.
 | `vloop init [--language en\|es] [--stacks <a,b>] [--dry-run]` | set a git repository up: config with detected stacks, the install stamp, a starter brief, the `.vloop/tmp/` line in `.gitignore` and vloop's section of `CLAUDE.md`; refuses a repository already set up; never commits; `--dry-run` writes nothing |
 | `vloop upgrade [--yes] [--dry-run]` | refresh vloop's `CLAUDE.md` section and `.gitignore` line and rewrite the stamp; refuses a repository set up by a newer vloop; a breaking jump (or any pre-release) needs `--yes`; never commits; `--dry-run` writes nothing |
 | `vloop doctor` | check git, install stamp, config, `claude`, workspace trust, gate shell, plan, branch, plugin version and scoped stacks; writes nothing; exit 1 on a problem; `--json` |
+| `vloop run [<brief>] [--plan-only] [--replan] [--max-iterations N] [--cost-ceiling USD] [--max-attempts N] [--stall-limit N]` | refuse on any `vloop doctor` problem; on the default branch create the work branch named for the run id; plan the brief (checked like `vloop task validate` plus the gate-shape rules), then per task: work session, gates, review, one `[vloop] <task>: <outcome>` commit, and the metrics snapshot; ends with an exit code (see Exit codes); `--plan-only` stops after the plan commit; a brief whose journal exists is refused unless `--replan`; each budget flag overrides its `run.*` key (`run.max-iterations`, `run.cost-ceiling`, `run.max-attempts`, `run.stall-limit`) |
 | `vloop plugin path` | extract the embedded plugin into `.vloop/tmp/plugin/<version>/` and print that path; files already matching are left alone, stray ones removed |
 | `vloop config get <key>` | print the resolved value of a key |
 | `vloop config set <key> <value>` | write a key to `.vloop/config.toml` (`''` removes it) |
@@ -118,8 +118,8 @@ These flags work on every command:
 
 Settings are per repository, in `.vloop/config.toml`. Nothing is read from your
 home directory. Each key can be overridden by an environment variable: the key
-in upper case, `.` turned into `_`, with the prefix shown in the table. The environment wins over
-the file, and the file over the default.
+in upper case, `.` and `-` turned into `_`, with the prefix shown in the table.
+The environment wins over the file, and the file over the default.
 
 | Key | Default | Values | Environment variable |
 | --- | --- | --- | --- |
@@ -130,26 +130,26 @@ the file, and the file over the default.
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` |
-| `shell` | `sh` (`cmd` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` |
+| `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` |
 | `areas` | unset | a TOML array of names | `VLOOP_AREAS` |
 | `metrics.stacks` | unset | a TOML array of stack names | `VLOOP_METRICS_STACKS` |
 | `metrics.code` | unset | a TOML array of glob patterns | `VLOOP_METRICS_CODE` |
 | `metrics.test` | unset | a TOML array of glob patterns | `VLOOP_METRICS_TEST` |
 | `metrics.docs` | unset | a TOML array of glob patterns | `VLOOP_METRICS_DOCS` |
 | `metrics.excluded` | unset | a TOML array of glob patterns | `VLOOP_METRICS_EXCLUDED` |
+| `run.max-iterations` | `30` | an integer, 0 or more | `VLOOP_RUN_MAX_ITERATIONS` |
+| `run.cost-ceiling` | `40` | a number of dollars above 0 | `VLOOP_RUN_COST_CEILING` |
+| `run.max-attempts` | `3` | an integer, 1 or more | `VLOOP_RUN_MAX_ATTEMPTS` |
+| `run.stall-limit` | `2` | an integer, 1 or more | `VLOOP_RUN_STALL_LIMIT` |
+| `run.convergence-max` | `3.0` | a number above 0 | `VLOOP_RUN_CONVERGENCE_MAX` |
+| `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN` |
 
-`language` chooses the language of a brief's section headings and of the template
-`vloop brief new` writes. It applies to briefs only: commands, flags, keys, JSON
-and vloop's own messages are always English. The `model.*` and `effort.*` keys
-choose the model and the effort for each kind of session (plan, work, review).
-`shell` is the shell `vloop task gate` runs a verify command in. `areas` lists
-the names a task's `area` may take; when set, `vloop task validate` reports any
-other. In the file it is an array, for example `areas = ["cli", "docs"]`.
-The `metrics.*` keys are lists too, set as comma-joined text and stored under
-`[metrics]`: `metrics.stacks` names the language presets used to classify lines
-as code, test, docs or excluded, and the four glob keys hold the repository's
-own doublestar patterns, which win over the presets, for example
-`metrics.code = ["internal/brief/templates/**"]`.
+`language` is the language of a brief's section headings and of the template
+`vloop brief new` writes; commands, flags, keys and JSON are always English.
+The `model.*` and `effort.*` keys choose the model and effort per session kind.
+`areas` lists the names a task's `area` may take. List keys are arrays in the
+file; the `metrics.*` ones (stored under `[metrics]`) classify lines as code, test,
+docs or excluded. The `run.*` budgets (under `[run]`) bound the autonomous run.
 For example:
 
 ```
@@ -168,7 +168,7 @@ vloop keeps its files under `.vloop/` in the repo root (the nearest parent with 
   follows the `state/v1` schema; `vloop status` reads it and `vloop task validate`
   checks it.
 
-Briefs live in `docs/briefs/`. Only `vloop init`, `vloop upgrade`, `vloop config set`, `vloop brief new`, `vloop plugin path`, `vloop defect add|set` and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`, `verify`) write anything, and each task command refuses a plan that fails `vloop task validate`. Every path vloop prints is relative to the repo root.
+Briefs live in `docs/briefs/`. Only `vloop run`, `vloop init`, `vloop upgrade`, `vloop config set`, `vloop brief new`, `vloop plugin path`, `vloop defect add|set` and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`, `verify`) write anything, and each task command refuses a plan that fails `vloop task validate`. Every path vloop prints is relative to the repo root.
 
 ## Guides
 
@@ -185,12 +185,9 @@ Briefs live in `docs/briefs/`. Only `vloop init`, `vloop upgrade`, `vloop config
 
 ## Exit codes
 
-- `0`: success.
-- `1`: the command ran and found problems or failed (a brief with problems, a
-  malformed config file, a brief that already exists).
-- `2`: usage error: an unknown command, flag or config key, a missing argument,
-  or an invalid value.
-
+Every command exits `0` on success, `1` on problems or failure, `2` on a usage
+error; `vloop run` also ends with 3–9. All of them, and which a run can resume
+from, are in [docs/guide/concepts.md](docs/guide/concepts.md#exit-codes).
 Errors go to stderr as one line starting with `vloop: `.
 
 ## What comes next

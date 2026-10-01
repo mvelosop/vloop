@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 77568,
+  "stop_reason": "end_turn",
+  "session_id": "58566dae-a3d4-4595-a238-e0a629266b3b",
+  "total_cost_usd": 0.41817679999999996,
+  "usage": {
+    "input_tokens": 28,
+    "cache_creation_input_tokens": 47781,
+    "cache_read_input_tokens": 620634,
+    "output_tokens": 10287,
+    "output_tokens_details": {
+      "thinking_tokens": 560
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 47781,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 725,
+        "cache_read_input_tokens": 59042,
+        "cache_creation_input_tokens": 755,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 755
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 28,
+      "outputTokens": 10287,
+      "cacheReadInputTokens": 620634,
+      "cacheCreationInputTokens": 47781,
+      "webSearchRequests": 0,
+      "costUSD": 0.41817679999999996,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 560,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 15,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T10 is done: the T10 verify command exits 0 and prints `gate T10 ok`, and I've written `.loop/tmp/proposal.json`.\n\n- **Exit codes:** `docs/guide/concepts.md` now has a `## Exit codes` section with 0–9, their meanings, and which are resumable. The README's section is a pointer to it, and the README is 196 lines.\n- **README test:** the new `TestGuideExitCodesMatchDriver` in `internal/cli/readme_test.go` checks the guide's codes against the driver's and the CLI's. It fails if the guide misses a code or lists one the driver can't return. I removed none of the existing README checks.\n- **F1:** the README's `shell` row now says `pwsh` on Windows. `TestReadmeShellDefaultMatchesCode` fails if the README's default for either OS differs from the code's.\n- **Config and defects docs:** the README's `vloop run` row, `docs/guide/configuration.md` and `docs/guide/defects.md` cover the `run.*` flags and the flaky-gate env defect.\n- **Commands reference:** `go generate` produced no diff for `docs/guide/commands.md`, so it was already current.\n- **Domain docs:** I updated `run.md` (`run.log` and `gate.flaky`), `plan.md`, `session.md`, `task.md`, `execution-context.md` and `domain-model.md` to say the driver is built. No `(planned, B6)` is left in `run.md` or `plan.md`.\n\nThings I left alone because they're outside T10's file list:\n- **Remaining `(planned, B6)` markers:** `docs/domain/bounded-contexts.md:46` and `docs/domain/measurement/measurement-context.md:42` still have it.\n- **Possible metrics bug:** `internal/runs/runs.go:189` finds run folders by reading `loop.log`, but `vloop run` writes `run.log`. Metrics may not find folders `vloop run` creates.\n- **Still-failing test:** `TestWorkedExampleEnglishSession` in `cmd/vloop` still fails because of the `run.*` config lines. It isn't in this gate.",
+  "ttft_ms": 2500,
+  "type": "result",
+  "duration_ms": 121638,
+  "uuid": "637741cc-8866-4214-b820-a295c1a2a695",
+  "ttft_stream_ms": 1318,
+  "time_to_request_ms": 370,
+  "first_content_frame_ms": 1318,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 10
+}

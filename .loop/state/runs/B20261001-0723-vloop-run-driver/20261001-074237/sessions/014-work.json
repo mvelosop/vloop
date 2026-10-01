@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 224375,
+  "stop_reason": "end_turn",
+  "session_id": "f52a8af9-b72f-4a70-870d-56991ef67c81",
+  "total_cost_usd": 1.2640836000000002,
+  "usage": {
+    "input_tokens": 62,
+    "cache_creation_input_tokens": 107916,
+    "cache_read_input_tokens": 2755678,
+    "output_tokens": 28116,
+    "output_tokens_details": {
+      "thinking_tokens": 8589
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 107916,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 662,
+        "cache_read_input_tokens": 119007,
+        "cache_creation_input_tokens": 925,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 925
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 62,
+      "outputTokens": 28116,
+      "cacheReadInputTokens": 2755678,
+      "cacheCreationInputTokens": 107916,
+      "webSearchRequests": 0,
+      "costUSD": 1.2640836000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 8589,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01D6kYSSDXoH51SqEhMx2xt9",
+      "tool_input": {
+        "command": "python3 - <<'EOF'\np='cmd/vloop/run_iterate_test.go'\ns=open(p).read()\ns=s.replace('r.vloop(\"run\", \"--max-attempts\", \"2\", runBrief)','r.vloop(\"run\", \"--max-attempts\", \"2\", \"--stall-limit\", \"99\", runBrief)')\nopen(p,'w').write(s)\np='cmd/vloop/run_gates_test.go'\ns=open(p).read()\ns=s.replace('''wantExit(t, r.vloop(\"run\", runBrief), 2)\n\t\tr.wantTask(\"T1\", \"blocked\", 3)''','''wantExit(t, r.vloop(\"run\", \"--stall-limit\", \"99\", runBrief), 2)\n\t\tr.wantTask(\"T1\", \"blocked\", 3)''')\nopen(p,'w').write(s)\nEOF\ngo test -count=1 ./cmd/vloop 2>&1 | grep -E \"^(--- FAIL|FAIL|ok)\"; git stash -q; go test -count=1 -run TestWorkedExampleEnglishSession ./cmd/vloop 2>&1 | tail -2; git stash pop -q; git status --short | head"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 34,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T7 is implemented and its verify command exits 0 (`gate T7 ok`). The proposal is in `.loop/tmp/proposal.json`, outcome `done`. `TestWorkedExampleEnglishSession` still fails and was already failing: its expected `config` line count doesn't include the six `run.*` keys T2 added.\n\n- **Budgets:** `internal/driver/iterate.go` now checks, between iterations, max-iterations (exit 4), cost ceiling (exit 6) and convergence (exit 5). Cost comes from the session records in the run folder.\n- **Stall:** reaching the stall limit ends the run `stalled`, exit 3.\n- **Session error:** a work session that exits non-zero or reports `is_error`, and leaves no valid proposal, halts with exit 7 and charges no attempt.\n- **Repeat blocked:** a task blocked twice with nothing changed halts with exit 8 and prints the first diagnosis.\n- **Moved refs:** exit 9 logs `REFS MOVED <task|plan>` plus what moved, sets plan status `halted`, and commits nothing.\n- **Tests:** `cmd/vloop/run_halt_test.go` has the eight ported scenario tests and `TestRunBudgetPrecedence`; `internal/driver/halt_test.go` has a unit test for the spend calculation.\n\nI changed two earlier tests, because the new halts fired in them:\n- `TestRun17StaleHandoff` now passes `--stall-limit 99`.\n- The \"blocked proposal without gate_dispute\" case of `TestRunGateDispute` also passes `--stall-limit 99`, and its work session now touches a marker file each attempt so the repeat-blocked halt doesn't fire. Both still assert what they did before.\n\nRepeat-blocked tracking is held in memory per run, since state/v1 has no field for it. A resumed run therefore starts the blocked pair fresh. The proposal notes record this and the other decisions.",
+  "ttft_ms": 2341,
+  "type": "result",
+  "duration_ms": 802080,
+  "uuid": "f547fe36-4777-4afc-bea5-60d883c6656b",
+  "ttft_stream_ms": 1299,
+  "time_to_request_ms": 346,
+  "first_content_frame_ms": 1299,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 7
+}

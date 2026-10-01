@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/mvelosop/vloop/internal/classify"
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/defect"
 	"github.com/mvelosop/vloop/internal/runs"
 )
@@ -285,4 +286,28 @@ func byTask(m *runs.Model, plan *runs.PlanDoc, size Size) []ReportTask {
 		out = append(out, *rt)
 	}
 	return out
+}
+
+// NewClassifier is the file classifier the repo's metrics.* config describes.
+// The error is the config's, unwrapped.
+func NewClassifier(root string) (*classify.Classifier, error) {
+	get := func(k string) ([]string, error) {
+		v, err := config.Get(root, k)
+		return v.List, err
+	}
+	var repo classify.Preset
+	for _, r := range []struct {
+		key string
+		dst *[]string
+	}{{"metrics.excluded", &repo.Excluded}, {"metrics.test", &repo.Test}, {"metrics.docs", &repo.Docs}, {"metrics.code", &repo.Code}} {
+		var err error
+		if *r.dst, err = get(r.key); err != nil {
+			return nil, err
+		}
+	}
+	stacks, err := get("metrics.stacks")
+	if err != nil {
+		return nil, err
+	}
+	return classify.New(repo, stacks), nil
 }

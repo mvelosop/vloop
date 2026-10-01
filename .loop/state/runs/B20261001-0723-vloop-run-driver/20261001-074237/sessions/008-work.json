@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 427396,
+  "stop_reason": "end_turn",
+  "session_id": "b35114b5-bb4f-4e07-8e9f-41dcffc69cf1",
+  "total_cost_usd": 2.1391888000000003,
+  "usage": {
+    "input_tokens": 68,
+    "cache_creation_input_tokens": 171981,
+    "cache_read_input_tokens": 4225194,
+    "output_tokens": 60609,
+    "output_tokens_details": {
+      "thinking_tokens": 23405
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 171981,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 843,
+        "cache_read_input_tokens": 182666,
+        "cache_creation_input_tokens": 1331,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1331
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 68,
+      "outputTokens": 60609,
+      "cacheReadInputTokens": 4225194,
+      "cacheCreationInputTokens": 171981,
+      "webSearchRequests": 0,
+      "costUSD": 2.1391888000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 23405,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 37,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 is done: `vloop run` now exists, and the task's verify command, run in the foreground, printed `gate T4 ok`. The proposal is written to `.loop/tmp/proposal.json`.\n\n- **What it does:** `vloop run [<brief>]` takes `--plan-only`, `--replan` and the four budget flags. A missing brief exits 2 and an unknown flag exits 2. Preflight is doctor's checks and refuses with exit 1; an untrusted workspace counts as a problem.\n- **Work branch:** on the default branch it creates and switches to `<run id>`, or refuses with exit 1 if that branch exists. On any other branch it stays put.\n- **Plan phase:** it runs the plan session through T3's runner, then checks the plan and stamps `run_id`, `brief`, `branch` and `status` on it. It then writes `plan.md` and the journal and commits `[vloop] plan <run id>`.\n- **Plan checks:**\n  - schema and `task validate` checks (including dangling references);\n  - the three gate-shape rules;\n  - the head-diff advisory, which warns and does not refuse.\n- **Rejected plans:** a plan that fails its checks exits 1 and is not committed.\n- **Tests:** the eight ported scenarios, `TestRunWorkBranch`, plus `TestRunPlanCommit` and `TestRunPreflight`, in `cmd/vloop/run_plan_test.go`, and unit tests in `internal/driver/plan_test.go`. README has the `vloop run` row, and `docs/guide/commands.md` is regenerated.\n- **Without `--plan-only`:** it plans, then exits 1 with \"running its tasks is not available in this build\". T5 has to replace that branch in `internal/cli/run.go`.\n- **Budgets:** they are resolved (flag, then `VLOOP_RUN_*`, then file, then default) and validated, but nothing reads them yet.\n- **Beyond the spec:**\n  - The driver also stamps `run_id` from the brief stem, so branch, run folder, journal and commit all agree.\n  - A rejected plan is deleted from `.vloop/state/state.json`; otherwise a re-run with the same brief would resume it.\n- **README:** I trimmed two lines of prose to stay under the 200-line cap.\n- **Not done here:** scenarios 21 and 30 (T5), and the exit-codes move and the F1 shell-default fix (T10).\n\nI did not commit or touch `state.json`, per the loop rules.",
+  "ttft_ms": 2399,
+  "type": "result",
+  "duration_ms": 579646,
+  "uuid": "3cb764df-db2f-40bd-8e70-1826b437af6b",
+  "ttft_stream_ms": 1341,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1341,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 4
+}

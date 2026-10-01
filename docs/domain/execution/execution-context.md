@@ -40,8 +40,7 @@ sequenceDiagram
 ## Who writes what
 
 - **The driver** owns every status, every gate run and every commit (P-2, R-1).
-  Today the driver is the shell loop, `.loop/run.sh`; `vloop run` replaces it
-  *(planned, B6)*.
+  `vloop run` is the driver (the shell loop, `.loop/run.sh`, built it).
 - **The plan session** writes the plan once.
 - **A work session** changes the working tree for its one task and writes a
   proposal. **A review session** writes a verdict. Neither commits, sets status
@@ -55,7 +54,7 @@ P-1..P-6, S-1..S-3 and R-1..R-3 in [`../domain-model.md`](../domain-model.md#inv
 
 ## Gaps
 
-- The driver is the shell loop until B6: its plan lives in `.loop/state/`, its
-  run records carry no gate time or configured effort, and its plan status
-  strings are richer than `state/v1`'s (see [plan.md](plan.md)).
-- R-2 (runs only on a work branch) is the operator's discipline until B6.
+- Runs by the shell loop (this repo's own history) keep their plan in
+  `.loop/state/`, carry no gate time or configured effort, and use plan status
+  strings richer than `state/v1`'s (see [plan.md](plan.md)); vloop reads them.
+- R-2 is enforced by `vloop run`, which creates the work branch.

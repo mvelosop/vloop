@@ -14,3 +14,8 @@ var Plugin embed.FS
 //
 //go:embed schemas/*.json
 var Schemas embed.FS
+
+// Fence is the permission settings every session runs under.
+//
+//go:embed fence/settings.json
+var Fence []byte

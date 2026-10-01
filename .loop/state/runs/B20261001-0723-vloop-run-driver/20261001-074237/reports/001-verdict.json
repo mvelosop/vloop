@@ -1,0 +1,16 @@
+{
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "cmd/vloop/run_harness_test.go provides helpers that create a scratch git repository on branch `main` with a git identity set in the repository's own config, initialised with the built binary's `vloop init`, holding a ready loop brief, all committed", "met": true, "evidence": "newRunRepo: git init -b main, local user.name/email, r.vloop(\"init\"), brief written, add -A and commit; TestRunHarness asserts branch, clean status, local identity and brief check"},
+    {"criterion": "The helpers create a fake home whose `.claude.json` marks the scratch repository trusted, and every binary or stub invocation gets HOME, USERPROFILE and XDG_CONFIG_HOME pointing into temporary directories and GIT_CONFIG_GLOBAL/GIT_CONFIG_NOSYSTEM neutralised", "met": true, "evidence": "newRunRepo writes projects[dir and realpath].hasTrustDialogAccepted; r.env uses cleanEnv(r.home) plus GIT_CONFIG_GLOBAL=/dev/null and GIT_CONFIG_NOSYSTEM=1; all exec goes through r.exec"},
+    {"criterion": "A stub `claude` is put first on PATH: it appends its full argv to a log, answers `--version` and `plugin list --json`, and for the three -p prompts runs a per-test script that can write the plan, files, proposal/verdict, run git, print the result JSON or nothing, and exit with a chosen code", "met": true, "evidence": "runStubSource logs argv, answers --version/plugin, parses the three prompt kinds, sources script.sh (arbitrary shell) with STUB_COST/EXIT/DURATION/TURNS/ERROR/SILENT, prints JSON with modelUsage keyed by --model"},
+    {"criterion": "The stub's script can vary by task and by attempt without editing the harness file", "met": true, "evidence": "PHASE/TASK/ATTEMPT variables with per-PHASE+ARG counters; TestRunHarness uses case \"$PHASE:$TASK:$ATTEMPT\" and observes both arms"},
+    {"criterion": "The binary is the one TestMain builds once (`binPath`); the harness does not build another", "met": true, "evidence": "r.vloop uses binPath; no go build in the file"},
+    {"criterion": "`TestRunHarness` exists in package main of cmd/vloop and passes: doctor exits 0 with 0 problems, and the stub with `-p \"/vloop:work T1\" --model sonnet` performs its scripted action, prints JSON whose `modelUsage` is keyed `sonnet`, and is recorded in the argument log", "met": true, "evidence": "Test re-run: ok. Asserts doctor 'doctor: 0 problem(s)', T1.out written, modelUsage has only sonnet, argv log contains the invocation"},
+    {"criterion": "No test reads or writes this repository's `.loop/`, `.claude/`, `.vloop/`, its git history or the real home directory", "met": true, "evidence": "All dirs are t.TempDir(); git always via -C; home is a temp dir and the test asserts it holds only .claude.json"},
+    {"criterion": "Where the stub cannot run on the host OS the harness skips with `t.Skip` naming the reason; it never passes vacuously on darwin or linux", "met": true, "evidence": "newRunRepo t.Skip on windows with reason; on darwin/linux the test runs real assertions"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

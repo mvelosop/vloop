@@ -1,0 +1,14 @@
+{
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop config list` prints, after `metrics.excluded`, exactly the six run.* keys with defaults, in order", "met": true, "evidence": "Keys table in internal/config/config.go appends them in order; TestConfigListDefaults asserts the exact output; gate checks lines after metrics.excluded"},
+    {"criterion": "Each key reads VLOOP_ + key upper-cased with . and - turned into _; env beats file beats default", "met": true, "evidence": "config.EnvVar now replaces both; TestRunKeysEnvFileDefault covers env override, file, default and EnvVar name"},
+    {"criterion": "Validation: ints >= 0 / >= 1, numbers > 0; B1 invalid-value message; exit 2 from set, 1 from env/file", "met": true, "evidence": "Key.parseNum with Min/MinOpen; TestRunKeysValidation has a passing and failing value per key and checks the message; TestConfigRunKeys checks exit 2 for set and exit 1 for a bad env"},
+    {"criterion": "Keys stored under a [run] table; hand-written TOML numbers are read", "met": true, "evidence": "resolve() accepts int64/float64; Set writes ParseInt/ParseFloat values; TestRunKeysSetWritesRunTable and TestRunKeysEnvFileDefault"},
+    {"criterion": "README.md and docs/guide/configuration.md gain a row per run.* key; B1's README test maps - to _ and still fails on undocumented keys; no check removed", "met": true, "evidence": "Six rows added in both docs; readme_test.go envs map now uses a replacer for . and -; the checks themselves are unchanged"},
+    {"criterion": "Committed tests in internal/config and internal/cli cover defaults, order, precedence, and each validation rule with a passing and a failing value", "met": true, "evidence": "TestDefaultsEveryRow, TestRunKeysValidation, TestRunKeysEnvFileDefault, TestConfigListDefaults, TestConfigListJSONOrderAndNull, TestConfigRunKeys"}
+  ],
+  "findings": [],
+  "notes": "The work session condensed the README's config prose to stay under the 200-line cap (the shell detail still lives in docs/guide/configuration.md). It also edited commands_doc_test.go, which was not in the files list, to use config.EnvVar; the change is minimal and necessary. internal/cli/config.go and docs/guide/commands.md were listed but needed no change. No absolute paths found."
+}

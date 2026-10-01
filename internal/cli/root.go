@@ -56,6 +56,16 @@ func (e *ProblemError) Unwrap() error { return e.Err }
 // Problem wraps err so the command exits 1.
 func Problem(err error) error { return &ProblemError{Err: err} }
 
+// ExitError makes a command exit with a specific code, as `vloop run` does for
+// its own endings (R-3).
+type ExitError struct {
+	Code int
+	Err  error
+}
+
+func (e *ExitError) Error() string { return e.Err.Error() }
+func (e *ExitError) Unwrap() error { return e.Err }
+
 // Execute runs the command tree and returns the process exit code. Errors are
 // printed to stderr as one line starting "vloop: "; nothing goes to stdout.
 func Execute(b Build, args []string, stdout, stderr io.Writer) int {
@@ -69,6 +79,10 @@ func Execute(b Build, args []string, stdout, stderr io.Writer) int {
 	}
 	if err.Error() != "" { // an empty message exits non-zero having already reported
 		fmt.Fprintf(stderr, "vloop: %s\n", oneLine(err.Error()))
+	}
+	var xe *ExitError
+	if errors.As(err, &xe) {
+		return xe.Code
 	}
 	var pe *ProblemError
 	if errors.As(err, &pe) {
@@ -113,5 +127,6 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 	root.AddCommand(newInit(b, g))
 	root.AddCommand(newUpgrade(b, g))
 	root.AddCommand(newDoctor(b, g))
+	root.AddCommand(newRun(b, g))
 	return root, g
 }

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "vloop run now iterates: driver.Iterator picks the first ready task, runs work, every done task's gate plus its own (timed, with VLOOP_ACTIVE_TASK/VLOOP_GATE_TASK only on the gate), review, applies the outcome, writes iteration/v1, reports, gate logs, journal, plan.md, and makes one commit behind a HEAD check; ends complete (0), blocked (2) or halted (4, --max-iterations), with the closing commit.",
+  "files": ["internal/driver/iterate.go", "internal/driver/iterate_test.go", "internal/driver/plan.go", "internal/cli/run.go", "cmd/vloop/run_iterate_test.go"],
+  "verified": "the task's verify command exits 0 and prints 'gate T5 ok'.",
+  "notes": "Run.log is buffered in memory (lazyLog) and written only just before each commit: the plan commit tracks run.log, so appending to it mid-iteration made a gate's `git checkout main` fail on a dirty tracked file and TestRunHeadCheck could not reach exit 9. The iteration run reuses the plan session's run folder (PlanResult.RunDir); a resume creates a new folder. A resume on the default branch now creates the work branch (Planner.workBranch, extracted from Plan). The plan is held in memory and saved once per iteration, so a session editing state.json is overwritten (tamper detection, session_error exit 7, cost/stall/convergence halts, gate_dispute, flaky re-run, snapshot, summary and repeat-blocked are NOT done: T6-T9 per the brief). A done task whose gate fails during another task's iteration is reverted to pending with an attempt charged, as run.sh did. iteration.attempt is 1-based (attempts before + 1). Pre-existing failure outside this task: cmd/vloop TestWorkedExampleEnglishSession (e2e_test.go) expects 14 `config` lines but T2 added six run.* keys; it is not in T5's gate and I did not touch it."
+}

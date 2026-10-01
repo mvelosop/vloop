@@ -1,0 +1,8 @@
+{
+  "task": "T6",
+  "outcome": "done",
+  "summary": "The driver now handles gates across iterations: GATE REWRITE restores a session-rewritten gate file from HEAD (iteration fails, no review), a failing gate gets one immediate re-run (FLAKY GATE, flaky:true, no attempt), a blocked task whose gate passes says so in notes, run log and run-end report, and a gate_dispute proposal blocks its task at once. Ported tests 03/33/39/41 plus TestRunFlakyGate and TestRunGateDispute.",
+  "files": ["internal/driver/gates.go", "internal/driver/iterate.go", "schemas/iteration.v1.json", "cmd/vloop/run_gates_test.go"],
+  "verified": "The task's verify command: printed 'gate T6 ok'.",
+  "notes": "Added an optional boolean `flaky` to gate in schemas/iteration.v1.json. The re-run applies to every gate in the sweep (done tasks too), but only the active task's flaky flag reaches the record. On a dispute the done tasks' gates still run (regression net) and the task's own gate does not. gate_failed notes for a rewrite carry the tamper text, not 'gate failed — see'. internal/cli/run.go needed no change. TestWorkedExampleEnglishSession in ./cmd/vloop fails (config list now shows run.* keys, an earlier task's change, and the docs task is not done); it is not in T6's gate and not caused by T6."
+}

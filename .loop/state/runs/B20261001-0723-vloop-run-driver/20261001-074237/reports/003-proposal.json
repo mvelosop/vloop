@@ -1,0 +1,8 @@
+{
+  "task": "T3",
+  "outcome": "done",
+  "summary": "New internal/driver package: embedded fence (fence/settings.json via embed.go), shared plugin and fence extraction, the P-6 resolver, and Runner.Run, which starts claude under the fence, writes session/v1 records with masking, and logs SESSION RECORD MISSING when stdout is empty.",
+  "files": ["fence/settings.json", "embed.go", "embed_test.go", "internal/driver/extract.go", "internal/driver/resolve.go", "internal/driver/session.go", "internal/driver/session_test.go", "internal/cli/plugin.go", "internal/cli/task.go"],
+  "verified": "Full T3 verify command run as one script: printed 'gate T3 ok'.",
+  "notes": "ExtractPlugin/EnsureRealDir/withVersion moved from internal/cli/plugin.go to internal/driver/extract.go (cli imports driver, so driver cannot import cli); `vloop plugin path` calls driver.ExtractPlugin. Likewise the P-6 resolver now lives in driver.ResolveSession and cli.resolveSession delegates to it; driver.ModelEffort(root, task|nil, phase) is what T4/T5 call. Runner fields: Root, Version, RunID, RunDir (absolute run folder; records go in RunDir/sessions), Log, plus test seams Claude, Now, Home, User, Env. Run returns Result{ExitCode, Recorded, Path, Cost, Turns, IsError, Denials}; a non-zero claude exit is not an error. Stdout that is empty or not JSON counts as missing: no record, log line only. The session counter continues after the highest NNN already in sessions/, so a resumed run does not overwrite. stderr goes to RunDir/<phase>-<iter>.stderr (masked), as the shell loop did. Raw stdout is not persisted. Runner.Mask also masks the JSON-escaped form of a Windows home."
+}

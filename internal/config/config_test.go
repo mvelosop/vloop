@@ -47,6 +47,8 @@ func TestDefaultsEveryRow(t *testing.T) {
 		{"effort.review", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
+		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
+		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -279,7 +281,7 @@ func TestAreasKey(t *testing.T) {
 func TestMetricsKeys(t *testing.T) {
 	root := scratch(t)
 	var names []string
-	for _, k := range Keys[len(Keys)-5:] {
+	for _, k := range Keys[len(Keys)-11 : len(Keys)-6] {
 		names = append(names, k.Name)
 		if !k.List {
 			t.Errorf("%s is not a list", k.Name)
@@ -358,5 +360,81 @@ func TestStacksScopeReadIgnoresMissingDirectory(t *testing.T) {
 	var se *SourceError
 	if _, err := Get(root, "metrics.stacks"); !errors.As(err, &se) {
 		t.Errorf("want SourceError, got %v", err)
+	}
+}
+
+func TestRunKeysValidation(t *testing.T) {
+	root := scratch(t)
+	cases := []struct {
+		key, good string
+		bad       []string
+	}{
+		{"run.max-iterations", "0", []string{"-1", "1.5", "abc"}},
+		{"run.convergence-min", "0", []string{"-1", "x"}},
+		{"run.max-attempts", "1", []string{"0", "2.5"}},
+		{"run.stall-limit", "1", []string{"0", ""}},
+		{"run.cost-ceiling", "12.5", []string{"0", "-3", "abc", "NaN", "Inf"}},
+		{"run.convergence-max", "2.5", []string{"0", "-0.5", "x"}},
+	}
+	for _, c := range cases {
+		if err := Set(root, c.key, c.good); err != nil {
+			t.Errorf("set %s=%s: %v", c.key, c.good, err)
+		}
+		if v, err := Get(root, c.key); err != nil || v.Value != c.good || v.Source != SourceFile {
+			t.Errorf("get %s = %+v, %v", c.key, v, err)
+		}
+		for _, b := range c.bad {
+			var iv *InvalidValueError
+			err := Check(root, c.key, b)
+			if b == "" {
+				continue
+			}
+			if !errors.As(err, &iv) || !strings.HasPrefix(err.Error(), `invalid value "`+b+`" for `+c.key+`: want `) {
+				t.Errorf("%s=%q: %v", c.key, b, err)
+			}
+		}
+	}
+	if err := Set(root, "run.max-attempts", "0"); err == nil || err.Error() != `invalid value "0" for run.max-attempts: want an integer of at least 1` {
+		t.Errorf("message: %v", err)
+	}
+}
+
+func TestRunKeysEnvFileDefault(t *testing.T) {
+	root := scratch(t)
+	writeCfg(t, root, "[run]\nmax-attempts = 4\nconvergence-max = 2.5\ncost-ceiling = 10\n")
+	for key, want := range map[string]string{"run.max-attempts": "4", "run.convergence-max": "2.5", "run.cost-ceiling": "10"} {
+		if v, err := Get(root, key); err != nil || v.Value != want || v.Source != SourceFile {
+			t.Errorf("%s = %+v, %v", key, v, err)
+		}
+	}
+	if EnvVar("run.convergence-max") != "VLOOP_RUN_CONVERGENCE_MAX" {
+		t.Error(EnvVar("run.convergence-max"))
+	}
+	t.Setenv("VLOOP_RUN_MAX_ATTEMPTS", "9")
+	if v, _ := Get(root, "run.max-attempts"); v.Value != "9" || v.Source != SourceEnv {
+		t.Errorf("env: %+v", v)
+	}
+	t.Setenv("VLOOP_RUN_MAX_ATTEMPTS", "0")
+	var se *SourceError
+	if _, err := Get(root, "run.max-attempts"); !errors.As(err, &se) || se.Source != "VLOOP_RUN_MAX_ATTEMPTS" {
+		t.Errorf("bad env: %v", err)
+	}
+	t.Setenv("VLOOP_RUN_MAX_ATTEMPTS", "")
+	writeCfg(t, root, "[run]\nmax-attempts = \"x\"\n")
+	if _, err := Get(root, "run.max-attempts"); !errors.As(err, &se) {
+		t.Errorf("string in file: %v", err)
+	}
+}
+
+func TestRunKeysSetWritesRunTable(t *testing.T) {
+	root := scratch(t)
+	if err := Set(root, "run.max-attempts", "4"); err != nil {
+		t.Fatal(err)
+	}
+	if got := readCfg(t, root); got != "[run]\n  max-attempts = 4\n" {
+		t.Errorf("file = %q", got)
+	}
+	if err := Set(root, "run.max-attempts", ""); err != nil {
+		t.Fatal(err)
 	}
 }

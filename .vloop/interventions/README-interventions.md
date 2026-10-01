@@ -40,14 +40,18 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | partly | [I20260929-2330-eleven-choices-in-the-b3-draft-and-real](I20260929-2330-eleven-choices-in-the-b3-draft-and-real.md) |
 | design | decision | partly | [I20260930-0929-seven-choices-in-the-b4-draft](I20260930-0929-seven-choices-in-the-b4-draft.md) |
 | design | decision | partly | [I20260930-2002-four-forks-settled-for-b5](I20260930-2002-four-forks-settled-for-b5.md) |
+| design | decision | partly | [I20261001-0720-readme-cap-and-run-budgets](I20261001-0720-readme-cap-and-run-budgets.md) |
 | design | direction | no | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
 | design | direction | no | [I20260930-2001-b5-skills-move-to-b6-and-a-b7-review](I20260930-2001-b5-skills-move-to-b6-and-a-b7-review.md) |
 | design | direction | no | [I20260930-2025-monorepos-need-stacks-by-path](I20260930-2025-monorepos-need-stacks-by-path.md) |
+| design | direction | no | [I20260930-2240-b6-split-driver-skills-review](I20260930-2240-b6-split-driver-skills-review.md) |
 | design | verification-finding | yes | [I20260930-0935-vloop-s-checker-rejected-two-binding-ref](I20260930-0935-vloop-s-checker-rejected-two-binding-ref.md) |
 | design | verification-finding | yes | [I20260930-2003-marketplace-manifest-invalid-since-b1](I20260930-2003-marketplace-manifest-invalid-since-b1.md) |
 | design | verification-finding | yes | [I20260930-2009-checker-rejects-wrapped-binding-reason](I20260930-2009-checker-rejects-wrapped-binding-reason.md) |
+| design | verification-finding | yes | [I20261001-0724-readme-shell-default-wrong-since-b2](I20261001-0724-readme-shell-default-wrong-since-b2.md) |
+| design | verification-finding | yes | [I20261001-0730-b6-draft-cited-a-folder](I20261001-0730-b6-draft-cited-a-folder.md) |
 | run | ceremony | yes | [I20260929-1917-the-plan-commit-landed-on-main](I20260929-1917-the-plan-commit-landed-on-main.md) |
 | run | context-supply | partly | [I20260929-1900-go-not-installed-and-the-loop-s-fence-ha](I20260929-1900-go-not-installed-and-the-loop-s-fence-ha.md) |
 | run | halt | yes | [I20260929-1941-the-driver-refused-to-resume-on-the-new](I20260929-1941-the-driver-refused-to-resume-on-the-new.md) |
@@ -64,6 +68,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | [I20260930-0026-the-task-estimate-was-read-from-the-firs](I20260930-0026-the-task-estimate-was-read-from-the-firs.md) |
 | verify | verification-finding | partly | [I20260930-1302-the-loop-s-fence-blocked-the-read-only-g](I20260930-1302-the-loop-s-fence-blocked-the-read-only-g.md) |
 | verify | verification-finding | yes | [I20260930-1305-schema-files-counted-as-other-lines](I20260930-1305-schema-files-counted-as-other-lines.md) |
+| verify | verification-finding | partly | [I20261001-1005-plan-md-run-id-wording](I20261001-1005-plan-md-run-id-wording.md) |
 | close | carry-forward | partly | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
@@ -71,6 +76,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | close | ceremony | yes | [I20260930-0815-manual-close-of-b3-with-the-vloop-brief](I20260930-0815-manual-close-of-b3-with-the-vloop-brief.md) |
 | close | ceremony | yes | [I20260930-1330-the-first-close-by-vloop-itself-plus-han](I20260930-1330-the-first-close-by-vloop-itself-plus-han.md) |
 | close | ceremony | yes | [I20260930-2215-b5-closed-by-vloop-after-three-runs](I20260930-2215-b5-closed-by-vloop-after-three-runs.md) |
+| close | ceremony | yes | [I20261001-1015-b6-closed-with-a-finding](I20261001-1015-b6-closed-with-a-finding.md) |
 | close | repair | yes | [I20260929-2048-local-main-reset-to-the-pre-merge-commit](I20260929-2048-local-main-reset-to-the-pre-merge-commit.md) |
 | next | carry-forward | no | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |

@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 20973,
+  "stop_reason": "end_turn",
+  "session_id": "51296a15-7586-4b11-93b8-081bccf66456",
+  "total_cost_usd": 0.1562294,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 26590,
+    "cache_read_input_tokens": 157577,
+    "output_tokens": 1833,
+    "output_tokens_details": {
+      "thinking_tokens": 96
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 26590,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 307,
+        "cache_read_input_tokens": 37839,
+        "cache_creation_input_tokens": 767,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 767
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 1833,
+      "cacheReadInputTokens": 157577,
+      "cacheCreationInputTokens": 26590,
+      "webSearchRequests": 0,
+      "costUSD": 0.1562294,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 96,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**T3: PASS.** All nine acceptance criteria are met, and `go test ./internal/driver` passes. I wrote `.loop/tmp/verdict.json`.\n\n- **Fence:** `fence/settings.json` differs from `.loop/settings.json` only by the listed allow and deny entries, and it is embedded via `embed.go`.\n- **Extraction:** The plugin extractor moved into `internal/driver` rather than being copied, and `vloop plugin path` now calls it.\n- **Model resolution:** The model/effort resolver is shared with `task show` rather than duplicated. A review uses the review model, and a work override does not leak into it.\n- **Tests:** The `TestSession*` tests exercise the argv, review resolution, field mapping, masking, the missing-record path and symlink refusal. I found no hardcoded values and no absolute paths.\n\nI did not re-run the full verify command, only the driver package tests.",
+  "ttft_ms": 2484,
+  "type": "result",
+  "duration_ms": 24320,
+  "uuid": "1a9aee89-e361-4f04-9cc2-efcb0467b91d",
+  "ttft_stream_ms": 1265,
+  "time_to_request_ms": 353,
+  "first_content_frame_ms": 1265,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 3
+}

@@ -1,0 +1,3 @@
+ok  	github.com/mvelosop/vloop/internal/cli	18.776s
+?   	github.com/mvelosop/vloop/cmd/gendocs	[no test files]
+gate T10 ok

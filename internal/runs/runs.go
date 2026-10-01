@@ -71,6 +71,7 @@ type Iteration struct {
 	Attempt   int
 	Outcome   string // as written; see Canonical
 	GateMS    *int64 // nil when the record carries no gate duration
+	Flaky     bool   // the gate failed, then passed on an immediate re-run
 	Started   time.Time
 	Ended     time.Time
 }
@@ -427,6 +428,7 @@ func readIterations(p string) ([]Iteration, error) {
 			Outcome   string `json:"outcome"`
 			Gate      *struct {
 				DurationMS *int64 `json:"duration_ms"`
+				Flaky      bool   `json:"flaky"`
 			} `json:"gate"`
 			Started string `json:"started"`
 			Ended   string `json:"ended"`
@@ -438,6 +440,7 @@ func readIterations(p string) ([]Iteration, error) {
 			Started: parseTime(r.Started), Ended: parseTime(r.Ended)}
 		if r.Gate != nil {
 			it.GateMS = r.Gate.DurationMS
+			it.Flaky = r.Gate.Flaky
 		}
 		out = append(out, it)
 	}

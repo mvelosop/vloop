@@ -1,0 +1,13 @@
+{
+  "task": "T11",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "cmd/vloop/b6_e2e_test.go has TestWorkedExampleB6* tests that reproduce the brief's worked example on the stub (announcement, summary, four commit subjects, status first line, stub argument log, valid 002-work.json, first gate {exit,duration_ms}, metrics gate minutes)", "met": true, "evidence": "b6_e2e_test.go TestWorkedExampleB6 (lines 43-64) and TestWorkedExampleB6Sessions (66-112) assert each item with real comparisons; gate keys checked as exactly two, exit 0, duration_ms numeric"},
+    {"criterion": "The same file covers each planted failure", "met": true, "evidence": "BranchExists (exit 1, exact stderr), GateDispute (exit 2, notes, attempts 0, no review), FlakyGate (FLAKY GATE T1, flaky true, env defect matrix [3][0]==1), SilentReview (SESSION RECORD MISSING, no review record for iteration 1, records line), RefsMoved (exit 9, no commits), MaxIterations (exit 4, halted, re-run complete)"},
+    {"criterion": "Real data: throwaway clone with stub claude and one-task brief; vloop run completes, metrics reads it; .vloop/tmp/ not committed; this repository unchanged", "met": true, "evidence": "TestWorkedExampleB6RealData lines 212-254: clones repo root, runs oneTask, checks metrics tasks line, ls-files .vloop/tmp empty, git status before/after equal"},
+    {"criterion": "go test, vet, gofmt, mod tidy clean; linux/windows/host builds succeed", "met": true, "evidence": "Driver gate runs all of these and passed before review; the only other diff is a test-expectation string in e2e_test.go"},
+    {"criterion": "No skill content under plugin/skills/ and no use of vloop run on this repository", "met": true, "evidence": "git status shows no changes under plugin/; the real-data test runs only in a clone"}
+  ],
+  "findings": [],
+  "notes": "The work session edited cmd/vloop/e2e_test.go, which is outside the task's files list. The edit is justified: it updates the stale config-list expectation for the six run.* keys added in T2, and go test ./... could not pass without it. A gap in the plan, not a failure of the work. No absolute paths in the diff."
+}

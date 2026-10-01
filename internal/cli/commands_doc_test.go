@@ -44,7 +44,7 @@ func TestGuideConfigurationCoversKeysAndPresets(t *testing.T) {
 		if !strings.Contains(text, "`"+k.Name+"`") {
 			t.Errorf("configuration.md does not document the key %q", k.Name)
 		}
-		v := "VLOOP_" + strings.ToUpper(strings.ReplaceAll(k.Name, ".", "_"))
+		v := config.EnvVar(k.Name)
 		if !strings.Contains(text, v) {
 			t.Errorf("configuration.md does not name %s", v)
 		}

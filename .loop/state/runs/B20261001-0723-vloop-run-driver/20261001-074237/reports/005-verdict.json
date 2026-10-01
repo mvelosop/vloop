@@ -1,0 +1,58 @@
+{
+ "task": "T5",
+ "verdict": "PASS",
+ "criteria": [
+  {
+   "criterion": "Each iteration takes the first pending task (plan order) whose depends_on are all done, starts `/vloop:work <id>`, then runs that task's gate and every done task's gate in the plan's shell from the repo root with `VLOOP_ACTIVE_TASK` = the iteration's task and `VLOOP_GATE_TASK` = the gate's task; sessions never see either variable",
+   "met": true,
+   "evidence": "iterate.go nextReady/runGate (cmd.Dir=Root, env set only on gate); TestRun09, TestRun37, TestRunGateEnvironment"
+  },
+  {
+   "criterion": "A proposal or verdict that is missing or fails `proposal/v1`/`verdict/v1` counts as absent: no proposal \u2192 outcome `blocked` naming the files the session changed (scenario 40); no verdict \u2192 `rejected` (scenario 16); a stale handoff from an earlier session is never reused (17)",
+   "met": true,
+   "evidence": "readReport validates schema; stale files removed at iteration start; TestRun16/17/40"
+  },
+  {
+   "criterion": "Outcomes are `done` (gates pass, review PASS), `gate_failed` (no review is started), `rejected`, `blocked`; the last three set attempts+1 and notes = why; a task whose attempts reach `run.max-attempts` becomes `blocked`",
+   "met": true,
+   "evidence": "iterate.go step 3-4; TestRunGateFailure, TestRun16"
+  },
+  {
+   "criterion": "Each iteration appends one `iteration/v1` line (run_id, iteration, task, attempt, outcome, gate, started, ended) to `iterations.jsonl`; `gate` is the iteration's own task's gate `{exit, duration_ms}` measured by the driver, or null when no gate ran; `reports/NNN-verdict.json` and `gates/T<n>.log` are written",
+   "met": true,
+   "evidence": "appendIteration, runGate, copyReport; TestRun01"
+  },
+  {
+   "criterion": "After each iteration the journal gets the task's entry, `.vloop/state/plan.md` is re-rendered as `vloop status --markdown` renders it, and exactly one commit `[vloop] <task>: <outcome>` covers code, plan, journal, plan.md and the run folder; `.vloop/tmp/` is never committed even when .gitignore does not list it",
+   "met": true,
+   "evidence": "appendJournal, render, commit with git reset -- .vloop/tmp; TestRun01"
+  },
+  {
+   "criterion": "Before every commit the driver checks HEAD is still on the run's branch; if not it halts with exit 9 and commits nothing (`TestRunHeadCheck`)",
+   "met": true,
+   "evidence": "commit() CurrentBranch check, ExitRefsMoved; TestRunHeadCheck"
+  },
+  {
+   "criterion": "The run ends `complete` (exit 0) when every task is done or `blocked` (exit 2) when tasks remain but none is ready, sets the plan status, and makes the closing commit `[vloop] run <run id>/<folder>: <status>`; the working tree is clean afterwards",
+   "met": true,
+   "evidence": "Run()/finish(); wantClean in TestRun01/16"
+  },
+  {
+   "criterion": "`run.max-iterations`/`--max-iterations` stops the run between iterations with plan status `halted`, exit 4",
+   "met": true,
+   "evidence": "Run() budget check; TestRunMaxIterations, TestRun40"
+  },
+  {
+   "criterion": "Ported tests `TestRun01HappyPath`, `TestRun02ReviewFail`, `TestRun09DependencyOrder`, `TestRun16ReviewFailsClosed`, `TestRun17StaleHandoff`, `TestRun21ForeignState`, `TestRun30PlanOnly`, `TestRun37GateTaskEnv`, `TestRun40NoProposalTree` each assert everything their shell scenario asserts, translated into vloop's layout",
+   "met": true,
+   "evidence": "all nine present in cmd/vloop/run_iterate_test.go with substantive assertions (read 01,16,17,40)"
+  },
+  {
+   "criterion": "The driver never edits, replaces or disables a task's `verify`",
+   "met": true,
+   "evidence": "no write to Verify in iterate.go"
+  }
+ ],
+ "findings": [],
+ "notes": "Pre-existing TestWorkedExampleEnglishSession config-line count failure (from T2) is outside T5's gate; worth a later fix. Plan is held in memory and saved once per iteration, so session edits to state.json are overwritten until T6 adds tamper detection."
+}

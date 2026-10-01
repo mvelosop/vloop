@@ -1,0 +1,8 @@
+{
+  "task": "T11",
+  "outcome": "done",
+  "summary": "Added cmd/vloop/b6_e2e_test.go: TestWorkedExampleB6* reproduce the brief's worked example and each planted failure on the stub, plus a real-data test that runs vloop on a throwaway clone of this repository and checks this repository's status is unchanged. Updated the stale config-list expectation in e2e_test.go so go test ./... passes.",
+  "files": ["cmd/vloop/b6_e2e_test.go", "cmd/vloop/e2e_test.go"],
+  "verified": "The T11 verify command ran in the foreground and printed 'gate T11 ok' (exit 0).",
+  "notes": "Edited the existing cmd/vloop/e2e_test.go (outside the task's file list): TestWorkedExampleEnglishSession expected 14 config lines and T2 had added six run.* keys, so the full-suite gate could not pass without it. Only the expected string changed. The tests reuse the run_*_test.go harness (newRunRepo, scripted, defaultScript) instead of the gate's shell fixture. The harness brief has a Shape line, so the summary reads 'tasks 2 planned (brief said 2-3)'; the tests match 'tasks 2 planned' and '2 done · 0 blocked · first-pass 2/2' separately. The real-data test clones the repo root (the current branch, not necessarily main), commits a fixture brief there and runs the stub; nothing under the source tree is touched."
+}

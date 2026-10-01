@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 1413979,
+  "stop_reason": "end_turn",
+  "session_id": "aaf127de-cfbc-4bed-8481-42f55e5475fd",
+  "total_cost_usd": 6.9276274,
+  "usage": {
+    "input_tokens": 126,
+    "cache_creation_input_tokens": 262771,
+    "cache_read_input_tokens": 8917077,
+    "output_tokens": 152077,
+    "output_tokens_details": {
+      "thinking_tokens": 89367
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 262771,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 3263,
+        "cache_read_input_tokens": 272074,
+        "cache_creation_input_tokens": 922,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 922
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 126,
+      "outputTokens": 152077,
+      "cacheReadInputTokens": 8917077,
+      "cacheCreationInputTokens": 262771,
+      "webSearchRequests": 0,
+      "costUSD": 6.9276274,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 89367,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 69,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The plan is written to `.loop/state/state.json` and passes `.loop/amend.sh check`.\n\n- **Run id:** `B20261001-0723-vloop-run-driver`\n- **Tasks:** 11 (the brief asked for 11 to 14)\n- **First ready task:** T1, the test harness. T2 (budget keys) and T3 (sessions) have no dependencies either.\n\n| Task | What it builds | Ported scenarios |\n|---|---|---|\n| T1 | Test harness with a stub `claude` | — |\n| T2 | The six `run.*` config keys | — |\n| T3 | Sessions: fence, invocation, `session/v1` record | — |\n| T4 | `vloop run`, work branch, planning, plan checks | 08 25 27 29 35 36 38 43 |\n| T5 | One iteration, plus the HEAD check before each commit | 01 02 09 16 17 21 30 37 40 |\n| T6 | Gates across iterations, flaky gates, disputes | 03 33 39 41 |\n| T7 | Halts and budgets | 04 05 06 07 11 19 42 44 |\n| T8 | Safety and records | 10 13 14 15 18 20 22 23 24 |\n| T9 | Snapshot, summary, flaky-gate defect | — |\n| T10 | Docs, including the README Windows-shell fix (F1) | — |\n| T11 | Close: worked example, real-data check, `go test ./...` | — |\n\n**How far the gates are proven.** I ran all 11 gates against the current tree and each fails for the right reason. For T4–T9 and T11 that failure is `unknown command \"run\"`, so the checks that come after a run can't execute yet. I tested those checks against a throwaway mock driver for:\n- the worked example, snapshot and summary;\n- containment, the missing session record, and the gate environment variables.\n\nThe planted failures in T4 (other than plan-only), T6 and T7 were reviewed by eye only. If one of those gates is wrong, that's where it will be.\n\nThat testing caught one real defect: B3's metrics print `gates 0.0 · wall`, with no `min` after the gate figure, though the brief's example shows one. The gates accept both forms; I didn't change the metrics format.\n\n**Names I pinned** (the brief is silent on these):\n- Package `internal/driver`, and the embedded fence at `fence/settings.json`.\n- Test names: `TestRunHarness`, `TestRun<NN><Name>` for the 38 ported scenarios, `TestRunWorkBranch`, `TestRunHeadCheck`, `TestRunFlakyGate`, `TestRunGateDispute`, `TestRunBudgetPrecedence`, `TestRunSessionRecordMissing`, `TestRunSnapshot`, `TestRunSummary`, `TestSession*`, a test named `*Flaky*` in `internal/metrics`, and `TestWorkedExampleB6*`. The test files are `cmd/vloop/run_*_test.go` and `b6_e2e_test.go`.\n- Environment variables replace `-` with `_` as well as `.`, giving `VLOOP_RUN_MAX_ITERATIONS` and so on.\n- The exit codes go in `docs/guide/concepts.md` under `## Exit codes`, and the README links to `#exit-codes`.\n\n**Where I interpreted rather than read** — please correct any of these before the run:\n1. **Scenarios 21 and 30 move from planning (T4) to T5**, because both run full iterations. T5 also enforces `--max-iterations`, which scenarios 39 and 40 need; its \"resumable\" test (05) stays in T7.\n2. **A missing brief path exits 2**, as scenario 29 and B1's usage convention say, although R-3 lists usage errors under exit 1.\n3. **`vloop run` refuses an untrusted workspace** (scenario 18), even though `vloop doctor` only warns about it. It also warns about an active pre-commit hook (scenario 23).\n4. **The `run.*` keys are documented in T2, and the `vloop run` README row in T4.** The existing README and guide tests fail otherwise.\n5. **Exit codes:** the README only lists the general codes 0–2. I read \"move\" as: the guide holds those plus `run`'s 0–9, and the README section becomes a pointer.\n6. **Validation ranges:** `max-iterations` may be 0 (scenario 13 uses 0), while `max-attempts` and `stall-limit` must be at least 1.\n7. **The final snapshot goes into the closing commit**, so the working tree is clean when a run ends.\n8. **`.vloop/tmp/` is never committed**, even when `.gitignore` doesn't list it. This repository's `.gitignore` doesn't, which the real-data clone exercises.\n9. **The brief's \"no 004-review.json\" doesn't match the session numbering** (001-plan, 002-work, 003-review). The gates check that no review record exists for iteration 1, not a filename.\n10. **The fence's allow list is exactly** `.loop/settings.json` plus the four read-only commands. Its deny list must include `.loop/settings.json`'s denials plus every vloop write command. The `--settings` and `--plugin-dir` paths are repo-relative, as the worked example shows.\n11. **Base SHA:** the brief says the plan pins it, but the shell loop's plan format has no field for it, so it isn't recorded. No gate compares against it, since a fixed baseline would trip the decaying-baseline rule.\n\nThe gates are long single-line shell commands (2–16 KB). `amend.sh check` raised one advisory: T2 and T4 edit `README.md`, which T10's gate reads. That's expected, because both run before T10 and the README test forces those edits.",
+  "ttft_ms": 1711,
+  "type": "result",
+  "duration_ms": 1640744,
+  "uuid": "a981ac87-e2b0-4fd3-afa7-0d60606d51a3",
+  "ttft_stream_ms": 1214,
+  "time_to_request_ms": 373,
+  "first_content_frame_ms": 1214,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "plan",
+  "iteration": 0
+}

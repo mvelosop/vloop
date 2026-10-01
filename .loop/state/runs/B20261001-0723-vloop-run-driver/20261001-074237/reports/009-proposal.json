@@ -1,0 +1,8 @@
+{
+  "task": "T9",
+  "outcome": "done",
+  "summary": "After each iteration's commit the driver computes the brief's metrics/v1 and writes it into the next commit (the closing commit carries the last one); every run ending through finish prints the vloop metrics summary on stdout; a gate.flaky iteration derives one env/bug/gate defect.",
+  "files": ["internal/driver/snapshot.go", "internal/driver/iterate.go", "internal/metrics/defects.go", "internal/metrics/defects_test.go", "internal/metrics/metrics.go", "internal/runs/runs.go", "internal/cli/metrics.go", "cmd/vloop/run_snapshot_test.go"],
+  "verified": "the task's verify command exited 0 and printed 'gate T9 ok'.",
+  "notes": "The snapshot is computed right after the iteration commit (metrics.Build, same as vloop metrics --json and brief close) but held in memory and written to disk only inside the next commit(), so no tracked file is dirty while sessions or gates run (same reason as the lazy run.log). A Build failure only warns. The summary is printed after the closing commit, to stdout only, so the tree stays clean; halts that return early (exit 9 refs moved, preflight) print none. Moved cli.newClassifier's body to metrics.NewClassifier(root) so driver can reuse it. runs.Iteration has a Flaky field read from gate.flaky; metrics.Derive adds the env defect with no work defect since a flaky iteration's outcome is not gate_failed. cmd/vloop TestWorkedExampleEnglishSession still fails (run.* config keys), outside this gate."
+}

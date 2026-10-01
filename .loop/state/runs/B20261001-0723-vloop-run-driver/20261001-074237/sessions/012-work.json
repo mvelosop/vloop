@@ -1,0 +1,108 @@
+{
+  "duration_api_ms": 148256,
+  "stop_reason": "end_turn",
+  "session_id": "8ce5daf7-a370-463a-8863-0d1b1dc48b90",
+  "total_cost_usd": 0.7638841999999999,
+  "usage": {
+    "input_tokens": 38,
+    "cache_creation_input_tokens": 83200,
+    "cache_read_input_tokens": 1233991,
+    "output_tokens": 18421,
+    "output_tokens_details": {
+      "thinking_tokens": 4076
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 83200,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 827,
+        "cache_read_input_tokens": 94516,
+        "cache_creation_input_tokens": 700,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 700
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 38,
+      "outputTokens": 18421,
+      "cacheReadInputTokens": 1233991,
+      "cacheCreationInputTokens": 83200,
+      "webSearchRequests": 0,
+      "costUSD": 0.7638841999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 4076,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_0195n5xXHLQKu9cNpAFqBKAw",
+      "tool_input": {
+        "command": "python3 -c \"\nimport json;s=json.load(open('.loop/state/state.json'))\nprint([t for t in s['tasks'] if t['id']=='T6'][0]['verify'])\" > /tmp/v6.sh && bash /tmp/v6.sh 2>&1 | tail -15; echo rc=$?; git stash -q && go test -count=1 -run TestWorkedExampleEnglishSession ./cmd/vloop | tail -2; git stash pop -q"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 21,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T6 is done and its verify command prints `gate T6 ok`. The proposal is written to `.loop/tmp/proposal.json`.\n\nOne test fails in the full `./cmd/vloop` run: `TestWorkedExampleEnglishSession`. It expects `config list` without the `run.*` keys, so I'm treating it as pre-existing and not caused by T6. I didn't confirm that against a clean tree, because the stash command was denied.\n\nWhat the driver now does:\n- **Rewritten gate files:** if a session modifies a file the task's verify names, that existed at HEAD, isn't in the task's `files`, and wasn't committed by this task's own earlier attempt, the file is restored from HEAD. The run log says `GATE REWRITE <task>`, the iteration is `gate_failed`, and no review runs. Creating such a file, or a file in the task's `files`, is not reverted.\n- **Flaky gates:** a failing gate is re-run once at once. If it passes, the log says `FLAKY GATE <task>`, the iteration record's gate carries `flaky: true`, and no attempt is charged. A gate that fails both runs is `gate_failed`, and a gate that passes first time has no `flaky` key.\n- **Blocked but gate passes:** the task's notes, the run log and the run-end report all say its gate passes.\n- **Gate disputes:** a proposal with `gate_dispute` blocks its task at once with notes `gate disputed: <reason> — <evidence>`. Attempts are unchanged, there is no review, and the run continues with other ready tasks. If none remain it ends `blocked`, exit 2. `verify` is never touched.\n- **Regressions:** the existing regression handling already covered `GATE REGRESSION <id>`; the new tests assert that its log line also names the iteration's task.\n\nI added an optional `flaky` boolean to the gate in `schemas/iteration.v1.json`. The new tests are in `cmd/vloop/run_gates_test.go`: ports of scenarios 03, 33, 39 and 41, plus `TestRunFlakyGate` and `TestRunGateDispute`, each with a case where the behaviour must not apply. The driver changes are in `internal/driver/gates.go` and `internal/driver/iterate.go`.\n\nThe flaky re-run applies to every gate in the sweep, but only the active task's flaky flag goes into the record. On a dispute, done tasks' gates still run as the regression net, and the disputed task's own gate does not.",
+  "ttft_ms": 2324,
+  "type": "result",
+  "duration_ms": 243385,
+  "uuid": "9ddbfe85-d491-4219-b796-68d71ff9e7f3",
+  "ttft_stream_ms": 1293,
+  "time_to_request_ms": 349,
+  "first_content_frame_ms": 1294,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 6
+}

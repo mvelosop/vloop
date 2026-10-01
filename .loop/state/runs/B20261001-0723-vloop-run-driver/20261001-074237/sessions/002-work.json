@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 61018,
+  "stop_reason": "end_turn",
+  "session_id": "e73d0052-2e07-4e99-89b9-c600da629fe1",
+  "total_cost_usd": 0.30577899999999997,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 41177,
+    "cache_read_input_tokens": 268895,
+    "output_tokens": 8726,
+    "output_tokens_details": {
+      "thinking_tokens": 1211
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 41177,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 730,
+        "cache_read_input_tokens": 50615,
+        "cache_creation_input_tokens": 903,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 903
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 8726,
+      "cacheReadInputTokens": 268895,
+      "cacheCreationInputTokens": 41177,
+      "webSearchRequests": 0,
+      "costUSD": 0.30577899999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1211,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 9,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 is done. The harness is in `cmd/vloop/run_harness_test.go`, and `TestRunHarness` passes (`go test -count=1 -run TestRunHarness ./cmd/vloop`). `gofmt`, `go vet`, `go mod tidy -diff` and the linux and windows builds are clean. I did not run the task's `verify` script as a single command; I ran its steps separately.\n\n- **Scratch repo:** `newRunRepo(t)` builds a git repo on `main`, with the identity in the repo's own config, and runs the built binary's `vloop init`. It adds a ready English brief and commits everything. It skips with `t.Skip` on windows, since the stub is a shell script.\n- **Fake home and environment:** the fake home's `.claude.json` marks the repo trusted, and every invocation gets HOME, USERPROFILE and XDG_CONFIG_HOME pointing into temp dirs, with the global git config neutralised.\n- **Stub `claude`:** it is first on PATH and logs each invocation's argv as one line. It answers `--version` and `plugin list --json`. For the `/vloop:plan`, `/vloop:work` and `/vloop:review` prompts it sources a per-test shell script set with `r.script(body)`, and its result JSON is keyed by the `--model` it was given.\n- **Script variables:** the script sees `PHASE`, `TASK`, `ARG`, `MODEL`, `ATTEMPT` and `STUB_COST/EXIT/DURATION/TURNS/ERROR/SILENT`. Tests can plant any failure and vary by task and attempt with `case \"$PHASE:$TASK:$ATTEMPT\"`, without editing the harness.\n- **`TestRunHarness`:** it checks the repo state, a ready brief and `vloop doctor` exiting 0 with 0 problems. It then runs the stub with `-p \"/vloop:work T1\" --model sonnet` and checks the scripted action, the `sonnet` key and the argv log. It also covers the per-attempt script and a silent, failing stub.\n\nThe proposal is written to `.loop/tmp/proposal.json`, and I did not commit.",
+  "ttft_ms": 2515,
+  "type": "result",
+  "duration_ms": 65776,
+  "uuid": "343dd332-6460-4f25-9632-bae3ed39a3ca",
+  "ttft_stream_ms": 1400,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1401,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 1
+}

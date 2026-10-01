@@ -14,6 +14,7 @@ import (
 
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/driver"
 	"github.com/mvelosop/vloop/internal/install"
 	"github.com/mvelosop/vloop/internal/state"
 )
@@ -254,18 +255,8 @@ func gitOut(root string, args ...string) (string, error) {
 	return strings.TrimSpace(string(out)), err
 }
 
-// doctorOnDefaultBranch reports whether HEAD is on the default branch: the one
-// origin/HEAD names, else main or master.
-func doctorOnDefaultBranch(root string) bool {
-	cur, err := gitOut(root, "symbolic-ref", "--short", "-q", "HEAD")
-	if err != nil || cur == "" {
-		return false
-	}
-	if def, err := gitOut(root, "symbolic-ref", "--short", "-q", "refs/remotes/origin/HEAD"); err == nil && def != "" {
-		return cur == strings.TrimPrefix(def, "origin/")
-	}
-	return cur == "main" || cur == "master"
-}
+// doctorOnDefaultBranch reports whether HEAD is on the default branch.
+func doctorOnDefaultBranch(root string) bool { return driver.OnDefaultBranch(root) }
 
 func pathHas(name string) bool {
 	_, err := exec.LookPath(name)

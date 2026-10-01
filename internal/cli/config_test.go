@@ -10,7 +10,7 @@ import (
 
 func scratchRepo(t *testing.T) string {
 	t.Helper()
-	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW", "SHELL", "AREAS"} {
+	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW", "SHELL", "AREAS", "RUN_MAX_ITERATIONS", "RUN_COST_CEILING", "RUN_MAX_ATTEMPTS", "RUN_STALL_LIMIT", "RUN_CONVERGENCE_MAX", "RUN_CONVERGENCE_MIN"} {
 		t.Setenv("VLOOP_"+v, "")
 	}
 	d := t.TempDir()
@@ -26,7 +26,9 @@ func TestConfigListDefaults(t *testing.T) {
 	want := "language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\n" +
 		"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n" +
 		"shell=" + defaultShellForTest() + " (default)\nareas= (default)\n" +
-		"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n"
+		"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n" +
+		"run.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\n" +
+		"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d out %q", code, out)
 	}
@@ -42,7 +44,10 @@ func TestConfigListJSONOrderAndNull(t *testing.T) {
 		`"shell":{"value":"` + defaultShellForTest() + `","source":"default"},"areas":{"value":[],"source":"default"},` +
 		`"metrics.stacks":{"value":[],"source":"default"},"metrics.code":{"value":[],"source":"default"},` +
 		`"metrics.test":{"value":[],"source":"default"},"metrics.docs":{"value":[],"source":"default"},` +
-		`"metrics.excluded":{"value":[],"source":"default"}}` + "\n"
+		`"metrics.excluded":{"value":[],"source":"default"},` +
+		`"run.max-iterations":{"value":"30","source":"default"},"run.cost-ceiling":{"value":"40","source":"default"},` +
+		`"run.max-attempts":{"value":"3","source":"default"},"run.stall-limit":{"value":"2","source":"default"},` +
+		`"run.convergence-max":{"value":"3.0","source":"default"},"run.convergence-min":{"value":"6","source":"default"}}` + "\n"
 	if out != want {
 		t.Fatalf("got %s", out)
 	}
@@ -158,5 +163,26 @@ func TestConfigAreasAndShell(t *testing.T) {
 	t.Setenv("VLOOP_SHELL", "cmd")
 	if _, out, _ := run(t, "-C", d, "config", "get", "shell", "--json"); out != `{"key":"shell","value":"cmd","source":"env"}`+"\n" {
 		t.Errorf("env shell: %q", out)
+	}
+}
+
+func TestConfigRunKeys(t *testing.T) {
+	d := scratchRepo(t)
+	if code, _, e := run(t, "-C", d, "config", "set", "run.max-attempts", "0"); code != 2 || !strings.HasPrefix(e, `vloop: invalid value "0" for run.max-attempts`) {
+		t.Errorf("invalid set: %d %q", code, e)
+	}
+	if code, _, _ := run(t, "-C", d, "config", "set", "run.cost-ceiling", "12.5"); code != 0 {
+		t.Errorf("set cost-ceiling: %d", code)
+	}
+	if _, out, _ := run(t, "-C", d, "config", "get", "run.cost-ceiling"); out != "12.5\n" {
+		t.Errorf("get: %q", out)
+	}
+	t.Setenv("VLOOP_RUN_COST_CEILING", "7")
+	if _, out, _ := run(t, "-C", d, "config", "get", "run.cost-ceiling", "--json"); out != `{"key":"run.cost-ceiling","value":"7","source":"env"}`+"\n" {
+		t.Errorf("env: %q", out)
+	}
+	t.Setenv("VLOOP_RUN_COST_CEILING", "abc")
+	if code, _, e := run(t, "-C", d, "config", "list"); code != 1 || !strings.Contains(e, "VLOOP_RUN_COST_CEILING") {
+		t.Errorf("bad env: %d %q", code, e)
 	}
 }

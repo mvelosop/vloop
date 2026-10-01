@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/mvelosop/vloop/internal/classify"
-	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/defect"
 	"github.com/mvelosop/vloop/internal/metrics"
 )
@@ -155,25 +154,11 @@ func newMetricsStacks(g *Globals) *cobra.Command {
 
 // newClassifier builds the classifier from the repo's metrics.* config keys.
 func newClassifier(g *Globals, out io.Writer, root string) (*classify.Classifier, error) {
-	get := func(k string) ([]string, error) {
-		v, err := config.Get(root, k)
-		return v.List, err
-	}
-	var repo classify.Preset
-	for _, r := range []struct {
-		key string
-		dst *[]string
-	}{{"metrics.excluded", &repo.Excluded}, {"metrics.test", &repo.Test}, {"metrics.docs", &repo.Docs}, {"metrics.code", &repo.Code}} {
-		var err error
-		if *r.dst, err = get(r.key); err != nil {
-			return nil, configErr(g, out, err)
-		}
-	}
-	stacks, err := get("metrics.stacks")
+	c, err := metrics.NewClassifier(root)
 	if err != nil {
 		return nil, configErr(g, out, err)
 	}
-	return classify.New(repo, stacks), nil
+	return c, nil
 }
 
 type classifyLine struct {

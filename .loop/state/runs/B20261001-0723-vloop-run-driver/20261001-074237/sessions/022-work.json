@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 76290,
+  "stop_reason": "end_turn",
+  "session_id": "624bf5b6-2d93-4f1d-a028-55a2b36c8641",
+  "total_cost_usd": 0.441915,
+  "usage": {
+    "input_tokens": 24,
+    "cache_creation_input_tokens": 56535,
+    "cache_read_input_tokens": 587285,
+    "output_tokens": 9827,
+    "output_tokens_details": {
+      "thinking_tokens": 1576
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 56535,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 459,
+        "cache_read_input_tokens": 67877,
+        "cache_creation_input_tokens": 674,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 674
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 24,
+      "outputTokens": 9827,
+      "cacheReadInputTokens": 587285,
+      "cacheCreationInputTokens": 56535,
+      "webSearchRequests": 0,
+      "costUSD": 0.441915,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1576,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 12,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T11 is done: I ran its verify command in the foreground and it exited 0, printing `gate T11 ok`. I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **New tests:** `cmd/vloop/b6_e2e_test.go` holds the `TestWorkedExampleB6*` tests. They cover the worked example (branch announcement, summary, commit subjects, `vloop status`, argument log, session record, gate, metrics) and each planted failure on the stub. A real-data test runs `vloop run` on a throwaway clone of this repository, reads it back with `vloop metrics`, and checks `.vloop/tmp/` isn't committed and this repository's status is unchanged.\n- **Edit outside the task's file list:** I changed the expected `config list` output in `cmd/vloop/e2e_test.go`, because `TestWorkedExampleEnglishSession` was already failing against the six `run.*` keys T2 added. The gate runs `go test ./...`, so it couldn't pass without that. This is flagged in the proposal notes.\n- **Summary line:** the harness brief has a Shape line, so the metrics summary reads `tasks 2 planned (brief said 2–3)`. The tests match `tasks 2 planned` and `2 done · 0 blocked · first-pass 2/2` separately instead of the exact line from the brief.",
+  "ttft_ms": 2431,
+  "type": "result",
+  "duration_ms": 431973,
+  "uuid": "a1c75e04-ef4e-457f-8175-b580e5b8974b",
+  "ttft_stream_ms": 1171,
+  "time_to_request_ms": 358,
+  "first_content_frame_ms": 1172,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 11
+}

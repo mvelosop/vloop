@@ -11,7 +11,7 @@ runs its verify command, a **review** session judges the result independently,
 and the driver makes one **commit**. Every session is a fresh Claude session
 with no memory; the sessions share only files in the repository. A task that
 fails its gate or its review is tried again, and a run that cannot go on halts
-and says why.
+and says why (see [Exit codes](#exit-codes)).
 
 ## Briefs and their lifecycle
 
@@ -51,6 +51,29 @@ A task's `verify` command is its **gate**: the task is done only when it exits 0
 default, `pwsh` on Windows). A gate is written before the work exists, and the
 work session may not change it; only the operator does, with `vloop task verify
 <id> <command> --reason <text>`, which records the change in the task's history.
+
+## Exit codes
+
+Every vloop command exits `0` on success, `1` when it ran and found problems or
+failed, and `2` on a usage error (an unknown command, flag or config key, a
+missing argument, an invalid value). `vloop run` uses the same numbers and adds
+its own, one per way a run can end:
+
+| Exit | Ending | Resumable as is |
+| --- | --- | --- |
+| `0` | complete: every task is done | — |
+| `1` | preflight or usage: a refusal before anything ran, or a plan that is not fit | after fixing the cause |
+| `2` | blocked: tasks remain but none can run (or the brief was not found) | no — a human decides |
+| `3` | stalled: iterations in a row closed nothing and charged no attempt | yes, once understood |
+| `4` | max iterations: `run.max-iterations` is spent | yes |
+| `5` | not converging: too many iterations per closed task | no |
+| `6` | cost ceiling: `run.cost-ceiling` is reached | yes, with a higher ceiling |
+| `7` | session error: a session failed to run | no |
+| `8` | repeat blocked: a task blocked twice with nothing changed | no |
+| `9` | refs moved: a session moved git refs; nothing was committed | no — restore the refs first |
+
+Resuming is running `vloop run` again on the work branch. Errors go to stderr as
+one line starting with `vloop: `.
 
 ## Metrics and defects
 
