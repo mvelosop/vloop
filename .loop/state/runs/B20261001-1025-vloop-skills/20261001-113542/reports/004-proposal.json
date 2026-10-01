@@ -1,0 +1,8 @@
+{
+  "task": "T4",
+  "outcome": "done",
+  "summary": "plugin/skills/review/SKILL.md now exists as /vloop:review: the shell review ported to vloop's commands and files, writing verdict/v1 with finding kinds, failing closed, with a validating FAIL example.",
+  "files": ["plugin/skills/review/SKILL.md"],
+  "verified": "The T4 verify command ran in the foreground and printed GATE OK.",
+  "notes": "Port deltas: state.json read became vloop task show --json; verdict gets schema field verdict/v1 and is checked with vloop schema validate; evidence/summaries/notes follow vloop config get language; finding kinds bug/spec-gap/gate-gap defined (each FAIL finding becomes a defect). Added: explicit FAIL when the reviewer cannot judge (fail closed), and a 'did it touch its own gate' question (goalpost move, from the calibration's case 06 and the work skill's gate rule). Kept verbatim: why-you-exist, evidence-not-summary, proposal read last, per-criterion rule, durable/test/hardcode/scope/earlier/absolute-path questions, proportionality. Dropped: nothing. The shell 'git diff HEAD' stays; git commands are named in prose, not code spans, where the fence denies them. Only the FAIL example is included; no PASS example, to avoid a copyable PASS."
+}

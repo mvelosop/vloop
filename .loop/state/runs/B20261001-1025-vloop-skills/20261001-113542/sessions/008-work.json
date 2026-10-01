@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 37914,
+  "stop_reason": "end_turn",
+  "session_id": "ef2fab48-e011-4337-82b1-786a270bae23",
+  "total_cost_usd": 0.2233162,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 30405,
+    "cache_read_input_tokens": 249621,
+    "output_tokens": 5174,
+    "output_tokens_details": {
+      "thinking_tokens": 144
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 30405,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 497,
+        "cache_read_input_tokens": 41784,
+        "cache_creation_input_tokens": 637,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 637
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 5174,
+      "cacheReadInputTokens": 249621,
+      "cacheCreationInputTokens": 30405,
+      "webSearchRequests": 0,
+      "costUSD": 0.2233162,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 144,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 9,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T4 is done. `plugin/skills/review/SKILL.md` now exists as `/vloop:review`, and the T4 verify command, run in the foreground, printed `GATE OK`.\n\nThe skill is the shell review ported to vloop's files and commands:\n- **Reading:** it reads the task with `vloop task show --json` and judges the change with `git diff HEAD` and the files, reading the proposal last as a claim to check.\n- **Verdict:** it writes `.vloop/tmp/verdict.json` as `verdict/v1` and validates it with `vloop schema validate`. It defines the finding kinds `bug`, `spec-gap` and `gate-gap`.\n- **Failing closed:** the verdict is FAIL on any unmet criterion, any `bug` finding, or when the reviewer cannot judge. It carries one FAIL example with findings and no PASS example.\n- **Language:** evidence, finding summaries and notes follow `vloop config get language`.\n- **Limits:** it forbids editing the work, committing, setting a status or moving a ref, and names no command the fence denies.\n\nI added one question the shell version lacked: whether the work touched its own gate. That is the calibration's case 06 (a goalpost move), and it matches the work skill's gate rule. Nothing from the shell review was dropped; the shell wording is kept verbatim apart from the vloop adaptations.\n\nI wrote `.loop/tmp/proposal.json` with outcome `done`. I did not commit or edit the state file.",
+  "ttft_ms": 2185,
+  "type": "result",
+  "duration_ms": 64071,
+  "uuid": "5645a41a-25e3-4f52-ab9e-7ecac8cdaf9e",
+  "ttft_stream_ms": 1121,
+  "time_to_request_ms": 355,
+  "first_content_frame_ms": 1122,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 4
+}

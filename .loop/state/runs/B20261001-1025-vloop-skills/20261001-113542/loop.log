@@ -58,3 +58,19 @@
 [36m[loop][0m cost=$0.131232 turns=6 dur=23s error=false
 [36m[loop][0m    review: PASS
 [36m[loop][0m    T3 done
+[36m[loop][0m    committed ba9c851
+[36m[loop][0m   ── signals ──
+[36m[loop][0m   iterations:            3
+[36m[loop][0m   tasks closed:          3/10
+[36m[loop][0m   iterations per closed: 1.00
+[36m[loop][0m   gate failures:         0
+[36m[loop][0m   review rejections:     0
+[36m[loop][0m   attempts burned:       0
+[36m[loop][0m   no-progress streak:    0
+[36m[loop][0m   estimated spend:       $6.40 (estimate, not a bill)
+[36m[loop][0m ── iteration 4 (4/30 this run) · T4 · 3/10 done ──
+[36m[loop][0m    Port loop-review to plugin/skills/review as /vloop:review, failing closed
+[36m[loop][0m cost=$0.2233162 turns=9 dur=64s error=false
+[36m[loop][0m cost=$0.11474580000000001 turns=6 dur=17s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T4 done

@@ -1,0 +1,16 @@
+{
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/skills/review/SKILL.md has frontmatter name: review and a description", "met": true, "evidence": "SKILL.md lines 1-4"},
+    {"criterion": "It tells the session to read the task with `vloop task show <id> --json` and judge the change itself (`git diff`, the files) against the acceptance, the brief and the references, not the proposal's summary (S-3)", "met": true, "evidence": "SKILL.md section 1: task show --json, git diff HEAD, references, brief; proposal read last as a claim (S-3)"},
+    {"criterion": "It writes .vloop/tmp/verdict.json as verdict/v1, validated with `vloop schema validate verdict/v1 .vloop/tmp/verdict.json`: one criteria entry per acceptance line, verbatim, with met and evidence; findings with summary and kind — bug, spec-gap when the brief is silent or ambiguous, gate-gap when the gate passes on wrong behaviour", "met": true, "evidence": "SKILL.md section 3 lines 83-112 define the schema, validate command, and the three kinds"},
+    {"criterion": "verdict is FAIL whenever a criterion is unmet or a finding is a bug, and FAIL when the reviewer cannot judge; the skill carries a validating FAIL example with a finding, and no example PASSes with an unmet criterion or a bug finding", "met": true, "evidence": "SKILL.md lines 114-119 fail closed; FAIL example lines 129-144; the only PASS-shaped template has met true and no findings"},
+    {"criterion": "evidence, finding summaries and notes are written in the language `vloop config get language` prints; keys, enum values and ids stay English", "met": true, "evidence": "SKILL.md Language section lines 146-151"},
+    {"criterion": "It forbids editing the work, committing, setting a status and moving a ref, and names no command the fence denies", "met": true, "evidence": "SKILL.md section 4 lines 153-161; commands named are task show, schema validate, config get, git diff/status, none denied by the fence"},
+    {"criterion": "Every rule of .claude/skills/loop-review/SKILL.md survives, adapted to vloop, or its omission is explained in this task's notes", "met": true, "evidence": "All shell-review sections and questions are present; the goalpost question and fail-closed rule are added; proposal notes say nothing was dropped"},
+    {"criterion": "TestPluginSkills passes on the real plugin", "met": true, "evidence": "the driver's gate passed (GATE OK, per gates/T4.log)"}
+  ],
+  "findings": [],
+  "notes": "none"
+}
