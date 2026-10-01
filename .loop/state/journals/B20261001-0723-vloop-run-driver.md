@@ -133,3 +133,9 @@ The gates are long single-line shell commands (2–16 KB). `amend.sh check` rais
 - **Summary:** Added cmd/vloop/b6_e2e_test.go: TestWorkedExampleB6* reproduce the brief's worked example and each planted failure on the stub, plus a real-data test that runs vloop on a throwaway clone of this repository and checks this repository's status is unchanged. Updated the stale config-list expectation in e2e_test.go so go test ./... passes.
 - **Files:** cmd/vloop/b6_e2e_test.go, cmd/vloop/e2e_test.go
 - **Notes for next iteration:** Edited the existing cmd/vloop/e2e_test.go (outside the task's file list): TestWorkedExampleEnglishSession expected 14 config lines and T2 had added six run.* keys, so the full-suite gate could not pass without it. Only the expected string changed. The tests reuse the run_*_test.go harness (newRunRepo, scripted, defaultScript) instead of the gate's shell fixture. The harness brief has a Shape line, so the summary reads 'tasks 2 planned (brief said 2-3)'; the tests match 'tasks 2 planned' and '2 done · 0 blocked · first-pass 2/2' separately. The real-data test clones the repo root (the current branch, not necessarily main), commits a fixture brief there and runs the stub; nothing under the source tree is touched.
+
+## Run ended — complete
+
+- **Run:** `20261001-074237` · 11 iteration(s) this run
+- **Plan:** 11/11 done, 0 blocked
+- **Signals:** 11 iterations · 1.00 per closed · 0 gate failure(s) · 0 review rejection(s) · 0 attempt(s) burned · streak 0 · ~$18.02
