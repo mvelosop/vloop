@@ -5,8 +5,8 @@ origin: work
 found-by: user
 kind: bug
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261001-0723-vloop-run-driver.loop-brief
 case: ""
 created: 2026-10-01T06:24:16Z
 ---

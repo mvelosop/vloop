@@ -57,4 +57,4 @@ the operator first.
 
 - The shell loop writes its run's ending as the plan status verbatim
   (`max_iterations`, `session_error`, `refs_moved`…), not `halted`; `state/v1`'s
-  six values are what `vloop run` writes: it stamps `run_id` (the brief's name), `brief` and `branch`, and sets `status` `running`, then `complete`, `blocked`, `stalled` or `halted`.
+  six values are what `vloop run` writes: it stamps `run_id` (the brief's run id: its name without `.loop-brief`), `brief` and `branch`, and sets `status` `running`, then `complete`, `blocked`, `stalled` or `halted`.
