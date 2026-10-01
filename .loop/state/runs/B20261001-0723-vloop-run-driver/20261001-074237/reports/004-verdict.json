@@ -1,0 +1,19 @@
+{
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop run [<brief>] [--plan-only] [--replan] [--max-iterations N] [--cost-ceiling USD] [--max-attempts N] [--stall-limit N]` exists; each budget resolves flag > VLOOP_RUN_* > file > default through T2's keys", "met": true, "evidence": "internal/cli/run.go runBudgetFlags + driver.ResolveBudgets; TestResolveBudgetsPrecedence"},
+    {"criterion": "Preflight runs doctor's checks and refuses (exit 1) on any problem before any branch, session or file change", "met": true, "evidence": "runPreflight (runDoctor minus branch check) runs before Planner.Plan; TestRunPreflight"},
+    {"criterion": "A brief path that does not exist is `vloop: brief not found: <path>`, exit 2 (scenario 29), with nothing changed; `--help` and an unknown flag leave the plan untouched too", "met": true, "evidence": "runBriefPath; TestRun29BriefTypo asserts exit 2, exact stderr, no session/run folder, plan/HEAD untouched for typo, --help and --resume"},
+    {"criterion": "On the default branch `run` creates branch `<run id>` ... on any other branch it runs there", "met": true, "evidence": "Planner.Plan branch logic; TestRunWorkBranch covers all three cases with exact messages"},
+    {"criterion": "The plan session is `/vloop:plan <brief path>` through T3's session path; its record is `sessions/001-plan.json` (`iteration` 0, no `task`)", "met": true, "evidence": "r.Run(Spec{Phase: PhasePlan, Arg: briefPath}); TestRunPlanCommit"},
+    {"criterion": "The plan must be valid state/v1 and pass every validate check; plus dangling references, three gate-shape rules, head-diff advisory (warns); a failing plan exits 1, names task and cause, not committed", "met": true, "evidence": "acceptPlan: state.CheckBytes, GateShapeProblems, BlindReferences, HeadDiffAdvisory; tests 08/25/27/35/36/38"},
+    {"criterion": "The driver stamps branch and brief, sets status, writes plan.md, opens the journal, commits as `[vloop] plan <run id>`", "met": true, "evidence": "acceptPlan stamping, writeJournal, plan.md write, commit in Plan(); TestRunPlanCommit"},
+    {"criterion": "Scenario 43: journal exists refused unless --replan; scenario 21 reset/refuse rules hold", "met": true, "evidence": "journal check and reset/refuse logic in Plan(); TestRun43BriefAlreadyRun incl. other-brief plan survives the refusal"},
+    {"criterion": "`--plan-only` starts exactly one session and stops after the plan commit, exit 0; with a plan already in place it changes nothing", "met": true, "evidence": "resuming+PlanOnly returns without change; tests in run_plan_test.go"},
+    {"criterion": "Ported tests TestRun08..TestRun43 and TestRunWorkBranch exist and assert what the scenarios assert", "met": true, "evidence": "all nine present in cmd/vloop/run_plan_test.go with substantive assertions"},
+    {"criterion": "README.md documents `vloop run` and every flag; docs/guide/commands.md regenerated", "met": true, "evidence": "README table row lists all flags; commands.md diff +15 lines"}
+  ],
+  "findings": [],
+  "notes": "Without --plan-only, run exits 1 after planning ('running its tasks is not available in this build'); T5 must replace that branch. Budgets are resolved but unused until T5. A resume does not yet create a work branch/run folder (T5)."
+}

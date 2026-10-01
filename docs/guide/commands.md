@@ -217,6 +217,21 @@ Extract the embedded plugin under .vloop/tmp/plugin/ and print its path
 vloop plugin path
 ```
 
+## vloop run
+
+Plan a brief into tasks, on a work branch, and commit the plan
+
+```
+vloop run [<brief>] [flags]
+```
+
+- `--cost-ceiling USD`: stop once the run's sessions cost USD dollars (default: config key run.cost-ceiling)
+- `--max-attempts N`: block a task after N attempts (1 or more) (default: config key run.max-attempts)
+- `--max-iterations N`: stop after N iterations in this run (0 or more) (default: config key run.max-iterations)
+- `--plan-only`: stop after the plan is committed
+- `--replan`: plan a brief again even though its journal exists
+- `--stall-limit N`: stop after N iterations in a row that close nothing (1 or more) (default: config key run.stall-limit)
+
 ## vloop schema
 
 List, print and validate against the embedded JSON Schemas

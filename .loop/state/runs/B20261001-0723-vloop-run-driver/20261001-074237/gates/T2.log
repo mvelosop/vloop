@@ -1,3 +1,3 @@
-ok  	github.com/mvelosop/vloop/internal/config	0.388s
-ok  	github.com/mvelosop/vloop/internal/cli	19.046s
+ok  	github.com/mvelosop/vloop/internal/config	0.432s
+ok  	github.com/mvelosop/vloop/internal/cli	18.951s
 gate T2 ok
