@@ -56,3 +56,10 @@ That testing caught one real defect: B3's metrics print `gates 0.0 · wall`, wit
 
 The gates are long single-line shell commands (2–16 KB). `amend.sh check` raised one advisory: T2 and T4 edit `README.md`, which T10's gate reads. That's expected, because both run before T10 and the README test forces those edits.
 
+
+## T1 — Build the run test harness: scratch repository, fake home, a stub claude scripted by prompt, and a smoke test
+
+- **Outcome:** done (review: PASS)
+- **Summary:** cmd/vloop/run_harness_test.go now provides newRunRepo (scratch repo on main, init, ready brief, fake trusted home, stub claude) and TestRunHarness.
+- **Files:** cmd/vloop/run_harness_test.go
+- **Notes for next iteration:** Stub is a POSIX sh script sourcing a per-test script.sh (r.script(body)) in the repo cwd; it sets PHASE, TASK, ARG, MODEL, ATTEMPT (per PHASE+ARG counter kept in the stub dir, outside the repo) and STUB_COST/EXIT/DURATION/TURNS/ERROR/SILENT, so tests branch with case "$PHASE:$TASK:$ATTEMPT". argv log is one space-joined line per invocation (r.argv()), including doctor's --version and plugin probes. Stub reports plugin version 0.0.0-dev to match binPath. Helpers: r.vloop(args), r.claude(args), r.git, r.write/read, r.env(extra...). Skips on windows via t.Skip. Gate's go test was run by me with the full verify only in parts (the verify's individual steps), not as one script.

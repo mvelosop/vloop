@@ -2,9 +2,9 @@
   "run_id": "B20261001-0723-vloop-run-driver",
   "brief": "docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-10-01T08:00:00Z",
-  "updated": "2026-10-01T08:00:00Z",
+  "updated": "2026-10-01T07:11:34Z",
   "tasks": [
     {
       "id": "T1",
@@ -39,7 +39,7 @@
         "Where the stub cannot run on the host OS the harness skips with `t.Skip` naming the reason; it never passes vacuously on darwin or linux"
       ],
       "verify": "unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_EFFORT_PLAN VLOOP_EFFORT_WORK VLOOP_EFFORT_REVIEW VLOOP_SHELL VLOOP_AREAS VLOOP_METRICS_STACKS VLOOP_METRICS_CODE VLOOP_METRICS_TEST VLOOP_METRICS_DOCS VLOOP_METRICS_EXCLUDED VLOOP_RUN_MAX_ITERATIONS VLOOP_RUN_COST_CEILING VLOOP_RUN_MAX_ATTEMPTS VLOOP_RUN_STALL_LIMIT VLOOP_RUN_CONVERGENCE_MAX VLOOP_RUN_CONVERGENCE_MIN VLOOP_ACTIVE_TASK VLOOP_GATE_TASK NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT; export LC_ALL=C TZ=UTC GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0; R=$(pwd -P); fail(){ echo \"GATE FAIL: $*\" >&2; exit 1; }; t=$(mktemp -d) && t=$(cd \"$t\" && pwd -P) || fail mktemp; trap 'rm -rf \"$t\"' EXIT; test -z \"$(gofmt -l .)\" || fail \"gofmt -l . lists files: $(gofmt -l . | head -5)\"; go vet ./... || fail \"go vet ./...\"; go mod tidy -diff >\"$t/tidy\" 2>&1 || fail \"go mod tidy -diff: $(head -c 600 \"$t/tidy\")\"; [ ! -s \"$t/tidy\" ] || fail \"go mod tidy -diff printed output\"; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./... || fail \"linux build\"; CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build ./... || fail \"windows build\"; go build -o \"$t/vloop\" ./cmd/vloop || fail \"host build of ./cmd/vloop\"; B=\"$t/vloop\"; nz(){ sed -E \"s/[[:space:]]+/ /g; s/^ //; s/ $//\"; }; go test -list '^TestRun' ./cmd/vloop >\"$t/list\" 2>\"$t/liste\" || fail \"go test -list ./cmd/vloop: $(tail -c 800 \"$t/liste\")\"; for n in TestRunHarness; do grep -qx \"$n\" \"$t/list\" || fail \"no committed test named $n in ./cmd/vloop\"; done; go test -count=1 -run '^(TestRunHarness)$' ./cmd/vloop || fail \"the committed tests TestRunHarness in ./cmd/vloop\"; echo \"gate T1 ok\";",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

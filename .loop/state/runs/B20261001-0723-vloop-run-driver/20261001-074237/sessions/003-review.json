@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 18459,
+  "stop_reason": "end_turn",
+  "session_id": "aff2542c-ba50-47b3-8ed5-c4d97ddfcc90",
+  "total_cost_usd": 0.118951,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 18876,
+    "cache_read_input_tokens": 112835,
+    "output_tokens": 2086,
+    "output_tokens_details": {
+      "thinking_tokens": 169
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 18876,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 110,
+        "cache_read_input_tokens": 29386,
+        "cache_creation_input_tokens": 1506,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1506
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 2086,
+      "cacheReadInputTokens": 112835,
+      "cacheCreationInputTokens": 18876,
+      "webSearchRequests": 0,
+      "costUSD": 0.118951,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 169,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 passes: all eight acceptance criteria are met, and `TestRunHarness` passes when I re-ran it. The one new file, `cmd/vloop/run_harness_test.go`, holds the scratch repository, fake home and scripted stub `claude`. The verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2451,
+  "type": "result",
+  "duration_ms": 21079,
+  "uuid": "45da2d1f-d729-4108-baa4-c371ea1d3988",
+  "ttft_stream_ms": 1211,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1211,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 1
+}

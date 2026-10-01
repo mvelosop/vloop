@@ -4,13 +4,13 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **0/11 done** · iteration 0
+**Status:** running · **1/11 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T08:00:00Z
+**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T07:11:34Z
 
 ## Progress
 
-- [ ] **T1** — Build the run test harness: scratch repository, fake home, a stub claude scripted by prompt, and a smoke test
+- [x] **T1** — Build the run test harness: scratch repository, fake home, a stub claude scripted by prompt, and a smoke test
 - [ ] **T2** — Add the six run.* budget keys to config, with VLOOP_RUN_* variables, validation and the config list update
 - [ ] **T3** — Start sessions: the embedded fence, plugin and fence extraction, the claude invocation, the session/v1 record with masking, and the missing-record warning
 - [ ] **T4** — Add `vloop run` with its flags and preflight, the work branch, the plan session, the plan checks and the plan commit
@@ -26,7 +26,7 @@
 
 ### T1 — Build the run test harness: scratch repository, fake home, a stub claude scripted by prompt, and a smoke test
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `cmd/vloop/run_harness_test.go`
 

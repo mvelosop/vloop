@@ -16,3 +16,10 @@
 [36m[loop][0m planning from docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md using opus
 [36m[loop][0m cost=$6.9276274 turns=69 dur=1641s error=false
 [36m[loop][0m planned: B20261001-0723-vloop-run-driver — 11 tasks
+[36m[loop][0m committed the plan
+[36m[loop][0m ── iteration 1 (1/30 this run) · T1 · 0/11 done ──
+[36m[loop][0m    Build the run test harness: scratch repository, fake home, a stub claude scripted by prompt, and a smoke test
+[36m[loop][0m cost=$0.30577899999999997 turns=9 dur=66s error=false
+[36m[loop][0m cost=$0.118951 turns=5 dur=21s error=false
+[36m[loop][0m    review: PASS
+[36m[loop][0m    T1 done
