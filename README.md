@@ -81,6 +81,9 @@ does not exist, or an item with no reason, is a problem.
 | `vloop defect add "<summary>"` | record a defect as `.vloop/defects/D<stamp>-<slug>.md` and print its path |
 | `vloop defect list` | print the recorded defects, sorted by id |
 | `vloop defect set <id> <field> <value>` | set a defect's `status`, `fixed-by`, `case`, `severity`, `origin`, `kind` or `task` |
+| `vloop intervention add "<summary>" --phase <p> --kind <k> --automatable <a> --by <b>` | record an operator intervention as `.vloop/interventions/I<stamp>-<slug>.md` and print its path; takes `--brief <name>` (none: series-level), `--trigger`, `--done` and `--automation` text; the values are those of `.vloop/interventions/README-interventions.md` |
+| `vloop intervention list [--brief <name>]` | print `<phase>  <kind>  <automatable>  <id>` per record, by phase, kind and id; `--json` prints `intervention/v1` objects |
+| `vloop intervention set <id> <field> <value>` | set an intervention's `brief`, `phase`, `kind`, `automatable`, `by` or `occurred` |
 | `vloop task reset <id>` | set a task back to pending with no attempts |
 | `vloop task note <id> <text>` | replace a task's notes |
 | `vloop task drop <id>` | remove a task nothing depends on |
@@ -168,7 +171,7 @@ vloop keeps its files under `.vloop/` in the repo root (the nearest parent with 
   follows the `state/v1` schema; `vloop status` reads it and `vloop task validate`
   checks it.
 
-Briefs live in `docs/briefs/`. Only `vloop run`, `vloop init`, `vloop upgrade`, `vloop config set`, `vloop brief new`, `vloop plugin path`, `vloop defect add|set` and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`, `verify`) write anything, and each task command refuses a plan that fails `vloop task validate`. Every path vloop prints is relative to the repo root.
+Briefs live in `docs/briefs/`. Only `vloop run`, `vloop init`, `vloop upgrade`, `vloop config set`, `vloop brief new`, `vloop plugin path`, `vloop defect add|set`, `vloop intervention add|set` and the `vloop task` commands that change a task (`reset`, `note`, `drop`, `set`, `verify`) write anything, and each task command refuses a plan that fails `vloop task validate`. Every path vloop prints is relative to the repo root.
 
 ## Guides
 

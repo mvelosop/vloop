@@ -164,6 +164,49 @@ vloop init [flags]
 - `--language string`: language of briefs and guidance: en or es (default en)
 - `--stacks string`: metrics.stacks to write, instead of the detected ones
 
+## vloop intervention
+
+Record, list and update operator interventions
+
+```
+vloop intervention
+```
+
+## vloop intervention add
+
+Record an intervention as .vloop/interventions/I<stamp>-<slug>.md and print its path
+
+```
+vloop intervention add "<summary>" [flags]
+```
+
+- `--automatable string`: could a driver do it: yes, partly, no
+- `--automation string`: what would automate it
+- `--brief string`: the loop brief it belongs to (none: series-level)
+- `--by string`: who did it: operator, assistant, both
+- `--done string`: what was done
+- `--kind string`: kind: direction, decision, context-supply, halt, verification-finding, repair, carry-forward, ceremony
+- `--phase string`: lifecycle phase: setup, design, run, halt, verify, close, next
+- `--trigger string`: what made it necessary
+
+## vloop intervention list
+
+Print the recorded interventions by phase, kind and id
+
+```
+vloop intervention list [flags]
+```
+
+- `--brief string`: only interventions of this loop brief
+
+## vloop intervention set
+
+Set brief, phase, kind, automatable, by, occurred of an intervention
+
+```
+vloop intervention set <id> <field> <value>
+```
+
 ## vloop metrics
 
 Summarise what a brief cost and delivered, from its runs and commits

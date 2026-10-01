@@ -68,6 +68,8 @@
       "Bash(vloop task set:*)",
       "Bash(vloop defect add:*)",
       "Bash(vloop defect set:*)",
+      "Bash(vloop intervention add:*)",
+      "Bash(vloop intervention set:*)",
       "Bash(vloop config set:*)",
       "Bash(.loop/run.sh:*)",
       "Read(~/.claude/**)",

@@ -1,0 +1,17 @@
+{
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "vloop intervention add writes .vloop/interventions/I<YYYYMMDD-HHMM>-<slug>.md and prints the repo-relative path", "met": true, "evidence": "internal/intervention/intervention.go Add (defect.Slug, O_EXCL, returns Dir/id.md); cli prints it; TestAddWritesRecord"},
+    {"criterion": "File is frontmatter id, brief, phase, kind, automatable, by, occurred, recorded, then summary and Trigger/Done/What would automate it sections", "met": true, "evidence": "render() in intervention.go writes exactly that order; brief quoted as \"\" when absent"},
+    {"criterion": "Invalid phase/kind/automatable/by is exit 2 with B1 message in vocabulary order; missing required flag exit 2; nothing written", "met": true, "evidence": "Validate returns config.InvalidValueError with vocab slices; cli validates all before Add; TestInterventionAddRefusals"},
+    {"criterion": "intervention list [--brief] [--json] prints rows sorted by phase lifecycle, kind, id; --json prints intervention/v1 array", "met": true, "evidence": "List sort in intervention.go; cli list uses two-space format and JSON encoder; TestListOrderFilterAndRoundTrip"},
+    {"criterion": "intervention set sets one field, validates enums, keeps the rest; unknown id is exit 1", "met": true, "evidence": "Set validates before reading, rewrites only the frontmatter line, unknown id returns Problem error; TestSetAndValidate"},
+    {"criterion": "schemas/intervention.v1.json with const intervention/v1, listed by schema list, existing records validate", "met": true, "evidence": "schema file present with const; schema list updated tests; TestExistingInterventionsValidate and TestExistingRecordsParse; driver gate ran the real-repo validation"},
+    {"criterion": "Fence denies vloop intervention add and set", "met": true, "evidence": "fence/settings.json diff adds both deny entries"},
+    {"criterion": "Committed tests cover add, list order/filtering, set, invalid values, existing records; schema TestNames and fixture table gain intervention/v1", "met": true, "evidence": "internal/intervention/intervention_test.go, internal/cli/intervention_test.go, schema_test.go diff adds intervention to invalidAt and TestNames"},
+    {"criterion": "README documents the commands and stays under 200 lines; commands.md regenerated", "met": true, "evidence": "README.md is 199 lines with three new table rows; docs/guide/commands.md gains the vloop intervention section"}
+  ],
+  "findings": [],
+  "notes": "Three existing tests with hard-coded schema counts (embed_test.go, cmd/vloop/b2_e2e_test.go, internal/cli/schema_test.go) were updated 9 to 10; this is the required change, not a weakening. README is at 199 lines, so the next README addition must replace text. The plan did not list those three test files in files; that is a gap in the plan. No absolute paths found."
+}

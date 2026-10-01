@@ -1,0 +1,8 @@
+{
+  "task": "T5",
+  "outcome": "done",
+  "summary": "vloop intervention add | list | set now exist over .vloop/interventions/ with intervention/v1 (schemas/intervention.v1.json); list matches tools/interventions-index.sh on this repo and all existing records validate; the fence denies add and set.",
+  "files": ["internal/intervention/intervention.go", "internal/intervention/intervention_test.go", "internal/cli/intervention.go", "internal/cli/intervention_test.go", "internal/cli/root.go", "internal/cli/schema_test.go", "schemas/intervention.v1.json", "internal/schema/schema_test.go", "internal/schema/testdata/intervention.valid.json", "internal/schema/testdata/intervention.invalid.json", "fence/settings.json", "README.md", "docs/guide/commands.md", "embed_test.go", "cmd/vloop/b2_e2e_test.go"],
+  "verified": "the task's verify command printed GATE OK.",
+  "notes": "Three existing tests hard-coded the schema list/count (internal/cli/schema_test.go TestSchemaList, embed_test.go TestSchemasAreEmbedded, cmd/vloop/b2_e2e_test.go TestWorkedExampleB2Commands); each gained intervention/v1 (9 -> 10), required by the new schema, not a weakening. List sorts kind alphabetically (as the shell index does under LC_ALL=C), not in vocabulary order. add does not check that --brief exists (existing records cite briefs that may not be in docs/briefs/) and takes no --occurred (today's date). set accepts brief, phase, kind, automatable, by, occurred. JSON items carry the sections as trigger/done/automation plus optional backfilled. README is at 199 lines (cap: under 200), so the next README addition must replace text, not add lines."
+}

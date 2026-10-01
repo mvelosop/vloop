@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **4/10 done** · iteration 4
+**Status:** running · **5/10 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:07:49Z
+**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:16:55Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T2** — Port loop-plan to plugin/skills/plan as /vloop:plan, with the planner's three gate checks
 - [x] **T3** — Port loop-work to plugin/skills/work as /vloop:work, with gate_dispute
 - [x] **T4** — Port loop-review to plugin/skills/review as /vloop:review, failing closed
-- [ ] **T5** — Add interventions as a vloop record: intervention/v1 and vloop intervention add | list | set
+- [x] **T5** — Add interventions as a vloop record: intervention/v1 and vloop intervention add | list | set
 - [ ] **T6** — Export intervention records and every record's repo.stacks
 - [ ] **T7** — Write plugin/skills/operate as /vloop:operate, the operator's playbook driven by the CLI
 - [ ] **T8** — Port the reviewer calibration and the four skill cases as eval suites, and stop extracting evals
@@ -137,7 +137,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T5 — Add interventions as a vloop record: intervention/v1 and vloop intervention add | list | set
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/intervention/intervention.go`, `internal/intervention/intervention_test.go`, `internal/cli/intervention.go`, `internal/cli/intervention_test.go`, `internal/cli/root.go`, `schemas/intervention.v1.json`, `internal/schema/schema_test.go`, `internal/schema/testdata/intervention.valid.json`, `internal/schema/testdata/intervention.invalid.json`, `fence/settings.json`, `README.md`, `docs/guide/commands.md`
 

@@ -1,0 +1,1 @@
+{"schema":"intervention/v1","id":"I20260101-1000-the-gate-failed","brief":"B20260101-0900-a.loop-brief","phase":"bogus","kind":"halt","automatable":"partly","by":"operator","occurred":"2026-01-01","recorded":"2026-01-01T10:00:00Z","summary":"the gate failed","trigger":"T1 blocked","done":"rewrote the gate","automation":"the planner runs its gates"}
