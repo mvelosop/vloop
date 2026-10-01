@@ -4,14 +4,14 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **1/10 done** · iteration 1
+**Status:** running · **2/10 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T10:58:55Z
+**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:02:21Z
 
 ## Progress
 
 - [x] **T1** — Write the structural checks over plugin/, each proven by a fixture it rejects
-- [ ] **T2** — Port loop-plan to plugin/skills/plan as /vloop:plan, with the planner's three gate checks
+- [x] **T2** — Port loop-plan to plugin/skills/plan as /vloop:plan, with the planner's three gate checks
 - [ ] **T3** — Port loop-work to plugin/skills/work as /vloop:work, with gate_dispute
 - [ ] **T4** — Port loop-review to plugin/skills/review as /vloop:review, failing closed
 - [ ] **T5** — Add interventions as a vloop record: intervention/v1 and vloop intervention add | list | set
@@ -54,7 +54,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T2 — Port loop-plan to plugin/skills/plan as /vloop:plan, with the planner's three gate checks
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 **Files:** `plugin/skills/plan/SKILL.md`, `fence/settings.json`
 

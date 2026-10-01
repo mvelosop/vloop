@@ -21,9 +21,12 @@
       "Bash(find:*)",
       "Bash(mkdir:*)",
       "Bash(jq:*)",
+      "Bash(vloop config get:*)",
       "Bash(vloop status:*)",
       "Bash(vloop task list:*)",
       "Bash(vloop task show:*)",
+      "Bash(vloop task validate:*)",
+      "Bash(vloop task gate:*)",
       "Bash(vloop schema validate:*)"
     ],
     "deny": [
