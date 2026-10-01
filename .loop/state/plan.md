@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **6/10 done** · iteration 6
+**Status:** running · **7/10 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:22:29Z
+**Brief:** `docs/briefs/B20261001-1025-vloop-skills.loop-brief.md` · **Updated:** 2026-10-01T11:27:01Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T4** — Port loop-review to plugin/skills/review as /vloop:review, failing closed
 - [x] **T5** — Add interventions as a vloop record: intervention/v1 and vloop intervention add | list | set
 - [x] **T6** — Export intervention records and every record's repo.stacks
-- [ ] **T7** — Write plugin/skills/operate as /vloop:operate, the operator's playbook driven by the CLI
+- [x] **T7** — Write plugin/skills/operate as /vloop:operate, the operator's playbook driven by the CLI
 - [ ] **T8** — Port the reviewer calibration and the four skill cases as eval suites, and stop extracting evals
 - [ ] **T9** — Document the skills and interventions, and state them as built in the domain docs
 - [ ] **T10** — Close: the worked example on copies of the real plugin, claude plugin validate, and the whole suite
@@ -189,7 +189,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T7 — Write plugin/skills/operate as /vloop:operate, the operator's playbook driven by the CLI
 
-`pending` · depends on: T1, T5
+`done` · depends on: T1, T5
 
 **Files:** `plugin/skills/operate/SKILL.md`
 

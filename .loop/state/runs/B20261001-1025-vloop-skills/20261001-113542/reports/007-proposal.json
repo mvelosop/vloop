@@ -1,0 +1,8 @@
+{
+  "task": "T7",
+  "outcome": "done",
+  "summary": "plugin/skills/operate/SKILL.md now exists as /vloop:operate: the generic operator playbook (doctor, run on a work branch, halts by exit code 0-9, gate dispute via task verify --reason with approval, verification, recording defects and interventions, brief close, squash-merge with trailer on go-ahead).",
+  "files": ["plugin/skills/operate/SKILL.md"],
+  "verified": "The task's verify command, run by hand: printed GATE OK.",
+  "notes": "Dropped from the repo's own operator skill: roadmap, domain-doc paths, BSD-tools and B-numbered lessons, the shell-loop commands and the index script. Exit table follows docs/guide/concepts.md. Replacing a gate is stated as needing the operator's approval and followed by vloop task reset and vloop task gate. The skill is not fenced (interactive), so it names denied commands such as task verify and defect add in code spans; TestPluginSkills accepts that."
+}
