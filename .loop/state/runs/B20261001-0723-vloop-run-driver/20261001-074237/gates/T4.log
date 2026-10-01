@@ -1,4 +1,4 @@
-ok  	github.com/mvelosop/vloop/internal/driver	2.049s
-ok  	github.com/mvelosop/vloop/internal/cli	18.809s
-ok  	github.com/mvelosop/vloop/cmd/vloop	17.513s
+ok  	github.com/mvelosop/vloop/internal/driver	2.013s
+ok  	github.com/mvelosop/vloop/internal/cli	18.949s
+ok  	github.com/mvelosop/vloop/cmd/vloop	17.660s
 gate T4 ok

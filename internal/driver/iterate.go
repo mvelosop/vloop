@@ -56,6 +56,7 @@ type Iterator struct {
 
 	plan       *state.Plan
 	noProposal []string // tasks whose session died after changing files, with the account
+	gatePasses []string // tasks reported blocked whose own gate passes
 	r          *Runner
 	log        *lazyLog
 	branch     string
@@ -267,6 +268,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 
 	outcome, summary, notes := OutBlocked, "", "none"
 	var proposalFiles []string
+	var dispute string
 	if data, ok := it.readReport("proposal.json", "proposal/v1"); !ok {
 		it.warn("work session left no valid proposal")
 		changed := it.sessionTreeChanges()
@@ -285,9 +287,23 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 			Summary string   `json:"summary"`
 			Files   []string `json:"files"`
 			Notes   string   `json:"notes"`
+			Dispute *struct {
+				Reason   string `json:"reason"`
+				Evidence string `json:"evidence"`
+			} `json:"gate_dispute"`
 		}
 		_ = json.Unmarshal(data, &p)
 		outcome, summary, notes, proposalFiles = p.Outcome, it.r.Mask(p.Summary), it.r.Mask(p.Notes), p.Files
+		if p.Dispute != nil {
+			dispute = it.r.Mask(fmt.Sprintf("gate disputed: %s — %s", p.Dispute.Reason, p.Dispute.Evidence))
+		}
+	}
+
+	// A session does not rewrite the file its own gate runs. Restored from
+	// HEAD before any gate runs, and the work is not reviewable.
+	tampered := ""
+	if moved := it.gateFilesMoved(task); len(moved) > 0 {
+		tampered = it.restoreGateFiles(id, moved)
 	}
 
 	// 2. gates: every done task, plus this one if it claims done or blocked
@@ -297,13 +313,13 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 			targets = append(targets, t.ID)
 		}
 	}
-	if outcome == OutDone || outcome == OutBlocked {
+	if dispute == "" && (outcome == OutDone || outcome == OutBlocked) {
 		targets = append(targets, id)
 	}
 	var own *gateResult
 	failed := map[string]bool{}
 	for _, gid := range targets {
-		g, err := it.runGate(iter, id, gid)
+		g, err := it.runGateRetry(iter, id, gid)
 		if err != nil {
 			return err
 		}
@@ -327,9 +343,19 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 	// 3. review
 	verdict := "skipped"
 	var findings []string
+	gatePassed := outcome == OutBlocked && dispute == "" && own != nil && own.exit == 0
 	switch {
+	case dispute != "":
+		it.warn("   GATE DISPUTE %s — blocked for the operator; no review, no attempt charged", id)
+	case tampered != "":
+		outcome = OutGateFailed
+		it.warn("   %s failed on a rewritten gate — the work is reverted whatever the gate said", id)
 	case outcome == OutBlocked:
 		it.say("   work session reported blocked")
+		if gatePassed {
+			it.warn("   %s", gatePassesLine(id))
+			it.gatePasses = append(it.gatePasses, id)
+		}
 	case failed[id]:
 		outcome = OutGateFailed
 		it.warn("   GATE FAIL %s — review skipped, work that fails its own gate is not reviewable", id)
@@ -369,20 +395,13 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 
 	// 4. apply: the driver makes every status transition
 	attempt := task.Attempts + 1
-	switch outcome {
-	case OutDone:
-		task.Status, task.Notes = "done", ""
-		it.say("   %s done", id)
-	case OutGateFailed:
-		task.Status, task.Attempts = "pending", task.Attempts+1
-		task.Notes = "gate failed — see " + it.relGate(id)
-	case OutRejected:
-		task.Status, task.Attempts = "pending", task.Attempts+1
-		task.Notes = it.r.Mask(strings.Join(findings, "; "))
-	default:
+	switch {
+	case dispute != "":
 		outcome = OutBlocked
-		task.Status, task.Attempts = "pending", task.Attempts+1
-		task.Notes = summary
+		task.Status, task.Notes = "blocked", dispute
+		it.say("   %s blocked — the operator resolves the disputed gate with vloop task verify", id)
+	default:
+		it.applyOutcome(task, outcome, summary, findings, tampered, gatePassed)
 	}
 	if task.Status == "pending" && task.Attempts >= it.Budgets.MaxAttempts {
 		for i := range plan.Tasks {
@@ -404,7 +423,11 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) error {
 		"started": started.Format(time.RFC3339), "ended": it.now().UTC().Format(time.RFC3339),
 	}
 	if own != nil {
-		rec["gate"] = map[string]any{"exit": own.exit, "duration_ms": own.ms}
+		g := map[string]any{"exit": own.exit, "duration_ms": own.ms}
+		if own.flaky {
+			g["flaky"] = true
+		}
+		rec["gate"] = g
 	}
 	if err := it.appendIteration(rec); err != nil {
 		return err
@@ -448,8 +471,9 @@ func (it *Iterator) sessionTreeChanges() []string {
 }
 
 type gateResult struct {
-	exit int
-	ms   int64
+	exit  int
+	ms    int64
+	flaky bool // failed, then passed on the immediate re-run
 }
 
 func (it *Iterator) relGate(id string) string {
@@ -636,6 +660,12 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 	case "halted":
 		it.say("iteration budget spent. resumable: re-run vloop run")
 	}
+	if len(it.gatePasses) > 0 {
+		it.say("")
+		for _, id := range it.gatePasses {
+			it.say("%s", gatePassesLine(id))
+		}
+	}
 	for _, l := range it.noProposal {
 		it.say("")
 		it.say("%s", l)
@@ -659,4 +689,29 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 		return err
 	}
 	return it.commit(fmt.Sprintf("[vloop] run %s/%s: %s", plan.RunID, filepath.Base(it.RunDir), end.Status))
+}
+
+// applyOutcome is the status transition of an iteration that is not a gate
+// dispute: the driver's, never the session's.
+func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, findings []string, tampered string, gatePassed bool) {
+	switch outcome {
+	case OutDone:
+		task.Status, task.Notes = "done", ""
+		it.say("   %s done", task.ID)
+	case OutGateFailed:
+		task.Status, task.Attempts = "pending", task.Attempts+1
+		task.Notes = "gate failed — see " + it.relGate(task.ID)
+		if tampered != "" {
+			task.Notes = tampered
+		}
+	case OutRejected:
+		task.Status, task.Attempts = "pending", task.Attempts+1
+		task.Notes = it.r.Mask(strings.Join(findings, "; "))
+	default:
+		task.Status, task.Attempts = "pending", task.Attempts+1
+		task.Notes = summary
+		if gatePassed {
+			task.Notes = strings.TrimSpace(summary + " — " + gatePassesLine(task.ID))
+		}
+	}
 }
