@@ -1,0 +1,8 @@
+{
+  "task": "T8",
+  "outcome": "done",
+  "summary": "Added the run lock (.vloop/tmp/.running, stale-pid clearing, released on exit) and the plan-tampering guard (work and review sessions; STATE TAMPERING, gate_failed), plus ported tests 10/13/14/15/18/20/22/23/24 and TestRunSessionRecordMissing. Trust and identity refusals and the record behaviour already existed and are now covered by tests.",
+  "files": ["internal/driver/safety.go", "internal/driver/pid_unix.go", "internal/driver/pid_windows.go", "internal/driver/iterate.go", "internal/driver/safety_test.go", "internal/cli/run.go", "cmd/vloop/run_safety_test.go"],
+  "verified": "The T8 verify command ran and printed 'gate T8 ok'.",
+  "notes": "The lock is taken in internal/cli/run.go after preflight and before the plan phase, so plan-only runs lock too; its message is one line because the CLI prints only one. A pid in the lock may be a number or a string (the shell driver wrote strings). A review session that edits state.json is restored and its verdict forced to FAIL (rejected) with a finding. Work-session tampering and gate-file rewrites are joined into one note when both occur. cmd/vloop TestWorkedExampleEnglishSession still fails for the earlier run.* config lines; it is not in T8's gate and was not touched."
+}

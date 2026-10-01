@@ -4,9 +4,9 @@
      Do NOT edit: regenerated on every state change, your edits will be lost.
      The source of truth is .loop/state/state.json. -->
 
-**Status:** running · **7/11 done** · iteration 7
+**Status:** running · **8/11 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T08:05:10Z
+**Brief:** `docs/briefs/B20261001-0723-vloop-run-driver.loop-brief.md` · **Updated:** 2026-10-01T08:16:02Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T5** — Run one iteration end to end: task choice, work, gates with timing and the env ids, review, the outcome, journal, plan.md, and the commit behind a HEAD check
 - [x] **T6** — Handle gates across iterations: regressions, rewrites, blocked tasks whose gate passes, flaky gates and gate disputes
 - [x] **T7** — Halt the run: budgets with flag precedence, convergence, stall, session errors, repeat-blocked and moved refs
-- [ ] **T8** — Make the run safe and its records sound: containment, preflight refusals, the run lock, git identity, state tampering, the empty run, rendered views, telemetry and layout
+- [x] **T8** — Make the run safe and its records sound: containment, preflight refusals, the run lock, git identity, state tampering, the empty run, rendered views, telemetry and layout
 - [ ] **T9** — Snapshot the metrics after every iteration, print the summary at the end, and derive an env defect from a flaky gate
 - [ ] **T10** — Document the driver: exit codes 0–9 in the guide with the README pointer and test change, the run row and keys, F1, the command reference, and the domain docs as built
 - [ ] **T11** — Close: the B6 worked example end to end on the stub, the real-data check on a throwaway clone, and the full suite
@@ -217,7 +217,7 @@ unset VLOOP_LANGUAGE VLOOP_MODEL_PLAN VLOOP_MODEL_WORK VLOOP_MODEL_REVIEW VLOOP_
 
 ### T8 — Make the run safe and its records sound: containment, preflight refusals, the run lock, git identity, state tampering, the empty run, rendered views, telemetry and layout
 
-`pending` · depends on: T5
+`done` · depends on: T5
 
 **Files:** `internal/cli/run.go`, `internal/driver/`, `internal/driver/safety.go`, `internal/driver/safety_test.go`, `cmd/vloop/run_safety_test.go`
 

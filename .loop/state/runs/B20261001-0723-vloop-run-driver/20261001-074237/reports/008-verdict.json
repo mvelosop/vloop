@@ -1,0 +1,12 @@
+{"task":"T8","verdict":"PASS","criteria":[
+{"criterion":"Preflight refuses untrusted workspace and missing git identity; warns on pre-commit hook (18, 23)","met":true,"evidence":"TestRun18PreflightUntrusted, TestRun23GitIdentity in cmd/vloop/run_safety_test.go; behaviour pre-existing, now covered"},
+{"criterion":"Run lock under .vloop/tmp/ (22)","met":true,"evidence":"internal/driver/safety.go AcquireLock, wired in internal/cli/run.go; TestRun22RunLock checks live/stale/release/ignored, git worktree add message"},
+{"criterion":"State tampering restored, STATE TAMPERING logged, gate_failed (24)","met":true,"evidence":"iterate.go guard.restoreIfTouched -> tampered; TestRun24StateTampering"},
+{"criterion":"Containment, no absolute paths, $HOME masked to ~ (10)","met":true,"evidence":"TestRun10Containment"},
+{"criterion":"--max-iterations 0 exits 4 with report; plan.md render; journal shape (13, 14)","met":true,"evidence":"TestRun13EmptyRunSignals, TestRun14RenderedViews"},
+{"criterion":"Session/iteration records validate; name-sortable (15)","met":true,"evidence":"TestRun15TelemetryContract"},
+{"criterion":"Run folder layout; journal per plan (20)","met":true,"evidence":"TestRun20ParallelSafeLayout"},
+{"criterion":"Silent session gets no record; run log SESSION RECORD MISSING; metrics reports it","met":true,"evidence":"TestRunSessionRecordMissing"},
+{"criterion":"Ported tests exist and assert their scenarios","met":true,"evidence":"all ten named tests present in cmd/vloop/run_safety_test.go and pass; internal/driver passes"}],
+"findings":[],
+"notes":"TestWorkedExampleEnglishSession in cmd/vloop fails (config list lacks run.* lines); outside T8's gate and not touched by this diff - earlier-task issue worth a look. Review-session tampering handling goes slightly beyond the criteria but is consistent with the shell driver."}

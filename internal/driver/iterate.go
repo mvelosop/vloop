@@ -335,6 +335,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		return iterResult{}, halt(ExitPreflight, "%v", err)
 	}
 	before := refsState(root)
+	guard := snapshotState(root)
 	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort})
 	if err != nil {
 		return iterResult{}, err
@@ -384,8 +385,16 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	// A session does not rewrite the file its own gate runs. Restored from
 	// HEAD before any gate runs, and the work is not reviewable.
 	tampered := ""
+	if guard.restoreIfTouched() {
+		tampered = it.r.Mask(tamperNote(PhaseWork))
+		it.warn("   STATE TAMPERING %s — %s was modified; restored, iteration failed", id, state.FilePath)
+	}
 	if moved := it.gateFilesMoved(task); len(moved) > 0 {
-		tampered = it.restoreGateFiles(id, moved)
+		note := it.restoreGateFiles(id, moved)
+		if tampered != "" {
+			note = tampered + "; " + note
+		}
+		tampered = note
 	}
 
 	// 2. gates: every done task, plus this one if it claims done or blocked
@@ -447,11 +456,16 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 			return iterResult{}, halt(ExitPreflight, "%v", err)
 		}
 		before := refsState(root)
+		guard := snapshotState(root)
 		if _, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort}); err != nil {
 			return iterResult{}, err
 		}
 		if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
 			return iterResult{}, err
+		}
+		reviewTampered := guard.restoreIfTouched()
+		if reviewTampered {
+			it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, state.FilePath)
 		}
 		if data, ok := it.readReport("verdict.json", "verdict/v1"); !ok {
 			it.warn("   review session left no valid verdict — treating as FAIL")
@@ -471,6 +485,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		}
 		if verdict != "PASS" {
 			outcome = OutRejected
+		}
+		if reviewTampered {
+			outcome, verdict = OutRejected, "FAIL"
+			findings = append(findings, it.r.Mask(tamperNote(PhaseReview)))
 		}
 		it.say("   review: %s", verdict)
 	}

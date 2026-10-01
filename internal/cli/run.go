@@ -7,9 +7,11 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/brief"
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/driver"
 )
@@ -58,6 +60,18 @@ func newRun(b Build, g *Globals) *cobra.Command {
 			if err := runPreflight(b, root, cmd); err != nil {
 				return err
 			}
+
+			lockRun := ""
+			if briefPath != "" {
+				lockRun = brief.RunID(briefPath)
+			}
+			errOut := cmd.ErrOrStderr()
+			release, err := driver.AcquireLock(root, driver.CurrentBranch(root), lockRun, time.Now(),
+				func(f string, a ...any) { fmt.Fprintf(errOut, "warning: "+f+"\n", a...) })
+			if err != nil {
+				return Problem(err)
+			}
+			defer release()
 
 			pl := &driver.Planner{Root: root, Version: b.Version, Brief: briefPath,
 				PlanOnly: planOnly, Replan: replan,
