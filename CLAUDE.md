@@ -2,17 +2,17 @@
 
 A Go CLI and Claude Code plugin that packages the autonomous loop: plan a brief
 into tasks, then per task a fresh work session, a gate, an independent review,
-one commit. It is built **by** the shell loop vendored in `.loop/`, one brief at
-a time, following `docs/design-notes/vloop-roadmap.md` — read that first; its
+one commit. B1–B7 were built **by** the shell loop vendored in `.loop/`; from
+B8 it builds itself with `vloop run`, one brief at a time, following `docs/design-notes/vloop-roadmap.md` — read that first; its
 "Owns" column says what exists and what comes next. The domain — vocabulary,
 invariants, contexts — is `docs/domain/README-domain.md`. The briefs live in
 `docs/briefs/`, each with a `## Run record` once consumed.
 
 ## Which rules bind you
 
-- **Started by `.loop/run.sh`** as a plan, work or review session: the loop's
-  rules below bind you, all of them. You do not commit, you do one task, you set
-  no status.
+- **Started by `vloop run`** (or, for B1–B7, `.loop/run.sh`) as a plan, work
+  or review session: the loop's rules below and the vloop section bind you, all
+  of them. You do not commit, you do one task, you set no status.
 - **An interactive session with the operator**: you are the operator's hands,
   not a loop session. Writing a brief follows
   `.claude/skills/vloop-architect/SKILL.md` (the design act); running,
@@ -34,6 +34,22 @@ GOOS=linux go build ./...   GOOS=windows go build ./...
 `.vloop/config.toml` is this repo's own vloop config (`metrics.stacks = ["go"]`);
 `.vloop/defects/` holds its recorded defects. The shell loop's own suite is
 `.loop/tests/run-all.sh`.
+
+<!-- vloop:begin -->
+## vloop
+
+Sessions started by the vloop loop (plan, work, review) follow these rules:
+
+1. Use repo-relative paths only, in files, logs and commit messages.
+2. A work session does one task and stops; it does not start the next one.
+3. Sessions never commit, set a task status or move git refs; the driver does.
+4. A task is done only when its gate passes and the review passes it.
+5. Halting cleanly with an account of what blocked you is a success; faking progress is the only failure.
+
+In an interactive session you are the operator's hands: follow the operator skill (vloop-operator), not these session rules.
+
+Written by vloop 0.0.0-dev.
+<!-- vloop:end -->
 
 <!-- loop:begin -->
 ## Rules for any session working here

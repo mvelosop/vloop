@@ -24,8 +24,8 @@ the brief left out. Whatever binds a task must be in the brief.
 - **The domain** (`docs/domain/README-domain.md`): walk from the whole
   (`domain-model.md`) to the context and entity pages each part of the brief
   touches. Note the invariants that apply, by ID.
-- The code the brief will touch, and any format it reads (the shell loop's
-  `.loop/run.sh`, `.loop/state/runs/`). Measure real numbers from the telemetry
+- The code the brief will touch, and any format it reads (`.vloop/state/runs/`;
+  for B1–B7, the shell loop's `.loop/state/runs/`). Measure real numbers from the telemetry
   or `vloop metrics`, never from hand-rounded run records.
 
 ## 2. Settle forks with the operator
@@ -35,8 +35,8 @@ reply as "choices to review".
 
 ## 3. Write the brief
 
-From `.loop/loop-brief.template.md`, named
-`docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md`, frontmatter `status: draft`
+From `vloop brief new <slug>`, which writes
+`docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md` from the template, frontmatter `status: draft`
 and `depends-on:` the previous brief's name. Pin decisions, leave mechanics
 open. Every brief so far also carried:
 
@@ -65,9 +65,8 @@ and then through its index file.
 
 ## 4. Check it twice
 
-`.loop/check-brief.sh <brief>` (the shell loop plans from it) and `vloop brief
-check` on a copy with `status: ready` (stricter: one path per binding
-reference). Aim for 0 problems and 0 warnings; un-backtick paths that exist only
+`vloop brief check` on a copy with `status: ready` (one path per binding
+reference); `vloop run` plans from it. `.loop/check-brief.sh` checked B1–B7. Aim for 0 problems and 0 warnings; un-backtick paths that exist only
 after the run. Look for sentences two sessions could read two ways — the review
 of the brief is the cheapest place to find the next spec gap.
 

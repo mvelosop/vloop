@@ -1,6 +1,6 @@
 ---
 name: vloop-operator
-description: The operator's playbook for this repo — from a ready loop brief, run it with the shell loop on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief, and merge; and use the docs to resolve what comes up. Use in an interactive session whenever the operator asks to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is the vloop-architect skill's.
+description: The operator's playbook for this repo — from a ready loop brief, run it with `vloop run` on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief, and merge; and use the docs to resolve what comes up. Use in an interactive session whenever the operator asks to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is the vloop-architect skill's.
 ---
 
 # Operating the loop
@@ -33,7 +33,7 @@ and bring the operator a proposal:
   operator; it may belong in `domain-model.md`.
 - **Is it a gate problem?** `docs/domain/execution/task.md` → "The gate": a gate
   that cannot pass for a reason outside the task is a plan defect, and
-  `task verify` (or `.loop/amend.sh verify`) with a reason is the remedy.
+  `vloop task verify <id> '<cmd>' --reason '…'` is the remedy.
 - **What has happened before?** `.vloop/defects/`, the interventions index
   (`.vloop/interventions/README-interventions.md`) and the run records — the
   same problem may already have a recorded answer.
@@ -44,22 +44,29 @@ and bring the operator a proposal:
    anything else** — named for the run id (the brief name minus `.loop-brief`):
    `git switch -c <run id>`, commit the brief there. B1's plan commit landed on
    `main` because the branch came after the planning preview.
-2. Run in the background and wait for the notification; do not poll:
-   `.loop/run.sh <brief path>`, output to a log in your scratchpad.
-   `--plan-only` first when the operator wants to see the task split.
+2. Run it **detached**, so it outlives your session's background-task limit
+   (2 hours; a killed driver leaves a `.vloop/tmp/.running` lock), and keep the
+   Mac awake (an idle-sleeping Mac stalled B7's acceptance run for over an hour):
+   `nohup caffeinate -i vloop run <brief path> > <scratchpad>/run.log 2>&1 &`.
+   Then wait in the background for the log's end, without polling in the
+   foreground. `vloop status` shows progress. `--plan-only` first when the
+   operator wants to see the task split. B1–B7 ran under `.loop/run.sh`.
 3. Resuming on another branch than the one that planned needs the brief path
    again; the driver refuses without it (exit 1) and says so.
 
 ## 3. When it halts
 
-Read the log's end, the journal (`.loop/state/journals/<run id>.md`) and the
-blocked task's `notes` in `.loop/state/state.json`.
+Read the log's end, the journal (`.vloop/state/journals/<run id>.md`) and the
+blocked task's `notes` (`vloop task show <id>`). Exit codes:
+`docs/guide/concepts.md#exit-codes`; resuming is `vloop run` again on the work
+branch.
 
 | Exit | Meaning | What you do |
 | --- | --- | --- |
 | 0 | complete | verify (step 4) |
+| 1 | preflight: refused before anything ran | fix the cause it names, re-run |
 | 2 | blocked | read the notes; usually a design question → the operator |
-| 3 | stalled | read the notes. A **gate defect** the work session diagnosed, whose fix keeps the gate's intent, you may fix: `.loop/amend.sh verify <id> '<cmd>'`, then `.loop/amend.sh reset <id>`, run the new gate once by hand, resume. Record it later as a `plan`/`gate` defect |
+| 3 | stalled | read the notes. A **gate defect** the work session diagnosed, whose fix keeps the gate's intent, you may fix: `vloop task verify <id> '<cmd>' --reason '…'`, then `vloop task reset <id>`, `vloop task gate <id>` once by hand, resume. Record it later as a `plan`/`gate` defect |
 | 4, 6 | budget | resumable; tell the operator |
 | 5, 7, 8 | needs a human | report, don't retry blindly |
 | 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog`, `git show-ref` against what the log lists; restore refs (nothing was committed); tell the operator |
