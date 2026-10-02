@@ -43,6 +43,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | partly | [I20261001-0720-readme-cap-and-run-budgets](I20261001-0720-readme-cap-and-run-budgets.md) |
 | design | decision | partly | [I20261001-1021-four-forks-settled-for-b7](I20261001-1021-four-forks-settled-for-b7.md) |
 | design | decision | partly | [I20261001-1040-planner-gate-checks-questioned](I20261001-1040-planner-gate-checks-questioned.md) |
+| design | decision | partly | [I20261002-2140-b8-designed-from-the-v1-0-review-securit](I20261002-2140-b8-designed-from-the-v1-0-review-securit.md) |
 | design | direction | no | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
