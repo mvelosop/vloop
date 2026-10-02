@@ -80,6 +80,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | [I20261001-1005-plan-md-run-id-wording](I20261001-1005-plan-md-run-id-wording.md) |
 | verify | verification-finding | yes | [I20261001-1338-eval-cases-fail-to-load-setup-key](I20261001-1338-eval-cases-fail-to-load-setup-key.md) |
 | verify | verification-finding | partly | [I20261001-2310-eval-suite-first-run](I20261001-2310-eval-suite-first-run.md) |
+| verify | verification-finding | partly | [I20261002-1426-b7-s-acceptance-run-restarted-detached-t](I20261002-1426-b7-s-acceptance-run-restarted-detached-t.md) |
 | close | carry-forward | partly | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
