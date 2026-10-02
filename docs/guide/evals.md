@@ -73,10 +73,15 @@ PATH=<scratch>/bin:$PATH claude plugin eval plugin \
   --scaffold --trust-plugin --no-publish \
   --output-dir <scratch>/evals --report <scratch>/evals/report.html \
   --max-cost-usd 40 \
-  --allow-tools Write Edit 'Bash(cat:*)' 'Bash(chmod:*)' 'Bash(git diff:*)' \
-    'Bash(git log:*)' 'Bash(git rev-parse:*)' 'Bash(git status:*)' 'Bash(grep:*)' \
-    'Bash(sh:*)' 'Bash(test:*)' 'Bash(vloop config get:*)' \
-    'Bash(vloop schema validate:*)' 'Bash(vloop task show:*)' 'Bash(vloop task:*)'
+  --allow-tools Write Edit 'Bash(git status:*)' 'Bash(git diff:*)' \
+    'Bash(git log:*)' 'Bash(git show:*)' 'Bash(git rev-parse:*)' \
+    'Bash(git ls-files:*)' 'Bash(ls:*)' 'Bash(cat:*)' 'Bash(head:*)' \
+    'Bash(tail:*)' 'Bash(wc:*)' 'Bash(find:*)' 'Bash(mkdir:*)' 'Bash(jq:*)' \
+    'Bash(echo:*)' 'Bash(grep:*)' 'Bash(sh:*)' 'Bash(chmod:*)' 'Bash(test:*)' \
+    'Bash(vloop config get:*)' 'Bash(vloop status:*)' 'Bash(vloop task:*)' \
+    'Bash(vloop task list:*)' 'Bash(vloop task show:*)' \
+    'Bash(vloop task validate:*)' 'Bash(vloop task gate:*)' \
+    'Bash(vloop schema validate:*)'
 ```
 
 - `--scaffold` runs each case's `scaffold.sh`; the tool does not run scaffolds
@@ -84,6 +89,14 @@ PATH=<scratch>/bin:$PATH claude plugin eval plugin \
 - `--allow-tools` is the operator's grant: a case's `allowed_tools` only takes
   effect for gated tools (Bash, Write, Edit) the operator also grants. The list
   above is every gated tool any case names.
+- Every case grants at least the fence's allow list (`fence/settings.json`),
+  plus `echo`, `git ls-files`, `grep`, `sh`, `chmod`, `test` and `vloop task`.
+  Eval sessions run in don't-ask mode: a command outside the grant is denied
+  outright, a compound command is denied whole if any part is, and a session
+  denied once tends to stop using Bash. The driver's sessions run in auto mode
+  under the fence, so a narrower grant scores the grant, not the skill.
+  `TestEvalGrantsCoverFence` holds the cases to the fence and the list above to
+  the cases.
 - `--max-cost-usd` is a hard ceiling, checked before each run. The full suite
   is 13 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
 - **Probe first**: `--case 01-hollow-test --runs 1 --ablation none

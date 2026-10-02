@@ -766,3 +766,93 @@ func checkLLMFocus(name, grader, text string) []string {
 	}
 	return out
 }
+
+// Eval sessions run in don't-ask mode, where a command outside the case's grant
+// is denied outright and a compound command is denied whole; the driver's
+// sessions run in auto mode under the fence. A case granting less than the
+// fence allows measures the grant, not the skill: the first suite's plan cases
+// stopped using Bash after one `cat …; echo …` was denied.
+const evalsGuide = "../../docs/guide/evals.md"
+
+// evalGrantGaps names every fence allow rule a case's allowed_tools lacks, and
+// every gated tool (Bash, Write, Edit) a case grants that the guide's
+// --allow-tools does not; guide "" skips the second check.
+func evalGrantGaps(dir string, fenceAllow []string, guide string) []string {
+	var out []string
+	cases, _ := filepath.Glob(filepath.Join(dir, "evals", "*", "prompt.md"))
+	sort.Strings(cases)
+	for _, p := range cases {
+		name := filepath.Base(filepath.Dir(p))
+		raw, err := os.ReadFile(p)
+		if err != nil {
+			out = append(out, fmt.Sprintf("eval %s: %v", name, err))
+			continue
+		}
+		var grant []string
+		if err := json.Unmarshal([]byte(frontmatter(string(raw))["allowed_tools"]), &grant); err != nil {
+			out = append(out, fmt.Sprintf("eval %s: allowed_tools is not a JSON-style array: %v", name, err))
+			continue
+		}
+		for _, r := range fenceAllow {
+			if !inList(grant, r) {
+				out = append(out, fmt.Sprintf("eval %s: allowed_tools lacks the fence's %s", name, r))
+			}
+		}
+		if guide == "" {
+			continue
+		}
+		for _, g := range grant {
+			gated := strings.HasPrefix(g, "Bash(") || g == "Write" || g == "Edit"
+			if gated && !strings.Contains(guide, " "+g+" ") && !strings.Contains(guide, "'"+g+"'") {
+				out = append(out, fmt.Sprintf("eval %s: %s is not in the guide's --allow-tools", name, g))
+			}
+		}
+	}
+	return out
+}
+
+func fenceAllowRules(t *testing.T) []string {
+	t.Helper()
+	var f struct {
+		Permissions struct {
+			Allow []string `json:"allow"`
+		} `json:"permissions"`
+	}
+	if err := json.Unmarshal(vloop.Fence, &f); err != nil {
+		t.Fatal(err)
+	}
+	return f.Permissions.Allow
+}
+
+func TestEvalGrantsCoverFence(t *testing.T) {
+	guide, err := os.ReadFile(evalsGuide)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The guide's command is one block; join its continuation lines.
+	g := strings.ReplaceAll(string(guide), "\\\n", " ") + " "
+	for _, v := range evalGrantGaps(skillCheckDefault, fenceAllowRules(t), g) {
+		t.Errorf("%s", v)
+	}
+}
+
+func TestEvalGrantGapsRejectsNarrowGrant(t *testing.T) {
+	dir := t.TempDir()
+	c := filepath.Join(dir, "evals", "case-a")
+	if err := os.MkdirAll(c, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	pm := "---\nmax_turns: 5\nallowed_tools: [\"Read\", \"Bash(cat:*)\"]\n---\n/vloop:plan b.md\n"
+	if err := os.WriteFile(filepath.Join(c, "prompt.md"), []byte(pm), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got := strings.Join(evalGrantGaps(dir, []string{"Read", "Bash(ls:*)"}, " Write 'Bash(ls:*)' "), "\n")
+	for _, want := range []string{"eval case-a: allowed_tools lacks the fence's Bash(ls:*)", "eval case-a: Bash(cat:*) is not in the guide's --allow-tools"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("want %q in:\n%s", want, got)
+		}
+	}
+	if strings.Contains(got, "lacks the fence's Read") {
+		t.Errorf("Read is granted but reported:\n%s", got)
+	}
+}
