@@ -141,6 +141,9 @@ func (it *Iterator) Run() (Ending, error) {
 	if err != nil {
 		return Ending{}, halt(ExitPreflight, "%v", err)
 	}
+	if err := checkPlanRunID(plan); err != nil {
+		return Ending{}, err
+	}
 	it.plan = plan
 	it.branch = CurrentBranch(it.Root)
 	if it.RunDir == "" {
@@ -282,7 +285,7 @@ func (it *Iterator) save() error { return state.Save(it.Root, it.plan) }
 // readReport reads a session's handoff file, which counts as absent unless it
 // exists and passes its schema.
 func (it *Iterator) readReport(name, schemaName string) ([]byte, bool) {
-	data, err := os.ReadFile(filepath.Join(it.Root, filepath.FromSlash(tmpDir), name))
+	data, err := readHandoff(filepath.Join(it.Root, filepath.FromSlash(tmpDir), name))
 	if err != nil {
 		return nil, false
 	}
@@ -805,9 +808,27 @@ func (it *Iterator) appendIteration(rec map[string]any) error {
 
 // copyReport keeps a masked copy of a handoff file under reports/; a file that
 // is not there leaves nothing.
-func (it *Iterator) copyReport(name, dest string) {
-	data, err := os.ReadFile(filepath.Join(it.Root, filepath.FromSlash(tmpDir), name))
+// readHandoff reads a session's handoff file only when it is a regular file; a
+// symlink is treated as missing.
+func readHandoff(path string) ([]byte, error) {
+	fi, err := os.Lstat(path)
 	if err != nil {
+		return nil, err
+	}
+	if !fi.Mode().IsRegular() {
+		return nil, fmt.Errorf("%s is not a regular file", filepath.Base(path))
+	}
+	return os.ReadFile(path)
+}
+
+// copyReport keeps a report in the run folder, but only one that validates.
+func (it *Iterator) copyReport(name, dest string) {
+	schemaName := "proposal/v1"
+	if name == "verdict.json" {
+		schemaName = "verdict/v1"
+	}
+	data, ok := it.readReport(name, schemaName)
+	if !ok {
 		return
 	}
 	dir := filepath.Join(it.RunDir, "reports")

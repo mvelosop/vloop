@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T10",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Handoff files (proposal.json, verdict.json) are read only when they are regular files, never through a symlink; a symlinked one is treated as missing, and a report is copied into the run folder only after it validated.", "met": true, "evidence": "internal/driver/iterate.go: readHandoff uses Lstat and requires a regular file; readReport uses it; copyReport now goes through readReport, which validates the schema before copying."},
+    {"criterion": "The lock is created atomically with exclusive create and without following a symlink; a lock whose process is gone is replaced once; two concurrent acquisitions → exactly one succeeds and the other exits 1 naming the running pid.", "met": true, "evidence": "internal/driver/safety.go: AcquireLock writes a temp file and os.Link()s it into place, so it fails with EEXIST and never follows a symlink; readLock uses Lstat; a stale lock is replaced once (attempt>0 halts); the loser gets lockHeld naming the pid with ExitPreflight."},
+    {"criterion": "run_id must match ^[A-Za-z0-9._-]+$, contain no .., and equal the run id of the plan's brief; otherwise vloop run exits 1 before anything is written. schemas/state.v1.json gains the pattern while still accepting the empty run_id a planning session writes.", "met": true, "evidence": "safety.go: CheckRunID/checkPlanRunID check the pattern, '..' and brief.RunID; called in internal/cli/run.go before the lock and in Iterator.Run. schemas/state.v1.json: pattern ^[A-Za-z0-9._-]*$ plus not '..', so the empty run_id is still accepted."},
+    {"criterion": "internal/driver/safety_test.go holds TestLockExactlyOneOfConcurrent (two goroutines) and a test TestHandoffSymlinkIsMissing exists in internal/driver; cmd/vloop/run_tmp_test.go holds TestRunSymlinkedProposal (a proposal.json symlinked to a file holding SECRET: no SECRET under .vloop/state/) and TestRunBadRunID (run_id \"../x\": exit 1, nothing written outside the repo); each fails against the base.", "met": true, "evidence": "All four tests exist with real assertions (safety_test.go, run_tmp_test.go). The driver-run gate invokes each by name and requires PASS. Against the base, readHandoff, the lock link and CheckRunID do not exist, so each would fail."}
+  ],
+  "findings": [],
+  "notes": "A stray duplicate doc comment (the old copyReport comment) is left above readHandoff in iterate.go; cosmetic. The proposal says TestRun03GateRegression and TestRun41RegressionNamesBoth fail in cmd/vloop from before T10; I did not verify this independently (the full run was still going when I wrote the verdict), and they are outside this gate."
+}

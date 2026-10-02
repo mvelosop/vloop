@@ -61,6 +61,10 @@ func newRun(b Build, g *Globals) *cobra.Command {
 				return err
 			}
 
+			if err := driver.CheckRunID(root, briefPath); err != nil {
+				return Problem(err)
+			}
+
 			lockRun := ""
 			if briefPath != "" {
 				lockRun = brief.RunID(briefPath)

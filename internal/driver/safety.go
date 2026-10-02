@@ -10,10 +10,13 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/mvelosop/vloop/internal/brief"
 	"github.com/mvelosop/vloop/internal/state"
 )
 
@@ -40,47 +43,117 @@ func (l lockRecord) pid() int {
 
 // AcquireLock takes the run lock of the working tree at root. A live holder
 // refuses with a *Halt naming git worktree as the alternative; a lock whose
-// process is gone is cleared and reported through warn. The returned function
-// releases the lock and is safe to call more than once.
+// process is gone is replaced once and reported through warn. The record is
+// written to a private file and hard-linked into place, so the lock appears
+// complete or not at all, never follows a symlink, and exactly one of several
+// concurrent acquisitions succeeds. The returned function releases the lock and
+// is safe to call more than once.
 func AcquireLock(root, branch, runID string, now time.Time, warn func(format string, a ...any)) (func(), error) {
 	path := filepath.Join(root, filepath.FromSlash(lockFile))
-	if data, err := os.ReadFile(path); err == nil {
-		var held lockRecord
-		_ = json.Unmarshal(data, &held)
-		if pid := held.pid(); pid > 0 && processAlive(pid) {
-			other := held.Branch
-			if other == "" {
-				other = "?"
-			}
-			started := held.Started
-			if started == "" {
-				started = "?"
-			}
-			return nil, halt(ExitPreflight, "a loop is already running in this working tree (pid %d, branch '%s', started %s) — two loops in one tree share .vloop/state/state.json and .vloop/tmp/proposal.json; to run in parallel give each its own worktree: git worktree add ../<dir> <branch>", pid, other, started)
-		} else if warn != nil {
-			if pid > 0 {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return nil, err
+	}
+	rec, _ := json.Marshal(lockRecord{PID: os.Getpid(), Branch: branch, Started: now.UTC().Format(time.RFC3339), Run: runID})
+	rec = append(rec, '\n')
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".running-*")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmp.Name())
+	_, werr := tmp.Write(rec)
+	if cerr := tmp.Close(); werr == nil {
+		werr = cerr
+	}
+	if werr != nil {
+		return nil, werr
+	}
+
+	for attempt := 0; ; attempt++ {
+		err := os.Link(tmp.Name(), path)
+		if err == nil {
+			break
+		}
+		if !errors.Is(err, fs.ErrExist) {
+			return nil, err
+		}
+		held, raw, regular := readLock(path)
+		if pid := held.pid(); regular && pid > 0 && processAlive(pid) {
+			return nil, lockHeld(held)
+		}
+		if attempt > 0 {
+			return nil, halt(ExitPreflight, "could not take the run lock %s: another loop is starting in this working tree", lockFile)
+		}
+		if warn != nil {
+			if pid := held.pid(); pid > 0 {
 				warn("clearing a stale lock (pid %d is gone)", pid)
 			} else {
 				warn("clearing a stale lock (pid unknown is gone)")
 			}
 		}
-	}
-	rec, _ := json.Marshal(lockRecord{PID: os.Getpid(), Branch: branch, Started: now.UTC().Format(time.RFC3339), Run: runID})
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return nil, err
-	}
-	if err := os.WriteFile(path, append(rec, '\n'), 0o644); err != nil {
-		return nil, err
+		// Remove only the lock that was judged stale, not a newer one.
+		if _, now, _ := readLock(path); bytes.Equal(now, raw) {
+			_ = os.Remove(path)
+		}
 	}
 	return func() {
-		if data, err := os.ReadFile(path); err == nil {
-			var cur lockRecord
-			if json.Unmarshal(data, &cur) == nil && cur.pid() != os.Getpid() {
-				return
-			}
+		if held, _, regular := readLock(path); !regular || held.pid() != os.Getpid() {
+			return
 		}
 		_ = os.Remove(path)
 	}, nil
+}
+
+// readLock reads the lock at path without following a symlink. regular is false
+// for anything but a regular file, which holds no usable record.
+func readLock(path string) (rec lockRecord, raw []byte, regular bool) {
+	fi, err := os.Lstat(path)
+	if err != nil || !fi.Mode().IsRegular() {
+		return rec, nil, false
+	}
+	raw, err = os.ReadFile(path)
+	if err != nil {
+		return rec, nil, false
+	}
+	_ = json.Unmarshal(raw, &rec)
+	return rec, raw, true
+}
+
+func lockHeld(held lockRecord) error {
+	other := held.Branch
+	if other == "" {
+		other = "?"
+	}
+	started := held.Started
+	if started == "" {
+		started = "?"
+	}
+	return halt(ExitPreflight, "a loop is already running in this working tree (pid %d, branch '%s', started %s) — two loops in one tree share .vloop/state/state.json and .vloop/tmp/proposal.json; to run in parallel give each its own worktree: git worktree add ../<dir> <branch>", held.pid(), other, started)
+}
+
+// runIDPattern is what a run id may be: it names a folder and a journal.
+var runIDPattern = regexp.MustCompile(`^[A-Za-z0-9._-]+$`)
+
+// CheckRunID refuses a committed plan whose run_id is not a plain name, or is
+// not the run id of the brief the plan names. A missing plan is not its
+// concern, and neither is one about to be replaced: briefPath names another
+// brief than the plan's.
+func CheckRunID(root, briefPath string) error {
+	plan, err := state.Load(root)
+	if err != nil || (briefPath != "" && briefPath != plan.Brief) {
+		return nil
+	}
+	return checkPlanRunID(plan)
+}
+
+func checkPlanRunID(plan *state.Plan) error {
+	id := plan.RunID
+	if !runIDPattern.MatchString(id) || strings.Contains(id, "..") {
+		return halt(ExitPreflight, "the plan's run_id %q is not a plain name (letters, digits, '.', '_' and '-', no '..') — it names folders and the journal; nothing was written", id)
+	}
+	if want := brief.RunID(plan.Brief); id != want {
+		return halt(ExitPreflight, "the plan's run_id %q is not the run id of its brief %s (%q) — nothing was written", id, plan.Brief, want)
+	}
+	return nil
 }
 
 // stateGuard is the plan's bytes as the driver left them before a session ran.

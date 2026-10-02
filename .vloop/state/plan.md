@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **9/18 done** · iteration 10
+**Status:** running · **10/18 done** · iteration 11
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:26:41Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:36:36Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Time gates and sessions and leave nothing running (F3) · 1 attempt(s)
 - [x] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
 - [x] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
-- [ ] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
+- [x] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
 - [ ] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
 - [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
 - [ ] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
@@ -251,7 +251,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T10 — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/driver/iterate.go`, `internal/driver/safety.go`, `internal/driver/safety_test.go`, `internal/driver/plan.go`, `schemas/state.v1.json`, `cmd/vloop/run_tmp_test.go`
 
