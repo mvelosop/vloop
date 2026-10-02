@@ -2,14 +2,14 @@
 name: B20261002-2135-vloop-v1-security.loop-brief
 description: Make the driver, not the fence, the boundary of what a run can do — sessions and gates confined and timed, secrets kept out of what is committed, only ready briefs planned from a clean tree — and land B7's carry-overs, from the v1.0 review's security pass
 kind: brief
-status: draft
+status: ready
 created: 2026-10-02
 seeds: The first brief vloop runs on itself; it hardens the driver that runs the next one (B9, the quality pass)
 depends-on: [B20261001-1025-vloop-skills.loop-brief]
 ---
 # Brief — vloop B8: the v1.0 security pass
 
-- **Status:** draft
+- **Status:** ready to plan
 - **Starting point:** extends `main` at the v0.7.0 release (`e18f80e`, tag
   `v0.7.0`, PR #9), after the cut-over (`271e5b0`, PR #8). The planner pins the
   base it plans from as the **base** every gate compares against — never
