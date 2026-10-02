@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T11",
+  "outcome": "done",
+  "summary": "repo.remote is now exported only as scheme://host[:port]/path or host:path without user info, query or fragment, and omitted for a local path or file:// origin; repo.name derives from the sanitized remote.",
+  "files": ["internal/cli/export.go", "internal/cli/export_test.go", "schemas/export.v1.json"],
+  "verified": "vloop task gate T11 exited 0 and printed GATE OK.",
+  "notes": "Schema: remote is now optional and a plain string (no null); Remote uses omitempty. scp-like user (git@) is dropped too. Local-path detection: no colon, slash/backslash before the colon, a one-letter Windows drive, or a ~ host."
+}

@@ -83,3 +83,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Handoffs are read only as regular files and a report is copied into the run folder only after it validates; the run lock is hard-linked into place atomically; run_id must match the pattern and its brief's run id, in the driver and in state.v1.json.
 - **Files:** internal/driver/safety.go, internal/driver/safety_test.go, internal/driver/iterate.go, internal/cli/run.go, schemas/state.v1.json, cmd/vloop/run_tmp_test.go
 - **Notes for next iteration:** AcquireLock writes the record to a temp file and os.Link()s it to .vloop/tmp/.running: atomic, never follows a symlink, never visible half-written; a stale or non-regular lock is replaced once (removed only if its bytes are unchanged), then a second EEXIST halts. CheckRunID(root, briefPath) runs in internal/cli/run.go before the lock and is skipped when the named brief differs from the plan's (the plan is about to be reset); Iterator.Run checks again. The schema pattern is ^[A-Za-z0-9._-]*$ plus a not-pattern for '..', so the planning session's empty run_id still validates; a bad run_id in a committed plan is usually refused first by the preflight plan validation. A full go test ./... in cmd/vloop still fails TestRun03GateRegression and TestRun41RegressionNamesBoth (known before T10, from T5 token matching); not part of this gate.
+
+## T11 — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** repo.remote is now exported only as scheme://host[:port]/path or host:path without user info, query or fragment, and omitted for a local path or file:// origin; repo.name derives from the sanitized remote.
+- **Files:** internal/cli/export.go, internal/cli/export_test.go, schemas/export.v1.json
+- **Notes for next iteration:** Schema: remote is now optional and a plain string (no null); Remote uses omitempty. scp-like user (git@) is dropped too. Local-path detection: no colon, slash/backslash before the colon, a one-letter Windows drive, or a ~ host.

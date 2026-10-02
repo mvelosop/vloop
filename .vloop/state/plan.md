@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/18 done** · iteration 11
+**Status:** running · **10/18 done** · iteration 12
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:36:36Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:41:03Z
 
 ## Progress
 
@@ -17,8 +17,8 @@
 - [x] **T7** — Time gates and sessions and leave nothing running (F3) · 1 attempt(s)
 - [x] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
 - [x] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
-- [x] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
-- [ ] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
+- [ ] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13) · 1 attempt(s)
+- [x] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
 - [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
 - [ ] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
 - [ ] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
@@ -251,7 +251,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T10 — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
 
-`done` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 **Files:** `internal/driver/iterate.go`, `internal/driver/safety.go`, `internal/driver/safety_test.go`, `internal/driver/plan.go`, `schemas/state.v1.json`, `cmd/vloop/run_tmp_test.go`
 
@@ -264,6 +264,8 @@ The driver reads .vloop/tmp/proposal.json and verdict.json through symlinks and 
 - run_id must match ^[A-Za-z0-9._-]+$, contain no .., and equal the run id of the plan's brief; otherwise vloop run exits 1 before anything is written. schemas/state.v1.json gains the pattern while still accepting the empty run_id a planning session writes.
 - internal/driver/safety_test.go holds TestLockExactlyOneOfConcurrent (two goroutines) and a test TestHandoffSymlinkIsMissing exists in internal/driver; cmd/vloop/run_tmp_test.go holds TestRunSymlinkedProposal (a proposal.json symlinked to a file holding SECRET: no SECRET under .vloop/state/) and TestRunBadRunID (run_id "../x": exit 1, nothing written outside the repo); each fails against the base.
 
+**From the last attempt:** regressed: verify failed during T11 — see .vloop/state/runs/B20261002-2135-vloop-v1-security/20261002-225019/gates/T10.log
+
 <details><summary>verify command</summary>
 
 ```sh
@@ -274,7 +276,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T11 — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/cli/export.go`, `internal/cli/export_test.go`, `schemas/export.v1.json`
 

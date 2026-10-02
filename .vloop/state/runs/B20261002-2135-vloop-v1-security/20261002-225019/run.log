@@ -44,3 +44,8 @@ committing the plan
    Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
    review: PASS
    T10 done
+── iteration 12 (12 this run) · T11 · 10/18 done ──
+   Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
+   GATE REGRESSION T10 — reverting to pending; detected during T11's iteration
+   review: PASS
+   T11 done
