@@ -48,7 +48,7 @@ Sessions started by the vloop loop (plan, work, review) follow these rules:
 
 In an interactive session you are the operator's hands: follow the operator skill (vloop-operator), not these session rules.
 
-Written by vloop 0.0.0-dev.
+Written by vloop 0.7.0.
 <!-- vloop:end -->
 
 <!-- loop:begin -->
