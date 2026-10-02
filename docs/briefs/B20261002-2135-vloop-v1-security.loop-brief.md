@@ -10,9 +10,10 @@ depends-on: [B20261001-1025-vloop-skills.loop-brief]
 # Brief — vloop B8: the v1.0 security pass
 
 - **Status:** draft
-- **Starting point:** extends `main` at the cut-over commit (`271e5b0`, PR #8).
-  The planner pins the base it plans from as the **base** every gate compares
-  against — never `HEAD~n`.
+- **Starting point:** extends `main` at the v0.7.0 release (`e18f80e`, tag
+  `v0.7.0`, PR #9), after the cut-over (`271e5b0`, PR #8). The planner pins the
+  base it plans from as the **base** every gate compares against — never
+  `HEAD~n`.
 - **Produced by:** the v1.0 review's design act, 2026-10-02 — five read-only
   review passes (command execution; file writes, paths and secrets; what
   sessions may do; docs against the binary; code health), every finding below

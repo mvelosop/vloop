@@ -7,7 +7,7 @@ created: 2026-10-02
 ---
 # vloop — the v1.0 review
 
-Done on 2026-10-02 in the design act for B8, at `main` `271e5b0`, by five
+Done on 2026-10-02 in the design act for B8, at `main` `271e5b0` (the v0.7.0 release `e18f80e` changes only versions), by five
 read-only review passes: command execution; file writes, paths and secrets;
 what sessions may do; docs against the binary; code health. The architect
 checked the load-bearing claims against the code before triage. Decided with
