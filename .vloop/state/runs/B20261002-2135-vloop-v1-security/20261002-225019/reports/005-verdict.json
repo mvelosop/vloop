@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A changed path is a gate file when it equals, as a whole token, a path named in the verify of the current task or of any done task, after both are normalised: `\\` to `/`, a leading `./` removed, quotes stripped.", "met": true, "evidence": "internal/driver/gates.go: normGatePath and verifyTokens normalise both sides; gateFilesMoved matches by map lookup over the current and done tasks' verify tokens"},
+    {"criterion": "Paths from git are read unquoted (core.quotepath=false, from T2), so a non-ASCII gate file such as prüfung.sh is matched and restored.", "met": true, "evidence": "git() in internal/driver/gitguard.go:27 sets core.quotepath=false; gates_test.go:53 asserts prüfung.sh is moved; the gate's end-to-end fixture restores it"},
+    {"criterion": "A file in the current task's own files, or created by the task, is still never restored; restoration still uses git checkout HEAD and the same notes as today.", "met": true, "evidence": "own-files check kept (normalised); the cat-file HEAD check and the earlier-attempt log check are untouched; restoreGateFiles is not in the diff"},
+    {"criterion": "internal/driver/gates_test.go holds TestGateFilesByToken covering: a.sh changed with verify `bash data.sh` is not a gate file; verify `pwsh -File .\\scripts\\check.ps1` with scripts/check.ps1 changed is; prüfung.sh edited is restored; a file named only by a done task's verify is restored; it fails against the base.", "met": true, "evidence": "gates_test.go:47-58 covers all four cases with real git state; the gate log ends in GATE OK and the base's substring match would fail the a.sh and backslash cases"}
+  ],
+  "findings": [],
+  "notes": "Cosmetic: the doc comment on gateFilesMoved has one over-long line. No existing test or gate file was modified."
+}

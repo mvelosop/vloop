@@ -17,3 +17,7 @@ committing the plan
    Revert and fail a review session that changes the work it judges (F8)
    review: PASS
    T4 done
+── iteration 5 (5 this run) · T5 · 4/18 done ──
+   Find gate files by whole token, across OS path forms and for every done task (F9)
+   review: PASS
+   T5 done

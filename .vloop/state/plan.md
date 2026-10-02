@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/18 done** · iteration 4
+**Status:** running · **5/18 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:37:42Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:40:22Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Make the driver's git ignore hooks and fsmonitor, and halt when .git/config, the hooks or a gate's refs change (F4, F5)
 - [x] **T3** — Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
 - [x] **T4** — Revert and fail a review session that changes the work it judges (F8)
-- [ ] **T5** — Find gate files by whole token, across OS path forms and for every done task (F9)
+- [x] **T5** — Find gate files by whole token, across OS path forms and for every done task (F9)
 - [ ] **T6** — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
 - [ ] **T7** — Time gates and sessions and leave nothing running (F3)
 - [ ] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
@@ -133,7 +133,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T5 — Find gate files by whole token, across OS path forms and for every done task (F9)
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 **Files:** `internal/driver/gates.go`, `internal/driver/gates_test.go`
 

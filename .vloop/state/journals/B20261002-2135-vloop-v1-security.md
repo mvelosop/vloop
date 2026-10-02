@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The driver snapshots the working tree via git status before the review session and afterwards reverts every change outside .vloop/tmp/ and .vloop/state/, logs each path and forces the verdict to FAIL with the finding 'the review session changed files'.
 - **Files:** internal/driver/iterate.go, cmd/vloop/run_review_test.go
 - **Notes for next iteration:** treeGuard (end of internal/driver/iterate.go) reads git status -z --no-renames, keeps the bytes of paths already dirty (the work's own changes) and writes them back; a path that was clean is restored with git checkout HEAD, or removed if untracked. .vloop/state/ is excluded because the state and input guards own it. Ignored files are invisible to it. The test's retry passes, so the finding is cleared from task notes; the gate's single-iteration run checks the notes.
+
+## T5 — Find gate files by whole token, across OS path forms and for every done task (F9)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** gateFilesMoved now matches changed paths as whole normalised tokens (backslashes to slashes, leading ./ and quotes stripped) against the verify of the current task and every done task; TestGateFilesByToken added.
+- **Files:** internal/driver/gates.go, internal/driver/gates_test.go
+- **Notes for next iteration:** Tokens split on whitespace and ;&|()<>; done tasks are read from it.plan. A path inside a quoted string with spaces is not matched.
