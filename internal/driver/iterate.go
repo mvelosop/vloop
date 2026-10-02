@@ -697,27 +697,22 @@ func (it *Iterator) relGate(id string) string {
 // task's gate log, and a failing one is also kept for this iteration.
 func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	t := it.plan.Find(id)
-	shell := it.plan.Shell
-	if shell == "" {
-		shell = "sh"
-	}
-	path, err := exec.LookPath(shell)
-	if err != nil {
-		return nil, halt(ExitPreflight, "%v", &state.ShellMissingError{Shell: shell})
-	}
-	cmd := exec.Command(path, state.GateArgs(shell, t.Verify)...)
-	cmd.Dir = it.Root
 	base := it.Env
 	if base == nil {
 		base = os.Environ()
 	}
+	var env []string
 	for _, kv := range base {
 		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") {
 			continue
 		}
-		cmd.Env = append(cmd.Env, kv)
+		env = append(env, kv)
 	}
-	cmd.Env = append(cmd.Env, "VLOOP_ACTIVE_TASK="+active, "VLOOP_GATE_TASK="+id)
+	env = append(env, "VLOOP_ACTIVE_TASK="+active, "VLOOP_GATE_TASK="+id)
+	cmd, err := state.GateCommand(it.Root, it.plan.Shell, t.Verify, env)
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
 	var out bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &out, &out
 	refsBefore := refsState(it.Root)

@@ -21,3 +21,7 @@ committing the plan
    Find gate files by whole token, across OS path forms and for every done task (F9)
    review: PASS
    T5 done
+── iteration 6 (6 this run) · T6 · 5/18 done ──
+   Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
+   review: PASS
+   T6 done

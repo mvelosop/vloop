@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/18 done** · iteration 5
+**Status:** running · **6/18 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:40:22Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:43:17Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
 - [x] **T4** — Revert and fail a review session that changes the work it judges (F8)
 - [x] **T5** — Find gate files by whole token, across OS path forms and for every done task (F9)
-- [ ] **T6** — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
+- [x] **T6** — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
 - [ ] **T7** — Time gates and sessions and leave nothing running (F3)
 - [ ] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
 - [ ] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
@@ -156,7 +156,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T6 — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/state/gate.go`, `internal/state/gate_test.go`, `internal/driver/iterate.go`, `internal/cli/task_gate.go`
 

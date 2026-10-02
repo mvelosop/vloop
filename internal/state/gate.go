@@ -28,17 +28,56 @@ func GateArgs(shell, cmd string) []string {
 	}
 }
 
-// RunGate runs verify from root in shell, streaming its output to stdout and
-// stderr. It returns the command's own exit code (1 when it was killed by a
-// signal) and how long it took. A shell that is not on PATH is a
-// *ShellMissingError and nothing runs.
-func RunGate(root, shell, verify string, stdout, stderr io.Writer) (int, time.Duration, error) {
+// UnknownShellError is returned when the plan's shell is not one of the five
+// gate shells.
+type UnknownShellError struct{ Shell string }
+
+func (e *UnknownShellError) Error() string {
+	return fmt.Sprintf("shell %s is not one of sh, bash, pwsh, powershell, cmd", e.Shell)
+}
+
+// GateCmdLine is the command line cmd.exe receives for verify: /C and the
+// command verbatim, so cmd sees the quotes the plan wrote.
+func GateCmdLine(verify string) string {
+	return "/C " + verify
+}
+
+// GateCommand builds the one command that runs verify from root in shell; the
+// driver and vloop task gate both start gates from it. An empty shell is sh.
+// A shell outside the five known ones is an *UnknownShellError and one that is
+// not on PATH a *ShellMissingError; neither builds a command. A nil env keeps
+// the process environment.
+func GateCommand(root, shell, verify string, env []string) (*exec.Cmd, error) {
+	if shell == "" {
+		shell = "sh"
+	}
+	switch shell {
+	case "sh", "bash", "pwsh", "powershell", "cmd":
+	default:
+		return nil, &UnknownShellError{Shell: shell}
+	}
 	path, err := exec.LookPath(shell)
 	if err != nil {
-		return 0, 0, &ShellMissingError{Shell: shell}
+		return nil, &ShellMissingError{Shell: shell}
 	}
 	c := exec.Command(path, GateArgs(shell, verify)...)
+	if shell == "cmd" {
+		setCmdLine(c, GateCmdLine(verify))
+	}
 	c.Dir = root
+	c.Env = env
+	return c, nil
+}
+
+// RunGate runs verify from root in shell, streaming its output to stdout and
+// stderr. It returns the command's own exit code (1 when it was killed by a
+// signal) and how long it took. An unknown shell or one that is not on PATH is
+// an error and nothing runs.
+func RunGate(root, shell, verify string, stdout, stderr io.Writer) (int, time.Duration, error) {
+	c, err := GateCommand(root, shell, verify, nil)
+	if err != nil {
+		return 0, 0, err
+	}
 	c.Stdout, c.Stderr = stdout, stderr
 	start := time.Now()
 	err = c.Run()

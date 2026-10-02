@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** gateFilesMoved now matches changed paths as whole normalised tokens (backslashes to slashes, leading ./ and quotes stripped) against the verify of the current task and every done task; TestGateFilesByToken added.
 - **Files:** internal/driver/gates.go, internal/driver/gates_test.go
 - **Notes for next iteration:** Tokens split on whitespace and ;&|()<>; done tasks are read from it.plan. A path inside a quoted string with spaces is not matched.
+
+## T6 — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** state.GateCommand is now the single builder of a gate's command, used by RunGate (vloop task gate) and Iterator.runGate. It refuses a shell outside sh, bash, pwsh, powershell, cmd, and passes cmd its command line verbatim on Windows.
+- **Files:** internal/state/gate.go, internal/state/gate_cmdline_windows.go, internal/state/gate_cmdline_other.go, internal/state/gate_test.go, internal/driver/iterate.go
+- **Notes for next iteration:** GateCommand(root, shell, verify, env) returns *UnknownShellError or *ShellMissingError and builds nothing; an empty shell means sh. GateCmdLine(verify) is the pure builder (/C <verify>); gate_cmdline_windows.go sets SysProcAttr.CmdLine from it, the other-OS file is a no-op. The driver halts with ExitPreflight on either error. internal/cli/task_gate.go needed no change: it calls RunGate and prints the error via Problem. The timeout and process group (T7) belong in GateCommand's callers or in it.
