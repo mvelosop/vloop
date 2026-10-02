@@ -1,9 +1,14 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -21,6 +26,11 @@ func newTaskGate(g *Globals) *cobra.Command {
 			p, err := loadPlan(g, out)
 			if err != nil {
 				return err
+			}
+			if want := os.Getenv("VLOOP_PLAN_SHA256"); want != "" {
+				if err := checkPlanHash(g, want); err != nil {
+					return jsonProblem(g, out, err)
+				}
 			}
 			t := p.Find(args[0])
 			if t == nil {
@@ -77,4 +87,26 @@ func newTaskVerify(g *Globals) *cobra.Command {
 	cmd.Flags().StringVar(&reason, "reason", "", "why the gate is being replaced (required)")
 	_ = cmd.MarkFlagRequired("reason")
 	return cmd
+}
+
+// checkPlanHash refuses to run a gate when the plan on disk is not the one the
+// driver handed this session, and leaves the driver a note that it did.
+func checkPlanHash(g *Globals, want string) error {
+	root, err := g.root()
+	if err != nil {
+		return err
+	}
+	data, err := os.ReadFile(state.Path(root))
+	if err != nil {
+		return Problem(err)
+	}
+	sum := sha256.Sum256(data)
+	if hex.EncodeToString(sum[:]) == strings.ToLower(strings.TrimSpace(want)) {
+		return nil
+	}
+	note := filepath.Join(root, ".vloop", "tmp", "gate-refused")
+	if os.MkdirAll(filepath.Dir(note), 0o755) == nil {
+		_ = os.WriteFile(note, []byte("plan changed\n"), 0o644)
+	}
+	return Problem(errors.New("the plan was changed during this session — gates run only from the plan the driver holds"))
 }

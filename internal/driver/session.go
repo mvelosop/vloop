@@ -47,6 +47,7 @@ type Spec struct {
 	Arg       string
 	Model     string
 	Effort    string
+	PlanSHA   string // the plan's hash handed to the session; "" for none
 }
 
 // Result is how a session ended. Recorded is false when it printed nothing and
@@ -171,10 +172,13 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		base = os.Environ()
 	}
 	for _, kv := range base {
-		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") {
+		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") || strings.HasPrefix(kv, PlanHashEnv+"=") {
 			continue
 		}
 		cmd.Env = append(cmd.Env, kv)
+	}
+	if s.PlanSHA != "" {
+		cmd.Env = append(cmd.Env, PlanHashEnv+"="+s.PlanSHA)
 	}
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr

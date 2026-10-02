@@ -9,3 +9,7 @@ committing the plan
    Make the driver's git ignore hooks and fsmonitor, and halt when .git/config, the hooks or a gate's refs change (F4, F5)
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/18 done ──
+   Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
+   review: PASS
+   T3 done

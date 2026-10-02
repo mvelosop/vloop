@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/18 done** · iteration 2
+**Status:** running · **3/18 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:28:29Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:34:22Z
 
 ## Progress
 
 - [x] **T1** — Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
 - [x] **T2** — Make the driver's git ignore hooks and fsmonitor, and halt when .git/config, the hooks or a gate's refs change (F4, F5)
-- [ ] **T3** — Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
+- [x] **T3** — Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
 - [ ] **T4** — Revert and fail a review session that changes the work it judges (F8)
 - [ ] **T5** — Find gate files by whole token, across OS path forms and for every done task (F9)
 - [ ] **T6** — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
@@ -83,7 +83,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T3 — Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 **Files:** `internal/driver/iterate.go`, `internal/driver/safety.go`, `internal/driver/session.go`, `internal/driver/resolve.go`, `internal/cli/task_gate.go`, `internal/cli/task_gate_test.go`, `cmd/vloop/run_inputs_test.go`
 

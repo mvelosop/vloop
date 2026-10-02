@@ -64,6 +64,8 @@ type Iterator struct {
 	Env    []string
 
 	plan       *state.Plan
+	resolved   *Resolved              // model and effort defaults, read once at the start
+	spent      float64                // what this run's sessions cost, summed as they finish
 	noProposal []string               // tasks whose session died after changing files, with the account
 	gatePasses []string               // tasks reported blocked whose own gate passes
 	blockedAt  map[string]blockedMark // per task, the last iteration it ended blocked in
@@ -144,6 +146,13 @@ func (it *Iterator) Run() (Ending, error) {
 	it.r = &Runner{Root: it.Root, Version: it.Version, RunID: plan.RunID, RunDir: it.RunDir, Log: it.log,
 		Claude: it.Claude, Now: it.Now, Home: it.Home, User: it.User, Env: it.Env}
 
+	if it.resolved, err = ResolveRun(it.Root); err != nil {
+		return Ending{}, halt(ExitPreflight, "%v", err)
+	}
+	// The one read of the records on disk: the sessions before this phase, such
+	// as the plan session. Every later session is added as it finishes.
+	it.spent = it.spend()
+
 	if plan.Status != "running" || plan.Branch != it.branch {
 		plan.Status, plan.Branch = "running", it.branch
 		if err := it.save(); err != nil {
@@ -170,7 +179,7 @@ func (it *Iterator) Run() (Ending, error) {
 			end = Ending{Status: "halted", Code: ExitMaxIter}
 			break
 		}
-		if spend := it.spend(); spend >= it.Budgets.CostCeiling {
+		if spend := it.spent; spend >= it.Budgets.CostCeiling {
 			it.warn("cost ceiling reached: $%.2f spent this run, ceiling $%.2f", spend, it.Budgets.CostCeiling)
 			end = Ending{Status: "halted", Code: ExitCostCeiling}
 			break
@@ -276,6 +285,22 @@ func (it *Iterator) readReport(name, schemaName string) ([]byte, bool) {
 	return data, true
 }
 
+// restoreInputs puts back what the session changed among the driver's inputs,
+// saying so in the run log, and notes a gate refused for a changed plan. It
+// reports whether anything had to be restored. keep is the session's own record.
+func (it *Iterator) restoreInputs(g inputGuard, phase, keep string) bool {
+	changed := g.restore(keep)
+	for _, p := range changed {
+		it.warn("vloop: %s session changed %s — restored", phase, p)
+	}
+	refused := filepath.Join(it.Root, filepath.FromSlash(GateRefusedFile))
+	if _, err := os.Stat(refused); err == nil {
+		it.warn("vloop: %s session ran vloop task gate against a changed plan — refused", phase)
+		_ = os.Remove(refused)
+	}
+	return len(changed) > 0
+}
+
 // gitChanged halts when .git/config or the hooks differ from the guard.
 func (it *Iterator) gitChanged(g gitGuard, phase string) error {
 	what := g.changed()
@@ -312,7 +337,7 @@ func (it *Iterator) gitRefsMoved(before []string, task, phase string) error {
 	return halt(ExitRefsMoved, "REFS MOVED %s — a %s session changed git refs; nothing was committed", task, phase)
 }
 
-// spend is what this run's sessions cost, from the records in its folder.
+// spend is what the records in the run folder say its sessions cost.
 func (it *Iterator) spend() float64 {
 	files, _ := filepath.Glob(filepath.Join(it.RunDir, "sessions", "*.json"))
 	total := 0.0
@@ -352,17 +377,18 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	}
 
 	// 1. work session
-	model, effort, err := ModelEffort(root, task, PhaseWork)
-	if err != nil {
-		return iterResult{}, halt(ExitPreflight, "%v", err)
-	}
+	model, effort := it.resolved.For(task, PhaseWork)
 	before := refsState(root)
 	guard := snapshotState(root)
 	gguard := snapshotGit(root)
-	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort})
+	inputs := snapshotInputs(root, it.RunDir)
+	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
+	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: planHash(guard.pre)})
+	it.spent += wres.Cost
 	if err != nil {
 		return iterResult{}, err
 	}
+	it.restoreInputs(inputs, PhaseWork, wres.Path)
 	if err := it.gitChanged(gguard, PhaseWork); err != nil {
 		return iterResult{}, err
 	}
@@ -477,16 +503,18 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		outcome = OutGateFailed
 		it.warn("   GATE FAIL %s — review skipped, work that fails its own gate is not reviewable", id)
 	default:
-		model, effort, err := ModelEffort(root, task, PhaseReview)
-		if err != nil {
-			return iterResult{}, halt(ExitPreflight, "%v", err)
-		}
+		model, effort := it.resolved.For(task, PhaseReview)
 		before := refsState(root)
 		guard := snapshotState(root)
 		gguard := snapshotGit(root)
-		if _, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort}); err != nil {
+		inputs := snapshotInputs(root, it.RunDir)
+		_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
+		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: planHash(guard.pre)})
+		it.spent += rres.Cost
+		if err != nil {
 			return iterResult{}, err
 		}
+		inputsChanged := it.restoreInputs(inputs, PhaseReview, rres.Path)
 		if err := it.gitChanged(gguard, PhaseReview); err != nil {
 			return iterResult{}, err
 		}
@@ -519,6 +547,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		if reviewTampered {
 			outcome, verdict = OutRejected, "FAIL"
 			findings = append(findings, it.r.Mask(tamperNote(PhaseReview)))
+		}
+		if inputsChanged {
+			outcome, verdict = OutRejected, "FAIL"
+			findings = append(findings, "review session changed the driver's inputs — restored by the driver; a review judges the work and changes nothing else")
 		}
 		it.say("   review: %s", verdict)
 	}

@@ -2,11 +2,15 @@ package driver
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"time"
 
@@ -112,4 +116,91 @@ func tamperNote(phase string) string {
 		return "work session modified " + state.FilePath + " — restored by the driver; the plan and its verify commands are not a session's to edit"
 	}
 	return fmt.Sprintf("%s session modified %s — restored by the driver; only the driver makes status transitions", phase, state.FilePath)
+}
+
+// PlanHashEnv names the variable that hands a session the SHA-256 of the plan
+// the driver holds, so that `vloop task gate` runs only that plan.
+const PlanHashEnv = "VLOOP_PLAN_SHA256"
+
+// GateRefusedFile is where `vloop task gate` notes, for the driver, that it
+// refused a plan other than the one the driver holds.
+const GateRefusedFile = tmpDir + "/gate-refused"
+
+// planHash is the lower-case hex SHA-256 of the plan's bytes.
+func planHash(data []byte) string {
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:])
+}
+
+// inputGuard holds, in memory, the files a session must leave alone: the
+// config, the operator's defects and interventions, and the run's own session
+// and report records. Detection compares what is on disk after the session
+// with what the driver read before it, whatever commands the session ran.
+type inputGuard struct {
+	root  string
+	roots []string          // repo-relative, slash-separated
+	files map[string][]byte // repo-relative path -> bytes before the session
+}
+
+func snapshotInputs(root, runDir string) inputGuard {
+	g := inputGuard{root: root, files: map[string][]byte{}}
+	g.roots = []string{".vloop/config.toml", ".vloop/defects", ".vloop/interventions"}
+	if rel, err := filepath.Rel(root, runDir); err == nil {
+		rel = filepath.ToSlash(rel)
+		g.roots = append(g.roots, rel+"/sessions", rel+"/reports")
+	}
+	for p := range g.walk() {
+		if data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p))); err == nil {
+			g.files[p] = data
+		}
+	}
+	return g
+}
+
+// walk lists the regular files now under the guarded paths.
+func (g inputGuard) walk() map[string]bool {
+	out := map[string]bool{}
+	for _, r := range g.roots {
+		base := filepath.Join(g.root, filepath.FromSlash(r))
+		_ = filepath.WalkDir(base, func(p string, d fs.DirEntry, err error) error {
+			if err == nil && d.Type().IsRegular() {
+				if rel, err := filepath.Rel(g.root, p); err == nil {
+					out[filepath.ToSlash(rel)] = true
+				}
+			}
+			return nil
+		})
+	}
+	return out
+}
+
+// restore puts every changed, removed or added file back and returns the
+// repo-relative paths it touched, sorted. keep is a file the driver itself
+// wrote during the session, such as the session's own record.
+func (g inputGuard) restore(keep string) []string {
+	var changed []string
+	now := g.walk()
+	for p, want := range g.files {
+		abs := filepath.Join(g.root, filepath.FromSlash(p))
+		got, err := os.ReadFile(abs)
+		if err == nil && bytes.Equal(got, want) {
+			continue
+		}
+		_ = os.MkdirAll(filepath.Dir(abs), 0o755)
+		_ = os.WriteFile(abs, want, 0o644)
+		changed = append(changed, p)
+	}
+	for p := range now {
+		if _, ok := g.files[p]; ok {
+			continue
+		}
+		abs := filepath.Join(g.root, filepath.FromSlash(p))
+		if keep != "" && filepath.Clean(abs) == filepath.Clean(keep) {
+			continue
+		}
+		_ = os.Remove(abs)
+		changed = append(changed, p)
+	}
+	sort.Strings(changed)
+	return changed
 }

@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"os"
 	"os/exec"
@@ -175,4 +177,29 @@ func mustMarshal(t *testing.T, p *state.Plan) string {
 		t.Fatal(err)
 	}
 	return string(b)
+}
+
+// TestTaskGatePlanHash: with VLOOP_PLAN_SHA256 set, a gate runs only the plan
+// that hash names.
+func TestTaskGatePlanHash(t *testing.T) {
+	if _, err := exec.LookPath("sh"); err != nil {
+		t.Skip("sh is not on PATH")
+	}
+	root := gateRepo(t, "sh", "touch gate.ran")
+	t.Setenv("VLOOP_PLAN_SHA256", strings.Repeat("0", 64))
+	code, out, errOut := run(t, "-C", root, "task", "gate", "T2")
+	if code != 1 || out != "" || errOut != "vloop: the plan was changed during this session — gates run only from the plan the driver holds\n" {
+		t.Fatalf("code %d out %q err %q", code, out, errOut)
+	}
+	if _, err := os.Stat(filepath.Join(root, "gate.ran")); err == nil {
+		t.Fatal("the verify ran against a plan that does not match the hash")
+	}
+	sum := sha256.Sum256([]byte(planBytes(t, root)))
+	t.Setenv("VLOOP_PLAN_SHA256", hex.EncodeToString(sum[:]))
+	if code, out, errOut := run(t, "-C", root, "task", "gate", "T2"); code != 0 {
+		t.Fatalf("matching hash: code %d out %q err %q", code, out, errOut)
+	}
+	if _, err := os.Stat(filepath.Join(root, "gate.ran")); err != nil {
+		t.Fatal("the verify did not run with the matching hash")
+	}
 }
