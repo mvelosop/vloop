@@ -146,13 +146,10 @@ The environment wins over the file, and the file over the default.
 | `run.stall-limit` | `2` | an integer, 1 or more | `VLOOP_RUN_STALL_LIMIT` |
 | `run.convergence-max` | `3.0` | a number above 0 | `VLOOP_RUN_CONVERGENCE_MAX` |
 | `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN` |
+| `run.gate-timeout` | `15` | a whole number of minutes, 1 or more | `VLOOP_RUN_GATE_TIMEOUT` |
+| `run.session-timeout` | `60` | a whole number of minutes, 1 or more | `VLOOP_RUN_SESSION_TIMEOUT` |
 
-`language` is the language of a brief's section headings and of the template
-`vloop brief new` writes; commands, flags, keys and JSON are always English.
-The `model.*` and `effort.*` keys choose the model and effort per session kind.
-`areas` lists the names a task's `area` may take. List keys are arrays in the
-file; the `metrics.*` ones (stored under `[metrics]`) classify lines as code, test,
-docs or excluded. The `run.*` budgets (under `[run]`) bound the autonomous run.
+`language` is the language of a brief's section headings and of the template `vloop brief new` writes; commands, flags, keys and JSON are always English. The `model.*` and `effort.*` keys choose the model and effort per session kind. `areas` lists the names a task's `area` may take. List keys are arrays in the file; the `metrics.*` ones (under `[metrics]`) classify lines as code, test, docs or excluded. The `run.*` budgets and timeouts (under `[run]`) bound the autonomous run.
 For example:
 
 ```

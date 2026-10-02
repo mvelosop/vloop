@@ -28,3 +28,7 @@ committing the plan
 ── iteration 7 (7 this run) · T7 · 6/18 done ──
    Time gates and sessions and leave nothing running (F3)
    review: FAIL
+── iteration 8 (8 this run) · T7 · 6/18 done ──
+   Time gates and sessions and leave nothing running (F3)
+   review: PASS
+   T7 done

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Fixed the two regressions the earlier T7 attempt left: TestMetricsKeys window shifted for the two new keys, and README config table now lists run.gate-timeout and run.session-timeout (README kept under its 200-line cap).",
+  "files": ["internal/config/config_test.go", "README.md"],
+  "verified": "vloop task gate T7 exited 0 and printed GATE OK; go test ./internal/config ./internal/cli pass.",
+  "notes": "TestMetricsKeys slices Keys by position from the end; adding run.* keys shifts it again, so update the offsets. README has a line cap under 200 (now 196) and a test requiring every config key in it."
+}

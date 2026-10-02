@@ -282,7 +282,7 @@ func TestAreasKey(t *testing.T) {
 func TestMetricsKeys(t *testing.T) {
 	root := scratch(t)
 	var names []string
-	for _, k := range Keys[len(Keys)-11 : len(Keys)-6] {
+	for _, k := range Keys[len(Keys)-13 : len(Keys)-8] {
 		names = append(names, k.Name)
 		if !k.List {
 			t.Errorf("%s is not a list", k.Name)

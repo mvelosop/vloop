@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/18 done** · iteration 7
+**Status:** running · **7/18 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:57:23Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:12:57Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Revert and fail a review session that changes the work it judges (F8)
 - [x] **T5** — Find gate files by whole token, across OS path forms and for every done task (F9)
 - [x] **T6** — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
-- [ ] **T7** — Time gates and sessions and leave nothing running (F3) · 1 attempt(s)
+- [x] **T7** — Time gates and sessions and leave nothing running (F3) · 1 attempt(s)
 - [ ] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
 - [ ] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
 - [ ] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
@@ -179,7 +179,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T7 — Time gates and sessions and leave nothing running (F3)
 
-`pending` · 1 attempt(s) · depends on: T6
+`done` · 1 attempt(s) · depends on: T6
 
 **Files:** `internal/state/`, `internal/driver/session.go`, `internal/driver/iterate.go`, `internal/config/config.go`, `internal/config/config_test.go`, `internal/cli/config_test.go`, `docs/guide/configuration.md`, `go.mod`, `go.sum`
 
@@ -193,8 +193,6 @@ Gates and sessions run with no deadline and no process group, and gate output is
 - When the gate's shell exits, anything left in its group is killed, so verify `sleep 1000 & exit 0` returns promptly through a pipe and leaves no sleep running — in the driver and in vloop task gate alike.
 - The timeout is injectable in tests in seconds; tests named TestGateLeavesNothingRunning, TestGateTimeout (a verify sleeping past a short test timeout fails with the line above) and TestSessionTimeout exist under internal/ and fail against the base.
 - golang.org/x/sys is the only dependency added; GOOS=windows builds and vets.
-
-**From the last attempt:** internal/config TestMetricsKeys, which existed before, now fails: it slices Keys[len(Keys)-11:len(Keys)-6] by position and the two appended keys shifted the window; go test ./... is red and the work did not update it although config_test.go was in its files; the gate runs only named config tests, so it does not run the whole internal/config package and missed this regression
 
 <details><summary>verify command</summary>
 
