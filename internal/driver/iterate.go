@@ -2,6 +2,8 @@ package driver
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -508,6 +511,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		guard := snapshotState(root)
 		gguard := snapshotGit(root)
 		inputs := snapshotInputs(root, it.RunDir)
+		tree := snapshotTree(root)
 		_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
 		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: planHash(guard.pre)})
 		it.spent += rres.Cost
@@ -520,6 +524,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		}
 		if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
 			return iterResult{}, err
+		}
+		treeChanged := tree.revert()
+		for _, p := range treeChanged {
+			it.warn("vloop: the review session changed %s — reverted", p)
 		}
 		reviewTampered := guard.restoreIfTouched()
 		if reviewTampered {
@@ -551,6 +559,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		if inputsChanged {
 			outcome, verdict = OutRejected, "FAIL"
 			findings = append(findings, "review session changed the driver's inputs — restored by the driver; a review judges the work and changes nothing else")
+		}
+		if len(treeChanged) > 0 {
+			outcome, verdict = OutRejected, "FAIL"
+			findings = append(findings, "the review session changed files")
 		}
 		it.say("   review: %s", verdict)
 	}
@@ -938,4 +950,87 @@ func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, find
 			task.Notes = strings.TrimSpace(summary + " — " + gatePassesLine(task.ID))
 		}
 	}
+}
+
+// treeGuard is the working tree as git reports it before a review session: every
+// changed or untracked path with the digest and bytes it had. It is built from
+// git status, not a file-system walk.
+type treeGuard struct {
+	root  string
+	paths map[string]treeFile
+}
+
+type treeFile struct {
+	exists bool
+	sum    string
+	data   []byte
+}
+
+// reviewMayWrite is where a review session may write: its verdict and scratch,
+// and the driver's own state, which other guards restore.
+func reviewMayWrite(p string) bool {
+	return strings.HasPrefix(p, tmpDir+"/") || strings.HasPrefix(p, ".vloop/state/")
+}
+
+func snapshotTree(root string) treeGuard {
+	g := treeGuard{root: root, paths: map[string]treeFile{}}
+	cmd := gitCmd(root, "status", "--porcelain", "-z", "--no-renames", "--untracked-files=all")
+	out, err := cmd.Output()
+	if err != nil {
+		return g
+	}
+	for _, e := range strings.Split(string(out), "\x00") {
+		if len(e) < 4 {
+			continue
+		}
+		if p := e[3:]; !reviewMayWrite(p) {
+			g.paths[p] = readTreeFile(root, p)
+		}
+	}
+	return g
+}
+
+func readTreeFile(root, p string) treeFile {
+	data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p)))
+	if err != nil {
+		return treeFile{}
+	}
+	sum := sha256.Sum256(data)
+	return treeFile{exists: true, sum: hex.EncodeToString(sum[:]), data: data}
+}
+
+// revert undoes every change made since the snapshot outside what a review may
+// write, and returns the paths it had to put back.
+func (g treeGuard) revert() []string {
+	now := snapshotTree(g.root)
+	var changed []string
+	for p, f := range now.paths {
+		if old, ok := g.paths[p]; !ok || old.exists != f.exists || old.sum != f.sum {
+			changed = append(changed, p)
+		}
+	}
+	for p := range g.paths {
+		if _, ok := now.paths[p]; !ok {
+			changed = append(changed, p)
+		}
+	}
+	sort.Strings(changed)
+	for _, p := range changed {
+		abs := filepath.Join(g.root, filepath.FromSlash(p))
+		if old, ok := g.paths[p]; ok {
+			if old.exists {
+				_ = os.MkdirAll(filepath.Dir(abs), 0o755)
+				_ = os.WriteFile(abs, old.data, 0o644)
+			} else {
+				_ = os.Remove(abs)
+			}
+			continue
+		}
+		if err := gitCmd(g.root, "cat-file", "-e", "HEAD:"+p).Run(); err == nil {
+			_ = gitCmd(g.root, "checkout", "HEAD", "--", p).Run()
+		} else {
+			_ = os.Remove(abs)
+		}
+	}
+	return changed
 }

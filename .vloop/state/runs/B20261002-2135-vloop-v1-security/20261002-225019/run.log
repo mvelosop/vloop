@@ -13,3 +13,7 @@ committing the plan
    Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
    review: PASS
    T3 done
+── iteration 4 (4 this run) · T4 · 3/18 done ──
+   Revert and fail a review session that changes the work it judges (F8)
+   review: PASS
+   T4 done
