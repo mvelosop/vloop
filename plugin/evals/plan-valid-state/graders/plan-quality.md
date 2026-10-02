@@ -15,4 +15,7 @@ otherwise:
 - each of the three behaviours appears in some task's acceptance criteria;
 - the task that ships behaviour lists `tests/greet.sh` (or the test it names) in `files`, and its `verify` runs it;
 - no task adds a flag or option;
-- no absolute path appears anywhere in the file.
+- no path names the machine: nothing under a home or user directory (`/Users/`,
+  `/home/`, `~/`) or a machine's temporary directory (`/var/folders/`,
+  `/private/tmp/`). System paths such as `#!/bin/sh`, `cd /` and the fallback in
+  `${TMPDIR:-/tmp}` are fine.

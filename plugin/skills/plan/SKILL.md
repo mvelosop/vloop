@@ -35,7 +35,9 @@ Each `verify` command must be:
 
 - **In the plan's shell** (P-5): the value `vloop config get shell` prints, and
   written for the host's tools — BSD `grep`, `sed`, `awk` and `date` on macOS.
-  A GNU-only pattern stalled a real run.
+  A GNU-only pattern stalled a real run. A scratch directory is
+  `mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX"`: macOS `mktemp -d` without a
+  template ignores `TMPDIR`, and a sandbox may deny the directory it uses instead.
 - **Runnable from the repo root**, as a single command line.
 - **Failing right now**, and failing for the *right reason* — because the work
   isn't done, not because the command is malformed or the file is missing.
