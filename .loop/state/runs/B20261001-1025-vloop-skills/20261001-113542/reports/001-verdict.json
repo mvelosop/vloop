@@ -1,0 +1,18 @@
+{
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "TestPluginSkills runs every check over SKILLCHECK_PLUGIN_DIR or ../../plugin, reporting with t.Errorf", "met": true, "evidence": "skills_test.go:35-43 reads the env var, falls back to ../../plugin, calls t.Errorf per violation; each message names skill/eval plus the command, flag, schema, path or field"},
+    {"criterion": "Frontmatter check", "met": true, "evidence": "checkFrontmatter (l.181) reports a missing name/description by field and a name that differs from the folder by both values; bad-frontmatter-* fixtures"},
+    {"criterion": "Command-tree check", "met": true, "evidence": "checkCommand (l.337) resolves words against NewRoot, rejects unknown subcommands and flags, accepts persistent flags via InheritedFlags; skips placeholders; bare vloop is not a command line"},
+    {"criterion": "Schema check", "met": true, "evidence": "checkSchemas (l.404) compares named schemas to schema.Names() and validates json blocks that have a \"schema\" field via schema.Validate; blocks without it are skipped"},
+    {"criterion": "Path check", "met": true, "evidence": "onDiskLayout (l.447) reads the On disk block from the document; checkPaths matches with <> placeholders normalised to one segment"},
+    {"criterion": "On disk block gains the .vloop/tmp/ entries and plan.md, no other line changes", "met": true, "evidence": "git diff HEAD of domain-model.md is 5 added lines only: plan.md, proposal.json, verdict.json, plugin/<version>/, fence/<version>/settings.json"},
+    {"criterion": "Skills-and-fence check", "met": true, "evidence": "fenceRules.judge (l.565) says \"denied by the fence\" or \"not allowed by the fence\"; applied only to plan/work/review (fencedSkills); operate still gets the command-tree check; fixtures bad-fence-denied, bad-fence-not-allowed, operate-exempt, bad-operate-command"},
+    {"criterion": "Eval-format check", "met": true, "evidence": "checkEvals (l.575) checks prompt.md max_turns and allowed_tools, at least one graders/*.md, and each grader's type and weight; the messages name the case"},
+    {"criterion": "TestSkillChecksRejectFixtures over committed fixtures, at least one per check, plus an accepted well-formed one", "met": true, "evidence": "15 fixture folders under testdata/skillcheck/ with fixtureWants entries (two-way coverage asserted); good is accepted; go test of TestPluginSkills and TestSkillChecks passes"},
+    {"criterion": "No check runs claude, reads .loop/ or .vloop/state/, or weakens an existing test", "met": true, "evidence": "only skills_test.go, fixtures and 5 doc lines changed; no exec; the only repo file read is the domain doc; the file has no absolute paths"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

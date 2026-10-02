@@ -14,4 +14,10 @@ B5 split: the skills move to B6, a whole-package quality and security review bec
 
 **Done.** B5 rescoped to distribution and health; roadmap rows B5-B7 rewritten
 
+**Context.** B5's forks: the operator split the skills out to B6, added a whole-package quality and security review (became B7, later B8), kept upgrade separate ('an accidental implied upgrade might install a breaking changes release') and asked for a starter brief.
+
+**Suggested.** skills to B6, upgrade folded into init, consumer-owned basics only.
+
+**Decided.** the operator: split plus a review brief; keep upgrade separate; also a starter brief.
+
 **What would automate it.** none: scope and release policy are the operator's

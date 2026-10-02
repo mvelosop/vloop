@@ -15,4 +15,10 @@ local main reset to the pre-merge commit
 
 **Done.** fetched again and reset
 
+**Context.** After merging PR #1, local main was reset to origin/main, but origin/main had been fetched before the merge and still pointed at 8515fbd. A second fetch and reset reached 8da6c95; nothing was lost (the commits were on the branch).
+
+**Suggested.** reset local main to origin/main.
+
+**Decided.** the operator: 'yes, reset local main to origin/main'.
+
 **What would automate it.** fetch after merging, before resetting; scriptable

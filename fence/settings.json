@@ -21,9 +21,12 @@
       "Bash(find:*)",
       "Bash(mkdir:*)",
       "Bash(jq:*)",
+      "Bash(vloop config get:*)",
       "Bash(vloop status:*)",
       "Bash(vloop task list:*)",
       "Bash(vloop task show:*)",
+      "Bash(vloop task validate:*)",
+      "Bash(vloop task gate:*)",
       "Bash(vloop schema validate:*)"
     ],
     "deny": [
@@ -65,6 +68,8 @@
       "Bash(vloop task set:*)",
       "Bash(vloop defect add:*)",
       "Bash(vloop defect set:*)",
+      "Bash(vloop intervention add:*)",
+      "Bash(vloop intervention set:*)",
       "Bash(vloop config set:*)",
       "Bash(.loop/run.sh:*)",
       "Read(~/.claude/**)",

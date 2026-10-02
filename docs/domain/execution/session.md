@@ -50,11 +50,15 @@ the run with exit 9 and nothing is committed.
 `duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A missing
 record is reported by the metrics, never silently skipped.
 
+## Skills, as built
+
+`/vloop:plan`, `/vloop:work` and `/vloop:review` are the plugin's session skills,
+and `/vloop:operate` the operator's playbook (not a session). They write their
+prose in the repo's `language` (C-4).
+
 ## Gaps
 
-- Sessions today are the shell loop's `loop-plan`, `loop-work` and
-  `loop-review` skills; vloop's plugin skills `/vloop:plan`, `/vloop:work`,
-  `/vloop:review` replace them *(planned, B5)*, and write their prose in the
-  repo's `language` (C-4).
+- The shell loop's `loop-plan`, `loop-work` and `loop-review` skills still
+  exist beside vloop's.
 - The shell loop's session records are the raw `claude` JSON plus `phase` and
   `iteration`, not `session/v1`; vloop reads both.

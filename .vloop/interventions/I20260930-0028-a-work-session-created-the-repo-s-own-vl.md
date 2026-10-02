@@ -15,4 +15,10 @@ a work session created the repo's own .vloop/config.toml
 
 **Done.** accepted as the config the operator would have set
 
+**Context.** Verifying B3: T10 had created this repo's .vloop/config.toml (`metrics.stacks = ["go"]`, templates as code) because its real-data check needed code lines. Kept: it was the config the operator would have set.
+
+**Suggested.** keep it.
+
+**Decided.** the operator accepted it with the close.
+
 **What would automate it.** none: scope acceptance

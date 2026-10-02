@@ -1,0 +1,8 @@
+{
+  "task": "T6",
+  "outcome": "done",
+  "summary": "vloop metrics export now emits one intervention record per intervention (id order, after the brief groups, filtered by named briefs) and every record's repo carries stacks (metrics.stacks as configured, [] when unset); export/v1 gained both in place.",
+  "files": ["internal/cli/export.go", "internal/cli/export_test.go", "schemas/export.v1.json", "internal/schema/testdata/export-intervention.valid.json", "internal/schema/testdata/export-intervention.invalid.json", "internal/schema/schema_test.go", "docs/guide/commands.md"],
+  "verified": "The task's verify command ran in the foreground and printed GATE OK.",
+  "notes": "repo.stacks is NOT required in schemas/export.v1.json: the existing export-brief/task/defect fixtures lack it and are not this task's to edit, so requiring it would break them; the CLI always emits it and the new intervention fixture carries it. Make it required when those fixtures are next legitimately touched. Stacks come from config.Get (env override VLOOP_METRICS_STACKS applies). Added export-intervention to the invalidAt map in internal/schema/schema_test.go (needed to exercise the new fixture pair, additive only). docs/guide/commands.md regenerated with go generate because the export Short text changed."
+}

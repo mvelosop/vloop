@@ -123,6 +123,7 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 	root.AddCommand(newTask(g))
 	root.AddCommand(newMetrics(g))
 	root.AddCommand(newDefect(g))
+	root.AddCommand(newIntervention(g))
 	root.AddCommand(newPlugin(b, g))
 	root.AddCommand(newInit(b, g))
 	root.AddCommand(newUpgrade(b, g))

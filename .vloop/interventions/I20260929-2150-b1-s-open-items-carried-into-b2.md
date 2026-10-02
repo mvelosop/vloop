@@ -15,4 +15,10 @@ B1's open items carried into B2
 
 **Done.** a tidy gate in every task and F1 in the brief
 
+**Context.** B1's run record left open: no gate ran `go mod tidy -diff`, and the cycle-start mismatch. B2's brief added the tidy check to every gate and F1 for the cycle.
+
+**Suggested.** carry both into B2.
+
+**Decided.** the assistant, within the operator skill's remit; no operator decision asked.
+
 **What would automate it.** a project driver reading the last run record's open items into the next brief's seed

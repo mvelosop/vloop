@@ -1,0 +1,18 @@
+{
+  "id": "T1",
+  "title": "Route every error the CLI prints through one message catalogue",
+  "goal": "The brief asks for the CLI's failures to read consistently, and for the wording to live in one place so it cannot drift from what the program actually prints. This adds the catalogue module and routes cli.py's failure paths through it. A later task reads the same strings when it checks the exit-code contract.",
+  "files": [
+    "src/runstat/messages.py",
+    "src/runstat/cli.py"
+  ],
+  "depends_on": [],
+  "acceptance": [
+    "A message catalogue exists at src/runstat/messages.py and defines the CLI's user-facing strings",
+    "cli.py imports the catalogue rather than carrying a separate hard-coded string table",
+    "The catalogue's strings are used on the CLI's failure paths",
+    "A missing run directory exits 2, with the catalogue's text on stderr",
+    "stdout is completely empty on every failing path"
+  ],
+  "verify": "uv run pytest -q tests/test_messages.py"
+}

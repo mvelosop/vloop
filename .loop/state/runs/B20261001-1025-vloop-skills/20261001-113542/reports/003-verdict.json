@@ -1,0 +1,15 @@
+{
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/skills/work/SKILL.md has frontmatter name: work and a description", "met": true, "evidence": "Frontmatter lines 2-3 of the new file."},
+    {"criterion": "It tells the session to read its task with `vloop task show <id> --json`, then the brief, references and notes; do exactly that task (S-3); run the gate with `vloop task gate <id>`; write .vloop/tmp/proposal.json as proposal/v1, validated with `vloop schema validate proposal/v1 .vloop/tmp/proposal.json`", "met": true, "evidence": "Sections 1-4: orient reads the task via vloop task show --json, then CLAUDE.md, brief, references, notes; section 2 scope discipline cites S-3; section 3 uses vloop task gate; section 4 has the validate command."},
+    {"criterion": "Blocked with gate_dispute {reason, evidence}; skill carries a validating blocked example beside an ordinary done example", "met": true, "evidence": "Section 4 done example and section 6 gate_dispute example with reason and evidence; the gate's jq and validate checks over both passed."},
+    {"criterion": "It forbids editing a gate or files a gate inspects, committing, setting a status and moving a ref (S-2), and names no command the fence denies", "met": true, "evidence": "Section 5 bullets cover all four; git ref commands are in prose, not code spans; TestPluginSkills passed on the real plugin."},
+    {"criterion": "summary and notes are written in the language `vloop config get language` prints; keys, enum values and ids stay English", "met": true, "evidence": "Section 4 'Language' subsection."},
+    {"criterion": "Every rule of .claude/skills/loop-work/SKILL.md survives, adapted to vloop, or its omission is explained in this task's notes", "met": true, "evidence": "Side-by-side: orient, scope, foreground one-shot gate, no suite run, notes-carry-behaviour, no status/commit/journal/push, blocked all present. The only change is shortening the B0007 anecdote, which the proposal notes explain. Journal path .vloop/state/journals matches internal/driver/plan.go."},
+    {"criterion": "TestPluginSkills passes on the real plugin", "met": true, "evidence": "The driver's gate re-run; the verify command includes pass_on on the real plugin/."}
+  ],
+  "findings": [],
+  "notes": "none. The files list names only SKILL.md, which is itself the durable artifact, and TestPluginSkills covers it."
+}

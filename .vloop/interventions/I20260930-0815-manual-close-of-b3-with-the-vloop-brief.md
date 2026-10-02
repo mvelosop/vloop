@@ -15,4 +15,10 @@ manual close of B3, with the Vloop-Brief trailer for the first time
 
 **Done.** run record, consumed, PR, squash-merge with trailer, sync main
 
+**Context.** Closing B3 by hand: run record including the refs incident, consumed, PR #3, squash-merge (7c845c5) with the Vloop-Brief trailer for the first time, branch kept. `defect add --blame` then attributed through the trailer.
+
+**Suggested.** close with the trailer in the squash body.
+
+**Decided.** the operator approved the three items.
+
 **What would automate it.** vloop brief close plus the merge step

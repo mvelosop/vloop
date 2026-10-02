@@ -6,11 +6,14 @@ import (
 	"io"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/metrics"
 )
 
@@ -19,6 +22,23 @@ const exportSchema = "export/v1"
 type exportRepo struct {
 	Name   string  `json:"name"`
 	Remote *string `json:"remote"`
+	// Stacks is metrics.stacks as configured, [] when unset.
+	Stacks []string `json:"stacks"`
+}
+
+type exportIntervention struct {
+	Schema      string     `json:"schema"`
+	Type        string     `json:"type"`
+	Repo        exportRepo `json:"repo"`
+	ID          string     `json:"id"`
+	Brief       string     `json:"brief"`
+	Phase       string     `json:"phase"`
+	Kind        string     `json:"kind"`
+	Automatable string     `json:"automatable"`
+	By          string     `json:"by"`
+	Occurred    string     `json:"occurred"`
+	Recorded    string     `json:"recorded"`
+	Backfilled  bool       `json:"backfilled,omitempty"`
 }
 
 type exportTask struct {
@@ -60,7 +80,7 @@ func newMetricsExport(g *Globals) *cobra.Command {
 	var workspace string
 	cmd := &cobra.Command{
 		Use:   "export [<brief>…]",
-		Short: "Print briefs, tasks and defects as JSON Lines (export/v1), with the repository's identity",
+		Short: "Print briefs, tasks, defects and interventions as JSON Lines (export/v1), with the repository's identity",
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			out := cmd.OutOrStdout()
@@ -107,6 +127,11 @@ func exportRepoLines(g *Globals, out io.Writer, root, name string, args []string
 		}
 	}
 	repo := repoIdentity(root)
+	sv, err := config.Get(root, "metrics.stacks")
+	if err != nil {
+		return "", configErr(g, out, err)
+	}
+	repo.Stacks = append([]string{}, sv.List...)
 	if name != "" {
 		repo.Name = name
 	}
@@ -121,6 +146,28 @@ func exportRepoLines(g *Globals, out io.Writer, root, name string, args []string
 			if err := enc.Encode(rec); err != nil {
 				return "", Problem(err)
 			}
+		}
+	}
+	ivs, err := intervention.List(root, "")
+	if err != nil {
+		return "", Problem(err)
+	}
+	sort.Slice(ivs, func(i, j int) bool { return ivs[i].ID < ivs[j].ID })
+	named := map[string]bool{}
+	for _, b := range args {
+		named[defect.BriefName(b)] = true
+	}
+	for _, v := range ivs {
+		if len(args) > 0 && !named[defect.BriefName(v.Brief)] {
+			continue
+		}
+		rec := exportIntervention{
+			Schema: exportSchema, Type: "intervention", Repo: repo, ID: v.ID, Brief: v.Brief,
+			Phase: v.Phase, Kind: v.Kind, Automatable: v.Automatable, By: v.By,
+			Occurred: v.Occurred, Recorded: v.Recorded, Backfilled: v.Backfilled,
+		}
+		if err := enc.Encode(rec); err != nil {
+			return "", Problem(err)
 		}
 	}
 	return buf.String(), nil
@@ -219,7 +266,7 @@ func repoIdentity(root string) exportRepo {
 	out, err := exec.Command("git", "-C", root, "config", "--get", "remote.origin.url").Output()
 	url := strings.TrimSpace(string(out))
 	if err != nil || url == "" {
-		return exportRepo{Name: filepath.Base(root)}
+		return exportRepo{Name: filepath.Base(root), Stacks: []string{}}
 	}
 	url = stripUserinfo(url)
 	name := strings.TrimSuffix(strings.TrimRight(url, "/"), ".git")
@@ -229,7 +276,7 @@ func repoIdentity(root string) exportRepo {
 	if name == "" {
 		name = filepath.Base(root)
 	}
-	return exportRepo{Name: name, Remote: &url}
+	return exportRepo{Name: name, Remote: &url, Stacks: []string{}}
 }
 
 // stripUserinfo removes `user[:password]@` from a URL's authority. Forms with

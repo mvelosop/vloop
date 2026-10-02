@@ -15,4 +15,10 @@ the brief contradicted itself on clearing a model
 
 **Done.** accepted the planner's reading; recorded as a spec gap
 
+**Context.** B2's brief said both `task set … ''` clears a value and 'an empty model is exit 2'. The planner's note #7 flagged the contradiction and took '' as clearing; recorded later as a brief spec gap.
+
+**Suggested.** accept the planner's reading.
+
+**Decided.** the operator accepted it at close.
+
 **What would automate it.** a domain rule written once instead of per brief

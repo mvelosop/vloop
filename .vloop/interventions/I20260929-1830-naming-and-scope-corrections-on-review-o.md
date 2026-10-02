@@ -15,4 +15,10 @@ naming and scope corrections on review of the B1 draft
 
 **Done.** batched and applied on the operator's word
 
+**Context.** Reviewing the B1 draft, the operator kept the `.loop-brief.md` suffix (with `name:` frontmatter), decided vloop knows only loop briefs, kept `.loop/` as the record of how vloop was built, and asked for a README task; then 'README.md alone is enough, apply the batched changes'.
+
+**Suggested.** `<id>.brief.md` naming, `.design-brief.md` for upstream briefs, README plus docs/concepts.md.
+
+**Decided.** the operator overrode the naming, rejected vloop knowing other brief types, and chose the README alone.
+
 **What would automate it.** none: these changed what the product is

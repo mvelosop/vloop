@@ -15,4 +15,10 @@ the loop's fence blocked the read-only git remote -v
 
 **Done.** denied only the git remote subcommands that change something
 
+**Context.** B4's session records showed the planner denied `git remote -v`: the fence's `Bash(git remote:*)` prefix also blocked the read-only form. Narrowed to the mutating subcommands (commit 48dd7ef); the loop suite stayed 47/47.
+
+**Suggested.** deny only the mutating git remote subcommands.
+
+**Decided.** the operator: 'go ahead!'.
+
 **What would automate it.** reading the denials is automatable; judging a rule too broad is partly

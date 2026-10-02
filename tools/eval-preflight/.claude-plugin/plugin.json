@@ -1,0 +1,6 @@
+{
+  "name": "vloop-eval-preflight",
+  "version": "0.0.0",
+  "description": "A one-case plugin that checks a machine can run vloop's evals: a current vloop, a working git and a writable scratch directory inside the eval sandbox.",
+  "author": { "name": "Miguel Veloso" }
+}

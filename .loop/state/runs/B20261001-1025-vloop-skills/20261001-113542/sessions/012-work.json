@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 58656,
+  "stop_reason": "end_turn",
+  "session_id": "583456b8-5206-4891-bd5d-473a10942890",
+  "total_cost_usd": 0.34053220000000006,
+  "usage": {
+    "input_tokens": 28,
+    "cache_creation_input_tokens": 39361,
+    "cache_read_input_tokens": 554011,
+    "output_tokens": 7223,
+    "output_tokens_details": {
+      "thinking_tokens": 858
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 39361,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 496,
+        "cache_read_input_tokens": 50766,
+        "cache_creation_input_tokens": 611,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 611
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 28,
+      "outputTokens": 7223,
+      "cacheReadInputTokens": 554011,
+      "cacheCreationInputTokens": 39361,
+      "webSearchRequests": 0,
+      "costUSD": 0.34053220000000006,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 858,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 14,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T6 is done and its verify command prints `GATE OK`. I ran it in the foreground. The proposal is at `.loop/tmp/proposal.json`.\n\n- **Intervention records:** `vloop metrics export` now emits one `intervention` record per intervention, after the brief groups and in id order. With briefs named, only those briefs' interventions are exported.\n- **Stacks:** every record's `repo` carries `stacks`, which is `metrics.stacks` as configured, or `[]` when unset. With `--workspace`, each repository gets its own.\n- **Schema:** `schemas/export.v1.json` gains the intervention type and `repo.stacks`, still `export/v1`.\n- **Tests:** new tests cover the intervention records, filtering by brief, and `repo.stacks` with and without configured stacks. I added fixtures `export-intervention.valid.json` and `export-intervention.invalid.json`.\n- **`stacks` is optional in the schema:** the existing `export-brief`, `export-task` and `export-defect` fixtures have no `stacks` and aren't mine to edit, so requiring it would fail them. The CLI always emits it. It can become required when those fixtures are next legitimately touched.\n- **Files outside the task's list:** I added `export-intervention` to the fixture map in `internal/schema/schema_test.go`, so the new fixture pair is actually exercised. I also regenerated `docs/guide/commands.md` with `go generate`, because the export command's short description changed.",
+  "ttft_ms": 2288,
+  "type": "result",
+  "duration_ms": 152078,
+  "uuid": "cca1c929-f681-41ae-b4ec-4fa0235d36a0",
+  "ttft_stream_ms": 1197,
+  "time_to_request_ms": 352,
+  "first_content_frame_ms": 1198,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 6
+}

@@ -1,0 +1,14 @@
+{
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/evals/ holds the nine calibration cases under their names ... with the gate committed before the plant", "met": true, "evidence": "All nine directories exist, each with prompt.md invoking /vloop:review, graders/*.md, and scaffold.sh (plus plant.sh/_plant-*.sh helpers); task.json and proposal.json are in vloop's layout; the shared _lib.sh is described as committing the gate before the plant."},
+    {"criterion": "Each calibration case's graders expect a FAIL verdict with a finding naming the planted defect; the suite's bar is the calibration's baseline ... stated in the cases", "met": true, "evidence": "Every case has names-the-defect.md (llm), verdict-is-fail.md (jq FAIL check) and verdict-validates.md. 06's verdict-is-fail.md states the bar (all caught, 06 allowed to miss) and README.md repeats it."},
+    {"criterion": "plan-valid-state, plan-checks-its-gates, work-disputes-impossible-gate and language-es exist with prompt.md and graders", "met": true, "evidence": "All four directories exist with prompt.md and several graders each; the gate checks that each prompt invokes /vloop:plan or /vloop:work."},
+    {"criterion": "Every case is in claude plugin eval's format: prompt.md with max_turns and allowed_tools frontmatter, graders/*.md with type and weight", "met": true, "evidence": "06-gate-rewrite/prompt.md has max_turns and allowed_tools, and its graders have type and weight. The extra 'setup' field is a disclosed assumption, not a violation."},
+    {"criterion": "`vloop plugin path` extracts skills/ but not evals/, and removes an evals/ left in the extracted tree; a committed test covers both", "met": true, "evidence": "internal/driver/extract.go returns fs.SkipDir for the evals name, so it is left out of the wanted set and a stale copy is removed. internal/cli/plugin_test.go adds TestPluginPathLeavesOutEvals, which checks both behaviours."},
+    {"criterion": "No gate or test runs claude or the eval suites", "met": true, "evidence": "The diff to Go code adds only extract logic and a filesystem test. The verify command only checks that the files exist and runs go test."}
+  ],
+  "findings": [],
+  "notes": "Minor: the plan asked for 06's graders to carry the lowest weight, but weights are all 1, and the grader text only claims it. This does not change the outcome. The prompt.md 'setup:' frontmatter key and the grader types are the work session's disclosed assumptions about the eval runner, and the operator should confirm them on the first real run. The scaffolds need python3 with pytest."
+}

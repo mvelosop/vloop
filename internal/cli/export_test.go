@@ -107,3 +107,59 @@ func TestExportRepoIdentity(t *testing.T) {
 		t.Errorf("no origin: repo %v", repo)
 	}
 }
+
+func exportInterventions(recs []map[string]any) []map[string]any {
+	var out []map[string]any
+	for _, r := range recs {
+		if r["type"] == "intervention" {
+			out = append(out, r)
+		}
+	}
+	return out
+}
+
+func TestExportInterventions(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	for _, a := range [][]string{
+		{"Second", "--phase", "design", "--kind", "decision", "--automatable", "no", "--by", "both"},
+		{"First", "--phase", "run", "--kind", "halt", "--automatable", "partly", "--by", "operator", "--brief", closeName},
+	} {
+		if code, _, errs := runCLI(t, dir, append([]string{"intervention", "add"}, a...)...); code != 0 {
+			t.Fatal(errs)
+		}
+	}
+	recs := exportRecs(t, dir)
+	ivs := exportInterventions(recs)
+	if len(ivs) != 2 || recs[len(recs)-1]["type"] != "intervention" {
+		t.Fatalf("want 2 trailing intervention records, got %v", recs)
+	}
+	if ivs[0]["id"].(string) >= ivs[1]["id"].(string) {
+		t.Errorf("not in id order: %v %v", ivs[0]["id"], ivs[1]["id"])
+	}
+	for _, v := range ivs {
+		for _, k := range []string{"id", "brief", "phase", "kind", "automatable", "by", "occurred", "recorded"} {
+			if _, ok := v[k]; !ok {
+				t.Errorf("intervention lacks %s: %v", k, v)
+			}
+		}
+		if v["schema"] != "export/v1" {
+			t.Errorf("schema %v", v["schema"])
+		}
+	}
+	byBrief := exportInterventions(exportRecs(t, dir, closeName))
+	if len(byBrief) != 1 || byBrief[0]["kind"] != "halt" || byBrief[0]["brief"] != closeName {
+		t.Errorf("filtered by brief: %v", byBrief)
+	}
+}
+
+func TestExportRepoStacks(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	stacks := func() any { return exportRecs(t, dir)[0]["repo"].(map[string]any)["stacks"] }
+	if s, _ := stacks().([]any); len(s) != 1 || s[0] != "go" {
+		t.Errorf("configured stacks = %v, want [go]", stacks())
+	}
+	write(t, dir, ".vloop/config.toml", "")
+	if s, ok := stacks().([]any); !ok || len(s) != 0 {
+		t.Errorf("unset stacks = %#v, want []", stacks())
+	}
+}

@@ -15,4 +15,10 @@ seven choices in the B4 draft
 
 **Done.** listed as choices to review
 
+**Context.** B4's draft listed seven choices: findings must be stated (--finding or --no-findings), finding defaults, refusals on the default branch and a dirty tree, an abandoned status, close never merging, derived defect ids, the refs constraint.
+
+**Suggested.** the seven choices as listed.
+
+**Decided.** the operator marked B4 ready.
+
 **What would automate it.** as for B1

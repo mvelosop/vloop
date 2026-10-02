@@ -91,3 +91,27 @@ func TestPluginPathRefusesSymlink(t *testing.T) {
 		t.Errorf("wrote through the symlink: %v", ents)
 	}
 }
+
+func TestPluginPathLeavesOutEvals(t *testing.T) {
+	d := t.TempDir()
+	os.Mkdir(filepath.Join(d, ".git"), 0o755)
+	b := Build{Version: "9.9.9"}
+	x := filepath.Join(d, ".vloop/tmp/plugin/9.9.9")
+	if _, _, code := runPluginCLI(t, b, d, "plugin", "path"); code != 0 {
+		t.Fatalf("code %d", code)
+	}
+	if _, err := os.Stat(filepath.Join(x, "skills/review/SKILL.md")); err != nil {
+		t.Errorf("skills were not extracted: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(x, "evals")); err == nil {
+		t.Error("evals/ was extracted")
+	}
+	os.MkdirAll(filepath.Join(x, "evals/stale"), 0o755)
+	os.WriteFile(filepath.Join(x, "evals/stale/prompt.md"), []byte("x"), 0o644)
+	if _, _, code := runPluginCLI(t, b, d, "plugin", "path"); code != 0 {
+		t.Fatalf("second run: code %d", code)
+	}
+	if _, err := os.Stat(filepath.Join(x, "evals")); err == nil {
+		t.Error("an evals/ left in the extracted tree was not removed")
+	}
+}

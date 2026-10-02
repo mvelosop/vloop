@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 15000,
+  "stop_reason": "end_turn",
+  "session_id": "a77e7ba1-417b-4c08-a11c-ca57eabf482c",
+  "total_cost_usd": 0.1111554,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 17742,
+    "cache_read_input_tokens": 111087,
+    "output_tokens": 1795,
+    "output_tokens_details": {
+      "thinking_tokens": 63
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 17742,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 296,
+        "cache_read_input_tokens": 28828,
+        "cache_creation_input_tokens": 930,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 930
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 1795,
+      "cacheReadInputTokens": 111087,
+      "cacheCreationInputTokens": 17742,
+      "webSearchRequests": 0,
+      "costUSD": 0.1111554,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 63,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS**: `plugin/skills/operate/SKILL.md` meets every acceptance criterion. I didn't re-run `TestPluginSkills`, so that criterion rests on the driver's gate result.\n\n- **Steps:** it covers doctor, run on a work branch, the exit 0–9 table, a gate dispute via `vloop task verify --reason`, refs-first verification, `vloop metrics` read critically, and `vloop brief close`. It ends with the squash-merge on the operator's go-ahead, keeping the branch.\n- **Recording:** the `defect add` and `intervention add` flags and vocabularies match the CLI's `--help` output.\n- **Specifics:** a grep for `.loop/`, design notes, roadmap, `mvelosop` and `/Users/` finds nothing in the skill.\n\nThe verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2148,
+  "type": "result",
+  "duration_ms": 17279,
+  "uuid": "a320b51f-a13c-426f-b81d-b6eb59ed2739",
+  "ttft_stream_ms": 1152,
+  "time_to_request_ms": 362,
+  "first_content_frame_ms": 1153,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 7
+}

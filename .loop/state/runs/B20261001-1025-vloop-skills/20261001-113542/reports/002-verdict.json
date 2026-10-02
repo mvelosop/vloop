@@ -1,0 +1,19 @@
+{
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/skills/plan/SKILL.md has frontmatter name: plan and a description; supporting files, if any, sit beside it in plugin/skills/plan/", "met": true, "evidence": "SKILL.md frontmatter: name: plan, description present; only file in plugin/skills/plan/"},
+    {"criterion": "It tells the session to write .vloop/state/state.json as state/v1 with base, shell, status planning, iteration 0, timestamps, run_id/brief/branch empty, and each task's fields", "met": true, "evidence": "'Task shape' section and top-level fields list: git rev-parse HEAD, vloop config get shell, run_id/brief/branch stay \"\", per-task field list"},
+    {"criterion": "It assigns kind to every task, and area only when areas prints a value", "met": true, "evidence": "'Kind and area' section"},
+    {"criterion": "References are the brief's binding references distributed with reasons; no discovery", "met": true, "evidence": "'Distributing references': 'Never cite a document the brief does not cite', B-5"},
+    {"criterion": "Before finishing it requires schema validate, task validate and gates run on the base three ways", "met": true, "evidence": "'Check every gate on the base — three ways' and 'Before you finish' items 1, 2, 7"},
+    {"criterion": "Gate contradicting its own acceptance is left to gate_dispute; gates follow plan's shell and host tools", "met": true, "evidence": "gate_dispute paragraph after the three checks; verify bullet on plan's shell / BSD tools"},
+    {"criterion": "Prose written in the configured language; keys/enums/ids/commands English; skill itself English", "met": true, "evidence": "'Language' section"},
+    {"criterion": "Every rule of loop-plan survives adapted to vloop, or omission explained; nothing tells session to commit, set status, move ref, or run denied command", "met": true, "evidence": "Parse-vs-text, source-text, restored-file, baseline-decay, VLOOP_ACTIVE_TASK/GATE_TASK, naming, durable files, regression net all present; omissions (amend.sh, knowledge survey) explained in proposal notes; 'You do not commit, set a status, move a ref'"},
+    {"criterion": "The skill carries at least one fenced json example with schema state/v1 that validates and shows a fresh plan", "met": true, "evidence": "json block in Task shape; driver gate (GATE OK) validated it and asserted fresh-plan shape"},
+    {"criterion": "fence/settings.json gains allow rules for config get, task validate, task gate; no deny removed", "met": true, "evidence": "git diff fence/settings.json: three additions only"},
+    {"criterion": "TestPluginSkills passes on the real plugin", "met": true, "evidence": "gates/T2.log ends GATE OK, which includes pass_on for the real plugin"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

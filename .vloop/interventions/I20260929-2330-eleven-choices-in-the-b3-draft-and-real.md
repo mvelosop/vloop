@@ -15,4 +15,10 @@ eleven choices in the B3 draft, and real numbers computed from telemetry
 
 **Done.** listed as choices to review
 
+**Context.** B3's design act: eleven choices (the split, the line measure, missing records, wall time from commits, found-by deciding release, derived defects never stored, blame via trailer, B6's layout contract, BSD tools, doublestar, expectation updates). B1's and B2's figures were recomputed from telemetry ($7.40, $8.36) to pin a real-data gate.
+
+**Suggested.** the eleven choices as listed.
+
+**Decided.** the operator: 'Please go ahead and! Will check tomorrow!'.
+
 **What would automate it.** as for B1

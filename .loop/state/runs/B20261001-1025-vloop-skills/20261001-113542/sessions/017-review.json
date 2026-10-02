@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 15799,
+  "stop_reason": "end_turn",
+  "session_id": "81e34ccf-b633-4812-910a-fc8bb97fbfca",
+  "total_cost_usd": 0.1131818,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 18989,
+    "cache_read_input_tokens": 87049,
+    "output_tokens": 1980,
+    "output_tokens_details": {
+      "thinking_tokens": 195
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 18989,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 309,
+        "cache_read_input_tokens": 29697,
+        "cache_creation_input_tokens": 1308,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1308
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1980,
+      "cacheReadInputTokens": 87049,
+      "cacheCreationInputTokens": 18989,
+      "webSearchRequests": 0,
+      "costUSD": 0.1131818,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 195,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T8, and I wrote the verdict to `.loop/tmp/verdict.json`. All six acceptance criteria are met, and I did not run the evals or any gate myself.\n\n- **Evals:** All 13 cases are present with their `prompt.md`, graders and scaffold.\n- **Extraction:** `vloop plugin path` now skips `evals/` and removes a stale one, and `TestPluginPathLeavesOutEvals` covers both.\n- **Minor gap:** The plan asked for 06's graders to carry the lowest weight, but every grader weight is 1. Only the grader text says 06 may miss. I left it as a note, not a finding.\n- **Assumptions to confirm:** The `setup:` frontmatter key and the grader types are the work session's guesses at `claude plugin eval`'s format. Check them on the first real run.\n- **Requirement:** The scaffolds need `python3` with pytest.",
+  "ttft_ms": 2201,
+  "type": "result",
+  "duration_ms": 16883,
+  "uuid": "79878046-1453-438c-bb9a-57a3c2695990",
+  "ttft_stream_ms": 1176,
+  "time_to_request_ms": 368,
+  "first_content_frame_ms": 1177,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 8
+}

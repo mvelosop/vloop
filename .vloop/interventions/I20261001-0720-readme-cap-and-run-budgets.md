@@ -14,4 +14,10 @@ two more forks for B6: the README cap (exit codes move to the guide) and budgets
 
 **Done.** the operator chose both recommendations; B1's README test change listed as required
 
+**Context.** B6 adds a command, flags and ten exit codes to a README at 199 of its 200-line cap, and budgets needed a home.
+
+**Suggested.** exit codes to the guide; budgets as config keys plus flags.
+
+**Decided.** the operator chose both recommendations.
+
 **What would automate it.** the size check can be computed in the survey; the trade-off is the operator's

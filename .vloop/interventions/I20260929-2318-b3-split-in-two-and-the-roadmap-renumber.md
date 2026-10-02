@@ -15,4 +15,10 @@ B3 split in two and the roadmap renumbered
 
 **Done.** B3 metrics and defects, B4 close and consolidate; init/doctor to B5, run to B6
 
+**Context.** Writing B3, the roadmap's B3 row came to about 16 tasks. Split into B3 (metrics, defects, release, their guide) and B4 (close, export, workspace, the rest of the guide); init/doctor and run renumbered to B5 and B6.
+
+**Suggested.** split as described.
+
+**Decided.** the operator accepted the split by running B3 as written.
+
 **What would automate it.** a size heuristic can flag it; the split is a judgement

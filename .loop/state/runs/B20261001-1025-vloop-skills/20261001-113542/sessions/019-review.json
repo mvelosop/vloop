@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 14997,
+  "stop_reason": "end_turn",
+  "session_id": "3b812091-592f-4fe7-914b-f568eb132193",
+  "total_cost_usd": 0.10692,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 17857,
+    "cache_read_input_tokens": 84130,
+    "output_tokens": 1865,
+    "output_tokens_details": {
+      "thinking_tokens": 196
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 17857,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 282,
+        "cache_read_input_tokens": 28526,
+        "cache_creation_input_tokens": 1347,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1347
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1865,
+      "cacheReadInputTokens": 84130,
+      "cacheCreationInputTokens": 17857,
+      "webSearchRequests": 0,
+      "costUSD": 0.10692,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 196,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**PASS** for T9. All six acceptance criteria are met, and I found no scope creep or absolute paths. I didn't re-run the gate; I took the driver's `GATE OK` as given. The verdict is in `.loop/tmp/verdict.json`.\n\n- **README and its test:** the README has a \"Skills\" section naming all four skills and is 199 lines. `TestReadmeNamesTheSkills` was added, and no other README test changed.\n- **Guides:** `concepts.md` explains the skills and the evals. `defects.md` covers interventions in full, and the new test checks it against the `intervention/v1` schema.\n- **Domain docs:** the \"planned, B5\" gaps are gone from `session.md` and `task.md`.\n- **`commands.md`:** it is untouched and `TestCommandsReferenceIsCurrent` still passes.",
+  "ttft_ms": 2383,
+  "type": "result",
+  "duration_ms": 16094,
+  "uuid": "36eaf558-d4b3-43bc-8af4-1b295ca93764",
+  "ttft_stream_ms": 1189,
+  "time_to_request_ms": 374,
+  "first_content_frame_ms": 1189,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 9
+}

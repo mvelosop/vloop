@@ -104,6 +104,15 @@ func TestGuideDefectsCoversSchema(t *testing.T) {
 	}
 }
 
+func TestGuideDefectsCoversInterventions(t *testing.T) {
+	text := readGuide(t, "defects.md")
+	for _, w := range guideWords(t, "intervention/v1", true) {
+		if !strings.Contains(text, w) {
+			t.Errorf("defects.md does not mention the intervention field or value %q", w)
+		}
+	}
+}
+
 func TestGuideConfigurationCoversStampAndScopes(t *testing.T) {
 	text := readGuide(t, "configuration.md")
 	for _, w := range guideWords(t, "install/v1", false) {

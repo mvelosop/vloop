@@ -14,4 +14,10 @@ the README states cmd as the Windows shell default; the code and B2's brief say 
 
 **Done.** recorded as an escaped defect against B2; fixed in B6 as F1, with a test comparing the README's stated default with the code's
 
+**Context.** Reading the README's config table during B6's survey: `shell` default 'sh (cmd on Windows)' where the code and B2's brief say pwsh. Recorded as an escaped defect against B2; fixed in B6 as F1 with a test.
+
+**Suggested.** record it and fix it as B6's F1.
+
+**Decided.** the operator accepted it with the B6 brief.
+
 **What would automate it.** a test checking every default the README states against config.Keys

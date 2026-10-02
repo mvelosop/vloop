@@ -1,0 +1,13 @@
+{
+  "task": "T10",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "cmd/vloop/b7_e2e_test.go has TestWorkedExampleB7…, covering in temporary directories: `vloop plugin path` extracting skills operate, plan, review and work and no evals/; and an intervention added, listed and exported with repo.stacks", "met": true, "evidence": "b7_e2e_test.go: TestWorkedExampleB7PluginPath asserts the skill list 'operate plan review work', a SKILL.md each, and no evals/; TestWorkedExampleB7Interventions adds, lists and exports, asserting repo.stacks == [go] on every record and exactly one intervention record. Both use newScratch temp dirs."},
+    {"criterion": "On copies of the real plugin, TestPluginSkills fails naming the skill and the command for `vloop task frobnicate` in the plan skill, names verified for a work example proposal missing it, says denied for the work skill telling a session to run `vloop task verify`, and names the case for an eval case with no graders; on the real plugin it passes", "met": true, "evidence": "Settled by the gate's fixture copies w1-w4 and the pass_on checks in the verify command (it printed GATE OK per the proposal; the checks do assert the named strings). No check was weakened in the diff."},
+    {"criterion": "`claude plugin validate .` passes", "met": true, "evidence": "It is part of the verify command, which exits 0 only if it passes."},
+    {"criterion": "go test ./..., go vet ./..., gofmt -l . and go mod tidy -diff printing nothing, and the linux, windows and host builds all pass", "met": true, "evidence": "All are in the verify command. The b4 test that T6 broke is fixed, so go test ./... is green."},
+    {"criterion": "Any fix made here is the smallest that makes a check pass, is in the files of the task it belongs to, and is explained in this task's notes; no check is weakened", "met": true, "evidence": "The only extra change is one line in cmd/vloop/b4_e2e_test.go: the expected repo JSON gains \"stacks\":[\"go\"], which T6 added to every export record. The assertion is stricter, not weaker. The proposal explains it."}
+  ],
+  "findings": [],
+  "notes": "The b4 expectation fix belongs to T6's change, and T6's gate did not run ./cmd/vloop; that is a gap in T6's verify, not in this work. No absolute paths in the new file."
+}

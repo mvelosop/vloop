@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 65621,
+  "stop_reason": "end_turn",
+  "session_id": "7a3af3f5-6db1-4e57-95e0-17e8c2ba8af6",
+  "total_cost_usd": 0.3989642,
+  "usage": {
+    "input_tokens": 28,
+    "cache_creation_input_tokens": 51419,
+    "cache_read_input_tokens": 707161,
+    "output_tokens": 5180,
+    "output_tokens_details": {
+      "thinking_tokens": 316
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 51419,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 356,
+        "cache_read_input_tokens": 62886,
+        "cache_creation_input_tokens": 549,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 549
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 28,
+      "outputTokens": 5180,
+      "cacheReadInputTokens": 707161,
+      "cacheCreationInputTokens": 51419,
+      "webSearchRequests": 0,
+      "costUSD": 0.3989642,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 316,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 16,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T10 is done: its verify command prints `GATE OK`, and I wrote `.loop/tmp/proposal.json` with outcome `done`.\n\n- **New test file:** `cmd/vloop/b7_e2e_test.go` has two tests. `TestWorkedExampleB7PluginPath` checks that `vloop plugin path` extracts exactly the skills operate, plan, review and work, and no `evals/`. `TestWorkedExampleB7Interventions` adds an intervention, lists it, and exports it with `repo.stacks`.\n- **Fix outside the new file:** `TestWorkedExampleB4Close` in `cmd/vloop/b4_e2e_test.go` was failing. T6 added `stacks` to every export record's `repo`, so its expected string now includes `\"stacks\":[\"go\"]`. No assertion was weakened. T6's own gate never ran `./cmd/vloop`, which is why this wasn't caught earlier. I explained the change in the proposal notes.\n\nI didn't commit anything and I left `.loop/state/state.json` alone.",
+  "ttft_ms": 1943,
+  "type": "result",
+  "duration_ms": 529276,
+  "uuid": "543cac24-59b4-4c2b-b1f2-5583535e26aa",
+  "ttft_stream_ms": 1716,
+  "time_to_request_ms": 349,
+  "first_content_frame_ms": 1716,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 10
+}

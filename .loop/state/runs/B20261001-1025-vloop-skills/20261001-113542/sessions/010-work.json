@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 109773,
+  "stop_reason": "end_turn",
+  "session_id": "431c8550-d939-444c-8ca9-c736875121f7",
+  "total_cost_usd": 0.548487,
+  "usage": {
+    "input_tokens": 30,
+    "cache_creation_input_tokens": 58795,
+    "cache_read_input_tokens": 755235,
+    "output_tokens": 16220,
+    "output_tokens_details": {
+      "thinking_tokens": 1323
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 58795,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 469,
+        "cache_read_input_tokens": 69992,
+        "cache_creation_input_tokens": 819,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 819
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 30,
+      "outputTokens": 16220,
+      "cacheReadInputTokens": 755235,
+      "cacheCreationInputTokens": 58795,
+      "webSearchRequests": 0,
+      "costUSD": 0.548487,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1323,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 16,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T5 is implemented and its verify command printed `GATE OK`. I wrote the proposal to `.loop/tmp/proposal.json` with outcome `done`.\n\n- **Commands:** `vloop intervention add`, `list` and `set` now work over `.vloop/interventions/`. `list` prints the same rows as `tools/interventions-index.sh` on this repo.\n- **Schema:** `intervention/v1` is in `schemas/intervention.v1.json`, and all 60 existing records validate as they are.\n- **Fence:** it now denies `vloop intervention add` and `vloop intervention set`.\n- **Docs:** `README.md` documents the commands and flags and is at 199 lines, under the 200 cap. `docs/guide/commands.md` is regenerated.\n- **Existing tests changed:** three tests hard-coded the schema count or list, so I added `intervention/v1` to each: `internal/cli/schema_test.go`, `embed_test.go` and `cmd/vloop/b2_e2e_test.go`.\n- **Decisions to know:**\n  - `list` sorts kinds alphabetically, as the shell index does, not in vocabulary order.\n  - `add` doesn't check that `--brief` names an existing brief, because some existing records cite briefs that aren't in `docs/briefs/`.\n  - `add` has no `--occurred` flag and uses today's date.\n\nI did not commit.",
+  "ttft_ms": 2783,
+  "type": "result",
+  "duration_ms": 406708,
+  "uuid": "a0f3a306-32b3-46ad-9463-078cbb5b1f66",
+  "ttft_stream_ms": 1357,
+  "time_to_request_ms": 355,
+  "first_content_frame_ms": 1357,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 5
+}

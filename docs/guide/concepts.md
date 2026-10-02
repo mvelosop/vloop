@@ -13,6 +13,28 @@ with no memory; the sessions share only files in the repository. A task that
 fails its gate or its review is tried again, and a run that cannot go on halts
 and says why (see [Exit codes](#exit-codes)).
 
+## Skills
+
+The plugin ships four skills. The first three are the sessions of the loop;
+`vloop run` starts each one, you do not.
+
+- `/vloop:plan` reads the brief and its binding references and writes the plan
+  (`.vloop/state/state.json`): tasks with acceptance criteria, a verify command,
+  and `kind` (and `area`, when `areas` is set).
+- `/vloop:work` takes one task: reads the plan, the journal and the task's
+  references, does the task, runs its gate, and writes `proposal/v1`
+  (`done`, or `blocked`, with a `gate_dispute` when the gate is wrong). It never
+  commits or sets a status.
+- `/vloop:review` reads the diff and the proposal and writes `verdict/v1`:
+  `PASS` or `FAIL`, per-criterion evidence, and findings of kind `bug`,
+  `spec-gap` or `gate-gap`. It fails closed.
+- `/vloop:operate` is yours: invoke it in an interactive session to run a brief
+  on a work branch, handle halts, verify, record defects and interventions, close
+  the brief and merge.
+
+Each skill's behaviour is checked by evals in the plugin. They are run by the
+operator with `claude plugin eval`; `vloop run` never runs them.
+
 ## Briefs and their lifecycle
 
 A brief is a Markdown file `B<YYYYMMDD-HHMM>-<slug>.loop-brief.md` in

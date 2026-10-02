@@ -112,7 +112,13 @@ func newRunRepo(t *testing.T) *runRepo {
 	if runtime.GOOS == "windows" {
 		t.Skip("the stub claude is a POSIX shell script and cannot run on windows")
 	}
-	r := &runRepo{t: t, dir: t.TempDir(), home: t.TempDir(), stub: t.TempDir()}
+	// The home's base name is the user name the driver masks and the
+	// containment test hunts for; t.TempDir's base names are counters such as
+	// 002, which a date-stamped run id contains on 2 October.
+	r := &runRepo{t: t, dir: t.TempDir(), home: filepath.Join(t.TempDir(), "harnessuser"), stub: t.TempDir()}
+	if err := os.Mkdir(r.home, 0o755); err != nil {
+		t.Fatal(err)
+	}
 	runGit(t, r.dir, "init", "-q", "-b", "main")
 	runGit(t, r.dir, "config", "user.name", "harness")
 	runGit(t, r.dir, "config", "user.email", "harness@example.com")

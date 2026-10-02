@@ -15,4 +15,10 @@ gates run in any shell of the OS, not only sh; stack presets and more docs for B
 
 **Done.** a shell setting in config and plan; roadmap updated
 
+**Context.** On the B2 draft's choice 9 (gates need sh), the operator: 'I didn't actually mean shell-shell, but any shell from the underlying OS, might be pwsh if on Windows, or even on linux if the project requires it.' Also stack presets and more docs for B3.
+
+**Suggested.** gates as POSIX sh strings.
+
+**Decided.** the operator: any OS shell — a shell setting in config and plan; presets and docs into B3.
+
 **What would automate it.** none

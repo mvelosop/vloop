@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 12846,
+  "stop_reason": "end_turn",
+  "session_id": "e513269b-bf0c-4a8b-9662-7bb0955d6973",
+  "total_cost_usd": 0.1077812,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 18612,
+    "cache_read_input_tokens": 90886,
+    "output_tokens": 1514,
+    "output_tokens_details": {
+      "thinking_tokens": 185
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 18612,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 227,
+        "cache_read_input_tokens": 29764,
+        "cache_creation_input_tokens": 864,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 864
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1514,
+      "cacheReadInputTokens": 90886,
+      "cacheCreationInputTokens": 18612,
+      "webSearchRequests": 0,
+      "costUSD": 0.1077812,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 185,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**T6: PASS.** Export now emits intervention records in id order after the brief groups. They are filtered by named briefs, and every record's `repo.stacks` carries the configured stacks, or `[]` when unset. The schema changed in place and has valid and invalid fixtures. Tests cover interventions, brief filtering and stacks with and without configuration. I re-ran `go test` on `./internal/cli` and `./internal/schema`, and both pass.\n\nOne gap, noted in the verdict: no committed test covers per-repository stacks under `--workspace`. The code reads each repository's own config, so I did not fail it for that.\n\nThe verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2238,
+  "type": "result",
+  "duration_ms": 34559,
+  "uuid": "79e24cdb-bea5-4460-92ff-7ac6d48e4992",
+  "ttft_stream_ms": 1084,
+  "time_to_request_ms": 371,
+  "first_content_frame_ms": 1085,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 6
+}

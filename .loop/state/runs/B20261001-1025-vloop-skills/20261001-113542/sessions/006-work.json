@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 37284,
+  "stop_reason": "end_turn",
+  "session_id": "f6d42e86-d316-400c-a9b4-88d54bbd82d2",
+  "total_cost_usd": 0.22218340000000003,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 31356,
+    "cache_read_input_tokens": 219907,
+    "output_tokens": 5275,
+    "output_tokens_details": {
+      "thinking_tokens": 157
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 31356,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 525,
+        "cache_read_input_tokens": 42627,
+        "cache_creation_input_tokens": 745,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 745
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 5275,
+      "cacheReadInputTokens": 219907,
+      "cacheCreationInputTokens": 31356,
+      "webSearchRequests": 0,
+      "costUSD": 0.22218340000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 157,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `plugin/skills/work/SKILL.md` for `/vloop:work`, and the T3 gate passes. I ran the verify command in bash and it printed `GATE OK`. I did not run `vloop task gate T3`, because `vloop` isn't on the PATH in this shell.\n\nThe skill is the shell `loop-work` skill ported to vloop's commands and files:\n- **Reading the task:** it reads the task with `vloop task show <id> --json`, then the brief, references and notes.\n- **Gate:** it runs the gate with `vloop task gate <id>`.\n- **Proposal:** it writes `.vloop/tmp/proposal.json` as `proposal/v1` and validates it with `vloop schema validate proposal/v1 .vloop/tmp/proposal.json`.\n- **Language:** it writes `summary` and `notes` in the language `vloop config get language` prints.\n- **Gate dispute:** a gate a correct implementation can't pass is reported as `outcome: blocked` with a `gate_dispute`. The skill carries one done example and one dispute example, and both validate against the schema.\n- **What it forbids:** editing a gate or the files a gate inspects, committing, setting a status, moving a ref and pushing. It names no command the fence denies in a code span.\n\nI wrote `.loop/tmp/proposal.json` with outcome `done`. Its `notes` field records the port deltas and the rules kept, and says that the new rule about not running the driver or editing defect and intervention records was added.\n\nI left the working-tree changes uncommitted, as the loop requires.",
+  "ttft_ms": 2465,
+  "type": "result",
+  "duration_ms": 63443,
+  "uuid": "ff0d98b6-682f-4d21-8c1b-cafd0b80d1d7",
+  "ttft_stream_ms": 1455,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1455,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "work",
+  "iteration": 3
+}

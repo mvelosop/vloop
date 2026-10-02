@@ -1,0 +1,100 @@
+{
+  "duration_api_ms": 14766,
+  "stop_reason": "end_turn",
+  "session_id": "3669c586-1ddd-42ac-9332-c7bcc9792917",
+  "total_cost_usd": 0.1448162,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 26559,
+    "cache_read_input_tokens": 95921,
+    "output_tokens": 1938,
+    "output_tokens_details": {
+      "thinking_tokens": 113
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 26559,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 185,
+        "cache_read_input_tokens": 37183,
+        "cache_creation_input_tokens": 1392,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1392
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1938,
+      "cacheReadInputTokens": 95921,
+      "cacheCreationInputTokens": 26559,
+      "webSearchRequests": 0,
+      "costUSD": 0.1448162,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 113,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 5,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "T1 passes: all ten acceptance criteria are met, and I found nothing to send back. I ran `TestPluginSkills` and `TestSkillChecksRejectFixtures`, and both pass. I did not re-run the full verify command.\n\nThe domain-model change is five added lines to the \"On disk\" block, with nothing else touched. The 15 committed fixtures each have an expectation in `fixtureWants`, the checks run nothing outside `internal/cli`, and there are no absolute paths.\n\nThe verdict is in `.loop/tmp/verdict.json`.",
+  "ttft_ms": 2114,
+  "type": "result",
+  "duration_ms": 16389,
+  "uuid": "7e417a85-09c0-46ad-95ca-6b030c70547b",
+  "ttft_stream_ms": 1118,
+  "time_to_request_ms": 354,
+  "first_content_frame_ms": 1119,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "phase": "review",
+  "iteration": 1
+}

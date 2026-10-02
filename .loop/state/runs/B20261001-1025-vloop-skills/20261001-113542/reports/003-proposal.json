@@ -1,0 +1,8 @@
+{
+  "task": "T3",
+  "outcome": "done",
+  "summary": "plugin/skills/work/SKILL.md now exists as /vloop:work: the shell work skill ported to vloop's commands and files, with the gate_dispute duty and validating done and blocked/gate_dispute example proposals.",
+  "files": ["plugin/skills/work/SKILL.md"],
+  "verified": "Ran the T3 verify command in bash; it printed GATE OK.",
+  "notes": "Port deltas: state.json/journal reads go through vloop task show --json and vloop status; the gate is run with vloop task gate <id>; the proposal gets schema field proposal/v1 and is checked with vloop schema validate; summary/notes follow vloop config get language. The shell skill's 'do not change your gate' is widened to files the gate inspects. Rules kept: one-task scope, one-shot foreground gate, no suite run, notes-carry-behaviour, no status/commit/journal/push. The 'git commit/branch/tag/...' commands are named in prose, not code spans, so the fence check does not flag them. The B0007 'exploring-claude' citation is shortened to an anonymous 'real run'. Added: do not run the driver or edit defects/interventions."
+}

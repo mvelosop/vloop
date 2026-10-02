@@ -14,4 +14,10 @@ T6 blocked twice on a gate that contradicted its own acceptance
 
 **Done.** Read the work session's diagnosis; replaced the clause with git diff --cached --quiet (nothing staged; HEAD equality and the refs check kept "no commit"), with .loop/amend.sh verify, reset T6, ran the new gate by hand (passes end to end), resumed. Recorded as a plan/gate defect.
 
+**Context.** B5's first run stalled (exit 3) at T6 (vloop init), blocked twice. Its gate asserted `git status --porcelain --untracked-files=no` empty after requiring init to append to a committed .gitignore. Replaced with `git diff --cached --quiet`, reset, gate passed by hand, resumed.
+
+**Suggested.** replace the clause with git diff --cached --quiet.
+
+**Decided.** the assistant, within the operator skill's remit; no operator decision asked.
+
 **What would automate it.** The diagnosis was exact and the fix kept the clause's intent. A driver could apply a work session's gate_dispute fix after checking the new gate still fails on the base commit and passes on the work — the operator's judgement is only whether the intent is kept.

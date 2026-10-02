@@ -15,4 +15,10 @@ schema files counted as 'other' lines
 
 **Done.** classified schemas/** as code in the repo config
 
+**Context.** The rehearsed B4 run record showed T1 with 110 'other' lines: the schema .json files, unclassified. `metrics.code` gained `schemas/**` in this repo's config (commit 1fc8e15).
+
+**Suggested.** classify schemas/** as code.
+
+**Decided.** the operator: 'go ahead!'.
+
 **What would automate it.** a check for unclassified lines above a threshold

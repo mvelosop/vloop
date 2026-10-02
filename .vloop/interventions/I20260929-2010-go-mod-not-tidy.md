@@ -15,4 +15,10 @@ go.mod not tidy
 
 **Done.** go mod tidy by hand; recorded as D...-go-mod-not-tidy and its gate gap
 
+**Context.** Verifying B1 after a 9/9 first-pass run: `go mod tidy -diff` showed BurntSushi/toml listed as indirect though imported directly. Tidied by hand; recorded later as a work defect and a plan gate-gap, since no gate checked tidiness.
+
+**Suggested.** run go mod tidy and add a tidy check to future gates.
+
+**Decided.** the operator approved the tidy and the gate.
+
 **What would automate it.** a go mod tidy -diff gate, in every gate since B2

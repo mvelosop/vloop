@@ -15,4 +15,10 @@ vloop's checker rejected two binding references citing two paths each
 
 **Done.** split into one path per entry
 
+**Context.** Checking the B4 draft with `vloop brief check` (besides the shell checker): two binding-reference entries cited two paths each, which vloop's one-path-per-entry rule rejects. Split into one path per entry.
+
+**Suggested.** split the entries.
+
+**Decided.** the assistant, within the operator skill's remit; no operator decision asked.
+
 **What would automate it.** already a check; run it as part of the design act

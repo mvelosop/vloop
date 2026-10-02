@@ -17,6 +17,10 @@ import (
 
 const pluginManifest = ".claude-plugin/plugin.json"
 
+// pluginEvals is the embedded directory of on-demand eval suites. Sessions never
+// need it, so it is not extracted, and one left in the tree is removed.
+const pluginEvals = "evals"
+
 // EnsureRealDir makes dir exist as a real directory, refusing a symlink or a
 // file in its place, so nothing is ever written through a link.
 func EnsureRealDir(dir string) error {
@@ -33,7 +37,7 @@ func EnsureRealDir(dir string) error {
 }
 
 // ExtractPlugin makes .vloop/tmp/plugin/<version>/ under root hold exactly the
-// embedded plugin and returns that directory relative to root, with "/".
+// embedded plugin, less its evals/, and returns that directory relative to root, with "/".
 func ExtractPlugin(root, version string) (string, error) {
 	if version == "" || version == "." || version == ".." || strings.ContainsAny(version, `/\\`) {
 		return "", fmt.Errorf("cannot extract the plugin for version %q", version)
@@ -55,6 +59,9 @@ func ExtractPlugin(root, version string) (string, error) {
 		name := strings.TrimPrefix(strings.TrimPrefix(p, "plugin"), "/")
 		if name == "" {
 			return nil
+		}
+		if name == pluginEvals {
+			return fs.SkipDir
 		}
 		want[name] = d.IsDir()
 		target := filepath.Join(dir, filepath.FromSlash(name))

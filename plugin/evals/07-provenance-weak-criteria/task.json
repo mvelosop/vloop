@@ -1,0 +1,18 @@
+{
+  "id": "T1",
+  "title": "Route every error the CLI prints through one message catalogue",
+  "goal": "Error text is written inline at each call site today, so changing a word means finding every copy and missing one. A single catalogue in src/runstat/messages.py makes each string definable in one place and referenced everywhere else. A copy left inline in cli.py reintroduces exactly the drift this task exists to remove, which is why the catalogue is the point of the task rather than a tidy-up on the way to it.",
+  "files": [
+    "src/runstat/messages.py",
+    "src/runstat/cli.py"
+  ],
+  "depends_on": [],
+  "acceptance": [
+    "A message catalogue exists at src/runstat/messages.py and defines the CLI's user-facing strings",
+    "cli.py imports the catalogue rather than carrying a separate hard-coded string table",
+    "The catalogue's strings are used on the CLI's failure paths",
+    "A missing run directory exits 2, with the catalogue's text on stderr",
+    "stdout is completely empty on every failing path"
+  ],
+  "verify": "uv run pytest -q tests/test_messages.py"
+}

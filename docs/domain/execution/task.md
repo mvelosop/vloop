@@ -66,7 +66,7 @@ else the default — `sonnet` for work and review, effort unset (P-6).
 
 ## Gaps
 
-- No planner assigns `area` or `kind` yet *(planned, B5)*; shell-loop plans have
-  neither.
+- `/vloop:plan` assigns `kind`, and `area` when `areas` is set; shell-loop plans
+  have neither.
 - The shell loop's `amend.sh verify` keeps no `gate_history`; only `vloop task
   verify` records it.
