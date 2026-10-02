@@ -1,13 +1,2 @@
-/bin/sh: /private/var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/gate.PwCH8u/i/.vloop/state/state.json: No such file or directory
-GATE FAIL: go test ./internal/driver ./internal/schema ./internal/state: ok  	github.com/mvelosop/vloop/internal/driver	5.441s
---- FAIL: TestFixturesValidateAndFail (0.02s)
-    --- FAIL: TestFixturesValidateAndFail/export-intervention (0.00s)
-        schema_test.go:50: valid fixture: [{/repo/remote got null, want string}], <nil>
-    --- FAIL: TestFixturesValidateAndFail/export-brief (0.00s)
-        schema_test.go:50: valid fixture: [{/repo/remote got null, want string}], <nil>
-    --- FAIL: TestFixturesValidateAndFail/export-task (0.00s)
-        schema_test.go:50: valid fixture: [{/repo/remote got null, want string}], <nil>
-FAIL
-FAIL	github.com/mvelosop/vloop/internal/schema	0.556s
-ok  	github.com/mvelosop/vloop/internal/state	1.373s
-FAIL
+/bin/sh: /private/var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/gate.xXgZpa/i/.vloop/state/state.json: No such file or directory
+GATE OK

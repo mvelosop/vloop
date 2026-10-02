@@ -49,3 +49,8 @@ committing the plan
    GATE REGRESSION T10 — reverting to pending; detected during T11's iteration
    review: PASS
    T11 done
+   no recorded progress (1/2)
+── iteration 13 (13 this run) · T10 · 10/18 done ──
+   Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
+   review: PASS
+   T10 done

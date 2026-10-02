@@ -90,3 +90,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** repo.remote is now exported only as scheme://host[:port]/path or host:path without user info, query or fragment, and omitted for a local path or file:// origin; repo.name derives from the sanitized remote.
 - **Files:** internal/cli/export.go, internal/cli/export_test.go, schemas/export.v1.json
 - **Notes for next iteration:** Schema: remote is now optional and a plain string (no null); Remote uses omitempty. scp-like user (git@) is dropped too. Local-path detection: no colon, slash/backslash before the colon, a one-letter Windows drive, or a ~ host.
+
+## T10 — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** T10's work was already in place; fixed the regression T11 caused: export schema fixtures still carried repo.remote null, which the T11 schema (optional plain string) rejects.
+- **Files:** internal/schema/testdata/export-task.valid.json, internal/schema/testdata/export-brief.valid.json, internal/schema/testdata/export-intervention.valid.json, internal/schema/testdata/export-task.invalid.json, internal/schema/testdata/export-brief.invalid.json, internal/schema/testdata/export-intervention.invalid.json
+- **Notes for next iteration:** export/v1 repo.remote is omitted, never null; fixtures under internal/schema/testdata must omit the key. The 'No such file' line from /bin/sh in the gate output is a harmless fixture quirk.

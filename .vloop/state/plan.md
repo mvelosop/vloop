@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/18 done** · iteration 12
+**Status:** running · **11/18 done** · iteration 13
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:41:03Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:45:47Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Time gates and sessions and leave nothing running (F3) · 1 attempt(s)
 - [x] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
 - [x] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
-- [ ] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13) · 1 attempt(s)
+- [x] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13) · 1 attempt(s)
 - [x] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
 - [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
 - [ ] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
@@ -251,7 +251,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T10 — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 **Files:** `internal/driver/iterate.go`, `internal/driver/safety.go`, `internal/driver/safety_test.go`, `internal/driver/plan.go`, `schemas/state.v1.json`, `cmd/vloop/run_tmp_test.go`
 
@@ -263,8 +263,6 @@ The driver reads .vloop/tmp/proposal.json and verdict.json through symlinks and 
 - The lock is created atomically with exclusive create and without following a symlink; a lock whose process is gone is replaced once; two concurrent acquisitions → exactly one succeeds and the other exits 1 naming the running pid.
 - run_id must match ^[A-Za-z0-9._-]+$, contain no .., and equal the run id of the plan's brief; otherwise vloop run exits 1 before anything is written. schemas/state.v1.json gains the pattern while still accepting the empty run_id a planning session writes.
 - internal/driver/safety_test.go holds TestLockExactlyOneOfConcurrent (two goroutines) and a test TestHandoffSymlinkIsMissing exists in internal/driver; cmd/vloop/run_tmp_test.go holds TestRunSymlinkedProposal (a proposal.json symlinked to a file holding SECRET: no SECRET under .vloop/state/) and TestRunBadRunID (run_id "../x": exit 1, nothing written outside the repo); each fails against the base.
-
-**From the last attempt:** regressed: verify failed during T11 — see .vloop/state/runs/B20261002-2135-vloop-v1-security/20261002-225019/gates/T10.log
 
 <details><summary>verify command</summary>
 

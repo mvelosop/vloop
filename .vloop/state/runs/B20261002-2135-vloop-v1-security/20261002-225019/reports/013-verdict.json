@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T10",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Handoff files (proposal.json, verdict.json) are read only when they are regular files, never through a symlink; a symlinked one is treated as missing, and a report is copied into the run folder only after it validated.", "met": true, "evidence": "internal/driver/iterate.go:814 Lstat check; TestHandoffSymlinkIsMissing and TestRunSymlinkedProposal exist and the gate passes (including the symlink fixture in the gate itself)"},
+    {"criterion": "The lock is created atomically with exclusive create and without following a symlink; a lock whose process is gone is replaced once; two concurrent acquisitions → exactly one succeeds and the other exits 1 naming the running pid.", "met": true, "evidence": "internal/driver/safety.go AcquireLock: private temp file hard-linked into place (os.Link fails if exists), readLock uses Lstat, stale lock replaced once (attempt>0 halts); TestLockExactlyOneOfConcurrent, TestLockSymlinkNotFollowed"},
+    {"criterion": "run_id must match ^[A-Za-z0-9._-]+$, contain no .., and equal the run id of the plan's brief; otherwise vloop run exits 1 before anything is written. schemas/state.v1.json gains the pattern while still accepting the empty run_id a planning session writes.", "met": true, "evidence": "schemas/state.v1.json:9 pattern ^[A-Za-z0-9._-]*$ plus not '..'; the gate loops over '../../../../escaped', '../x' and another brief's id, expecting exit 1, and validates '' and the real id; TestRunBadRunID"},
+    {"criterion": "internal/driver/safety_test.go holds TestLockExactlyOneOfConcurrent (two goroutines) and a test TestHandoffSymlinkIsMissing exists in internal/driver; cmd/vloop/run_tmp_test.go holds TestRunSymlinkedProposal (a proposal.json symlinked to a file holding SECRET: no SECRET under .vloop/state/) and TestRunBadRunID (run_id \"../x\": exit 1, nothing written outside the repo); each fails against the base.", "met": true, "evidence": "all four tests found at safety_test.go:72,121 and run_tmp_test.go:12,37; the gate runs them by name and passes (vloop task gate T10 → GATE OK)"}
+  ],
+  "findings": [],
+  "notes": "T10's implementation was already committed (52e5faf). This iteration only fixed a regression from T11: export/v1 fixtures in internal/schema/testdata carried repo.remote:null, which the T11 schema (optional string) rejects; removing the key is the correct fix, the schema stays the authority, and these are not T10's gate files. Those fixtures are outside T10's files list, but the change is necessary and minimal. No absolute paths in the diff."
+}
