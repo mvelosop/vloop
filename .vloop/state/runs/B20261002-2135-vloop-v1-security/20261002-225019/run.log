@@ -54,3 +54,7 @@ committing the plan
    Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
    review: PASS
    T10 done
+── iteration 14 (14 this run) · T12 · 11/18 done ──
+   Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
+   GATE DISPUTE T12 — blocked for the operator; no review, no attempt charged
+   T12 blocked — the operator resolves the disputed gate with vloop task verify

@@ -159,15 +159,41 @@ func refsDiff(before, after []string) []string {
 	return out
 }
 
-// LatestBrief is the newest loop brief in docs/briefs/ (names carry their
-// timestamp, so the last sorted is the newest); "" when there is none.
-func LatestBrief(root string) string {
-	m, _ := filepath.Glob(filepath.Join(root, filepath.FromSlash(briefsDir), "*"+briefSuffix))
-	if len(m) == 0 {
-		return ""
+// requireCleanTree refuses when git status lists a modified, staged or
+// untracked-not-ignored path, so `git add -A` cannot sweep stray files into the
+// driver's commits. .vloop/tmp/ never counts; a resume also tolerates
+// .vloop/state/, where the operator's task edits wait for the next iteration.
+func requireCleanTree(root string, resuming bool) error {
+	raw, err := gitCmd(root, "status", "--porcelain", "-z", "--untracked-files=all").Output() // untrimmed: entries start with a space
+	if err != nil {
+		return halt(ExitPreflight, "git status: %v", err)
 	}
-	sort.Strings(m)
-	return briefsDir + "/" + filepath.Base(m[len(m)-1])
+	out := string(raw)
+	var dirty []string
+	parts := strings.Split(out, "\x00")
+	for i := 0; i < len(parts); i++ {
+		e := parts[i]
+		if len(e) < 4 {
+			continue
+		}
+		if e[0] == 'R' || e[0] == 'C' { // the next entry is the rename's source
+			i++
+		}
+		f := e[3:]
+		if strings.HasPrefix(f, ".vloop/tmp/") || (resuming && strings.HasPrefix(f, ".vloop/state/")) {
+			continue
+		}
+		dirty = append(dirty, f)
+	}
+	if len(dirty) == 0 {
+		return nil
+	}
+	sort.Strings(dirty)
+	list := strings.Join(dirty, ", ")
+	if len(dirty) > 10 {
+		list = fmt.Sprintf("%s and %d more", strings.Join(dirty[:10], ", "), len(dirty)-10)
+	}
+	return halt(ExitPreflight, "the tree is not clean — commit, ignore or remove these first: %s", list)
 }
 
 type term struct {
@@ -214,8 +240,12 @@ func (p *Planner) Plan() (*PlanResult, error) {
 
 	briefPath := p.Brief
 	if briefPath == "" && !hasPlan {
-		if briefPath = LatestBrief(root); briefPath == "" {
-			return nil, halt(ExitPreflight, "no plan and no loop brief in %s/ — usage: vloop run %s/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md", briefsDir, briefsDir)
+		entries, err := brief.Load(root)
+		if err != nil {
+			return nil, halt(ExitPreflight, "%v", err)
+		}
+		if briefPath = brief.Newest(entries); briefPath == "" {
+			return nil, halt(ExitPreflight, "no ready brief in %s/ — name one, or set status: ready on a checked brief", briefsDir)
 		}
 	}
 
@@ -230,6 +260,19 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	if hasPlan && briefPath == "" && existing.Branch != "" && existing.Branch != cur {
 		return nil, halt(ExitPreflight, "the plan %s was made on branch %s and you are on %s — name its brief to resume it, or another brief to plan afresh", existing.RunID, existing.Branch, cur)
+	}
+
+	if !resuming {
+		lang, err := config.Get(root, "language")
+		if err != nil {
+			return nil, halt(ExitPreflight, "%v", err)
+		}
+		if err := brief.Plannable(root, briefPath, brief.SetFor(lang.Value), p.Replan); err != nil {
+			return nil, halt(ExitPreflight, "%v", err)
+		}
+	}
+	if err := requireCleanTree(root, resuming); err != nil {
+		return nil, err
 	}
 
 	if resuming {

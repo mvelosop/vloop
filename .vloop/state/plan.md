@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **11/18 done** · iteration 13
+**Status:** running · **11/18 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:45:47Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:57:35Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
 - [x] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13) · 1 attempt(s)
 - [x] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
-- [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
+- [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2) · **blocked**
 - [ ] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
 - [ ] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
 - [ ] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
@@ -298,7 +298,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T12 — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
 
-`pending` · depends on: none
+`blocked` · **blocked** · depends on: none
 
 **Files:** `internal/driver/plan.go`, `internal/cli/run.go`, `internal/brief/`, `cmd/vloop/run_preflight_test.go`, `cmd/vloop/`
 
@@ -313,6 +313,8 @@ A bare vloop run plans whichever brief sorts last, whatever its status, and neve
 - Resuming also requires a clean tree, except for changes under .vloop/state/ (the operator's vloop task verify|reset|note|drop|set), which the next iteration commits.
 - cmd/vloop/run_preflight_test.go holds TestRunPlansNewestReadyBrief, TestRunRefusesDraftBriefs, TestRunRefusesUncheckedBrief, TestRunRefusesUnconsumedDependency, TestRunRefusesDirtyTree and TestRunResumeAllowsStateEdits, each failing against the base.
 - Every existing cmd/vloop test whose repository started with untracked or modified files is changed to start clean, and in no other way; no assertion is weakened.
+
+**From the last attempt:** gate disputed: The gate's fixture repository for the resume clause is the stub claude's own directory, so the tree is dirty by construction and the required clean-tree refusal fires; and its final clause runs the whole cmd/vloop suite, which contains two tests broken before this task. — mkrepo s sets R=$t/s while the stub lives in $t/s (printf ... > $t/s/claude, plan.json, argv.log); the gate's stderr on the run is 'vloop: the tree is not clean — commit, ignore or remove these first: argv.log, plan.json'. With the repo renamed, the only failures are TestRun03GateRegression and TestRun41RegressionNamesBoth ('GATE REWRITE T2 — T1.out restored from HEAD').
 
 <details><summary>verify command</summary>
 
