@@ -1,3 +1,7 @@
 planning from docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md using opus
 planned: B20261002-2135-vloop-v1-security — 18 tasks
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/18 done ──
+   Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
+   review: PASS
+   T1 done

@@ -68,7 +68,7 @@ func TestWorkedExampleB6Sessions(t *testing.T) {
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
 
-	fence := regexp.MustCompile(`--settings \.vloop/tmp/fence/([^/ ]+)/settings\.json`)
+	fence := regexp.MustCompile(`--settings \.vloop/tmp/fence/([^/ ]+)/work\.json`)
 	plan := b6Lines(r, "/vloop:plan "+runBrief)
 	if len(plan) != 1 || !strings.Contains(plan[0], "--model opus") || strings.Contains(plan[0], "--effort") {
 		t.Errorf("plan session = %q, want one with --model opus and no --effort", plan)
@@ -82,7 +82,7 @@ func TestWorkedExampleB6Sessions(t *testing.T) {
 	}
 	m := fence.FindStringSubmatch(work[0])
 	if m == nil {
-		t.Fatalf("work session has no --settings .vloop/tmp/fence/<v>/settings.json: %q", work[0])
+		t.Fatalf("work session has no --settings .vloop/tmp/fence/<v>/work.json: %q", work[0])
 	}
 	if !strings.Contains(work[0], "--plugin-dir .vloop/tmp/plugin/"+m[1]) {
 		t.Errorf("work session = %q, want --plugin-dir .vloop/tmp/plugin/%s", work[0], m[1])

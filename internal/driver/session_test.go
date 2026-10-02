@@ -168,7 +168,7 @@ func TestSessionInvocationAndEnv(t *testing.T) {
 	}
 	argv, _ := os.ReadFile(filepath.Join(r.Root, "argv"))
 	for _, w := range []string{"-p /vloop:review T1 --model sonnet --permission-mode auto",
-		"--settings .vloop/tmp/fence/1.2.3/settings.json", "--plugin-dir .vloop/tmp/plugin/1.2.3 "} {
+		"--settings .vloop/tmp/fence/1.2.3/review.json", "--plugin-dir .vloop/tmp/plugin/1.2.3 "} {
 		if !strings.Contains(string(argv), w) {
 			t.Errorf("argv %q lacks %q", argv, w)
 		}
@@ -180,7 +180,7 @@ func TestSessionInvocationAndEnv(t *testing.T) {
 	if strings.Contains(string(env), "VLOOP_ACTIVE_TASK") || strings.Contains(string(env), "VLOOP_GATE_TASK") || !strings.Contains(string(env), "KEEP=1") {
 		t.Errorf("environment: %s", env)
 	}
-	if _, err := os.Stat(filepath.Join(r.Root, ".vloop/tmp/fence/1.2.3/settings.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(r.Root, ".vloop/tmp/fence/1.2.3/review.json")); err != nil {
 		t.Error(err)
 	}
 	if _, err := os.Stat(filepath.Join(r.Root, ".vloop/tmp/plugin/1.2.3/.claude-plugin/plugin.json")); err != nil {

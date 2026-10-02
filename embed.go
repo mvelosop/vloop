@@ -15,7 +15,13 @@ var Plugin embed.FS
 //go:embed schemas/*.json
 var Schemas embed.FS
 
-// Fence is the permission settings every session runs under.
+// Fences are the permission settings a session runs under, one file per
+// phase: fence/plan.json, fence/work.json and fence/review.json.
 //
-//go:embed fence/settings.json
-var Fence []byte
+//go:embed fence/*.json
+var Fences embed.FS
+
+// Fence is the permission settings of one session phase.
+func Fence(phase string) ([]byte, error) {
+	return Fences.ReadFile("fence/" + phase + ".json")
+}

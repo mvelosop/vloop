@@ -6,3 +6,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md`
 - **Tasks:** 18
+
+## T1 — Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The fence is now three embedded files (fence/plan.json, work.json, review.json), each extracted and passed to its own session, with the F10 bypass forms denied in all three. session.md says the fence is advisory.
+- **Files:** fence/plan.json, fence/work.json, fence/review.json, embed.go, embed_test.go, internal/driver/extract.go, internal/driver/session.go, internal/driver/session_test.go, cmd/vloop/b6_e2e_test.go, internal/cli/fence_test.go, internal/cli/skills_test.go, docs/guide/evals.md, docs/domain/execution/session.md
+- **Notes for next iteration:** fence/settings.json is gone; vloop.Fence(phase) replaces the vloop.Fence byte slice and ExtractFence takes the phase, writing .vloop/tmp/fence/<version>/<phase>.json (session_test.go and b6_e2e_test.go paths updated). The review fence differs from work's by allowing Edit/Write only under .vloop/tmp/**; the work fence's allow list is unchanged, so eval grants needed no change. Deny rules use glob forms such as Bash(find*-delete*); the skills_test matcher handles both :* prefixes and * globs. Dropped from my first draft: denying git add/mv/rm/restore/apply, since a work session may legitimately need them.

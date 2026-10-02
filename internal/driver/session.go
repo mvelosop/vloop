@@ -147,7 +147,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	fence, err := ExtractFence(r.Root, r.Version)
+	fence, err := ExtractFence(r.Root, r.Version, s.Phase)
 	if err != nil {
 		return Result{}, err
 	}

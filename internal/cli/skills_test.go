@@ -121,9 +121,14 @@ func checkSkillPlugin(dir string) []string {
 	if err != nil {
 		out = append(out, "On disk layout: "+err.Error())
 	}
-	fence, err := loadFence()
-	if err != nil {
-		out = append(out, "embedded fence: "+err.Error())
+	fences := map[string]*fenceRules{}
+	for phase := range fencedSkills {
+		f, err := loadFence(phase)
+		if err != nil {
+			out = append(out, "embedded "+phase+" fence: "+err.Error())
+			continue
+		}
+		fences[phase] = f
 	}
 	skills, _ := filepath.Glob(filepath.Join(dir, "skills", "*", "SKILL.md"))
 	sort.Strings(skills)
@@ -151,7 +156,7 @@ func checkSkillPlugin(dir string) []string {
 			for _, p := range problems {
 				out = append(out, fmt.Sprintf("skill %s: `%s`: %s", folder, c, p))
 			}
-			if resolved && fencedSkills[folder] && fence != nil {
+			if fence := fences[folder]; resolved && fencedSkills[folder] && fence != nil {
 				if p := fence.judge(c); p != "" {
 					out = append(out, fmt.Sprintf("skill %s: `%s`: %s", folder, c, p))
 				}
@@ -532,37 +537,68 @@ func segMatch(entry, seg string) bool {
 	return regexp.MustCompile(re).MatchString(seg)
 }
 
-// fenceRules are the embedded fence's Bash(vloop ...) rules, as command prefixes.
+// fenceRules are one phase's fence Bash rules.
 type fenceRules struct{ allow, deny []string }
 
-func loadFence() (*fenceRules, error) {
-	var f struct {
-		Permissions struct {
-			Allow []string `json:"allow"`
-			Deny  []string `json:"deny"`
-		} `json:"permissions"`
-	}
-	if err := json.Unmarshal(vloop.Fence, &f); err != nil {
-		return nil, err
-	}
-	return &fenceRules{allow: bashPrefixes(f.Permissions.Allow), deny: bashPrefixes(f.Permissions.Deny)}, nil
+type fenceFile struct {
+	Permissions struct {
+		Allow []string `json:"allow"`
+		Deny  []string `json:"deny"`
+	} `json:"permissions"`
 }
 
-func bashPrefixes(rules []string) []string {
+// readFence parses the embedded fence of one phase.
+func readFence(phase string) (*fenceFile, error) {
+	raw, err := vloop.Fence(phase)
+	if err != nil {
+		return nil, err
+	}
+	var f fenceFile
+	if err := json.Unmarshal(raw, &f); err != nil {
+		return nil, err
+	}
+	return &f, nil
+}
+
+func loadFence(phase string) (*fenceRules, error) {
+	f, err := readFence(phase)
+	if err != nil {
+		return nil, err
+	}
+	return &fenceRules{allow: bashPatterns(f.Permissions.Allow), deny: bashPatterns(f.Permissions.Deny)}, nil
+}
+
+// bashPatterns are the Bash(...) rules' bodies: "git push:*" is a prefix rule,
+// a body with a "*" elsewhere is a glob.
+func bashPatterns(rules []string) []string {
 	var out []string
 	for _, r := range rules {
 		if !strings.HasPrefix(r, "Bash(") || !strings.HasSuffix(r, ")") {
 			continue
 		}
-		p := strings.TrimSuffix(strings.TrimPrefix(r, "Bash("), ")")
-		out = append(out, strings.TrimSuffix(p, ":*"))
+		out = append(out, strings.TrimSuffix(strings.TrimPrefix(r, "Bash("), ")"))
 	}
 	return out
 }
 
+// patternMatch reports whether the Bash rule body p covers cmd.
+func patternMatch(p, cmd string) bool {
+	if pre, ok := strings.CutSuffix(p, ":*"); ok {
+		return cmd == pre || strings.HasPrefix(cmd, pre+" ")
+	}
+	if !strings.Contains(p, "*") {
+		return cmd == p
+	}
+	parts := strings.Split(p, "*")
+	for i, q := range parts {
+		parts[i] = regexp.QuoteMeta(q)
+	}
+	return regexp.MustCompile("^" + strings.Join(parts, ".*") + "$").MatchString(cmd)
+}
+
 func prefixMatch(rules []string, cmd string) (string, bool) {
 	for _, p := range rules {
-		if cmd == p || strings.HasPrefix(cmd, p+" ") {
+		if patternMatch(p, cmd) {
 			return p, true
 		}
 	}
@@ -813,12 +849,8 @@ func evalGrantGaps(dir string, fenceAllow []string, guide string) []string {
 
 func fenceAllowRules(t *testing.T) []string {
 	t.Helper()
-	var f struct {
-		Permissions struct {
-			Allow []string `json:"allow"`
-		} `json:"permissions"`
-	}
-	if err := json.Unmarshal(vloop.Fence, &f); err != nil {
+	f, err := readFence("work")
+	if err != nil {
 		t.Fatal(err)
 	}
 	return f.Permissions.Allow

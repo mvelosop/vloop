@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/18 done** · iteration 0
+**Status:** running · **1/18 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:15:56Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T22:21:25Z
 
 ## Progress
 
-- [ ] **T1** — Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
+- [x] **T1** — Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
 - [ ] **T2** — Make the driver's git ignore hooks and fsmonitor, and halt when .git/config, the hooks or a gate's refs change (F4, F5)
 - [ ] **T3** — Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
 - [ ] **T4** — Revert and fail a review session that changes the work it judges (F8)
@@ -31,7 +31,7 @@
 
 ### T1 — Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `fence/`, `embed.go`, `embed_test.go`, `internal/driver/extract.go`, `internal/driver/session.go`, `internal/cli/fence_test.go`, `internal/cli/skills_test.go`, `plugin/evals/`, `docs/guide/evals.md`, `docs/domain/execution/session.md`
 

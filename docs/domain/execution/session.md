@@ -35,10 +35,24 @@ with evidence), `findings` (`{summary, kind}`, kind `bug`, `spec-gap` or
 ## What a session never does
 
 Commit, set a status, or move a git ref (S-2). The **fence** — the permission
-settings loop sessions run under — denies the commands (`git commit`, `push`,
-`reset`, `clean`, `branch`, `checkout`, `switch`, the mutating `git remote`
-subcommands, `update-ref`, `symbolic-ref`, `tag`, `stash`, `rebase`), web access,
-and reads of the user's global Claude directory. The driver checks anyway, and
+settings loop sessions run under, one file per phase (plan, work, review) — denies
+the commands (`git commit`, `push`, `reset`, `clean`, `branch`, `checkout`,
+`switch`, `merge`, `cherry-pick`, `revert`, `am`, `pull`, `fetch`, `config`,
+`reflog`, `gc` and the other mutating git subcommands, `git -C` and `git -c`,
+the mutating `git remote` subcommands, `update-ref`, `symbolic-ref`, `tag`,
+`stash`, `rebase`; `find -delete`, `-exec` and `-fprint`; `--output=` on
+`git diff`, `log` and `show`; recursive `rm`; `vloop -C` and `vloop brief new`),
+web access, and reads of the user's global Claude directory. No fence lets a
+session write under `.git/`. The plan fence allows writing only
+`.vloop/state/state.json` and `.vloop/tmp/**`; the work and review fences allow
+nothing under `.vloop/` but `.vloop/tmp/**`.
+
+**The fence is advisory.** It is a first line that saves attempts, not a
+boundary: a deny list cannot name every form of a command. The driver's checks
+are the boundary. A consumer repository's own `.claude/settings.json` allow
+rules also apply to sessions, so the fence is not the only permission source.
+
+The driver checks anyway, and
 records what it found in `run.log`: a session that edits the plan has it
 reverted (a review session's verdict is then forced to FAIL); a session that moves any ref halts
 the run with exit 9 and nothing is committed.
