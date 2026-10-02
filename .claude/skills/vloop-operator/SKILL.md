@@ -1,6 +1,6 @@
 ---
 name: vloop-operator
-description: The operator's playbook for this repo — from a ready loop brief, run it with the shell loop on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief, and merge; and use the docs to resolve what comes up. Use in an interactive session whenever the operator asks to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is the vloop-architect skill's.
+description: The operator's playbook for this repo — from a ready loop brief, run it with `vloop run` on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief, and merge; and use the docs to resolve what comes up. Use in an interactive session whenever the operator asks to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is the vloop-architect skill's.
 ---
 
 # Operating the loop
