@@ -198,13 +198,13 @@ func TestSessionMasking(t *testing.T) {
 		t.Fatal(res, err)
 	}
 	b, _ := os.ReadFile(res.Path)
-	if strings.Contains(string(b), home) || strings.Contains(string(b), "alice") {
+	if strings.Contains(string(b), home) {
 		t.Errorf("record not masked: %s", b)
 	}
-	if !strings.Contains(string(b), "cat ~/f") || !strings.Contains(string(b), "USER-model") {
+	if !strings.Contains(string(b), "cat ~/f") || !strings.Contains(string(b), "alice-model") {
 		t.Errorf("record: %s", b)
 	}
-	if got := r2.Mask("in " + home + "/a, user alice"); got != "in ~/a, user USER" {
+	if got := r2.Mask("in " + home + "/a, user alice, /home/alice/b"); got != "in ~/a, user alice, /home/USER/b" {
 		t.Errorf("Mask: %q", got)
 	}
 	r2.Logf("saw %s", home)
@@ -247,5 +247,78 @@ func TestSessionRefusesSymlink(t *testing.T) {
 	}
 	if ents, _ := os.ReadDir(other); len(ents) != 0 {
 		t.Errorf("wrote through the symlink: %v", ents)
+	}
+}
+
+func TestMaskUserOnlyAsPathComponent(t *testing.T) {
+	for _, user := range []string{"us", "ion", "1000", "al"} {
+		r := &Runner{Home: "/Users/" + user, User: user}
+		for in, want := range map[string]string{
+			"cost_usd iteration version 1000 al": "cost_usd iteration version 1000 al",
+			"/Users/" + user + "x/f":             "/Users/" + user + "x/f",
+			"/Users/x" + user + "/f":             "/Users/x" + user + "/f",
+			"/home/" + user + "/f":               "/home/USER/f",
+			`C:\Users\` + user + `\f`:            `C:\Users\USER\f`,
+			"/Users/" + user + "/f":              "~/f",
+			"/Users/other/" + user + "/f":        "/Users/other/" + user + "/f",
+		} {
+			if got := r.Mask(in); got != want {
+				t.Errorf("user %s: Mask(%q) = %q, want %q", user, in, got, want)
+			}
+		}
+	}
+	// the user is also masked where the home differs
+	r := &Runner{Home: "/elsewhere/me", User: "alice"}
+	if got := r.Mask("/Users/alice/x /home/alice /home/alicia"); got != "/Users/USER/x /home/USER /home/alicia" {
+		t.Errorf("Mask: %q", got)
+	}
+}
+
+func TestMaskHomeAtPathBoundary(t *testing.T) {
+	r := &Runner{Home: "/home/al", User: "al"}
+	for in, want := range map[string]string{
+		"/home/al":                 "~",
+		"/home/al/x":               "~/x",
+		`"/home/al"`:               `"~"`,
+		`{"p":"/home/al\\x"}`:      `{"p":"~\\x"}`,
+		"/home/alice/x":            "/home/alice/x",
+		"/home/al-b/x /home/al.d":  "/home/al-b/x /home/al.d",
+		"a /home/al, b /home/al/c": "a ~, b ~/c",
+	} {
+		if got := r.Mask(in); got != want {
+			t.Errorf("Mask(%q) = %q, want %q", in, got, want)
+		}
+	}
+	// a numeric home never corrupts a number
+	n := &Runner{Home: "/home/1000", User: "1000"}
+	if got := n.Mask("cost 1000 /home/10000/x"); got != "cost 1000 /home/10000/x" {
+		t.Errorf("Mask: %q", got)
+	}
+}
+
+func TestMaskRootHomeUnchanged(t *testing.T) {
+	for _, home := range []string{"/", `\`, "//"} {
+		r := &Runner{Home: home}
+		in := `/usr/bin /tmp/x C:\a \\srv`
+		if got := r.Mask(in); got != in {
+			t.Errorf("home %q: Mask(%q) = %q", home, in, got)
+		}
+	}
+}
+
+func TestMaskWindowsForms(t *testing.T) {
+	r := &Runner{Home: `C:\Users\Alice`, User: "Alice"}
+	for in, want := range map[string]string{
+		`C:\Users\Alice\f`:      `~\f`,
+		`C:/Users/Alice/f`:      `~/f`,
+		`c:\users\alice\f`:      `~\f`,
+		`C:/users/ALICE`:        `~`,
+		`"C:\\Users\\Alice\\f"`: `"~\\f"`,
+		`C:\Users\Alicia\f`:     `C:\Users\Alicia\f`,
+		`D:\Users\Alice\f`:      `D:\Users\USER\f`,
+	} {
+		if got := r.Mask(in); got != want {
+			t.Errorf("Mask(%q) = %q, want %q", in, got, want)
+		}
 	}
 }

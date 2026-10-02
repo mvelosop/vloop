@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/18 done** · iteration 8
+**Status:** running · **8/18 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:12:57Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:17:31Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Find gate files by whole token, across OS path forms and for every done task (F9)
 - [x] **T6** — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
 - [x] **T7** — Time gates and sessions and leave nothing running (F3) · 1 attempt(s)
-- [ ] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
+- [x] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
 - [ ] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
 - [ ] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
 - [ ] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
@@ -204,7 +204,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T8 — Mask paths in string values before marshalling, never serialized text (F11)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/driver/session.go`, `internal/driver/session_test.go`, `cmd/vloop/run_safety_test.go`
 

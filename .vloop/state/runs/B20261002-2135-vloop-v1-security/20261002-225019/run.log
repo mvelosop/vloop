@@ -32,3 +32,7 @@ committing the plan
    Time gates and sessions and leave nothing running (F3)
    review: PASS
    T7 done
+── iteration 9 (9 this run) · T8 · 7/18 done ──
+   Mask paths in string values before marshalling, never serialized text (F11)
+   review: PASS
+   T8 done

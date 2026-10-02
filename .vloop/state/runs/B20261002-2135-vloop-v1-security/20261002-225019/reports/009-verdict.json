@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Masking applies to string values before a record is marshalled, never to serialized JSON; every session record parses and keeps iteration, duration_ms and cost_usd for users us, ion and 1000.", "met": true, "evidence": "internal/driver/session.go: Run now calls maskRecord, which decodes with UseNumber, masks only strings and keys via maskValue, then marshals; the old Mask(string(data)) is gone. The gate's us/ion/1000 loop passed."},
+    {"criterion": "The home is replaced by ~ only at a path boundary (followed by a separator, a quote or the end); a sibling home such as alice beside al is unchanged.", "met": true, "evidence": "homePattern requires pathEnd after the home; TestMaskHomeAtPathBoundary asserts /home/alice/x, /home/al-b and /home/al.d stay unchanged, and /home/al/x becomes ~/x."},
+    {"criterion": "The user name is replaced by USER only as a whole path component directly under the users directory that holds the home (macOS, Linux, Windows), never as free text.", "met": true, "evidence": "Mask builds a regexp from the separator, Users|home|parent-of-home, the separator, the user and pathEnd. TestMaskUserOnlyAsPathComponent covers free text, prefix and suffix names, /Users/other/<user>, and the Windows form."},
+    {"criterion": "A home of / or \\ is not masked; on Windows the home's / and \\ forms are matched case-insensitively — tested as a pure function on every OS.", "met": true, "evidence": "trimSeps empties a root home, so no home pass runs. windowsPath selects a (?i) pattern with either separator. TestMaskRootHomeUnchanged and TestMaskWindowsForms call Runner.Mask directly with literal homes, so they are OS independent."},
+    {"criterion": "internal/driver/session_test.go holds TestMaskUserOnlyAsPathComponent, TestMaskHomeAtPathBoundary, TestMaskRootHomeUnchanged and TestMaskWindowsForms, each failing against the base, and its existing masking tests follow the new rules; TestRun10Containment gains a short-user case and checks for the user only as a path component.", "met": true, "evidence": "All four tests are present in session_test.go. Each exercises behaviour the base lacked, such as the root-home backslash, the path boundary and the Windows case-insensitivity. TestSessionMasking was updated to the new rules. cmd/vloop/run_safety_test.go runs TestRun10Containment for harnessuser and us, and checks for '/'+user+'/' instead of the bare name."}
+  ],
+  "findings": [],
+  "notes": "Edits to the existing TestSessionMasking and TestRun10Containment are explicitly allowed by the last criterion. Nothing hardcodes the fixture and no absolute paths were found in the diff."
+}

@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -102,25 +103,111 @@ func (r *Runner) home() (home, user string) {
 	}
 	user = r.User
 	if user == "" && home != "" {
-		user = filepath.Base(home)
+		h := trimSeps(home)
+		user = h[strings.LastIndexAny(h, `/\`)+1:]
 	}
 	return home, user
 }
 
-// Mask replaces $HOME with ~ and the user name with USER, as the shell
-// driver's mask() does. A path is masked in its JSON-escaped form too.
-func (r *Runner) Mask(s string) string {
-	home, user := r.home()
-	if home != "" && home != "/" {
-		s = strings.ReplaceAll(s, home, "~")
+// pathEnd is what may follow a masked path: the end, a separator, a quote,
+// white space or a list delimiter. A letter, digit, dot or dash continues a
+// name, so it is not the end of the path.
+const pathEnd = `(\z|[/\\"'\s:,;)\]])`
+
+const pathSep = `[/\\]{1,2}`
+
+// windowsPath reports whether p is a drive or UNC path, whose separators and
+// letter case are not significant.
+func windowsPath(p string) bool {
+	drive := len(p) >= 3 && p[1] == ':' && (p[2] == '/' || p[2] == '\\') && (p[0]|0x20 >= 'a' && p[0]|0x20 <= 'z')
+	return drive || strings.HasPrefix(p, `\\`)
+}
+
+func trimSeps(p string) string { return strings.TrimRight(p, `/\`) }
+
+// homePattern matches the home in the forms it can take: as given, JSON
+// escaped, and for a Windows home with either separator in any letter case.
+func homePattern(home string) *regexp.Regexp {
+	var body string
+	if windowsPath(home) {
+		var parts []string
+		for _, c := range regexp.MustCompile(`[/\\]+`).Split(home, -1) {
+			parts = append(parts, regexp.QuoteMeta(c))
+		}
+		return regexp.MustCompile(`(?i)(?:` + strings.Join(parts, pathSep) + `)` + pathEnd)
+	} else {
+		body = regexp.QuoteMeta(home)
 		if esc := strings.ReplaceAll(home, `\`, `\\`); esc != home {
-			s = strings.ReplaceAll(s, esc, "~")
+			body += `|` + regexp.QuoteMeta(esc)
 		}
 	}
-	if user != "" {
-		s = strings.ReplaceAll(s, user, "USER")
+	return regexp.MustCompile(`(?:` + body + `)` + pathEnd)
+}
+
+// Mask replaces the home with ~ where it ends at a path boundary and the user
+// name with USER where it is a whole path component directly under the users
+// directory (Users, home, or the one that holds the home) — never as free
+// text. It works on text; a JSON document is masked through its string values
+// (maskValue), never as serialized text.
+func (r *Runner) Mask(s string) string {
+	home, user := r.home()
+	if home = trimSeps(home); home != "" {
+		s = homePattern(home).ReplaceAllString(s, "~${1}")
+	}
+	if user = trimSeps(user); user != "" {
+		dirs := []string{"Users", "home"}
+		if i := strings.LastIndexAny(trimSeps(home), `/\`); i > 0 {
+			if parent := trimSeps(home[:i]); parent != "" {
+				dirs = append(dirs, filepath.Base(strings.ReplaceAll(parent, `\`, "/")))
+			}
+		}
+		for i, d := range dirs {
+			dirs[i] = regexp.QuoteMeta(d)
+		}
+		flags := ""
+		if windowsPath(home) {
+			flags = `(?i)`
+		}
+		re := regexp.MustCompile(flags + `(` + pathSep + `(?:` + strings.Join(dirs, "|") + `)` + pathSep + `)` + regexp.QuoteMeta(user) + pathEnd)
+		s = re.ReplaceAllString(s, "${1}USER${2}")
 	}
 	return s
+}
+
+// maskValue masks every string, and every object key, of a decoded JSON value.
+func (r *Runner) maskValue(v any) any {
+	switch x := v.(type) {
+	case string:
+		return r.Mask(x)
+	case []any:
+		for i := range x {
+			x[i] = r.maskValue(x[i])
+		}
+		return x
+	case map[string]any:
+		out := make(map[string]any, len(x))
+		for k, e := range x {
+			out[r.Mask(k)] = r.maskValue(e)
+		}
+		return out
+	}
+	return v
+}
+
+// maskRecord masks the strings of a record and returns it as indented JSON.
+// Numbers pass through untouched.
+func (r *Runner) maskRecord(rec map[string]any) ([]byte, error) {
+	raw, err := json.Marshal(rec)
+	if err != nil {
+		return nil, err
+	}
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+	var v any
+	if err := dec.Decode(&v); err != nil {
+		return nil, err
+	}
+	return json.MarshalIndent(r.maskValue(v), "", "  ")
 }
 
 // Logf writes one masked line to the run log.
@@ -215,12 +302,12 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		return res, nil
 	}
 	rec, out := r.record(s, task, started, raw)
-	data, err := json.MarshalIndent(rec, "", "  ")
+	data, err := r.maskRecord(rec)
 	if err != nil {
 		return res, err
 	}
 	res.Path = filepath.Join(r.RunDir, "sessions", fmt.Sprintf("%03d-%s.json", n, s.Phase))
-	if err := os.WriteFile(res.Path, []byte(r.Mask(string(data))+"\n"), 0o644); err != nil {
+	if err := os.WriteFile(res.Path, append(data, '\n'), 0o644); err != nil {
 		return res, err
 	}
 	res.Recorded = true

@@ -62,3 +62,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Fixed the two regressions the earlier T7 attempt left: TestMetricsKeys window shifted for the two new keys, and README config table now lists run.gate-timeout and run.session-timeout (README kept under its 200-line cap).
 - **Files:** internal/config/config_test.go, README.md
 - **Notes for next iteration:** TestMetricsKeys slices Keys by position from the end; adding run.* keys shifts it again, so update the offsets. README has a line cap under 200 (now 196) and a test requiring every config key in it.
+
+## T8 — Mask paths in string values before marshalling, never serialized text (F11)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Runner.Mask now replaces the home only at a path boundary (never for / or \) and the user only as a path component under Users, home or the home's parent directory, with Windows home forms matched case-insensitively. Session records are masked through their decoded string values (maskRecord) and re-marshalled, not as serialized JSON.
+- **Files:** internal/driver/session.go, internal/driver/session_test.go, cmd/vloop/run_safety_test.go
+- **Notes for next iteration:** Mask is text-only: free-text user names (e.g. model name alice-model, 'user alice') are no longer masked, so TestSessionMasking was adjusted. Records go through maskRecord (json.Number decode, masks strings and object keys). Home is detected as Windows-style by drive letter or UNC prefix, on any OS. TestRun10Containment now runs as subtests for harnessuser and a short user 'us' (home dir renamed after newRunRepo) and checks the user only as '/us/'.

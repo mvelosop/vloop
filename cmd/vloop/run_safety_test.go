@@ -59,7 +59,20 @@ func (r *runRepo) sessionFiles() []string {
 // TestRun10Containment: nothing is written outside the repository and nothing
 // persisted names the machine, even when a session reports an absolute path.
 func TestRun10Containment(t *testing.T) {
+	for _, user := range []string{"harnessuser", "us"} {
+		t.Run(user, func(t *testing.T) { run10Containment(t, user) })
+	}
+}
+
+func run10Containment(t *testing.T, user string) {
 	r := newRunRepo(t)
+	if user != "harnessuser" {
+		short := filepath.Join(filepath.Dir(r.home), user)
+		if err := os.Rename(r.home, short); err != nil {
+			t.Fatal(err)
+		}
+		r.home = short
+	}
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = work ]; then
   printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"wrote %s/secret/file.py","files":["%s/secret/file.py"],"verified":"ok","notes":"see %s/notes.txt"}\n' "$TASK" "$HOME" "$HOME" "$HOME" > .vloop/tmp/proposal.json
 fi
@@ -75,7 +88,7 @@ fi
 		if err != nil {
 			continue
 		}
-		for _, bad := range []string{r.dir, r.home, filepath.Base(r.home)} {
+		for _, bad := range []string{r.dir, r.home, "/" + user + "/"} {
 			if strings.Contains(string(b), bad) {
 				t.Errorf("tracked file %s holds %q", f, bad)
 			}
