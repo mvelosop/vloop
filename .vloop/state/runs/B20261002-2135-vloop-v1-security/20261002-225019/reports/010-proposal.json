@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "Runner.Mask now redacts the values of secret-named environment variables (KEY, TOKEN, SECRET, PASSWORD, CREDENTIAL; 8+ chars) as <redacted:NAME>, and session records keep only tool_name and file_path per permission denial. A guide section says what is and is not redacted.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go", "cmd/vloop/run_redact_test.go", "docs/guide/concepts.md"],
+  "verified": "vloop task gate T9 exited 0 and printed GATE OK.",
+  "notes": "Redaction lives in Runner.Mask (redactSecrets), which every write under .vloop/state/ goes through, using Runner.Env or os.Environ; it also redacts the JSON-escaped form of a value. Denials are rebuilt from tool_name plus tool_input.file_path or notebook_path. TestSessionMasking now carries the home path in a denial's file_path instead of a command."
+}

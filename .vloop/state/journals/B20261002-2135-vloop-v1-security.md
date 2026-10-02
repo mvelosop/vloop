@@ -69,3 +69,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Runner.Mask now replaces the home only at a path boundary (never for / or \) and the user only as a path component under Users, home or the home's parent directory, with Windows home forms matched case-insensitively. Session records are masked through their decoded string values (maskRecord) and re-marshalled, not as serialized JSON.
 - **Files:** internal/driver/session.go, internal/driver/session_test.go, cmd/vloop/run_safety_test.go
 - **Notes for next iteration:** Mask is text-only: free-text user names (e.g. model name alice-model, 'user alice') are no longer masked, so TestSessionMasking was adjusted. Records go through maskRecord (json.Number decode, masks strings and object keys). Home is detected as Windows-style by drive letter or UNC prefix, on any OS. TestRun10Containment now runs as subtests for harnessuser and a short user 'us' (home dir renamed after newRunRepo) and checks the user only as '/us/'.
+
+## T9 — Redact secret environment values and keep only tool and path of permission denials (F12)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Runner.Mask now redacts the values of secret-named environment variables (KEY, TOKEN, SECRET, PASSWORD, CREDENTIAL; 8+ chars) as <redacted:NAME>, and session records keep only tool_name and file_path per permission denial. A guide section says what is and is not redacted.
+- **Files:** internal/driver/session.go, internal/driver/session_test.go, cmd/vloop/run_redact_test.go, docs/guide/concepts.md
+- **Notes for next iteration:** Redaction lives in Runner.Mask (redactSecrets), which every write under .vloop/state/ goes through, using Runner.Env or os.Environ; it also redacts the JSON-escaped form of a value. Denials are rebuilt from tool_name plus tool_input.file_path or notebook_path. TestSessionMasking now carries the home path in a denial's file_path instead of a command.

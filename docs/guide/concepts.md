@@ -74,6 +74,18 @@ default, `pwsh` on Windows). A gate is written before the work exists, and the
 work session may not change it; only the operator does, with `vloop task verify
 <id> <command> --reason <text>`, which records the change in the task's history.
 
+## What is redacted
+
+Before anything is written under `.vloop/state/` (gate logs, session records,
+reports, `run.log`, the journal), the driver replaces every occurrence of the
+value of an environment variable whose **name** contains `KEY`, `TOKEN`,
+`SECRET`, `PASSWORD` or `CREDENTIAL` (any letter case) and whose value is at
+least 8 characters with `<redacted:NAME>`. Redaction keys on names, not on what
+a value looks like: a secret held in an innocently named variable, such as
+`DB_URL` or `AUTH`, is **not** caught, and neither is one shorter than 8
+characters. Session records keep, per permission denial, only the tool name and
+the file path when there is one — never the command or the content.
+
 ## Exit codes
 
 Every vloop command exits `0` on success, `1` when it ran and found problems or

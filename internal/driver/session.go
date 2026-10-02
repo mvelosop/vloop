@@ -144,12 +144,54 @@ func homePattern(home string) *regexp.Regexp {
 	return regexp.MustCompile(`(?:` + body + `)` + pathEnd)
 }
 
-// Mask replaces the home with ~ where it ends at a path boundary and the user
+// secretName matches the environment variables whose values are redacted.
+var secretName = regexp.MustCompile(`(?i)KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL`)
+
+// minSecret is the shortest value that is redacted; shorter ones are too
+// likely to be ordinary words.
+const minSecret = 8
+
+// redactSecrets replaces every occurrence of the value of a secret-named
+// environment variable with <redacted:NAME>, longest values first. It keys on
+// names, not on what a value looks like.
+func redactSecrets(env []string, s string) string {
+	type secret struct{ name, value string }
+	var secrets []secret
+	for _, kv := range env {
+		name, value, ok := strings.Cut(kv, "=")
+		if !ok || len(value) < minSecret || !secretName.MatchString(name) {
+			continue
+		}
+		secrets = append(secrets, secret{name, value})
+	}
+	sort.SliceStable(secrets, func(i, j int) bool { return len(secrets[i].value) > len(secrets[j].value) })
+	for _, c := range secrets {
+		s = strings.ReplaceAll(s, c.value, "<redacted:"+c.name+">")
+		// A JSON document holds the value escaped.
+		if q, err := json.Marshal(c.value); err == nil {
+			if esc := string(q[1 : len(q)-1]); esc != c.value {
+				s = strings.ReplaceAll(s, esc, "<redacted:"+c.name+">")
+			}
+		}
+	}
+	return s
+}
+
+func (r *Runner) env() []string {
+	if r.Env != nil {
+		return r.Env
+	}
+	return os.Environ()
+}
+
+// Mask redacts the values of secret-named environment variables, replaces the
+// home with ~ where it ends at a path boundary and the user
 // name with USER where it is a whole path component directly under the users
 // directory (Users, home, or the one that holds the home) — never as free
 // text. It works on text; a JSON document is masked through its string values
 // (maskValue), never as serialized text.
 func (r *Runner) Mask(s string) string {
+	s = redactSecrets(r.env(), s)
 	home, user := r.home()
 	if home = trimSeps(home); home != "" {
 		s = homePattern(home).ReplaceAllString(s, "~${1}")
@@ -259,11 +301,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	}
 	cmd := exec.Command(bin, Args(s, fence, plugin)...)
 	cmd.Dir = r.Root
-	base := r.Env
-	if base == nil {
-		base = os.Environ()
-	}
-	for _, kv := range base {
+	for _, kv := range r.env() {
 		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") || strings.HasPrefix(kv, PlanHashEnv+"=") {
 			continue
 		}
@@ -348,7 +386,25 @@ func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]j
 	get("duration_ms", &dur)
 	get("num_turns", &turns)
 	get("is_error", &o.IsError)
-	get("permission_denials", &o.Denials)
+	var denials []struct {
+		Tool  string `json:"tool_name"`
+		Input struct {
+			Path     string `json:"file_path"`
+			NotePath string `json:"notebook_path"`
+		} `json:"tool_input"`
+	}
+	get("permission_denials", &denials)
+	for _, d := range denials {
+		kept := map[string]string{"tool_name": d.Tool}
+		if p := d.Input.Path + d.Input.NotePath; p != "" {
+			kept["file_path"] = d.Input.Path
+			if d.Input.Path == "" {
+				kept["file_path"] = d.Input.NotePath
+			}
+		}
+		b, _ := json.Marshal(kept)
+		o.Denials = append(o.Denials, b)
+	}
 	o.Turns = int(turns)
 	if o.Denials == nil {
 		o.Denials = []json.RawMessage{}

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/18 done** · iteration 9
+**Status:** running · **9/18 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:17:31Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:26:41Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
 - [x] **T7** — Time gates and sessions and leave nothing running (F3) · 1 attempt(s)
 - [x] **T8** — Mask paths in string values before marshalling, never serialized text (F11)
-- [ ] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
+- [x] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
 - [ ] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
 - [ ] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
 - [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
@@ -228,7 +228,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T9 — Redact secret environment values and keep only tool and path of permission denials (F12)
 
-`pending` · depends on: T8
+`done` · depends on: T8
 
 **Files:** `internal/driver/iterate.go`, `internal/driver/session.go`, `internal/driver/`, `cmd/vloop/run_redact_test.go`, `docs/guide/concepts.md`
 

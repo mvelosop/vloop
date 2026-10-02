@@ -190,7 +190,7 @@ func TestSessionInvocationAndEnv(t *testing.T) {
 
 func TestSessionMasking(t *testing.T) {
 	_, home, log := fixture(t, "")
-	body := `{"total_cost_usd":0,"duration_ms":1,"num_turns":1,"is_error":false,"permission_denials":[{"cmd":"cat ` + home + `/f"}],"modelUsage":{"alice-model":{"inputTokens":0,"outputTokens":0,"cacheReadInputTokens":0,"cacheCreationInputTokens":0,"costUSD":0}}}` + "\n"
+	body := `{"total_cost_usd":0,"duration_ms":1,"num_turns":1,"is_error":false,"permission_denials":[{"tool_name":"Read","tool_input":{"file_path":"` + home + `/f"}}],"modelUsage":{"alice-model":{"inputTokens":0,"outputTokens":0,"cacheReadInputTokens":0,"cacheCreationInputTokens":0,"costUSD":0}}}` + "\n"
 	r2, _, _ := fixture(t, body)
 	r2.Home, r2.User, r2.Log = home, "alice", log
 	res, err := r2.Run(Spec{Phase: PhaseWork, Iteration: 1, Arg: "T1", Model: "m"})
@@ -201,7 +201,7 @@ func TestSessionMasking(t *testing.T) {
 	if strings.Contains(string(b), home) {
 		t.Errorf("record not masked: %s", b)
 	}
-	if !strings.Contains(string(b), "cat ~/f") || !strings.Contains(string(b), "alice-model") {
+	if !strings.Contains(string(b), `"~/f"`) || !strings.Contains(string(b), "alice-model") {
 		t.Errorf("record: %s", b)
 	}
 	if got := r2.Mask("in " + home + "/a, user alice, /home/alice/b"); got != "in ~/a, user alice, /home/USER/b" {
@@ -320,5 +320,41 @@ func TestMaskWindowsForms(t *testing.T) {
 		if got := r.Mask(in); got != want {
 			t.Errorf("Mask(%q) = %q, want %q", in, got, want)
 		}
+	}
+}
+
+func TestRedactSecretEnvValues(t *testing.T) {
+	r := &Runner{Home: "/h/alice", User: "alice", Env: []string{
+		"FOO_TOKEN=s3cr3t-value", "my_Password=hunter2hunter2", "API_KEY=abc123", "PLAIN=innocent-value",
+		"AWS_CREDENTIAL=line\"quoted-secret",
+	}}
+	got := r.Mask("a s3cr3t-value b hunter2hunter2 c abc123 d innocent-value e line\"quoted-secret")
+	want := "a <redacted:FOO_TOKEN> b <redacted:my_Password> c abc123 d innocent-value e <redacted:AWS_CREDENTIAL>"
+	if got != want {
+		t.Errorf("got  %q\nwant %q", got, want)
+	}
+	rec, err := r.maskRecord(map[string]any{"x": `say "line\"quoted-secret"`, "y": []any{"s3cr3t-value"}})
+	if err != nil || strings.Contains(string(rec), "s3cr3t-value") || strings.Contains(string(rec), "quoted-secret") {
+		t.Errorf("record %s %v", rec, err)
+	}
+}
+
+func TestSessionDenialsKeepToolAndPath(t *testing.T) {
+	body := `{"type":"result","total_cost_usd":0.1,"duration_ms":1,"num_turns":1,"is_error":false,
+"permission_denials":[{"tool_name":"Write","tool_use_id":"w","tool_input":{"file_path":"notes/a.txt","content":"TOPSECRET"}},
+{"tool_name":"Bash","tool_use_id":"b","tool_input":{"command":"echo CMD-SECRET"}}],"modelUsage":{}}
+`
+	r, _, _ := fixture(t, body)
+	res, err := r.Run(Spec{Phase: PhaseWork, Iteration: 1, Arg: "T1", Model: "sonnet"})
+	if err != nil || !res.Recorded || res.Denials != 2 {
+		t.Fatalf("%+v %v", res, err)
+	}
+	raw, _ := os.ReadFile(res.Path)
+	if strings.Contains(string(raw), "TOPSECRET") || strings.Contains(string(raw), "CMD-SECRET") {
+		t.Errorf("record keeps content or command: %s", raw)
+	}
+	want := []any{map[string]any{"tool_name": "Write", "file_path": "notes/a.txt"}, map[string]any{"tool_name": "Bash"}}
+	if got := readJSON(t, res.Path)["permission_denials"]; !reflect.DeepEqual(got, want) {
+		t.Errorf("denials %v, want %v", got, want)
 	}
 }

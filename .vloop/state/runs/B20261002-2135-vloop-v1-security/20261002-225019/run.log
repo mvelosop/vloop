@@ -36,3 +36,7 @@ committing the plan
    Mask paths in string values before marshalling, never serialized text (F11)
    review: PASS
    T8 done
+── iteration 10 (10 this run) · T9 · 8/18 done ──
+   Redact secret environment values and keep only tool and path of permission denials (F12)
+   review: PASS
+   T9 done
