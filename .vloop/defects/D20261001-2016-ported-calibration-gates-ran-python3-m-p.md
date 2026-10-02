@@ -6,8 +6,8 @@ origin: work
 found-by: operator
 kind: bug
 severity: high
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261001-1025-vloop-skills.loop-brief
 case: ""
 created: 2026-10-01T19:16:11Z
 ---
