@@ -10,4 +10,7 @@ focus:
 of that prose is written in Spanish. Score 0 if any title, goal or acceptance
 criterion is in English. File paths, shell commands, the `verify` string and
 literal output such as `hello, world` or `usage: greet <name>` quoted from the
-brief are not prose and may stay as they are.
+brief are not prose and may stay as they are. Technical loanwords that Spanish
+technical writing uses as they are (*test*, *brief*, *script*, *shell*, *flag*,
+*stdout*, *stderr*, *gate*) do not make a sentence English: judge the sentence's
+grammar and its other words.
