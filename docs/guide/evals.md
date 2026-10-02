@@ -62,14 +62,46 @@ not noisy.
 it (`--ablation with-without`). The report gives the score delta — what the
 skill adds over a bare model given the same prompt.
 
-## Running
+## Pre-flight
 
-The skills call `vloop`, so a freshly built binary goes first on `PATH`.
-Results and reports go to a scratch directory, never the repository.
+Eval sessions run in a sandbox much stricter than a real run's: they can read
+little outside their own directories, write almost nothing, and run in
+don't-ask mode. The skills call `vloop` and `git` and their gates make scratch
+directories, so a machine that runs a real `vloop run` can still fail every
+case. Check the machine first, for about $0.03:
 
 ```
-go build -o <scratch>/bin/vloop ./cmd/vloop
-PATH=<scratch>/bin:$PATH claude plugin eval plugin \
+go install ./cmd/vloop
+claude plugin eval tools/eval-preflight --scaffold --trust-plugin --no-publish \
+  --runs 1 --ablation none --model claude-haiku-4-5-20251001 \
+  --max-cost-usd 0.5 --output-dir <scratch>/preflight \
+  --allow-tools 'Bash(vloop schema list:*)' 'Bash(git status:*)' 'Bash(sh:*)'
+```
+
+`tools/eval-preflight/` is a one-case plugin, kept out of `plugin/` so it never
+ships or joins the suite. Its three graders must all pass; each failure has a
+known cause.
+
+| Grader fails, or | Cause | Fix |
+| --- | --- | --- |
+| the tool refuses to start: "the Docker … credential store … holds a symbolic link" | the sandbox cannot exclude `~/.docker` | stop Docker and rename `~/.docker` for the evals' duration; rename it back before Docker starts |
+| `vloop-current`: `unknown command "schema"` | the sandbox denies reads under your home and `/tmp`, allowing back only bin directories on `PATH` such as `~/go/bin` and `~/.local/bin`; a binary built into a scratch directory is unreadable and an older one wins | `go install ./cmd/vloop` before every eval run |
+| `git-runs`: `xcode-select: Failed to locate 'git'` | on macOS the sandbox's shell resolves bare `git` to the xcrun stub `/usr/bin/git`, skipping Homebrew's symlinked `/opt/homebrew/bin/git` though `$PATH` lists it first; the stub writes a cache to the per-user temp directory, which the sandbox denies | a regular script, not a symlink, at `~/.local/bin/git`: `#!/bin/sh` then `exec /opt/homebrew/bin/git "$@"` |
+| `mktemp-works` | macOS `mktemp -d` without a template ignores `TMPDIR` and uses the per-user temp directory | none for the machine; the plan skill writes gates with `mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX"` |
+
+A real `vloop run` needs none of these: its sessions run in auto mode under the
+fence, without this sandbox. Then probe one real case (`--case 01-hollow-test
+--runs 1 --ablation none --max-cost-usd 1`, about $0.5) before the full suite.
+
+## Running
+
+The skills call `vloop`, so install the current binary where the sandbox can
+read it (see Pre-flight). Results and reports go to a scratch directory, never
+the repository.
+
+```
+go install ./cmd/vloop
+claude plugin eval plugin \
   --scaffold --trust-plugin --no-publish \
   --output-dir <scratch>/evals --report <scratch>/evals/report.html \
   --max-cost-usd 40 \
@@ -99,10 +131,9 @@ PATH=<scratch>/bin:$PATH claude plugin eval plugin \
   the cases.
 - `--max-cost-usd` is a hard ceiling, checked before each run. The full suite
   is 13 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
-- **Probe first**: `--case 01-hollow-test --runs 1 --ablation none
-  --max-cost-usd 1` costs about $0.5 and shows whether the machine can run the
-  suite at all. The tool refuses Bash-granting cases when it cannot sandbox
-  Bash, for example when the Docker credential store holds a symbolic link.
+- `--keep-temp` keeps each run's sandbox and `trace.jsonl`, the only way to see
+  what a session ran and which commands were denied; read them before
+  re-running a case that scores low.
 
 The exit code is 0 when every case scores at least `--threshold` (default 1.0),
 1 otherwise, 2 when the cost ceiling was hit. `--json <file>` writes every

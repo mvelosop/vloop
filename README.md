@@ -183,8 +183,8 @@ Briefs live in `docs/briefs/`. Only `vloop run`, `vloop init`, `vloop upgrade`, 
   gates, closing and release, and the flow end to end.
 - [docs/guide/configuration.md](docs/guide/configuration.md): every config key,
   the stack presets and the workspace file.
-- [docs/guide/commands.md](docs/guide/commands.md): every command and flag,
-  generated from the binary.
+- [docs/guide/commands.md](docs/guide/commands.md): every command and flag, generated from the binary.
+- [docs/guide/evals.md](docs/guide/evals.md): testing the skills against a real model — cases, graders, the pre-flight, running and reading the suite.
 
 ## Exit codes
 
