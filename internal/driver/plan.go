@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -78,7 +77,7 @@ func (p *Planner) now() time.Time {
 
 // git runs git in the repository and returns its trimmed stdout.
 func git(root string, args ...string) (string, error) {
-	cmd := exec.Command("git", append([]string{"-C", root}, args...)...)
+	cmd := gitCmd(root, args...)
 	var stderr strings.Builder
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
@@ -281,9 +280,13 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	t.say("planning from %s using %s", briefPath, model)
 	before := refsState(root)
+	gguard := snapshotGit(root)
 	res, err := r.Run(Spec{Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
 	if err != nil {
 		return nil, halt(ExitPreflight, "planning session failed: %v", err)
+	}
+	if what := gguard.changed(); what != "" {
+		return nil, halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
 	}
 	if moved := refsDiff(before, refsState(root)); len(moved) > 0 {
 		t.warn("REFS MOVED plan — the planning session changed git refs; nothing was committed:")
@@ -343,7 +346,7 @@ func (p *Planner) workBranch(runID string) (string, error) {
 	if !OnDefaultBranch(p.Root) {
 		return "", nil
 	}
-	if exists := exec.Command("git", "-C", p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
+	if exists := gitCmd(p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
 		return "", halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
 	}
 	if _, err := git(p.Root, "switch", "-q", "-c", runID); err != nil {

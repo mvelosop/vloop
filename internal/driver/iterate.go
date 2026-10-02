@@ -276,6 +276,25 @@ func (it *Iterator) readReport(name, schemaName string) ([]byte, bool) {
 	return data, true
 }
 
+// gitChanged halts when .git/config or the hooks differ from the guard.
+func (it *Iterator) gitChanged(g gitGuard, phase string) error {
+	what := g.changed()
+	if what == "" {
+		return nil
+	}
+	return it.haltGit("%s changed %s — nothing was committed; restore it, then re-run", phase, what)
+}
+
+// haltGit ends the run with exit 9, committing nothing.
+func (it *Iterator) haltGit(format string, a ...any) error {
+	err := halt(ExitRefsMoved, format, a...)
+	it.warn("%v", err)
+	it.plan.Status = "halted"
+	_ = it.save()
+	_ = it.log.flush()
+	return err
+}
+
 func (it *Iterator) gitRefsMoved(before []string, task, phase string) error {
 	moved := refsDiff(before, refsState(it.Root))
 	if len(moved) == 0 {
@@ -339,8 +358,12 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	}
 	before := refsState(root)
 	guard := snapshotState(root)
+	gguard := snapshotGit(root)
 	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort})
 	if err != nil {
+		return iterResult{}, err
+	}
+	if err := it.gitChanged(gguard, PhaseWork); err != nil {
 		return iterResult{}, err
 	}
 	if err := it.gitRefsMoved(before, id, PhaseWork); err != nil {
@@ -460,7 +483,11 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		}
 		before := refsState(root)
 		guard := snapshotState(root)
+		gguard := snapshotGit(root)
 		if _, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort}); err != nil {
+			return iterResult{}, err
+		}
+		if err := it.gitChanged(gguard, PhaseReview); err != nil {
 			return iterResult{}, err
 		}
 		if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
@@ -649,9 +676,17 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	cmd.Env = append(cmd.Env, "VLOOP_ACTIVE_TASK="+active, "VLOOP_GATE_TASK="+id)
 	var out bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &out, &out
+	refsBefore := refsState(it.Root)
+	gguard := snapshotGit(it.Root)
 	start := time.Now()
 	runErr := cmd.Run()
 	d := time.Since(start)
+	if err := it.gitChanged(gguard, "gate"); err != nil {
+		return nil, err
+	}
+	if len(refsDiff(refsBefore, refsState(it.Root))) > 0 {
+		return nil, it.haltGit("the gate of %s moved git refs — nothing was committed; restore them, then re-run", id)
+	}
 	g := &gateResult{ms: d.Milliseconds()}
 	if runErr != nil {
 		var ee *exec.ExitError
@@ -773,7 +808,7 @@ func (it *Iterator) commit(subject string) error {
 	if _, err := git(it.Root, "reset", "-q", "--", tmpDir); err != nil {
 		return halt(ExitPreflight, "%v", err)
 	}
-	if exec.Command("git", "-C", it.Root, "diff", "--cached", "--quiet").Run() == nil {
+	if gitCmd(it.Root, "diff", "--cached", "--quiet").Run() == nil {
 		return nil
 	}
 	if _, err := git(it.Root, "commit", "-q", "-m", subject); err != nil {

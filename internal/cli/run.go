@@ -150,7 +150,7 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		}
 	}
 	if hook := preCommitHook(root); hook != "" {
-		fmt.Fprintf(errOut, "  ! a pre-commit hook is active (%s) — if it rejects the driver's commit, the run stops after paying for a task\n", hook)
+		fmt.Fprintf(errOut, "  ! a pre-commit hook is active (%s) — the driver's commits do not run repository hooks; put what it checks in the gates\n", hook)
 	}
 	if bad > 0 {
 		return Problem(fmt.Errorf("preflight failed — %d problem(s), nothing has run", bad))

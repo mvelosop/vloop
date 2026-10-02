@@ -5,3 +5,7 @@ committing the plan
    Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/18 done ──
+   Make the driver's git ignore hooks and fsmonitor, and halt when .git/config, the hooks or a gate's refs change (F4, F5)
+   review: PASS
+   T2 done

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Every driver git command now disables hooks and fsmonitor and reads paths unquoted. The run halts with exit 9, committing nothing, when a session or gate changes .git/config or the hooks, or when a gate moves refs. The preflight pre-commit line is reworded.",
+  "files": ["internal/driver/gitguard.go", "internal/driver/plan.go", "internal/driver/iterate.go", "internal/driver/gateshape.go", "internal/cli/run.go", "cmd/vloop/run_git_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed GATE OK; go test ./internal/... ./cmd/... passes.",
+  "notes": "gitCmd (internal/driver/gitguard.go) is the one constructor for driver git; it recreates .vloop/tmp/nohooks empty on each call because a session can write there. gitGuard hashes .git/config and the hooks dir from plain `git rev-parse --git-path`, without the overrides, so it sees the real hooks. Plan and work and review sessions, and each gate run (own and regression), are checked via it.gitChanged. Gate refs are compared inside runGate. Non-driver packages (metrics, defect, runs, cli doctor/close) still use plain git; they were out of this task's files."
+}
