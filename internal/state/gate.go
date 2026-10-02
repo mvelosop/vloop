@@ -69,30 +69,44 @@ func GateCommand(root, shell, verify string, env []string) (*exec.Cmd, error) {
 	return c, nil
 }
 
-// RunGate runs verify from root in shell, streaming its output to stdout and
-// stderr. It returns the command's own exit code (1 when it was killed by a
-// signal) and how long it took. An unknown shell or one that is not on PATH is
-// an error and nothing runs.
+// RunGate runs verify from root in shell with no deadline; see RunGateWithin.
 func RunGate(root, shell, verify string, stdout, stderr io.Writer) (int, time.Duration, error) {
+	code, d, _, err := RunGateWithin(root, shell, verify, stdout, stderr, 0)
+	return code, d, err
+}
+
+// RunGateWithin runs verify from root in shell, in a process group of its own,
+// streaming its output to stdout and stderr. A gate still running after
+// timeout (none when it is zero) is killed with everything it started and
+// timedOut is true; so is whatever a finished gate left running. It returns
+// the command's own exit code (1 when it was killed by a signal) and how long
+// it took. An unknown shell or one that is not on PATH is an error and nothing
+// runs.
+func RunGateWithin(root, shell, verify string, stdout, stderr io.Writer, timeout time.Duration) (code int, d time.Duration, timedOut bool, err error) {
 	c, err := GateCommand(root, shell, verify, nil)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, false, err
 	}
 	c.Stdout, c.Stderr = stdout, stderr
 	start := time.Now()
-	err = c.Run()
-	d := time.Since(start)
+	timedOut, err = RunGroup(c, timeout)
+	d = time.Since(start)
 	if err == nil {
-		return 0, d, nil
+		return 0, d, timedOut, nil
 	}
 	var ee *exec.ExitError
 	if errors.As(err, &ee) {
 		if code := ee.ExitCode(); code > 0 {
-			return code, d, nil
+			return code, d, timedOut, nil
 		}
-		return 1, d, nil
+		return 1, d, timedOut, nil
 	}
-	return 0, d, err
+	return 0, d, timedOut, err
+}
+
+// GateTimedOutLine is the line that ends a gate's log when it timed out.
+func GateTimedOutLine(id string, minutes int) string {
+	return fmt.Sprintf("vloop: gate %s timed out after %d min", id, minutes)
 }
 
 // ReplaceGate replaces a task's verify command, recording the old one, when

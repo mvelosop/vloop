@@ -49,6 +49,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
+		{"run.gate-timeout", "15", true}, {"run.session-timeout", "60", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -375,6 +376,8 @@ func TestRunKeysValidation(t *testing.T) {
 		{"run.stall-limit", "1", []string{"0", ""}},
 		{"run.cost-ceiling", "12.5", []string{"0", "-3", "abc", "NaN", "Inf"}},
 		{"run.convergence-max", "2.5", []string{"0", "-0.5", "x"}},
+		{"run.gate-timeout", "1", []string{"0", "1.5", "-2", "x"}},
+		{"run.session-timeout", "90", []string{"0", "2.5", "-1", "x"}},
 	}
 	for _, c := range cases {
 		if err := Set(root, c.key, c.good); err != nil {

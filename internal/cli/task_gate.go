@@ -8,11 +8,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/state"
 )
 
@@ -44,9 +46,21 @@ func newTaskGate(g *Globals) *cobra.Command {
 			if g.JSON {
 				gateOut = cmd.ErrOrStderr()
 			}
-			code, d, err := state.RunGate(root, p.Shell, t.Verify, gateOut, cmd.ErrOrStderr())
+			minutes, err := config.Get(root, "run.gate-timeout")
+			if err != nil {
+				return configErr(g, out, err)
+			}
+			n, _ := strconv.Atoi(minutes.Value)
+			timeout := time.Duration(n) * time.Minute
+			code, d, timedOut, err := state.RunGateWithin(root, p.Shell, t.Verify, gateOut, cmd.ErrOrStderr(), timeout)
 			if err != nil {
 				return jsonProblem(g, out, err)
+			}
+			if timedOut {
+				if code == 0 {
+					code = 1
+				}
+				fmt.Fprintln(cmd.ErrOrStderr(), state.GateTimedOutLine(t.ID, n))
 			}
 			if g.JSON {
 				b, err := json.Marshal(struct {

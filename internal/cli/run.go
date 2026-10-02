@@ -75,7 +75,8 @@ func newRun(b Build, g *Globals) *cobra.Command {
 
 			pl := &driver.Planner{Root: root, Version: b.Version, Brief: briefPath,
 				PlanOnly: planOnly, Replan: replan,
-				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet}
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet,
+				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute}
 			res, err := pl.Plan()
 			if err != nil {
 				var h *driver.Halt

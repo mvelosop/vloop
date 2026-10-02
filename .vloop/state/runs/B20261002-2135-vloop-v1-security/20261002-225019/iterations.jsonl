@@ -4,3 +4,4 @@
 {"attempt":1,"ended":"2026-10-02T22:37:42Z","gate":{"duration_ms":15062,"exit":0},"iteration":4,"outcome":"done","run_id":"B20261002-2135-vloop-v1-security","schema":"iteration/v1","started":"2026-10-02T22:34:22Z","task":"T4"}
 {"attempt":1,"ended":"2026-10-02T22:40:22Z","gate":{"duration_ms":18599,"exit":0},"iteration":5,"outcome":"done","run_id":"B20261002-2135-vloop-v1-security","schema":"iteration/v1","started":"2026-10-02T22:37:42Z","task":"T5"}
 {"attempt":1,"ended":"2026-10-02T22:43:17Z","gate":{"duration_ms":17007,"exit":0},"iteration":6,"outcome":"done","run_id":"B20261002-2135-vloop-v1-security","schema":"iteration/v1","started":"2026-10-02T22:40:22Z","task":"T6"}
+{"attempt":1,"ended":"2026-10-02T22:57:23Z","gate":{"duration_ms":13734,"exit":0},"iteration":7,"outcome":"rejected","run_id":"B20261002-2135-vloop-v1-security","schema":"iteration/v1","started":"2026-10-02T22:43:17Z","task":"T7"}

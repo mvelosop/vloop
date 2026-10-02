@@ -66,6 +66,9 @@ type Iterator struct {
 	User   string
 	Env    []string
 
+	GateTimeout    time.Duration // test seam: replaces Budgets.GateTimeout when not zero
+	SessionTimeout time.Duration // test seam: replaces Budgets.SessionTimeout when not zero
+
 	plan       *state.Plan
 	resolved   *Resolved              // model and effort defaults, read once at the start
 	spent      float64                // what this run's sessions cost, summed as they finish
@@ -147,7 +150,8 @@ func (it *Iterator) Run() (Ending, error) {
 	}
 	it.log = &lazyLog{path: filepath.Join(it.RunDir, "run.log")}
 	it.r = &Runner{Root: it.Root, Version: it.Version, RunID: plan.RunID, RunDir: it.RunDir, Log: it.log,
-		Claude: it.Claude, Now: it.Now, Home: it.Home, User: it.User, Env: it.Env}
+		Claude: it.Claude, Now: it.Now, Home: it.Home, User: it.User, Env: it.Env,
+		Timeout: it.sessionTimeout()}
 
 	if it.resolved, err = ResolveRun(it.Root); err != nil {
 		return Ending{}, halt(ExitPreflight, "%v", err)
@@ -403,6 +407,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	var proposalFiles []string
 	var dispute string
 	data, ok := it.readReport("proposal.json", "proposal/v1")
+	if wres.TimedOut {
+		it.warn("   the work session for %s timed out after %s", id, it.sessionTimeout())
+		return iterResult{}, errSessionError
+	}
 	if !ok && (wres.ExitCode != 0 || wres.IsError) {
 		// An infrastructure failure, not the task's: no attempt is charged.
 		return iterResult{}, errSessionError
@@ -532,6 +540,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		reviewTampered := guard.restoreIfTouched()
 		if reviewTampered {
 			it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, state.FilePath)
+		}
+		if rres.TimedOut {
+			it.warn("   the review session for %s timed out after %s", id, it.sessionTimeout())
+			return iterResult{}, errSessionError
 		}
 		if data, ok := it.readReport("verdict.json", "verdict/v1"); !ok {
 			it.warn("   review session left no valid verdict — treating as FAIL")
@@ -692,6 +704,22 @@ func (it *Iterator) relGate(id string) string {
 	return relRunDir(it.Root, it.RunDir) + "gates/" + id + ".log"
 }
 
+// gateTimeout is how long a gate may run, none when it is zero.
+func (it *Iterator) gateTimeout() time.Duration {
+	if it.GateTimeout != 0 {
+		return it.GateTimeout
+	}
+	return time.Duration(it.Budgets.GateTimeout) * time.Minute
+}
+
+// sessionTimeout is how long a session may run, none when it is zero.
+func (it *Iterator) sessionTimeout() time.Duration {
+	if it.SessionTimeout != 0 {
+		return it.SessionTimeout
+	}
+	return time.Duration(it.Budgets.SessionTimeout) * time.Minute
+}
+
 // runGate runs one task's verify in the plan's shell from the repo root, with
 // the two ids in its environment and nowhere else. Its masked output is the
 // task's gate log, and a failing one is also kept for this iteration.
@@ -718,7 +746,7 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	refsBefore := refsState(it.Root)
 	gguard := snapshotGit(it.Root)
 	start := time.Now()
-	runErr := cmd.Run()
+	timedOut, runErr := state.RunGroup(cmd, it.gateTimeout())
 	d := time.Since(start)
 	if err := it.gitChanged(gguard, "gate"); err != nil {
 		return nil, err
@@ -739,6 +767,15 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	dir := filepath.Join(it.RunDir, "gates")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
+	}
+	if timedOut {
+		if g.exit == 0 {
+			g.exit = 1
+		}
+		if out.Len() > 0 && !bytes.HasSuffix(out.Bytes(), []byte("\n")) {
+			out.WriteByte('\n')
+		}
+		out.WriteString(state.GateTimedOutLine(id, it.Budgets.GateTimeout) + "\n")
 	}
 	masked := []byte(it.r.Mask(out.String()))
 	if err := os.WriteFile(filepath.Join(dir, id+".log"), masked, 0o644); err != nil {

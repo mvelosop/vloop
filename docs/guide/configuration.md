@@ -37,9 +37,11 @@ environment and in `config set`.
 | `run.stall-limit` | `2` | an integer, 1 or more | `VLOOP_RUN_STALL_LIMIT`  | consecutive iterations without progress that end the run |
 | `run.convergence-max` | `3.0` | a number above 0 | `VLOOP_RUN_CONVERGENCE_MAX`  | iterations per closed task above which a run is not converging (after `run.convergence-min` iterations) |
 | `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN`  | iterations a run must have taken before convergence is judged |
+| `run.gate-timeout` | `15` | a whole number of minutes, 1 or more | `VLOOP_RUN_GATE_TIMEOUT`  | minutes a gate may run, in `vloop run` and in `vloop task gate`; a gate still running is killed with everything it started and has failed |
+| `run.session-timeout` | `60` | a whole number of minutes, 1 or more | `VLOOP_RUN_SESSION_TIMEOUT`  | minutes a plan, work or review session may run; a session still running is killed with everything it started and is a session error (exit 7) |
 
 `model.*` and `effort.*` are stored under `[model]` and `[effort]`, the
-`metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. `vloop run`'s `--max-iterations`, `--cost-ceiling`, `--max-attempts` and `--stall-limit` flags override the first four `run.*` keys for one run (flag, then environment, then file, then default). For example:
+`metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. the two timeouts are whole minutes. `vloop run`'s `--max-iterations`, `--cost-ceiling`, `--max-attempts` and `--stall-limit` flags override the first four `run.*` keys for one run (flag, then environment, then file, then default). For example:
 
 ```
 language = "es"

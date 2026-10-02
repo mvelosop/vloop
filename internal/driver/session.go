@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mvelosop/vloop/internal/state"
 )
 
 // Session kinds.
@@ -35,6 +37,8 @@ type Runner struct {
 	Home   string           // masked to "~"; os.UserHomeDir when empty
 	User   string           // masked to "USER"; the home's base name when empty
 	Env    []string         // base environment; os.Environ when nil
+
+	Timeout time.Duration // a session still running after this is killed with its group; none when zero
 
 	n int // sessions started in this run folder
 }
@@ -60,6 +64,7 @@ type Result struct {
 	Turns    int
 	IsError  bool
 	Denials  int
+	TimedOut bool // the session was killed for running past the timeout
 }
 
 // Prompt is the slash command a session of the phase starts with.
@@ -184,14 +189,20 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 
 	started := r.now().UTC()
-	runErr := cmd.Run()
-	res := Result{}
+	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
+	res := Result{TimedOut: timedOut}
 	if runErr != nil {
 		ee, ok := runErr.(*exec.ExitError)
 		if !ok {
 			return Result{}, fmt.Errorf("cannot start %s: %w", bin, runErr)
 		}
 		res.ExitCode = ee.ExitCode()
+	}
+	if timedOut {
+		if res.ExitCode == 0 {
+			res.ExitCode = -1
+		}
+		r.Logf("SESSION TIMED OUT %s %s (iteration %d) after %s", s.Phase, orDash(task), s.Iteration, r.Timeout)
 	}
 	errName := filepath.Join(r.RunDir, fmt.Sprintf("%s-%d.stderr", s.Phase, s.Iteration))
 	if err := os.WriteFile(errName, []byte(r.Mask(stderr.String())), 0o644); err != nil {

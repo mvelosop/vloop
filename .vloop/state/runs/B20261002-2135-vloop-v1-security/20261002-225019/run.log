@@ -25,3 +25,6 @@ committing the plan
    Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
    review: PASS
    T6 done
+── iteration 7 (7 this run) · T7 · 6/18 done ──
+   Time gates and sessions and leave nothing running (F3)
+   review: FAIL

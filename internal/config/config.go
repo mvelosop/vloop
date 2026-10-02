@@ -75,6 +75,8 @@ var Keys = []Key{
 	{Name: "run.stall-limit", Default: "2", Int: true, Min: 1},
 	{Name: "run.convergence-max", Default: "3.0", Num: true, MinOpen: true},
 	{Name: "run.convergence-min", Default: "6", Int: true},
+	{Name: "run.gate-timeout", Default: "15", Int: true, Min: 1},
+	{Name: "run.session-timeout", Default: "60", Int: true, Min: 1},
 }
 
 // Value is a resolved key. Set is false for an unset effort. For a list key

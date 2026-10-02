@@ -55,6 +55,8 @@ type Planner struct {
 	Out, Err io.Writer // progress and warnings; may be nil
 	Quiet    bool
 
+	SessionTimeout time.Duration // the plan session is killed after this; none when zero
+
 	Claude string           // test seams, as Runner's
 	Now    func() time.Time // the driver's clock
 	Home   string
@@ -268,7 +270,7 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	defer logFile.Close()
 	r := &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
-		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User}
+		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
 	t := term{p, r}
 	if hasPlan {
 		t.say("the plan %s was for %s — you asked for %s: resetting and planning fresh", existing.RunID, existing.Brief, briefPath)
@@ -295,6 +297,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		}
 		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
 		return nil, halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
+	}
+	if res.TimedOut {
+		return nil, halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
 	}
 	if res.ExitCode != 0 {
 		return nil, halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))

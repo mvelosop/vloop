@@ -15,6 +15,8 @@ type Budgets struct {
 	StallLimit     int
 	ConvergenceMax float64
 	ConvergenceMin int
+	GateTimeout    int // minutes a gate may run
+	SessionTimeout int // minutes a session may run
 }
 
 // ResolveBudgets resolves each budget by flag, then VLOOP_RUN_*, then the
@@ -51,5 +53,7 @@ func ResolveBudgets(root string, over map[string]string) (Budgets, error) {
 	integer("run.stall-limit", &b.StallLimit)
 	num("run.convergence-max", &b.ConvergenceMax)
 	integer("run.convergence-min", &b.ConvergenceMin)
+	integer("run.gate-timeout", &b.GateTimeout)
+	integer("run.session-timeout", &b.SessionTimeout)
 	return b, err
 }
