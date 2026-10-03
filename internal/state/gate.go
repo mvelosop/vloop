@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -107,4 +108,10 @@ func RunGateWithin(root, shell, verify string, stdout, stderr io.Writer, timeout
 // GateTimedOutLine is the line that ends a gate's log when it timed out.
 func GateTimedOutLine(id string, minutes int) string {
 	return fmt.Sprintf("vloop: gate %s timed out after %d min", id, minutes)
+}
+
+// GateChangedTreeLine is the line that ends a gate's log when it changed the
+// tree: the paths the driver put back.
+func GateChangedTreeLine(id string, paths []string) string {
+	return fmt.Sprintf("vloop: gate %s changed the tree — restored: %s", id, strings.Join(paths, ", "))
 }

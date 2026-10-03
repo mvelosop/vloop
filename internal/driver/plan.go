@@ -273,6 +273,15 @@ func (p *Planner) Plan() (*PlanResult, error) {
 			return nil, halt(ExitPreflight, "%v", err)
 		}
 	}
+	scratch, err := config.Get(root, "run.gate-scratch")
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	for _, d := range scratch.List {
+		if !GitIgnored(root, d) {
+			return nil, halt(ExitPreflight, "gate scratch %s is not ignored by git — add it to .gitignore", d)
+		}
+	}
 	if err := requireCleanTree(root, resuming); err != nil {
 		return nil, err
 	}
@@ -542,6 +551,9 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	// to record it: which run, brief and branch the plan belongs to.
 	plan.RunID, plan.Brief, plan.Branch = runID, briefPath, branch
 	plan.Status = "running"
+	if v, err := config.Get(root, "run.gate-scratch"); err == nil {
+		plan.GateScratch = append([]string{}, v.List...)
+	}
 	if err := state.StampFixtures(root, &plan); err != nil {
 		return nil, err
 	}
@@ -571,4 +583,11 @@ func writeJournal(root string, plan *state.Plan) error {
 	defer f.Close()
 	_, err = f.WriteString(b.String())
 	return err
+}
+
+// GitIgnored reports whether git ignores the repo-relative folder rel, as it
+// would the files a gate leaves in it.
+func GitIgnored(root, rel string) bool {
+	probe := strings.TrimSuffix(rel, "/") + "/.vloop-probe"
+	return gitCmd(root, "check-ignore", "-q", "--no-index", "--", probe).Run() == nil
 }

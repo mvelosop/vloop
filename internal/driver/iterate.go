@@ -702,6 +702,8 @@ type gateResult struct {
 	exit  int
 	ms    int64
 	flaky bool // failed, then passed on the immediate re-run
+	// timedOut: the gate hit its time limit; it is not re-run
+	timedOut bool
 }
 
 func (it *Iterator) relGate(id string) string {
@@ -749,16 +751,21 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	cmd.Stdout, cmd.Stderr = &out, &out
 	refsBefore := refsState(it.Root)
 	gguard := snapshotGit(it.Root)
+	tree := snapshotTreeIgnoring(it.Root, gateMayWrite(it.plan.GateScratch))
 	start := time.Now()
 	timedOut, runErr := state.RunGroup(cmd, it.gateTimeout())
 	d := time.Since(start)
+	restored := tree.revert()
+	if err := state.EmptyScratch(it.Root, it.plan.GateScratch); err != nil {
+		it.warn("   gate scratch of %s not emptied: %v", id, err)
+	}
 	if err := it.gitChanged(gguard, "gate"); err != nil {
 		return nil, err
 	}
 	if len(refsDiff(refsBefore, refsState(it.Root))) > 0 {
 		return nil, it.haltGit("the gate of %s moved git refs — nothing was committed; restore them, then re-run", id)
 	}
-	g := &gateResult{ms: d.Milliseconds()}
+	g := &gateResult{ms: d.Milliseconds(), timedOut: timedOut}
 	if runErr != nil {
 		var ee *exec.ExitError
 		if !errors.As(runErr, &ee) {
@@ -780,6 +787,15 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 			out.WriteByte('\n')
 		}
 		out.WriteString(state.GateTimedOutLine(id, it.Budgets.GateTimeout) + "\n")
+	}
+	if len(restored) > 0 {
+		if g.exit == 0 {
+			g.exit = 1
+		}
+		if out.Len() > 0 && !bytes.HasSuffix(out.Bytes(), []byte("\n")) {
+			out.WriteByte('\n')
+		}
+		out.WriteString(state.GateChangedTreeLine(id, restored) + "\n")
 	}
 	masked := []byte(it.r.Mask(out.String()))
 	if err := os.WriteFile(filepath.Join(dir, id+".log"), masked, 0o644); err != nil {
@@ -1010,8 +1026,9 @@ func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, find
 // changed or untracked path with the digest and bytes it had. It is built from
 // git status, not a file-system walk.
 type treeGuard struct {
-	root  string
-	paths map[string]treeFile
+	root   string
+	paths  map[string]treeFile
+	ignore func(string) bool
 }
 
 type treeFile struct {
@@ -1026,8 +1043,29 @@ func reviewMayWrite(p string) bool {
 	return strings.HasPrefix(p, tmpDir+"/") || strings.HasPrefix(p, ".vloop/state/")
 }
 
+// gateMayWrite is where a gate may write without being failed: the run's
+// scratch space and its own gate scratch folders.
+func gateMayWrite(scratch []string) func(string) bool {
+	return func(p string) bool {
+		if strings.HasPrefix(p, tmpDir+"/") {
+			return true
+		}
+		for _, d := range scratch {
+			if strings.HasPrefix(p, strings.TrimSuffix(d, "/")+"/") {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 func snapshotTree(root string) treeGuard {
-	g := treeGuard{root: root, paths: map[string]treeFile{}}
+	return snapshotTreeIgnoring(root, reviewMayWrite)
+}
+
+// snapshotTreeIgnoring is snapshotTree leaving out the paths ignore names.
+func snapshotTreeIgnoring(root string, ignore func(string) bool) treeGuard {
+	g := treeGuard{root: root, paths: map[string]treeFile{}, ignore: ignore}
 	cmd := gitCmd(root, "status", "--porcelain", "-z", "--no-renames", "--untracked-files=all")
 	out, err := cmd.Output()
 	if err != nil {
@@ -1037,7 +1075,7 @@ func snapshotTree(root string) treeGuard {
 		if len(e) < 4 {
 			continue
 		}
-		if p := e[3:]; !reviewMayWrite(p) {
+		if p := e[3:]; !ignore(p) {
 			g.paths[p] = readTreeFile(root, p)
 		}
 	}
@@ -1056,7 +1094,7 @@ func readTreeFile(root, p string) treeFile {
 // revert undoes every change made since the snapshot outside what a review may
 // write, and returns the paths it had to put back.
 func (g treeGuard) revert() []string {
-	now := snapshotTree(g.root)
+	now := snapshotTreeIgnoring(g.root, g.ignore)
 	var changed []string
 	for p, f := range now.paths {
 		if old, ok := g.paths[p]; !ok || old.exists != f.exists || old.sum != f.sum {

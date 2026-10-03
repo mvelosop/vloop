@@ -10,3 +10,6 @@
    Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
    review: PASS
    T3 done
+── iteration 9 (4 this run) · T6 · 5/16 done ──
+   Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
+   review: FAIL

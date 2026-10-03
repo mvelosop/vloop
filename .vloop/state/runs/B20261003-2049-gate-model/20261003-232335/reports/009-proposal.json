@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "vloop run refuses an un-ignored run.gate-scratch folder before planning and the plan copies the list into gate_scratch; every gate run in the driver and in vloop task gate empties the scratch folders; the driver restores and fails a gate that changed the tree; a timed-out gate is not re-run.",
+  "files": ["internal/state/scratch.go", "internal/state/scratch_test.go", "internal/state/gate.go", "internal/driver/gates.go", "internal/driver/iterate.go", "internal/driver/plan.go", "internal/cli/task_gate.go", "internal/cli/task_gate_test.go", "internal/cli/run.go", "internal/cli/doctor.go", "cmd/vloop/run_gates_test.go"],
+  "verified": "vloop task gate T6 exited 0 and printed GATE OK.",
+  "notes": "state.EmptyScratch(root, dirs) is the shared emptying helper; no gate runs at acceptance yet, so T9 must call it (and snapshotTreeIgnoring with gateMayWrite(plan.GateScratch), as runGate does) when it adds the acceptance gate runs. runPreflight skips the doctor 'gate scratch' problem so Planner.Plan prints the exact refusal; driver.GitIgnored is shared with doctor. Tree restore applies to vloop run only, not vloop task gate (a work session's own uncommitted work is in the tree there). Added tests instead of editing TestRunFlakyGate/TestWorkedExampleB6FlakyGate: TestRunTimedOutGateNotRerun covers the timeout case (needs ~1 min). Running go test of internal/cli inside a session needs VLOOP_PLAN_SHA256 unset."
+}

@@ -243,3 +243,22 @@ func TestTaskGatePlanHash(t *testing.T) {
 		t.Fatal("the verify did not run with the matching hash")
 	}
 }
+
+func TestTaskGateEmptiesScratch(t *testing.T) {
+	if _, err := exec.LookPath("sh"); err != nil {
+		t.Skip("sh is not on PATH")
+	}
+	t.Setenv("VLOOP_PLAN_SHA256", "")
+	root := gateRepo(t, "sh", "mkdir -p web/.gate && echo x > web/.gate/copy.txt")
+	p, _ := state.Load(root)
+	p.GateScratch = []string{"web/.gate/"}
+	if err := state.Save(root, p); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, errs := run(t, "-C", root, "task", "gate", "T2"); code != 0 {
+		t.Fatalf("code %d out %q err %q", code, out, errs)
+	}
+	if es, _ := os.ReadDir(filepath.Join(root, "web", ".gate")); len(es) != 0 {
+		t.Fatalf("web/.gate/ holds %d entries after the gate", len(es))
+	}
+}

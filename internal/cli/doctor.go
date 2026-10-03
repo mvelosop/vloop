@@ -272,12 +272,7 @@ func doctorGit(root string, add func(name, result, msg string)) (bool, string) {
 	return true, head
 }
 
-// gitIgnored reports whether git ignores the repo-relative folder rel, as it
-// would the files a gate leaves in it.
-func gitIgnored(root, rel string) bool {
-	probe := strings.TrimSuffix(rel, "/") + "/.vloop-probe"
-	return exec.Command("git", "-C", root, "check-ignore", "-q", "--no-index", "--", probe).Run() == nil
-}
+func gitIgnored(root, rel string) bool { return driver.GitIgnored(root, rel) }
 
 func gitOut(root string, args ...string) (string, error) {
 	out, err := exec.Command("git", append([]string{"-C", root}, args...)...).Output()

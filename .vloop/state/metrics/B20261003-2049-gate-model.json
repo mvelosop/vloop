@@ -8,7 +8,7 @@
     "planned": 16,
     "done": 3,
     "blocked": 1,
-    "first_pass": 2,
+    "first_pass": 3,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,30 +43,30 @@
     "rework": 1.0011848341232228
   },
   "time": {
-    "agent_ms": 2729267,
-    "work_ms": 2416166,
-    "review_ms": 313101,
+    "agent_ms": 4094910,
+    "work_ms": 3763334,
+    "review_ms": 331576,
     "plan_ms": 2493754,
-    "gates_ms": 25254,
+    "gates_ms": 29324,
     "wall_ms": 2714000
   },
   "rate": {
-    "code_per_min": 18.554432380562254,
-    "code_test_per_min": 31.37106043490798
+    "code_per_min": 12.366572159095071,
+    "code_test_per_min": 20.90888444434676
   },
   "cost": {
-    "total_usd": 13.320930200000001,
+    "total_usd": 14.284314400000001,
     "plan_usd": 9.2589652,
-    "work_usd": 3.1412560000000003,
-    "review_usd": 0.920709,
-    "per_1000_code_lines_usd": 15.783092654028438
+    "work_usd": 3.9355820000000006,
+    "review_usd": 1.0897672,
+    "per_1000_code_lines_usd": 16.92454312796209
   },
   "tokens": {
-    "input": 458,
-    "output": 254755,
-    "cache_read": 22708201,
-    "cache_creation": 798672,
-    "cache_hit_ratio": 0.9660050730557204
+    "input": 524,
+    "output": 271564,
+    "cache_read": 24611652,
+    "cache_creation": 902290,
+    "cache_hit_ratio": 0.9646156027721685
   },
   "models": {
     "plan": [
@@ -98,8 +98,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 7,
-  "iterations_per_closed": 2.3333333333333335,
+  "iterations": 8,
+  "iterations_per_closed": 2.6666666666666665,
   "by_task": [
     {
       "id": "T1",
@@ -151,7 +151,7 @@
       "id": "T3",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -164,9 +164,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 1365643,
+      "cost_usd": 0.9633842000000002,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T4",

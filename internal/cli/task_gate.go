@@ -51,6 +51,9 @@ func newTaskGate(g *Globals) *cobra.Command {
 			n, _ := strconv.Atoi(minutes.Value)
 			timeout := time.Duration(n) * time.Minute
 			code, d, timedOut, err := state.RunGateWithin(root, p.Shell, t.Verify, gateOut, cmd.ErrOrStderr(), timeout)
+			if scratchErr := state.EmptyScratch(root, p.GateScratch); scratchErr != nil {
+				fmt.Fprintf(cmd.ErrOrStderr(), "gate scratch not emptied: %v\n", scratchErr)
+			}
 			if err != nil {
 				return jsonProblem(g, out, err)
 			}

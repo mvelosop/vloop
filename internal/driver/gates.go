@@ -1,10 +1,11 @@
 package driver
 
 // runGateRetry runs a gate and, if it fails, once more at once with nothing
-// changed: a pass on the re-run is a flaky gate, recorded and not charged.
+// changed: a pass on the re-run is a flaky gate, recorded and not charged. A
+// gate that timed out is not re-run: it already cost its whole limit.
 func (it *Iterator) runGateRetry(iter int, active, id string) (*gateResult, error) {
 	g, err := it.runGate(iter, active, id)
-	if err != nil || g.exit == 0 {
+	if err != nil || g.exit == 0 || g.timedOut {
 		return g, err
 	}
 	g2, err := it.runGate(iter, active, id)
