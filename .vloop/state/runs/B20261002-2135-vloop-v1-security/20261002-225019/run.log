@@ -71,3 +71,7 @@ committing the plan
    Keep the machine awake for the lifetime of vloop run (C2)
    review: PASS
    T15 done
+── iteration 18 (18 this run) · T16 · 14/18 done ──
+   Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
+   review: PASS
+   T16 done

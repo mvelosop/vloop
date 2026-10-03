@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T16",
+  "outcome": "done",
+  "summary": "Completeness checks moved to the guides (TestGuideConfigurationNamesEveryKey, TestGuideCommandsNamesEveryCommandAndFlag, shell-default check now on configuration.md); the README is checked only for unknown names and guide links (TestReadmeRejectsUnknownNames), and its config table is a pointer.",
+  "files": ["internal/cli/readme_test.go", "internal/cli/guide_test.go", "README.md", "docs/guide/configuration.md"],
+  "verified": "vloop task gate T16 exited 0 and printed GATE OK.",
+  "notes": "README went from 196 to 174 lines. docs/guide/configuration.md preset tables for javascript and typescript also gained the NestJS e2e-spec and test/ globs that T14 added only to metrics.md; TestGuideConfigurationCoversKeysAndPresets failed without them."
+}

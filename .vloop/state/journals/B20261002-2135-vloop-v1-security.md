@@ -125,3 +125,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added run.keep-awake (on/off, default on, VLOOP_RUN_KEEP_AWAKE); vloop run now holds a no-idle-sleep hold (caffeinate, systemd-inhibit, SetThreadExecutionState) for its lifetime, with one run.log warning line if it cannot.
 - **Files:** internal/config/config.go, internal/config/config_test.go, internal/cli/config_test.go, cmd/vloop/e2e_test.go, internal/cli/run.go, internal/driver/budgets.go, internal/driver/iterate.go, internal/driver/plan.go, internal/driver/keepawake.go, internal/driver/keepawake_other.go, internal/driver/keepawake_windows.go, internal/driver/keepawake_test.go, internal/driver/keepawake_darwin_test.go, docs/guide/configuration.md, docs/guide/concepts.md
 - **Notes for next iteration:** The hold is taken in internal/cli/run.go after the lock; the failure reason is passed as AwakeWarn to the Iterator (or the Planner for --plan-only) which writes the single run.log line. Linux helper is systemd-inhibit wrapping tail --pid=<vloop pid> -f /dev/null. Windows code was only vetted and cross-built, not run. Existing config list tests (internal/cli, cmd/vloop e2e) gained the run.keep-awake row at the end.
+
+## T16 — Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Completeness checks moved to the guides (TestGuideConfigurationNamesEveryKey, TestGuideCommandsNamesEveryCommandAndFlag, shell-default check now on configuration.md); the README is checked only for unknown names and guide links (TestReadmeRejectsUnknownNames), and its config table is a pointer.
+- **Files:** internal/cli/readme_test.go, internal/cli/guide_test.go, README.md, docs/guide/configuration.md
+- **Notes for next iteration:** README went from 196 to 174 lines. docs/guide/configuration.md preset tables for javascript and typescript also gained the NestJS e2e-spec and test/ globs that T14 added only to metrics.md; TestGuideConfigurationCoversKeysAndPresets failed without them.

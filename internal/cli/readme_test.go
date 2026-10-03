@@ -1,9 +1,10 @@
 package cli
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strings"
 	"testing"
@@ -37,14 +38,18 @@ func walk(c *cobra.Command, path string, cmds, flags map[string]bool) {
 	}
 }
 
-func TestReadmeMatchesCommandTree(t *testing.T) {
-	b, err := os.ReadFile("../../README.md")
-	if err != nil {
-		t.Fatal(err)
-	}
-	text := string(b)
+// readmeProblems returns what is wrong with a README: a flag, command, config
+// key or variable it names that does not exist, or a guide it does not link.
+// Completeness (every name documented) is the guides' check, not the README's.
+func readmeProblems(text string, guides []string) []string {
+	var out []string
 	if n := strings.Count(text, "\n"); n >= readmeLineCap {
-		t.Errorf("README.md is %d lines; the cap is under %d", n, readmeLineCap)
+		out = append(out, fmt.Sprintf("README.md is %d lines; the cap is under %d", n, readmeLineCap))
+	}
+	for _, g := range guides {
+		if !strings.Contains(text, "("+g+")") {
+			out = append(out, "README does not link "+g)
+		}
 	}
 
 	root, _ := NewRoot(Build{})
@@ -52,20 +57,9 @@ func TestReadmeMatchesCommandTree(t *testing.T) {
 	walk(root, "", cmds, flags)
 	delete(flags, "help")
 
-	for c := range cmds {
-		if !strings.Contains(text, "vloop "+c) {
-			t.Errorf("README does not document vloop %s", c)
-		}
-	}
-	for f := range flags {
-		if !strings.Contains(text, "--"+f) {
-			t.Errorf("README does not document --%s", f)
-		}
-	}
-
 	for _, m := range regexp.MustCompile(`--[a-z][a-z-]*`).FindAllString(text, -1) {
 		if !flags[strings.TrimPrefix(m, "--")] {
-			t.Errorf("README names %s, which no command has", m)
+			out = append(out, "README names "+m+", which no command has")
 		}
 	}
 
@@ -75,7 +69,7 @@ func TestReadmeMatchesCommandTree(t *testing.T) {
 		args := strings.Fields(m[1])
 		cmd, _, err := root.Find(args)
 		if err != nil || cmd == root {
-			t.Errorf("README names vloop%s, which is not a command", m[1])
+			out = append(out, "README names vloop"+m[1]+", which is not a command")
 		}
 	}
 
@@ -83,13 +77,10 @@ func TestReadmeMatchesCommandTree(t *testing.T) {
 	for _, k := range config.Keys {
 		keys[k.Name] = true
 		envs["VLOOP_"+strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(k.Name))] = true
-		if !strings.Contains(text, "`"+k.Name+"`") {
-			t.Errorf("README does not mention config key %s", k.Name)
-		}
 	}
 	for _, m := range regexp.MustCompile(`\b(?:model|effort)\.[a-z]+`).FindAllString(text, -1) {
 		if !keys[m] {
-			t.Errorf("README names config key %s, which does not exist", m)
+			out = append(out, "README names config key "+m+", which does not exist")
 		}
 	}
 	var missing []string
@@ -100,7 +91,46 @@ func TestReadmeMatchesCommandTree(t *testing.T) {
 	}
 	sort.Strings(missing)
 	if len(missing) > 0 {
-		t.Errorf("README names variables vloop does not read: %v", missing)
+		out = append(out, fmt.Sprintf("README names variables vloop does not read: %v", missing))
+	}
+	return out
+}
+
+func guideLinks(t *testing.T) []string {
+	t.Helper()
+	files, err := filepath.Glob("../../docs/guide/*.md")
+	if err != nil || len(files) == 0 {
+		t.Fatalf("no guides found: %v", err)
+	}
+	var out []string
+	for _, f := range files {
+		out = append(out, "docs/guide/"+filepath.Base(f))
+	}
+	return out
+}
+
+func TestReadmeMatchesCommandTree(t *testing.T) {
+	b, err := os.ReadFile("../../README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range readmeProblems(string(b), guideLinks(t)) {
+		t.Error(p)
+	}
+}
+
+// TestReadmeRejectsUnknownNames shows the README check fails on a name that
+// does not exist.
+func TestReadmeRejectsUnknownNames(t *testing.T) {
+	text := "Run `vloop status --frobnicate`.\n"
+	var found bool
+	for _, p := range readmeProblems(text, nil) {
+		if strings.Contains(p, "--frobnicate") {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("a README naming --frobnicate passed the check")
 	}
 }
 
@@ -118,53 +148,6 @@ func TestReadmeNamesTheSkills(t *testing.T) {
 	for _, k := range []string{"plan", "work", "review", "operate"} {
 		if !strings.Contains(text, "/vloop:"+k) {
 			t.Errorf("README does not name /vloop:%s", k)
-		}
-	}
-}
-
-// TestReadmeShellDefaultMatchesCode checks the README's stated default for the
-// `shell` key on each OS against config's (F1).
-func TestReadmeShellDefaultMatchesCode(t *testing.T) {
-	b, err := os.ReadFile("../../README.md")
-	if err != nil {
-		t.Fatal(err)
-	}
-	var row string
-	for _, l := range strings.Split(string(b), "\n") {
-		if strings.HasPrefix(l, "| `shell` |") {
-			row = l
-		}
-	}
-	if row == "" {
-		t.Fatal("README has no shell row in its config table")
-	}
-	def := strings.TrimSpace(strings.Split(row, "|")[2])
-	m := regexp.MustCompile("^`([a-z]+)` \\(`([a-z]+)` on Windows\\)$").FindStringSubmatch(def)
-	if m == nil {
-		t.Fatalf("README's shell default %q is not of the form `x` (`y` on Windows)", def)
-	}
-	// The code's default on the other OS is read from defaultShell's source,
-	// since config.Keys holds only the running OS's.
-	src, err := os.ReadFile("../../internal/config/config.go")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fn := regexp.MustCompile(`(?s)func defaultShell\(\) string \{.*?return "([a-z]+)"\n\t\}\n\treturn "([a-z]+)"`).FindStringSubmatch(string(src))
-	if fn == nil {
-		t.Fatal("cannot read defaultShell in internal/config/config.go")
-	}
-	if m[2] != fn[1] || m[1] != fn[2] {
-		t.Errorf("README says shell defaults to %s (%s on Windows); the code says %s (%s on Windows)", m[1], m[2], fn[2], fn[1])
-	}
-	for _, k := range config.Keys {
-		if k.Name == "shell" {
-			want := m[1]
-			if runtime.GOOS == "windows" {
-				want = m[2]
-			}
-			if k.Default != want {
-				t.Errorf("README says the shell default here is %s; config says %s", want, k.Default)
-			}
 		}
 	}
 }
