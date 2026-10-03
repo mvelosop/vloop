@@ -158,3 +158,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Made all doc edits (S-2, S-4, R-3, R-4, session/run/task/brief docs, concepts exit table); every gate clause up to the brief check passes, but the brief check clause cannot pass while this brief is being run.
 - **Files:** docs/domain/domain-model.md, docs/domain/execution/session.md, docs/domain/execution/run.md, docs/domain/execution/task.md, docs/domain/briefing/brief.md, docs/guide/concepts.md
 - **Notes for next iteration:** Doc greps, TestGuideExitCodesMatchDriver and the README/guide/skills tests passed before the failing clause. The only brief-check problem is 'already run: .vloop/state/journals/B20261002-2135-vloop-v1-security.md exists' for the brief under execution. The clause should exclude the running brief or tolerate that problem.
+
+## Run ended — blocked
+
+- **Run:** `B20261002-2135-vloop-v1-security` · 3 iteration(s) this run
+- **Plan:** 16/18 done, 1 blocked
