@@ -281,8 +281,17 @@ func TestAreasKey(t *testing.T) {
 
 func TestMetricsKeys(t *testing.T) {
 	root := scratch(t)
+	at := -1
+	for i, k := range Keys {
+		if k.Name == "areas" {
+			at = i
+		}
+	}
+	if at < 0 || at+6 > len(Keys) {
+		t.Fatalf("no five keys after areas in %d keys", len(Keys))
+	}
 	var names []string
-	for _, k := range Keys[len(Keys)-13 : len(Keys)-8] {
+	for _, k := range Keys[at+1 : at+6] {
 		names = append(names, k.Name)
 		if !k.List {
 			t.Errorf("%s is not a list", k.Name)

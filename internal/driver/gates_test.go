@@ -56,4 +56,21 @@ func TestGateFilesByToken(t *testing.T) {
 	if got := moved("true", "sh ./done.sh && true"); !got["done.sh"] || got["a.sh"] {
 		t.Errorf("done task's verify: %v", got)
 	}
+
+	// A file some task owns is that task's product — the subject a gate
+	// exercises, judged by the regression net — never a judge file.
+	owned := func(verify string, tasks ...state.Task) map[string]bool {
+		it := &Iterator{Root: root, plan: &state.Plan{Tasks: tasks}}
+		got := map[string]bool{}
+		for _, f := range it.gateFilesMoved(&state.Task{ID: "T9", Verify: verify}) {
+			got[f] = true
+		}
+		return got
+	}
+	if got := owned("true", state.Task{ID: "T1", Status: "done", Verify: "test -f done.sh", Files: []string{"done.sh"}}); got["done.sh"] {
+		t.Errorf("a done task's own product was treated as a gate file: %v", got)
+	}
+	if got := owned("bash data.sh", state.Task{ID: "T2", Status: "pending", Files: []string{"data.sh"}}); got["data.sh"] {
+		t.Errorf("a file another task owns was treated as a gate file: %v", got)
+	}
 }

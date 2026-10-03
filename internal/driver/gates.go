@@ -8,10 +8,12 @@ import (
 	"github.com/mvelosop/vloop/internal/state"
 )
 
-// gateFilesMoved lists the files a work session rewrote that the task's gate
-// judges it by: modified (or deleted) in the working tree, present at HEAD,
-// named, as a whole token, by the verify of this task or of any done task, not among the task's files, and not committed by
-// this task's own earlier attempt. Creating such a file is the durable-artifact
+// gateFilesMoved lists the judge files a work session rewrote: modified (or
+// deleted) in the working tree, present at HEAD, named, as a whole token, by
+// the verify of this task or of any done task, owned by no task of the plan,
+// and not committed by this task's own earlier attempt. A file some task owns
+// is that task's product — the subject a gate exercises, which the regression
+// net judges — never a judge. Creating such a file is the durable-artifact
 // shape and is never listed.
 func (it *Iterator) gateFilesMoved(t *state.Task) []string {
 	out, err := git(it.Root, "diff", "--name-only", "HEAD")
@@ -25,7 +27,11 @@ func (it *Iterator) gateFilesMoved(t *state.Task) []string {
 	named := verifyTokens(t.Verify)
 	if it.plan != nil {
 		for i := range it.plan.Tasks {
-			if d := &it.plan.Tasks[i]; d.Status == "done" {
+			d := &it.plan.Tasks[i]
+			for _, f := range d.Files {
+				own[normGatePath(f)] = true
+			}
+			if d.Status == "done" {
 				for k := range verifyTokens(d.Verify) {
 					named[k] = true
 				}
