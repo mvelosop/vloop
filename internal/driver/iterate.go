@@ -60,6 +60,8 @@ type Iterator struct {
 	Out, Err io.Writer // progress and warnings; may be nil
 	Quiet    bool
 
+	AwakeWarn string // why the keep-awake hold could not be taken; logged once to run.log
+
 	Claude string // test seams, as Runner's
 	Now    func() time.Time
 	Home   string
@@ -155,6 +157,9 @@ func (it *Iterator) Run() (Ending, error) {
 	it.r = &Runner{Root: it.Root, Version: it.Version, RunID: plan.RunID, RunDir: it.RunDir, Log: it.log,
 		Claude: it.Claude, Now: it.Now, Home: it.Home, User: it.User, Env: it.Env,
 		Timeout: it.sessionTimeout()}
+	if it.AwakeWarn != "" {
+		it.r.Logf("%s", AwakeWarning(it.AwakeWarn))
+	}
 
 	if it.resolved, err = ResolveRun(it.Root); err != nil {
 		return Ending{}, halt(ExitPreflight, "%v", err)

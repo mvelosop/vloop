@@ -77,9 +77,16 @@ func newRun(b Build, g *Globals) *cobra.Command {
 			}
 			defer release()
 
+			awakeWarn := ""
+			if budget.KeepAwake {
+				if err := driver.KeepAwake(); err != nil {
+					awakeWarn = err.Error()
+				}
+			}
+
 			pl := &driver.Planner{Root: root, Version: b.Version, Brief: briefPath,
 				PlanOnly: planOnly, Replan: replan,
-				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet,
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn,
 				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute}
 			res, err := pl.Plan()
 			if err != nil {
@@ -93,7 +100,7 @@ func newRun(b Build, g *Globals) *cobra.Command {
 				return nil
 			}
 			it := &driver.Iterator{Root: root, Version: b.Version, RunDir: res.RunDir, Budgets: budget,
-				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet}
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn}
 			end, err := it.Run()
 			if err != nil {
 				var h *driver.Halt

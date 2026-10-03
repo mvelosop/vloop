@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **13/18 done** · iteration 16
+**Status:** running · **14/18 done** · iteration 17
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T00:05:33Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T00:10:51Z
 
 ## Progress
 
@@ -22,7 +22,7 @@
 - [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2) · **blocked**
 - [x] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
 - [x] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
-- [ ] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
+- [x] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
 - [ ] **T16** — Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
 - [ ] **T17** — Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
 - [ ] **T18** — Close B8: the worked example line for line, every check at once, and the real-data check
@@ -371,7 +371,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T15 — Keep the machine awake for the lifetime of vloop run (C2)
 
-`pending` · depends on: T7
+`done` · depends on: T7
 
 **Files:** `internal/config/config.go`, `internal/config/config_test.go`, `internal/cli/config_test.go`, `internal/cli/run.go`, `internal/driver/`, `docs/guide/configuration.md`, `docs/guide/concepts.md`, `go.mod`, `go.sum`
 

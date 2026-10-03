@@ -39,6 +39,7 @@ environment and in `config set`.
 | `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN`  | iterations a run must have taken before convergence is judged |
 | `run.gate-timeout` | `15` | a whole number of minutes, 1 or more | `VLOOP_RUN_GATE_TIMEOUT`  | minutes a gate may run, in `vloop run` and in `vloop task gate`; a gate still running is killed with everything it started and has failed |
 | `run.session-timeout` | `60` | a whole number of minutes, 1 or more | `VLOOP_RUN_SESSION_TIMEOUT`  | minutes a plan, work or review session may run; a session still running is killed with everything it started and is a session error (exit 7) |
+| `run.keep-awake` | `on` | `on` or `off` | `VLOOP_RUN_KEEP_AWAKE`  | `on` holds a no-idle-sleep hold for the lifetime of `vloop run` (macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`); `off` takes none |
 
 `model.*` and `effort.*` are stored under `[model]` and `[effort]`, the
 `metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. the two timeouts are whole minutes. `vloop run`'s `--max-iterations`, `--cost-ceiling`, `--max-attempts` and `--stall-limit` flags override the first four `run.*` keys for one run (flag, then environment, then file, then default). For example:

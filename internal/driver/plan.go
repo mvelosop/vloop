@@ -55,6 +55,8 @@ type Planner struct {
 	Out, Err io.Writer // progress and warnings; may be nil
 	Quiet    bool
 
+	AwakeWarn string // why the keep-awake hold could not be taken; logged once to run.log
+
 	SessionTimeout time.Duration // the plan session is killed after this; none when zero
 
 	Claude string           // test seams, as Runner's
@@ -315,6 +317,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	r := &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
 		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
 	t := term{p, r}
+	if p.PlanOnly && p.AwakeWarn != "" {
+		r.Logf("%s", AwakeWarning(p.AwakeWarn))
+	}
 	if hasPlan {
 		t.say("the plan %s was for %s — you asked for %s: resetting and planning fresh", existing.RunID, existing.Brief, briefPath)
 	}

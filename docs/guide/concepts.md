@@ -66,6 +66,17 @@ the review decide. `vloop status` and `vloop task list` read the plan, and the
 `vloop task` commands that change it refuse a result that fails `vloop task
 validate`.
 
+## Keeping the machine awake
+
+A run can last hours, and a machine that sleeps stalls it. With `run.keep-awake`
+on (the default), `vloop run` holds a no-idle-sleep hold for its own lifetime:
+`caffeinate -i -w <pid>` on macOS, `systemd-inhibit --what=idle` on Linux where
+it is installed, and `SetThreadExecutionState` on Windows. The hold ends when
+`vloop run` exits, however it exits. If it cannot be taken, `run.log` gets one
+warning line and the run continues; with `run.keep-awake = off` none is
+attempted. It does not cover closing a laptop's lid, which sleeps the machine
+regardless: keep the lid open, or change the OS's lid setting.
+
 ## Gates and the gate shell
 
 A task's `verify` command is its **gate**: the task is done only when it exits 0.

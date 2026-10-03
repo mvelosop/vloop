@@ -118,3 +118,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The typescript and javascript presets now classify **/*.e2e-spec.{ts,js} and **/test/** as tests; the metrics guide table follows, and TestPresetsCountNestTests covers it.
 - **Files:** internal/classify/presets.go, internal/classify/classify_test.go, docs/guide/metrics.md
 - **Notes for next iteration:** none
+
+## T15 — Keep the machine awake for the lifetime of vloop run (C2)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added run.keep-awake (on/off, default on, VLOOP_RUN_KEEP_AWAKE); vloop run now holds a no-idle-sleep hold (caffeinate, systemd-inhibit, SetThreadExecutionState) for its lifetime, with one run.log warning line if it cannot.
+- **Files:** internal/config/config.go, internal/config/config_test.go, internal/cli/config_test.go, cmd/vloop/e2e_test.go, internal/cli/run.go, internal/driver/budgets.go, internal/driver/iterate.go, internal/driver/plan.go, internal/driver/keepawake.go, internal/driver/keepawake_other.go, internal/driver/keepawake_windows.go, internal/driver/keepawake_test.go, internal/driver/keepawake_darwin_test.go, docs/guide/configuration.md, docs/guide/concepts.md
+- **Notes for next iteration:** The hold is taken in internal/cli/run.go after the lock; the failure reason is passed as AwakeWarn to the Iterator (or the Planner for --plan-only) which writes the single run.log line. Linux helper is systemd-inhibit wrapping tail --pid=<vloop pid> -f /dev/null. Windows code was only vetted and cross-built, not run. Existing config list tests (internal/cli, cmd/vloop e2e) gained the run.keep-awake row at the end.

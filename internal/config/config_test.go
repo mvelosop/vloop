@@ -49,7 +49,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
-		{"run.gate-timeout", "15", true}, {"run.session-timeout", "60", true},
+		{"run.gate-timeout", "15", true}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
 	}
 	vals, err := List(root)
 	if err != nil {

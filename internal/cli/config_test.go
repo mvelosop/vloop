@@ -28,7 +28,7 @@ func TestConfigListDefaults(t *testing.T) {
 		"shell=" + defaultShellForTest() + " (default)\nareas= (default)\n" +
 		"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n" +
 		"run.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\n" +
-		"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.session-timeout=60 (default)\n"
+		"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d out %q", code, out)
 	}
@@ -48,7 +48,8 @@ func TestConfigListJSONOrderAndNull(t *testing.T) {
 		`"run.max-iterations":{"value":"30","source":"default"},"run.cost-ceiling":{"value":"40","source":"default"},` +
 		`"run.max-attempts":{"value":"3","source":"default"},"run.stall-limit":{"value":"2","source":"default"},` +
 		`"run.convergence-max":{"value":"3.0","source":"default"},"run.convergence-min":{"value":"6","source":"default"},` +
-		`"run.gate-timeout":{"value":"15","source":"default"},"run.session-timeout":{"value":"60","source":"default"}}` + "\n"
+		`"run.gate-timeout":{"value":"15","source":"default"},"run.session-timeout":{"value":"60","source":"default"},` +
+		`"run.keep-awake":{"value":"on","source":"default"}}` + "\n"
 	if out != want {
 		t.Fatalf("got %s", out)
 	}
