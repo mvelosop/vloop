@@ -647,3 +647,62 @@ T18  -     test     1    0      223    0      0       11m57s  $0.55  claude-sonn
 - D20261003-1147-t15-added-run-keep-awake-and-broke-testm — regression, work, found by gate: T15 added run.keep-awake and broke TestMetricsKeys, which sliced config.Keys by position; no gate ran the whole internal/config package
 - D20261003-1217-t12-s-gate-put-its-resume-fixture-in-the — gate, plan, found by gate: T12's gate put its resume fixture in the stub claude's directory and T17's gate brief-checked the running brief; both could never pass
 <!-- vloop:run-record:end -->
+
+### Operator notes
+
+Written by hand, outside the generated markers.
+
+**The first brief vloop ran on itself**, from the released v0.7.0 (stamped
+build; `vloop doctor`'s self-hosting check passed on the work branch).
+Detached and under `caffeinate -i`. Three runs, 23 iterations, $19.84 — the plan
+alone $8.74 (opus, 18 tasks whose 3,000–10,000-character gates it checked on the
+base). The wall time spans two halts left overnight; the agents worked about 102
+minutes.
+
+**Two halts, both gate disputes the work sessions were right about.** T12's gate
+built its resume fixture in the stub claude's directory, so the clean-tree
+refusal under test fired on the stub's files; T17's gate brief-checked every
+brief including the running one, which the checker always rejects once its
+journal exists. Both replaced with `vloop task verify --reason`, one change each,
+run by hand before resuming (I20261003-1147, I20261003-1217). On the first resume
+the released binary — still matching gate files by substring — took the
+operator's uncommitted plan edit for a rewrite of T12's gate and cost it one
+attempt; the driver kept the replaced gate from memory.
+
+**One repair by hand, on the operator's direction.** T5 made every token of a
+done task's verify a gate file, including that task's own product: `test -f
+T1.out` froze `T1.out`, so a later task breaking it was restored as a gate rewrite
+instead of caught as a regression (`TestRun03GateRegression`,
+`TestRun41RegressionNamesBoth`). F9's wording was the cause: it did not restate
+"absent from that task's files". Fixed test first: a file any task owns is never
+a gate file (36ed325). T15's new key broke `TestMetricsKeys`, which sliced the
+key list by position; it now finds keys by name. Neither was caught by a gate:
+gates follow the diff surface, and only T12's ran the whole suite.
+
+**That led to the gate model, decided with the operator for the next release**
+(`docs/design-notes/vloop-horizon.md` → Now): a gate judges a contract and never
+by a file a task writes; it does not run tests; the task's `files` property and
+gate-file detection go; the driver runs an authoritative check command after
+every iteration; an independent gate review precedes the work.
+
+**Verified outside the loop.** Refs first: every commit on the work branch,
+`main` untouched at v0.7.0. `go test ./...`, `go vet` (also for windows),
+`gofmt`, `go mod tidy -diff`, both cross-builds, `.loop/tests/run-all.sh`, the
+interventions index, `claude plugin validate`. The worked example by an
+independent session with a fresh build and its own stub claude: all 13 cases
+and keep-awake pass with the brief's exact messages — the planted hook never ran,
+the secret appears nowhere under `.vloop/state/` or in history, a user named `us`
+breaks nothing, two simultaneous runs gave exactly one winner in 6 of 6 trials.
+The real-data check: `vloop metrics --json` for B1–B7 byte-identical between
+v0.7.0 and this build. 18 existing test files changed, each as the brief's
+must-change list allows (per-phase fences, path-only masking, the README's
+completeness checks moved to the guide tests; the README cap stays, 174 lines).
+10 permission denials, all in the first run: reviewers' compound commands with
+`git stash`, and the planner reading its own tool output under `~/.claude`.
+
+**Defects.** The review's 16 findings were recorded at design with blame, so
+they count against B2, B4, B5 and B6, not B8; all fixed here, with
+D20261002-1425 (the presets) and the three found during the run.
+
+**Next.** v1.0.0 is tagged after this merges. The gate model is the next
+release's first brief; the quality pass (was B9) follows it, the README last.
