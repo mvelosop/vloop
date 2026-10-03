@@ -14,7 +14,7 @@ records. This note is the plan to the next release, built from the horizon's
 the horizon.
 
 **Why 2.0, not 1.1.** B9 changes vloop's public contracts. The task loses
-`files` (`state/v1` → `state/v2`), a gate gains a judge it may not share with a
+`files` and the plan gains `check` (`state/v1` → `state/v2`), a gate gains a judge it may not share with a
 task, and a gate review can reject a plan that v1 accepted. Plans and briefs
 written for v1 may not plan under v2. That is a breaking change, so the next
 version is major. B10 and B11 alone would be minor.
@@ -27,7 +27,7 @@ predecessor in `depends-on:`.
 
 | # | Brief | Owns | Depends on |
 | --- | --- | --- | --- |
-| B9 | not written | **The gate model.** A gate judges a contract, by exercising the product, with its judge out of every task's reach. Gates never run tests. The task's `files` goes, and so does gate-file detection. The driver runs an authoritative **check command** after every iteration. An independent **gate review** session precedes the work. `state/v2` | B8 |
+| B9 | not written | **The gate model.** A gate judges a contract, by exercising the product, with its judge out of every task's reach. Gates never run tests. The task's `files` goes, and so does gate-file detection. The plan gains a **`check`** command the driver runs, authoritatively, after every iteration. An independent **gate review** session precedes the work. `state/v2` | B8 |
 | B10 | not written | **Interventions that weigh the model against the operator.** Each record carries the model's **three options**, the one it recommends **and why**, and the operator's decision. A derived `agreement` per record; `vloop metrics` reports it by kind and phase; a self-contained context paragraph; `vloop intervention show`. `intervention/v2` | B9 |
 | B11 | not written | **The quality pass**, last: the guides against the binary, error messages and exit codes, help text, code health, the test suite's speed. **The README is rewritten last of all**, so it describes the v2 gates | B10 |
 
@@ -66,8 +66,9 @@ horizon; this section is now its record):
 - **The task's `files` property goes**, and with it gate-file detection
   (`internal/driver/gates.go`): nothing in a task's reach needs protecting.
 - **The driver runs an authoritative check command** after every iteration: the
-  repository's tests and health checks (vet, `vloop brief check`…). The planner
-  writes it, or the repository configures it. It must pass at the plan's base. It
+  repository's tests and health checks (vet, `vloop brief check`…). It is the
+  plan's **`check`** property in `state/v2`, beside the tasks — one command for
+  the whole plan, as each task's `verify` is one command for its gate. It must pass at the plan's base. It
   is responsible for its own flaky tests (for example, re-running failures
   individually); vloop treats its exit code as the truth. Its result is the
   reviewer's evidence, so reviewers stop re-running tests.
@@ -97,8 +98,11 @@ horizon; this section is now its record):
 
 ### Forks for its design act
 
-- **Who writes the check command:** the planner, per plan; a config key per
-  repository; or both, the config as the default and the plan as an override.
+- **Where the plan's `check` comes from:** the planner writes it from the brief
+  and the repository; whether a config key gives a default the planner starts
+  from (and whether a brief may override it).
+- **What the iteration records of it:** exit code and duration as for a gate,
+  and whether its output is kept (as gate logs are) for the reviewer.
 - **The gate review's outcome:** back to the planner automatically (how many
   rounds?), or always to the operator. Is it a new session kind (`gate-review`),
   with its own model and effort keys, verdict schema and fence?
