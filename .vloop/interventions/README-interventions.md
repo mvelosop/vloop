@@ -65,6 +65,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | halt | partly | [I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt](I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt.md) |
 | run | halt | partly | [I20260930-2149-t6-gate-contradicted-its-own-acceptance](I20260930-2149-t6-gate-contradicted-its-own-acceptance.md) |
 | run | halt | partly | [I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table](I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table.md) |
+| halt | repair | partly | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
 | verify | decision | partly | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | halt | partly | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |
