@@ -66,6 +66,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | halt | partly | [I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt](I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt.md) |
 | run | halt | partly | [I20260930-2149-t6-gate-contradicted-its-own-acceptance](I20260930-2149-t6-gate-contradicted-its-own-acceptance.md) |
 | run | halt | partly | [I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table](I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table.md) |
+| halt | halt | yes | [I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new](I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new.md) |
 | halt | repair | partly | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
 | halt | repair | yes | [I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th](I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th.md) |
 | verify | decision | partly | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
