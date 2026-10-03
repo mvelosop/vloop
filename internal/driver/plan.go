@@ -554,6 +554,11 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	if v, err := config.Get(root, "run.gate-scratch"); err == nil {
 		plan.GateScratch = append([]string{}, v.List...)
 	}
+	// The planner may have run a gate while drafting it; acceptance leaves the
+	// scratch folders empty like every other gate run.
+	if err := state.EmptyScratch(root, plan.GateScratch); err != nil {
+		return nil, err
+	}
 	if err := state.StampFixtures(root, &plan); err != nil {
 		return nil, err
 	}

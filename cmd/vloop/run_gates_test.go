@@ -192,19 +192,19 @@ func TestRunFlakyGate(t *testing.T) {
 		r.wantTask("T1", "done", 1)
 		wantNotIn(t, "run log", r.runLog(), "FLAKY GATE")
 	})
-}
 
-func TestRunTimedOutGateNotRerun(t *testing.T) {
-	r := newRunRepo(t)
-	r.write(".vloop/config.toml", "run.gate-timeout = 1\n"+runCheckConfig)
-	r.commitAll("one minute gates")
-	count := filepath.Join(r.stub, "runs")
-	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": `test -f T1.out || exit 1; echo run >> "` + count + `"; sleep 90`})), defaultScript)
-	wantExit(t, r.vloop("run", "--max-attempts", "1", runBrief), 2)
-	b, _ := os.ReadFile(count)
-	if n := strings.Count(string(b), "run"); n != 1 {
-		t.Errorf("a timed-out gate ran %d times, want 1", n)
-	}
+	t.Run("a gate that times out is not re-run", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", "run.gate-timeout = 1\n"+runCheckConfig)
+		r.commitAll("one minute gates")
+		count := filepath.Join(r.stub, "runs")
+		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": `test -f T1.out || exit 1; echo run >> "` + count + `"; sleep 90`})), defaultScript)
+		wantExit(t, r.vloop("run", "--max-attempts", "1", runBrief), 2)
+		b, _ := os.ReadFile(count)
+		if n := strings.Count(string(b), "run"); n != 1 {
+			t.Errorf("a timed-out gate ran %d times, want 1", n)
+		}
+	})
 }
 
 func TestRunGateDispute(t *testing.T) {
@@ -309,6 +309,19 @@ func TestRunGateScratch(t *testing.T) {
 		wantIn(t, "stderr", res.err, "vloop: gate scratch web/.gate/ is not ignored by git — add it to .gitignore")
 		if n := strings.Count(strings.Join(r.argv(), "\n"), "/vloop:"); n != 0 {
 			t.Errorf("%d session(s) started", n)
+		}
+	})
+
+	t.Run("acceptance empties what the planning session left in the folders", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", scratchConfig)
+		r.write(".gitignore", "web/.gate/\n")
+		r.commitAll("scratch config")
+		r.scripted(planJSON(t, planTask("T1", nil)), defaultScript+`if [ "$PHASE" = plan ]; then mkdir -p web/.gate && echo x > web/.gate/left.txt; fi
+`)
+		wantExit(t, r.vloop("run", "--plan-only", runBrief), 0)
+		if es, _ := os.ReadDir(filepath.Join(r.dir, "web", ".gate")); len(es) != 0 {
+			t.Errorf("web/.gate/ holds %d entries after acceptance", len(es))
 		}
 	})
 

@@ -157,6 +157,19 @@ func TestWorkedExampleB6FlakyGate(t *testing.T) {
 		t.Errorf("defect matrix = %q (%v), want one env defect at [3][0]", res.out, err)
 	}
 	wantExit(t, r.vloop("metrics", runBriefName), 0)
+
+	t.Run("a gate that times out is not re-run", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", "run.gate-timeout = 1\n"+runCheckConfig)
+		r.commitAll("one minute gates")
+		count := filepath.Join(r.stub, "runs")
+		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": `test -f T1.out || exit 1; echo run >> "` + count + `"; sleep 90`})), defaultScript)
+		wantExit(t, r.vloop("run", "--max-attempts", "1", runBrief), 2)
+		b, _ := os.ReadFile(count)
+		if n := strings.Count(string(b), "run"); n != 1 {
+			t.Errorf("a timed-out gate ran %d times, want 1", n)
+		}
+	})
 }
 
 func TestWorkedExampleB6SilentReview(t *testing.T) {

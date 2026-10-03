@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "The timeout case now lives inside TestRunFlakyGate and TestWorkedExampleB6FlakyGate as a subtest each, and the separate test is removed. Plan acceptance empties the gate scratch folders, with a test.",
+  "files": ["cmd/vloop/run_gates_test.go", "cmd/vloop/b6_e2e_test.go", "internal/driver/plan.go"],
+  "verified": "vloop task gate T6 exited 0 and printed GATE OK.",
+  "notes": "Work from the earlier attempt is unchanged. There is no gate run at acceptance yet (T9 adds them), so acceptance empties the scratch folders in acceptPlan, in case the planning session left files there. T9 should still call state.EmptyScratch after each gate it runs there. The timeout subtests each take about a minute."
+}

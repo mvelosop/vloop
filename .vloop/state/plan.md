@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/16 done** · iteration 9
+**Status:** running · **6/16 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T23:05:05Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T23:15:31Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
 - [x] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
 - [x] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify · 1 attempt(s)
-- [ ] **T6** — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate · 1 attempt(s)
+- [x] **T6** — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate · 1 attempt(s)
 - [ ] **T7** — Run every check on the base before planning, refuse without one, and copy the checks into the plan
 - [ ] **T8** — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
 - [ ] **T9** — Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
@@ -155,7 +155,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T6 — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
 
-`pending` · 1 attempt(s) · depends on: T2, T5
+`done` · 1 attempt(s) · depends on: T2, T5
 
 **Files:** `internal/driver/gates.go`, `internal/driver/iterate.go`, `internal/driver/plan.go`, `internal/driver/gates_test.go`, `internal/state/gate.go`, `internal/state/gate_test.go`, `internal/cli/task_gate.go`, `internal/cli/run.go`, `internal/cli/task_gate_test.go`, `cmd/vloop/run_gates_test.go`, `cmd/vloop/b6_e2e_test.go`
 
@@ -168,8 +168,6 @@ Oracle tests run by the product's own runner have to sit inside the product, so 
 - The driver snapshots the tree before each gate and compares after, ignoring .vloop/tmp/ and the scratch folders; a gate that changed anything has it restored and fails, its log ending `vloop: gate T<n> changed the tree — restored: <paths>`.
 - A timed-out gate is not re-run; the one immediate re-run stays for an ordinary failure. TestRunFlakyGate and TestWorkedExampleB6FlakyGate gain the timeout case and change nothing else.
 - Tests cover the scratch refusal, the emptying in each of the three places, the tree restore of a new and of a modified file, and the timeout.
-
-**From the last attempt:** The timeout case was put in a new test instead of TestRunFlakyGate and TestWorkedExampleB6FlakyGate, which the acceptance criterion names; B6's test is untouched.; Acceptance emptying is neither implemented nor tested, though the criterion lists it and the brief expects it.
 
 <details><summary>verify command</summary>
 

@@ -13,3 +13,7 @@
 ── iteration 9 (4 this run) · T6 · 5/16 done ──
    Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
    review: FAIL
+── iteration 10 (5 this run) · T6 · 5/16 done ──
+   Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
+   review: PASS
+   T6 done
