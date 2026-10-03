@@ -163,3 +163,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261002-2135-vloop-v1-security` · 3 iteration(s) this run
 - **Plan:** 16/18 done, 1 blocked
+
+## T17 — Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** domain-model.md carries S-2, S-4, R-3 and R-4 as the brief quotes them; session.md, run.md, task.md, brief.md and the concepts.md exit-code table describe the B8 behaviour.
+- **Files:** docs/domain/domain-model.md, docs/domain/execution/session.md, docs/domain/execution/run.md, docs/domain/execution/task.md, docs/domain/briefing/brief.md, docs/guide/concepts.md
+- **Notes for next iteration:** No new edits this attempt: the doc changes were committed with the earlier block; the operator then replaced the gate so the brief check skips the running brief, and this attempt only re-ran it. In domain-model.md S-4 sits before S-3 in the list, as it was written.
