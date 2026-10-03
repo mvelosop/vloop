@@ -20,6 +20,47 @@ promoted it into the roadmap.
 
 ## Now
 
+### The gate model: what a gate is, who reviews it, and the checks the driver runs
+
+*Noted 2026-10-03, by the operator, from B8's run. The first brief after v1.0.*
+
+B8 showed the gate concept is underdefined: two of its 18 gates could never
+pass (a fixture sharing the stub's directory; a brief check of the running
+brief), two regressions went past per-task gates (T5, T15), its gates ran to
+3,000–10,000 characters, and F9's gate-file rule froze a task's own product
+(I20261003-1147). Direction set with the operator on 2026-10-03:
+
+- **A gate judges a contract** from the brief, by exercising the product. Its
+  judge — expected values, assertions — is in the verify itself, or in fixtures
+  the planner writes under a plan-owned directory (such as
+  `.vloop/state/gates/<task id>/`) that sessions cannot write. **A gate never
+  judges by a file a task writes, and never runs the tests.**
+- **The task's `files` property goes**, and with it gate-file detection: there
+  is nothing in a task's reach to protect.
+- **The driver runs an authoritative check command** after every iteration —
+  the repository's tests and health checks (vet, brief check…), written by the
+  planner or configured, required to pass at the plan's base, and responsible
+  for its own flaky tests. Its result is the reviewer's evidence; reviewers stop
+  re-running tests.
+- **A gate review step**: an independent session confirms every gate is a
+  contract check, fails on the base for the right reason, and keeps its judge out
+  of tasks' reach, before any work.
+- An earlier brief's test that a task must change is a contract change: the
+  brief lists it, and the check command judges it.
+- From B8's verification: a timed-out gate costs twice the timeout, because a
+  failed gate is re-run once to detect flakiness.
+
+### The quality pass (was B9)
+
+*Moved out of the v1.0 series by the operator on 2026-10-03.*
+
+The quality findings of the v1.0 review, in full in
+`docs/design-notes/vloop-v1-review.md` → "B9 — quality": the guides against the
+binary, error messages and exit codes, help text, code health, the test suite's
+speed. **The README rewrite comes after the gate model**, so it describes gates as
+they will be.
+
+
 ### Configurable merge strategy and work-branch retention
 
 *Noted 2026-10-01, by the operator.*

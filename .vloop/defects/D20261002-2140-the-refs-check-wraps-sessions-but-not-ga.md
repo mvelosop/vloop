@@ -5,8 +5,8 @@ origin: brief
 found-by: operator
 kind: spec-gap
 severity: medium
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261002-2135-vloop-v1-security.loop-brief
 case: ""
 created: 2026-10-02T20:40:30Z
 ---

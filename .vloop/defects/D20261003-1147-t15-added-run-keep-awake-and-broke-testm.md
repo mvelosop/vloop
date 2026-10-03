@@ -6,8 +6,8 @@ origin: work
 found-by: gate
 kind: regression
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261002-2135-vloop-v1-security.loop-brief
 case: ""
 created: 2026-10-03T10:47:36Z
 ---

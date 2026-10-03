@@ -6,8 +6,8 @@ origin: plan
 found-by: gate
 kind: gate
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261002-2135-vloop-v1-security.loop-brief
 case: ""
 created: 2026-10-03T11:17:04Z
 ---

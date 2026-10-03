@@ -12,7 +12,9 @@ read-only review passes: command execution; file writes, paths and secrets;
 what sessions may do; docs against the binary; code health. The architect
 checked the load-bearing claims against the code before triage. Decided with
 the operator the same day: **B8 fixes the security and correctness findings and
-B7's carry-overs; B9 the quality findings; v1.0 is tagged after B9.**
+B7's carry-overs; B9 the quality findings; v1.0 is tagged after B9.** Amended
+2026-10-03: v1.0 is tagged after B8; the quality pass moved to the next release
+(`docs/design-notes/vloop-horizon.md` → Now).
 
 B8's findings are pinned, one subsection each, in
 `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` (F1–F16, C1–C3);

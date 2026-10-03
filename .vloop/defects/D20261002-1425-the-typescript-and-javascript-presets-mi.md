@@ -5,8 +5,8 @@ origin: work
 found-by: operator
 kind: bug
 severity: medium
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261002-2135-vloop-v1-security.loop-brief
 case: ""
 created: 2026-10-02T13:25:56Z
 ---
