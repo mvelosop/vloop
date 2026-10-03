@@ -2,8 +2,6 @@ package driver
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -156,29 +154,36 @@ func checkPlanRunID(plan *state.Plan) error {
 	return nil
 }
 
-// stateGuard is the plan's bytes as the driver left them before a session ran.
+// stateGuard is the plan's bytes and the gate folders as the driver left them
+// before a session ran.
 type stateGuard struct {
-	root string
-	pre  []byte
+	root  string
+	pre   []byte
+	gates map[string][]byte // path relative to the gates folder -> bytes
 }
 
 func snapshotState(root string) stateGuard {
 	data, _ := os.ReadFile(state.Path(root))
-	return stateGuard{root: root, pre: data}
+	gates, _ := state.GateFiles(root)
+	return stateGuard{root: root, pre: data, gates: gates}
 }
 
-// restoreIfTouched puts the plan back and reports true when the session changed
-// it, in any byte.
+// hash is the plan hash handed to the session: the plan and every gate folder.
+func (g stateGuard) hash() string { return state.PlanDigest(g.pre, g.gates) }
+
+// restoreIfTouched puts the plan and the gate folders back and reports true
+// when the session changed either, in any byte.
 func (g stateGuard) restoreIfTouched() bool {
 	if len(g.pre) == 0 {
 		return false
 	}
+	touched := len(state.RestoreGateFiles(g.root, g.gates)) > 0
 	now, err := os.ReadFile(state.Path(g.root))
 	if err == nil && bytes.Equal(now, g.pre) {
-		return false
+		return touched
 	}
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return false
+		return touched
 	}
 	_ = os.WriteFile(state.Path(g.root), g.pre, 0o644)
 	return true
@@ -186,7 +191,7 @@ func (g stateGuard) restoreIfTouched() bool {
 
 func tamperNote(phase string) string {
 	if phase == PhaseWork {
-		return "work session modified " + state.FilePath + " — restored by the driver; the plan and its verify commands are not a session's to edit"
+		return "work session modified " + state.FilePath + " or " + state.GatesDir + " — restored by the driver; the plan, its verify commands and its gate folders are not a session's to edit"
 	}
 	return fmt.Sprintf("%s session modified %s — restored by the driver; only the driver makes status transitions", phase, state.FilePath)
 }
@@ -198,12 +203,6 @@ const PlanHashEnv = "VLOOP_PLAN_SHA256"
 // GateRefusedFile is where `vloop task gate` notes, for the driver, that it
 // refused a plan other than the one the driver holds.
 const GateRefusedFile = tmpDir + "/gate-refused"
-
-// planHash is the lower-case hex SHA-256 of the plan's bytes.
-func planHash(data []byte) string {
-	sum := sha256.Sum256(data)
-	return hex.EncodeToString(sum[:])
-}
 
 // inputGuard holds, in memory, the files a session must leave alone: the
 // config, the operator's defects and interventions, and the run's own session

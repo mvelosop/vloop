@@ -284,6 +284,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 			t.show("read:   %s", planMarkdown)
 			return &PlanResult{Plan: existing}, nil
 		}
+		if err := CheckFixtures(root, existing); err != nil {
+			return nil, err
+		}
 		if _, err := p.workBranch(existing.RunID); err != nil {
 			return nil, err
 		}
@@ -302,6 +305,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 			if err := os.Remove(filepath.Join(root, filepath.FromSlash(f))); err != nil && !errors.Is(err, os.ErrNotExist) {
 				return nil, err
 			}
+		}
+		if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir))); err != nil {
+			return nil, err
 		}
 	}
 
@@ -392,6 +398,19 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	return &PlanResult{Plan: rendered, Planned: true, RunDir: runDir}, nil
 }
 
+// CheckFixtures refuses a plan whose gate folder no longer matches the fixtures
+// stamped on a task: the change was not recorded by vloop task verify.
+func CheckFixtures(root string, plan *state.Plan) error {
+	id, err := state.FixturesMismatch(root, plan)
+	if err != nil {
+		return halt(ExitPreflight, "%v", err)
+	}
+	if id != "" {
+		return halt(ExitPreflight, "the gate fixtures of %s changed outside vloop task verify — record the change with vloop task verify %s --reason '<why>'", id, id)
+	}
+	return nil
+}
+
 // workBranch is R-2: on the default branch the run gets a branch named for its
 // run id, and the name is returned; anywhere else it runs where it is and the
 // result is "".
@@ -466,6 +485,7 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 			t.warn("  %s", l)
 		}
 		_ = os.Remove(state.Path(root))
+		_ = os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir)))
 		return halt(ExitPreflight, "the plan is not fit (%d problem(s)), nothing was committed — see above and %s", len(problems), relRunDir(root, t.r.RunDir)+"run.log")
 	}
 
@@ -496,6 +516,15 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	if len(rep.Problems) == 0 {
 		problems = append(problems, GateShapeProblems(root, &plan)...)
 	}
+	if len(rep.Problems) == 0 {
+		stray, err := state.StrayGateFolders(root, &plan)
+		if err != nil {
+			return nil, err
+		}
+		for _, id := range stray {
+			problems = append(problems, fmt.Sprintf("%s/%s is a gate folder for %s, which is not a task of the plan", state.GatesDir, id, id))
+		}
+	}
 	if len(problems) > 0 {
 		return nil, reject(problems)
 	}
@@ -513,6 +542,9 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	// to record it: which run, brief and branch the plan belongs to.
 	plan.RunID, plan.Brief, plan.Branch = runID, briefPath, branch
 	plan.Status = "running"
+	if err := state.StampFixtures(root, &plan); err != nil {
+		return nil, err
+	}
 	if err := state.Save(root, &plan); err != nil {
 		return nil, err
 	}

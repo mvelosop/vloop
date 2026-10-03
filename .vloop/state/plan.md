@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/16 done** · iteration 3
+**Status:** running · **2/16 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T22:04:40Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T22:16:00Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [ ] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config · **blocked**
 - [ ] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
 - [x] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
-- [ ] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
+- [ ] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify · 1 attempt(s)
 - [ ] **T6** — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
 - [ ] **T7** — Run every check on the base before planning, refuse without one, and copy the checks into the plan
 - [ ] **T8** — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
@@ -132,7 +132,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T5 — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
 
-`pending` · depends on: T4
+`pending` · 1 attempt(s) · depends on: T4
 
 **Files:** `internal/driver/plan.go`, `internal/driver/safety.go`, `internal/driver/safety_test.go`, `internal/driver/plan_test.go`, `internal/driver/iterate.go`, `internal/state/`, `internal/cli/task_gate.go`, `internal/cli/task_gate_test.go`, `internal/cli/run.go`, `fence/plan.json`, `internal/cli/fence_test.go`, `cmd/vloop/run_gates_test.go`, `cmd/vloop/run_safety_test.go`
 
@@ -146,6 +146,8 @@ A gate's judge may be files, not only a command, and those files must be as far 
 - `vloop run` resuming a plan whose gate folder no longer matches a task's fixtures refuses with `vloop: the gate fixtures of T<n> changed outside vloop task verify — record the change with vloop task verify T<n> --reason '<why>'` (exit 1), starting no session.
 - `vloop task verify <id> [<command>] --reason '<why>'` takes the command optionally; it appends a gate_history entry {verify (old), fixtures (old), replaced_at, reason, by: operator}, then sets the command if given and re-stamps fixtures from the folder; with neither a new command nor a changed folder it refuses with `vloop: nothing to record — T<n>'s gate and fixtures are unchanged` (exit 1).
 - TestRun33GateRewrite's replacement tests the folder restore; TestTaskVerifyReplaces, TestTaskVerifyRefusals and TestTaskGatePlanHash follow G2; tests cover the stamp, the stray-folder refusal and the resume refusal.
+
+**From the last attempt:** No durable test covers acceptance refusing a stray gate folder (exit 1, nothing committed) or CheckFixtures' resume refusal with its exact message and exit 1; only the ephemeral gate script exercises them
 
 <details><summary>verify command</summary>
 

@@ -108,28 +108,3 @@ func RunGateWithin(root, shell, verify string, stdout, stderr io.Writer, timeout
 func GateTimedOutLine(id string, minutes int) string {
 	return fmt.Sprintf("vloop: gate %s timed out after %d min", id, minutes)
 }
-
-// ReplaceGate replaces a task's verify command, recording the old one, when
-// and why in gate_history. Setting the command the task already has is an
-// error.
-func ReplaceGate(p *Plan, id, verify, reason string, at time.Time) error {
-	t := p.Find(id)
-	if t == nil {
-		return &NoTaskError{id}
-	}
-	if verify == "" {
-		return errors.New("verify command is empty")
-	}
-	if t.Verify == verify {
-		return fmt.Errorf("%s already has that verify command", id)
-	}
-	t.GateHistory = append(t.GateHistory, GateReplace{
-		Verify:     t.Verify,
-		ReplacedAt: at.UTC().Format(time.RFC3339),
-		Reason:     reason,
-		By:         "operator",
-		Fixtures:   t.Fixtures,
-	})
-	t.Verify = verify
-	return nil
-}

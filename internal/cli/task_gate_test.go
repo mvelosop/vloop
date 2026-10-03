@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"os"
 	"os/exec"
@@ -160,13 +158,37 @@ func TestTaskVerifyRefusals(t *testing.T) {
 	root := amendRepo(t, "")
 	refuse(t, root, 2, `vloop: required flag(s) "reason" not set`, "task", "verify", "T2", "true")
 	p, _ := state.Load(root)
-	refuse(t, root, 1, "vloop: T2 already has that verify command\n", "task", "verify", "T2", p.Tasks[1].Verify, "--reason", "r")
+	refuse(t, root, 1, "vloop: nothing to record — T2's gate and fixtures are unchanged\n", "task", "verify", "T2", p.Tasks[1].Verify, "--reason", "r")
+	refuse(t, root, 1, "vloop: nothing to record — T2's gate and fixtures are unchanged\n", "task", "verify", "T2", "--reason", "r")
 	refuse(t, root, 1, "vloop: no task T9\n", "task", "verify", "T9", "x", "--reason", "r")
 	if code, out, _ := run(t, "-C", root, "task", "verify", "T2", "", "--reason", "r"); code == 0 || out != "" {
 		t.Fatalf("empty command: code %d out %q", code, out)
 	}
 	if planBytes(t, root) != mustMarshal(t, p) {
 		t.Fatal("the plan was modified")
+	}
+}
+
+// TestTaskVerifyFolder: with no command, a changed gate folder is recorded —
+// old verify and fixtures to gate_history, the fixtures re-stamped.
+func TestTaskVerifyFolder(t *testing.T) {
+	root := amendRepo(t, "")
+	before, _ := state.Load(root)
+	dir := filepath.Join(root, filepath.FromSlash(state.GateFolder("T2")))
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "seed.txt"), []byte("row\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, errOut := run(t, "-C", root, "task", "verify", "T2", "--reason", "seed row"); code != 0 || out != "" || errOut != "" {
+		t.Fatalf("code %d out %q err %q", code, out, errOut)
+	}
+	got, _ := state.Load(root)
+	want, _ := state.FixturesDigest(dir)
+	h := got.Tasks[1].GateHistory
+	if got.Tasks[1].Fixtures != want || got.Tasks[1].Verify != before.Tasks[1].Verify || len(h) != 1 || h[0].Verify != before.Tasks[1].Verify || h[0].Fixtures != "" || h[0].Reason != "seed row" || h[0].By != "operator" {
+		t.Fatalf("got %+v", got.Tasks[1])
 	}
 }
 
@@ -194,8 +216,26 @@ func TestTaskGatePlanHash(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(root, "gate.ran")); err == nil {
 		t.Fatal("the verify ran against a plan that does not match the hash")
 	}
-	sum := sha256.Sum256([]byte(planBytes(t, root)))
-	t.Setenv("VLOOP_PLAN_SHA256", hex.EncodeToString(sum[:]))
+	gdir := filepath.Join(root, filepath.FromSlash(state.GateFolder("T2")))
+	if err := os.MkdirAll(gdir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(gdir, "oracle.sh"), []byte("true\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gates, _ := state.GateFiles(root)
+	hash := state.PlanDigest([]byte(planBytes(t, root)), gates)
+	// A session that edits a gate folder changes the hash like an edit of the plan.
+	t.Setenv("VLOOP_PLAN_SHA256", hash)
+	if err := os.WriteFile(filepath.Join(gdir, "oracle.sh"), []byte("false\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code, _, errOut := run(t, "-C", root, "task", "gate", "T2"); code != 1 || !strings.Contains(errOut, "the plan was changed during this session") {
+		t.Fatalf("gate folder edit: code %d err %q", code, errOut)
+	}
+	if err := os.WriteFile(filepath.Join(gdir, "oracle.sh"), []byte("true\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if code, out, errOut := run(t, "-C", root, "task", "gate", "T2"); code != 0 {
 		t.Fatalf("matching hash: code %d out %q err %q", code, out, errOut)
 	}

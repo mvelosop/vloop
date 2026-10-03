@@ -146,6 +146,9 @@ func (it *Iterator) Run() (Ending, error) {
 	if err := checkPlanRunID(plan); err != nil {
 		return Ending{}, err
 	}
+	if err := CheckFixtures(it.Root, plan); err != nil {
+		return Ending{}, err
+	}
 	it.plan = plan
 	it.branch = CurrentBranch(it.Root)
 	if it.RunDir == "" {
@@ -398,7 +401,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	gguard := snapshotGit(root)
 	inputs := snapshotInputs(root, it.RunDir)
 	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: planHash(guard.pre)})
+	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 	it.spent += wres.Cost
 	if err != nil {
 		return iterResult{}, err
@@ -522,7 +525,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		inputs := snapshotInputs(root, it.RunDir)
 		tree := snapshotTree(root)
 		_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: planHash(guard.pre)})
+		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 		it.spent += rres.Cost
 		if err != nil {
 			return iterResult{}, err

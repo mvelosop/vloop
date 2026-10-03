@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/mvelosop/vloop/internal/state"
 )
 
 func TestLockLiveStaleAndRelease(t *testing.T) {
@@ -133,3 +135,41 @@ func TestHandoffSymlinkIsMissing(t *testing.T) {
 		t.Error("a symlinked handoff was read")
 	}
 }
+
+// TestStateGuardGateFolders: a session's edit, addition or removal under the
+// gate folders is undone, and the hash handed to the session covers them.
+func TestStateGuardGateFolders(t *testing.T) {
+	root := t.TempDir()
+	write := func(rel, data string) {
+		t.Helper()
+		p := filepath.Join(root, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(data), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write(".vloop/state/state.json", "{}\n")
+	write(".vloop/state/gates/T2/oracle.sh", "test -f x\n")
+	g := snapshotState(root)
+	if g.restoreIfTouched() {
+		t.Fatal("an untouched snapshot reported a change")
+	}
+	write(".vloop/state/gates/T2/oracle.sh", "exit 0\n")
+	write(".vloop/state/gates/T3/new.sh", "true\n")
+	if !g.restoreIfTouched() {
+		t.Fatal("a rewritten gate folder was not noticed")
+	}
+	if got, _ := os.ReadFile(filepath.Join(root, ".vloop", "state", "gates", "T2", "oracle.sh")); string(got) != "test -f x\n" {
+		t.Fatalf("oracle: %q", got)
+	}
+	if _, err := os.Stat(filepath.Join(root, ".vloop", "state", "gates", "T3")); err == nil {
+		t.Fatal("the added folder survived")
+	}
+	if g.hash() == planHashOfPlanOnly(g) {
+		t.Fatal("the hash does not cover the gate folders")
+	}
+}
+
+func planHashOfPlanOnly(g stateGuard) string { return state.PlanDigest(g.pre, nil) }
