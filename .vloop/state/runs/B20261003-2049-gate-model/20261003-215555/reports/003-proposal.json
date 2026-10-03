@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "The plan is state/v2: Plan carries checks, gate_scratch and gate_review, a task carries fixtures and no files; the gate-file detection and restore are gone, and vloop run refuses a state/v1 plan with exit 1 before anything else.",
+  "files": ["internal/state/state.go", "internal/state/gate.go", "internal/state/validate.go", "internal/state/state_test.go", "internal/state/testdata/", "internal/driver/gates.go", "internal/driver/gateshape.go", "internal/driver/iterate.go", "internal/driver/plan_test.go", "internal/driver/gates_test.go", "internal/cli/run.go", "internal/cli/task.go", "internal/cli/status_test.go", "internal/cli/doctor_test.go", "cmd/vloop/"],
+  "verified": "vloop task gate T4 exited 0 and printed GATE OK.",
+  "notes": "state.SchemaName is state/v2; state.SchemaV1 is what run refuses (checked first thing in RunE, before preflight, via state.Load). Load still tolerates v1 so status and metrics read it. Plan.Marshal defaults nil checks/gate_scratch to []; ReplaceGate records the old fixtures in gate_history. internal/driver/gates_test.go was deleted whole (it held only TestGateFilesByToken). inspectedPaths stays in gateshape.go (still tested) but nothing calls it now. Beyond the listed files: cmd/vloop/e2e_test.go and b2_e2e_test.go expectations were stale from T1/T2 (config list gate-review and gate-scratch keys, 15-schema list) and are updated; b6_e2e_test.go RealData removes the clone's live plan, which is state/v1 in this repo and which run now refuses. The live B9 plan on disk is state/v1: a vloop built from this tree will refuse to resume it. go test of internal/cli fails inside a vloop session on TestTaskGate* because of inherited VLOOP_* env; unset them (the gate does)."
+}

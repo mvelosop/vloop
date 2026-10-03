@@ -293,8 +293,8 @@ func TestRun21ForeignState(t *testing.T) {
 	r.commitAll("another brief")
 	// verify never names a path, so gate-shape rule 3 has nothing to say about
 	// files the first run already committed.
-	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "true", "files": []string{}}),
-		planTask("T2", map[string]any{"verify": "true", "files": []string{}, "depends_on": []string{"T1"}})), defaultScript)
+	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "true"}),
+		planTask("T2", map[string]any{"verify": "true", "depends_on": []string{"T1"}})), defaultScript)
 	res := r.vloop("run", "docs/briefs/"+other+".loop-brief.md")
 	wantExit(t, res, 0)
 	wantIn(t, "output", res.out+res.err, "resetting and planning fresh")
@@ -342,8 +342,8 @@ func TestRun21ForeignState(t *testing.T) {
 func TestRun30PlanOnly(t *testing.T) {
 	r := newRunRepo(t)
 	r.scripted(planJSON(t,
-		planTask("T1", map[string]any{"verify": "true", "files": []string{}}),
-		planTask("T2", map[string]any{"verify": "true", "files": []string{}, "depends_on": []string{"T1"}})), defaultScript)
+		planTask("T1", map[string]any{"verify": "true"}),
+		planTask("T2", map[string]any{"verify": "true", "depends_on": []string{"T1"}})), defaultScript)
 
 	res := r.vloop("run", "--plan-only", runBrief)
 	wantExit(t, res, 0)
@@ -439,7 +439,7 @@ func TestRun40NoProposalTree(t *testing.T) {
 `
 		}
 		script += "esac\n"
-		r.scripted(planJSON(t, planTask("T1", map[string]any{"files": []string{"thing_one.txt"}})), script)
+		r.scripted(planJSON(t, planTask("T1", nil)), script)
 		res := r.vloop("run", "--max-iterations", "1", runBrief)
 		wantExit(t, res, 4)
 		r.wantIterations("T1:blocked")

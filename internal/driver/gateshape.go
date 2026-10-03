@@ -105,19 +105,6 @@ scan:
 	return ref
 }
 
-func tracked(root, path string) bool {
-	return gitCmd(root, "cat-file", "-e", "HEAD:"+path).Run() == nil
-}
-
-func owns(t state.Task, path string) bool {
-	for _, f := range t.Files {
-		if f == path {
-			return true
-		}
-	}
-	return false
-}
-
 // GateShapeProblems are the reasons the plan's gates are refused, one line
 // each, each naming its task.
 func GateShapeProblems(root string, p *state.Plan) []string {
@@ -129,13 +116,6 @@ func GateShapeProblems(root string, p *state.Plan) []string {
 			add("%s  re-serialises a parsed structure and substring-matches the text; navigate to the value and assert on it", t.ID)
 		case reSourceText.MatchString(t.Verify):
 			add("%s  asserts on source text rather than on what the program does", t.ID)
-		}
-	}
-	for _, t := range p.Tasks {
-		for _, f := range inspectedPaths(t.Verify) {
-			if tracked(root, f) && !owns(t, f) {
-				add("%s  inspects %s, which it does not own; the driver reverts that file before the gate runs, so no implementation can pass; add it to the task's files or move the claim to acceptance", t.ID, f)
-			}
 		}
 	}
 	for _, t := range p.Tasks {

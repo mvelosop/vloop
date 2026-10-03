@@ -20,7 +20,7 @@ type Report struct {
 	Warnings []string
 }
 
-// Check validates the plan file under root: the state/v1 schema, then the
+// Check validates the plan file under root: the state/v2 schema, then the
 // structural rules the schema cannot express. areas is the repo's configured
 // area list; when empty, a task's area is optional and unchecked. It never
 // writes. A missing plan is ErrNoPlan.

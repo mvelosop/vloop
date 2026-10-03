@@ -128,6 +128,7 @@ func ReplaceGate(p *Plan, id, verify, reason string, at time.Time) error {
 		ReplacedAt: at.UTC().Format(time.RFC3339),
 		Reason:     reason,
 		By:         "operator",
+		Fixtures:   t.Fixtures,
 	})
 	t.Verify = verify
 	return nil

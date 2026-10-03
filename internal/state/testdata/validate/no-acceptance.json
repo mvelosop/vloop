@@ -1,5 +1,5 @@
 {
-  "schema": "state/v1",
+  "schema": "state/v2",
   "run_id": "B20260101-0900-a",
   "brief": "docs/briefs/b.loop-brief.md",
   "base": "0000000000000000000000000000000000000000",
@@ -9,6 +9,12 @@
   "created": "2026-01-01T09:00:00Z",
   "updated": "2026-01-01T09:00:00Z",
   "shell": "sh",
+  "checks": [],
+  "gate_scratch": [],
+  "gate_review": {
+    "rounds": 0,
+    "verdict": ""
+  },
   "tasks": [
     {
       "id": "T1",
@@ -16,9 +22,7 @@
       "goal": "g",
       "kind": "feature",
       "area": "cli",
-      "files": [
-        "f1.txt"
-      ],
+      "fixtures": "",
       "references": [],
       "depends_on": [],
       "acceptance": [],
@@ -33,9 +37,7 @@
       "goal": "g",
       "kind": "feature",
       "area": "config",
-      "files": [
-        "f2.txt"
-      ],
+      "fixtures": "",
       "references": [
         {
           "path": "docs/x.md",
@@ -59,9 +61,7 @@
       "goal": "g",
       "kind": "feature",
       "area": "docs",
-      "files": [
-        "f3.txt"
-      ],
+      "fixtures": "",
       "references": [
         {
           "path": "docs/",

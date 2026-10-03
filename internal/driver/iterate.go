@@ -453,19 +453,12 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		}
 	}
 
-	// A session does not rewrite the file its own gate runs. Restored from
-	// HEAD before any gate runs, and the work is not reviewable.
+	// A session does not touch the plan. Restored from HEAD before any gate
+	// runs, and the work is not reviewable.
 	tampered := ""
 	if guard.restoreIfTouched() {
 		tampered = it.r.Mask(tamperNote(PhaseWork))
 		it.warn("   STATE TAMPERING %s — %s was modified; restored, iteration failed", id, state.FilePath)
-	}
-	if moved := it.gateFilesMoved(task); len(moved) > 0 {
-		note := it.restoreGateFiles(id, moved)
-		if tampered != "" {
-			note = tampered + "; " + note
-		}
-		tampered = note
 	}
 
 	// 2. gates: every done task, plus this one if it claims done or blocked

@@ -18,10 +18,10 @@ const (
 	runBrief = "docs/briefs/" + runBriefName + ".md"
 )
 
-// planTask is a valid state/v1 task; over replaces fields.
+// planTask is a valid state/v2 task; over replaces fields.
 func planTask(id string, over map[string]any) map[string]any {
 	t := map[string]any{"id": id, "title": "Task " + id, "goal": "Do " + id + ".", "kind": "feature",
-		"files": []string{id + ".out"}, "references": []any{}, "depends_on": []string{},
+		"fixtures": "", "references": []any{}, "depends_on": []string{},
 		"acceptance": []string{id + ".out exists"}, "verify": "test -f " + id + ".out",
 		"status": "pending", "attempts": 0, "notes": ""}
 	for k, v := range over {
@@ -30,12 +30,13 @@ func planTask(id string, over map[string]any) map[string]any {
 	return t
 }
 
-// planJSON is a state/v1 plan for runBrief, as a planning session writes it.
+// planJSON is a state/v2 plan for runBrief, as a planning session writes it.
 func planJSON(t *testing.T, tasks ...map[string]any) string {
 	t.Helper()
-	b, err := json.MarshalIndent(map[string]any{"schema": "state/v1", "run_id": runID, "brief": runBrief,
+	b, err := json.MarshalIndent(map[string]any{"schema": "state/v2", "run_id": runID, "brief": runBrief,
 		"base": "", "branch": "", "status": "planning", "iteration": 0,
-		"created": "2026-01-01T09:00:00Z", "updated": "2026-01-01T09:00:00Z", "shell": "sh", "tasks": tasks}, "", "  ")
+		"created": "2026-01-01T09:00:00Z", "updated": "2026-01-01T09:00:00Z", "shell": "sh",
+		"checks": []any{map[string]any{"name": "all", "paths": []string{"**"}, "run": "true"}}, "gate_scratch": []string{}, "gate_review": map[string]any{"rounds": 0, "verdict": ""}, "tasks": tasks}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -285,40 +286,6 @@ func TestRun29BriefTypo(t *testing.T) {
 	}
 }
 
-func TestRun35GateUnownedFile(t *testing.T) {
-	// Rule 3: a gate may not read the bytes of a file already in HEAD that its
-	// task does not own — the driver reverts such a file before the gate runs,
-	// so no implementation could pass. One rejected shape, two accepted.
-	const verify = `grep -q TIMEOUT docs/todo.md && uv run pytest -q tests/test_thing.py`
-	setup := func(files []string, verify string) *runRepo {
-		r := newRunRepo(t)
-		r.write("docs/todo.md", "TIMEOUT=5\n")
-		r.write("tests/test_thing.py", "def test_x(): pass\n")
-		r.commitAll("pre-existing files")
-		r.planWith(planJSON(t, planTask("T1", map[string]any{"files": files, "verify": verify})))
-		return r
-	}
-
-	r := setup([]string{"lib/thing.py"}, verify)
-	res := r.vloop("run", "--plan-only", runBrief)
-	planRejected(t, r, res)
-	wantIn(t, "stderr", res.err, "gate shape rejected")
-	if !regexp.MustCompile(`T1 .*docs/todo\.md`).MatchString(res.err) {
-		t.Errorf("stderr does not name T1 and docs/todo.md:\n%s", res.err)
-	}
-
-	for name, s := range map[string]*runRepo{
-		"the path is owned":              setup([]string{"lib/thing.py", "docs/todo.md"}, verify),
-		"the path is handed to a runner": setup([]string{"lib/thing.py"}, `uv run pytest -q tests/test_thing.py`),
-	} {
-		res := s.vloop("run", "--plan-only", runBrief)
-		if res.code != 0 {
-			t.Errorf("%s: exit %d, want 0: %s", name, res.code, res.err)
-		}
-		wantNotIn(t, name+": output", s.outputs(res), "gate shape rejected")
-	}
-}
-
 func TestRun36GateDecayingBaseline(t *testing.T) {
 	// Rule 4: a gate may not diff, log or rev-list against a ref other than
 	// HEAD — that baseline decays the moment another task commits. A range that
@@ -526,7 +493,7 @@ func TestRunPlanCommit(t *testing.T) {
 	if err := json.Unmarshal([]byte(r.read(".vloop/state/state.json")), &plan); err != nil {
 		t.Fatal(err)
 	}
-	if plan.Schema != "state/v1" || plan.RunID != runID || plan.Brief != runBrief || plan.Branch != runID ||
+	if plan.Schema != "state/v2" || plan.RunID != runID || plan.Brief != runBrief || plan.Branch != runID ||
 		plan.Status != "running" || plan.Iteration != 0 || len(plan.Tasks) != 2 {
 		t.Errorf("the stamped plan: %+v", plan)
 	}

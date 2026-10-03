@@ -159,7 +159,7 @@ esac
 // on the next pair.
 func TestRun42RepeatBlockedHalts(t *testing.T) {
 	plan := func(t *testing.T) string {
-		return planJSON(t, planTask("T1", map[string]any{"files": []string{"thing.txt"}}))
+		return planJSON(t, planTask("T1", nil))
 	}
 	env := []string{"VLOOP_RUN_STALL_LIMIT=9", "VLOOP_RUN_MAX_ATTEMPTS=5", "VLOOP_RUN_CONVERGENCE_MIN=99"}
 	endOf := func(res result) string {

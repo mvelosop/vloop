@@ -10,3 +10,8 @@ committing the plan
    Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
    GATE DISPUTE T2 — blocked for the operator; no review, no attempt charged
    T2 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 3 (3 this run) · T4 · 1/16 done ──
+   Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
+   review: PASS
+   T4 done

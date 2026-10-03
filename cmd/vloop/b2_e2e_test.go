@@ -9,12 +9,12 @@ import (
 	"testing"
 )
 
-const b2Plan = `{"schema":"state/v1","run_id":"B20260101-0900-a","brief":"docs/briefs/B20260101-0900-a.loop-brief.md",` +
+const b2Plan = `{"schema":"state/v2","run_id":"B20260101-0900-a","brief":"docs/briefs/B20260101-0900-a.loop-brief.md",` +
 	`"base":"0123456789abcdef0123456789abcdef01234567","branch":"B20260101-0900-a","status":"running","iteration":2,` +
-	`"created":"2026-01-01T09:00:00Z","updated":"2026-01-01T09:00:00Z","shell":"sh","tasks":[` +
-	`{"id":"T1","title":"Skeleton","goal":"g","kind":"feature","area":"cli","files":[],"references":[],"depends_on":[],"acceptance":["a"],"verify":"test -f skeleton.txt","status":"done","attempts":0,"notes":""},` +
-	`{"id":"T2","title":"Config","goal":"g","kind":"feature","area":"config","files":[],"references":[],"depends_on":["T1"],"acceptance":["a"],"verify":"test -f config.txt","status":"pending","attempts":1,"notes":"","model":{"work":"opus"}},` +
-	`{"id":"T3","title":"README","goal":"g","kind":"docs","area":"docs","files":[],"references":[],"depends_on":["T2"],"acceptance":["a"],"verify":"test -f README.md","status":"pending","attempts":0,"notes":""}]}`
+	`"created":"2026-01-01T09:00:00Z","updated":"2026-01-01T09:00:00Z","shell":"sh","checks":[],"gate_scratch":[],"gate_review":{"rounds":0,"verdict":""},"tasks":[` +
+	`{"id":"T1","title":"Skeleton","goal":"g","kind":"feature","area":"cli","fixtures":"","references":[],"depends_on":[],"acceptance":["a"],"verify":"test -f skeleton.txt","status":"done","attempts":0,"notes":""},` +
+	`{"id":"T2","title":"Config","goal":"g","kind":"feature","area":"config","fixtures":"","references":[],"depends_on":["T1"],"acceptance":["a"],"verify":"test -f config.txt","status":"pending","attempts":1,"notes":"","model":{"work":"opus"}},` +
+	`{"id":"T3","title":"README","goal":"g","kind":"docs","area":"docs","fixtures":"","references":[],"depends_on":["T2"],"acceptance":["a"],"verify":"test -f README.md","status":"pending","attempts":0,"notes":""}]}`
 
 const planPath = ".vloop/state/state.json"
 
@@ -124,8 +124,8 @@ func TestWorkedExampleB2Commands(t *testing.T) {
 		t.Fatalf("task list after reset: %+v", r)
 	}
 
-	expect(t, s.run(nil, "schema", "list"), 0, "defect/v1\nexport/v1\ninstall/v1\nintervention/v1\niteration/v1\nmetrics/v1\nproposal/v1\nsession/v1\nstate/v1\nverdict/v1\n", "")
-	expect(t, s.run(nil, "schema", "validate", "state/v1", planPath), 0, planPath+": ok\n", "")
+	expect(t, s.run(nil, "schema", "list"), 0, "defect/v1\nexport/v1\ngate-verdict/v1\ninstall/v1\nintervention/v1\niteration/v1\niteration/v2\nmetrics/v1\nmetrics/v2\nproposal/v1\nsession/v1\nsession/v2\nstate/v1\nstate/v2\nverdict/v1\n", "")
+	expect(t, s.run(nil, "schema", "validate", "state/v2", planPath), 0, planPath+": ok\n", "")
 }
 
 func TestWorkedExampleB2PlantedFailures(t *testing.T) {

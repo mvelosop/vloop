@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/16 done** · iteration 2
+**Status:** running · **2/16 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T21:48:10Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T22:04:40Z
 
 ## Progress
 
 - [x] **T1** — Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
 - [ ] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config · **blocked**
 - [ ] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
-- [ ] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
+- [x] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
 - [ ] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
 - [ ] **T6** — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
 - [ ] **T7** — Run every check on the base before planning, refuse without one, and copy the checks into the plan
@@ -107,7 +107,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T4 — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 **Files:** `internal/state/`, `internal/driver/plan.go`, `internal/driver/gateshape.go`, `internal/driver/gates.go`, `internal/driver/iterate.go`, `internal/driver/plan_test.go`, `internal/driver/gates_test.go`, `internal/driver/iterate_test.go`, `internal/cli/run.go`, `internal/cli/status.go`, `internal/cli/status_test.go`, `internal/cli/task_validate.go`, `internal/cli/doctor_test.go`, `internal/runs/`, `cmd/vloop/`
 

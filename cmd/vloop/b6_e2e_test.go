@@ -234,6 +234,11 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	}
 
 	r := &runRepo{t: t, dir: clone, home: src.home, stub: src.stub}
+	// The clone carries this repository's live plan, which may be a state/v1
+	// one that vloop run refuses; the run below plans a fresh brief.
+	if err := os.Remove(filepath.Join(clone, ".vloop", "state", "state.json")); err != nil && !os.IsNotExist(err) {
+		t.Fatal(err)
+	}
 	r.write("docs/x.md", "x\n")
 	r.write("docs/briefs/"+runBriefName+".md", runBriefText())
 	r.commitAll("fixture brief")

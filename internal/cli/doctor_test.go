@@ -148,10 +148,11 @@ func (e *doctorEnv) plan(status, shell string) {
 	e.t.Helper()
 	e.write("docs/briefs/B20260101-0900-a.loop-brief.md", "x\n")
 	doc, _ := json.Marshal(map[string]any{
-		"schema": "state/v1", "run_id": "B20260101-0900-a", "brief": "docs/briefs/B20260101-0900-a.loop-brief.md",
+		"schema": "state/v2", "run_id": "B20260101-0900-a", "brief": "docs/briefs/B20260101-0900-a.loop-brief.md",
 		"base": strings.Repeat("0123456789", 4), "branch": "B20260101-0900-a", "status": status, "iteration": 0,
 		"created": "2026-01-01T09:00:00Z", "updated": "2026-01-01T09:00:00Z", "shell": shell,
-		"tasks": []any{map[string]any{"id": "T1", "title": "t", "goal": "g", "kind": "feature", "files": []string{},
+		"checks": []any{}, "gate_scratch": []string{}, "gate_review": map[string]any{"rounds": 0, "verdict": ""},
+		"tasks": []any{map[string]any{"id": "T1", "title": "t", "goal": "g", "kind": "feature", "fixtures": "",
 			"references": []any{}, "depends_on": []string{}, "acceptance": []string{"a"}, "verify": "true",
 			"status": "pending", "attempts": 0, "notes": ""}},
 	})

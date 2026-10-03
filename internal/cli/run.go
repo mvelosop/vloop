@@ -14,6 +14,7 @@ import (
 	"github.com/mvelosop/vloop/internal/brief"
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/driver"
+	"github.com/mvelosop/vloop/internal/state"
 )
 
 // runBudgetFlags maps each budget flag to the config key it overrides.
@@ -35,6 +36,9 @@ func newRun(b Build, g *Globals) *cobra.Command {
 			root, err := g.root()
 			if err != nil {
 				return err
+			}
+			if p, err := state.Load(root); err == nil && p.Schema == state.SchemaV1 {
+				return Problem(fmt.Errorf("%s is a %s plan — finish it with vloop 1.x or re-plan the brief", state.FilePath, state.SchemaV1))
 			}
 			over := map[string]string{}
 			for i, f := range runBudgetFlags {
