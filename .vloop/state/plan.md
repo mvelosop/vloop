@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **16/18 done** · iteration 20
+**Status:** running · **16/18 done** · iteration 21
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T11:11:16Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T11:15:51Z
 
 ## Progress
 
@@ -24,7 +24,7 @@
 - [x] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
 - [x] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
 - [x] **T16** — Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
-- [ ] **T17** — Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
+- [ ] **T17** — Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4) · **blocked**
 - [ ] **T18** — Close B8: the worked example line for line, every check at once, and the real-data check
 
 ## Tasks
@@ -416,7 +416,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T17 — Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
 
-`pending` · depends on: T1, T2, T3, T4, T7, T12
+`blocked` · **blocked** · depends on: T1, T2, T3, T4, T7, T12
 
 **Files:** `docs/domain/domain-model.md`, `docs/domain/execution/session.md`, `docs/domain/execution/run.md`, `docs/domain/execution/task.md`, `docs/domain/briefing/brief.md`, `docs/guide/concepts.md`
 
@@ -428,6 +428,8 @@ The behaviour B8 adds has to be where the next brief's architect and every sessi
 - S-4 is added: "A session writes nothing under `.git/` and nothing under `.vloop/` but `.vloop/tmp/` — the plan session also writes the plan."; R-3's exit 9 reads "refs or repository configuration moved"; R-4 is added: "A run plans only a `ready` brief that passes the check, with its dependencies consumed, from a clean tree; every gate and session runs under a timeout and leaves no process behind." Nothing else in domain-model.md changes.
 - docs/domain/execution/session.md, run.md and task.md, and docs/domain/briefing/brief.md, describe the B8 behaviour where they describe the same thing today: per-phase fences, restored inputs and VLOOP_PLAN_SHA256; the timeouts, the clean-tree preflight and exit 9; timed-out gates, one gate runner and token-matched gate files; vloop run enforcing status and dependencies.
 - The exit-code table of docs/guide/concepts.md says 9 is refs or repository configuration moved, and TestGuideExitCodesMatchDriver passes.
+
+**From the last attempt:** gate disputed: The gate runs vloop brief check over every brief in docs/briefs/, including the brief being run, which the checker always rejects once its journal exists. — Clause '"$B" brief check docs/briefs/*.loop-brief.md' exits 1 with '✗ already run — .vloop/state/journals/B20261002-2135-vloop-v1-security.md exists'; no docs change can alter that.
 
 <details><summary>verify command</summary>
 

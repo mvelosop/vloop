@@ -6,3 +6,7 @@
    Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
    review: PASS
    T12 done
+── iteration 21 (3 this run) · T17 · 16/18 done ──
+   Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
+   GATE DISPUTE T17 — blocked for the operator; no review, no attempt charged
+   T17 blocked — the operator resolves the disputed gate with vloop task verify

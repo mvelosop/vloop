@@ -115,7 +115,7 @@ its own, one per way a run can end:
 | `6` | cost ceiling: `run.cost-ceiling` is reached | yes, with a higher ceiling |
 | `7` | session error: a session failed to run | no |
 | `8` | repeat blocked: a task blocked twice with nothing changed | no |
-| `9` | refs moved: a session moved git refs; nothing was committed | no — restore the refs first |
+| `9` | refs or repository configuration moved: a session or a gate changed a ref, `.git/config` or the git hooks; nothing was committed | no — restore the refs first |
 
 Resuming is running `vloop run` again on the work branch. Errors go to stderr as
 one line starting with `vloop: `.

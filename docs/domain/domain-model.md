@@ -183,7 +183,8 @@ marked.
 
 - **S-1** A session is a fresh process; sessions share nothing but files.
 - **S-2** Sessions never commit, never set status and never move git refs. The
-  fence denies the commands; the driver halts (exit 9) if a ref moves anyway.
+  fence denies the commands. The fence is advisory; the driver is the boundary. It halts (exit 9) if a ref, `.git/config` or the git hooks change during a session or a gate, and restores what a session changed among the driver's inputs.
+- **S-4** A session writes nothing under `.git/` and nothing under `.vloop/` but `.vloop/tmp/` — the plan session also writes the plan.
 - **S-3** A work session does exactly one task. A review session judges it
   independently, from the diff and the acceptance, not from the proposal's
   summary.
@@ -196,7 +197,8 @@ marked.
   default branch. *(Enforced by `vloop run`, which creates the work branch.)*
 - **R-3** A run ends with one of the driver's exit codes: 0 complete, 1
   preflight, 2 blocked, 3 stalled, 4 max iterations, 5 not converging, 6 cost
-  ceiling, 7 session error, 8 repeat blocked, 9 refs moved.
+  ceiling, 7 session error, 8 repeat blocked, 9 refs or repository configuration moved.
+- **R-4** A run plans only a `ready` brief that passes the check, with its dependencies consumed, from a clean tree; every gate and session runs under a timeout and leaves no process behind.
 
 ### Measurement — M
 

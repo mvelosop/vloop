@@ -24,8 +24,13 @@ run.log                     the driver's own log (the shell loop's is loop.log)
 The driver buffers `run.log` and writes it only just before each commit, and
 the metrics snapshot into the next commit, so no tracked file is dirty while a
 session or a gate runs. Before each commit it checks that HEAD is where it was
-(a session that moved refs halts the run, exit 9). A gate that disputes itself
+(a session or gate that moved refs, `.git/config` or the git hooks halts the run, exit 9). A gate that disputes itself
 (`gate_dispute` in a proposal) blocks its task at once and charges no attempt.
+
+Before planning, the preflight requires a `ready` brief that passes the check,
+with its dependencies consumed, and a clean tree (R-4). Every gate and session
+runs under a timeout — `run.gate-timeout` and `run.session-timeout`, in minutes
+— and leaves no process behind; a timed-out gate fails like any failed gate.
 
 A brief owns every run folder whose log says it planned from the brief or
 resumed its run id; a folder that did neither is ignored.
@@ -84,7 +89,7 @@ with one exit code (R-3):
 | 6 | cost ceiling | yes, with a higher ceiling |
 | 7 | session error | no |
 | 8 | repeat blocked, nothing changed | no |
-| 9 | a session moved git refs; nothing committed | no — restore the refs first |
+| 9 | refs or repository configuration moved; nothing committed | no — restore the refs first |
 
 ## Gaps
 

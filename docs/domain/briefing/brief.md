@@ -43,7 +43,8 @@ stateDiagram-v2
   abandoned --> [*]
 ```
 
-- Only `ready` is checked by `brief check` and planned by the loop (B-2).
+- Only `ready` is checked by `brief check` and planned by the loop (B-2);
+  `vloop run` enforces it, and that every dependency is `consumed`, from a clean tree (R-4).
 - `consumed` and `abandoned` are terminal. Re-planning a consumed brief would
   reset the plan and re-derive merged work; both the checker (its journal
   exists) and the body status line refuse it.
