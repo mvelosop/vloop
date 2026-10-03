@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T18",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "cmd/vloop/b8_e2e_test.go holds TestWorkedExampleB8, which plays every line of the brief's worked example with the stub claude in a temp repo and asserts its exit codes, messages and effects; it uses no absolute path in anything it commits.", "met": true, "evidence": "cmd/vloop/b8_e2e_test.go has 14 subtests, one per line of the brief's worked example. Each asserts the exit code, the quoted message and the effect (no sleep left, evil branch absent, revert, redaction, pid named). Paths come from the temp repo helpers, and none are written into committed files."},
+    {"criterion": "go test ./... passes, as do gofmt, go vet, go mod tidy -diff and the linux and windows builds.", "met": true, "evidence": "gates/T18.log ends with GATE OK, and the gate runs all of these checks."},
+    {"criterion": "On this repository, vloop metrics --json for every consumed brief (B1–B7), from a build of the tree, is byte-identical to the output of a build of the plan's base commit.", "met": true, "evidence": "The gate builds the base commit, runs cmp on the metrics output of each consumed brief, requires at least 7 briefs, and ended GATE OK."},
+    {"criterion": "vloop doctor with the released v0.7.0 on PATH reports self-hosting as passed; a build of HEAD is warned about.", "met": true, "evidence": "The gate checks self-hosting == pass for the PATH binary and == warning for a HEAD build, and ended GATE OK."}
+  ],
+  "findings": [],
+  "notes": "The only change to an existing file is a gate log under .vloop/state/runs (T10.log, a temp dir name that differs), which is driver state and not a goalpost move. The test relies on helpers from the earlier run tests (newRunRepo, scripted, and others)."
+}

@@ -2,3 +2,7 @@
    Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
    review: PASS
    T17 done
+── iteration 23 (2 this run) · T18 · 17/18 done ──
+   Close B8: the worked example line for line, every check at once, and the real-data check
+   review: PASS
+   T18 done

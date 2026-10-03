@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T18",
+  "outcome": "done",
+  "summary": "cmd/vloop/b8_e2e_test.go adds TestWorkedExampleB8: one subtest per line of the brief's worked example, each in its own temp repo with the stub claude, asserting exit codes, messages and effects.",
+  "files": ["cmd/vloop/b8_e2e_test.go"],
+  "verified": "vloop task gate T18 exited 0 and printed GATE OK (metrics byte-identical for B1-B7, doctor pass/warning, full suite, vet, gofmt, tidy, linux and windows builds).",
+  "notes": "The gate-timeout subtest takes about two minutes because run.gate-timeout has a floor of 1 minute and the e2e binary has no timeout seam; it is t.Parallel so it overlaps the other subtests. Sleep-leak checks use distinctive sleep durations (1017, 1018) with pgrep."
+}

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **17/18 done** · iteration 22
+**Status:** running · **18/18 done** · iteration 23
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T11:21:46Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T11:45:37Z
 
 ## Progress
 
@@ -25,7 +25,7 @@
 - [x] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
 - [x] **T16** — Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
 - [x] **T17** — Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
-- [ ] **T18** — Close B8: the worked example line for line, every check at once, and the real-data check
+- [x] **T18** — Close B8: the worked example line for line, every check at once, and the real-data check
 
 ## Tasks
 
@@ -439,7 +439,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T18 — Close B8: the worked example line for line, every check at once, and the real-data check
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
+`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
 
 **Files:** `cmd/vloop/b8_e2e_test.go`
 
