@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/schema"
 	"github.com/mvelosop/vloop/internal/state"
 )
@@ -162,6 +163,17 @@ func (it *Iterator) Run() (Ending, error) {
 		Timeout: it.sessionTimeout()}
 	if it.AwakeWarn != "" {
 		it.r.Logf("%s", AwakeWarning(it.AwakeWarn))
+	}
+
+	// A resume takes the config's checks as they are now.
+	if defs, err := config.Checks(it.Root); err == nil {
+		if now := planChecks(defs); !sameChecks(plan.Checks, now) {
+			it.r.Logf("the checks changed since the plan was made: were %s, now %s", checkNames(plan.Checks), checkNames(now))
+			plan.Checks = now
+			if err := it.save(); err != nil {
+				return Ending{}, err
+			}
+		}
 	}
 
 	if it.resolved, err = ResolveRun(it.Root); err != nil {

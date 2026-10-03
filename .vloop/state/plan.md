@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/16 done** · iteration 10
+**Status:** running · **7/16 done** · iteration 11
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T23:15:31Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T23:32:12Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
 - [x] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify · 1 attempt(s)
 - [x] **T6** — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate · 1 attempt(s)
-- [ ] **T7** — Run every check on the base before planning, refuse without one, and copy the checks into the plan
+- [x] **T7** — Run every check on the base before planning, refuse without one, and copy the checks into the plan
 - [ ] **T8** — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
 - [ ] **T9** — Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
 - [ ] **T10** — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
@@ -179,7 +179,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T7 — Run every check on the base before planning, refuse without one, and copy the checks into the plan
 
-`pending` · depends on: T2, T3, T4
+`done` · depends on: T2, T3, T4
 
 **Files:** `internal/driver/checks.go`, `internal/driver/checks_test.go`, `internal/driver/plan.go`, `internal/cli/run.go`, `cmd/vloop/run_preflight_test.go`, `cmd/vloop/run_plan_test.go`
 

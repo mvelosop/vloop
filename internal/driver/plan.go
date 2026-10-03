@@ -282,6 +282,13 @@ func (p *Planner) Plan() (*PlanResult, error) {
 			return nil, halt(ExitPreflight, "gate scratch %s is not ignored by git — add it to .gitignore", d)
 		}
 	}
+	checkDefs, err := config.Checks(root)
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	if len(checkDefs) == 0 {
+		return nil, halt(ExitPreflight, "no check configured — add a [[check]] to .vloop/config.toml")
+	}
 	if err := requireCleanTree(root, resuming); err != nil {
 		return nil, err
 	}
@@ -303,6 +310,37 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 
 	runID := brief.RunID(briefPath)
+	if err := p.workBranchFree(runID); err != nil {
+		return nil, err
+	}
+	runDir, err := newRunDir(root, runID, p.now())
+	if err != nil {
+		return nil, err
+	}
+	logFile, err := os.OpenFile(filepath.Join(runDir, "run.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
+	if err != nil {
+		return nil, err
+	}
+	defer logFile.Close()
+	r := &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
+		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
+	t := term{p, r}
+
+	// Every check passes on the base before the branch is made or anything is
+	// planned: one that fails would be blamed on the first task.
+	shell, err := config.Get(root, "shell")
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	gt, err := config.Get(root, "run.gate-timeout")
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	gateMin, _ := strconv.Atoi(gt.Value)
+	if err := t.baseChecks(planChecks(checkDefs), shell.Value, time.Duration(gateMin)*time.Minute); err != nil {
+		return nil, err
+	}
+
 	if c, err := p.workBranch(runID); err != nil {
 		return nil, err
 	} else if c != "" {
@@ -320,18 +358,6 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		}
 	}
 
-	runDir, err := newRunDir(root, runID, p.now())
-	if err != nil {
-		return nil, err
-	}
-	logFile, err := os.OpenFile(filepath.Join(runDir, "run.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
-	if err != nil {
-		return nil, err
-	}
-	defer logFile.Close()
-	r := &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
-		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
-	t := term{p, r}
 	if p.PlanOnly && p.AwakeWarn != "" {
 		r.Logf("%s", AwakeWarning(p.AwakeWarn))
 	}
@@ -427,8 +453,8 @@ func (p *Planner) workBranch(runID string) (string, error) {
 	if !OnDefaultBranch(p.Root) {
 		return "", nil
 	}
-	if exists := gitCmd(p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
-		return "", halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
+	if err := p.workBranchFree(runID); err != nil {
+		return "", err
 	}
 	if _, err := git(p.Root, "switch", "-q", "-c", runID); err != nil {
 		return "", halt(ExitPreflight, "cannot create branch %s: %v", runID, err)
@@ -437,6 +463,18 @@ func (p *Planner) workBranch(runID string) (string, error) {
 		fmt.Fprintf(p.Out, "created and switched to branch %s\n", runID)
 	}
 	return runID, nil
+}
+
+// workBranchFree refuses when the run would branch off the default branch and
+// the branch for its run id already exists.
+func (p *Planner) workBranchFree(runID string) error {
+	if !OnDefaultBranch(p.Root) {
+		return nil
+	}
+	if gitCmd(p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil {
+		return halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
+	}
+	return nil
 }
 
 // bareTerm is a terminal without a run: progress goes to stdout only.
@@ -551,6 +589,10 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	// to record it: which run, brief and branch the plan belongs to.
 	plan.RunID, plan.Brief, plan.Branch = runID, briefPath, branch
 	plan.Status = "running"
+	// The plan's checks are the config's, whatever the session wrote.
+	if defs, err := config.Checks(root); err == nil {
+		plan.Checks = planChecks(defs)
+	}
 	if v, err := config.Get(root, "run.gate-scratch"); err == nil {
 		plan.GateScratch = append([]string{}, v.List...)
 	}

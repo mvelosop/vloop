@@ -154,13 +154,14 @@ func runBriefPath(g *Globals, root, arg string) (string, error) {
 // only warns about stop a run: an untrusted workspace, whose settings Claude
 // would silently ignore, and — as a warning here — an active pre-commit hook.
 // The branch check is not run's business: it creates the work branch itself;
-// nor is gate scratch, which the planner refuses in its own words.
+// nor are gate scratch and the checks, which the planner refuses in its own
+// words.
 func runPreflight(b Build, root string, cmd *cobra.Command) error {
 	errOut := cmd.ErrOrStderr()
 	bad := 0
 	for _, c := range runDoctor(b, root) {
 		switch {
-		case c.Name == "branch", c.Name == "gate scratch": // the planner refuses an un-ignored scratch folder itself
+		case c.Name == "branch", c.Name == "gate scratch", c.Name == "checks": // the planner refuses these itself, in its own words
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++

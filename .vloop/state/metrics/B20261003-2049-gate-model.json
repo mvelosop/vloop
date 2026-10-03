@@ -43,30 +43,30 @@
     "rework": 1.0011848341232228
   },
   "time": {
-    "agent_ms": 4996794,
-    "work_ms": 4640545,
-    "review_ms": 356249,
+    "agent_ms": 5532372,
+    "work_ms": 5152492,
+    "review_ms": 379880,
     "plan_ms": 2493754,
-    "gates_ms": 96849,
+    "gates_ms": 164418,
     "wall_ms": 2714000
   },
   "rate": {
-    "code_per_min": 10.134498240271663,
-    "code_test_per_min": 17.13498695363467
+    "code_per_min": 9.153397493877852,
+    "code_test_per_min": 15.476182729577838
   },
   "cost": {
-    "total_usd": 15.101176200000001,
+    "total_usd": 15.530130000000002,
     "plan_usd": 9.2589652,
-    "work_usd": 4.590228000000001,
-    "review_usd": 1.251983,
-    "per_1000_code_lines_usd": 17.892388862559244
+    "work_usd": 4.870037600000001,
+    "review_usd": 1.4011272000000001,
+    "per_1000_code_lines_usd": 18.40062796208531
   },
   "tokens": {
-    "input": 574,
-    "output": 288472,
-    "cache_read": 25916401,
-    "cache_creation": 998973,
-    "cache_hit_ratio": 0.9628641354188974
+    "input": 610,
+    "output": 295477,
+    "cache_read": 26520240,
+    "cache_creation": 1058489,
+    "cache_hit_ratio": 0.9615981006651392
   },
   "models": {
     "plan": [
@@ -98,8 +98,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 9,
-  "iterations_per_closed": 3,
+  "iterations": 10,
+  "iterations_per_closed": 3.3333333333333335,
   "by_task": [
     {
       "id": "T1",
@@ -220,7 +220,7 @@
       "id": "T6",
       "area": null,
       "kind": "feature",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
         "code": 0,
         "test": 0,
@@ -233,8 +233,8 @@
           "other": 0
         }
       },
-      "agent_ms": 901884,
-      "cost_usd": 0.8168617999999999,
+      "agent_ms": 1437462,
+      "cost_usd": 1.2458156,
       "models": [
         "claude-sonnet-5-5"
       ]

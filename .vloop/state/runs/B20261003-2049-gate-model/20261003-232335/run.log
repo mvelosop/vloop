@@ -17,3 +17,7 @@
    Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
    review: PASS
    T6 done
+── iteration 11 (6 this run) · T7 · 6/16 done ──
+   Run every check on the base before planning, refuse without one, and copy the checks into the plan
+   review: PASS
+   T7 done
