@@ -6,3 +6,7 @@
    Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
    review: PASS
    T2 done
+── iteration 8 (3 this run) · T3 · 4/16 done ──
+   Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
+   review: PASS
+   T3 done

@@ -19,6 +19,10 @@ type doctorEnv struct {
 	plugins string
 }
 
+// doctorCheckConfig is a config with the one check a repository needs to pass
+// doctor.
+const doctorCheckConfig = "[[check]]\nname = \"all\"\npaths = [\"**\"]\nrun = \"true\"\n"
+
 // newDoctorEnv is a committed git repository with an identity, a stub claude
 // first on PATH, and a fake home that trusts the repository.
 func newDoctorEnv(t *testing.T) *doctorEnv {
@@ -49,6 +53,7 @@ func newDoctorEnv(t *testing.T) *doctorEnv {
 	e.claude(true)
 	e.trust(true)
 	e.run("init") // stamp at 0.1.0
+	e.write(".vloop/config.toml", doctorCheckConfig)
 	return e
 }
 
@@ -281,7 +286,7 @@ func TestDoctorStacks(t *testing.T) {
 		t.Errorf("a stacks check without a scoped entry:\n%s", out)
 	}
 	e.write("services/api/x", "x")
-	e.write(".vloop/config.toml", "[metrics]\nstacks = [\"go\", \"csharp@services/api\"]\n")
+	e.write(".vloop/config.toml", "[metrics]\nstacks = [\"go\", \"csharp@services/api\"]\n\n"+doctorCheckConfig)
 	e.want("stacks", resPass)
 	if err := os.RemoveAll(filepath.Join(e.repo, "services")); err != nil {
 		t.Fatal(err)
@@ -340,5 +345,26 @@ func TestDoctorWritesNothing(t *testing.T) {
 	e.run("--json", "doctor")
 	if snap() != before {
 		t.Error("doctor changed files")
+	}
+}
+
+func TestDoctorChecksAndGateScratch(t *testing.T) {
+	e := newDoctorEnv(t)
+	cfg := doctorCheckConfig
+	e.write(".vloop/config.toml", "language = \"en\"\n")
+	if c := e.want("checks", resProblem); !strings.Contains(c.Message, "[[check]]") {
+		t.Errorf("message %q", c.Message)
+	}
+	e.write(".vloop/config.toml", cfg)
+	if out, _ := e.run("--json", "doctor"); strings.Contains(out, `"name":"checks"`) || strings.Contains(out, `"result":"problem"`) {
+		t.Errorf("a problem with a check configured:\n%s", out)
+	}
+	e.write(".vloop/config.toml", "run.gate-scratch = [\"web/.gate/\"]\n\n"+cfg)
+	if c := e.want("gate scratch", resProblem); !strings.Contains(c.Message, "web/.gate/") {
+		t.Errorf("message %q", c.Message)
+	}
+	e.write(".gitignore", "web/.gate/\n")
+	if out, _ := e.run("--json", "doctor"); strings.Contains(out, `"result":"problem"`) {
+		t.Errorf("a problem once the folder is ignored:\n%s", out)
 	}
 }

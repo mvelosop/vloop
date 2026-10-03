@@ -8,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/detect"
 	"github.com/mvelosop/vloop/internal/install"
 )
 
@@ -73,11 +75,26 @@ func runUpgrade(b Build, g *Globals, cmd *cobra.Command, dryRun, yes bool, now t
 	if err := checkRepoPath(root, install.Path); err != nil {
 		return Problem(err)
 	}
+	// A repository with no check gets starting points; one that has any is
+	// never touched.
+	var starter []config.CheckDef
+	if cur, err := config.Checks(root); err != nil {
+		return Problem(err)
+	} else if len(cur) == 0 {
+		detected, err := detect.Stacks(root)
+		if err != nil {
+			return Problem(err)
+		}
+		starter = detect.StarterChecks(detected)
+	}
 
 	breaking := rel != install.Newer && !yes
 	if dryRun || breaking {
 		for _, c := range changes {
 			fmt.Fprintf(out, "would update %s\n", c.path)
+		}
+		for _, c := range starter {
+			fmt.Fprintf(out, "would add check %s\n", detect.FormatCheck(c))
 		}
 		if breaking && !dryRun {
 			return Problem(fmt.Errorf("%s → %s may break this repository's setup — review the changes above, then run vloop upgrade --yes", st.Version, b.Version))
@@ -90,6 +107,15 @@ func runUpgrade(b Build, g *Globals, cmd *cobra.Command, dryRun, yes bool, now t
 			return Problem(err)
 		}
 		fmt.Fprintf(out, "updated %s\n", c.path)
+	}
+	if len(starter) > 0 {
+		if err := config.AddChecks(root, starter); err != nil {
+			return Problem(err)
+		}
+		for _, c := range starter {
+			fmt.Fprintf(out, "added check %s\n", detect.FormatCheck(c))
+		}
+		fmt.Fprintln(out, "each check is a starting point — edit it in "+config.FilePath)
 	}
 	up := now.UTC().Format("2006-01-02T15:04:05Z")
 	st.Version, st.Commit, st.Upgraded = b.Version, b.Commit, &up

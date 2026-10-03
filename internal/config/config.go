@@ -424,6 +424,46 @@ func Checks(root string) ([]CheckDef, error) {
 	return parseChecks(file)
 }
 
+// AddChecks appends [[check]] tables to the config file under root, creating
+// the file when absent. It refuses when a check of the same name exists, and
+// every other key is preserved.
+func AddChecks(root string, add []CheckDef) error {
+	if len(add) == 0 {
+		return nil
+	}
+	file, _, err := readFile(root)
+	if err != nil {
+		return err
+	}
+	cur, err := parseChecks(file)
+	if err != nil {
+		return err
+	}
+	tables := []map[string]any{}
+	taken := map[string]bool{}
+	for _, c := range cur {
+		taken[c.Name] = true
+		tables = append(tables, map[string]any{"name": c.Name, "paths": c.Paths, "run": c.Run})
+	}
+	for _, c := range add {
+		if taken[c.Name] {
+			return fmt.Errorf("check %q already exists", c.Name)
+		}
+		taken[c.Name] = true
+		tables = append(tables, map[string]any{"name": c.Name, "paths": c.Paths, "run": c.Run})
+	}
+	file["check"] = tables
+	var buf bytes.Buffer
+	if err := toml.NewEncoder(&buf).Encode(file); err != nil {
+		return err
+	}
+	p := filePath(root)
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(p, buf.Bytes(), 0o644)
+}
+
 // Get resolves one key under root.
 func Get(root, name string) (Value, error) {
 	k, err := Lookup(name)

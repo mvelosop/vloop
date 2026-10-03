@@ -107,6 +107,10 @@ func runBriefText() string {
 // the repository's own config, vloop init, a ready brief, all committed; a fake
 // home trusting it; the stub claude (no script yet). It skips where the stub
 // cannot run.
+// runCheckConfig is the config a run repository carries: vloop 2 refuses to
+// run a repository with no [[check]].
+const runCheckConfig = "[[check]]\nname = \"all\"\npaths = [\"**\"]\nrun = \"true\"\n"
+
 func newRunRepo(t *testing.T) *runRepo {
 	t.Helper()
 	if runtime.GOOS == "windows" {
@@ -143,6 +147,7 @@ func newRunRepo(t *testing.T) *runRepo {
 	if res := r.vloop("init"); res.code != 0 {
 		t.Fatalf("vloop init: %+v", res)
 	}
+	r.write(".vloop/config.toml", runCheckConfig)
 	r.write("docs/briefs/"+runBriefName+".md", runBriefText())
 	runGit(t, r.dir, "add", "-A")
 	runGit(t, r.dir, "commit", "-q", "-m", "harness: init and brief")

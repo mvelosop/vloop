@@ -119,6 +119,26 @@ func runDoctor(b Build, root string) []doctorCheck {
 		add("config", resPass, "")
 	}
 
+	if cerr == nil {
+		if cks, err := config.Checks(root); err == nil && len(cks) == 0 {
+			add("checks", resProblem, "no [[check]] is configured — a run needs at least one; see docs/guide/configuration.md")
+		}
+		for _, v := range vals {
+			if v.Key != "run.gate-scratch" {
+				continue
+			}
+			var loose []string
+			for _, d := range v.List {
+				if isRepo && !gitIgnored(root, d) {
+					loose = append(loose, d)
+				}
+			}
+			if len(loose) > 0 {
+				add("gate scratch", resProblem, strings.Join(loose, ", ")+" is not ignored by git — add it to .gitignore")
+			}
+		}
+	}
+
 	_, lerr := exec.LookPath("claude")
 	hasClaude := lerr == nil
 	switch {
@@ -250,6 +270,13 @@ func doctorGit(root string, add func(name, result, msg string)) (bool, string) {
 	}
 	head, _ := gitOut(root, "rev-parse", "HEAD")
 	return true, head
+}
+
+// gitIgnored reports whether git ignores the repo-relative folder rel, as it
+// would the files a gate leaves in it.
+func gitIgnored(root, rel string) bool {
+	probe := strings.TrimSuffix(rel, "/") + "/.vloop-probe"
+	return exec.Command("git", "-C", root, "check-ignore", "-q", "--no-index", "--", probe).Run() == nil
 }
 
 func gitOut(root string, args ...string) (string, error) {

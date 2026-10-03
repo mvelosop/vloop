@@ -239,6 +239,7 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if err := os.Remove(filepath.Join(clone, ".vloop", "state", "state.json")); err != nil && !os.IsNotExist(err) {
 		t.Fatal(err)
 	}
+	r.write(".vloop/config.toml", r.read(".vloop/config.toml")+"\n"+runCheckConfig)
 	r.write("docs/x.md", "x\n")
 	r.write("docs/briefs/"+runBriefName+".md", runBriefText())
 	r.commitAll("fixture brief")

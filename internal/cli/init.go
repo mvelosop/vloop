@@ -104,9 +104,15 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 		chosen = o.stacks
 	}
 
+	starter := detect.StarterChecks(strings.Split(chosen, ","))
 	var steps []initStep
 	// 1. config
 	if haveConfig {
+		if cur, err := config.Checks(root); err == nil && len(cur) == 0 {
+			for _, c := range starter {
+				fmt.Fprintln(out, "suggest check: "+detect.FormatCheck(c))
+			}
+		}
 		steps = append(steps, initStep{path: config.FilePath, verb: "kept"})
 		if cur, err := config.Get(root, "metrics.stacks"); err == nil {
 			var missing []string
@@ -128,11 +134,19 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 			if err := config.Set(root, "language", lang); err != nil {
 				return err
 			}
-			if chosen == "" {
-				return nil
+			if chosen != "" {
+				if err := config.Set(root, "metrics.stacks", chosen); err != nil {
+					return err
+				}
 			}
-			return config.Set(root, "metrics.stacks", chosen)
+			return config.AddChecks(root, starter)
 		}})
+		for _, c := range starter {
+			fmt.Fprintln(out, "check "+detect.FormatCheck(c))
+		}
+		if len(starter) > 0 {
+			fmt.Fprintln(out, "each check is a starting point — edit it in "+config.FilePath)
+		}
 	}
 	// 2. stamp
 	stamp := install.Stamp{

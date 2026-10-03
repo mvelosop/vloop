@@ -159,3 +159,55 @@ func TestInitRefusesSymlink(t *testing.T) {
 		t.Error("wrote before refusing")
 	}
 }
+
+func TestInitWritesStarterChecks(t *testing.T) {
+	cases := []struct {
+		name  string
+		files map[string]string
+		want  []string // entries of "check.<name>=<run> (paths: <globs>)"
+	}{
+		{"go", map[string]string{"go.mod": "module a\n"},
+			[]string{"check.go=go test ./... && go vet ./... (paths: **)"}},
+		{"scoped go", map[string]string{"svc/go.mod": "module a\n"},
+			[]string{"check.go-svc=cd svc && go test ./... && go vet ./... (paths: svc/**)"}},
+		{"python", map[string]string{"pyproject.toml": "x\n"},
+			[]string{"check.python=pytest (paths: **)"}},
+		{"node stacks share one npm check", map[string]string{"package.json": `{"dependencies":{"react":"1"}}`, "tsconfig.json": "{}"},
+			[]string{"check.javascript=npm test (paths: **)"}},
+		{"rust", map[string]string{"Cargo.toml": "x\n"},
+			[]string{"check.rust=cargo test (paths: **)"}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			d := initRepo(t, c.files)
+			out, errs, code := runPluginCLI(t, initBuild, d, "init")
+			if code != 0 || errs != "" {
+				t.Fatalf("code %d, stderr %q", code, errs)
+			}
+			if !strings.Contains(out, "starting point") {
+				t.Errorf("output does not call the checks a starting point:\n%s", out)
+			}
+			list, _, code := runPluginCLI(t, initBuild, d, "config", "list")
+			if code != 0 {
+				t.Fatalf("config list exit %d", code)
+			}
+			var got []string
+			for _, l := range strings.Split(list, "\n") {
+				if strings.HasPrefix(l, "check.") {
+					got = append(got, l)
+				}
+			}
+			if strings.Join(got, "\n") != strings.Join(c.want, "\n") {
+				t.Errorf("checks = %q, want %q", got, c.want)
+			}
+		})
+	}
+}
+
+func TestInitWithNoStackWritesNoCheck(t *testing.T) {
+	d := initRepo(t, map[string]string{"README.md": "x\n"})
+	out, _, code := runPluginCLI(t, initBuild, d, "init")
+	if code != 0 || strings.Contains(out, "starting point") || strings.Contains(readFile(t, d, ".vloop/config.toml"), "[[check]]") {
+		t.Errorf("code %d:\n%s", code, out)
+	}
+}

@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/16 done** · iteration 7
+**Status:** running · **5/16 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T22:25:26Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T22:48:34Z
 
 ## Progress
 
 - [x] **T1** — Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
 - [x] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config · 1 attempt(s)
-- [ ] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
+- [x] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
 - [x] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
 - [x] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify · 1 attempt(s)
 - [ ] **T6** — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
@@ -81,7 +81,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T3 — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 **Files:** `internal/cli/init.go`, `internal/cli/init_test.go`, `internal/cli/upgrade.go`, `internal/cli/upgrade_test.go`, `internal/cli/doctor.go`, `internal/cli/doctor_test.go`, `internal/detect/detect.go`, `internal/classify/presets.go`, `internal/config/config.go`, `cmd/vloop/`
 

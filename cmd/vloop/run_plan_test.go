@@ -479,7 +479,7 @@ func TestRunPlanCommit(t *testing.T) {
 	// plan session's record, and one commit holding them — never .vloop/tmp.
 	r := newRunRepo(t)
 	r.planWith(planJSON(t, planTask("T1", nil), planTask("T2", map[string]any{"depends_on": []string{"T1"}})))
-	r.write(".vloop/config.toml", "[model]\nplan = \"opus\"\n")
+	r.write(".vloop/config.toml", "[model]\nplan = \"opus\"\n\n"+runCheckConfig)
 	r.commitAll("config")
 	res := r.vloop("run", "--plan-only", runBrief)
 	wantExit(t, res, 0)
