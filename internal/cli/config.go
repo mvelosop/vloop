@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -82,6 +83,13 @@ func newConfig(g *Globals) *cobra.Command {
 			}
 			for _, v := range vals {
 				fmt.Fprintf(out, "%s=%s (%s)\n", v.Key, v.Value, v.Source)
+			}
+			checks, err := config.Checks(root)
+			if err != nil {
+				return configErr(g, out, err)
+			}
+			for _, c := range checks {
+				fmt.Fprintf(out, "check.%s=%s (paths: %s)\n", c.Name, c.Run, strings.Join(c.Paths, ", "))
 			}
 			return nil
 		},

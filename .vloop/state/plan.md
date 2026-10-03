@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/16 done** · iteration 1
+**Status:** running · **1/16 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T21:44:17Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T21:48:10Z
 
 ## Progress
 
 - [x] **T1** — Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
-- [ ] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
+- [ ] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config · **blocked**
 - [ ] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
 - [ ] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
 - [ ] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
@@ -55,7 +55,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T2 — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
 
-`pending` · depends on: none
+`blocked` · **blocked** · depends on: none
 
 **Files:** `internal/config/config.go`, `internal/config/config_test.go`, `internal/cli/config.go`, `internal/cli/config_test.go`, `docs/guide/configuration.md`
 
@@ -70,6 +70,8 @@ Checks, gate scratch folders and the gate-review session are all configured, so 
 - `vloop config set` of any key leaves the file's [[check]] tables in place.
 - docs/guide/configuration.md documents [[check]], run.gate-scratch, model.gate-review and effort.gate-review.
 - Config tests cover each new key and each refusal.
+
+**From the last attempt:** gate disputed: The gate runs TestWorkedExampleB2Commands, which asserts the exact `vloop schema list` output and has been stale since T1 added five schemas; no T2 change can make it pass except editing that existing test, which is a file the gate inspects. — go test -run ^(TestWorkedExampleB2.*|TestRunBudgetPrecedence)$ ./cmd/vloop/ fails at b2_e2e_test.go:127: got schema list including defect/v1 and gate-verdict/v1, want the 10-schema list.
 
 <details><summary>verify command</summary>
 

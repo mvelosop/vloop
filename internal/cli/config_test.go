@@ -23,12 +23,12 @@ func scratchRepo(t *testing.T) string {
 func TestConfigListDefaults(t *testing.T) {
 	d := scratchRepo(t)
 	code, out, _ := run(t, "-C", d, "config", "list")
-	want := "language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\n" +
-		"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n" +
+	want := "language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\nmodel.gate-review=sonnet (default)\n" +
+		"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\neffort.gate-review= (default)\n" +
 		"shell=" + defaultShellForTest() + " (default)\nareas= (default)\n" +
 		"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n" +
 		"run.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\n" +
-		"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n"
+		"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.gate-scratch= (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d out %q", code, out)
 	}
@@ -39,8 +39,9 @@ func TestConfigListJSONOrderAndNull(t *testing.T) {
 	_, out, _ := run(t, "-C", d, "config", "list", "--json")
 	want := `{"language":{"value":"en","source":"default"},"model.plan":{"value":"opus","source":"default"},` +
 		`"model.work":{"value":"sonnet","source":"default"},"model.review":{"value":"sonnet","source":"default"},` +
+		`"model.gate-review":{"value":"sonnet","source":"default"},` +
 		`"effort.plan":{"value":null,"source":"default"},"effort.work":{"value":null,"source":"default"},` +
-		`"effort.review":{"value":null,"source":"default"},` +
+		`"effort.review":{"value":null,"source":"default"},"effort.gate-review":{"value":null,"source":"default"},` +
 		`"shell":{"value":"` + defaultShellForTest() + `","source":"default"},"areas":{"value":[],"source":"default"},` +
 		`"metrics.stacks":{"value":[],"source":"default"},"metrics.code":{"value":[],"source":"default"},` +
 		`"metrics.test":{"value":[],"source":"default"},"metrics.docs":{"value":[],"source":"default"},` +
@@ -48,7 +49,7 @@ func TestConfigListJSONOrderAndNull(t *testing.T) {
 		`"run.max-iterations":{"value":"30","source":"default"},"run.cost-ceiling":{"value":"40","source":"default"},` +
 		`"run.max-attempts":{"value":"3","source":"default"},"run.stall-limit":{"value":"2","source":"default"},` +
 		`"run.convergence-max":{"value":"3.0","source":"default"},"run.convergence-min":{"value":"6","source":"default"},` +
-		`"run.gate-timeout":{"value":"15","source":"default"},"run.session-timeout":{"value":"60","source":"default"},` +
+		`"run.gate-timeout":{"value":"15","source":"default"},"run.gate-scratch":{"value":[],"source":"default"},"run.session-timeout":{"value":"60","source":"default"},` +
 		`"run.keep-awake":{"value":"on","source":"default"}}` + "\n"
 	if out != want {
 		t.Fatalf("got %s", out)
@@ -116,6 +117,7 @@ func TestConfigBadSourceExit1(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(d, ".vloop"), 0o755); err != nil {
 		t.Fatal(err)
 	}
+	_ = os.MkdirAll(filepath.Join(d, ".vloop"), 0o755)
 	if err := os.WriteFile(filepath.Join(d, ".vloop", "config.toml"), []byte("language = \n[[[\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -198,5 +200,35 @@ func TestConfigRunKeys(t *testing.T) {
 	t.Setenv("VLOOP_RUN_COST_CEILING", "abc")
 	if code, _, e := run(t, "-C", d, "config", "list"); code != 1 || !strings.Contains(e, "VLOOP_RUN_COST_CEILING") {
 		t.Errorf("bad env: %d %q", code, e)
+	}
+}
+
+func TestConfigChecksListAndSurviveSet(t *testing.T) {
+	d := scratchRepo(t)
+	body := "[[check]]\nname = \"api\"\npaths = [\"api/**\"]\nrun = \"sh api/test.sh\"\n\n" +
+		"[[check]]\nname = \"web\"\npaths = [\"web/**\", \"shared/*.ts\"]\nrun = \"sh web/test.sh\"\n"
+	_ = os.MkdirAll(filepath.Join(d, ".vloop"), 0o755)
+	if err := os.WriteFile(filepath.Join(d, ".vloop", "config.toml"), []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code, _, errs := run(t, "-C", d, "config", "set", "effort.gate-review", "high"); code != 0 {
+		t.Fatalf("set: %d %s", code, errs)
+	}
+	code, out, _ := run(t, "-C", d, "config", "list")
+	tail := "check.api=sh api/test.sh (paths: api/**)\ncheck.web=sh web/test.sh (paths: web/**, shared/*.ts)\n"
+	if code != 0 || !strings.HasSuffix(out, tail) {
+		t.Fatalf("code %d out %q", code, out)
+	}
+}
+
+func TestConfigBadCheckExit1(t *testing.T) {
+	d := scratchRepo(t)
+	_ = os.MkdirAll(filepath.Join(d, ".vloop"), 0o755)
+	if err := os.WriteFile(filepath.Join(d, ".vloop", "config.toml"), []byte("[[check]]\nname = \"A\"\npaths = [\"**\"]\nrun = \"true\"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := run(t, "-C", d, "config", "list")
+	if code != 1 || out != "" || !strings.HasPrefix(errs, "vloop: ") {
+		t.Fatalf("code %d out %q err %q", code, out, errs)
 	}
 }

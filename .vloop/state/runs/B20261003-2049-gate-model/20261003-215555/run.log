@@ -6,3 +6,7 @@ committing the plan
    Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/16 done ──
+   Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
+   GATE DISPUTE T2 — blocked for the operator; no review, no attempt charged
+   T2 blocked — the operator resolves the disputed gate with vloop task verify
