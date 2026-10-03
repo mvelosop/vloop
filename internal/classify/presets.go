@@ -34,7 +34,7 @@ var presets = map[string]Preset{
 	},
 	"javascript": {
 		Code:     []string{"**/*.js", "**/*.mjs", "**/*.cjs"},
-		Test:     []string{"**/*.test.js", "**/*.spec.js", "**/__tests__/**"},
+		Test:     []string{"**/*.test.js", "**/*.spec.js", "**/__tests__/**", "**/*.e2e-spec.js", "**/test/**"},
 		Excluded: nodeExcluded,
 	},
 	"kotlin": {
@@ -59,7 +59,7 @@ var presets = map[string]Preset{
 	},
 	"typescript": {
 		Code:     []string{"**/*.ts"},
-		Test:     []string{"**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"},
+		Test:     []string{"**/*.test.ts", "**/*.spec.ts", "**/__tests__/**", "**/*.e2e-spec.ts", "**/test/**"},
 		Excluded: nodeExcluded,
 	},
 }

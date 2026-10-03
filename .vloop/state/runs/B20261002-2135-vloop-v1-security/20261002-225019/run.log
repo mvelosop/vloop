@@ -63,3 +63,7 @@ committing the plan
    Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
    review: PASS
    T13 done
+── iteration 16 (16 this run) · T14 · 12/18 done ──
+   Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
+   review: PASS
+   T14 done

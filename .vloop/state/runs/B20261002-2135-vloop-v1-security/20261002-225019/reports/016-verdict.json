@@ -1,0 +1,5 @@
+{"schema":"verdict/v1","task":"T14","verdict":"PASS","criteria":[
+{"criterion":"The typescript preset's test globs gain **/*.e2e-spec.ts and **/test/**; the javascript preset's gain **/*.e2e-spec.js and **/test/**.","met":true,"evidence":"internal/classify/presets.go diff adds both globs to the typescript and javascript Test lists"},
+{"criterion":"Under typescript, test/links.e2e-spec.ts and test/jest-e2e.json classify as test and src/app.ts stays code; under javascript the same holds for the .js forms; other presets are unchanged.","met":true,"evidence":"TestPresetsCountNestTests asserts these paths for both presets; the diff touches only those two presets"},
+{"criterion":"internal/classify/classify_test.go holds TestPresetsCountNestTests, failing against the base; any guide that lists the preset globs follows them.","met":true,"evidence":"The test is added at the end of classify_test.go and asserts Test for paths the base globs did not match; docs/guide/metrics.md table rows updated to match"}
+],"findings":[],"notes":"none"}

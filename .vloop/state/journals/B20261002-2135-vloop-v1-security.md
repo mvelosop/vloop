@@ -111,3 +111,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Doctor's self-hosting check now warns for a binary with no commit (empty or the default "unknown") in this module; HEAD-stamped keeps its warning, other commits pass. concepts.md documents the stamped release build and release steps.
 - **Files:** internal/cli/doctor.go, internal/cli/doctor_test.go, docs/guide/concepts.md
 - **Notes for next iteration:** main.commit defaults to "unknown", so the no-commit case matches both "" and "unknown". TestDoctorSelfHosting was left unchanged: its default test build commit c010 already covers a stamped build of another commit passing.
+
+## T14 — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The typescript and javascript presets now classify **/*.e2e-spec.{ts,js} and **/test/** as tests; the metrics guide table follows, and TestPresetsCountNestTests covers it.
+- **Files:** internal/classify/presets.go, internal/classify/classify_test.go, docs/guide/metrics.md
+- **Notes for next iteration:** none

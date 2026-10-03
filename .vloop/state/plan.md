@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **12/18 done** · iteration 15
+**Status:** running · **13/18 done** · iteration 16
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T00:01:39Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T00:05:33Z
 
 ## Progress
 
@@ -21,7 +21,7 @@
 - [x] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
 - [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2) · **blocked**
 - [x] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
-- [ ] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
+- [x] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
 - [ ] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
 - [ ] **T16** — Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
 - [ ] **T17** — Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
@@ -349,7 +349,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T14 — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/classify/presets.go`, `internal/classify/classify_test.go`, `docs/guide/metrics.md`
 
