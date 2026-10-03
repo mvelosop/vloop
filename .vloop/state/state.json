@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261003-2049-gate-model.loop-brief.md",
   "base": "786f233d506336c3f7d634609223a0df9ad7eefe",
   "branch": "B20261003-2049-gate-model",
-  "status": "running",
+  "status": "blocked",
   "iteration": 5,
   "created": "2026-10-03T21:36:02Z",
-  "updated": "2026-10-03T22:22:44Z",
+  "updated": "2026-10-03T22:22:45Z",
   "shell": "sh",
   "tasks": [
     {
