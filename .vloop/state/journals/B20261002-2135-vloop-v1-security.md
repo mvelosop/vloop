@@ -137,3 +137,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261002-2135-vloop-v1-security` · 18 iteration(s) this run
 - **Plan:** 15/18 done, 1 blocked
+
+## T12 — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
+
+- **Outcome:** gate_failed (review: skipped)
+- **Summary:** vloop run now refuses a brief that is not ready, fails brief check or has unconsumed dependencies, picks the newest ready brief when none is named, and refuses a dirty tree (on resume, .vloop/state/ edits are allowed). Six preflight tests were added and the existing tests that started dirty now start clean.
+- **Files:** internal/brief/ready.go, internal/brief/check.go, internal/driver/plan.go, cmd/vloop/run_preflight_test.go, cmd/vloop/run_iterate_test.go
+- **Notes for next iteration:** The work was done in an earlier attempt and committed with the block. The operator has since fixed the gate fixture and the two pre-existing failing tests, so this attempt only re-ran the gate, which passes.

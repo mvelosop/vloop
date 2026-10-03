@@ -1,0 +1,24 @@
+{
+  "cost_usd": 0.17903000000000002,
+  "duration_ms": 215655,
+  "effort": null,
+  "is_error": false,
+  "iteration": 19,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "input_tokens": 10,
+      "output_tokens": 1229,
+      "cache_read_input_tokens": 156800,
+      "cache_creation_input_tokens": 33840,
+      "cost_usd": 0.17903000000000002
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261002-2135-vloop-v1-security",
+  "schema": "session/v1",
+  "started": "2026-10-03T10:47:43Z",
+  "task": "T12",
+  "turns": 5
+}
