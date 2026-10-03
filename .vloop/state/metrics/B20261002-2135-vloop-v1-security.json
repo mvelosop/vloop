@@ -2,12 +2,12 @@
   "schema": "metrics/v1",
   "brief": "B20261002-2135-vloop-v1-security.loop-brief",
   "run_id": "B20261002-2135-vloop-v1-security",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 18,
-    "done": 16,
-    "blocked": 1,
+    "done": 18,
+    "blocked": 0,
     "first_pass": 15,
     "estimate": {
       "min": 14,
@@ -17,7 +17,7 @@
   "size": {
     "delivered": {
       "code": 1373,
-      "test": 1263,
+      "test": 1486,
       "docs": 84,
       "other": 320,
       "deleted": {
@@ -29,7 +29,7 @@
     },
     "churn": {
       "code": 1373,
-      "test": 1243,
+      "test": 1466,
       "docs": 88,
       "other": 320,
       "deleted": {
@@ -39,7 +39,7 @@
         "other": 4
       }
     },
-    "test_code_ratio": 0.9198834668608885,
+    "test_code_ratio": 1.0823015294974507,
     "rework": 1
   },
   "time": {
@@ -48,11 +48,11 @@
     "review_ms": 1315898,
     "plan_ms": 1535401,
     "gates_ms": 1091528,
-    "wall_ms": 46795000
+    "wall_ms": 48581000
   },
   "rate": {
     "code_per_min": 13.516413631790448,
-    "code_test_per_min": 25.949939062927616
+    "code_test_per_min": 28.14524877879744
   },
   "cost": {
     "total_usd": 19.840349400000008,
@@ -99,7 +99,7 @@
   },
   "permission_denials": 10,
   "iterations": 23,
-  "iterations_per_closed": 1.4375,
+  "iterations_per_closed": 1.2777777777777777,
   "by_task": [
     {
       "id": "T1",
@@ -499,7 +499,7 @@
       "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
+        "test": 223,
         "docs": 0,
         "other": 0,
         "deleted": {
