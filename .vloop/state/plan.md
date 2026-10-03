@@ -2,7 +2,7 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **15/18 done** · iteration 18
+**Status:** blocked · **15/18 done** · iteration 18
 
 **Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T00:15:43Z
 

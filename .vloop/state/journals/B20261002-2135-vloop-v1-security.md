@@ -132,3 +132,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Completeness checks moved to the guides (TestGuideConfigurationNamesEveryKey, TestGuideCommandsNamesEveryCommandAndFlag, shell-default check now on configuration.md); the README is checked only for unknown names and guide links (TestReadmeRejectsUnknownNames), and its config table is a pointer.
 - **Files:** internal/cli/readme_test.go, internal/cli/guide_test.go, README.md, docs/guide/configuration.md
 - **Notes for next iteration:** README went from 196 to 174 lines. docs/guide/configuration.md preset tables for javascript and typescript also gained the NestJS e2e-spec and test/ globs that T14 added only to metrics.md; TestGuideConfigurationCoversKeysAndPresets failed without them.
+
+## Run ended — blocked
+
+- **Run:** `B20261002-2135-vloop-v1-security` · 18 iteration(s) this run
+- **Plan:** 15/18 done, 1 blocked
