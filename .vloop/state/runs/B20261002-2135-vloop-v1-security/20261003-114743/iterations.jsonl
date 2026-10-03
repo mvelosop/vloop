@@ -1,1 +1,2 @@
 {"attempt":1,"ended":"2026-10-03T10:58:14Z","gate":{"duration_ms":195778,"exit":0},"iteration":19,"outcome":"gate_failed","run_id":"B20261002-2135-vloop-v1-security","schema":"iteration/v1","started":"2026-10-03T10:47:43Z","task":"T12"}
+{"attempt":2,"ended":"2026-10-03T11:11:16Z","gate":{"duration_ms":196863,"exit":0},"iteration":20,"outcome":"done","run_id":"B20261002-2135-vloop-v1-security","schema":"iteration/v1","started":"2026-10-03T10:58:14Z","task":"T12"}

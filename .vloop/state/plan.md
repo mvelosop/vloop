@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **15/18 done** · iteration 19
+**Status:** running · **16/18 done** · iteration 20
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T10:58:14Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T11:11:16Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T9** — Redact secret environment values and keep only tool and path of permission denials (F12)
 - [x] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13) · 1 attempt(s)
 - [x] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
-- [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2) · 1 attempt(s)
+- [x] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2) · 1 attempt(s)
 - [x] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
 - [x] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
 - [x] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
@@ -298,7 +298,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T12 — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 **Files:** `internal/driver/plan.go`, `internal/cli/run.go`, `internal/brief/`, `cmd/vloop/run_preflight_test.go`, `cmd/vloop/`
 
@@ -313,8 +313,6 @@ A bare vloop run plans whichever brief sorts last, whatever its status, and neve
 - Resuming also requires a clean tree, except for changes under .vloop/state/ (the operator's vloop task verify|reset|note|drop|set), which the next iteration commits.
 - cmd/vloop/run_preflight_test.go holds TestRunPlansNewestReadyBrief, TestRunRefusesDraftBriefs, TestRunRefusesUncheckedBrief, TestRunRefusesUnconsumedDependency, TestRunRefusesDirtyTree and TestRunResumeAllowsStateEdits, each failing against the base.
 - Every existing cmd/vloop test whose repository started with untracked or modified files is changed to start clean, and in no other way; no assertion is weakened.
-
-**From the last attempt:** work session modified .vloop/state/state.json — a file a verify command runs, which this task neither created nor was assigned; restored by the driver
 
 <details><summary>verify command</summary>
 

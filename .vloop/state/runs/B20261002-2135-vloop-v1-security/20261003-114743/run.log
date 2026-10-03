@@ -2,3 +2,7 @@
    Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
    GATE REWRITE T12 — .vloop/state/state.json restored from HEAD; a gate is not a session's to rewrite
    T12 failed on a rewritten gate — the work is reverted whatever the gate said
+── iteration 20 (2 this run) · T12 · 15/18 done ──
+   Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
+   review: PASS
+   T12 done
