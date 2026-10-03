@@ -177,3 +177,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** cmd/vloop/b8_e2e_test.go adds TestWorkedExampleB8: one subtest per line of the brief's worked example, each in its own temp repo with the stub claude, asserting exit codes, messages and effects.
 - **Files:** cmd/vloop/b8_e2e_test.go
 - **Notes for next iteration:** The gate-timeout subtest takes about two minutes because run.gate-timeout has a floor of 1 minute and the e2e binary has no timeout seam; it is t.Parallel so it overlaps the other subtests. Sleep-leak checks use distinctive sleep durations (1017, 1018) with pgrep.
+
+## Run ended — complete
+
+- **Run:** `B20261002-2135-vloop-v1-security` · 2 iteration(s) this run
+- **Plan:** 18/18 done, 0 blocked

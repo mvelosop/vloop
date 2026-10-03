@@ -6,3 +6,8 @@
    Close B8: the worked example line for line, every check at once, and the real-data check
    review: PASS
    T18 done
+
+═══ complete ═══
+run:    B20261002-2135-vloop-v1-security/20261003-121705  (2 iteration(s) this run)
+plan:   18/18 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261002-2135-vloop-v1-security.md

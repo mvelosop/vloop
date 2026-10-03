@@ -8,7 +8,7 @@
     "planned": 18,
     "done": 16,
     "blocked": 1,
-    "first_pass": 14,
+    "first_pass": 15,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,30 +43,30 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 5377805,
-    "work_ms": 4076419,
-    "review_ms": 1301386,
+    "agent_ms": 6094812,
+    "work_ms": 4778914,
+    "review_ms": 1315898,
     "plan_ms": 1535401,
-    "gates_ms": 618494,
+    "gates_ms": 1091528,
     "wall_ms": 46795000
   },
   "rate": {
-    "code_per_min": 15.318517499239931,
-    "code_test_per_min": 29.409768483609948
+    "code_per_min": 13.516413631790448,
+    "code_test_per_min": 25.949939062927616
   },
   "cost": {
-    "total_usd": 19.288768000000005,
+    "total_usd": 19.840349400000008,
     "plan_usd": 8.744938400000004,
-    "work_usd": 7.670596600000001,
-    "review_usd": 2.8732330000000004,
-    "per_1000_code_lines_usd": 14.048629278951205
+    "work_usd": 8.104297800000001,
+    "review_usd": 2.9911132000000005,
+    "per_1000_code_lines_usd": 14.450363729060458
   },
   "tokens": {
-    "input": 974,
-    "output": 345559,
-    "cache_read": 33810960,
-    "cache_creation": 1624639,
-    "cache_hit_ratio": 0.9541261227489464
+    "input": 1014,
+    "output": 356893,
+    "cache_read": 34564347,
+    "cache_creation": 1696510,
+    "cache_hit_ratio": 0.9531870818248733
   },
   "models": {
     "plan": [
@@ -98,8 +98,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 10,
-  "iterations": 22,
-  "iterations_per_closed": 1.375,
+  "iterations": 23,
+  "iterations_per_closed": 1.4375,
   "by_task": [
     {
       "id": "T1",
@@ -496,7 +496,7 @@
       "id": "T18",
       "area": null,
       "kind": "test",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -509,9 +509,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 717007,
+      "cost_usd": 0.5515814,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     }
   ]
 }
