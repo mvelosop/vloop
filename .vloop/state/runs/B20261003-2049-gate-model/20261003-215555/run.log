@@ -2,3 +2,7 @@ the plan B20261002-2135-vloop-v1-security was for docs/briefs/B20261002-2135-vlo
 planning from docs/briefs/B20261003-2049-gate-model.loop-brief.md using opus
 planned: B20261003-2049-gate-model — 16 tasks
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/16 done ──
+   Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
+   review: PASS
+   T1 done

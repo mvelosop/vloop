@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/16 done** · iteration 0
+**Status:** running · **1/16 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T21:37:31Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T21:44:17Z
 
 ## Progress
 
-- [ ] **T1** — Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
+- [x] **T1** — Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
 - [ ] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
 - [ ] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
 - [ ] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
@@ -29,7 +29,7 @@
 
 ### T1 — Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `schemas/state.v2.json`, `schemas/iteration.v2.json`, `schemas/session.v2.json`, `schemas/gate-verdict.v1.json`, `schemas/metrics.v2.json`, `internal/schema/schema_test.go`, `internal/schema/testdata/`
 

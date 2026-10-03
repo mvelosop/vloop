@@ -1,0 +1,19 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added schemas state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2 as additions to the v1 schemas, with a valid and an invalid fixture for each.",
+  "files": [
+    "schemas/state.v2.json",
+    "schemas/iteration.v2.json",
+    "schemas/session.v2.json",
+    "schemas/gate-verdict.v1.json",
+    "schemas/metrics.v2.json",
+    "internal/schema/schema_test.go",
+    "internal/schema/testdata/",
+    "embed_test.go",
+    "internal/cli/schema_test.go"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed GATE OK.",
+  "notes": "Fixtures named state2/iteration2/session2/metrics2 are the v2 pairs; gate-verdict is v1 (schemaName in schema_test.go maps them). gate-verdict/v1 forbids a top-level task with a `not: required` clause. New schemas are v1 copies with only the listed changes; metrics/v2 gate_review_ms is a non-null integer, checks_ms is nullable like gates_ms. Nothing in Go uses the v2 shapes yet. Existing count/list assertions in embed_test.go (15 schemas) and internal/cli/schema_test.go (schema list) were updated for the new schemas."
+}

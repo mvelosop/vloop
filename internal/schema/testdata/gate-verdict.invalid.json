@@ -1,0 +1,1 @@
+{"schema":"gate-verdict/v1","verdict":"FAIL","tasks":[{"task":"T1","verdict":"FAIL","findings":[{"summary":"s","kind":"style"}]}],"notes":"none"}
