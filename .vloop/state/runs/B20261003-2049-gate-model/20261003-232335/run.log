@@ -1,0 +1,4 @@
+── iteration 6 (1 this run) · T2 · 3/16 done ──
+   Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
+   GATE REWRITE T2 — .vloop/state/state.json restored from HEAD; a gate is not a session's to rewrite
+   T2 failed on a rewritten gate — the work is reverted whatever the gate said

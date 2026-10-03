@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The config reads [[check]] tables, run.gate-scratch, model.gate-review and effort.gate-review; config list prints the checks and config set keeps them; docs and tests cover them. The implementation was already committed by the earlier attempt.",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/cli/config.go", "internal/cli/config_test.go", "docs/guide/configuration.md"],
+  "verified": "vloop task gate T2 exited 0 and printed GATE OK.",
+  "notes": "No changes this attempt: the earlier gate dispute (stale schema-list test in cmd/vloop) was fixed by T4, so the gate now passes on the existing work. config.Checks(root) returns []CheckDef{Name, Paths, Run}."
+}
