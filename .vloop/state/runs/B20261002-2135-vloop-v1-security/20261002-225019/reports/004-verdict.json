@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The driver snapshots the tree with git (git status --porcelain plus a hash of the working-tree diff) before the review session, not by walking the file system.", "met": true, "evidence": "internal/driver/iterate.go snapshotTree runs git status --porcelain -z and stores a sha256 and the bytes of each changed path; no directory walk."},
+    {"criterion": "After the review session every change outside .vloop/tmp/ is reverted: a modified tracked file is restored and a created file is removed; neither is committed.", "met": true, "evidence": "treeGuard.revert restores the pre-review bytes, removes created files, and runs git checkout HEAD for tracked paths. It is called right after the review session and before the commit. The test asserts src.txt is restored and review-new.txt is not tracked."},
+    {"criterion": "run.log lists each one as `vloop: the review session changed <path> — reverted`, and the iteration's verdict is FAIL with the finding `the review session changed files`, so the task is not done.", "met": true, "evidence": "iterate.go warns once per path with the exact text. It sets OutRejected/FAIL and appends the finding 'the review session changed files'. The test asserts both log lines and T1:rejected."},
+    {"criterion": "A reviewer that writes only under .vloop/tmp/ (its verdict, scratch) is not affected.", "met": true, "evidence": "reviewMayWrite excludes .vloop/tmp/ and .vloop/state/. The test's second attempt writes .vloop/tmp/review-notes.txt and the task ends done."},
+    {"criterion": "cmd/vloop/run_review_test.go holds TestRunReviewChangesReverted: a stub reviewer that edits a source file and returns PASS leaves the file reverted, the verdict FAIL and the task not done; it fails against the base.", "met": true, "evidence": "The test exists and passes (go test run). The base has no tree guard, so the 'reverted' log lines and the rejected outcome could not appear."}
+  ],
+  "findings": [],
+  "notes": "Gitignored files are not covered, because git status does not report them. File mode bits are not preserved on restore. Neither is required by the brief."
+}

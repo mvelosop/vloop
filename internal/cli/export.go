@@ -21,7 +21,7 @@ const exportSchema = "export/v1"
 
 type exportRepo struct {
 	Name   string  `json:"name"`
-	Remote *string `json:"remote"`
+	Remote *string `json:"remote,omitempty"`
 	// Stacks is metrics.stacks as configured, [] when unset.
 	Stacks []string `json:"stacks"`
 }
@@ -260,15 +260,16 @@ func strPtr(s string) *string {
 	return &s
 }
 
-// repoIdentity names the repository by its origin remote, credentials removed,
-// else by its directory. It reads local git config only.
+// repoIdentity names the repository by its origin remote, else by its
+// directory. The remote is exported only as a URL or scp-like form without
+// user info, query or fragment; a local path or file:// remote is not exported
+// at all (M-7). It reads local git config only.
 func repoIdentity(root string) exportRepo {
 	out, err := exec.Command("git", "-C", root, "config", "--get", "remote.origin.url").Output()
-	url := strings.TrimSpace(string(out))
-	if err != nil || url == "" {
+	url, ok := publicRemote(strings.TrimSpace(string(out)))
+	if err != nil || !ok {
 		return exportRepo{Name: filepath.Base(root), Stacks: []string{}}
 	}
-	url = stripUserinfo(url)
 	name := strings.TrimSuffix(strings.TrimRight(url, "/"), ".git")
 	if i := strings.LastIndexAny(name, "/:"); i >= 0 {
 		name = name[i+1:]
@@ -279,20 +280,42 @@ func repoIdentity(root string) exportRepo {
 	return exportRepo{Name: name, Remote: &url, Stacks: []string{}}
 }
 
-// stripUserinfo removes `user[:password]@` from a URL's authority. Forms with
-// no scheme (`git@host:path`) carry no password and are left as they are.
-func stripUserinfo(u string) string {
-	i := strings.Index(u, "://")
-	if i < 0 {
-		return u
+// publicRemote reduces a remote to `scheme://host[:port]/path` or
+// `host:path`, dropping user info, query and fragment. It reports false for a
+// local path, a file:// URL or anything without a host.
+func publicRemote(u string) (string, bool) {
+	if i := strings.IndexAny(u, "?#"); i >= 0 {
+		u = u[:i]
 	}
-	rest := u[i+3:]
-	end := strings.IndexAny(rest, "/?#")
-	if end < 0 {
-		end = len(rest)
+	if i := strings.Index(u, "://"); i >= 0 {
+		scheme, rest := u[:i], u[i+3:]
+		if strings.EqualFold(scheme, "file") {
+			return "", false
+		}
+		host, path := rest, ""
+		if j := strings.Index(rest, "/"); j >= 0 {
+			host, path = rest[:j], rest[j:]
+		}
+		if at := strings.LastIndex(host, "@"); at >= 0 {
+			host = host[at+1:]
+		}
+		if host == "" {
+			return "", false
+		}
+		return scheme + "://" + host + path, true
 	}
-	if at := strings.LastIndex(rest[:end], "@"); at >= 0 {
-		rest = rest[at+1:]
+	// scp-like: [user@]host:path, where the host has no slash and is not a
+	// Windows drive letter.
+	c := strings.Index(u, ":")
+	if c < 0 || strings.ContainsAny(u[:c], `/\`) || c == 1 {
+		return "", false
 	}
-	return u[:i+3] + rest
+	host := u[:c]
+	if at := strings.LastIndex(host, "@"); at >= 0 {
+		host = host[at+1:]
+	}
+	if host == "" || strings.HasPrefix(host, "~") {
+		return "", false
+	}
+	return host + u[c:], true
 }

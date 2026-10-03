@@ -11,6 +11,9 @@ import (
 	"strings"
 )
 
+// alreadyRun starts the problem a brief with a journal reports.
+const alreadyRun = "already run"
+
 // Marker classifies a line of a check report.
 type Marker string
 
@@ -112,7 +115,7 @@ func Check(root string, b *Brief, set *HeadingSet) *Result {
 
 	journal := JournalDir + "/" + RunID(b.Path) + ".md"
 	if st, err := os.Stat(filepath.Join(root, filepath.FromSlash(journal))); err == nil && st.Mode().IsRegular() {
-		add(Problem, "already run — %s exists; this brief declares itself plannable and is not", journal)
+		add(Problem, alreadyRun+" — %s exists; this brief declares itself plannable and is not", journal)
 	}
 
 	if heading(set.WorkedExample).MatchString(body) {

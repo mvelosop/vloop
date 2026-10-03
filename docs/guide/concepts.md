@@ -66,6 +66,17 @@ the review decide. `vloop status` and `vloop task list` read the plan, and the
 `vloop task` commands that change it refuse a result that fails `vloop task
 validate`.
 
+## Keeping the machine awake
+
+A run can last hours, and a machine that sleeps stalls it. With `run.keep-awake`
+on (the default), `vloop run` holds a no-idle-sleep hold for its own lifetime:
+`caffeinate -i -w <pid>` on macOS, `systemd-inhibit --what=idle` on Linux where
+it is installed, and `SetThreadExecutionState` on Windows. The hold ends when
+`vloop run` exits, however it exits. If it cannot be taken, `run.log` gets one
+warning line and the run continues; with `run.keep-awake = off` none is
+attempted. It does not cover closing a laptop's lid, which sleeps the machine
+regardless: keep the lid open, or change the OS's lid setting.
+
 ## Gates and the gate shell
 
 A task's `verify` command is its **gate**: the task is done only when it exits 0.
@@ -73,6 +84,18 @@ A task's `verify` command is its **gate**: the task is done only when it exits 0
 default, `pwsh` on Windows). A gate is written before the work exists, and the
 work session may not change it; only the operator does, with `vloop task verify
 <id> <command> --reason <text>`, which records the change in the task's history.
+
+## What is redacted
+
+Before anything is written under `.vloop/state/` (gate logs, session records,
+reports, `run.log`, the journal), the driver replaces every occurrence of the
+value of an environment variable whose **name** contains `KEY`, `TOKEN`,
+`SECRET`, `PASSWORD` or `CREDENTIAL` (any letter case) and whose value is at
+least 8 characters with `<redacted:NAME>`. Redaction keys on names, not on what
+a value looks like: a secret held in an innocently named variable, such as
+`DB_URL` or `AUTH`, is **not** caught, and neither is one shorter than 8
+characters. Session records keep, per permission denial, only the tool name and
+the file path when there is one — never the command or the content.
 
 ## Exit codes
 
@@ -92,7 +115,7 @@ its own, one per way a run can end:
 | `6` | cost ceiling: `run.cost-ceiling` is reached | yes, with a higher ceiling |
 | `7` | session error: a session failed to run | no |
 | `8` | repeat blocked: a task blocked twice with nothing changed | no |
-| `9` | refs moved: a session moved git refs; nothing was committed | no — restore the refs first |
+| `9` | refs or repository configuration moved: a session or a gate changed a ref, `.git/config` or the git hooks; nothing was committed | no — restore the refs first |
 
 Resuming is running `vloop run` again on the work branch. Errors go to stderr as
 one line starting with `vloop: `.
@@ -120,6 +143,20 @@ Release is not declared: vloop detects it as the brief's merge to the default
 branch (`origin/HEAD`'s target, else `main`, else `master`), through that trailer
 or the commit that marked the brief `consumed`. That is what lets `vloop defect
 add --blame <file>:<line>` attribute a later bug to the brief that wrote the line.
+
+### The stamped release build
+
+`go install` stamps no commit, so `vloop doctor` warns in this repository that
+the binary carries no commit. Build releases with the stamped build:
+
+```
+go build -ldflags "-X main.version=<v> -X main.commit=<sha>" -o vloop ./cmd/vloop
+```
+
+Release steps: set the version in `plugin.json`, tag the release commit
+(`v<v>`), then build with the tag's version and commit sha. A binary stamped
+with HEAD still draws the self-hosting warning; build the next vloop with a
+released one.
 
 ## Setting up a repository
 

@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T17",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "docs/domain/domain-model.md S-2 gains, verbatim: \"The fence is advisory; the driver is the boundary. It halts (exit 9) if a ref, `.git/config` or the git hooks change during a session or a gate, and restores what a session changed among the driver's inputs.\"", "met": true, "evidence": "docs/domain/domain-model.md:186 carries the sentence verbatim; the diff against main replaces only the old S-2 tail."},
+    {"criterion": "S-4 is added: \"A session writes nothing under `.git/` and nothing under `.vloop/` but `.vloop/tmp/` — the plan session also writes the plan.\"; R-3's exit 9 reads \"refs or repository configuration moved\"; R-4 is added: \"A run plans only a `ready` brief that passes the check, with its dependencies consumed, from a clean tree; every gate and session runs under a timeout and leaves no process behind.\" Nothing else in domain-model.md changes.", "met": true, "evidence": "domain-model.md:187 (S-4), :200 (R-3), :201 (R-4), all verbatim; git diff main -- docs/domain/domain-model.md shows only these four changes."},
+    {"criterion": "docs/domain/execution/session.md, run.md and task.md, and docs/domain/briefing/brief.md, describe the B8 behaviour where they describe the same thing today: per-phase fences, restored inputs and VLOOP_PLAN_SHA256; the timeouts, the clean-tree preflight and exit 9; timed-out gates, one gate runner and token-matched gate files; vloop run enforcing status and dependencies.", "met": true, "evidence": "session.md:46-61 (per-phase fences, restored inputs, VLOOP_PLAN_SHA256, exit 9); run.md:27-32 (exit 9, run.gate-timeout, run.session-timeout, clean tree); task.md:48-57 (timed-out gate, plan hash, whole-path token match); brief.md:47 (vloop run enforces status, dependencies consumed, clean tree)."},
+    {"criterion": "The exit-code table of docs/guide/concepts.md says 9 is refs or repository configuration moved, and TestGuideExitCodesMatchDriver passes.", "met": true, "evidence": "docs/guide/concepts.md:118 row 9; TestGuideExitCodesMatchDriver re-run in review: ok."}
+  ],
+  "findings": [],
+  "notes": "The doc edits were committed in earlier blocked attempts; this attempt changed only state (the operator's gate replacement) and the working-tree diff holds no docs, so the review judged the files as they stand against main. Not a defect of the work."
+}

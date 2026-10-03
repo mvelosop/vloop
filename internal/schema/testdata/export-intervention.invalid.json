@@ -1,1 +1,1 @@
-{"schema":"export/v1","type":"intervention","repo":{"name":"shop","remote":null,"stacks":["go"]},"id":"I20260101-0900-a","brief":"B20260101-0900-a.loop-brief","phase":"party","kind":"halt","automatable":"partly","by":"operator","occurred":"2026-01-01","recorded":"2026-01-01","backfilled":true}
+{"schema":"export/v1","type":"intervention","repo":{"name":"shop","stacks":["go"]},"id":"I20260101-0900-a","brief":"B20260101-0900-a.loop-brief","phase":"party","kind":"halt","automatable":"partly","by":"operator","occurred":"2026-01-01","recorded":"2026-01-01","backfilled":true}

@@ -6,7 +6,7 @@
   "required": ["schema", "run_id", "brief", "base", "branch", "status", "iteration", "created", "updated", "shell", "tasks"],
   "properties": {
     "schema": { "const": "state/v1" },
-    "run_id": { "type": "string" },
+    "run_id": { "type": "string", "pattern": "^[A-Za-z0-9._-]*$", "not": { "pattern": "\\.\\." } },
     "brief": { "type": "string" },
     "base": { "type": "string" },
     "branch": { "type": "string" },

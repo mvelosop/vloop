@@ -121,7 +121,7 @@ claude plugin eval plugin \
 - `--allow-tools` is the operator's grant: a case's `allowed_tools` only takes
   effect for gated tools (Bash, Write, Edit) the operator also grants. The list
   above is every gated tool any case names.
-- Every case grants at least the fence's allow list (`fence/settings.json`),
+- Every case grants at least the work fence's allow list (`fence/work.json`),
   plus `echo`, `git ls-files`, `grep`, `sh`, `chmod`, `test` and `vloop task`.
   Eval sessions run in don't-ask mode: a command outside the grant is denied
   outright, a compound command is denied whole if any part is, and a session

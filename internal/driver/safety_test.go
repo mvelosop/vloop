@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -65,5 +66,70 @@ func TestStateGuard(t *testing.T) {
 	}
 	if b, _ := os.ReadFile(p); string(b) != "{\"a\": 1}\n" {
 		t.Errorf("not restored: %q", b)
+	}
+}
+
+func TestLockExactlyOneOfConcurrent(t *testing.T) {
+	root := t.TempDir()
+	var wg sync.WaitGroup
+	errs := make([]error, 2)
+	start := make(chan struct{})
+	for i := range errs {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-start
+			_, errs[i] = AcquireLock(root, "main", "r", time.Now(), nil)
+		}()
+	}
+	close(start)
+	wg.Wait()
+	won := 0
+	for _, err := range errs {
+		if err == nil {
+			won++
+			continue
+		}
+		var h *Halt
+		if !errors.As(err, &h) || h.Code != ExitPreflight || !strings.Contains(err.Error(), "pid "+itoa(os.Getpid())) {
+			t.Errorf("the loser: %v", err)
+		}
+	}
+	if won != 1 {
+		t.Fatalf("%d acquisitions succeeded, want exactly 1", won)
+	}
+}
+
+func TestLockSymlinkNotFollowed(t *testing.T) {
+	root := t.TempDir()
+	lock := filepath.Join(root, filepath.FromSlash(lockFile))
+	os.MkdirAll(filepath.Dir(lock), 0o755)
+	target := filepath.Join(root, "target")
+	if err := os.Symlink(target, lock); err != nil {
+		t.Skip("no symlinks:", err)
+	}
+	release, err := AcquireLock(root, "main", "r", time.Now(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer release()
+	if _, err := os.Stat(target); err == nil {
+		t.Error("the lock was written through the symlink")
+	}
+}
+
+func TestHandoffSymlinkIsMissing(t *testing.T) {
+	dir := t.TempDir()
+	real := filepath.Join(dir, "real.json")
+	os.WriteFile(real, []byte("{}"), 0o644)
+	if _, err := readHandoff(real); err != nil {
+		t.Fatalf("a regular file: %v", err)
+	}
+	link := filepath.Join(dir, "link.json")
+	if err := os.Symlink(real, link); err != nil {
+		t.Skip("no symlinks:", err)
+	}
+	if _, err := readHandoff(link); err == nil {
+		t.Error("a symlinked handoff was read")
 	}
 }

@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T16",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A test TestGuideConfigurationNamesEveryKey checks docs/guide/configuration.md names every config key, and TestGuideCommandsNamesEveryCommandAndFlag checks docs/guide/commands.md names every command and flag.", "met": true, "evidence": "internal/cli/guide_test.go adds both tests; they iterate config.Keys and the walked command tree and flags, and they pass."},
+    {"criterion": "The README is checked only for commands, flags and config keys it names that do not exist, and for a link to each guide; TestReadmeRejectsUnknownNames shows a fixture README naming --frobnicate fails that check.", "met": true, "evidence": "internal/cli/readme_test.go readmeProblems drops the completeness loops and keeps the existence checks, the line cap and a link check for each docs/guide/*.md; TestReadmeRejectsUnknownNames asserts that a fixture naming --frobnicate is flagged."},
+    {"criterion": "The README keeps its cap of under 200 lines; its config-key table is replaced by a short pointer to docs/guide/configuration.md, and the shell-default check moves with the table to the guide; nothing else in the README changes.", "met": true, "evidence": "README.md is 174 lines. The table is replaced by a pointer to the guide, and the env-prefix sentence is adjusted because the table it referred to is gone. TestGuideShellDefaultMatchesCode in guide_test.go now reads configuration.md."},
+    {"criterion": "The new tests fail against the base; no check is dropped, only moved.", "met": true, "evidence": "The README completeness checks (commands, flags, keys) moved to the guide tests, the shell-default check moved to the guide, and the skills and cap checks remain. The existence checks remain too. TestReadmeRejectsUnknownNames and the guide-link check did not exist at the base."}
+  ],
+  "findings": [],
+  "notes": "docs/guide/configuration.md also gained e2e-spec and test/** globs in the javascript and typescript preset rows, to match internal/classify/presets.go. This is a stale-doc fix, small and harmless, and the file is in the task's files list. It is not strictly required by the task."
+}

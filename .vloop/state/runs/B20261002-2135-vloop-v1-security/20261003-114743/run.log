@@ -1,0 +1,19 @@
+── iteration 19 (1 this run) · T12 · 15/18 done ──
+   Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
+   GATE REWRITE T12 — .vloop/state/state.json restored from HEAD; a gate is not a session's to rewrite
+   T12 failed on a rewritten gate — the work is reverted whatever the gate said
+── iteration 20 (2 this run) · T12 · 15/18 done ──
+   Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
+   review: PASS
+   T12 done
+── iteration 21 (3 this run) · T17 · 16/18 done ──
+   Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
+   GATE DISPUTE T17 — blocked for the operator; no review, no attempt charged
+   T17 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+1 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261002-2135-vloop-v1-security/20261003-114743  (3 iteration(s) this run)
+plan:   16/18 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

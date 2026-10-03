@@ -1,0 +1,32 @@
+{
+  "cost_usd": 0.15890939999999998,
+  "duration_ms": 141882,
+  "effort": null,
+  "is_error": false,
+  "iteration": 10,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "input_tokens": 14,
+      "output_tokens": 2414,
+      "cache_read_input_tokens": 198047,
+      "cache_creation_input_tokens": 23783,
+      "cost_usd": 0.15890939999999998
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01CVLGd9PjDod7U3mRAJP1w7",
+      "tool_input": {
+        "command": "grep -rn \"Mask(\" internal cmd --include='*.go' | grep -v _test; grep -rn \"runWith\" cmd/vloop/*_test.go | head -3; git stash list | head -1"
+      }
+    }
+  ],
+  "phase": "review",
+  "run_id": "B20261002-2135-vloop-v1-security",
+  "schema": "session/v1",
+  "started": "2026-10-02T23:24:13Z",
+  "task": "T9",
+  "turns": 9
+}

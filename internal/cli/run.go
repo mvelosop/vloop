@@ -61,6 +61,10 @@ func newRun(b Build, g *Globals) *cobra.Command {
 				return err
 			}
 
+			if err := driver.CheckRunID(root, briefPath); err != nil {
+				return Problem(err)
+			}
+
 			lockRun := ""
 			if briefPath != "" {
 				lockRun = brief.RunID(briefPath)
@@ -73,9 +77,17 @@ func newRun(b Build, g *Globals) *cobra.Command {
 			}
 			defer release()
 
+			awakeWarn := ""
+			if budget.KeepAwake {
+				if err := driver.KeepAwake(); err != nil {
+					awakeWarn = err.Error()
+				}
+			}
+
 			pl := &driver.Planner{Root: root, Version: b.Version, Brief: briefPath,
 				PlanOnly: planOnly, Replan: replan,
-				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet}
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn,
+				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute}
 			res, err := pl.Plan()
 			if err != nil {
 				var h *driver.Halt
@@ -88,7 +100,7 @@ func newRun(b Build, g *Globals) *cobra.Command {
 				return nil
 			}
 			it := &driver.Iterator{Root: root, Version: b.Version, RunDir: res.RunDir, Budgets: budget,
-				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet}
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn}
 			end, err := it.Run()
 			if err != nil {
 				var h *driver.Halt
@@ -150,7 +162,7 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		}
 	}
 	if hook := preCommitHook(root); hook != "" {
-		fmt.Fprintf(errOut, "  ! a pre-commit hook is active (%s) — if it rejects the driver's commit, the run stops after paying for a task\n", hook)
+		fmt.Fprintf(errOut, "  ! a pre-commit hook is active (%s) — the driver's commits do not run repository hooks; put what it checks in the gates\n", hook)
 	}
 	if bad > 0 {
 		return Problem(fmt.Errorf("preflight failed — %d problem(s), nothing has run", bad))

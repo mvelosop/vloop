@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "Runner.Mask now replaces the home only at a path boundary (never for / or \\) and the user only as a path component under Users, home or the home's parent directory, with Windows home forms matched case-insensitively. Session records are masked through their decoded string values (maskRecord) and re-marshalled, not as serialized JSON.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go", "cmd/vloop/run_safety_test.go"],
+  "verified": "vloop task gate T8 exited 0 and printed GATE OK.",
+  "notes": "Mask is text-only: free-text user names (e.g. model name alice-model, 'user alice') are no longer masked, so TestSessionMasking was adjusted. Records go through maskRecord (json.Number decode, masks strings and object keys). Home is detected as Windows-style by drive letter or UNC prefix, on any OS. TestRun10Containment now runs as subtests for harnessuser and a short user 'us' (home dir renamed after newRunRepo) and checks the user only as '/us/'."
+}

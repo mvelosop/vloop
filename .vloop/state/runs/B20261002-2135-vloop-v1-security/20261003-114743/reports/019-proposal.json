@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T12",
+  "outcome": "done",
+  "summary": "vloop run now refuses a brief that is not ready, fails brief check or has unconsumed dependencies, picks the newest ready brief when none is named, and refuses a dirty tree (on resume, .vloop/state/ edits are allowed). Six preflight tests were added and the existing tests that started dirty now start clean.",
+  "files": ["internal/brief/ready.go", "internal/brief/check.go", "internal/driver/plan.go", "cmd/vloop/run_preflight_test.go", "cmd/vloop/run_iterate_test.go"],
+  "verified": "vloop task gate T12 exited 0 and printed GATE OK.",
+  "notes": "The work was done in an earlier attempt and committed with the block. The operator has since fixed the gate fixture and the two pre-existing failing tests, so this attempt only re-ran the gate, which passes."
+}

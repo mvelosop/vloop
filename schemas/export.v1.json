@@ -9,10 +9,10 @@
     "type": { "enum": ["brief", "task", "defect", "intervention"] },
     "repo": {
       "type": "object",
-      "required": ["name", "remote"],
+      "required": ["name"],
       "properties": {
         "name": { "type": "string" },
-        "remote": { "type": ["string", "null"], "description": "the origin remote URL with credentials removed; null when there is none" },
+        "remote": { "type": "string", "description": "the origin remote as a URL or scp-like form without user info, query or fragment; absent when there is none or it is a local path" },
         "stacks": { "type": "array", "items": { "type": "string" }, "description": "metrics.stacks as configured; [] when unset" }
       }
     }

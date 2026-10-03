@@ -307,6 +307,15 @@ func TestDoctorSelfHosting(t *testing.T) {
 	e.want("self-hosting", resWarning)
 }
 
+func TestDoctorSelfHostingUnstamped(t *testing.T) {
+	e := newDoctorEnv(t)
+	e.write("go.mod", "module github.com/mvelosop/vloop\n\ngo 1.22\n")
+	for _, c := range []string{"", "unknown"} {
+		e.build.Commit = c
+		e.want("self-hosting", resWarning)
+	}
+}
+
 func TestDoctorWritesNothing(t *testing.T) {
 	e := newDoctorEnv(t)
 	snap := func() string {

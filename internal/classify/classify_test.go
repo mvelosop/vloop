@@ -115,3 +115,18 @@ func TestClassifyScopeRepoGlobsStayRepoRelative(t *testing.T) {
 		t.Errorf("got %+v", r)
 	}
 }
+
+func TestPresetsCountNestTests(t *testing.T) {
+	for _, ext := range []string{"ts", "js"} {
+		name := map[string]string{"ts": "typescript", "js": "javascript"}[ext]
+		c := New(Preset{}, []string{name})
+		for _, p := range []string{"test/links.e2e-spec." + ext, "test/jest-e2e.json", "src/links.e2e-spec." + ext} {
+			if got := c.Classify(p); got.Category != Test {
+				t.Errorf("%s %s: got %+v, want test", name, p, got)
+			}
+		}
+		if got := c.Classify("src/app." + ext); got.Category != Code {
+			t.Errorf("%s src/app.%s: got %+v, want code", name, ext, got)
+		}
+	}
+}

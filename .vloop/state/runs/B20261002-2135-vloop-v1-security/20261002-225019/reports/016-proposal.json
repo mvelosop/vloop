@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T14",
+  "outcome": "done",
+  "summary": "The typescript and javascript presets now classify **/*.e2e-spec.{ts,js} and **/test/** as tests; the metrics guide table follows, and TestPresetsCountNestTests covers it.",
+  "files": ["internal/classify/presets.go", "internal/classify/classify_test.go", "docs/guide/metrics.md"],
+  "verified": "vloop task gate T14 exited 0 and printed GATE OK.",
+  "notes": "none"
+}

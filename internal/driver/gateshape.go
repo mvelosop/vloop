@@ -3,7 +3,6 @@ package driver
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -107,7 +106,7 @@ scan:
 }
 
 func tracked(root, path string) bool {
-	return exec.Command("git", "-C", root, "cat-file", "-e", "HEAD:"+path).Run() == nil
+	return gitCmd(root, "cat-file", "-e", "HEAD:"+path).Run() == nil
 }
 
 func owns(t state.Task, path string) bool {

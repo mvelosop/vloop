@@ -1,0 +1,13 @@
+── iteration 22 (1 this run) · T17 · 16/18 done ──
+   Bring the domain model, the domain docs and the exit-code table in line with B8 (S-2, S-4, R-3, R-4)
+   review: PASS
+   T17 done
+── iteration 23 (2 this run) · T18 · 17/18 done ──
+   Close B8: the worked example line for line, every check at once, and the real-data check
+   review: PASS
+   T18 done
+
+═══ complete ═══
+run:    B20261002-2135-vloop-v1-security/20261003-121705  (2 iteration(s) this run)
+plan:   18/18 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261002-2135-vloop-v1-security.md

@@ -142,12 +142,16 @@ func withVersion(manifest []byte, v string) ([]byte, error) {
 	return append(out, '\n'), nil
 }
 
-// ExtractFence writes the embedded fence to .vloop/tmp/fence/<version>/
-// settings.json under root and returns that path relative to root, with "/".
-// Nothing is written through a symlink.
-func ExtractFence(root, version string) (string, error) {
+// ExtractFence writes the embedded fence of one phase to
+// .vloop/tmp/fence/<version>/<phase>.json under root and returns that path
+// relative to root, with "/". Nothing is written through a symlink.
+func ExtractFence(root, version, phase string) (string, error) {
 	if version == "" || version == "." || version == ".." || strings.ContainsAny(version, `/\\`) {
 		return "", fmt.Errorf("cannot extract the fence for version %q", version)
+	}
+	body, err := vloop.Fence(phase)
+	if err != nil {
+		return "", fmt.Errorf("no fence for phase %q", phase)
 	}
 	rel := path.Join(".vloop", "tmp", "fence", version)
 	dir := root
@@ -157,17 +161,17 @@ func ExtractFence(root, version string) (string, error) {
 			return "", err
 		}
 	}
-	target := filepath.Join(dir, "settings.json")
+	target := filepath.Join(dir, phase+".json")
 	if fi, err := os.Lstat(target); err == nil && !fi.Mode().IsRegular() {
 		if err := os.RemoveAll(target); err != nil {
 			return "", err
 		}
 	}
-	if have, err := os.ReadFile(target); err == nil && bytes.Equal(have, vloop.Fence) {
-		return rel + "/settings.json", nil
+	if have, err := os.ReadFile(target); err == nil && bytes.Equal(have, body) {
+		return rel + "/" + phase + ".json", nil
 	}
-	if err := os.WriteFile(target, vloop.Fence, 0o644); err != nil {
+	if err := os.WriteFile(target, body, 0o644); err != nil {
 		return "", err
 	}
-	return rel + "/settings.json", nil
+	return rel + "/" + phase + ".json", nil
 }

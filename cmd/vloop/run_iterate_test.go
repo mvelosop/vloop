@@ -290,6 +290,7 @@ func TestRun21ForeignState(t *testing.T) {
 	// A different brief is a different plan, so reset.
 	const other = "B20260101-1000-other"
 	r.write("docs/briefs/"+other+".loop-brief.md", strings.Replace(runBriefText(), runBriefName, other+".loop-brief", 1))
+	r.commitAll("another brief")
 	// verify never names a path, so gate-shape rule 3 has nothing to say about
 	// files the first run already committed.
 	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "true", "files": []string{}}),

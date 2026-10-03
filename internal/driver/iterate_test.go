@@ -2,10 +2,12 @@ package driver
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/mvelosop/vloop/internal/state"
 )
@@ -80,5 +82,87 @@ func TestRunGateEnvironment(t *testing.T) {
 		if b, _ := os.ReadFile(filepath.Join(dir, "gates", f)); !strings.Contains(string(b), "noisy") {
 			t.Errorf("gates/%s = %q", f, b)
 		}
+	}
+}
+
+func timeoutIterator(t *testing.T, verify string) (*Iterator, string) {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		t.Skip("the gate is a POSIX shell command")
+	}
+	root := t.TempDir()
+	dir := filepath.Join(root, "run")
+	os.MkdirAll(dir, 0o755)
+	it := &Iterator{Root: root, RunDir: dir, Budgets: Budgets{GateTimeout: 15},
+		GateTimeout: time.Second,
+		Env:         []string{"PATH=" + os.Getenv("PATH")},
+		plan:        &state.Plan{Shell: "sh", Tasks: []state.Task{{ID: "T1", Verify: verify}}}}
+	it.r = &Runner{Root: root, RunDir: dir}
+	return it, root
+}
+
+func TestGateTimeout(t *testing.T) {
+	it, _ := timeoutIterator(t, "echo started; sleep 1000")
+	start := time.Now()
+	g, err := it.runGate(1, "T1", "T1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if g.exit == 0 {
+		t.Error("a timed-out gate passed")
+	}
+	if time.Since(start) > 15*time.Second {
+		t.Errorf("the gate took %s", time.Since(start))
+	}
+	b, _ := os.ReadFile(filepath.Join(it.RunDir, "gates", "T1.log"))
+	if !strings.HasSuffix(string(b), "started\nvloop: gate T1 timed out after 15 min\n") {
+		t.Errorf("log %q", b)
+	}
+}
+
+func TestGateLeavesNothingRunning(t *testing.T) {
+	it, root := timeoutIterator(t, "sleep 1000 & echo $! > pid; exit 0")
+	it.GateTimeout = 0
+	start := time.Now()
+	g, err := it.runGate(1, "T1", "T1")
+	if err != nil || g.exit != 0 {
+		t.Fatalf("gate %+v err %v", g, err)
+	}
+	if time.Since(start) > 10*time.Second {
+		t.Errorf("the gate took %s", time.Since(start))
+	}
+	b, _ := os.ReadFile(filepath.Join(root, "pid"))
+	pid := strings.TrimSpace(string(b))
+	for i := 0; ; i++ {
+		if exec.Command("kill", "-0", pid).Run() != nil {
+			return
+		}
+		if i == 40 {
+			t.Fatal("the background sleep is still running")
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}
+
+func TestSessionTimeout(t *testing.T) {
+	r, _, log := fixture(t, claudeOut)
+	stub := filepath.Join(t.TempDir(), "claude")
+	if err := os.WriteFile(stub, []byte("#!/bin/sh\nsleep 1000 &\nsleep 1000\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	r.Claude, r.Timeout = stub, time.Second
+	start := time.Now()
+	res, err := r.Run(Spec{Phase: PhaseWork, Iteration: 1, Arg: "T1", Model: "sonnet"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !res.TimedOut || res.ExitCode == 0 {
+		t.Errorf("result %+v", res)
+	}
+	if time.Since(start) > 15*time.Second {
+		t.Errorf("the session took %s", time.Since(start))
+	}
+	if !strings.Contains(log.String(), "SESSION TIMED OUT work T1") {
+		t.Errorf("log %q", log.String())
 	}
 }

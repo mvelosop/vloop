@@ -49,6 +49,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
+		{"run.gate-timeout", "15", true}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -280,8 +281,17 @@ func TestAreasKey(t *testing.T) {
 
 func TestMetricsKeys(t *testing.T) {
 	root := scratch(t)
+	at := -1
+	for i, k := range Keys {
+		if k.Name == "areas" {
+			at = i
+		}
+	}
+	if at < 0 || at+6 > len(Keys) {
+		t.Fatalf("no five keys after areas in %d keys", len(Keys))
+	}
 	var names []string
-	for _, k := range Keys[len(Keys)-11 : len(Keys)-6] {
+	for _, k := range Keys[at+1 : at+6] {
 		names = append(names, k.Name)
 		if !k.List {
 			t.Errorf("%s is not a list", k.Name)
@@ -375,6 +385,8 @@ func TestRunKeysValidation(t *testing.T) {
 		{"run.stall-limit", "1", []string{"0", ""}},
 		{"run.cost-ceiling", "12.5", []string{"0", "-3", "abc", "NaN", "Inf"}},
 		{"run.convergence-max", "2.5", []string{"0", "-0.5", "x"}},
+		{"run.gate-timeout", "1", []string{"0", "1.5", "-2", "x"}},
+		{"run.session-timeout", "90", []string{"0", "2.5", "-1", "x"}},
 	}
 	for _, c := range cases {
 		if err := Set(root, c.key, c.good); err != nil {

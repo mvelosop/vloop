@@ -21,7 +21,10 @@ func TestSchemasAreEmbedded(t *testing.T) {
 }
 
 func TestFenceIsEmbedded(t *testing.T) {
-	if len(Fence) == 0 {
-		t.Fatal("embedded fence is empty")
+	for _, phase := range []string{"plan", "work", "review"} {
+		b, err := Fence(phase)
+		if err != nil || len(b) == 0 {
+			t.Fatalf("embedded %s fence: %d bytes, err %v", phase, len(b), err)
+		}
 	}
 }

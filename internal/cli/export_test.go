@@ -163,3 +163,31 @@ func TestExportRepoStacks(t *testing.T) {
 		t.Errorf("unset stacks = %#v, want []", stacks())
 	}
 }
+
+func TestExportRemoteForms(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	local := t.TempDir()
+	for _, c := range []struct {
+		url, name, remote string // remote "" means absent
+	}{
+		{local, filepath.Base(dir), ""},
+		{"file://" + filepath.ToSlash(local), filepath.Base(dir), ""},
+		{"https://alice:pw@example.com/org/r.git?access_token=tok123#frag", "r", "https://example.com/org/r.git"},
+		{"ssh://bob@git.example.com:2222/org/r.git", "r", "ssh://git.example.com:2222/org/r.git"},
+		{"git@github.com:org/r.git", "r", "github.com:org/r.git"},
+	} {
+		gitIn(t, dir, "2026-01-02T00:00:00Z", "config", "remote.origin.url", c.url)
+		for _, rec := range exportRecs(t, dir) {
+			repo := rec["repo"].(map[string]any)
+			remote, has := repo["remote"]
+			if c.remote == "" && has || c.remote != "" && remote != c.remote || repo["name"] != c.name {
+				t.Errorf("%s: repo %v, want name %s remote %q", c.url, repo, c.name, c.remote)
+			}
+			for _, bad := range []string{"tok123", "alice", "frag", "bob", filepath.Base(local)} {
+				if b, _ := json.Marshal(repo); strings.Contains(string(b), bad) && bad != filepath.Base(dir) {
+					t.Errorf("%s: repo %s carries %q", c.url, b, bad)
+				}
+			}
+		}
+	}
+}

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -56,6 +55,10 @@ type Planner struct {
 	Out, Err io.Writer // progress and warnings; may be nil
 	Quiet    bool
 
+	AwakeWarn string // why the keep-awake hold could not be taken; logged once to run.log
+
+	SessionTimeout time.Duration // the plan session is killed after this; none when zero
+
 	Claude string           // test seams, as Runner's
 	Now    func() time.Time // the driver's clock
 	Home   string
@@ -78,7 +81,7 @@ func (p *Planner) now() time.Time {
 
 // git runs git in the repository and returns its trimmed stdout.
 func git(root string, args ...string) (string, error) {
-	cmd := exec.Command("git", append([]string{"-C", root}, args...)...)
+	cmd := gitCmd(root, args...)
 	var stderr strings.Builder
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
@@ -158,15 +161,41 @@ func refsDiff(before, after []string) []string {
 	return out
 }
 
-// LatestBrief is the newest loop brief in docs/briefs/ (names carry their
-// timestamp, so the last sorted is the newest); "" when there is none.
-func LatestBrief(root string) string {
-	m, _ := filepath.Glob(filepath.Join(root, filepath.FromSlash(briefsDir), "*"+briefSuffix))
-	if len(m) == 0 {
-		return ""
+// requireCleanTree refuses when git status lists a modified, staged or
+// untracked-not-ignored path, so `git add -A` cannot sweep stray files into the
+// driver's commits. .vloop/tmp/ never counts; a resume also tolerates
+// .vloop/state/, where the operator's task edits wait for the next iteration.
+func requireCleanTree(root string, resuming bool) error {
+	raw, err := gitCmd(root, "status", "--porcelain", "-z", "--untracked-files=all").Output() // untrimmed: entries start with a space
+	if err != nil {
+		return halt(ExitPreflight, "git status: %v", err)
 	}
-	sort.Strings(m)
-	return briefsDir + "/" + filepath.Base(m[len(m)-1])
+	out := string(raw)
+	var dirty []string
+	parts := strings.Split(out, "\x00")
+	for i := 0; i < len(parts); i++ {
+		e := parts[i]
+		if len(e) < 4 {
+			continue
+		}
+		if e[0] == 'R' || e[0] == 'C' { // the next entry is the rename's source
+			i++
+		}
+		f := e[3:]
+		if strings.HasPrefix(f, ".vloop/tmp/") || (resuming && strings.HasPrefix(f, ".vloop/state/")) {
+			continue
+		}
+		dirty = append(dirty, f)
+	}
+	if len(dirty) == 0 {
+		return nil
+	}
+	sort.Strings(dirty)
+	list := strings.Join(dirty, ", ")
+	if len(dirty) > 10 {
+		list = fmt.Sprintf("%s and %d more", strings.Join(dirty[:10], ", "), len(dirty)-10)
+	}
+	return halt(ExitPreflight, "the tree is not clean — commit, ignore or remove these first: %s", list)
 }
 
 type term struct {
@@ -213,8 +242,12 @@ func (p *Planner) Plan() (*PlanResult, error) {
 
 	briefPath := p.Brief
 	if briefPath == "" && !hasPlan {
-		if briefPath = LatestBrief(root); briefPath == "" {
-			return nil, halt(ExitPreflight, "no plan and no loop brief in %s/ — usage: vloop run %s/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md", briefsDir, briefsDir)
+		entries, err := brief.Load(root)
+		if err != nil {
+			return nil, halt(ExitPreflight, "%v", err)
+		}
+		if briefPath = brief.Newest(entries); briefPath == "" {
+			return nil, halt(ExitPreflight, "no ready brief in %s/ — name one, or set status: ready on a checked brief", briefsDir)
 		}
 	}
 
@@ -229,6 +262,19 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	if hasPlan && briefPath == "" && existing.Branch != "" && existing.Branch != cur {
 		return nil, halt(ExitPreflight, "the plan %s was made on branch %s and you are on %s — name its brief to resume it, or another brief to plan afresh", existing.RunID, existing.Branch, cur)
+	}
+
+	if !resuming {
+		lang, err := config.Get(root, "language")
+		if err != nil {
+			return nil, halt(ExitPreflight, "%v", err)
+		}
+		if err := brief.Plannable(root, briefPath, brief.SetFor(lang.Value), p.Replan); err != nil {
+			return nil, halt(ExitPreflight, "%v", err)
+		}
+	}
+	if err := requireCleanTree(root, resuming); err != nil {
+		return nil, err
 	}
 
 	if resuming {
@@ -269,8 +315,11 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	defer logFile.Close()
 	r := &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
-		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User}
+		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
 	t := term{p, r}
+	if p.PlanOnly && p.AwakeWarn != "" {
+		r.Logf("%s", AwakeWarning(p.AwakeWarn))
+	}
 	if hasPlan {
 		t.say("the plan %s was for %s — you asked for %s: resetting and planning fresh", existing.RunID, existing.Brief, briefPath)
 	}
@@ -281,9 +330,13 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	t.say("planning from %s using %s", briefPath, model)
 	before := refsState(root)
+	gguard := snapshotGit(root)
 	res, err := r.Run(Spec{Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
 	if err != nil {
 		return nil, halt(ExitPreflight, "planning session failed: %v", err)
+	}
+	if what := gguard.changed(); what != "" {
+		return nil, halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
 	}
 	if moved := refsDiff(before, refsState(root)); len(moved) > 0 {
 		t.warn("REFS MOVED plan — the planning session changed git refs; nothing was committed:")
@@ -292,6 +345,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		}
 		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
 		return nil, halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
+	}
+	if res.TimedOut {
+		return nil, halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
 	}
 	if res.ExitCode != 0 {
 		return nil, halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))
@@ -343,7 +399,7 @@ func (p *Planner) workBranch(runID string) (string, error) {
 	if !OnDefaultBranch(p.Root) {
 		return "", nil
 	}
-	if exists := exec.Command("git", "-C", p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
+	if exists := gitCmd(p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
 		return "", halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
 	}
 	if _, err := git(p.Root, "switch", "-q", "-c", runID); err != nil {

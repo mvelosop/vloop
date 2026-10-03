@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "state.GateCommand is now the single builder of a gate's command, used by RunGate (vloop task gate) and Iterator.runGate. It refuses a shell outside sh, bash, pwsh, powershell, cmd, and passes cmd its command line verbatim on Windows.",
+  "files": ["internal/state/gate.go", "internal/state/gate_cmdline_windows.go", "internal/state/gate_cmdline_other.go", "internal/state/gate_test.go", "internal/driver/iterate.go"],
+  "verified": "vloop task gate T6 exited 0 and printed GATE OK.",
+  "notes": "GateCommand(root, shell, verify, env) returns *UnknownShellError or *ShellMissingError and builds nothing; an empty shell means sh. GateCmdLine(verify) is the pure builder (/C <verify>); gate_cmdline_windows.go sets SysProcAttr.CmdLine from it, the other-OS file is a no-op. The driver halts with ExitPreflight on either error. internal/cli/task_gate.go needed no change: it calls RunGate and prints the error via Problem. The timeout and process group (T7) belong in GateCommand's callers or in it."
+}

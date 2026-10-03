@@ -8,10 +8,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mvelosop/vloop/internal/state"
 )
 
 // Session kinds.
@@ -36,6 +39,8 @@ type Runner struct {
 	User   string           // masked to "USER"; the home's base name when empty
 	Env    []string         // base environment; os.Environ when nil
 
+	Timeout time.Duration // a session still running after this is killed with its group; none when zero
+
 	n int // sessions started in this run folder
 }
 
@@ -47,6 +52,7 @@ type Spec struct {
 	Arg       string
 	Model     string
 	Effort    string
+	PlanSHA   string // the plan's hash handed to the session; "" for none
 }
 
 // Result is how a session ended. Recorded is false when it printed nothing and
@@ -59,6 +65,7 @@ type Result struct {
 	Turns    int
 	IsError  bool
 	Denials  int
+	TimedOut bool // the session was killed for running past the timeout
 }
 
 // Prompt is the slash command a session of the phase starts with.
@@ -96,25 +103,153 @@ func (r *Runner) home() (home, user string) {
 	}
 	user = r.User
 	if user == "" && home != "" {
-		user = filepath.Base(home)
+		h := trimSeps(home)
+		user = h[strings.LastIndexAny(h, `/\`)+1:]
 	}
 	return home, user
 }
 
-// Mask replaces $HOME with ~ and the user name with USER, as the shell
-// driver's mask() does. A path is masked in its JSON-escaped form too.
-func (r *Runner) Mask(s string) string {
-	home, user := r.home()
-	if home != "" && home != "/" {
-		s = strings.ReplaceAll(s, home, "~")
+// pathEnd is what may follow a masked path: the end, a separator, a quote,
+// white space or a list delimiter. A letter, digit, dot or dash continues a
+// name, so it is not the end of the path.
+const pathEnd = `(\z|[/\\"'\s:,;)\]])`
+
+const pathSep = `[/\\]{1,2}`
+
+// windowsPath reports whether p is a drive or UNC path, whose separators and
+// letter case are not significant.
+func windowsPath(p string) bool {
+	drive := len(p) >= 3 && p[1] == ':' && (p[2] == '/' || p[2] == '\\') && (p[0]|0x20 >= 'a' && p[0]|0x20 <= 'z')
+	return drive || strings.HasPrefix(p, `\\`)
+}
+
+func trimSeps(p string) string { return strings.TrimRight(p, `/\`) }
+
+// homePattern matches the home in the forms it can take: as given, JSON
+// escaped, and for a Windows home with either separator in any letter case.
+func homePattern(home string) *regexp.Regexp {
+	var body string
+	if windowsPath(home) {
+		var parts []string
+		for _, c := range regexp.MustCompile(`[/\\]+`).Split(home, -1) {
+			parts = append(parts, regexp.QuoteMeta(c))
+		}
+		return regexp.MustCompile(`(?i)(?:` + strings.Join(parts, pathSep) + `)` + pathEnd)
+	} else {
+		body = regexp.QuoteMeta(home)
 		if esc := strings.ReplaceAll(home, `\`, `\\`); esc != home {
-			s = strings.ReplaceAll(s, esc, "~")
+			body += `|` + regexp.QuoteMeta(esc)
 		}
 	}
-	if user != "" {
-		s = strings.ReplaceAll(s, user, "USER")
+	return regexp.MustCompile(`(?:` + body + `)` + pathEnd)
+}
+
+// secretName matches the environment variables whose values are redacted.
+var secretName = regexp.MustCompile(`(?i)KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL`)
+
+// minSecret is the shortest value that is redacted; shorter ones are too
+// likely to be ordinary words.
+const minSecret = 8
+
+// redactSecrets replaces every occurrence of the value of a secret-named
+// environment variable with <redacted:NAME>, longest values first. It keys on
+// names, not on what a value looks like.
+func redactSecrets(env []string, s string) string {
+	type secret struct{ name, value string }
+	var secrets []secret
+	for _, kv := range env {
+		name, value, ok := strings.Cut(kv, "=")
+		if !ok || len(value) < minSecret || !secretName.MatchString(name) {
+			continue
+		}
+		secrets = append(secrets, secret{name, value})
+	}
+	sort.SliceStable(secrets, func(i, j int) bool { return len(secrets[i].value) > len(secrets[j].value) })
+	for _, c := range secrets {
+		s = strings.ReplaceAll(s, c.value, "<redacted:"+c.name+">")
+		// A JSON document holds the value escaped.
+		if q, err := json.Marshal(c.value); err == nil {
+			if esc := string(q[1 : len(q)-1]); esc != c.value {
+				s = strings.ReplaceAll(s, esc, "<redacted:"+c.name+">")
+			}
+		}
 	}
 	return s
+}
+
+func (r *Runner) env() []string {
+	if r.Env != nil {
+		return r.Env
+	}
+	return os.Environ()
+}
+
+// Mask redacts the values of secret-named environment variables, replaces the
+// home with ~ where it ends at a path boundary and the user
+// name with USER where it is a whole path component directly under the users
+// directory (Users, home, or the one that holds the home) — never as free
+// text. It works on text; a JSON document is masked through its string values
+// (maskValue), never as serialized text.
+func (r *Runner) Mask(s string) string {
+	s = redactSecrets(r.env(), s)
+	home, user := r.home()
+	if home = trimSeps(home); home != "" {
+		s = homePattern(home).ReplaceAllString(s, "~${1}")
+	}
+	if user = trimSeps(user); user != "" {
+		dirs := []string{"Users", "home"}
+		if i := strings.LastIndexAny(trimSeps(home), `/\`); i > 0 {
+			if parent := trimSeps(home[:i]); parent != "" {
+				dirs = append(dirs, filepath.Base(strings.ReplaceAll(parent, `\`, "/")))
+			}
+		}
+		for i, d := range dirs {
+			dirs[i] = regexp.QuoteMeta(d)
+		}
+		flags := ""
+		if windowsPath(home) {
+			flags = `(?i)`
+		}
+		re := regexp.MustCompile(flags + `(` + pathSep + `(?:` + strings.Join(dirs, "|") + `)` + pathSep + `)` + regexp.QuoteMeta(user) + pathEnd)
+		s = re.ReplaceAllString(s, "${1}USER${2}")
+	}
+	return s
+}
+
+// maskValue masks every string, and every object key, of a decoded JSON value.
+func (r *Runner) maskValue(v any) any {
+	switch x := v.(type) {
+	case string:
+		return r.Mask(x)
+	case []any:
+		for i := range x {
+			x[i] = r.maskValue(x[i])
+		}
+		return x
+	case map[string]any:
+		out := make(map[string]any, len(x))
+		for k, e := range x {
+			out[r.Mask(k)] = r.maskValue(e)
+		}
+		return out
+	}
+	return v
+}
+
+// maskRecord masks the strings of a record and returns it as indented JSON.
+// Numbers pass through untouched.
+func (r *Runner) maskRecord(rec map[string]any) ([]byte, error) {
+	raw, err := json.Marshal(rec)
+	if err != nil {
+		return nil, err
+	}
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+	var v any
+	if err := dec.Decode(&v); err != nil {
+		return nil, err
+	}
+	return json.MarshalIndent(r.maskValue(v), "", "  ")
 }
 
 // Logf writes one masked line to the run log.
@@ -147,7 +282,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	fence, err := ExtractFence(r.Root, r.Version)
+	fence, err := ExtractFence(r.Root, r.Version, s.Phase)
 	if err != nil {
 		return Result{}, err
 	}
@@ -166,28 +301,33 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	}
 	cmd := exec.Command(bin, Args(s, fence, plugin)...)
 	cmd.Dir = r.Root
-	base := r.Env
-	if base == nil {
-		base = os.Environ()
-	}
-	for _, kv := range base {
-		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") {
+	for _, kv := range r.env() {
+		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") || strings.HasPrefix(kv, PlanHashEnv+"=") {
 			continue
 		}
 		cmd.Env = append(cmd.Env, kv)
+	}
+	if s.PlanSHA != "" {
+		cmd.Env = append(cmd.Env, PlanHashEnv+"="+s.PlanSHA)
 	}
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 
 	started := r.now().UTC()
-	runErr := cmd.Run()
-	res := Result{}
+	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
+	res := Result{TimedOut: timedOut}
 	if runErr != nil {
 		ee, ok := runErr.(*exec.ExitError)
 		if !ok {
 			return Result{}, fmt.Errorf("cannot start %s: %w", bin, runErr)
 		}
 		res.ExitCode = ee.ExitCode()
+	}
+	if timedOut {
+		if res.ExitCode == 0 {
+			res.ExitCode = -1
+		}
+		r.Logf("SESSION TIMED OUT %s %s (iteration %d) after %s", s.Phase, orDash(task), s.Iteration, r.Timeout)
 	}
 	errName := filepath.Join(r.RunDir, fmt.Sprintf("%s-%d.stderr", s.Phase, s.Iteration))
 	if err := os.WriteFile(errName, []byte(r.Mask(stderr.String())), 0o644); err != nil {
@@ -200,12 +340,12 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		return res, nil
 	}
 	rec, out := r.record(s, task, started, raw)
-	data, err := json.MarshalIndent(rec, "", "  ")
+	data, err := r.maskRecord(rec)
 	if err != nil {
 		return res, err
 	}
 	res.Path = filepath.Join(r.RunDir, "sessions", fmt.Sprintf("%03d-%s.json", n, s.Phase))
-	if err := os.WriteFile(res.Path, []byte(r.Mask(string(data))+"\n"), 0o644); err != nil {
+	if err := os.WriteFile(res.Path, append(data, '\n'), 0o644); err != nil {
 		return res, err
 	}
 	res.Recorded = true
@@ -246,7 +386,25 @@ func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]j
 	get("duration_ms", &dur)
 	get("num_turns", &turns)
 	get("is_error", &o.IsError)
-	get("permission_denials", &o.Denials)
+	var denials []struct {
+		Tool  string `json:"tool_name"`
+		Input struct {
+			Path     string `json:"file_path"`
+			NotePath string `json:"notebook_path"`
+		} `json:"tool_input"`
+	}
+	get("permission_denials", &denials)
+	for _, d := range denials {
+		kept := map[string]string{"tool_name": d.Tool}
+		if p := d.Input.Path + d.Input.NotePath; p != "" {
+			kept["file_path"] = d.Input.Path
+			if d.Input.Path == "" {
+				kept["file_path"] = d.Input.NotePath
+			}
+		}
+		b, _ := json.Marshal(kept)
+		o.Denials = append(o.Denials, b)
+	}
 	o.Turns = int(turns)
 	if o.Denials == nil {
 		o.Denials = []json.RawMessage{}

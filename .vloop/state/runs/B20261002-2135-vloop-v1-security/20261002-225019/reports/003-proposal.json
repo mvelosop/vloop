@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "The driver now sums spend in memory, resolves work and review model and effort once, snapshots and restores its inputs around each work and review session (a review that changes one is failed), and hands sessions VLOOP_PLAN_SHA256; vloop task gate refuses a plan that does not match it.",
+  "files": ["internal/driver/iterate.go", "internal/driver/safety.go", "internal/driver/session.go", "internal/driver/resolve.go", "internal/cli/task_gate.go", "internal/cli/task_gate_test.go", "cmd/vloop/run_inputs_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed GATE OK.",
+  "notes": "Spend is read from disk once at the start of the iterating phase (to pick up the plan session) and then summed from each session's Result; the old Iterator.spend is kept for that one read. Inputs are snapshotted as file bytes (config.toml, defects, interventions, run sessions/ and reports/) and compared after the session; the session's own record is excluded from the added-file check. A refused task gate leaves .vloop/tmp/gate-refused, which the driver logs and removes after the session. ResolveRun/Resolved.For in resolve.go replace ModelEffort for work and review; plan still uses ModelEffort."
+}

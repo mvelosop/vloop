@@ -1,13 +1,20 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/state"
 )
 
@@ -22,6 +29,11 @@ func newTaskGate(g *Globals) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if want := os.Getenv("VLOOP_PLAN_SHA256"); want != "" {
+				if err := checkPlanHash(g, want); err != nil {
+					return jsonProblem(g, out, err)
+				}
+			}
 			t := p.Find(args[0])
 			if t == nil {
 				return jsonProblem(g, out, &state.NoTaskError{ID: args[0]})
@@ -34,9 +46,21 @@ func newTaskGate(g *Globals) *cobra.Command {
 			if g.JSON {
 				gateOut = cmd.ErrOrStderr()
 			}
-			code, d, err := state.RunGate(root, p.Shell, t.Verify, gateOut, cmd.ErrOrStderr())
+			minutes, err := config.Get(root, "run.gate-timeout")
+			if err != nil {
+				return configErr(g, out, err)
+			}
+			n, _ := strconv.Atoi(minutes.Value)
+			timeout := time.Duration(n) * time.Minute
+			code, d, timedOut, err := state.RunGateWithin(root, p.Shell, t.Verify, gateOut, cmd.ErrOrStderr(), timeout)
 			if err != nil {
 				return jsonProblem(g, out, err)
+			}
+			if timedOut {
+				if code == 0 {
+					code = 1
+				}
+				fmt.Fprintln(cmd.ErrOrStderr(), state.GateTimedOutLine(t.ID, n))
 			}
 			if g.JSON {
 				b, err := json.Marshal(struct {
@@ -77,4 +101,26 @@ func newTaskVerify(g *Globals) *cobra.Command {
 	cmd.Flags().StringVar(&reason, "reason", "", "why the gate is being replaced (required)")
 	_ = cmd.MarkFlagRequired("reason")
 	return cmd
+}
+
+// checkPlanHash refuses to run a gate when the plan on disk is not the one the
+// driver handed this session, and leaves the driver a note that it did.
+func checkPlanHash(g *Globals, want string) error {
+	root, err := g.root()
+	if err != nil {
+		return err
+	}
+	data, err := os.ReadFile(state.Path(root))
+	if err != nil {
+		return Problem(err)
+	}
+	sum := sha256.Sum256(data)
+	if hex.EncodeToString(sum[:]) == strings.ToLower(strings.TrimSpace(want)) {
+		return nil
+	}
+	note := filepath.Join(root, ".vloop", "tmp", "gate-refused")
+	if os.MkdirAll(filepath.Dir(note), 0o755) == nil {
+		_ = os.WriteFile(note, []byte("plan changed\n"), 0o644)
+	}
+	return Problem(errors.New("the plan was changed during this session — gates run only from the plan the driver holds"))
 }

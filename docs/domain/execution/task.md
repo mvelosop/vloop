@@ -43,7 +43,10 @@ stateDiagram-v2
 
 - Written by the planner **before** the implementation (P-4); a gate that passes
   before the work exists proves nothing, and `amend.sh` warns about one.
-- Run by the driver, in the plan's shell (P-5), from the repo root. Every done
+- Run by the driver through one gate runner, in the plan's shell (P-5), which
+  refuses an unknown shell, from the repo root, under `run.gate-timeout`; a gate
+  that timed out has failed. The driver runs gates only from the plan it holds in
+  memory, checked against `VLOOP_PLAN_SHA256`. Every done
   task's gate re-runs every iteration, so a later task that breaks an earlier
   one fails.
 - A gate can be the defect: a work session reports `gate_dispute`, the task
@@ -51,7 +54,8 @@ stateDiagram-v2
   --reason '<why>'`. The old command goes to `gate_history` with `by: operator`,
   and every earlier gate failure on the task becomes `origin: plan` in the
   metrics (M-4). A dispute charges no attempt. A session that rewrites a gate
-  file has it restored from HEAD and the iteration fails with no review; a gate
+  file — found by whole path token, in any OS path form, for every done task, and
+  never a file a task owns — has it restored from HEAD and the iteration fails with no review; a gate
   that fails and passes on its one immediate re-run is flaky (`gate.flaky`), not
   a failed attempt.
 - Gates must run on the host's tools. On macOS that means BSD `grep`, `sed`,

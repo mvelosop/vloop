@@ -1,0 +1,83 @@
+planning from docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md using opus
+planned: B20261002-2135-vloop-v1-security — 18 tasks
+committing the plan
+── iteration 1 (1 this run) · T1 · 0/18 done ──
+   Give each session phase its own fence and deny the bypasses the review found (F10, F6 fence part)
+   review: PASS
+   T1 done
+── iteration 2 (2 this run) · T2 · 1/18 done ──
+   Make the driver's git ignore hooks and fsmonitor, and halt when .git/config, the hooks or a gate's refs change (F4, F5)
+   review: PASS
+   T2 done
+── iteration 3 (3 this run) · T3 · 2/18 done ──
+   Keep the driver's inputs in memory, restore what a session changes among them, and run gates only from the plan the driver holds (F6 driver part, F7)
+   review: PASS
+   T3 done
+── iteration 4 (4 this run) · T4 · 3/18 done ──
+   Revert and fail a review session that changes the work it judges (F8)
+   review: PASS
+   T4 done
+── iteration 5 (5 this run) · T5 · 4/18 done ──
+   Find gate files by whole token, across OS path forms and for every done task (F9)
+   review: PASS
+   T5 done
+── iteration 6 (6 this run) · T6 · 5/18 done ──
+   Run every gate through one runner that refuses an unknown shell and passes cmd its command line verbatim (F15)
+   review: PASS
+   T6 done
+── iteration 7 (7 this run) · T7 · 6/18 done ──
+   Time gates and sessions and leave nothing running (F3)
+   review: FAIL
+── iteration 8 (8 this run) · T7 · 6/18 done ──
+   Time gates and sessions and leave nothing running (F3)
+   review: PASS
+   T7 done
+── iteration 9 (9 this run) · T8 · 7/18 done ──
+   Mask paths in string values before marshalling, never serialized text (F11)
+   review: PASS
+   T8 done
+── iteration 10 (10 this run) · T9 · 8/18 done ──
+   Redact secret environment values and keep only tool and path of permission denials (F12)
+   review: PASS
+   T9 done
+── iteration 11 (11 this run) · T10 · 9/18 done ──
+   Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
+   review: PASS
+   T10 done
+── iteration 12 (12 this run) · T11 · 10/18 done ──
+   Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
+   GATE REGRESSION T10 — reverting to pending; detected during T11's iteration
+   review: PASS
+   T11 done
+   no recorded progress (1/2)
+── iteration 13 (13 this run) · T10 · 10/18 done ──
+   Read handoffs only as regular files, take the lock atomically, and check the run id (F13)
+   review: PASS
+   T10 done
+── iteration 14 (14 this run) · T12 · 11/18 done ──
+   Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
+   GATE DISPUTE T12 — blocked for the operator; no review, no attempt charged
+   T12 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 15 (15 this run) · T13 · 11/18 done ──
+   Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
+   review: PASS
+   T13 done
+── iteration 16 (16 this run) · T14 · 12/18 done ──
+   Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
+   review: PASS
+   T14 done
+── iteration 17 (17 this run) · T15 · 13/18 done ──
+   Keep the machine awake for the lifetime of vloop run (C2)
+   review: PASS
+   T15 done
+── iteration 18 (18 this run) · T16 · 14/18 done ──
+   Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
+   review: PASS
+   T16 done
+2 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261002-2135-vloop-v1-security/20261002-225019  (18 iteration(s) this run)
+plan:   15/18 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

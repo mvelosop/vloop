@@ -43,6 +43,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | partly | [I20261001-0720-readme-cap-and-run-budgets](I20261001-0720-readme-cap-and-run-budgets.md) |
 | design | decision | partly | [I20261001-1021-four-forks-settled-for-b7](I20261001-1021-four-forks-settled-for-b7.md) |
 | design | decision | partly | [I20261001-1040-planner-gate-checks-questioned](I20261001-1040-planner-gate-checks-questioned.md) |
+| design | decision | partly | [I20261002-2140-b8-designed-from-the-v1-0-review-securit](I20261002-2140-b8-designed-from-the-v1-0-review-securit.md) |
 | design | direction | no | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
@@ -64,6 +65,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | halt | partly | [I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt](I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt.md) |
 | run | halt | partly | [I20260930-2149-t6-gate-contradicted-its-own-acceptance](I20260930-2149-t6-gate-contradicted-its-own-acceptance.md) |
 | run | halt | partly | [I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table](I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table.md) |
+| halt | repair | partly | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
+| halt | repair | yes | [I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th](I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th.md) |
 | verify | decision | partly | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | halt | partly | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |
@@ -81,6 +84,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | yes | [I20261001-1338-eval-cases-fail-to-load-setup-key](I20261001-1338-eval-cases-fail-to-load-setup-key.md) |
 | verify | verification-finding | partly | [I20261001-2310-eval-suite-first-run](I20261001-2310-eval-suite-first-run.md) |
 | verify | verification-finding | partly | [I20261002-1426-b7-s-acceptance-run-restarted-detached-t](I20261002-1426-b7-s-acceptance-run-restarted-detached-t.md) |
+| verify | verification-finding | partly | [I20261002-2118-the-url-shortener-benchmark-the-cost-dro](I20261002-2118-the-url-shortener-benchmark-the-cost-dro.md) |
 | close | carry-forward | partly | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

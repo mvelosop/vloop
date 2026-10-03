@@ -1,0 +1,18 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "New keys run.gate-timeout (default 15) and run.session-timeout (default 60), whole minutes, at least 1, with VLOOP_RUN_GATE_TIMEOUT and VLOOP_RUN_SESSION_TIMEOUT; an invalid value is a usage error (exit 2) on config set; config list and docs/guide/configuration.md show both.", "met": true, "evidence": "internal/config/config.go adds both keys (Int, Min 1); internal/cli/config_test.go TestConfigRunKeys checks exit 2 for 0, 1.5, -2, x; docs table lists both with their variables"},
+    {"criterion": "Each gate and each session runs in its own process group (a Job object on Windows, in build-tagged files); on timeout the whole group is killed and a short wait bounds the read of its output.", "met": true, "evidence": "internal/state/group.go RunGroup, group_unix.go (Setpgid, kill -pgid), group_windows.go (Job object); drain bounded to 2s; used by iterate.go runGate, session.go Run, gate.go"},
+    {"criterion": "A timed-out gate is a failed gate whose log ends with the line `vloop: gate <id> timed out after <n> min`; a timed-out session is a session error (exit 7).", "met": true, "evidence": "iterate.go runGate appends state.GateTimedOutLine and forces exit 1; TestGateTimeout asserts the log suffix; work/review/plan timeouts return errSessionError / halt ExitSessionError"},
+    {"criterion": "When the gate's shell exits, anything left in its group is killed, so verify `sleep 1000 & exit 0` returns promptly through a pipe and leaves no sleep running — in the driver and in vloop task gate alike.", "met": true, "evidence": "RunGroup calls g.kill() after c.Wait(); TestGateLeavesNothingRunning exists in internal/state and internal/driver; task_gate.go uses RunGateWithin"},
+    {"criterion": "The timeout is injectable in tests in seconds; tests named TestGateLeavesNothingRunning, TestGateTimeout (a verify sleeping past a short test timeout fails with the line above) and TestSessionTimeout exist under internal/ and fail against the base.", "met": true, "evidence": "Iterator.GateTimeout/SessionTimeout and Runner.Timeout seams; the three tests exist in internal/driver/iterate_test.go and reference symbols absent in the base"},
+    {"criterion": "golang.org/x/sys is the only dependency added; GOOS=windows builds and vets.", "met": true, "evidence": "go.mod diff adds only golang.org/x/sys; GOOS=windows go vet ./... passes"}
+  ],
+  "findings": [
+    {"summary": "internal/config TestMetricsKeys, which existed before, now fails: it slices Keys[len(Keys)-11:len(Keys)-6] by position and the two appended keys shifted the window; go test ./... is red and the work did not update it although config_test.go was in its files", "kind": "bug"},
+    {"summary": "the gate runs only named config tests, so it does not run the whole internal/config package and missed this regression", "kind": "gate-gap"}
+  ],
+  "notes": "Fix: adjust the slice offsets in TestMetricsKeys (now -13:-8) or select the metrics keys by name. The proposal also reports TestRun03GateRegression and TestRun41RegressionNamesBoth in cmd/vloop failing, attributed to T5; I did not verify that. Domain docs (run.md, R-3) are left to T17 by the work session."
+}
