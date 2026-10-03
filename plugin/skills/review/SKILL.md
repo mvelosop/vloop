@@ -22,6 +22,15 @@ the thing that was asked for.
 That gap is the whole reason a second session costs what it costs. Spend it on
 judgment, not on re-running commands.
 
+## The checks
+
+The driver also ran the repository's checks that match what this iteration
+changed, and they passed, or you would not be here. `.vloop/tmp/checks.json`
+lists the checks that ran: `name`, `exit` and `log`, the repo-relative path of
+its output. `{"checks": []}` means none matched. Read a log when a criterion
+depends on what the check covers; do not re-run the tests. A check that passes
+only because it was re-run, skipped or loosened in this diff is a finding.
+
 ## 1. Read the evidence, not the summary
 
 You judge the work, not the claim (S-3). Read, in this order:

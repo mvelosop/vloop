@@ -80,8 +80,8 @@ func (r *runRepo) wantIterations(outcomes ...string) {
 		}
 		f := filepath.Join(r.t.TempDir(), "it.json")
 		os.WriteFile(f, []byte(its[i]["_line"].(string)), 0o644)
-		if res := r.vloop("schema", "validate", "iteration/v1", f); res.code != 0 {
-			r.t.Errorf("iteration record %d is not iteration/v1: %+v", i+1, res)
+		if res := r.vloop("schema", "validate", "iteration/v2", f); res.code != 0 {
+			r.t.Errorf("iteration record %d is not iteration/v2: %+v", i+1, res)
 		}
 	}
 }
@@ -154,6 +154,9 @@ func TestRun01HappyPath(t *testing.T) {
 		g, _ := it["gate"].(map[string]any)
 		if g == nil || g["exit"] != float64(0) || g["duration_ms"] == nil {
 			t.Errorf("iteration %d gate = %v, want exit 0 with a duration", i+1, it["gate"])
+		}
+		if it["schema"] != "iteration/v2" || iterationChecks(it) != "all:0" {
+			t.Errorf("iteration %d is %v with checks %q, want iteration/v2 with all:0", i+1, it["schema"], iterationChecks(it))
 		}
 		if it["run_id"] != runID || it["attempt"] != float64(1) {
 			t.Errorf("iteration %d: run_id %v attempt %v", i+1, it["run_id"], it["attempt"])

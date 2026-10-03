@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The iteration is: work session → own gate and every done task's gate → checks → review → one commit. Checks run only when every gate that ran passed, in config order, and only those with a glob matching a path the iteration changed (tracked changes against HEAD, and untracked files).", "met": true, "evidence": "iterate.go step 3 runs checks only when dispute, tamper and failed gates are all clear; checksFor keeps config order; changedPaths reads git status with untracked files; checks_match_test.go covers matching and order"},
+    {"criterion": "A failing check ends the iteration as `check_failed`: no review, attempts+1, the note names the check and its log; a check is never re-run for flakiness.", "met": true, "evidence": "iterate.go OutCheckFailed case skips the review, applyOutcome adds an attempt and sets the note to 'check X failed — see log'; runChecks stops at the first failure and never retries; run_checks_test.go covers it"},
+    {"criterion": "Logs are checks/<name>.log (latest) and checks/<iteration>-<name>.fail.log, the iteration zero-padded as gate fail logs are; final-pass logs are checks/final-<name>.log.", "met": true, "evidence": "checks.go runChecks writes prefix+name.log and %03d-name.fail.log; the final pass uses the 'final-' prefix"},
+    {"criterion": "Iteration records are iteration/v2 with `checks` [{name, exit, duration_ms}], `[]` when none ran.", "met": true, "evidence": "iterate.go record uses schema iteration/v2 and checksRecord, which starts from an empty slice so it prints []"},
+    {"criterion": "When the last task becomes done every check runs once; a failure ends the run with `vloop: check <name> failed in the final pass — see <log path>` (exit 2, plan blocked), the path repo-relative; resuming with every task done runs the final pass again.", "met": true, "evidence": "Run() calls finalPass when nothing is pending or blocked; the refusal line is built from the repo-relative log; the ending is blocked/ExitBlocked; TestRunFinalPassFailureAndResume covers the resume"},
+    {"criterion": "The review session is given the checks' results and log paths and is not asked to re-run the tests.", "met": true, "evidence": "writeChecksFile writes .vloop/tmp/checks.json before the review session; plugin/skills/review/SKILL.md has a new 'The checks' section that says not to re-run the tests"},
+    {"criterion": "TestRun01HappyPath and TestWorkedExampleB6Sessions follow iteration/v2; tests cover scoping, check_failed, no checks after a failed gate, no re-run, the final pass and its resume.", "met": true, "evidence": "run_iterate_test.go and b6_e2e_test.go assert iteration/v2 and the checks field; run_checks_test.go has four tests that cover the listed cases; checks_match_test.go covers glob matching"}
+  ],
+  "findings": [],
+  "notes": "The work also edited docs/domain/domain-model.md (On disk layout) and plugin/skills/review/SKILL.md. The domain-model edit is outside the task's files list, but it is a one-line addition that a plugin-skills test requires, so it is acceptable here. Tests that existed before were only moved from iteration/v1 to v2, as the task asked."
+}

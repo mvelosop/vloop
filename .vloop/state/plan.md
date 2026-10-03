@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/16 done** · iteration 11
+**Status:** running · **8/16 done** · iteration 12
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T23:32:12Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T23:53:32Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify · 1 attempt(s)
 - [x] **T6** — Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate · 1 attempt(s)
 - [x] **T7** — Run every check on the base before planning, refuse without one, and copy the checks into the plan
-- [ ] **T8** — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
+- [x] **T8** — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
 - [ ] **T9** — Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
 - [ ] **T10** — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
 - [ ] **T11** — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
@@ -204,7 +204,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T8 — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
 
-`pending` · depends on: T1, T7
+`done` · depends on: T1, T7
 
 **Files:** `internal/driver/checks.go`, `internal/driver/iterate.go`, `internal/driver/iterate_test.go`, `internal/runs/`, `cmd/vloop/run_iterate_test.go`, `cmd/vloop/run_halt_test.go`, `cmd/vloop/b6_e2e_test.go`
 

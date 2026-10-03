@@ -2,10 +2,12 @@ package driver
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -128,4 +130,170 @@ func checkNames(cs []state.PlanCheck) string {
 		names[i] = c.Name
 	}
 	return "[" + strings.Join(names, " ") + "]"
+}
+
+// matchGlob reports whether a repo-relative path matches a check's glob: "/"
+// separated, "*" and "?" within a segment, "**" for any number of segments.
+func matchGlob(pattern, p string) bool {
+	return matchSegs(strings.Split(strings.Trim(pattern, "/"), "/"), strings.Split(p, "/"))
+}
+
+func matchSegs(pat, segs []string) bool {
+	for len(pat) > 0 {
+		if pat[0] == "**" {
+			for len(pat) > 0 && pat[0] == "**" {
+				pat = pat[1:]
+			}
+			if len(pat) == 0 {
+				return true
+			}
+			for i := range segs {
+				if matchSegs(pat, segs[i:]) {
+					return true
+				}
+			}
+			return false
+		}
+		if len(segs) == 0 {
+			return false
+		}
+		if ok, err := path.Match(pat[0], segs[0]); err != nil || !ok {
+			return false
+		}
+		pat, segs = pat[1:], segs[1:]
+	}
+	return len(segs) == 0
+}
+
+// checksFor is the checks, in config order, with a glob matching a changed path.
+func checksFor(checks []state.PlanCheck, changed []string) []state.PlanCheck {
+	var out []state.PlanCheck
+	for _, c := range checks {
+		if slices.ContainsFunc(c.Paths, func(g string) bool {
+			return slices.ContainsFunc(changed, func(p string) bool { return matchGlob(g, p) })
+		}) {
+			out = append(out, c)
+		}
+	}
+	return out
+}
+
+// changedPaths is what the iteration changed: tracked changes against HEAD and
+// untracked files, less the driver's scratch folder.
+func changedPaths(root string) []string {
+	out, err := gitCmd(root, "status", "--porcelain", "-z", "--no-renames", "--untracked-files=all").Output()
+	if err != nil {
+		return nil
+	}
+	var paths []string
+	for _, e := range strings.Split(string(out), "\x00") {
+		if len(e) < 4 {
+			continue
+		}
+		if p := e[3:]; !strings.HasPrefix(p, tmpDir+"/") {
+			paths = append(paths, p)
+		}
+	}
+	return paths
+}
+
+// checkRun is one check's outcome in an iteration or the final pass.
+type checkRun struct {
+	name string
+	exit int
+	ms   int64
+	log  string // repo-relative path of the check's log
+}
+
+// runChecks runs the checks in order, stopping at the first failure; a failed
+// check is never re-run. Logs go under the run folder's checks/: <prefix><name>.log
+// always, and for an iteration also <NNN>-<name>.fail.log when it fails.
+func (it *Iterator) runChecks(checks []state.PlanCheck, prefix string, iter int) ([]checkRun, error) {
+	dir := filepath.Join(it.RunDir, checksDir)
+	if len(checks) > 0 {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return nil, err
+		}
+	}
+	var runs []checkRun
+	for _, c := range checks {
+		it.say("   check %s", c.Name)
+		res, err := runCheck(it.Root, it.plan.Shell, c, it.gateTimeout())
+		if err != nil {
+			var h *Halt
+			if errors.As(err, &h) {
+				it.plan.Status = "halted"
+				_ = it.save()
+				_ = it.log.flush()
+			}
+			return nil, err
+		}
+		masked := []byte(it.r.Mask(string(res.log)))
+		rel := relRunDir(it.Root, dir) + prefix + c.Name + ".log"
+		if err := os.WriteFile(filepath.Join(dir, prefix+c.Name+".log"), masked, 0o644); err != nil {
+			return nil, err
+		}
+		cr := checkRun{name: c.Name, exit: res.exit, ms: res.ms, log: rel}
+		if res.exit != 0 && iter > 0 {
+			fail := fmt.Sprintf("%03d-%s.fail.log", iter, c.Name)
+			if err := os.WriteFile(filepath.Join(dir, fail), masked, 0o644); err != nil {
+				return nil, err
+			}
+			cr.log = relRunDir(it.Root, dir) + fail
+		}
+		runs = append(runs, cr)
+		if res.exit != 0 {
+			break
+		}
+	}
+	return runs, nil
+}
+
+// checksRecord is the iteration record's checks field.
+func checksRecord(runs []checkRun) []map[string]any {
+	out := []map[string]any{}
+	for _, r := range runs {
+		out = append(out, map[string]any{"name": r.name, "exit": r.exit, "duration_ms": r.ms})
+	}
+	return out
+}
+
+// checksFile is where the review session finds the checks' results.
+const checksFile = tmpDir + "/checks.json"
+
+// writeChecksFile hands the review session the checks that ran and their logs.
+func (it *Iterator) writeChecksFile(runs []checkRun) error {
+	type entry struct {
+		Name string `json:"name"`
+		Exit int    `json:"exit"`
+		Log  string `json:"log"`
+	}
+	list := []entry{}
+	for _, r := range runs {
+		list = append(list, entry{r.name, r.exit, r.log})
+	}
+	data, err := json.MarshalIndent(map[string]any{"checks": list}, "", "  ")
+	if err != nil {
+		return err
+	}
+	p := filepath.Join(it.Root, filepath.FromSlash(checksFile))
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(p, append(data, '\n'), 0o644)
+}
+
+// finalPass runs every check once when the last task is done. It returns the
+// failing check's refusal line, "" when all pass.
+func (it *Iterator) finalPass() (string, error) {
+	runs, err := it.runChecks(it.plan.Checks, "final-", 0)
+	if err != nil {
+		return "", err
+	}
+	for _, r := range runs {
+		if r.exit != 0 {
+			return fmt.Sprintf("vloop: check %s failed in the final pass — see %s", r.name, r.log), nil
+		}
+	}
+	return "", nil
 }

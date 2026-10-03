@@ -36,12 +36,14 @@ var errSessionError = errors.New("session failed")
 
 const tmpDir = ".vloop/tmp"
 
-// Outcome names of an iteration (iteration/v1).
+// Outcome names of an iteration (iteration/v2).
 const (
 	OutDone       = "done"
 	OutGateFailed = "gate_failed"
 	OutRejected   = "rejected"
 	OutBlocked    = "blocked"
+
+	OutCheckFailed = "check_failed"
 )
 
 // Ending says how a run ended: the plan status it leaves and the exit code.
@@ -199,7 +201,16 @@ func (it *Iterator) Run() (Ending, error) {
 			if blocked > 0 {
 				end = Ending{Status: "blocked", Code: ExitBlocked}
 			} else {
-				end = Ending{Status: "complete"}
+				line, err := it.finalPass()
+				if err != nil {
+					return Ending{}, err
+				}
+				if line != "" {
+					it.warn("%s", line)
+					end = Ending{Status: "blocked", Code: ExitBlocked, Note: line}
+				} else {
+					end = Ending{Status: "complete"}
+				}
 			}
 			break
 		}
@@ -243,7 +254,7 @@ func (it *Iterator) Run() (Ending, error) {
 		}
 		// An iteration that closed nothing and charged no attempt made no
 		// recorded progress at all.
-		if nd, _, _ := counts(plan); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected {
+		if nd, _, _ := counts(plan); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected && res.outcome != OutCheckFailed {
 			stalls++
 			it.warn("   no recorded progress (%d/%d)", stalls, it.Budgets.StallLimit)
 			if stalls >= it.Budgets.StallLimit {
@@ -510,7 +521,23 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		t.Notes = fmt.Sprintf("regressed: verify failed during %s — see %s", id, it.relGate(gid))
 	}
 
-	// 3. review
+	// 3. checks: only when every gate that ran passed
+	var checkRuns []checkRun
+	failedCheck := ""
+	if dispute == "" && tampered == "" && outcome == OutDone && len(failed) == 0 {
+		var err error
+		checkRuns, err = it.runChecks(checksFor(plan.Checks, changedPaths(root)), "", iter)
+		if err != nil {
+			return iterResult{}, err
+		}
+		for _, c := range checkRuns {
+			if c.exit != 0 {
+				failedCheck = fmt.Sprintf("check %s failed — see %s", c.name, c.log)
+			}
+		}
+	}
+
+	// 4. review
 	verdict := "skipped"
 	var findings []string
 	gatePassed := outcome == OutBlocked && dispute == "" && own != nil && own.exit == 0
@@ -529,7 +556,13 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	case failed[id]:
 		outcome = OutGateFailed
 		it.warn("   GATE FAIL %s — review skipped, work that fails its own gate is not reviewable", id)
+	case failedCheck != "":
+		outcome = OutCheckFailed
+		it.warn("   CHECK FAIL %s — %s; review skipped", id, failedCheck)
 	default:
+		if err := it.writeChecksFile(checkRuns); err != nil {
+			return iterResult{}, err
+		}
 		model, effort := it.resolved.For(task, PhaseReview)
 		before := refsState(root)
 		guard := snapshotState(root)
@@ -595,7 +628,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		it.say("   review: %s", verdict)
 	}
 
-	// 4. apply: the driver makes every status transition
+	// 5. apply: the driver makes every status transition
 	attempt := task.Attempts + 1
 	switch {
 	case dispute != "":
@@ -603,7 +636,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		task.Status, task.Notes = "blocked", dispute
 		it.say("   %s blocked — the operator resolves the disputed gate with vloop task verify", id)
 	default:
-		it.applyOutcome(task, outcome, summary, findings, tampered, gatePassed)
+		it.applyOutcome(task, outcome, summary, findings, tampered, gatePassed, failedCheck)
 	}
 	repeat := it.repeatBlocked(id, outcome, summary)
 	if task.Status == "pending" && task.Attempts >= it.Budgets.MaxAttempts {
@@ -619,10 +652,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		return iterResult{}, err
 	}
 
-	// 5. record
+	// 6. record
 	rec := map[string]any{
-		"schema": "iteration/v1", "run_id": plan.RunID, "iteration": iter, "task": id, "attempt": attempt,
-		"outcome": outcome, "gate": nil,
+		"schema": "iteration/v2", "run_id": plan.RunID, "iteration": iter, "task": id, "attempt": attempt,
+		"outcome": outcome, "gate": nil, "checks": checksRecord(checkRuns),
 		"started": started.Format(time.RFC3339), "ended": it.now().UTC().Format(time.RFC3339),
 	}
 	if own != nil {
@@ -644,7 +677,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		return iterResult{}, err
 	}
 
-	// 6. commit: one per iteration
+	// 7. commit: one per iteration
 	if err := it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome)); err != nil {
 		return iterResult{outcome: outcome, repeat: repeat}, err
 	}
@@ -1011,7 +1044,7 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 
 // applyOutcome is the status transition of an iteration that is not a gate
 // dispute: the driver's, never the session's.
-func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, findings []string, tampered string, gatePassed bool) {
+func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, findings []string, tampered string, gatePassed bool, failedCheck string) {
 	switch outcome {
 	case OutDone:
 		task.Status, task.Notes = "done", ""
@@ -1022,6 +1055,9 @@ func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, find
 		if tampered != "" {
 			task.Notes = tampered
 		}
+	case OutCheckFailed:
+		task.Status, task.Attempts = "pending", task.Attempts+1
+		task.Notes = failedCheck
 	case OutRejected:
 		task.Status, task.Attempts = "pending", task.Attempts+1
 		task.Notes = it.r.Mask(strings.Join(findings, "; "))

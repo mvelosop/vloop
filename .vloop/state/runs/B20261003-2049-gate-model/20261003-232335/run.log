@@ -21,3 +21,7 @@
    Run every check on the base before planning, refuse without one, and copy the checks into the plan
    review: PASS
    T7 done
+── iteration 12 (7 this run) · T8 · 7/16 done ──
+   Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
+   review: PASS
+   T8 done

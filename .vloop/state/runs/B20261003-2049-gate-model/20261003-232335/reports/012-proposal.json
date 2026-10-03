@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "After an iteration whose gates all passed, the driver runs the checks whose globs match the changed paths and ends a failure as check_failed with no review. When the last task is done every check runs once in a final pass. Iteration records are now iteration/v2 with checks, and the review session reads the checks' results from .vloop/tmp/checks.json.",
+  "files": ["internal/driver/checks.go", "internal/driver/iterate.go", "internal/driver/checks_match_test.go", "cmd/vloop/run_checks_test.go", "cmd/vloop/run_iterate_test.go", "cmd/vloop/b6_e2e_test.go", "plugin/skills/review/SKILL.md", "docs/domain/domain-model.md"],
+  "verified": "vloop task gate T8 exited 0 and printed GATE OK.",
+  "notes": "Checks run only when outcome is done, no dispute or tamper, and no gate (own or regression) failed; they stop at the first failure and are never re-run. Changed paths are git status (tracked + untracked) minus .vloop/tmp/, matched by a local matchGlob (** spans segments). The final pass lives in Iterator.Run where pending==0 and nothing is blocked, so a resume with all tasks done reruns it; it logs checks/final-<name>.log and ends blocked/exit 2 with the refusal line on stderr. The review is handed .vloop/tmp/checks.json ({checks:[{name,exit,log}]}), documented in the review SKILL.md and listed in domain-model.md's On disk layout because TestPluginSkills requires every path a skill names to be there; T12/T14 rewrite those docs. check_failed counts as attempt-charging for the stall logic. go test of internal/cli inside a session needs the VLOOP_* env unset."
+}

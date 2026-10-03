@@ -135,6 +135,7 @@ docs/briefs/<name>.md                     the briefs
 .vloop/interventions/<id>.md              recorded interventions (data)
 .vloop/tmp/proposal.json                  the work session's report, read back by the driver
 .vloop/tmp/verdict.json                   the review session's verdict, read back by the driver
+.vloop/tmp/checks.json                    the checks that ran this iteration, handed to the review session
 .vloop/tmp/plugin/<version>/              the plugin extracted for sessions
 .vloop/tmp/fence/<version>/settings.json  the fence extracted for sessions
 ```
