@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/16 done** · iteration 6
+**Status:** running · **4/16 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T22:24:35Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-03T22:25:26Z
 
 ## Progress
 
 - [x] **T1** — Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
-- [ ] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config · 1 attempt(s)
+- [x] **T2** — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config · 1 attempt(s)
 - [ ] **T3** — Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
 - [x] **T4** — Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
 - [x] **T5** — Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify · 1 attempt(s)
@@ -55,7 +55,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T2 — Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 **Files:** `internal/config/config.go`, `internal/config/config_test.go`, `internal/cli/config.go`, `internal/cli/config_test.go`, `docs/guide/configuration.md`
 
@@ -70,8 +70,6 @@ Checks, gate scratch folders and the gate-review session are all configured, so 
 - `vloop config set` of any key leaves the file's [[check]] tables in place.
 - docs/guide/configuration.md documents [[check]], run.gate-scratch, model.gate-review and effort.gate-review.
 - Config tests cover each new key and each refusal.
-
-**From the last attempt:** work session modified .vloop/state/state.json — a file a verify command runs, which this task neither created nor was assigned; restored by the driver
 
 <details><summary>verify command</summary>
 
