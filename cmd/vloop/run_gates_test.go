@@ -237,3 +237,48 @@ fi
 		wantNotIn(t, "task notes", r.task("T1")["notes"].(string), "gate disputed")
 	})
 }
+
+// gatePlanScript plays the plan and a gate folder for each id in folders.
+func gatePlanScript(folders ...string) string {
+	s := planOnlyScript
+	for _, id := range folders {
+		s += `if [ "$PHASE" = plan ]; then mkdir -p .vloop/state/gates/` + id + `; echo seed > .vloop/state/gates/` + id + `/rows.txt; fi
+`
+	}
+	return s
+}
+
+// TestRunRefusesStrayGateFolder: a gate folder whose id is not a task of the
+// plan refuses the plan, exit 1, and nothing is committed.
+func TestRunRefusesStrayGateFolder(t *testing.T) {
+	r := newRunRepo(t)
+	r.scripted(planJSON(t, planTask("T1", nil)), gatePlanScript("T1", "T9"))
+	res := r.vloop("run", runBrief)
+	wantExit(t, res, 1)
+	wantIn(t, "output", r.outputs(res), ".vloop/state/gates/T9 is a gate folder for T9, which is not a task of the plan")
+	if n := r.planCommits(); n != 0 {
+		t.Errorf("%d plan commit(s) after a refused plan", n)
+	}
+	if r.has(".vloop/state/gates/T9") || r.has(".vloop/state/state.json") {
+		t.Error("the refused plan left its state or gate folder behind")
+	}
+}
+
+// TestRunRefusesChangedGateFixtures: resuming a plan whose gate folder no
+// longer matches the task's fixtures refuses, exit 1, with no session started.
+func TestRunRefusesChangedGateFixtures(t *testing.T) {
+	r := newRunRepo(t)
+	r.scripted(planJSON(t, planTask("T1", nil)), gatePlanScript("T1"))
+	wantExit(t, r.vloop("run", "--plan-only", runBrief), 0)
+	if r.task("T1")["fixtures"] == "" {
+		t.Fatal("the plan did not stamp T1's fixtures")
+	}
+	before := r.sessions()
+	r.write(".vloop/state/gates/T1/rows.txt", "edited by hand\n")
+	res := r.vloop("run")
+	wantExit(t, res, 1)
+	wantIn(t, "stderr", res.err, "vloop: the gate fixtures of T1 changed outside vloop task verify — record the change with vloop task verify T1 --reason '<why>'")
+	if got := r.sessions(); got != before {
+		t.Errorf("%d session(s) started despite the refusal", got-before)
+	}
+}

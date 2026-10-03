@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Added two durable end-to-end tests for the refusals the review found untested: a stray gate folder refuses the plan (exit 1, nothing committed) and a resume with a changed gate folder is refused with the exact message (exit 1, no session started). The T5 implementation from the previous attempt is unchanged.",
+  "files": ["cmd/vloop/run_gates_test.go"],
+  "verified": "vloop task gate T5 exited 0 and printed GATE OK.",
+  "notes": "Tests are TestRunRefusesStrayGateFolder and TestRunRefusesChangedGateFixtures in cmd/vloop/run_gates_test.go; gatePlanScript(ids...) makes the stub plan session write a gate folder per id. The rest of T5 (state/fixtures.go, driver CheckFixtures, safety guard, task verify) is from attempt 1 and was accepted by the review on every criterion but test coverage."
+}

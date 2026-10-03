@@ -18,3 +18,7 @@ committing the plan
 ── iteration 4 (4 this run) · T5 · 2/16 done ──
    Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
    review: FAIL
+── iteration 5 (5 this run) · T5 · 2/16 done ──
+   Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
+   review: PASS
+   T5 done
