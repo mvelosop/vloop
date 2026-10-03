@@ -20,46 +20,9 @@ promoted it into the roadmap.
 
 ## Now
 
-### The gate model: what a gate is, who reviews it, and the checks the driver runs
-
-*Noted 2026-10-03, by the operator, from B8's run. The first brief after v1.0.*
-
-B8 showed the gate concept is underdefined: two of its 18 gates could never
-pass (a fixture sharing the stub's directory; a brief check of the running
-brief), two regressions went past per-task gates (T5, T15), its gates ran to
-3,000–10,000 characters, and F9's gate-file rule froze a task's own product
-(I20261003-1147). Direction set with the operator on 2026-10-03:
-
-- **A gate judges a contract** from the brief, by exercising the product. Its
-  judge — expected values, assertions — is in the verify itself, or in fixtures
-  the planner writes under a plan-owned directory (such as
-  `.vloop/state/gates/<task id>/`) that sessions cannot write. **A gate never
-  judges by a file a task writes, and never runs the tests.**
-- **The task's `files` property goes**, and with it gate-file detection: there
-  is nothing in a task's reach to protect.
-- **The driver runs an authoritative check command** after every iteration —
-  the repository's tests and health checks (vet, brief check…), written by the
-  planner or configured, required to pass at the plan's base, and responsible
-  for its own flaky tests. Its result is the reviewer's evidence; reviewers stop
-  re-running tests.
-- **A gate review step**: an independent session confirms every gate is a
-  contract check, fails on the base for the right reason, and keeps its judge out
-  of tasks' reach, before any work.
-- An earlier brief's test that a task must change is a contract change: the
-  brief lists it, and the check command judges it.
-- From B8's verification: a timed-out gate costs twice the timeout, because a
-  failed gate is re-run once to detect flakiness.
-
-### The quality pass (was B9)
-
-*Moved out of the v1.0 series by the operator on 2026-10-03.*
-
-The quality findings of the v1.0 review, in full in
-`docs/design-notes/vloop-v1-review.md` → "B9 — quality": the guides against the
-binary, error messages and exit codes, help text, code health, the test suite's
-speed. **The README rewrite comes after the gate model**, so it describes gates as
-they will be.
-
+*Promoted 2026-10-03:* the gate model, the interventions entry and the quality
+pass are the v2.0 release, planned in `docs/design-notes/vloop-v2.0-roadmap.md`
+(B9, B10, B11). Their entries there carry the direction recorded here.
 
 ### Configurable merge strategy and work-branch retention
 
@@ -82,35 +45,6 @@ will not suit every team.
   `/vloop:operate` follows it. vloop still never merges by itself.
 
 Not for v1; ready to brief once v1.0 is tagged.
-
-### Interventions that measure the model against the operator, and explain themselves later
-
-*Noted 2026-10-01, by the operator.*
-
-B7 makes interventions a vloop record (`intervention/v1`). Two things it does
-not yet capture, both needed to learn from the data rather than only count it:
-
-- **The model's suggestion, beside the operator's decision.** Each record gains
-  `suggested` — what the model (the assistant acting as the operator's hands, or
-  a session) proposed, in a sentence, or `none` when it proposed nothing — and
-  `decided` — what the operator chose. A derived `agreement` (`same`,
-  `adjusted`, `different`, `no-suggestion`) lets `vloop metrics` report, per kind
-  and phase and across a workspace, how far the model's judgement is from the
-  operator's. That is the evidence for which interventions a driver could take
-  over: the kinds where the model already agrees are the candidates.
-- **Context for review after the fact.** A record read weeks later has to stand
-  on its own. Each gains, where they apply: the run, iteration and task it
-  happened in; the commit or files involved; the triggering message or output,
-  quoted briefly; the alternatives considered; and what changed because of it
-  (a defect recorded, a gate amended, a brief rescoped). `vloop intervention show
-  <id>` prints the record with those links resolved.
-
-Settled with the operator, 2026-10-01: `suggested` is **written at the time** —
-honest, and only what the model actually proposed; a record with no suggestion
-says `none`. The context is **one succinct paragraph**, so records stay cheap
-enough to keep being written. The 61 records to date were given their context,
-suggestion and decision on 2026-10-01, in their bodies, while the session that
-made them still held the history.
 
 ## Next
 

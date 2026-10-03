@@ -103,4 +103,5 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | next | direction | no | [I20260930-1956-refocus-on-v1-and-intervention-data](I20260930-1956-refocus-on-v1-and-intervention-data.md) |
 | next | direction | no | [I20261001-1043-horizon-now-next-later](I20261001-1043-horizon-now-next-later.md) |
 | next | direction | no | [I20261001-1105-interventions-record-suggestion-and-context](I20261001-1105-interventions-record-suggestion-and-context.md) |
+| next | direction | no | [I20261003-1811-the-v2-0-release-planned-the-gate-model](I20261003-1811-the-v2-0-release-planned-the-gate-model.md) |
 <!-- index:end -->
