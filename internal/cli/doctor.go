@@ -220,7 +220,9 @@ func runDoctor(b Build, root string) []doctorCheck {
 	switch {
 	case !isRepo || !ownModule(root):
 		add("self-hosting", resNA, "")
-	case b.Commit != "" && head != "" && strings.HasPrefix(head, b.Commit):
+	case b.Commit == "" || b.Commit == "unknown":
+		add("self-hosting", resWarning, "this binary carries no commit — build releases with the stamped build in docs/guide/concepts.md")
+	case head != "" && strings.HasPrefix(head, b.Commit):
 		add("self-hosting", resWarning, "this binary was built from HEAD — build the next vloop with a released one")
 	default:
 		add("self-hosting", resPass, "")

@@ -133,6 +133,20 @@ branch (`origin/HEAD`'s target, else `main`, else `master`), through that traile
 or the commit that marked the brief `consumed`. That is what lets `vloop defect
 add --blame <file>:<line>` attribute a later bug to the brief that wrote the line.
 
+### The stamped release build
+
+`go install` stamps no commit, so `vloop doctor` warns in this repository that
+the binary carries no commit. Build releases with the stamped build:
+
+```
+go build -ldflags "-X main.version=<v> -X main.commit=<sha>" -o vloop ./cmd/vloop
+```
+
+Release steps: set the version in `plugin.json`, tag the release commit
+(`v<v>`), then build with the tag's version and commit sha. A binary stamped
+with HEAD still draws the self-hosting warning; build the next vloop with a
+released one.
+
 ## Setting up a repository
 
 `vloop init` sets a git repository up and never commits. It writes

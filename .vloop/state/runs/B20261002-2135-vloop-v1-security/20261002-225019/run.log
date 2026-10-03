@@ -58,3 +58,8 @@ committing the plan
    Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2)
    GATE DISPUTE T12 — blocked for the operator; no review, no attempt charged
    T12 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 15 (15 this run) · T13 · 11/18 done ──
+   Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
+   review: PASS
+   T13 done

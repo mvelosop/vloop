@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **11/18 done** · iteration 14
+**Status:** running · **12/18 done** · iteration 15
 
-**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-02T23:57:35Z
+**Brief:** `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` · **Updated:** 2026-10-03T00:01:39Z
 
 ## Progress
 
@@ -20,7 +20,7 @@
 - [x] **T10** — Read handoffs only as regular files, take the lock atomically, and check the run id (F13) · 1 attempt(s)
 - [x] **T11** — Export repo.remote only as a URL or scp-like form without credentials, and never a local path (F14)
 - [ ] **T12** — Plan only a ready, checked brief with its dependencies consumed, from a clean tree (F1, F2) · **blocked**
-- [ ] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
+- [x] **T13** — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
 - [ ] **T14** — Count NestJS e2e specs and test/ directories as tests in the TypeScript and JavaScript presets (C1)
 - [ ] **T15** — Keep the machine awake for the lifetime of vloop run (C2)
 - [ ] **T16** — Move the README's completeness checks to the guides and replace its config table with a pointer (C3)
@@ -326,7 +326,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; for v in $(env | sed -n 
 
 ### T13 — Make the self-hosting check warn on a binary that carries no commit, and document the stamped release build (F16)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 **Files:** `internal/cli/doctor.go`, `internal/cli/doctor_test.go`, `docs/guide/concepts.md`
 
