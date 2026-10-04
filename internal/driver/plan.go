@@ -164,8 +164,10 @@ func refsDiff(before, after []string) []string {
 // requireCleanTree refuses when git status lists a modified, staged or
 // untracked-not-ignored path, so `git add -A` cannot sweep stray files into the
 // driver's commits. .vloop/tmp/ never counts; a resume also tolerates
-// .vloop/state/, where the operator's task edits wait for the next iteration.
-func requireCleanTree(root string, resuming bool) error {
+// .vloop/state/, where the operator's task edits wait for the next iteration,
+// and a fresh run its own run id's folders under .vloop/state/runs/, which a
+// refusal before planning (a check failing on the base) leaves behind.
+func requireCleanTree(root string, resuming bool, runID string) error {
 	raw, err := gitCmd(root, "status", "--porcelain", "-z", "--untracked-files=all").Output() // untrimmed: entries start with a space
 	if err != nil {
 		return halt(ExitPreflight, "git status: %v", err)
@@ -182,7 +184,8 @@ func requireCleanTree(root string, resuming bool) error {
 			i++
 		}
 		f := e[3:]
-		if strings.HasPrefix(f, ".vloop/tmp/") || (resuming && strings.HasPrefix(f, ".vloop/state/")) {
+		if strings.HasPrefix(f, ".vloop/tmp/") || (resuming && strings.HasPrefix(f, ".vloop/state/")) ||
+			(runID != "" && strings.HasPrefix(f, ".vloop/state/runs/"+runID+"/")) {
 			continue
 		}
 		dirty = append(dirty, f)
@@ -289,7 +292,7 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	if len(checkDefs) == 0 {
 		return nil, halt(ExitPreflight, "no check configured — add a [[check]] to .vloop/config.toml")
 	}
-	if err := requireCleanTree(root, resuming); err != nil {
+	if err := requireCleanTree(root, resuming, brief.RunID(briefPath)); err != nil {
 		return nil, err
 	}
 

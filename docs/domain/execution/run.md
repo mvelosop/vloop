@@ -32,7 +32,9 @@ session or a gate runs. Before each commit it checks that HEAD is where it was
 
 Before planning, the preflight requires a `ready` brief that passes the check,
 with its dependencies consumed, and a clean tree (R-4), at least one check, every
-check passing on the base, and the gate scratch folders git-ignored. Every gate and session
+check passing on the base, and the gate scratch folders git-ignored. The run folder a
+refusal before planning leaves for the same run id does not make the tree dirty;
+the plan commit records it. Every gate and session
 runs under a timeout — `run.gate-timeout` and `run.session-timeout`, in minutes
 — and leaves no process behind; a timed-out gate fails like any failed gate and is not re-run.
 

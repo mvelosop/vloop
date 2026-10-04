@@ -114,6 +114,18 @@ func TestWorkedExampleB9(t *testing.T) {
 		r.wantNoSession()
 	})
 
+	t.Run("a check fixed after its base refusal: the next run is not refused for the refusal's logs", func(t *testing.T) {
+		t.Parallel()
+		r := b9Repo(t)
+		r.write("web/test.sh", "exit 1\n")
+		r.commitAll("web fails")
+		wantExit(t, r.vloop("run", runBrief), 1)
+		r.write("web/test.sh", "exit 0\n")
+		r.git("add", "web/test.sh") // the operator commits the fix, not the refusal's logs
+		r.git("commit", "-q", "-m", "web fixed")
+		wantExit(t, r.vloop("run", runBrief), 0)
+	})
+
 	t.Run("web/.gate/ not in .gitignore: refused", func(t *testing.T) {
 		t.Parallel()
 		r := b9Repo(t)
