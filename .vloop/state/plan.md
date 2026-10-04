@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **11/16 done** · iteration 15
+**Status:** running · **12/16 done** · iteration 16
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T00:59:33Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T01:06:48Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T9** — Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
 - [x] **T10** — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
 - [x] **T11** — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
-- [ ] **T12** — Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
+- [x] **T12** — Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
 - [ ] **T13** — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
 - [ ] **T14** — Update the domain model and the execution and measurement docs for the gate model
 - [ ] **T15** — Update the operator guides: concepts, the generated commands reference and metrics
@@ -303,7 +303,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T12 — Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
 
-`pending` · depends on: T8, T10
+`done` · depends on: T8, T10
 
 **Files:** `plugin/skills/plan/SKILL.md`, `plugin/skills/gate-review/SKILL.md`, `plugin/skills/review/SKILL.md`, `plugin/skills/work/SKILL.md`, `internal/cli/readme_test.go`, `internal/cli/skills_test.go`
 

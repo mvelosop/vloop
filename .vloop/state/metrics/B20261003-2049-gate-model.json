@@ -8,7 +8,7 @@
     "planned": 16,
     "done": 3,
     "blocked": 1,
-    "first_pass": 7,
+    "first_pass": 8,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,30 +43,30 @@
     "rework": 1.0011848341232228
   },
   "time": {
-    "agent_ms": 11047581,
-    "work_ms": 10584112,
-    "review_ms": 463469,
+    "agent_ms": 11482611,
+    "work_ms": 10986751,
+    "review_ms": 495860,
     "plan_ms": 2493754,
-    "gates_ms": 198884,
+    "gates_ms": 215263,
     "wall_ms": 2714000
   },
   "rate": {
-    "code_per_min": 4.58380888992803,
-    "code_test_per_min": 7.750112898018127
+    "code_per_min": 4.410146786301478,
+    "code_test_per_min": 7.45649225598603
   },
   "cost": {
-    "total_usd": 19.5559826,
+    "total_usd": 20.3773018,
     "plan_usd": 9.2589652,
-    "work_usd": 8.228999600000002,
-    "review_usd": 2.0680178000000002,
-    "per_1000_code_lines_usd": 23.170595497630334
+    "work_usd": 8.886247800000001,
+    "review_usd": 2.2320888,
+    "per_1000_code_lines_usd": 24.143722511848345
   },
   "tokens": {
-    "input": 852,
-    "output": 376763,
-    "cache_read": 33839523,
-    "cache_creation": 1495652,
-    "cache_hit_ratio": 0.9576493418459296
+    "input": 904,
+    "output": 389117,
+    "cache_read": 35278839,
+    "cache_creation": 1598105,
+    "cache_hit_ratio": 0.9566403928992819
   },
   "models": {
     "plan": [
@@ -98,8 +98,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 7,
-  "iterations": 14,
-  "iterations_per_closed": 4.666666666666667,
+  "iterations": 15,
+  "iterations_per_closed": 5,
   "by_task": [
     {
       "id": "T1",
@@ -335,7 +335,7 @@
       "id": "T11",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -348,9 +348,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 435030,
+      "cost_usd": 0.8213192,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T12",

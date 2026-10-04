@@ -30,7 +30,7 @@ const (
 
 // fencedSkills are the skills whose sessions run under the fence; the operate
 // skill is the operator's, in an interactive session, and is exempt.
-var fencedSkills = map[string]bool{"plan": true, "work": true, "review": true}
+var fencedSkills = map[string]bool{"plan": true, "work": true, "review": true, "gate-review": true}
 
 func TestPluginSkills(t *testing.T) {
 	dir := os.Getenv(skillCheckPluginEnv)

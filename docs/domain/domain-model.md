@@ -128,6 +128,7 @@ docs/briefs/<name>.md                     the briefs
 .vloop/config.toml                        the repo's config
 .vloop/state/state.json                   the plan            (the shell loop's is .loop/state/)
 .vloop/state/plan.md                      the plan, rendered for people
+.vloop/state/gates/<task id>/               the gate fixtures, written by the plan session
 .vloop/state/journals/<run id>.md         the journal
 .vloop/state/runs/<run id>/<folder>/      sessions/, iterations.jsonl, reports/, run.log
 .vloop/state/metrics/<run id>.json        the snapshot, written by close
@@ -136,6 +137,8 @@ docs/briefs/<name>.md                     the briefs
 .vloop/tmp/proposal.json                  the work session's report, read back by the driver
 .vloop/tmp/verdict.json                   the review session's verdict, read back by the driver
 .vloop/tmp/checks.json                    the checks that ran this iteration, handed to the review session
+.vloop/tmp/gate-verdict.json               the gate review session's verdict, read back by the driver
+.vloop/tmp/plan-problems.md                what the plan session must revise, written by the driver
 .vloop/tmp/plugin/<version>/              the plugin extracted for sessions
 .vloop/tmp/fence/<version>/settings.json  the fence extracted for sessions
 ```

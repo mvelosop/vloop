@@ -37,3 +37,7 @@
    Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
    review: PASS
    T11 done
+── iteration 16 (11 this run) · T12 · 11/16 done ──
+   Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
+   review: PASS
+   T12 done

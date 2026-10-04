@@ -33,7 +33,8 @@ Read, in this order:
    attached them because this task is bound by them, and the review session can
    see the same list. Skipping one you were given is how work gets rejected for
    breaking a convention nobody mentioned in the diff.
-5. The files your task touches.
+5. The files your task touches. The plan does not list them; the goal and the
+   acceptance criteria say where the work lies.
 
 ## 2. Do the task — only the task
 
@@ -60,7 +61,8 @@ proposal is the only thing the driver reads.
 
 You do not need to run the whole test suite, and on a large repo you should not.
 The driver already runs **every** completed task's gate after you finish, not
-just yours, so a break in an earlier task is caught without you paying for it.
+just yours, and then the repository's checks that match what you changed, so a
+break in an earlier task is caught without you paying for it.
 Work that passes its own gate while breaking an earlier one is worse than work
 that fails honestly — but that is what the driver's gate pass establishes, not a
 suite run you launch yourself.
@@ -120,14 +122,15 @@ would not want repeated.
 - **You do not set task status.** You propose an outcome; the gate and the
   review session decide. Do not edit `.vloop/state/state.json` at all. The
   driver restores it if you do and fails the iteration.
-- **You do not change your own gate** — not the `verify` command, not a test
-  file that already existed when you started, and not any file the gate
-  inspects, in order to make it pass. Gates were authored before any
-  implementation existed, and that is the only reason they mean anything: a
-  session that writes both the work and the gate has a gate that proves nothing
-  — *however correct its rewrite happens to be*. The driver restores a gate file
-  from the last commit and fails the iteration with no review. If your gate is
-  wrong, dispute it (below).
+- **You do not change your own gate** — not the `verify` command, and not the
+  gate fixtures in `.vloop/state/gates/`, which are not yours to edit: the plan
+  session wrote them and only the operator amends them. Do not edit a test file
+  that already existed when you started in order to make the gate pass either.
+  Gates were authored before any implementation existed, and that is the only
+  reason they mean anything: a session that writes both the work and the gate
+  has a gate that proves nothing — *however correct its rewrite happens to be*.
+  The driver restores the plan and the gate fixtures after your session. If your
+  gate is wrong, dispute it (below).
 - **You do not commit**, and you do not move a git ref in any way (S-2): no
   branch, tag, reset, checkout or stash. The driver makes one commit per
   iteration covering everything. Leave your changes in the working tree.
@@ -156,8 +159,8 @@ proceed.
 **A gate a correct implementation cannot pass is the gate's defect, not yours.**
 If the only way to make it exit 0 is to write something you would not otherwise
 write — duplicating a value so a substring check finds it, weakening an
-assertion, inlining what belongs behind a reference, touching a file the gate
-inspects — then the gate is wrong, not the approach.
+assertion, inlining what belongs behind a reference, editing its fixtures —
+then the gate is wrong, not the approach.
 
 Implement the task properly, let the gate fail, and report `outcome: "blocked"`
 with a `gate_dispute`:

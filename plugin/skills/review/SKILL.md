@@ -27,9 +27,10 @@ judgment, not on re-running commands.
 The driver also ran the repository's checks that match what this iteration
 changed, and they passed, or you would not be here. `.vloop/tmp/checks.json`
 lists the checks that ran: `name`, `exit` and `log`, the repo-relative path of
-its output. `{"checks": []}` means none matched. Read a log when a criterion
-depends on what the check covers; do not re-run the tests. A check that passes
-only because it was re-run, skipped or loosened in this diff is a finding.
+its output. `{"checks": []}` means none matched. **You read the checks' results
+and logs; you do not run the tests yourself.** Read a log when a criterion
+depends on what the check covers. A check that passes only because it was
+skipped or loosened in this diff is a finding.
 
 ## 1. Read the evidence, not the summary
 
@@ -64,13 +65,14 @@ on from the evidence is *not met* — say what evidence would have settled it.
 
 Then ask the questions the criteria do not:
 
-- **Did anything durable come out of it?** The gate dies with the run. The plan
-  should have named something in `files` that outlives it — a test file, a
-  committed request collection, a fixture — so check that it is really there
-  and really exercises the behaviour. A task that shipped behaviour and left
-  nothing behind reaches the branch with a green gate and no coverage, which is
-  exactly what a gate cannot tell you. If the plan never asked for one, that is
-  a gap in the plan and belongs in `notes`, not a failure of the work.
+- **Did the task ship tests for what it built?** The gate and its fixtures die
+  with the run, and the plan has no `files` to point at: you judge from the
+  diff. A task that shipped behaviour should have added or extended a committed
+  test, request collection or fixture that the checks run, and it should really
+  exercise the behaviour. A task that shipped behaviour and left nothing behind
+  reaches the branch with a green gate and no coverage, which is exactly what a
+  gate cannot tell you. If the checks do not cover the path it changed, that is
+  a gap in the plan and belongs in `notes`.
 - **Does a test actually test?** Read the assertions. A test that constructs the
   expected value the same way the implementation does, or asserts only that
   nothing raised, is not coverage.
@@ -79,9 +81,9 @@ Then ask the questions the criteria do not:
 - **Did it stay in scope?** Work beyond the task, or anything on the brief's
   out-of-scope list, is a finding even when the code is good. Scope creep is the
   named failure mode of this loop.
-- **Did it touch its own gate?** A gate file or a test that existed before the
-  task, modified by the work, is a goalpost move even when the rewrite is
-  better. Say so.
+- **Did it touch its own gate?** A change under `.vloop/state/gates/`, or to a
+  test that existed before the task so that it passes, is a goalpost move even
+  when the rewrite is better. Say so.
 - **Did it break something earlier?** The gate catches this mechanically, but
   look at whether the change was the *right* fix or a way to quiet a failure.
 - **Are there absolute paths anywhere?** `/Users/...` in any file, log, or
