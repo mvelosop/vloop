@@ -76,6 +76,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | repair | yes | [I20260930-1300-a-rehearsal-clone-took-the-work-branch-a](I20260930-1300-a-rehearsal-clone-took-the-work-branch-a.md) |
 | verify | repair | partly | [I20261001-1415-eval-port-fixed-by-hand](I20261001-1415-eval-port-fixed-by-hand.md) |
 | verify | repair | partly | [I20261001-2035-llm-grader-focus-fixed](I20261001-2035-llm-grader-focus-fixed.md) |
+| verify | repair | partly | [I20261004-1143-b9-verified-the-worked-example-held-by-h](I20261004-1143-b9-verified-the-worked-example-held-by-h.md) |
 | verify | verification-finding | yes | [I20260929-2010-go-mod-not-tidy](I20260929-2010-go-mod-not-tidy.md) |
 | verify | verification-finding | partly | [I20260929-2012-brief-check-and-brief-list-started-a-rep](I20260929-2012-brief-check-and-brief-list-started-a-rep.md) |
 | verify | verification-finding | yes | [I20260929-2245-one-review-session-s-telemetry-record-wa](I20260929-2245-one-review-session-s-telemetry-record-wa.md) |

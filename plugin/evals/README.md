@@ -45,7 +45,7 @@ the only thing that stops it.
 | Case | Skill | Asks |
 | --- | --- | --- |
 | `plan-valid-state` | `/vloop:plan` | a plan for a small brief validates and every task has a `kind` |
-| `plan-checks-its-gates` | `/vloop:plan` | the planner's judges are assertions in the `verify` or files in the gate folder, never the test a task writes, no `verify` runs a repository suite, and a fixture is read back |
+| `plan-checks-its-gates` | `/vloop:plan` | the planner's judges are assertions in the `verify` or files in the gate folder, never the test a task writes, no `verify` runs a repository suite, and a gate's TOML fixture sets its key at the top level |
 | `gate-review-planted-gates` | `/vloop:gate-review` | five planted gates (a path typo, a judge the task writes, a grep of source text, one that passes on the base, one sound): the four defects are found with the right finding kind and the sound gate passes |
 | `work-disputes-impossible-gate` | `/vloop:work` | a gate no correct implementation passes is reported as a `gate_dispute`, not edited |
 | `language-es` | `/vloop:plan` | with `language = "es"`, titles and acceptance are Spanish and keys stay English |
