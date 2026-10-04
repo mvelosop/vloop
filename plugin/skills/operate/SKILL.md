@@ -120,6 +120,34 @@ vloop intervention add "<summary>" --brief <name> \
 `automatable` answers whether a driver could do it; be honest, because that
 column is what shows what to build next.
 
+### Decisions: propose options, then record them
+
+Whenever you bring the operator a decision, propose up to three real options.
+Three is a ceiling, not a target: if the situation offers one or two, propose one
+or two, and never invent a straw option, one nobody would pick, to reach three.
+Recommend one and say why. Then stop and wait: the operator decides.
+
+After the operator decides, record the intervention with what you proposed and
+what they chose:
+
+```
+vloop intervention add "<summary>" --brief <name> --phase <phase> --kind <kind> \
+  --automatable <yes|partly|no> --by <operator|assistant|both> \
+  --trigger '<...>' --done '<...>' --automation '<...>' \
+  --option '<first option you proposed>' --option '<second>' \
+  --recommended <which option you recommended> --why '<why you recommended it>' \
+  --decided-option <the option they took> --decided '<what they decided, in their terms>' \
+  --context '<the run, iteration and task; the commit or files; the triggering output, quoted briefly; what changed because of it>'
+```
+
+If the operator took an option with changes, pass `--adjusted` as well; if they
+chose something you did not propose, use `--decided-other` instead of
+`--decided-option`, and still `--decided`. The options are only what you
+proposed **before** the operator decided: never reconstruct or add options
+afterwards to make the record look better. A decision you were not asked for, or
+one with a single obvious course, is recorded without options. `vloop
+intervention migrate` brings older records to the current version.
+
 ## 5. Closing and merging
 
 1. Fix what the operator agrees to fix, on the work branch, test first.

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/11 done** · iteration 10
+**Status:** running · **8/11 done** · iteration 11
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:49:38Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:51:50Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Add vloop intervention show <id>, resolving the ids written in its Context
 - [x] **T6** — Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
 - [x] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
-- [ ] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
+- [x] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
 - [ ] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain
 - [ ] **T10** — Migrate this repository's intervention records to intervention/v2 and refresh the index
 - [ ] **T11** — Close: the brief's worked example, line for line, as an end-to-end test
@@ -181,7 +181,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
 
-`pending` · depends on: T2, T3, T4
+`done` · depends on: T2, T3, T4
 
 The record is only as good as what is put in it: whenever the operator skill brings the operator a decision, it now proposes up to three real options, recommends one and says why, and records the intervention with those flags after the operator decides. The eval case is the skill's gate, run by the operator later; it must exist and be gradeable now.
 

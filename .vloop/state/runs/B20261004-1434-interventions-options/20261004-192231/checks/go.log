@@ -1,17 +1,17 @@
-ok  	github.com/mvelosop/vloop	0.387s
+ok  	github.com/mvelosop/vloop	0.411s
 ?   	github.com/mvelosop/vloop/cmd/gendocs	[no test files]
-ok  	github.com/mvelosop/vloop/cmd/vloop	546.118s
+ok  	github.com/mvelosop/vloop/cmd/vloop	(cached)
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	31.718s
-ok  	github.com/mvelosop/vloop/internal/closing	1.161s
+ok  	github.com/mvelosop/vloop/internal/cli	29.024s
+ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
 ok  	github.com/mvelosop/vloop/internal/detect	(cached)
-ok  	github.com/mvelosop/vloop/internal/driver	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	6.031s
 ok  	github.com/mvelosop/vloop/internal/install	(cached)
 ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
-ok  	github.com/mvelosop/vloop/internal/metrics	3.438s
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
-ok  	github.com/mvelosop/vloop/internal/schema	2.412s
-ok  	github.com/mvelosop/vloop/internal/state	3.826s
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/state	(cached)

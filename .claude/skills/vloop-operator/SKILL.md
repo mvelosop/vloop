@@ -118,15 +118,22 @@ Since B4: `vloop brief close <brief> --finding "…"` / `--no-findings` does 2�
 and the commit, and prints the trailer for step 4.
 
 6. **Record the interventions** — everything you or the operator did around the
-   run besides testing — one file each in `.vloop/interventions/`, as
-   `I<YYYYMMDD-HHMM>-<slug>.md` with frontmatter `id`, `brief`, `phase`
-   (setup, design, run, halt, verify, close, next), `kind` (direction, decision,
-   context-supply, halt, verification-finding, repair, carry-forward, ceremony),
-   `automatable` (yes, partly, no), `by` (operator, assistant, both),
-   `occurred`, `recorded`; then the summary, **Trigger.**, **Done.**, **What
-   would automate it.** Record them when they happen, then refresh the
-   index: `tools/interventions-index.sh --write` (`--check` in verification).
-   Why: `docs/design-notes/vloop-interventions-b1-b4.md`.
+   run besides testing — with `vloop intervention add "<summary>" --brief
+   <name> --phase <setup|design|run|halt|verify|close|next> --kind <direction|
+   decision|context-supply|halt|verification-finding|repair|carry-forward|
+   ceremony> --automatable <yes|partly|no> --by <operator|assistant|both>
+   --trigger … --done … --automation …`, when they happen. When you brought the
+   operator a decision, you proposed up to three real options (never a straw
+   option to reach three), recommended one and said why; after they decide,
+   record `--option` (once per option, only what you proposed before they
+   decided), `--recommended`, `--why`, the decided choice (`--decided-option`,
+   with `--adjusted` if they changed it, or `--decided-other`) and `--decided`,
+   and `--context` (the run, iteration and task; the commit or files; the
+   triggering output quoted briefly; what changed because of it). Correct a
+   record with `vloop intervention set`. Records written before intervention/v2
+   are brought forward with `vloop intervention migrate`, where the index is
+   refreshed: `tools/interventions-index.sh --write` (`--check` in
+   verification). Why: `docs/design-notes/vloop-interventions-b1-b4.md`.
 
 ## Lessons, where they bite
 

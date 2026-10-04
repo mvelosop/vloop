@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 10,
+  "iteration": 11,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T20:49:38Z",
+  "updated": "2026-10-04T20:51:50Z",
   "shell": "sh",
   "checks": [
     {
@@ -238,7 +238,7 @@
         "plugin/evals/README.md lists the case; TestEvalGrantsCoverFence passes with it (its allowed_tools cover the fence and appear in the evals guide's --allow-tools)."
       ],
       "verify": "sh .vloop/state/gates/T8/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

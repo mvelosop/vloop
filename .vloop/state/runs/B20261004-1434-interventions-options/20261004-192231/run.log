@@ -62,3 +62,8 @@ committing the plan
    check go
    review: PASS
    T7 done
+── iteration 11 (11 this run) · T8 · 7/11 done ──
+   Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
+   check go
+   review: PASS
+   T8 done
