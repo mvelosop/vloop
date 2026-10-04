@@ -1,30 +1,17 @@
 ok  	github.com/mvelosop/vloop	(cached)
 ?   	github.com/mvelosop/vloop/cmd/gendocs	[no test files]
-ok  	github.com/mvelosop/vloop/cmd/vloop	542.985s
+ok  	github.com/mvelosop/vloop/cmd/vloop	(cached)
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
---- FAIL: TestCommandsReferenceIsCurrent (0.00s)
-    commands_doc_test.go:20: docs/guide/commands.md is out of date: run `go generate ./...` and commit the result
---- FAIL: TestGuideCommandsNamesEveryCommandAndFlag (0.00s)
-    guide_test.go:159: commands.md does not document --adjusted
-    guide_test.go:159: commands.md does not document --context
-    guide_test.go:159: commands.md does not document --decided
-    guide_test.go:159: commands.md does not document --option
-    guide_test.go:159: commands.md does not document --decided-option
-    guide_test.go:159: commands.md does not document --why
-    guide_test.go:159: commands.md does not document --decided-other
-    guide_test.go:159: commands.md does not document --recommended
-FAIL
-FAIL	github.com/mvelosop/vloop/internal/cli	29.849s
+ok  	github.com/mvelosop/vloop/internal/cli	28.098s
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
 ok  	github.com/mvelosop/vloop/internal/detect	(cached)
 ok  	github.com/mvelosop/vloop/internal/driver	(cached)
 ok  	github.com/mvelosop/vloop/internal/install	(cached)
-ok  	github.com/mvelosop/vloop/internal/intervention	0.787s
+ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
 ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
 ok  	github.com/mvelosop/vloop/internal/schema	(cached)
 ok  	github.com/mvelosop/vloop/internal/state	(cached)
-FAIL

@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop intervention add takes --context, --option (max three), --recommended, --why, --decided-option, --decided-other, --adjusted and --decided; it writes the v2 record with the derived agreement and refuses malformed combinations with the brief's messages (exit 2, nothing written). list text gains an agreement column.
 - **Files:** internal/intervention/intervention.go, internal/cli/intervention.go, internal/cli/intervention_test.go
 - **Notes for next iteration:** Validation lives in intervention.CheckOptions, called by the CLI before the root is resolved and again by Add. Flag presence uses RecommendedSet/DecidedOptionSet (cmd.Flags().Changed) so --recommended 0 is refused, not read as unset. list text is now phase  kind  automatable  agreement  id.
+
+## T2 — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop intervention add takes the options flags and refuses malformed combinations with the brief's messages; the previous check failure is fixed by regenerating docs/guide/commands.md, which now documents the new flags.
+- **Files:** internal/intervention/intervention.go, internal/cli/intervention.go, internal/cli/intervention_test.go, docs/guide/commands.md
+- **Notes for next iteration:** The earlier check failure was docs/guide/commands.md being stale: run go generate ./... after adding flags. TestTaskGate* in internal/cli fail only inside a loop session (plan changed during this session), not from this change.

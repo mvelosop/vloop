@@ -32,3 +32,8 @@ committing the plan
    Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided
    check go
    CHECK FAIL T2 — check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/004-go.fail.log; review skipped
+── iteration 5 (5 this run) · T2 · 1/11 done ──
+   Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided
+   check go
+   review: PASS
+   T2 done

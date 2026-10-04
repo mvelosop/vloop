@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "vloop intervention add takes the options flags and refuses malformed combinations with the brief's messages; the previous check failure is fixed by regenerating docs/guide/commands.md, which now documents the new flags.",
+  "files": ["internal/intervention/intervention.go", "internal/cli/intervention.go", "internal/cli/intervention_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; TestCommandsReferenceIsCurrent and TestGuideCommands* pass.",
+  "notes": "The earlier check failure was docs/guide/commands.md being stale: run go generate ./... after adding flags. TestTaskGate* in internal/cli fail only inside a loop session (plan changed during this session), not from this change."
+}

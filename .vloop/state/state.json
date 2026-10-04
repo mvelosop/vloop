@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T19:44:39Z",
+  "updated": "2026-10-04T19:46:30Z",
   "shell": "sh",
   "checks": [
     {
@@ -74,9 +74,9 @@
         "Committed tests in internal/cli/intervention_test.go (or beside it) cover each refusal's message, exit code and that nothing was written, and each agreement add can produce."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/004-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T3",
