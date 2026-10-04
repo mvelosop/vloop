@@ -7,13 +7,14 @@ description: Binds the Session entity — the plan, work and review kinds, what 
 A fresh `claude -p` process with one job and no memory of any other; sessions
 share nothing but files (S-1). *Part of [execution](execution-context.md).*
 
-## The three kinds
+## The four kinds
 
 | Kind | Invoked with | Reads | Writes |
 | --- | --- | --- | --- |
 | **plan** | the brief | the brief, its binding references, the repo | the plan |
 | **work** | one task id | the brief, the plan, the task's references and notes | the working tree for that task, then a **proposal** |
-| **review** | one task id | the brief, the task's acceptance, the diff | a **verdict** |
+| **review** | one task id | the brief, the task's acceptance, the diff, the checks' results (`.vloop/tmp/checks.json`) | a **verdict** |
+| **gate-review** | none | the brief, the plan, the gates, their logs on the base | a **gate verdict** |
 
 The review sees the diff and the acceptance, not the proposal's summary, so it
 judges the work rather than the claim (S-3).
@@ -32,10 +33,17 @@ wrong.
 with evidence), `findings` (`{summary, kind}`, kind `bug`, `spec-gap` or
 `gate-gap`), `notes`. Each finding of a `FAIL` becomes a derived defect (M-4).
 
+## Gate verdict — `gate-verdict/v1`
+
+`verdict` (`PASS` or `FAIL`) and `findings`, each naming a task and one of five
+kinds. The gate-review session judges the plan's gates, not a task; it has no
+per-task model override. The driver keeps the verdict as
+`reports/gate-review-<round>.json`; a missing or invalid one is a `FAIL`.
+
 ## What a session never does
 
 Commit, set a status, or move a git ref (S-2). The **fence** — the permission
-settings loop sessions run under, one file per phase (plan, work, review) — denies
+settings loop sessions run under, one file per phase (plan, work, review, gate-review) — denies
 the commands (`git commit`, `push`, `reset`, `clean`, `branch`, `checkout`,
 `switch`, `merge`, `cherry-pick`, `revert`, `am`, `pull`, `fetch`, `config`,
 `reflog`, `gc` and the other mutating git subcommands, `git -C` and `git -c`,
@@ -44,7 +52,7 @@ the mutating `git remote` subcommands, `update-ref`, `symbolic-ref`, `tag`,
 `git diff`, `log` and `show`; recursive `rm`; `vloop -C` and `vloop brief new`),
 web access, and reads of the user's global Claude directory. No fence lets a
 session write under `.git/`. Each phase has its own fence. The plan fence allows writing only
-`.vloop/state/state.json` and `.vloop/tmp/**`; the work and review fences allow
+`.vloop/state/state.json`, `.vloop/state/gates/**` and `.vloop/tmp/**`; the work, review and gate-review fences allow
 nothing under `.vloop/` but `.vloop/tmp/**`.
 
 **The fence is advisory.** It is a first line that saves attempts, not a
@@ -61,16 +69,16 @@ work it judges has it reverted and fails). A session or gate that moves any ref,
 committed. A session writes nothing under `.git/` and nothing under `.vloop/`
 but `.vloop/tmp/` (S-4).
 
-## The record it leaves — `session/v1`
+## The record it leaves — `session/v1`, `session/v2`
 
 `run_id`, `iteration`, `phase`, `task` (none for `plan`), the configured
 `model` and `effort`, `models_used` (per model: tokens and cost), `started`,
-`duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A missing
+`duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A gate-review session's record is `session/v2` (iteration 0, no task). A missing
 record is reported by the metrics, never silently skipped.
 
 ## Skills, as built
 
-`/vloop:plan`, `/vloop:work` and `/vloop:review` are the plugin's session skills,
+`/vloop:plan`, `/vloop:gate-review`, `/vloop:work` and `/vloop:review` are the plugin's session skills,
 and `/vloop:operate` the operator's playbook (not a session). They write their
 prose in the repo's `language` (C-4).
 

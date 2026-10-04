@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T14",
+  "outcome": "done",
+  "summary": "domain-model.md now carries P-3, P-4, P-7, S-4, R-3 and the new glossary terms as the brief words them; task, plan, session, run and metrics docs describe fixtures, checks, gate review, gate folders, check_failed, the final pass, checks_ms and gate_review_ms.",
+  "files": ["docs/domain/domain-model.md", "docs/domain/execution/task.md", "docs/domain/execution/plan.md", "docs/domain/execution/session.md", "docs/domain/execution/run.md", "docs/domain/measurement/metrics.md"],
+  "verified": "vloop task gate T14 exited 0 and printed GATE OK.",
+  "notes": "P-7 sits after P-6 (numeric order). The On disk and aggregate sections of domain-model.md were not touched. Plan field names checks, gate_scratch and gate_review and the check log paths (checks/<name>.log) in run.md were taken from earlier journal notes, not re-verified against the code."
+}

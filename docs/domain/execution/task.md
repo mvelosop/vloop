@@ -15,16 +15,16 @@ One independently verifiable unit of a [plan](plan.md). *Part of
 | `title`, `goal` | what and why |
 | `kind` | `feature`, `fix`, `refactor`, `test`, `docs`, `chore` |
 | `area` | one of the repo's `areas`; required only when `areas` is set |
-| `files` | the files it is expected to touch |
 | `references` | binding references distributed from the brief: `{path, why}` |
 | `depends_on` | task ids that must be done first |
 | `acceptance` | the criteria the review judges; non-empty |
-| `verify` | the **gate**: one command in the plan's shell; non-empty |
+| `verify` | the gate's command: one command in the plan's shell; non-empty. With the task's gate folder it is the **gate**, the planner's judge |
+| `fixtures` | the stamp (a sha) of the task's gate folder, `.vloop/state/gates/<id>/`; the driver fills it, empty when the task has no folder |
 | `status` | `pending`, `done`, `blocked` |
 | `attempts` | failed tries so far |
 | `notes` | what the next session must know; the reason for the last failure |
 | `model`, `effort` | optional overrides per session kind: `{work, review}` (P-6) |
-| `gate_history` | every replaced gate: `{verify, replaced_at, reason, by}` |
+| `gate_history` | every replaced gate or fixtures: `{verify, fixtures, replaced_at, reason, by}` |
 
 ## Lifecycle
 
@@ -41,8 +41,17 @@ stateDiagram-v2
 
 ## The gate
 
-- Written by the planner **before** the implementation (P-4); a gate that passes
-  before the work exists proves nothing, and `amend.sh` warns about one.
+- Written by the planner **before** the implementation (P-4), as the task's
+  `verify` and, when the judge is more than one command, its gate folder
+  `.vloop/state/gates/<id>/` (the gate fixtures). No task writes its judge. A
+  gate that passes before the work exists proves nothing: the driver runs every
+  gate on the base at acceptance and sends one that passes, or that changes the
+  tree, back to the planner; the gate review then judges all of them before any
+  work. `amend.sh` still warns about one.
+- An oracle the gate runs is copied into a gate scratch folder
+  (`run.gate-scratch`, git-ignored) and run there; the scratch folders are
+  emptied after every gate, and a gate that changes the tree fails. A work
+  session that edits the gate fixtures has them restored from HEAD.
 - Run by the driver through one gate runner, in the plan's shell (P-5), which
   refuses an unknown shell, from the repo root, under `run.gate-timeout`; a gate
   that timed out has failed. The driver runs gates only from the plan it holds in
@@ -57,7 +66,11 @@ stateDiagram-v2
   file — found by whole path token, in any OS path form, for every done task, and
   never a file a task owns — has it restored from HEAD and the iteration fails with no review; a gate
   that fails and passes on its one immediate re-run is flaky (`gate.flaky`), not
-  a failed attempt.
+  a failed attempt. A timed-out gate is not re-run.
+- The operator replaces a gate or its fixtures with `task verify <id>`, giving a
+  command, a changed gate folder, or both, with `--reason`; both the old command
+  and the old fixtures stamp go to `gate_history`. A change to the gate folder
+  made any other way stops the run before it starts.
 - Gates must run on the host's tools. On macOS that means BSD `grep`, `sed`,
   `awk`, `date` — B2 stalled on a GNU-only pattern.
 

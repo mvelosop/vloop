@@ -45,3 +45,7 @@
    Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
    review: PASS
    T13 done
+── iteration 18 (13 this run) · T14 · 13/16 done ──
+   Update the domain model and the execution and measurement docs for the gate model
+   review: PASS
+   T14 done

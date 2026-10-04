@@ -4,7 +4,7 @@ description: Binds the Plan aggregate — state.json's fields, its lifecycle fro
 ---
 # Plan
 
-A brief decomposed into tasks, in `state.json` (`state/v1`). *Part of
+A brief decomposed into tasks, in `state.json` (`state/v2`; a `state/v1` plan is refused by `vloop run`). *Part of
 [execution](execution-context.md).*
 
 ## Fields
@@ -20,6 +20,9 @@ A brief decomposed into tasks, in `state.json` (`state/v1`). *Part of
 | `iteration` | iterations so far, across runs |
 | `created`, `updated` | RFC 3339 UTC |
 | `tasks` | the [tasks](task.md), in plan order |
+| `checks` | the repository's tests and health checks, copied from the config's `[[check]]` tables: `{name, paths, run}`; at least one (P-3, P-7) |
+| `gate_scratch` | the config's `run.gate-scratch` folders, copied into the plan |
+| `gate_review` | the gate review's outcome: `{rounds, verdict}`, set once the review has run |
 
 ## Lifecycle
 
@@ -42,12 +45,22 @@ max iterations (4) and cost ceiling (6) are resumable as they are; not
 converging (5), session error (7), repeat blocked (8) and refs moved (9) want
 the operator first.
 
+## Acceptance
+
+The plan session writes the plan and the gate folders `.vloop/state/gates/<id>/`
+(S-4). Before any work the driver accepts it: the schema and the shape of the
+gates, every gate run on the base (one that passes, or changes the tree, goes
+back to the planner), then the **gate review**. Acceptance problems and review
+findings share two rounds; a plan the gate review failed twice is saved blocked
+and the run ends with exit 2. Every check must pass on the base before
+planning, and there must be at least one.
+
 ## Rules
 
 - One plan per repo, owned by its branch; a new brief resets it (P-1). Resuming
   on another branch than the one that planned needs the brief named again.
 - Only the driver changes `status` (P-2); `vloop task …` amends a plan between
-  runs, validating the whole plan before writing and refusing to write an
+  runs (gates under `.vloop/state/gates/` change only through `task verify`), validating the whole plan before writing and refusing to write an
   invalid one.
 - The plan is written as 2-space-indented JSON in schema key order; loading and
   saving an unchanged plan is byte-for-byte stable.

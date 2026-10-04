@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **13/16 done** · iteration 17
+**Status:** running · **14/16 done** · iteration 18
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T01:11:23Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T01:14:28Z
 
 ## Progress
 
@@ -21,7 +21,7 @@
 - [x] **T11** — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
 - [x] **T12** — Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
 - [x] **T13** — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
-- [ ] **T14** — Update the domain model and the execution and measurement docs for the gate model
+- [x] **T14** — Update the domain model and the execution and measurement docs for the gate model
 - [ ] **T15** — Update the operator guides: concepts, the generated commands reference and metrics
 - [ ] **T16** — Close B9: the worked example line for line, go test ./..., and the real-data check
 
@@ -350,7 +350,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T14 — Update the domain model and the execution and measurement docs for the gate model
 
-`pending` · depends on: T8, T10, T11
+`done` · depends on: T8, T10, T11
 
 **Files:** `docs/domain/domain-model.md`, `docs/domain/execution/task.md`, `docs/domain/execution/plan.md`, `docs/domain/execution/session.md`, `docs/domain/execution/run.md`, `docs/domain/measurement/metrics.md`
 
