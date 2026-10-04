@@ -15,3 +15,7 @@ checking the gate of T11 on the base
 planned: B20261004-1434-interventions-options — 11 tasks
 reviewing the gates using sonnet (round 1)
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/11 done ──
+   Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/001-go.fail.log; review skipped

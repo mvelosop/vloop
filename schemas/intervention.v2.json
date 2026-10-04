@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "intervention/v2",
+  "description": "A recorded operator intervention with the options put to the operator: the frontmatter of .vloop/interventions/I<stamp>-<slug>.md as JSON",
+  "type": "object",
+  "required": ["schema", "id", "brief", "phase", "kind", "automatable", "by", "occurred", "recorded", "options", "recommended", "decided", "agreement"],
+  "properties": {
+    "schema": { "const": "intervention/v2" },
+    "id": { "type": "string" },
+    "brief": { "type": "string" },
+    "phase": { "enum": ["setup", "design", "run", "halt", "verify", "close", "next"] },
+    "kind": { "enum": ["direction", "decision", "context-supply", "halt", "verification-finding", "repair", "carry-forward", "ceremony"] },
+    "automatable": { "enum": ["yes", "partly", "no"] },
+    "by": { "enum": ["operator", "assistant", "both"] },
+    "occurred": { "type": "string", "format": "date" },
+    "recorded": { "type": "string", "format": "date-time" },
+    "backfilled": { "type": "boolean" },
+    "summary": { "type": "string" },
+    "trigger": { "type": "string" },
+    "done": { "type": "string" },
+    "automation": { "type": "string" },
+    "context": { "type": "string" },
+    "suggested": { "type": "string" },
+    "options": { "type": "array", "items": { "type": "string" }, "maxItems": 3 },
+    "recommended": {
+      "type": "object",
+      "required": ["option", "why"],
+      "properties": {
+        "option": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "why": { "type": "string" }
+      }
+    },
+    "decided": {
+      "type": "object",
+      "required": ["option", "text"],
+      "properties": {
+        "option": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "adjusted": { "type": "boolean" },
+        "text": { "type": "string" }
+      }
+    },
+    "agreement": { "enum": ["recommended", "other-option", "adjusted", "different", "no-options"] }
+  }
+}

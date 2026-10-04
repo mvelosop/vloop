@@ -32,7 +32,27 @@ var (
 // SetFields are the fields `intervention set` may change.
 var SetFields = []string{"brief", "phase", "kind", "automatable", "by", "occurred"}
 
-// Intervention is the intervention/v1 frontmatter as JSON, plus the body.
+// Agreements are the values of the derived agreement field.
+var Agreements = []string{"recommended", "other-option", "adjusted", "different", "no-options"}
+
+// MaxOptions is how many options a record may carry.
+const MaxOptions = 3
+
+// Recommended is the option the operator's assistant recommended, and why.
+type Recommended struct {
+	Option int    `json:"option"`
+	Why    string `json:"why"`
+}
+
+// Decided is what was decided: option 0 is another choice, or none.
+type Decided struct {
+	Option   int    `json:"option"`
+	Adjusted bool   `json:"adjusted"`
+	Text     string `json:"text"`
+}
+
+// Intervention is the intervention/v2 frontmatter as JSON, plus the body. A
+// v1 record reads into it with Schema intervention/v1 and agreement no-options.
 type Intervention struct {
 	Schema      string `json:"schema"`
 	ID          string `json:"id"`
@@ -48,6 +68,42 @@ type Intervention struct {
 	Trigger     string `json:"trigger"`
 	Done        string `json:"done"`
 	Automation  string `json:"automation"`
+
+	Context     string      `json:"context,omitempty"`
+	Suggested   string      `json:"suggested,omitempty"`
+	Options     []string    `json:"options"`
+	Recommended Recommended `json:"recommended"`
+	Decided     Decided     `json:"decided"`
+	Agreement   string      `json:"agreement"`
+
+	// decision is the stored decided: value, 1-3, other or "".
+	decision string
+}
+
+// DeriveAgreement is the one place the agreement comes from: the option
+// count, the recommended option, the decision (1-3, "other" or "") and
+// whether the decided option was adjusted.
+func DeriveAgreement(options, recommended int, decided string, adjusted bool) (string, error) {
+	if options == 0 {
+		return "no-options", nil
+	}
+	switch decided {
+	case "":
+		return "", errors.New("options need a decision: decided is empty")
+	case "other":
+		return "different", nil
+	}
+	n, err := strconv.Atoi(decided)
+	if err != nil || n < 1 || n > options {
+		return "", fmt.Errorf("decided %q is not one of 1-%d or other", decided, options)
+	}
+	switch {
+	case adjusted:
+		return "adjusted", nil
+	case n == recommended:
+		return "recommended", nil
+	}
+	return "other-option", nil
 }
 
 // NewInput is what `intervention add` takes.
@@ -88,7 +144,7 @@ func oneLine(s string) string { return strings.Join(strings.Fields(s), " ") }
 func Add(root string, in NewInput, now time.Time) (string, error) {
 	summary := oneLine(in.Summary)
 	v := Intervention{
-		Schema: "intervention/v1", Brief: defect.BriefName(in.Brief), Phase: in.Phase, Kind: in.Kind,
+		Schema: "intervention/v2", Agreement: "no-options", Options: []string{}, Brief: defect.BriefName(in.Brief), Phase: in.Phase, Kind: in.Kind,
 		Automatable: in.Automatable, By: in.By, Occurred: now.Format("2006-01-02"),
 		Recorded: now.UTC().Format("2006-01-02T15:04:05Z"), Summary: summary,
 		Trigger: oneLine(in.Trigger), Done: oneLine(in.Done), Automation: oneLine(in.Automation),
@@ -134,11 +190,34 @@ func render(v Intervention) string {
 	var b strings.Builder
 	b.WriteString("---\n")
 	fmt.Fprintf(&b, "id: %s\nbrief: %s\nphase: %s\nkind: %s\nautomatable: %s\nby: %s\n", v.ID, quote(v.Brief), v.Phase, v.Kind, v.Automatable, v.By)
+	fmt.Fprintf(&b, "schema: intervention/v2\noptions: %d\nrecommended: %d\ndecided: %s\n", len(v.Options), v.Recommended.Option, quote(v.decision))
+	if v.Decided.Adjusted {
+		b.WriteString("adjusted: true\n")
+	}
+	fmt.Fprintf(&b, "agreement: %s\n", v.Agreement)
 	fmt.Fprintf(&b, "occurred: %s\nrecorded: %s\n", v.Occurred, v.Recorded)
 	if v.Backfilled {
 		b.WriteString("backfilled: true\n")
 	}
-	fmt.Fprintf(&b, "---\n%s\n\n**Trigger.** %s\n\n**Done.** %s\n\n**What would automate it.** %s\n", v.Summary, v.Trigger, v.Done, v.Automation)
+	fmt.Fprintf(&b, "---\n%s\n", v.Summary)
+	section := func(name, text string) {
+		if text != "" {
+			fmt.Fprintf(&b, "\n**%s.** %s\n", name, text)
+		}
+	}
+	section("Trigger", v.Trigger)
+	section("Done", v.Done)
+	section("Context", v.Context)
+	if len(v.Options) > 0 {
+		b.WriteString("\n**Options.**\n")
+		for i, o := range v.Options {
+			fmt.Fprintf(&b, "%d. %s\n", i+1, o)
+		}
+	}
+	section("Recommended", v.Recommended.Why)
+	section("Suggested", v.Suggested)
+	section("Decided", v.Decided.Text)
+	section("What would automate it", v.Automation)
 	return b.String()
 }
 
@@ -152,15 +231,28 @@ func unquote(v string) string {
 	return v
 }
 
-var sectionRe = regexp.MustCompile(`^\*\*(Trigger|Done|What would automate it)\.\*\*\s*`)
+var (
+	sectionRe = regexp.MustCompile(`^\*\*(Trigger|Done|Context|Options|Recommended|Suggested|Decided|What would automate it)\.\*\*\s*`)
+	optionRe  = regexp.MustCompile(`^(\d+)\.\s+(.*)$`)
+)
 
 func parse(text string) (Intervention, error) {
-	v := Intervention{Schema: "intervention/v1"}
+	v := Intervention{Schema: "intervention/v1", Options: []string{}, Agreement: "no-options"}
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 	if len(lines) == 0 || lines[0] != "---" {
 		return v, errors.New("missing frontmatter")
 	}
 	end := -1
+	var nOptions, nRecommended int
+	var stored string
+	var adjusted bool
+	num := func(key, val string) (int, error) {
+		n, err := strconv.Atoi(val)
+		if err != nil || n < 0 || n > MaxOptions {
+			return 0, fmt.Errorf("%s: %q is not 0-%d", key, val, MaxOptions)
+		}
+		return n, nil
+	}
 	for i, l := range lines[1:] {
 		if l == "---" {
 			end = i + 1
@@ -171,6 +263,7 @@ func parse(text string) (Intervention, error) {
 			continue
 		}
 		val = unquote(val)
+		var err error
 		switch k {
 		case "id":
 			v.ID = val
@@ -190,34 +283,97 @@ func parse(text string) (Intervention, error) {
 			v.Recorded = val
 		case "backfilled":
 			v.Backfilled = val == "true"
+		case "schema":
+			v.Schema = val
+		case "options":
+			nOptions, err = num(k, val)
+		case "recommended":
+			nRecommended, err = num(k, val)
+		case "decided":
+			v.decision = val
+		case "adjusted":
+			adjusted = val == "true"
+		case "agreement":
+			stored = val
+		}
+		if err != nil {
+			return v, err
 		}
 	}
 	if end < 0 {
 		return v, errors.New("unterminated frontmatter")
 	}
+	v2 := v.Schema == "intervention/v2"
 	// The summary is the first body line; each section runs to the next marker.
 	var cur *string
+	var list []string
+	inOptions := false
 	var summary []string
 	for _, l := range lines[end+1:] {
-		if m := sectionRe.FindStringSubmatch(l); m != nil {
+		if m := sectionRe.FindStringSubmatch(l); m != nil && (v2 || m[1] != "Options" && m[1] != "Recommended") {
+			inOptions = false
 			switch m[1] {
 			case "Trigger":
 				cur = &v.Trigger
 			case "Done":
 				cur = &v.Done
+			case "Context":
+				cur = &v.Context
+			case "Options":
+				cur, inOptions = new(string), true
+			case "Recommended":
+				cur = &v.Recommended.Why
+			case "Suggested":
+				cur = &v.Suggested
+			case "Decided":
+				cur = &v.Decided.Text
 			default:
 				cur = &v.Automation
 			}
 			*cur = strings.TrimSpace(l[len(m[0]):])
 			continue
 		}
-		if cur != nil {
+		switch {
+		case inOptions:
+			if t := strings.TrimSpace(l); t != "" {
+				list = append(list, t)
+			}
+		case cur != nil:
 			*cur = strings.TrimSpace(*cur + " " + strings.TrimSpace(l))
-		} else {
+		default:
 			summary = append(summary, l)
 		}
 	}
 	v.Summary = strings.TrimSpace(strings.Join(summary, "\n"))
+	if !v2 {
+		return v, nil
+	}
+	for i, l := range list {
+		m := optionRe.FindStringSubmatch(l)
+		if m == nil || m[1] != strconv.Itoa(i+1) {
+			return v, fmt.Errorf("options: line %q is not the numbered item %d", l, i+1)
+		}
+		v.Options = append(v.Options, m[2])
+	}
+	if len(v.Options) != nOptions {
+		return v, fmt.Errorf("options: %d declared, %d listed", nOptions, len(v.Options))
+	}
+	if nRecommended > nOptions {
+		return v, fmt.Errorf("recommended: %d is beyond the %d options", nRecommended, nOptions)
+	}
+	v.Recommended.Option = nRecommended
+	v.Decided.Adjusted = adjusted
+	if n, err := strconv.Atoi(v.decision); err == nil {
+		v.Decided.Option = n
+	}
+	agreement, err := DeriveAgreement(nOptions, nRecommended, v.decision, adjusted)
+	if err != nil {
+		return v, err
+	}
+	if stored != agreement {
+		return v, fmt.Errorf("agreement: stored %q, derived %q", stored, agreement)
+	}
+	v.Agreement = agreement
 	return v, nil
 }
 

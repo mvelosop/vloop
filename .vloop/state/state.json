@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T18:56:16Z",
+  "updated": "2026-10-04T19:11:46Z",
   "shell": "sh",
   "checks": [
     {
@@ -52,8 +52,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/001-go.fail.log"
     },
     {
       "id": "T2",
