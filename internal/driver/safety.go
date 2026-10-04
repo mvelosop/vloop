@@ -173,20 +173,25 @@ func (g stateGuard) hash() string { return state.PlanDigest(g.pre, g.gates) }
 
 // restoreIfTouched puts the plan and the gate folders back and reports true
 // when the session changed either, in any byte.
-func (g stateGuard) restoreIfTouched() bool {
+func (g stateGuard) restoreIfTouched() bool { return len(g.restoreTouched()) > 0 }
+
+// restoreTouched puts the plan and the gate folders back and returns the
+// repo-relative paths the session changed, sorted; none when it changed nothing.
+func (g stateGuard) restoreTouched() []string {
 	if len(g.pre) == 0 {
-		return false
+		return nil
 	}
-	touched := len(state.RestoreGateFiles(g.root, g.gates)) > 0
+	var touched []string
+	for _, p := range state.RestoreGateFiles(g.root, g.gates) {
+		touched = append(touched, state.GatesDir+"/"+p)
+	}
 	now, err := os.ReadFile(state.Path(g.root))
-	if err == nil && bytes.Equal(now, g.pre) {
-		return touched
+	if (err == nil && !bytes.Equal(now, g.pre)) || errors.Is(err, os.ErrNotExist) {
+		_ = os.WriteFile(state.Path(g.root), g.pre, 0o644)
+		touched = append(touched, state.FilePath)
 	}
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return touched
-	}
-	_ = os.WriteFile(state.Path(g.root), g.pre, 0o644)
-	return true
+	sort.Strings(touched)
+	return touched
 }
 
 func tamperNote(phase string) string {

@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"slices"
 	"errors"
 	"os"
 	"path/filepath"
@@ -158,6 +159,11 @@ func TestStateGuardGateFolders(t *testing.T) {
 	}
 	write(".vloop/state/gates/T2/oracle.sh", "exit 0\n")
 	write(".vloop/state/gates/T3/new.sh", "true\n")
+	// The warning names what the session changed, not the plan it left alone.
+	if got := g.restoreTouched(); !slices.Equal(got, []string{".vloop/state/gates/T2/oracle.sh", ".vloop/state/gates/T3/new.sh"}) {
+		t.Fatalf("restoreTouched = %v, want the two gate files and not state.json", got)
+	}
+	write(".vloop/state/gates/T2/oracle.sh", "exit 0\n")
 	if !g.restoreIfTouched() {
 		t.Fatal("a rewritten gate folder was not noticed")
 	}

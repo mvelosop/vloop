@@ -488,9 +488,9 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	// A session does not touch the plan. Restored from HEAD before any gate
 	// runs, and the work is not reviewable.
 	tampered := ""
-	if guard.restoreIfTouched() {
+	if touched := guard.restoreTouched(); len(touched) > 0 {
 		tampered = it.r.Mask(tamperNote(PhaseWork))
-		it.warn("   STATE TAMPERING %s — %s was modified; restored, iteration failed", id, state.FilePath)
+		it.warn("   STATE TAMPERING %s — %s was modified; restored, iteration failed", id, strings.Join(touched, ", "))
 	}
 
 	// 2. gates: every done task, plus this one if it claims done or blocked
@@ -592,9 +592,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		for _, p := range treeChanged {
 			it.warn("vloop: the review session changed %s — reverted", p)
 		}
-		reviewTampered := guard.restoreIfTouched()
+		reviewTouched := guard.restoreTouched()
+		reviewTampered := len(reviewTouched) > 0
 		if reviewTampered {
-			it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, state.FilePath)
+			it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, strings.Join(reviewTouched, ", "))
 		}
 		if rres.TimedOut {
 			it.warn("   the review session for %s timed out after %s", id, it.sessionTimeout())
