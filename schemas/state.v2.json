@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "state/v2",
+  "description": "The plan: .vloop/state/state.json",
+  "type": "object",
+  "required": ["schema", "run_id", "brief", "base", "branch", "status", "iteration", "created", "updated", "shell", "checks", "gate_scratch", "gate_review", "tasks"],
+  "properties": {
+    "schema": { "const": "state/v2" },
+    "run_id": { "type": "string", "pattern": "^[A-Za-z0-9._-]*$", "not": { "pattern": "\\.\\." } },
+    "brief": { "type": "string" },
+    "base": { "type": "string" },
+    "branch": { "type": "string" },
+    "status": { "enum": ["planning", "running", "complete", "blocked", "stalled", "halted"] },
+    "iteration": { "type": "integer" },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" },
+    "shell": { "enum": ["sh", "bash", "pwsh", "powershell", "cmd"] },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "paths", "run"],
+        "properties": {
+          "name": { "type": "string" },
+          "paths": { "type": "array", "items": { "type": "string" } },
+          "run": { "type": "string" }
+        }
+      }
+    },
+    "gate_scratch": { "type": "array", "items": { "type": "string" } },
+    "gate_review": {
+      "type": "object",
+      "required": ["rounds", "verdict"],
+      "properties": {
+        "rounds": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "verdict": { "enum": ["PASS", "FAIL", ""] }
+      }
+    },
+    "tasks": { "type": "array", "items": { "$ref": "#/$defs/task" } }
+  },
+  "$defs": {
+    "task": {
+      "type": "object",
+      "required": ["id", "title", "goal", "kind", "fixtures", "references", "depends_on", "acceptance", "verify", "status", "attempts", "notes"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^T[0-9]+$" },
+        "title": { "type": "string" },
+        "goal": { "type": "string" },
+        "kind": { "enum": ["feature", "fix", "refactor", "test", "docs", "chore"] },
+        "area": { "type": "string" },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "why"],
+            "properties": {
+              "path": { "type": "string" },
+              "why": { "type": "string" }
+            }
+          }
+        },
+        "depends_on": { "type": "array", "items": { "type": "string" } },
+        "acceptance": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "verify": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["pending", "done", "blocked"] },
+        "attempts": { "type": "integer" },
+        "notes": { "type": "string" },
+        "fixtures": { "type": "string" },
+        "model": {
+          "type": "object",
+          "properties": {
+            "work": { "type": "string", "minLength": 1 },
+            "review": { "type": "string", "minLength": 1 }
+          }
+        },
+        "effort": {
+          "type": "object",
+          "properties": {
+            "work": { "enum": ["low", "medium", "high", "xhigh", "max"] },
+            "review": { "enum": ["low", "medium", "high", "xhigh", "max"] }
+          }
+        },
+        "gate_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["verify", "replaced_at", "reason", "by", "fixtures"],
+            "properties": {
+              "verify": { "type": "string" },
+              "replaced_at": { "type": "string", "format": "date-time" },
+              "reason": { "type": "string" },
+              "by": { "enum": ["operator", "planner"] },
+              "fixtures": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

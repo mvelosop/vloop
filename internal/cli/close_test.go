@@ -236,7 +236,7 @@ func TestCloseJSON(t *testing.T) {
 	for _, w := range []string{
 		`"brief":"` + closeName + `"`, `"status":"consumed"`, `"commit":"` + headOf(t, dir) + `"`,
 		`"files":[".vloop/state/metrics/` + closeBrief + `.json","docs/briefs/` + closeName + `.md"]`,
-		`"trailer":"Vloop-Brief: ` + closeName + `"`, `"schema":"metrics/v1"`,
+		`"trailer":"Vloop-Brief: ` + closeName + `"`, `"schema":"metrics/v2"`,
 	} {
 		if !strings.Contains(out, w) {
 			t.Errorf("json lacks %s:\n%s", w, out)

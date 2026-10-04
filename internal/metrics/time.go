@@ -12,21 +12,24 @@ import (
 
 // Phases are the session phases metrics report on.
 const (
-	PhasePlan   = "plan"
-	PhaseWork   = "work"
-	PhaseReview = "review"
+	PhasePlan       = "plan"
+	PhaseWork       = "work"
+	PhaseReview     = "review"
+	PhaseGateReview = "gate-review"
 )
 
 // Time is where a brief's time went, in milliseconds. Agent time is work plus
 // review; plan is reported apart. Gate and wall are nil when unknown: the shell
 // loop never recorded gate durations, and wall needs a run commit.
 type Time struct {
-	AgentMS  int64  `json:"agent_ms"`
-	WorkMS   int64  `json:"work_ms"`
-	ReviewMS int64  `json:"review_ms"`
-	PlanMS   int64  `json:"plan_ms"`
-	GateMS   *int64 `json:"gate_ms"`
-	WallMS   *int64 `json:"wall_ms"`
+	AgentMS      int64  `json:"agent_ms"`
+	WorkMS       int64  `json:"work_ms"`
+	ReviewMS     int64  `json:"review_ms"`
+	PlanMS       int64  `json:"plan_ms"`
+	GateMS       *int64 `json:"gate_ms"`
+	ChecksMS     *int64 `json:"checks_ms"`
+	GateReviewMS int64  `json:"gate_review_ms"`
+	WallMS       *int64 `json:"wall_ms"`
 }
 
 // Rate is delivered lines per minute of agent time; nil when there is no agent
@@ -42,6 +45,7 @@ type Cost struct {
 	Plan        float64  `json:"plan"`
 	Work        float64  `json:"work"`
 	Review      float64  `json:"review"`
+	GateReview  float64  `json:"gate_review"`
 	Per1kCode   *float64 `json:"per_1k_code_lines"`
 	PerPhase1kC struct {
 		Plan   *float64 `json:"plan"`
@@ -120,6 +124,8 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	efforts := map[string]map[string]bool{}
 	var gate int64
 	gateKnown := false
+	var checks int64
+	checksKnown := false
 	iterations := 0
 
 	for _, f := range m.Folders {
@@ -128,6 +134,10 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 			if it.GateMS != nil {
 				gate += *it.GateMS
 				gateKnown = true
+			}
+			if it.ChecksMS != nil {
+				checks += *it.ChecksMS
+				checksKnown = true
 			}
 		}
 		for _, s := range f.Sessions {
@@ -141,6 +151,9 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 			case PhaseReview:
 				u.Time.ReviewMS += s.DurationMS
 				u.Cost.Review += s.CostUSD
+			case PhaseGateReview:
+				u.Time.GateReviewMS += s.DurationMS
+				u.Cost.GateReview += s.CostUSD
 			default:
 				continue
 			}
@@ -180,6 +193,9 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	if gateKnown {
 		u.Time.GateMS = &gate
 	}
+	if checksKnown {
+		u.Time.ChecksMS = &checks
+	}
 	if o := m.Owned; o != nil && o.Run != nil {
 		w := o.Run.Time.Sub(o.Plan.Time).Milliseconds()
 		u.Time.WallMS = &w
@@ -189,7 +205,7 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	u.Rate.CodePerMin = fratio(float64(delivered.Code), minutes)
 	u.Rate.CodeTestPerMin = fratio(float64(delivered.Code+delivered.Test), minutes)
 
-	u.Cost.Total = u.Cost.Plan + u.Cost.Work + u.Cost.Review
+	u.Cost.Total = u.Cost.Plan + u.Cost.Work + u.Cost.Review + u.Cost.GateReview
 	kc := float64(delivered.Code) / 1000
 	u.Cost.Per1kCode = fratio(u.Cost.Total, kc)
 	u.Cost.PerPhase1kC.Plan = fratio(u.Cost.Plan, kc)

@@ -126,7 +126,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 	}
 
 	snap := ".vloop/state/metrics/" + b3Brief + ".json"
-	expect(t, s.run(nil, "schema", "validate", "metrics/v1", snap), 0, snap+": ok\n", "")
+	expect(t, s.run(nil, "schema", "validate", "metrics/v2", snap), 0, snap+": ok\n", "")
 	if raw := s.read(snap); !strings.HasSuffix(raw, "}\n") || !strings.Contains(raw, "\n  \"") {
 		t.Fatalf("snapshot is not 2-space indented with a trailing newline: %q", raw)
 	}

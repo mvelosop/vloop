@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -53,6 +51,9 @@ func newTaskGate(g *Globals) *cobra.Command {
 			n, _ := strconv.Atoi(minutes.Value)
 			timeout := time.Duration(n) * time.Minute
 			code, d, timedOut, err := state.RunGateWithin(root, p.Shell, t.Verify, gateOut, cmd.ErrOrStderr(), timeout)
+			if scratchErr := state.EmptyScratch(root, p.GateScratch); scratchErr != nil {
+				fmt.Fprintf(cmd.ErrOrStderr(), "gate scratch not emptied: %v\n", scratchErr)
+			}
 			if err != nil {
 				return jsonProblem(g, out, err)
 			}
@@ -89,12 +90,23 @@ func newTaskGate(g *Globals) *cobra.Command {
 func newTaskVerify(g *Globals) *cobra.Command {
 	var reason string
 	cmd := &cobra.Command{
-		Use:   "verify <id> <command>",
-		Short: "Replace a task's verify command, recording why",
-		Args:  cobra.ExactArgs(2),
+		Use:   "verify <id> [<command>]",
+		Short: "Record a change to a task's gate: a new verify command, a changed gate folder, or both",
+		Args:  cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			root, err := g.root()
+			if err != nil {
+				return err
+			}
+			command := ""
+			if len(args) == 2 {
+				if args[1] == "" {
+					return Problem(errors.New("verify command is empty"))
+				}
+				command = args[1]
+			}
 			return amend(g, cmd, func(p *state.Plan) error {
-				return state.ReplaceGate(p, args[0], args[1], reason, time.Now())
+				return state.RecordGate(root, p, args[0], command, reason, time.Now())
 			})
 		},
 	}
@@ -114,8 +126,11 @@ func checkPlanHash(g *Globals, want string) error {
 	if err != nil {
 		return Problem(err)
 	}
-	sum := sha256.Sum256(data)
-	if hex.EncodeToString(sum[:]) == strings.ToLower(strings.TrimSpace(want)) {
+	gates, err := state.GateFiles(root)
+	if err != nil {
+		return Problem(err)
+	}
+	if state.PlanDigest(data, gates) == strings.ToLower(strings.TrimSpace(want)) {
 		return nil
 	}
 	note := filepath.Join(root, ".vloop", "tmp", "gate-refused")

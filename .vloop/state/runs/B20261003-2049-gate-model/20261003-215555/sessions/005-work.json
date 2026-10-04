@@ -1,0 +1,28 @@
+{
+  "cost_usd": 0.8452012000000002,
+  "duration_ms": 947326,
+  "effort": null,
+  "is_error": false,
+  "iteration": 3,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 78191,
+      "cache_read_input_tokens": 1949196,
+      "cost_usd": 0.8452012000000002,
+      "input_tokens": 64,
+      "output_tokens": 14247
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261003-2049-gate-model",
+  "schema": "session/v1",
+  "started": "2026-10-03T21:48:10Z",
+  "task": "T4",
+  "turns": 35
+}

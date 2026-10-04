@@ -130,12 +130,12 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 	}
 
 	expect(t, s.run(nil, "config", "list"), 0,
-		"language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\n"+
-			"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\n"+
+		"language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\nmodel.gate-review=sonnet (default)\n"+
+			"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\neffort.gate-review= (default)\n"+
 			"shell="+defaultShell()+" (default)\nareas= (default)\n"+
 			"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n"+
 			"run.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\n"+
-			"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n", "")
+			"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.gate-scratch= (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n", "")
 	expect(t, s.run(nil, "config", "set", "language", "es"), 0, "", "")
 	expect(t, s.run(nil, "config", "set", "effort.review", "high"), 0, "", "")
 	expect(t, s.run([]string{"VLOOP_MODEL_WORK=opus"}, "config", "get", "model.work", "--json"), 0,

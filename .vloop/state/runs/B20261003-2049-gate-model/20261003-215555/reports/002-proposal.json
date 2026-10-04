@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "blocked",
+  "summary": "Implemented [[check]] parsing, run.gate-scratch, model.gate-review and effort.gate-review, the config list check lines, the docs and tests; every gate clause passes except one stale test in cmd/vloop that T1 broke.",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/cli/config.go", "internal/cli/config_test.go", "docs/guide/configuration.md"],
+  "verified": "vloop task gate T2 exited 1: only TestWorkedExampleB2Commands in cmd/vloop fails (its schema list lacks the T1 schemas); go test ./internal/... passes.",
+  "notes": "config.Checks(root) returns []CheckDef{Name, Paths, Run}; List and Get also refuse a bad [[check]] as a SourceError (exit 1). Key order: model.gate-review after model.review, effort.gate-review after effort.review, run.gate-scratch after run.gate-timeout. cmd/vloop/b2_e2e_test.go:127 expects `vloop schema list` to print 10 schemas; T1 added state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2, so the list now has 15. The gate runs that test and the task's files do not include it; the expected string needs updating (operator or an earlier-task fix). Note go test ./internal/cli fails inside a vloop session on TestTaskGate* because of inherited VLOOP_* env; the gate unsets them, so it is unrelated.",
+  "gate_dispute": {
+    "reason": "The gate runs TestWorkedExampleB2Commands, which asserts the exact `vloop schema list` output and has been stale since T1 added five schemas; no T2 change can make it pass except editing that existing test, which is a file the gate inspects.",
+    "evidence": "go test -run ^(TestWorkedExampleB2.*|TestRunBudgetPrecedence)$ ./cmd/vloop/ fails at b2_e2e_test.go:127: got schema list including defect/v1 and gate-verdict/v1, want the 10-schema list."
+  }
+}

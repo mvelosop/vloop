@@ -79,15 +79,12 @@ func TestGateShapeProblems(t *testing.T) {
 	run("commit", "-q", "-m", "x")
 
 	p := &state.Plan{Tasks: []state.Task{
-		{ID: "T1", Verify: `grep -q x todo.md`},
-		{ID: "T2", Verify: `grep -q x todo.md`, Files: []string{"todo.md"}},
 		{ID: "T3", Verify: `grep -q x untracked.md`},
 		{ID: "T4", Verify: `git diff --quiet v1 -- .`},
 		{ID: "T5", Verify: `test -f T5.out`},
 	}}
 	got := GateShapeProblems(root, p)
-	if len(got) != 2 || !strings.Contains(got[0], "T1") || !strings.Contains(got[0], "todo.md") ||
-		!strings.Contains(got[1], "T4") || !strings.Contains(got[1], "v1") {
+	if len(got) != 1 || !strings.Contains(got[0], "T4") || !strings.Contains(got[0], "v1") {
 		t.Errorf("problems = %q", got)
 	}
 	for _, g := range got {

@@ -77,80 +77,6 @@ func TestRun41RegressionNamesBoth(t *testing.T) {
 	}
 }
 
-// gateRewriteRepo is a repository whose single task T1 has the given files and
-// verify, with the stub's work arm after the default's.
-func gateRewriteRepo(t *testing.T, files []string, verify, work string) *runRepo {
-	r := newRunRepo(t)
-	r.scripted(planJSON(t, planTask("T1", map[string]any{"files": files, "verify": verify})), defaultScript+work)
-	return r
-}
-
-func TestRun33GateRewrite(t *testing.T) {
-	t.Run("modified, pre-existing, not assigned: the goalpost moved", func(t *testing.T) {
-		r := newRunRepo(t)
-		r.commitFile("probe.txt", "exit 0\n")
-		r.scripted(planJSON(t, planTask("T1", map[string]any{"files": []string{"thing.txt"}, "verify": "sh probe.txt"})),
-			defaultScript+`if [ "$PHASE" = work ]; then touch thing.txt; echo "exit 1" > probe.txt; fi
-`)
-		wantExit(t, r.vloop("run", runBrief), 2)
-		wantIn(t, "run log", r.runLog(), "GATE REWRITE T1")
-		if got := r.read("probe.txt"); got != "exit 0\n" {
-			t.Errorf("probe.txt reads %q — a weakened gate survived the iteration", got)
-		}
-		its := r.iterations()
-		if len(its) == 0 || its[0]["outcome"] != "gate_failed" {
-			t.Errorf("iteration 1 = %v, want gate_failed", its)
-		}
-		if n := r.reviewed("T1"); n != 0 {
-			t.Errorf("%d review(s): work is not reviewable when its gate was edited", n)
-		}
-		wantNotIn(t, "run log", r.runLog(), "review: PASS")
-		// The stub offends every attempt, so the task ends blocked on the ceiling.
-		r.wantTask("T1", "blocked", 3)
-		if v := r.task("T1")["verify"]; v != "sh probe.txt" {
-			t.Errorf("the driver changed verify to %v", v)
-		}
-		r.wantClean()
-	})
-
-	t.Run("created by the task that ships it", func(t *testing.T) {
-		r := gateRewriteRepo(t, []string{"made.txt"}, "grep -q OK made.txt", `if [ "$PHASE" = work ]; then echo OK > made.txt; fi
-`)
-		wantExit(t, r.vloop("run", runBrief), 0)
-		wantNotIn(t, "run log", r.runLog(), "GATE REWRITE")
-		r.wantTask("T1", "done", 0)
-	})
-
-	t.Run("modified, pre-existing, but assigned", func(t *testing.T) {
-		r := newRunRepo(t)
-		r.commitFile("owned.txt", "OLD\n")
-		r.scripted(planJSON(t, planTask("T1", map[string]any{"files": []string{"owned.txt"}, "verify": "grep -q NEW owned.txt"})),
-			defaultScript+`if [ "$PHASE" = work ]; then echo NEW > owned.txt; fi
-`)
-		wantExit(t, r.vloop("run", runBrief), 0)
-		wantNotIn(t, "run log", r.runLog(), "GATE REWRITE")
-		r.wantTask("T1", "done", 0)
-	})
-
-	t.Run("pre-existing only because this task's own failed attempt committed it", func(t *testing.T) {
-		r := gateRewriteRepo(t, []string{"other.txt"}, "grep -q RETRY owned_by_me.txt", `if [ "$PHASE" = work ]; then
-  if [ -f owned_by_me.txt ]; then echo RETRY > owned_by_me.txt; else echo FIRST > owned_by_me.txt; fi
-fi
-if [ "$PHASE" = review ] && ! grep -q RETRY owned_by_me.txt 2>/dev/null; then
-  printf '{"schema":"verdict/v1","task":"T1","verdict":"FAIL","criteria":[],"findings":[{"summary":"not yet","kind":"bug"}],"notes":"n"}\n' > .vloop/tmp/verdict.json
-fi
-`)
-		// The first attempt writes FIRST, which the gate rejects; the retry's
-		// edit of its own committed file is not someone else's gate.
-		wantExit(t, r.vloop("run", runBrief), 0)
-		wantNotIn(t, "run log", r.runLog(), "GATE REWRITE")
-		r.wantTask("T1", "done", 1)
-		if got := r.read("owned_by_me.txt"); got != "RETRY\n" {
-			t.Errorf("owned_by_me.txt reads %q — the retry was falsely reverted", got)
-		}
-	})
-}
-
 // planOnlyScript plays the plan and leaves work and review to what follows.
 const planOnlyScript = `if [ "$PHASE" = plan ]; then mkdir -p .vloop/state; cp "$dir/plan.json" .vloop/state/state.json; fi
 `
@@ -266,6 +192,19 @@ func TestRunFlakyGate(t *testing.T) {
 		r.wantTask("T1", "done", 1)
 		wantNotIn(t, "run log", r.runLog(), "FLAKY GATE")
 	})
+
+	t.Run("a gate that times out is not re-run", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", "run.gate-timeout = 1\n"+runCheckConfig)
+		r.commitAll("one minute gates")
+		count := filepath.Join(r.stub, "runs")
+		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": `test -f T1.out || exit 1; echo run >> "` + count + `"; sleep 90`})), defaultScript)
+		wantExit(t, r.vloop("run", "--max-attempts", "1", runBrief), 2)
+		b, _ := os.ReadFile(count)
+		if n := strings.Count(string(b), "run"); n != 1 {
+			t.Errorf("a timed-out gate ran %d times, want 1", n)
+		}
+	})
 }
 
 func TestRunGateDispute(t *testing.T) {
@@ -310,4 +249,121 @@ fi
 		r.wantTask("T1", "blocked", 3)
 		wantNotIn(t, "task notes", r.task("T1")["notes"].(string), "gate disputed")
 	})
+}
+
+// gatePlanScript plays the plan and a gate folder for each id in folders.
+func gatePlanScript(folders ...string) string {
+	s := planOnlyScript
+	for _, id := range folders {
+		s += `if [ "$PHASE" = plan ]; then mkdir -p .vloop/state/gates/` + id + `; echo seed > .vloop/state/gates/` + id + `/rows.txt; fi
+`
+	}
+	return s
+}
+
+// TestRunRefusesStrayGateFolder: a gate folder whose id is not a task of the
+// plan refuses the plan, exit 1, and nothing is committed.
+func TestRunRefusesStrayGateFolder(t *testing.T) {
+	r := newRunRepo(t)
+	r.scripted(planJSON(t, planTask("T1", nil)), gatePlanScript("T1", "T9"))
+	res := r.vloop("run", runBrief)
+	wantExit(t, res, 1)
+	wantIn(t, "output", r.outputs(res), ".vloop/state/gates/T9 is a gate folder for T9, which is not a task of the plan")
+	if n := r.planCommits(); n != 0 {
+		t.Errorf("%d plan commit(s) after a refused plan", n)
+	}
+	if r.has(".vloop/state/gates/T9") || r.has(".vloop/state/state.json") {
+		t.Error("the refused plan left its state or gate folder behind")
+	}
+}
+
+// TestRunRefusesChangedGateFixtures: resuming a plan whose gate folder no
+// longer matches the task's fixtures refuses, exit 1, with no session started.
+func TestRunRefusesChangedGateFixtures(t *testing.T) {
+	r := newRunRepo(t)
+	r.scripted(planJSON(t, planTask("T1", nil)), gatePlanScript("T1"))
+	wantExit(t, r.vloop("run", "--plan-only", runBrief), 0)
+	if r.task("T1")["fixtures"] == "" {
+		t.Fatal("the plan did not stamp T1's fixtures")
+	}
+	before := r.sessions()
+	r.write(".vloop/state/gates/T1/rows.txt", "edited by hand\n")
+	res := r.vloop("run")
+	wantExit(t, res, 1)
+	wantIn(t, "stderr", res.err, "vloop: the gate fixtures of T1 changed outside vloop task verify — record the change with vloop task verify T1 --reason '<why>'")
+	if got := r.sessions(); got != before {
+		t.Errorf("%d session(s) started despite the refusal", got-before)
+	}
+}
+
+const scratchConfig = "run.gate-scratch = [\"web/.gate/\"]\n" + runCheckConfig
+
+func TestRunGateScratch(t *testing.T) {
+	t.Run("a scratch folder git does not ignore is refused before planning", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", scratchConfig)
+		r.commitAll("scratch config")
+		r.planWith(planJSON(t, planTask("T1", nil)))
+		res := r.vloop("run", runBrief)
+		wantExit(t, res, 1)
+		wantIn(t, "stderr", res.err, "vloop: gate scratch web/.gate/ is not ignored by git — add it to .gitignore")
+		if n := strings.Count(strings.Join(r.argv(), "\n"), "/vloop:"); n != 0 {
+			t.Errorf("%d session(s) started", n)
+		}
+	})
+
+	t.Run("acceptance empties what the planning session left in the folders", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", scratchConfig)
+		r.write(".gitignore", "web/.gate/\n")
+		r.commitAll("scratch config")
+		r.scripted(planJSON(t, planTask("T1", nil)), defaultScript+`if [ "$PHASE" = plan ]; then mkdir -p web/.gate && echo x > web/.gate/left.txt; fi
+`)
+		wantExit(t, r.vloop("run", "--plan-only", runBrief), 0)
+		if es, _ := os.ReadDir(filepath.Join(r.dir, "web", ".gate")); len(es) != 0 {
+			t.Errorf("web/.gate/ holds %d entries after acceptance", len(es))
+		}
+	})
+
+	t.Run("the plan keeps the list and every gate leaves the folders empty", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", scratchConfig)
+		r.write(".gitignore", "web/.gate/\n")
+		r.commitAll("scratch config")
+		verify := "mkdir -p web/.gate && echo x > web/.gate/copy.txt && test -f T1.out"
+		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": verify})), defaultScript)
+		wantExit(t, r.vloop("run", runBrief), 0)
+		if got := r.plan()["gate_scratch"]; len(got.([]any)) != 1 || got.([]any)[0] != "web/.gate/" {
+			t.Errorf("gate_scratch = %v", got)
+		}
+		if es, _ := os.ReadDir(filepath.Join(r.dir, "web", ".gate")); len(es) != 0 {
+			t.Errorf("web/.gate/ holds %d entries after the run", len(es))
+		}
+		r.wantTask("T1", "done", 0)
+	})
+}
+
+func TestRunGateChangedTree(t *testing.T) {
+	r := newRunRepo(t)
+	r.commitFile("web/keep.txt", "keep\n")
+	r.scripted(planJSON(t,
+		planTask("T1", map[string]any{"verify": "test -f T1.out && echo x > web/leftover.txt"}),
+		planTask("T2", map[string]any{"verify": "test -f T2.out && echo y >> web/keep.txt"})), defaultScript)
+	wantExit(t, r.vloop("run", "--max-attempts", "1", runBrief), 2)
+	for id, p := range map[string]string{"T1": "web/leftover.txt", "T2": "web/keep.txt"} {
+		b, err := os.ReadFile(filepath.Join(r.runFolder(), "gates", id+".log"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		lines := strings.Split(strings.TrimRight(string(b), "\n"), "\n")
+		if want := "vloop: gate " + id + " changed the tree — restored: " + p; lines[len(lines)-1] != want {
+			t.Errorf("%s log ends %q, want %q", id, lines[len(lines)-1], want)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(r.dir, "web", "leftover.txt")); err == nil {
+		t.Error("the new file a gate wrote is still in the tree")
+	}
+	if got := r.read("web/keep.txt"); got != "keep\n" {
+		t.Errorf("web/keep.txt = %q, want it restored", got)
+	}
 }

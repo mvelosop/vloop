@@ -7,8 +7,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
+
+	"github.com/mvelosop/vloop/internal/classify"
+	"github.com/mvelosop/vloop/internal/config"
 )
 
 // maxDepth is how many directory levels below the root are examined.
@@ -138,4 +143,63 @@ func jsStacks(file string, siblings []os.DirEntry) []string {
 		out = append(out, "react")
 	}
 	return out
+}
+
+// starterRuns is each stack's usual test command.
+var starterRuns = map[string]string{
+	"csharp":     "dotnet test",
+	"go":         "go test ./... && go vet ./...",
+	"java":       "mvn test",
+	"javascript": "npm test",
+	"kotlin":     "gradle test",
+	"python":     "pytest",
+	"react":      "npm test",
+	"rust":       "cargo test",
+	"typescript": "npm test",
+}
+
+var nonName = regexp.MustCompile(`[^a-z0-9]+`)
+
+// StarterChecks returns one check per entry of Stacks (<stack> or
+// <stack>@<dir>): an unscoped stack applies to "**", a scoped one to
+// "<dir>/**" and runs in <dir>. Stacks that share a directory and a command
+// (javascript, typescript and react all run npm test) yield one check. The
+// checks are starting points for the repository to edit.
+func StarterChecks(entries []string) []config.CheckDef {
+	var out []config.CheckDef
+	seenName, seenRun := map[string]bool{}, map[string]bool{}
+	for _, e := range entries {
+		stack, scope, err := classify.ParseStack(e)
+		if err != nil {
+			continue
+		}
+		run, ok := starterRuns[stack]
+		if !ok {
+			continue
+		}
+		paths := []string{"**"}
+		if scope != "" {
+			run = "cd " + scope + " && " + run
+			paths = []string{scope + "/**"}
+		}
+		if seenRun[run] {
+			continue
+		}
+		seenRun[run] = true
+		name := stack
+		if scope != "" {
+			name += "-" + strings.Trim(nonName.ReplaceAllString(strings.ToLower(scope), "-"), "-")
+		}
+		for base, n := name, 2; seenName[name]; n++ {
+			name = base + "-" + strconv.Itoa(n)
+		}
+		seenName[name] = true
+		out = append(out, config.CheckDef{Name: name, Paths: paths, Run: run})
+	}
+	return out
+}
+
+// FormatCheck is how init and upgrade show a check: name, command, paths.
+func FormatCheck(c config.CheckDef) string {
+	return c.Name + ": " + c.Run + " (paths: " + strings.Join(c.Paths, ", ") + ")"
 }

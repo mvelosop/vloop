@@ -118,8 +118,8 @@ func TestRun13EmptyRunSignals(t *testing.T) {
 	r.wantIterations()
 	wantIn(t, "output", res.out, "═══ halted ═══", "(0 iteration(s) this run)", "0/2 done, 0 blocked", "iteration budget spent")
 	wantIn(t, "run log", r.runLog(), "0 iteration(s) this run", "0/2 done, 0 blocked")
-	if n := r.sessions(); n != 1 {
-		t.Errorf("%d sessions, want only the plan session", n)
+	if n := r.sessions(); n != 2 {
+		t.Errorf("%d sessions, want only the plan and gate review sessions", n)
 	}
 	if m := r.vloop("metrics", runID+".loop-brief"); m.code != 0 {
 		t.Errorf("vloop metrics on an empty run: %+v", m)
@@ -160,18 +160,28 @@ func TestRun15TelemetryContract(t *testing.T) {
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
 
-	want := "001-plan.json 002-work.json 003-review.json 004-work.json 005-review.json"
+	want := "001-plan.json 002-gate-review.json 003-work.json 004-review.json 005-work.json 006-review.json"
 	if got := strings.Join(r.sessionFiles(), " "); got != want {
 		t.Fatalf("session files %q, want %q", got, want)
 	}
 	pairs := []string{}
 	for i, n := range r.sessionFiles() {
 		f := filepath.Join(r.runFolder(), "sessions", n)
-		if v := r.vloop("schema", "validate", "session/v1", f); v.code != 0 {
-			t.Errorf("%s is not session/v1: %+v", n, v)
-		}
 		var rec map[string]any
 		sessionRecord(t, f, &rec)
+		want := "session/v1"
+		if rec["phase"] == "gate-review" {
+			want = "session/v2"
+			if _, has := rec["task"]; has || rec["iteration"] != float64(0) {
+				t.Errorf("the gate review record is %v, want iteration 0 and no task", rec)
+			}
+		}
+		if v := r.vloop("schema", "validate", want, f); v.code != 0 {
+			t.Errorf("%s is not %s: %+v", n, want, v)
+		}
+		if rec["phase"] == "gate-review" {
+			continue
+		}
 		if rec["phase"] == "plan" {
 			if i != 0 || rec["iteration"] != float64(0) {
 				t.Errorf("the plan session is %v at position %d, want iteration 0 first", rec["iteration"], i)

@@ -14,6 +14,7 @@ import (
 	"github.com/mvelosop/vloop/internal/brief"
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/driver"
+	"github.com/mvelosop/vloop/internal/state"
 )
 
 // runBudgetFlags maps each budget flag to the config key it overrides.
@@ -35,6 +36,11 @@ func newRun(b Build, g *Globals) *cobra.Command {
 			root, err := g.root()
 			if err != nil {
 				return err
+			}
+			// vloop 2 never resumes a v1 plan; a complete one belongs to an
+			// earlier brief, and planning the next brief replaces it.
+			if p, err := state.Load(root); err == nil && p.Schema == state.SchemaV1 && p.Status != "complete" {
+				return Problem(fmt.Errorf("%s is a %s plan — finish it with vloop 1.x or re-plan the brief", state.FilePath, state.SchemaV1))
 			}
 			over := map[string]string{}
 			for i, f := range runBudgetFlags {
@@ -149,13 +155,15 @@ func runBriefPath(g *Globals, root, arg string) (string, error) {
 // runPreflight is doctor's checks, refusing on any problem. Two things doctor
 // only warns about stop a run: an untrusted workspace, whose settings Claude
 // would silently ignore, and — as a warning here — an active pre-commit hook.
-// The branch check is not run's business: it creates the work branch itself.
+// The branch check is not run's business: it creates the work branch itself;
+// nor are gate scratch and the checks, which the planner refuses in its own
+// words.
 func runPreflight(b Build, root string, cmd *cobra.Command) error {
 	errOut := cmd.ErrOrStderr()
 	bad := 0
 	for _, c := range runDoctor(b, root) {
 		switch {
-		case c.Name == "branch":
+		case c.Name == "branch", c.Name == "gate scratch", c.Name == "checks": // the planner refuses these itself, in its own words
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++

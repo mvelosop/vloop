@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop init` writes one [[check]] per detected stack: for an unscoped `go` stack `run = \"go test ./... && go vet ./...\"` with `paths = [\"**\"]`; a scoped stack `<stack>@<dir>` gets `paths = [\"<dir>/**\"]`; other stacks get their usual test command; init's output says each check is a starting point.", "met": true, "evidence": "internal/detect/detect.go StarterChecks and internal/cli/init.go; TestInitWritesStarterChecks covers go, scoped go, python, node, rust and asserts 'starting point' in the output"},
+    {"criterion": "`vloop upgrade` to a 2.x binary from 1.x is refused without --yes as today; with --yes it adds the same checks when none are configured and shows them; it never touches an existing [[check]].", "met": true, "evidence": "internal/cli/upgrade.go lists 'would add check' and still refuses without --yes, then AddChecks only when Checks is empty; TestUpgradeAddsStarterChecks and TestUpgradeLeavesConfiguredChecks (config byte-identical)"},
+    {"criterion": "`vloop doctor` reports a missing [[check]] as a problem and a run.gate-scratch folder git does not ignore as a problem.", "met": true, "evidence": "internal/cli/doctor.go adds 'checks' and 'gate scratch' problems; TestDoctorChecksAndGateScratch covers both, and the cleared case after .gitignore"},
+    {"criterion": "Every cmd/vloop test that runs `vloop run` has a passing [[check]] in its config (`run = \"true\"`, `paths = [\"**\"]`), and nothing else about those tests changes in this task.", "met": true, "evidence": "runCheckConfig in run_harness_test.go is added in newRunRepo, run_plan_test.go and b6_e2e_test.go; the full go test suite passes. The b5 init-output and doctor assertions changed only because init now prints check lines and doctor now reports no check."},
+    {"criterion": "Tests cover init per stack and scope, the upgrade addition and its refusal, and both doctor problems.", "met": true, "evidence": "init_test.go, upgrade_test.go and doctor_test.go new tests assert concrete command strings, paths and messages"}
+  ],
+  "findings": [],
+  "notes": "With an existing config and no checks, init only prints 'suggest check:' lines and writes nothing. The brief did not say what to do there, so this is a reasonable choice."
+}

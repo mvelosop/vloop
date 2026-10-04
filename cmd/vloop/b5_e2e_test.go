@@ -197,14 +197,17 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		t.Fatalf("init stderr: %q", init.err)
 	}
 	lines := b5Lines(init.out)
-	if len(lines) != 10 {
+	if len(lines) != 13 {
 		t.Fatalf("init printed %d lines: %q", len(lines), init.out)
 	}
 	brief := regexp.MustCompile(`^wrote docs/briefs/B\d{8}-\d{4}-primeros-pasos\.loop-brief\.md$`)
-	if !brief.MatchString(lines[3]) {
-		t.Fatalf("starter brief line: %q", lines[3])
+	if !brief.MatchString(lines[6]) {
+		t.Fatalf("starter brief line: %q", lines[6])
 	}
-	want := []string{"detected stacks: go, javascript, react", "wrote .vloop/config.toml", "wrote .vloop/install.json", lines[3],
+	want := []string{"detected stacks: go, javascript, react",
+		"check go: go test ./... && go vet ./... (paths: **)", "check javascript: npm test (paths: **)",
+		"each check is a starting point — edit it in .vloop/config.toml",
+		"wrote .vloop/config.toml", "wrote .vloop/install.json", lines[6],
 		"updated .gitignore", "wrote CLAUDE.md", "next:", "claude plugin marketplace add mvelosop/vloop",
 		"claude plugin install vloop@vloop", "vloop doctor"}
 	if strings.Join(lines, "\n") != strings.Join(want, "\n") {
@@ -316,6 +319,7 @@ func TestWorkedExampleB5PlantedFailures(t *testing.T) {
 	t.Run("plugin version warning", func(t *testing.T) {
 		r := b5New(t, false, false)
 		b5Code(t, r.run("0.2.0", "init"), 0)
+		r.write(".vloop/config.toml", r.read(".vloop/config.toml")+runCheckConfig)
 		doc := r.run("0.2.0", "doctor")
 		b5Code(t, doc, 0)
 		b5Has(t, doc, "! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — update the one that is behind")
@@ -325,6 +329,7 @@ func TestWorkedExampleB5PlantedFailures(t *testing.T) {
 	t.Run("no user.email", func(t *testing.T) {
 		r := b5New(t, false, true)
 		b5Code(t, r.run("0.2.0", "init"), 0)
+		r.write(".vloop/config.toml", r.read(".vloop/config.toml")+runCheckConfig)
 		doc := r.run("0.2.0", "doctor")
 		b5Code(t, doc, 1)
 		b5Has(t, doc, "✗ git user.name and user.email not set")

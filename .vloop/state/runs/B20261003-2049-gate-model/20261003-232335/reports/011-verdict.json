@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop run` with no [[check]] refuses before planning: `vloop: no check configured — add a [[check]] to .vloop/config.toml` (exit 1), starting no session.", "met": true, "evidence": "internal/driver/plan.go halts ExitPreflight with that message before the tree check and any session; TestRunRefusesNoCheck asserts exit 1, the stderr line, no session and no plan"},
+    {"criterion": "Before the plan session every check runs, in config order, in the plan's shell from the repo root under run.gate-timeout; one that fails refuses with `vloop: check <name> fails on the base — fix it before planning: <log path>` (exit 1), the path repo-relative, and no session runs or is recorded.", "met": true, "evidence": "plan.go calls t.baseChecks with config shell and gate-timeout before workBranch; checks.go runs checks in order via state.GateCommand and halts with the specified message and a relRunDir path; TestRunBaseCheckFailureRefuses asserts exit 1, relative path, log content, no session, no plan, still on main"},
+    {"criterion": "Base logs are checks/base-<name>.log in the run folder.", "met": true, "evidence": "checks.go writes base-<name>.log under RunDir/checks; tests glob checks/base-*.log and expect one per check"},
+    {"criterion": "The driver copies the config's checks into the plan at acceptance (replacing whatever the plan session wrote) and again on every resume; a resume that changed them says so in run.log.", "met": true, "evidence": "plan.go acceptPlan sets plan.Checks = planChecks(config); iterate.go Run() compares and replaces on resume and logs 'the checks changed since the plan was made'; TestRunCopiesChecksIntoThePlan uses a stale-named plan, then a changed config and checks run.log"},
+    {"criterion": "A check that moves a ref, or changes .git/config or the hooks, halts the run with exit 9, as a gate does.", "met": true, "evidence": "checks.go runCheck snapshots refs and git config/hooks and halts ExitRefsMoved; TestRunBaseCheckMovingARefHalts asserts exit 9 and no session"},
+    {"criterion": "Tests cover the refusal, the base failure, the copy and the resume copy.", "met": true, "evidence": "cmd/vloop/run_preflight_test.go adds four tests covering each; internal/driver/checks_test.go unit-tests planChecks/sameChecks"}
+  ],
+  "findings": [],
+  "notes": "Existing tests were only added to, not altered. The base-check refusal path still uses the run folder before the branch is made, which is intended. The git-config/hooks halt has no dedicated test, only the ref case, which the criterion's tests list does not require."
+}

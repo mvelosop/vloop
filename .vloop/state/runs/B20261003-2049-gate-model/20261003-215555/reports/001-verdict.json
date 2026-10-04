@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop schema list` lists state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2 alongside every v1 schema, which are unchanged byte for byte.", "met": true, "evidence": "git status shows no modification to any existing schemas/*.v1.json; internal/cli/schema_test.go asserts the full 15-name list; embed_test.go count updated to 15"},
+    {"criterion": "schemas/state.v2.json is state/v1 with exactly these changes: a task has no `files`; a task gains `fixtures` (a string, \"\" when there is no gate folder); a gate_history entry gains `fixtures`; the plan gains `checks` ([{name, paths, run}]), `gate_scratch` (a list of strings) and `gate_review` ({rounds 0–2, verdict PASS, FAIL or \"\"}); task.model and task.effort stay {work, review}.", "met": true, "evidence": "diff state.v1.json state.v2.json shows exactly those changes (files removed, fixtures added to task and gate_history, checks/gate_scratch/gate_review added and required); model/effort untouched"},
+    {"criterion": "schemas/iteration.v2.json is iteration/v1 with `check_failed` added to the outcome enum and `checks` ([{name, exit, duration_ms}]) added; nothing else differs.", "met": true, "evidence": "diff shows only title/schema const, outcome enum, checks property and its required entry"},
+    {"criterion": "schemas/session.v2.json is session/v1 with `gate-review` added to the phase enum; a gate-review record, like a plan record, carries no `task`.", "met": true, "evidence": "diff shows phase enum plus if-clause enum [plan, gate-review]; session2.invalid fixture / gate script reject a task on gate-review"},
+    {"criterion": "schemas/gate-verdict.v1.json has no top-level `task`, a `verdict` of PASS or FAIL, `tasks` with one {task, verdict, findings: [{summary, kind}]} entry per task, and `notes`; the finding kinds are exactly wrong-reason, not-contract, task-reach, unpassable and pins-unnamed.", "met": true, "evidence": "schemas/gate-verdict.v1.json: `not required task`, verdict enum, tasks items shape, kind enum of exactly the five values"},
+    {"criterion": "schemas/metrics.v2.json is metrics/v1 with time gaining checks_ms and gate_review_ms and every per-phase object (cost, models, effort, missing records) gaining gate-review; no other key changes.", "met": true, "evidence": "diff shows checks_ms, gate_review_ms, gate_review_usd, gate-review in models/effort/missing records and the record phase enum; no other changes"},
+    {"criterion": "internal/schema tests validate a passing and a failing document for each new schema.", "met": true, "evidence": "internal/schema/schema_test.go invalidAt gains state2, iteration2, session2, metrics2, gate-verdict with a schemaName mapping; testdata has .valid.json/.invalid.json pairs for each, with the invalid ones failing at a named pointer"}
+  ],
+  "findings": [],
+  "notes": "Existing count/list assertions in embed_test.go and internal/cli/schema_test.go were edited, but only to reflect the five added schemas, which is a necessary consequence of the task. The task's `files` did not list them, which is a minor plan gap. I did not wait for a full go test ./... run myself; the driver had already re-run the gate."
+}

@@ -86,7 +86,11 @@ classDiagram
 | **name**, **run id** | a brief's file name without `.md`; the name without `.loop-brief` |
 | **plan** | the brief as tasks, in `state.json` |
 | **task** | one independently verifiable unit of a plan, with its acceptance and its gate |
-| **gate** | a task's `verify` command; the driver runs every done task's gate each iteration |
+| **gate** | a task's `verify` and its gate folder: the planner's judge of the task's contract; the driver runs every done task's gate each iteration |
+| **check** | one of the plan's repository tests or health checks, named and scoped by path globs; run after every iteration whose changes match, and all once in a final pass |
+| **gate fixtures** | the files of a task's gate folder, `.vloop/state/gates/<task id>/`, written by the plan session and stamped in the plan; the work session cannot change them |
+| **gate review** | the session that judges the plan's gates on the base before any work: `PASS` or `FAIL`, two rounds |
+| **gate scratch** | the git-ignored folders (`run.gate-scratch`) where a gate copies its oracle to run it; emptied after every gate |
 | **gate shell** | the shell a plan's gates are written for: `sh`, `bash`, `pwsh`, `powershell`, `cmd` |
 | **attempt** | one failed try at a task; `attempts` counts them |
 | **iteration** | one pass of the driver: pick a task, work, gate, review, commit |
@@ -128,6 +132,7 @@ docs/briefs/<name>.md                     the briefs
 .vloop/config.toml                        the repo's config
 .vloop/state/state.json                   the plan            (the shell loop's is .loop/state/)
 .vloop/state/plan.md                      the plan, rendered for people
+.vloop/state/gates/<task id>/               the gate fixtures, written by the plan session
 .vloop/state/journals/<run id>.md         the journal
 .vloop/state/runs/<run id>/<folder>/      sessions/, iterations.jsonl, reports/, run.log
 .vloop/state/metrics/<run id>.json        the snapshot, written by close
@@ -135,6 +140,9 @@ docs/briefs/<name>.md                     the briefs
 .vloop/interventions/<id>.md              recorded interventions (data)
 .vloop/tmp/proposal.json                  the work session's report, read back by the driver
 .vloop/tmp/verdict.json                   the review session's verdict, read back by the driver
+.vloop/tmp/checks.json                    the checks that ran this iteration, handed to the review session
+.vloop/tmp/gate-verdict.json               the gate review session's verdict, read back by the driver
+.vloop/tmp/plan-problems.md                what the plan session must revise, written by the driver
 .vloop/tmp/plugin/<version>/              the plugin extracted for sessions
 .vloop/tmp/fence/<version>/settings.json  the fence extracted for sessions
 ```
@@ -171,20 +179,27 @@ marked.
 - **P-2** Only the driver changes a task's or a plan's status. Sessions propose.
 - **P-3** Every task has an id `T<n>` unique in the plan, a non-empty
   `acceptance` and a non-empty `verify`; `depends_on` resolves and is acyclic.
-- **P-4** Gates are authored before the work they judge. Replacing one records
-  the old command, a reason and who replaced it in `gate_history`.
+  A task has no `files`; the plan has at least one check.
+- **P-4** Gates are authored before the work they judge. A gate's judge is the
+  planner's — its verify and its gate folder — and no task writes it; it is
+  checked on the base and by the gate review before any work. Replacing a gate
+  or its fixtures records the old ones, a reason and who replaced them in
+  `gate_history`.
 - **P-5** A plan's gates are written for the plan's `shell`, which governs them
   from then on — not the config.
 - **P-6** Model and effort for a task's session of kind `k`: the task's
   `model.k`/`effort.k`, else `VLOOP_MODEL_<K>`/`VLOOP_EFFORT_<K>`, else the
   config file, else the default.
+- **P-7** A plan's checks are the repository's tests and health checks, named
+  and scoped by path; they pass on the base, run after every iteration whose
+  changes they match, and all run once when the last task is done.
 
 ### Sessions — S
 
 - **S-1** A session is a fresh process; sessions share nothing but files.
 - **S-2** Sessions never commit, never set status and never move git refs. The
   fence denies the commands. The fence is advisory; the driver is the boundary. It halts (exit 9) if a ref, `.git/config` or the git hooks change during a session or a gate, and restores what a session changed among the driver's inputs.
-- **S-4** A session writes nothing under `.git/` and nothing under `.vloop/` but `.vloop/tmp/` — the plan session also writes the plan.
+- **S-4** A session writes nothing under `.git/` and nothing under `.vloop/` but `.vloop/tmp/` — the plan session also writes the plan and its gate folders.
 - **S-3** A work session does exactly one task. A review session judges it
   independently, from the diff and the acceptance, not from the proposal's
   summary.
@@ -198,6 +213,8 @@ marked.
 - **R-3** A run ends with one of the driver's exit codes: 0 complete, 1
   preflight, 2 blocked, 3 stalled, 4 max iterations, 5 not converging, 6 cost
   ceiling, 7 session error, 8 repeat blocked, 9 refs or repository configuration moved.
+  Exit 2 also covers a plan the gate review failed twice and a final check pass
+  that failed.
 - **R-4** A run plans only a `ready` brief that passes the check, with its dependencies consumed, from a clean tree; every gate and session runs under a timeout and leaves no process behind.
 
 ### Measurement — M

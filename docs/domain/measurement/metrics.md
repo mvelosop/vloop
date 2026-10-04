@@ -5,7 +5,7 @@ description: Binds the Metrics entity — what is measured per brief and per tas
 # Metrics
 
 A brief's numbers, recomputed on every call from raw sources (M-1), frozen once
-at close as a snapshot (`metrics/v1`). *Part of
+at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *Part of
 [measurement](measurement-context.md).* Every field and formula:
 [`docs/guide/metrics.md`](../../guide/metrics.md).
 
@@ -15,11 +15,11 @@ at close as a snapshot (`metrics/v1`). *Part of
 | --- | --- | --- |
 | tasks | planned, done, blocked, first-pass, the brief's estimate (B-4), iterations per closed task | attempts |
 | size | delivered and churned lines per category, deletions, rework, test:code | churned lines per category |
-| time | agent (work + review), plan, gates, wall | agent |
+| time | agent (work + review), plan, gates, checks (`checks_ms`), gate review (`gate_review_ms`), wall | agent |
 | rate | delivered code lines per agent minute, with and without tests | — |
-| cost | total and per phase, per 1,000 delivered code lines; tokens and cache-hit ratio | cost |
+| cost | total and per phase (gate review included), per 1,000 delivered code lines; tokens and cache-hit ratio | cost |
 | models | the models actually used per phase; the configured effort | the work model |
-| defects | in-loop, operator, escaped, removal efficiency | — |
+| defects | in-loop, operator, escaped, removal efficiency; a `check_failed` iteration derives a `work` defect found by the gate, counted apart as check failures | — |
 | records | session records that should exist and do not | — |
 | lead time | created → planned → completed → merged | — |
 

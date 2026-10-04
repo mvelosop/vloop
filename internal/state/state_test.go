@@ -115,7 +115,6 @@ func TestMarkdown(t *testing.T) {
 		"- [ ] **T2** — Config · 1 attempt(s)\n",
 		"`pending` · 1 attempt(s) · depends on: T1\n",
 		"`done` · depends on: none\n",
-		"**Files:** `config.txt`\n",
 		"**From the last attempt:** watch the path\n",
 	} {
 		if !strings.Contains(md, want) {

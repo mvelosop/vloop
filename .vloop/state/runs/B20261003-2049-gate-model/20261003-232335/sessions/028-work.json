@@ -1,0 +1,24 @@
+{
+  "cost_usd": 1.0792936,
+  "duration_ms": 3495943,
+  "effort": null,
+  "is_error": false,
+  "iteration": 20,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 87225,
+      "cache_read_input_tokens": 2447858,
+      "cost_usd": 1.0792936,
+      "input_tokens": 66,
+      "output_tokens": 24069
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261003-2049-gate-model",
+  "schema": "session/v1",
+  "started": "2026-10-04T01:17:16Z",
+  "task": "T16",
+  "turns": 35
+}

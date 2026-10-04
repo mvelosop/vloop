@@ -43,13 +43,13 @@ func TestDefaultsEveryRow(t *testing.T) {
 		set      bool
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
-		{"model.review", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
+		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
-		{"run.gate-timeout", "15", true}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
+		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -448,5 +448,92 @@ func TestRunKeysSetWritesRunTable(t *testing.T) {
 	}
 	if err := Set(root, "run.max-attempts", ""); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestGateKeys(t *testing.T) {
+	root := scratch(t)
+	var iv *InvalidValueError
+	if err := Set(root, "effort.gate-review", "huge"); !errors.As(err, &iv) {
+		t.Errorf("effort.gate-review=huge: %v", err)
+	}
+	if err := Set(root, "effort.gate-review", "max"); err != nil {
+		t.Fatal(err)
+	}
+	if err := Set(root, "model.gate-review", "haiku"); err != nil {
+		t.Fatal(err)
+	}
+	if err := Set(root, "run.gate-scratch", "web/.gate/,app/.gate/"); err != nil {
+		t.Fatal(err)
+	}
+	if err := Set(root, "run.gate-scratch", ",x"); !errors.As(err, &iv) {
+		t.Errorf("empty scratch entry: %v", err)
+	}
+	for k, want := range map[string]string{"effort.gate-review": "max", "model.gate-review": "haiku", "run.gate-scratch": "web/.gate/,app/.gate/"} {
+		if v, err := Get(root, k); err != nil || v.Value != want || v.Source != SourceFile {
+			t.Errorf("get %s = %+v, %v", k, v, err)
+		}
+	}
+	if err := Set(root, "run.gate-scratch", ""); err != nil {
+		t.Fatal(err)
+	}
+	if v, _ := Get(root, "run.gate-scratch"); v.Set || len(v.List) != 0 {
+		t.Errorf("removed scratch = %+v", v)
+	}
+}
+
+const twoChecks = "[[check]]\nname = \"api\"\npaths = [\"api/**\"]\nrun = \"sh api/test.sh\"\n\n" +
+	"[[check]]\nname = \"web\"\npaths = [\"web/**\", \"shared/*.ts\"]\nrun = \"sh web/test.sh\"\n"
+
+func TestChecksRead(t *testing.T) {
+	root := scratch(t)
+	writeCfg(t, root, twoChecks)
+	cs, err := Checks(root)
+	if err != nil || len(cs) != 2 || cs[0].Name != "api" || cs[1].Name != "web" ||
+		strings.Join(cs[1].Paths, "|") != "web/**|shared/*.ts" || cs[1].Run != "sh web/test.sh" {
+		t.Fatalf("checks = %+v, %v", cs, err)
+	}
+	t.Setenv("VLOOP_CHECK", "x")
+	if cs2, _ := Checks(root); len(cs2) != 2 {
+		t.Error("an environment variable changed the checks")
+	}
+}
+
+func TestChecksRefusals(t *testing.T) {
+	for name, body := range map[string]string{
+		"bad name":     "[[check]]\nname = \"API\"\npaths = [\"**\"]\nrun = \"true\"\n",
+		"no name":      "[[check]]\npaths = [\"**\"]\nrun = \"true\"\n",
+		"duplicate":    "[[check]]\nname = \"a\"\npaths = [\"**\"]\nrun = \"true\"\n[[check]]\nname = \"a\"\npaths = [\"x\"]\nrun = \"true\"\n",
+		"empty paths":  "[[check]]\nname = \"a\"\npaths = []\nrun = \"true\"\n",
+		"no paths":     "[[check]]\nname = \"a\"\nrun = \"true\"\n",
+		"bad glob":     "[[check]]\nname = \"a\"\npaths = [\"[\"]\nrun = \"true\"\n",
+		"no run":       "[[check]]\nname = \"a\"\npaths = [\"**\"]\n",
+		"blank run":    "[[check]]\nname = \"a\"\npaths = [\"**\"]\nrun = \" \"\n",
+		"not an array": "check = \"x\"\n",
+	} {
+		root := scratch(t)
+		writeCfg(t, root, body)
+		var se *SourceError
+		if _, err := Checks(root); !errors.As(err, &se) {
+			t.Errorf("%s: Checks = %v", name, err)
+		}
+		if _, err := List(root); !errors.As(err, &se) {
+			t.Errorf("%s: List = %v", name, err)
+		}
+		if _, err := Get(root, "language"); !errors.As(err, &se) {
+			t.Errorf("%s: Get = %v", name, err)
+		}
+	}
+}
+
+func TestSetKeepsCheckTables(t *testing.T) {
+	root := scratch(t)
+	writeCfg(t, root, twoChecks)
+	if err := Set(root, "model.gate-review", "opus"); err != nil {
+		t.Fatal(err)
+	}
+	cs, err := Checks(root)
+	if err != nil || len(cs) != 2 || cs[0].Name != "api" || cs[1].Run != "sh web/test.sh" {
+		t.Fatalf("checks after set = %+v, %v", cs, err)
 	}
 }

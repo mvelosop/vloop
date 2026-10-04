@@ -9,7 +9,7 @@ import (
 const SourceTask = "task"
 
 // ResolveSession resolves the model or effort (field "model" or "effort") for
-// a session kind ("plan", "work", "review") by P-6: the task's own value, else
+// a session kind ("plan", "work", "review", "gate-review") by P-6: the task's own value, else
 // the environment, else the config file, else the default. An unset effort
 // resolves to "".
 func ResolveSession(root, field, kind, taskValue string) (value, source string, err error) {

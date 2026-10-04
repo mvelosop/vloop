@@ -173,7 +173,6 @@ func showTask(g *Globals, out io.Writer, t *state.Task, work, review resolvedSes
 	fmt.Fprintf(out, "area    %s\n", area)
 	fmt.Fprintf(out, "depends %s\n", dash(strings.Join(t.DependsOn, ", ")))
 	fmt.Fprintf(out, "goal    %s\n", t.Goal)
-	writeList(out, "files", t.Files)
 	writeList(out, "acceptance", t.Acceptance)
 	refs := make([]string, len(t.References))
 	for i, r := range t.References {

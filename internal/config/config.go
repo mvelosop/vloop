@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/bmatcuk/doublestar/v4"
 
 	"github.com/mvelosop/vloop/internal/classify"
 )
@@ -59,9 +60,11 @@ var Keys = []Key{
 	{Name: "model.plan", Default: "opus"},
 	{Name: "model.work", Default: "sonnet"},
 	{Name: "model.review", Default: "sonnet"},
+	{Name: "model.gate-review", Default: "sonnet"},
 	{Name: "effort.plan", Valid: efforts},
 	{Name: "effort.work", Valid: efforts},
 	{Name: "effort.review", Valid: efforts},
+	{Name: "effort.gate-review", Valid: efforts},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
 	{Name: "metrics.stacks", List: true, Stacks: true},
@@ -76,6 +79,7 @@ var Keys = []Key{
 	{Name: "run.convergence-max", Default: "3.0", Num: true, MinOpen: true},
 	{Name: "run.convergence-min", Default: "6", Int: true},
 	{Name: "run.gate-timeout", Default: "15", Int: true, Min: 1},
+	{Name: "run.gate-scratch", List: true, Glob: true},
 	{Name: "run.session-timeout", Default: "60", Int: true, Min: 1},
 	{Name: "run.keep-awake", Default: "on", Valid: []string{"on", "off"}},
 }
@@ -335,6 +339,131 @@ func resolve(k Key, file map[string]any) (Value, error) {
 	return v, nil
 }
 
+// CheckDef is one [[check]] table: a command run when a change touches its
+// paths. Checks come from the config file only; no environment variable
+// overrides them.
+type CheckDef struct {
+	Name  string
+	Paths []string
+	Run   string
+}
+
+// parseChecks reads and validates the [[check]] tables, in file order.
+func parseChecks(file map[string]any) ([]CheckDef, error) {
+	raw, ok := file["check"]
+	if !ok {
+		return nil, nil
+	}
+	bad := func(format string, a ...any) error {
+		return &SourceError{FilePath, fmt.Errorf(format, a...)}
+	}
+	var tables []map[string]any
+	switch t := raw.(type) {
+	case []map[string]any:
+		tables = t
+	case []any:
+		for _, e := range t {
+			m, ok := e.(map[string]any)
+			if !ok {
+				return nil, bad("check must be an array of tables ([[check]])")
+			}
+			tables = append(tables, m)
+		}
+	default:
+		return nil, bad("check must be an array of tables ([[check]])")
+	}
+	var out []CheckDef
+	seen := map[string]bool{}
+	for i, t := range tables {
+		name, ok := t["name"].(string)
+		if !ok || !areaName.MatchString(name) {
+			return nil, bad("check %d: name must be a string of lower-case letters, digits and hyphens", i+1)
+		}
+		if seen[name] {
+			return nil, bad("check %q: duplicate name", name)
+		}
+		seen[name] = true
+		var paths []string
+		switch a := t["paths"].(type) {
+		case []string:
+			paths = a
+		case []any:
+			for _, e := range a {
+				s, ok := e.(string)
+				if !ok {
+					return nil, bad("check %q: paths must be an array of strings", name)
+				}
+				paths = append(paths, s)
+			}
+		default:
+			return nil, bad("check %q: paths must be a non-empty array of globs", name)
+		}
+		if len(paths) == 0 {
+			return nil, bad("check %q: paths must not be empty", name)
+		}
+		for _, g := range paths {
+			if g == "" || !doublestar.ValidatePattern(g) {
+				return nil, bad("check %q: invalid glob %q", name, g)
+			}
+		}
+		run, ok := t["run"].(string)
+		if !ok || strings.TrimSpace(run) == "" {
+			return nil, bad("check %q: run must be a non-empty command", name)
+		}
+		out = append(out, CheckDef{name, paths, run})
+	}
+	return out, nil
+}
+
+// Checks reads the [[check]] tables under root, in config order.
+func Checks(root string) ([]CheckDef, error) {
+	file, _, err := readFile(root)
+	if err != nil {
+		return nil, err
+	}
+	return parseChecks(file)
+}
+
+// AddChecks appends [[check]] tables to the config file under root, creating
+// the file when absent. It refuses when a check of the same name exists, and
+// every other key is preserved.
+func AddChecks(root string, add []CheckDef) error {
+	if len(add) == 0 {
+		return nil
+	}
+	file, _, err := readFile(root)
+	if err != nil {
+		return err
+	}
+	cur, err := parseChecks(file)
+	if err != nil {
+		return err
+	}
+	tables := []map[string]any{}
+	taken := map[string]bool{}
+	for _, c := range cur {
+		taken[c.Name] = true
+		tables = append(tables, map[string]any{"name": c.Name, "paths": c.Paths, "run": c.Run})
+	}
+	for _, c := range add {
+		if taken[c.Name] {
+			return fmt.Errorf("check %q already exists", c.Name)
+		}
+		taken[c.Name] = true
+		tables = append(tables, map[string]any{"name": c.Name, "paths": c.Paths, "run": c.Run})
+	}
+	file["check"] = tables
+	var buf bytes.Buffer
+	if err := toml.NewEncoder(&buf).Encode(file); err != nil {
+		return err
+	}
+	p := filePath(root)
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(p, buf.Bytes(), 0o644)
+}
+
 // Get resolves one key under root.
 func Get(root, name string) (Value, error) {
 	k, err := Lookup(name)
@@ -345,6 +474,9 @@ func Get(root, name string) (Value, error) {
 	if err != nil {
 		return Value{}, err
 	}
+	if _, err := parseChecks(file); err != nil {
+		return Value{}, err
+	}
 	return resolve(k, file)
 }
 
@@ -352,6 +484,9 @@ func Get(root, name string) (Value, error) {
 func List(root string) ([]Value, error) {
 	file, _, err := readFile(root)
 	if err != nil {
+		return nil, err
+	}
+	if _, err := parseChecks(file); err != nil {
 		return nil, err
 	}
 	out := make([]Value, 0, len(Keys))

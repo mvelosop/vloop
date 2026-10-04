@@ -9,7 +9,7 @@ import (
 )
 
 const statusPlan = `{
-  "schema": "state/v1",
+  "schema": "state/v2",
   "run_id": "B20260101-0900-a",
   "brief": "docs/briefs/b.loop-brief.md",
   "base": "0123456789abcdef0123456789abcdef01234567",
@@ -19,10 +19,13 @@ const statusPlan = `{
   "created": "2026-01-01T09:00:00Z",
   "updated": "2026-01-01T09:00:00Z",
   "shell": "sh",
+  "checks": [],
+  "gate_scratch": [],
+  "gate_review": {"rounds": 0, "verdict": ""},
   "tasks": [
-    {"id":"T1","title":"Skeleton","goal":"g","kind":"feature","area":"cli","files":["a"],"references":[],"depends_on":[],"acceptance":["a"],"verify":"true","status":"done","attempts":0,"notes":""},
-    {"id":"T2","title":"Config","goal":"Add the config.","kind":"feature","area":"config","files":["b"],"references":[],"depends_on":["T1"],"acceptance":["b exists"],"verify":"true","status":"pending","attempts":1,"notes":"watch the path"},
-    {"id":"T3","title":"README","goal":"g","kind":"docs","files":["c"],"references":[],"depends_on":["T2"],"acceptance":["c"],"verify":"true","status":"blocked","attempts":2,"notes":""}
+    {"id":"T1","title":"Skeleton","goal":"g","kind":"feature","area":"cli","fixtures":"","references":[],"depends_on":[],"acceptance":["a"],"verify":"true","status":"done","attempts":0,"notes":""},
+    {"id":"T2","title":"Config","goal":"Add the config.","kind":"feature","area":"config","fixtures":"","references":[],"depends_on":["T1"],"acceptance":["b exists"],"verify":"true","status":"pending","attempts":1,"notes":"watch the path"},
+    {"id":"T3","title":"README","goal":"g","kind":"docs","fixtures":"","references":[],"depends_on":["T2"],"acceptance":["c"],"verify":"true","status":"blocked","attempts":2,"notes":""}
   ]
 }`
 
@@ -90,7 +93,6 @@ func TestStatusMarkdown(t *testing.T) {
 		"### T2 — Config\n",
 		"`pending` · 1 attempt(s) · depends on: T1\n",
 		"`blocked` · **blocked** · depends on: T2\n",
-		"**Files:** `b`\n",
 		"- b exists\n",
 		"**From the last attempt:** watch the path\n",
 	} {

@@ -21,9 +21,11 @@ environment and in `config set`.
 | `model.plan` | `opus` | any model name | `VLOOP_MODEL_PLAN` | model of the plan session |
 | `model.work` | `sonnet` | any model name | `VLOOP_MODEL_WORK` | model of the work sessions |
 | `model.review` | `sonnet` | any model name | `VLOOP_MODEL_REVIEW` | model of the review sessions |
+| `model.gate-review` | `sonnet` | any model name | `VLOOP_MODEL_GATE_REVIEW` | model of the gate-review session |
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` | effort of the plan session |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` | effort of the work sessions |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` | effort of the review sessions |
+| `effort.gate-review` | unset | same | `VLOOP_EFFORT_GATE_REVIEW` | effort of the gate-review session |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
 | `metrics.stacks` | unset | a list of preset names (below) | `VLOOP_METRICS_STACKS` | presets that classify changed lines as code, test, docs or excluded |
@@ -38,6 +40,7 @@ environment and in `config set`.
 | `run.convergence-max` | `3.0` | a number above 0 | `VLOOP_RUN_CONVERGENCE_MAX`  | iterations per closed task above which a run is not converging (after `run.convergence-min` iterations) |
 | `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN`  | iterations a run must have taken before convergence is judged |
 | `run.gate-timeout` | `15` | a whole number of minutes, 1 or more | `VLOOP_RUN_GATE_TIMEOUT`  | minutes a gate may run, in `vloop run` and in `vloop task gate`; a gate still running is killed with everything it started and has failed |
+| `run.gate-scratch` | unset | a list of doublestar globs | `VLOOP_RUN_GATE_SCRATCH` | repo-relative folders (for example `web/.gate/`) a gate may write into; they are emptied after every gate, and a gate that changes anything else in the tree fails |
 | `run.session-timeout` | `60` | a whole number of minutes, 1 or more | `VLOOP_RUN_SESSION_TIMEOUT`  | minutes a plan, work or review session may run; a session still running is killed with everything it started and is a session error (exit 7) |
 | `run.keep-awake` | `on` | `on` or `off` | `VLOOP_RUN_KEEP_AWAKE`  | `on` holds a no-idle-sleep hold for the lifetime of `vloop run` (macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`); `off` takes none |
 
@@ -55,6 +58,36 @@ work = "opus"
 stacks = ["go"]
 code = ["internal/brief/templates/**"]
 ```
+
+### Checks
+
+A check is a command that proves a part of the repository still works. Checks are
+`[[check]]` tables in `.vloop/config.toml`, the only place they are defined:
+there is no environment variable for them, and `vloop config set` leaves them in
+place when it rewrites the file.
+
+```
+[[check]]
+name = "api"
+paths = ["api/**"]
+run = "sh api/test.sh"
+
+[[check]]
+name = "web"
+paths = ["web/**", "shared/*.ts"]
+run = "sh web/test.sh"
+```
+
+| Field | Valid values | Meaning |
+| --- | --- | --- |
+| `name` | lower-case letters, digits and hyphens; unique | what the check is called |
+| `paths` | a non-empty list of repo-relative doublestar globs, as in `metrics.*` | the files that make the check apply |
+| `run` | one command | what is run, in the configured `shell` |
+
+A duplicate or malformed name, empty `paths`, a bad glob or a missing `run` makes
+reading the config fail with a `vloop: ` message, as any bad value in the file
+does. `vloop config list` prints each check after the keys, in config order, as
+`check.<name>=<run> (paths: <globs>)`.
 
 How the globs and presets are layered is in [metrics.md](metrics.md).
 

@@ -18,11 +18,30 @@ var invalidAt = map[string]string{
 	"install":      "/version",
 	"metrics":      "/tasks/done",
 
+	// The v2 contracts and gate-verdict/v1; a name ending in 2 is the v2 of the part before it.
+	"state2":       "/status",
+	"iteration2":   "/checks/0/exit",
+	"session2":     "",
+	"metrics2":     "/tasks/done",
+	"gate-verdict": "/tasks/0/findings/0/kind",
+
 	// export/v1 has one fixture pair per record type; the name is the part before the dash.
 	"export-brief":        "",
 	"export-task":         "/attempts",
 	"export-defect":       "/found_by",
 	"export-intervention": "/phase",
+}
+
+// schemaName maps a fixture base to its schema: state2 is state/v2, export-task is export/v1,
+// gate-verdict is gate-verdict/v1.
+func schemaName(base string) string {
+	if base == "gate-verdict" {
+		return "gate-verdict/v1"
+	}
+	if n, ok := strings.CutSuffix(base, "2"); ok {
+		return n + "/v2"
+	}
+	return strings.SplitN(base, "-", 2)[0] + "/v1"
 }
 
 func fixture(t *testing.T, n string) []byte {
@@ -35,7 +54,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"defect/v1", "export/v1", "install/v1", "intervention/v1", "iteration/v1", "metrics/v1", "proposal/v1", "session/v1", "state/v1", "verdict/v1"}
+	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "install/v1", "intervention/v1", "iteration/v1", "iteration/v2", "metrics/v1", "metrics/v2", "proposal/v1", "session/v1", "session/v2", "state/v1", "state/v2", "verdict/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}
@@ -43,7 +62,7 @@ func TestNames(t *testing.T) {
 
 func TestFixturesValidateAndFail(t *testing.T) {
 	for base, ptr := range invalidAt {
-		name := strings.SplitN(base, "-", 2)[0] + "/v1"
+		name := schemaName(base)
 		t.Run(base, func(t *testing.T) {
 			vs, err := Validate(name, fixture(t, base+".valid.json"))
 			if err != nil || len(vs) != 0 {

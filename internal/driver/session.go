@@ -19,9 +19,10 @@ import (
 
 // Session kinds.
 const (
-	PhasePlan   = "plan"
-	PhaseWork   = "work"
-	PhaseReview = "review"
+	PhasePlan       = "plan"
+	PhaseWork       = "work"
+	PhaseReview     = "review"
+	PhaseGateReview = "gate-review"
 )
 
 // Runner starts the sessions of one run. The zero value of the optional fields
@@ -45,7 +46,7 @@ type Runner struct {
 }
 
 // Spec is one session to start. Arg is the brief path for a plan and the task
-// id for work and review. Effort is "" when unset.
+// id for work and review; a gate review has none. Effort is "" when unset.
 type Spec struct {
 	Phase     string
 	Iteration int
@@ -70,6 +71,9 @@ type Result struct {
 
 // Prompt is the slash command a session of the phase starts with.
 func Prompt(phase, arg string) string {
+	if arg == "" {
+		return "/vloop:" + phase
+	}
 	return "/vloop:" + phase + " " + arg
 }
 
@@ -287,7 +291,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		return Result{}, err
 	}
 	task := ""
-	if s.Phase != PhasePlan {
+	if s.Phase == PhaseWork || s.Phase == PhaseReview {
 		task = s.Arg
 	}
 	if err := os.MkdirAll(filepath.Join(r.RunDir, "sessions"), 0o755); err != nil {
@@ -375,7 +379,7 @@ type output struct {
 	Denials []json.RawMessage
 }
 
-// record maps claude's JSON onto session/v1. Fields claude did not print are
+// record maps claude's JSON onto session/v1 (session/v2 for a gate review). Fields claude did not print are
 // zero values of the same type; none is made up beyond that.
 func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]json.RawMessage) (map[string]any, output) {
 	var o output
@@ -433,8 +437,12 @@ func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]j
 	if s.Effort != "" {
 		effort = s.Effort
 	}
+	schemaName := "session/v1"
+	if s.Phase == PhaseGateReview {
+		schemaName = "session/v2"
+	}
 	rec := map[string]any{
-		"schema":             "session/v1",
+		"schema":             schemaName,
 		"run_id":             r.RunID,
 		"iteration":          s.Iteration,
 		"phase":              s.Phase,

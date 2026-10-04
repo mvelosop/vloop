@@ -1,5 +1,5 @@
 {
-  "schema": "state/v1",
+  "schema": "state/v2",
   "run_id": "B20260101-0900-a",
   "brief": "docs/briefs/B20260101-0900-a.loop-brief.md",
   "base": "0123456789abcdef0123456789abcdef01234567",
@@ -9,6 +9,12 @@
   "created": "2026-01-01T09:00:00Z",
   "updated": "2026-01-01T09:00:00Z",
   "shell": "sh",
+  "checks": [],
+  "gate_scratch": [],
+  "gate_review": {
+    "rounds": 0,
+    "verdict": ""
+  },
   "tasks": [
     {
       "id": "T1",
@@ -16,9 +22,7 @@
       "goal": "Build the skeleton.",
       "kind": "feature",
       "area": "cli",
-      "files": [
-        "skeleton.txt"
-      ],
+      "fixtures": "",
       "references": [],
       "depends_on": [],
       "acceptance": [
@@ -34,9 +38,7 @@
       "title": "Config",
       "goal": "Add the config.",
       "kind": "feature",
-      "files": [
-        "config.txt"
-      ],
+      "fixtures": "",
       "references": [
         {
           "path": "docs/x.md",
@@ -64,7 +66,8 @@
           "verify": "true",
           "replaced_at": "2026-01-01T10:00:00Z",
           "reason": "wrong file",
-          "by": "operator"
+          "by": "operator",
+          "fixtures": ""
         }
       ]
     }

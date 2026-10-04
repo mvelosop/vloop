@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop run` refuses before planning when a run.gate-scratch folder is not ignored by git: `vloop: gate scratch <path> is not ignored by git — add it to .gitignore` (exit 1), starting no session; the plan copies the list into gate_scratch.", "met": true, "evidence": "plan.go copies run.gate-scratch into plan.GateScratch; run_gates_test.go:302 tests the refusal before planning"},
+    {"criterion": "After every gate run — in `vloop run`, at acceptance and in `vloop task gate` — the driver removes everything inside each scratch folder.", "met": true, "evidence": "state.EmptyScratch is called in iterate.go:759, cli/task_gate.go:54 and now plan.go:559 (acceptPlan); run_gates_test.go:315 tests acceptance, :328 the other two"},
+    {"criterion": "The driver snapshots the tree before each gate and compares after, ignoring .vloop/tmp/ and the scratch folders; a gate that changed anything has it restored and fails, its log ending `vloop: gate T<n> changed the tree — restored: <paths>`.", "met": true, "evidence": "state/gate.go:116 builds the message; run_gates_test.go:359-367 asserts the log's last line and that a new file is removed and a modified file restored"},
+    {"criterion": "A timed-out gate is not re-run; the one immediate re-run stays for an ordinary failure. TestRunFlakyGate and TestWorkedExampleB6FlakyGate gain the timeout case and change nothing else.", "met": true, "evidence": "timeout subtests added inside TestRunFlakyGate (run_gates_test.go:196) and TestWorkedExampleB6FlakyGate (b6_e2e_test.go); the earlier standalone TestRunTimedOutGateNotRerun was folded into the former, with the same body"},
+    {"criterion": "Tests cover the scratch refusal, the emptying in each of the three places, the tree restore of a new and of a modified file, and the timeout.", "met": true, "evidence": "run_gates_test.go subtests at :196, :302, :315, :328 and the restore assertions at :359-367; b6_e2e_test.go timeout subtest"}
+  ],
+  "findings": [],
+  "notes": "Most of T6 was already in HEAD from the earlier attempt; this diff adds the acceptance emptying plus its test and moves the timeout test into the named tests. I did not re-run the one-minute timeout tests; the driver's gate did. T9 should call state.EmptyScratch after each gate it adds at acceptance."
+}

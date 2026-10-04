@@ -52,7 +52,7 @@ func TestWorkedExampleB8(t *testing.T) {
 	t.Run("verify sleep 1000 & exit 0: the gate returns, no sleep remains", func(t *testing.T) {
 		r := newRunRepo(t)
 		// A distinctive duration finds this test's sleep among the machine's.
-		verify := "sleep 1017 & exit 0"
+		verify := "sleep 1017 & test -f T1.out"
 		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": verify})), defaultScript)
 		start := time.Now()
 		wantExit(t, r.vloop("run", runBrief), 0)
@@ -190,7 +190,7 @@ fi
 
 	t.Run("gate env with FOO_TOKEN: the log is redacted", func(t *testing.T) {
 		r := newRunRepo(t)
-		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "env"})), defaultScript)
+		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "env; test -f T1.out"})), defaultScript)
 		wantExit(t, r.runWith([]string{"FOO_TOKEN=s3cr3t-value"}, runBrief), 0)
 		log, err := os.ReadFile(filepath.Join(r.runFolder(), "gates", "T1.log"))
 		if err != nil {

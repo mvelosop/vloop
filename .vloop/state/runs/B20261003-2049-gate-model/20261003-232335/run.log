@@ -1,0 +1,64 @@
+── iteration 6 (1 this run) · T2 · 3/16 done ──
+   Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
+   GATE REWRITE T2 — .vloop/state/state.json restored from HEAD; a gate is not a session's to rewrite
+   T2 failed on a rewritten gate — the work is reverted whatever the gate said
+── iteration 7 (2 this run) · T2 · 3/16 done ──
+   Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
+   review: PASS
+   T2 done
+── iteration 8 (3 this run) · T3 · 4/16 done ──
+   Write starter checks in vloop init and upgrade, and make doctor report no check and an un-ignored scratch folder
+   review: PASS
+   T3 done
+── iteration 9 (4 this run) · T6 · 5/16 done ──
+   Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
+   review: FAIL
+── iteration 10 (5 this run) · T6 · 5/16 done ──
+   Empty the gate scratch folders after every gate, fail a gate that changes the tree, and stop re-running a timed-out gate
+   review: PASS
+   T6 done
+── iteration 11 (6 this run) · T7 · 6/16 done ──
+   Run every check on the base before planning, refuse without one, and copy the checks into the plan
+   review: PASS
+   T7 done
+── iteration 12 (7 this run) · T8 · 7/16 done ──
+   Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
+   review: PASS
+   T8 done
+── iteration 13 (8 this run) · T9 · 8/16 done ──
+   Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
+   review: PASS
+   T9 done
+── iteration 14 (9 this run) · T10 · 9/16 done ──
+   Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
+   review: PASS
+   T10 done
+── iteration 15 (10 this run) · T11 · 10/16 done ──
+   Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
+   review: PASS
+   T11 done
+── iteration 16 (11 this run) · T12 · 11/16 done ──
+   Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
+   review: PASS
+   T12 done
+── iteration 17 (12 this run) · T13 · 12/16 done ──
+   Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
+   review: PASS
+   T13 done
+── iteration 18 (13 this run) · T14 · 13/16 done ──
+   Update the domain model and the execution and measurement docs for the gate model
+   review: PASS
+   T14 done
+── iteration 19 (14 this run) · T15 · 14/16 done ──
+   Update the operator guides: concepts, the generated commands reference and metrics
+   review: PASS
+   T15 done
+── iteration 20 (15 this run) · T16 · 15/16 done ──
+   Close B9: the worked example line for line, go test ./..., and the real-data check
+   review: PASS
+   T16 done
+
+═══ complete ═══
+run:    B20261003-2049-gate-model/20261003-232335  (15 iteration(s) this run)
+plan:   16/16 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261003-2049-gate-model.md

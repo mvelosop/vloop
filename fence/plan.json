@@ -28,6 +28,8 @@
       "Bash(vloop schema validate:*)",
       "Edit(.vloop/state/state.json)",
       "Write(.vloop/state/state.json)",
+      "Edit(.vloop/state/gates/**)",
+      "Write(.vloop/state/gates/**)",
       "Edit(.vloop/tmp/**)",
       "Write(.vloop/tmp/**)"
     ],

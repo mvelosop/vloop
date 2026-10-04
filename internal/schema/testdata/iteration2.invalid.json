@@ -1,0 +1,1 @@
+{"schema":"iteration/v2","run_id":"r","iteration":1,"task":"T1","attempt":1,"outcome":"done","gate":{"exit":0,"duration_ms":5},"checks":[{"name":"api","exit":"1","duration_ms":12}],"started":"2026-01-01T09:00:00Z","ended":"2026-01-01T09:01:00Z"}

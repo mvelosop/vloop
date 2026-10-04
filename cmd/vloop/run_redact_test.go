@@ -11,7 +11,7 @@ import (
 // of a secret-named variable out of the committed gate log.
 func TestRunGateLogRedacted(t *testing.T) {
 	r := newRunRepo(t)
-	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "env"})), defaultScript)
+	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "env; test -f T1.out"})), defaultScript)
 	wantExit(t, r.runWith([]string{"FOO_TOKEN=s3cr3t-value", "SHORT_KEY=abc123"}, runBrief), 0)
 
 	log, err := os.ReadFile(filepath.Join(r.runFolder(), "gates", "T1.log"))

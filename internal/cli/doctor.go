@@ -119,6 +119,26 @@ func runDoctor(b Build, root string) []doctorCheck {
 		add("config", resPass, "")
 	}
 
+	if cerr == nil {
+		if cks, err := config.Checks(root); err == nil && len(cks) == 0 {
+			add("checks", resProblem, "no [[check]] is configured — a run needs at least one; see docs/guide/configuration.md")
+		}
+		for _, v := range vals {
+			if v.Key != "run.gate-scratch" {
+				continue
+			}
+			var loose []string
+			for _, d := range v.List {
+				if isRepo && !gitIgnored(root, d) {
+					loose = append(loose, d)
+				}
+			}
+			if len(loose) > 0 {
+				add("gate scratch", resProblem, strings.Join(loose, ", ")+" is not ignored by git — add it to .gitignore")
+			}
+		}
+	}
+
 	_, lerr := exec.LookPath("claude")
 	hasClaude := lerr == nil
 	switch {
@@ -171,6 +191,10 @@ func runDoctor(b Build, root string) []doctorCheck {
 		}
 		rep, err := state.Check(root, areas)
 		switch {
+		case plan.Schema == state.SchemaV1 && plan.Status == "complete":
+			add("plan", resPass, "a complete "+state.SchemaV1+" plan — the next brief's plan replaces it")
+		case plan.Schema == state.SchemaV1:
+			add("plan", resWarning, "a "+state.SchemaV1+" plan — finish it with vloop 1.x or re-plan the brief")
 		case err != nil:
 			add("plan", resProblem, err.Error())
 		case len(rep.Problems) > 0:
@@ -252,6 +276,8 @@ func doctorGit(root string, add func(name, result, msg string)) (bool, string) {
 	return true, head
 }
 
+func gitIgnored(root, rel string) bool { return driver.GitIgnored(root, rel) }
+
 func gitOut(root string, args ...string) (string, error) {
 	out, err := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
 	return strings.TrimSpace(string(out)), err
@@ -298,7 +324,7 @@ func doctorTrusted(root string) bool {
 
 // doctorPlan reads just the plan's shell and status, leniently: validity is
 // the plan check's business.
-func doctorPlan(root string) (p struct{ Shell, Status string }, ok bool) {
+func doctorPlan(root string) (p struct{ Schema, Shell, Status string }, ok bool) {
 	raw, err := os.ReadFile(state.Path(root))
 	if err != nil {
 		return p, false

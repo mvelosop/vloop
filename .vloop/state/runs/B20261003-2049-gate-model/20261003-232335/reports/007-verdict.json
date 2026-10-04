@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`[[check]]` tables are read from .vloop/config.toml, each with `name` (unique, matching [a-z0-9-]+), `paths` (a non-empty list of repo-relative globs in the metrics glob syntax) and `run` (one command); a duplicate name, a bad name, empty paths or a missing run makes reading the config fail with a `vloop: ` message, as other bad config values do.", "met": true, "evidence": "internal/config/config.go parseChecks validates name, uniqueness, non-empty paths, valid globs and run; TestChecksRefusals covers each refusal; the gate's badcfg cases pass"},
+    {"criterion": "`vloop config list` prints each check, in config order, as `check.<name>=<run> (paths: <globs>)`, after the existing keys' lines.", "met": true, "evidence": "gate checks the line format and order; TestConfigChecksListAndSurviveSet in internal/cli/config_test.go"},
+    {"criterion": "`run.gate-scratch` is a list key (default empty), `model.gate-review` defaults to `sonnet`, and `effort.gate-review` takes the effort values; all three work with `vloop config get`, `set` and `list` like their siblings.", "met": true, "evidence": "config.go:63,67,82 define the keys; TestGateKeys; gate exercises get, set and list"},
+    {"criterion": "There is no environment override for checks.", "met": true, "evidence": "CheckDef comment and parseChecks read only the file; no Getenv for checks"},
+    {"criterion": "`vloop config set` of any key leaves the file's [[check]] tables in place.", "met": true, "evidence": "TestSetKeepsCheckTables; gate lists checks again after config set"},
+    {"criterion": "docs/guide/configuration.md documents [[check]], run.gate-scratch, model.gate-review and effort.gate-review.", "met": true, "evidence": "docs/guide/configuration.md lines 24, 28, 43 and the [[check]] section at lines 64-90"},
+    {"criterion": "Config tests cover each new key and each refusal.", "met": true, "evidence": "TestGateKeys, TestChecksRead, TestChecksRefusals, TestSetKeepsCheckTables, TestConfigBadCheckExit1"}
+  ],
+  "findings": [],
+  "notes": "The implementation was committed by an earlier attempt, so git diff HEAD is empty for the task files; I reviewed the committed code at HEAD. The gate passes (GATE OK)."
+}

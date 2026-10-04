@@ -1,3 +1,14 @@
+# The [[check]] below runs cmd/vloop's ~9-minute package; the default 15 would
+# leave it no headroom (B11 owns the suite's speed).
+run.gate-timeout = 30
+
 [metrics]
   code = ["internal/brief/templates/**", "schemas/**"]
   stacks = ["go"]
+
+# The repository's tests and health checks — CLAUDE.md's toolchain — run by the
+# driver on the base, after every iteration, and once in full at the end.
+[[check]]
+  name = "go"
+  paths = ["**"]
+  run = "go test -timeout 30m ./... && go vet ./... && test -z \"$(gofmt -l .)\" && go mod tidy -diff && GOOS=linux go build ./... && GOOS=windows go build ./..."

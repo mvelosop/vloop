@@ -19,6 +19,10 @@ type doctorEnv struct {
 	plugins string
 }
 
+// doctorCheckConfig is a config with the one check a repository needs to pass
+// doctor.
+const doctorCheckConfig = "[[check]]\nname = \"all\"\npaths = [\"**\"]\nrun = \"true\"\n"
+
 // newDoctorEnv is a committed git repository with an identity, a stub claude
 // first on PATH, and a fake home that trusts the repository.
 func newDoctorEnv(t *testing.T) *doctorEnv {
@@ -49,6 +53,7 @@ func newDoctorEnv(t *testing.T) *doctorEnv {
 	e.claude(true)
 	e.trust(true)
 	e.run("init") // stamp at 0.1.0
+	e.write(".vloop/config.toml", doctorCheckConfig)
 	return e
 }
 
@@ -148,10 +153,11 @@ func (e *doctorEnv) plan(status, shell string) {
 	e.t.Helper()
 	e.write("docs/briefs/B20260101-0900-a.loop-brief.md", "x\n")
 	doc, _ := json.Marshal(map[string]any{
-		"schema": "state/v1", "run_id": "B20260101-0900-a", "brief": "docs/briefs/B20260101-0900-a.loop-brief.md",
+		"schema": "state/v2", "run_id": "B20260101-0900-a", "brief": "docs/briefs/B20260101-0900-a.loop-brief.md",
 		"base": strings.Repeat("0123456789", 4), "branch": "B20260101-0900-a", "status": status, "iteration": 0,
 		"created": "2026-01-01T09:00:00Z", "updated": "2026-01-01T09:00:00Z", "shell": shell,
-		"tasks": []any{map[string]any{"id": "T1", "title": "t", "goal": "g", "kind": "feature", "files": []string{},
+		"checks": []any{}, "gate_scratch": []string{}, "gate_review": map[string]any{"rounds": 0, "verdict": ""},
+		"tasks": []any{map[string]any{"id": "T1", "title": "t", "goal": "g", "kind": "feature", "fixtures": "",
 			"references": []any{}, "depends_on": []string{}, "acceptance": []string{"a"}, "verify": "true",
 			"status": "pending", "attempts": 0, "notes": ""}},
 	})
@@ -247,6 +253,13 @@ func TestDoctorGateShellPlanAndBranch(t *testing.T) {
 	e.write(".vloop/state/state.json", strings.Replace(readFile(t, e.repo, ".vloop/state/state.json"), `"depends_on":[]`, `"depends_on":["T9"]`, 1))
 	e.want("plan", resProblem)
 
+	// A v1 plan is not validated as v2: a complete one is an earlier brief's,
+	// which the next brief's plan replaces; an unfinished one wants vloop 1.x.
+	e.write(".vloop/state/state.json", `{"schema":"state/v1","status":"complete","tasks":[]}`+"\n")
+	e.want("plan", resPass)
+	e.write(".vloop/state/state.json", `{"schema":"state/v1","status":"blocked","tasks":[]}`+"\n")
+	e.want("plan", resWarning)
+
 	e.plan("running", "sh")
 	e.git("checkout", "-q", "main")
 	e.want("branch", resProblem)
@@ -280,7 +293,7 @@ func TestDoctorStacks(t *testing.T) {
 		t.Errorf("a stacks check without a scoped entry:\n%s", out)
 	}
 	e.write("services/api/x", "x")
-	e.write(".vloop/config.toml", "[metrics]\nstacks = [\"go\", \"csharp@services/api\"]\n")
+	e.write(".vloop/config.toml", "[metrics]\nstacks = [\"go\", \"csharp@services/api\"]\n\n"+doctorCheckConfig)
 	e.want("stacks", resPass)
 	if err := os.RemoveAll(filepath.Join(e.repo, "services")); err != nil {
 		t.Fatal(err)
@@ -339,5 +352,26 @@ func TestDoctorWritesNothing(t *testing.T) {
 	e.run("--json", "doctor")
 	if snap() != before {
 		t.Error("doctor changed files")
+	}
+}
+
+func TestDoctorChecksAndGateScratch(t *testing.T) {
+	e := newDoctorEnv(t)
+	cfg := doctorCheckConfig
+	e.write(".vloop/config.toml", "language = \"en\"\n")
+	if c := e.want("checks", resProblem); !strings.Contains(c.Message, "[[check]]") {
+		t.Errorf("message %q", c.Message)
+	}
+	e.write(".vloop/config.toml", cfg)
+	if out, _ := e.run("--json", "doctor"); strings.Contains(out, `"name":"checks"`) || strings.Contains(out, `"result":"problem"`) {
+		t.Errorf("a problem with a check configured:\n%s", out)
+	}
+	e.write(".vloop/config.toml", "run.gate-scratch = [\"web/.gate/\"]\n\n"+cfg)
+	if c := e.want("gate scratch", resProblem); !strings.Contains(c.Message, "web/.gate/") {
+		t.Errorf("message %q", c.Message)
+	}
+	e.write(".gitignore", "web/.gate/\n")
+	if out, _ := e.run("--json", "doctor"); strings.Contains(out, `"result":"problem"`) {
+		t.Errorf("a problem once the folder is ignored:\n%s", out)
 	}
 }

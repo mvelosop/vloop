@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T12",
+  "outcome": "done",
+  "summary": "The plan skill now states the gate model (state/v2, judges in the verify or .vloop/state/gates/<id>/, oracle scratch, UI oracles, the checks, revision rounds); /vloop:gate-review exists with the three ways, five finding kinds and gate-verdict/v1; review reads the checks' results; work leaves gate fixtures alone.",
+  "files": ["plugin/skills/plan/SKILL.md", "plugin/skills/gate-review/SKILL.md", "plugin/skills/review/SKILL.md", "plugin/skills/work/SKILL.md", "internal/cli/readme_test.go", "internal/cli/skills_test.go", "cmd/vloop/b7_e2e_test.go", "docs/domain/domain-model.md", "README.md"],
+  "verified": "vloop task gate T12 exited 0 and printed GATE OK.",
+  "notes": "Outside the listed files: cmd/vloop/b7_e2e_test.go expects the extracted skill list (now includes gate-review); docs/domain/domain-model.md On disk block gained .vloop/state/gates/<task id>/, .vloop/tmp/gate-verdict.json and .vloop/tmp/plan-problems.md because TestPluginSkills requires every path a skill names to be listed there (T14 rewrites the doc); README.md names five skills. skills_test.go fencedSkills gained gate-review so its commands are judged against fence/gate-review.json. TestPluginSkills rejects code spans naming commands the fence denies, so the skills mention vloop task verify and config list in prose without code formatting. The plan skill's example writes checks, gate_scratch and gate_review empty and fixtures as an empty string; the driver fills them. run.gate-scratch is not readable with vloop config get, so the plan skill tells the planner to read it from .vloop/config.toml."
+}

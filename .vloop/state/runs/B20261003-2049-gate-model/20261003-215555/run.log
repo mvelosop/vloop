@@ -1,0 +1,30 @@
+the plan B20261002-2135-vloop-v1-security was for docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md — you asked for docs/briefs/B20261003-2049-gate-model.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261003-2049-gate-model.loop-brief.md using opus
+planned: B20261003-2049-gate-model — 16 tasks
+committing the plan
+── iteration 1 (1 this run) · T1 · 0/16 done ──
+   Add the v2 file contracts: state/v2, iteration/v2, session/v2, gate-verdict/v1 and metrics/v2
+   review: PASS
+   T1 done
+── iteration 2 (2 this run) · T2 · 1/16 done ──
+   Add the [[check]] tables, run.gate-scratch and the gate-review model and effort keys to config
+   GATE DISPUTE T2 — blocked for the operator; no review, no attempt charged
+   T2 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 3 (3 this run) · T4 · 1/16 done ──
+   Make the plan state/v2: drop task files and the gate-file rule, refuse a v1 plan in vloop run
+   review: PASS
+   T4 done
+── iteration 4 (4 this run) · T5 · 2/16 done ──
+   Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
+   review: FAIL
+── iteration 5 (5 this run) · T5 · 2/16 done ──
+   Give gate fixtures to the planner: .vloop/state/gates/<id>/, the fixtures stamp, the restore and task verify
+   review: PASS
+   T5 done
+12 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261003-2049-gate-model/20261003-215555  (5 iteration(s) this run)
+plan:   3/16 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

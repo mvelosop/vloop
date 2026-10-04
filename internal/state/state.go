@@ -1,5 +1,5 @@
 // Package state loads, saves and renders the plan: .vloop/state/state.json.
-// The embedded state/v1 schema decides whether a plan is valid; the structs
+// The embedded state/v2 schema decides whether a plan is valid; the structs
 // here only carry it, in schema order, so a load-save cycle is byte-stable.
 package state
 
@@ -22,7 +22,11 @@ import (
 const FilePath = ".vloop/state/state.json"
 
 // SchemaName is the schema the plan is validated against.
-const SchemaName = "state/v1"
+const SchemaName = "state/v2"
+
+// SchemaV1 is the plan vloop 1.x wrote. vloop 2 reads it for status and metrics
+// and refuses to run it.
+const SchemaV1 = "state/v1"
 
 // ErrNoPlan is returned by Load when the plan file does not exist.
 var ErrNoPlan = errors.New("no plan: " + FilePath)
@@ -39,7 +43,25 @@ type Plan struct {
 	Created   string `json:"created"`
 	Updated   string `json:"updated"`
 	Shell     string `json:"shell"`
-	Tasks     []Task `json:"tasks"`
+
+	Checks      []PlanCheck `json:"checks"`
+	GateScratch []string    `json:"gate_scratch"`
+	GateReview  GateReview  `json:"gate_review"`
+	Tasks       []Task      `json:"tasks"`
+}
+
+// PlanCheck is a repo check copied into the plan: a name, the paths it covers and
+// the command it runs.
+type PlanCheck struct {
+	Name  string   `json:"name"`
+	Paths []string `json:"paths"`
+	Run   string   `json:"run"`
+}
+
+// GateReview is where the gate-review of the plan stands.
+type GateReview struct {
+	Rounds  int    `json:"rounds"`
+	Verdict string `json:"verdict"`
 }
 
 // Task is one task of the plan. Field order is the schema's key order.
@@ -49,7 +71,7 @@ type Task struct {
 	Goal        string        `json:"goal"`
 	Kind        string        `json:"kind"`
 	Area        string        `json:"area,omitempty"`
-	Files       []string      `json:"files"`
+	Fixtures    string        `json:"fixtures"`
 	References  []Reference   `json:"references"`
 	DependsOn   []string      `json:"depends_on"`
 	Acceptance  []string      `json:"acceptance"`
@@ -80,6 +102,7 @@ type GateReplace struct {
 	ReplacedAt string `json:"replaced_at"`
 	Reason     string `json:"reason"`
 	By         string `json:"by"`
+	Fixtures   string `json:"fixtures"`
 }
 
 // Path returns the plan file's path under root.
@@ -103,7 +126,7 @@ func Load(root string) (*Plan, error) {
 	return &p, nil
 }
 
-// Validate checks the plan file under root against the state/v1 schema.
+// Validate checks the plan file under root against the state/v2 schema.
 func Validate(root string) ([]schema.Violation, error) {
 	data, err := os.ReadFile(Path(root))
 	if errors.Is(err, fs.ErrNotExist) {
@@ -119,11 +142,19 @@ func Validate(root string) ([]schema.Violation, error) {
 // order, a trailing newline, and <, > and & written literally.
 func Marshal(p *Plan) ([]byte, error) {
 	q := *p
+	if q.Checks == nil {
+		q.Checks = []PlanCheck{}
+	}
+	for i, c := range q.Checks {
+		if c.Paths == nil {
+			q.Checks[i].Paths = []string{}
+		}
+	}
+	if q.GateScratch == nil {
+		q.GateScratch = []string{}
+	}
 	q.Tasks = make([]Task, len(p.Tasks))
 	for i, t := range p.Tasks {
-		if t.Files == nil {
-			t.Files = []string{}
-		}
 		if t.References == nil {
 			t.References = []Reference{}
 		}
@@ -236,16 +267,6 @@ func (p *Plan) Markdown() string {
 		w("### %s — %s", t.ID, t.Title)
 		w("")
 		w("`%s`%s · depends on: %s", t.Status, note(t), deps)
-		w("")
-		if len(t.Files) > 0 {
-			quoted := make([]string, len(t.Files))
-			for i, f := range t.Files {
-				quoted[i] = "`" + f + "`"
-			}
-			w("**Files:** %s", strings.Join(quoted, ", "))
-		} else {
-			w("**Files:** _none named_")
-		}
 		w("")
 		if t.Goal != "" {
 			w("%s", t.Goal)

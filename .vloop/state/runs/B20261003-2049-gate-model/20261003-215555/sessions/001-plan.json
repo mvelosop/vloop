@@ -1,0 +1,37 @@
+{
+  "cost_usd": 9.2589652,
+  "duration_ms": 2493754,
+  "effort": null,
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 311179,
+      "cache_read_input_tokens": 15933466,
+      "cost_usd": 9.2589652,
+      "input_tokens": 170,
+      "output_tokens": 179108
+    }
+  },
+  "permission_denials": [
+    {
+      "file_path": "~/.claude/projects/-Users-miguelveloso-source-personal-vloop/0c1c69c9-db6b-4659-bfb1-55857b6b346d/tool-results/b3lpxb60t.txt",
+      "tool_name": "Read"
+    },
+    {
+      "tool_name": "Bash"
+    },
+    {
+      "tool_name": "Bash"
+    },
+    {
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "plan",
+  "run_id": "B20261003-2049-gate-model",
+  "schema": "session/v1",
+  "started": "2026-10-03T20:55:55Z",
+  "turns": 87
+}

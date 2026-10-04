@@ -23,7 +23,7 @@ const runBriefName = "B20260101-0900-demo.loop-brief"
 // doctor makes, and for -p prompts sets the variables below and sources the
 // per-test script:
 //
-//	PHASE  plan|work|review      TASK   the task id (work, review), else empty
+//	PHASE  plan|work|review|gate-review      TASK   the task id (work, review), else empty
 //	ARG    the prompt's argument (the brief path for plan, the task id otherwise)
 //	MODEL  the --model it was given    ATTEMPT  1-based count of this PHASE+ARG so far
 //	STUB_COST, STUB_EXIT, STUB_DURATION, STUB_TURNS, STUB_ERROR  the result JSON and exit code
@@ -31,7 +31,7 @@ const runBriefName = "B20260101-0900-demo.loop-brief"
 //
 // The script runs in the stub's working directory (the repository) and may do
 // anything a shell can: write the plan, files, .vloop/tmp/proposal.json or
-// verdict.json, run git, set the variables above, or exit.
+// verdict.json (a gate review's passing gate-verdict.json is written before the script), run git, set the variables above, or exit.
 const runStubSource = `#!/bin/sh
 dir=$(dirname "$0")
 echo "$*" >> "$dir/argv.log"
@@ -53,12 +53,17 @@ case "$cmd" in
   /vloop:plan) PHASE=plan; TASK="";;
   /vloop:work) PHASE=work; TASK="$ARG";;
   /vloop:review) PHASE=review; TASK="$ARG";;
+  /vloop:gate-review) PHASE=gate-review; TASK=""; ARG="";;
   *) echo "stub claude: unrecognised prompt: $prompt" >&2; exit 64;;
 esac
 n=$(cat "$dir/count.$PHASE.$(echo "$ARG" | tr '/ ' '__')" 2>/dev/null || echo 0)
 ATTEMPT=$((n + 1))
 echo "$ATTEMPT" > "$dir/count.$PHASE.$(echo "$ARG" | tr '/ ' '__')"
 STUB_COST=0.10; STUB_EXIT=0; STUB_DURATION=1000; STUB_TURNS=3; STUB_ERROR=false; STUB_SILENT=0
+if [ "$PHASE" = gate-review ]; then
+  mkdir -p .vloop/tmp
+  echo '{"schema":"gate-verdict/v1","verdict":"PASS","tasks":[],"notes":"none"}' > .vloop/tmp/gate-verdict.json
+fi
 if [ -f "$dir/script.sh" ]; then . "$dir/script.sh"; fi
 if [ "$STUB_SILENT" != 1 ]; then
   printf '{"type":"result","subtype":"success","is_error":%s,"duration_ms":%s,"num_turns":%s,"total_cost_usd":%s,"session_id":"stub","permission_denials":[],"modelUsage":{"%s":{"costUSD":%s}}}\n' \
@@ -107,6 +112,10 @@ func runBriefText() string {
 // the repository's own config, vloop init, a ready brief, all committed; a fake
 // home trusting it; the stub claude (no script yet). It skips where the stub
 // cannot run.
+// runCheckConfig is the config a run repository carries: vloop 2 refuses to
+// run a repository with no [[check]].
+const runCheckConfig = "[[check]]\nname = \"all\"\npaths = [\"**\"]\nrun = \"true\"\n"
+
 func newRunRepo(t *testing.T) *runRepo {
 	t.Helper()
 	if runtime.GOOS == "windows" {
@@ -143,6 +152,7 @@ func newRunRepo(t *testing.T) *runRepo {
 	if res := r.vloop("init"); res.code != 0 {
 		t.Fatalf("vloop init: %+v", res)
 	}
+	r.write(".vloop/config.toml", runCheckConfig)
 	r.write("docs/briefs/"+runBriefName+".md", runBriefText())
 	runGit(t, r.dir, "add", "-A")
 	runGit(t, r.dir, "commit", "-q", "-m", "harness: init and brief")

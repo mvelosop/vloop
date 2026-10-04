@@ -92,9 +92,12 @@ func TestWorkedExampleB6Sessions(t *testing.T) {
 		t.Errorf("review session = %q, want one with --model opus and no --effort", review)
 	}
 
-	sess := filepath.Join(r.runFolder(), "sessions", "002-work.json")
+	sess := filepath.Join(r.runFolder(), "sessions", "003-work.json")
 	if res := r.vloop("schema", "validate", "session/v1", sess); res.code != 0 {
-		t.Errorf("002-work.json is not session/v1: %+v", res)
+		t.Errorf("003-work.json is not session/v1: %+v", res)
+	}
+	if rec := r.iterations()[0]; rec["schema"] != "iteration/v2" || iterationChecks(rec) != "all:0" {
+		t.Errorf("the first iteration is %v with checks %q, want iteration/v2 with all:0", rec["schema"], iterationChecks(rec))
 	}
 	g, ok := r.iterations()[0]["gate"].(map[string]any)
 	if !ok || len(g) != 2 || g["exit"] != float64(0) {
@@ -157,6 +160,19 @@ func TestWorkedExampleB6FlakyGate(t *testing.T) {
 		t.Errorf("defect matrix = %q (%v), want one env defect at [3][0]", res.out, err)
 	}
 	wantExit(t, r.vloop("metrics", runBriefName), 0)
+
+	t.Run("a gate that times out is not re-run", func(t *testing.T) {
+		r := newRunRepo(t)
+		r.write(".vloop/config.toml", "run.gate-timeout = 1\n"+runCheckConfig)
+		r.commitAll("one minute gates")
+		count := filepath.Join(r.stub, "runs")
+		r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": `test -f T1.out || exit 1; echo run >> "` + count + `"; sleep 90`})), defaultScript)
+		wantExit(t, r.vloop("run", "--max-attempts", "1", runBrief), 2)
+		b, _ := os.ReadFile(count)
+		if n := strings.Count(string(b), "run"); n != 1 {
+			t.Errorf("a timed-out gate ran %d times, want 1", n)
+		}
+	})
 }
 
 func TestWorkedExampleB6SilentReview(t *testing.T) {
@@ -234,6 +250,14 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	}
 
 	r := &runRepo{t: t, dir: clone, home: src.home, stub: src.stub}
+	// The clone carries this repository's live plan, which may be a state/v1
+	// one that vloop run refuses; the run below plans a fresh brief.
+	if err := os.Remove(filepath.Join(clone, ".vloop", "state", "state.json")); err != nil && !os.IsNotExist(err) {
+		t.Fatal(err)
+	}
+	// The repository's own checks run its whole suite; the fixture run has its
+	// own passing one instead.
+	r.write(".vloop/config.toml", withoutChecks(r.read(".vloop/config.toml"))+"\n"+runCheckConfig)
 	r.write("docs/x.md", "x\n")
 	r.write("docs/briefs/"+runBriefName+".md", runBriefText())
 	r.commitAll("fixture brief")
@@ -251,4 +275,24 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if after := status(); after != before {
 		t.Errorf("the real-data check changed this repository:\n%s", after)
 	}
+}
+
+// withoutChecks drops every [[check]] table from a config file's text.
+func withoutChecks(toml string) string {
+	var out []string
+	skip := false
+	for _, l := range strings.Split(toml, "\n") {
+		t := strings.TrimSpace(l)
+		switch {
+		case t == "[[check]]":
+			skip = true
+			continue
+		case strings.HasPrefix(t, "["):
+			skip = false
+		}
+		if !skip {
+			out = append(out, l)
+		}
+	}
+	return strings.Join(out, "\n")
 }

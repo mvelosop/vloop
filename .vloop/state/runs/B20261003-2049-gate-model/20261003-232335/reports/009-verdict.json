@@ -1,0 +1,17 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "`vloop run` refuses before planning when a run.gate-scratch folder is not ignored by git: `vloop: gate scratch <path> is not ignored by git — add it to .gitignore` (exit 1), starting no session; the plan copies the list into gate_scratch.", "met": true, "evidence": "internal/driver/plan.go checks GitIgnored before requireCleanTree and halts with the exact message; acceptPlan copies the list into plan.GateScratch; TestRunGateScratch asserts exit 1, the message and zero sessions, and gate_scratch."},
+    {"criterion": "After every gate run — in `vloop run`, at acceptance and in `vloop task gate` — the driver removes everything inside each scratch folder.", "met": false, "evidence": "internal/driver/iterate.go runGate and internal/cli/task_gate.go call state.EmptyScratch, and both are tested. No code or test covers acceptance: there is no EmptyScratch call in an acceptance path. The proposal says no acceptance gate run exists yet and leaves it to T9."},
+    {"criterion": "The driver snapshots the tree before each gate and compares after, ignoring .vloop/tmp/ and the scratch folders; a gate that changed anything has it restored and fails, its log ending `vloop: gate T<n> changed the tree — restored: <paths>`.", "met": true, "evidence": "iterate.go runGate uses snapshotTreeIgnoring with gateMayWrite, calls revert(), forces a non-zero exit and appends state.GateChangedTreeLine; TestRunGateChangedTree checks the log line, the new file removed and the modified file restored."},
+    {"criterion": "A timed-out gate is not re-run; the one immediate re-run stays for an ordinary failure. TestRunFlakyGate and TestWorkedExampleB6FlakyGate gain the timeout case and change nothing else.", "met": false, "evidence": "gates.go skips the re-run when g.timedOut. But TestRunFlakyGate and TestWorkedExampleB6FlakyGate (cmd/vloop/b6_e2e_test.go, unchanged) did not gain the timeout case. A new TestRunTimedOutGateNotRerun was added instead, which the criterion does not allow. The proposal admits this."},
+    {"criterion": "Tests cover the scratch refusal, the emptying in each of the three places, the tree restore of a new and of a modified file, and the timeout.", "met": false, "evidence": "The refusal, the restore of a new and of a modified file, and the timeout are covered. The emptying is tested for the run and for task gate only, not for acceptance."}
+  ],
+  "findings": [
+    {"summary": "The timeout case was put in a new test instead of TestRunFlakyGate and TestWorkedExampleB6FlakyGate, which the acceptance criterion names; B6's test is untouched.", "kind": "bug"},
+    {"summary": "Acceptance emptying is neither implemented nor tested, though the criterion lists it and the brief expects it.", "kind": "spec-gap"}
+  ],
+  "notes": "No acceptance gate run exists yet, so the acceptance part may belong to T9. The plan should say so or drop it from T6. The next attempt should add the timeout case inside TestRunFlakyGate and TestWorkedExampleB6FlakyGate, and either wire or explicitly defer acceptance emptying. The code is otherwise sound and stays in scope."
+}

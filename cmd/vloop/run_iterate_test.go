@@ -80,8 +80,8 @@ func (r *runRepo) wantIterations(outcomes ...string) {
 		}
 		f := filepath.Join(r.t.TempDir(), "it.json")
 		os.WriteFile(f, []byte(its[i]["_line"].(string)), 0o644)
-		if res := r.vloop("schema", "validate", "iteration/v1", f); res.code != 0 {
-			r.t.Errorf("iteration record %d is not iteration/v1: %+v", i+1, res)
+		if res := r.vloop("schema", "validate", "iteration/v2", f); res.code != 0 {
+			r.t.Errorf("iteration record %d is not iteration/v2: %+v", i+1, res)
 		}
 	}
 }
@@ -155,6 +155,9 @@ func TestRun01HappyPath(t *testing.T) {
 		if g == nil || g["exit"] != float64(0) || g["duration_ms"] == nil {
 			t.Errorf("iteration %d gate = %v, want exit 0 with a duration", i+1, it["gate"])
 		}
+		if it["schema"] != "iteration/v2" || iterationChecks(it) != "all:0" {
+			t.Errorf("iteration %d is %v with checks %q, want iteration/v2 with all:0", i+1, it["schema"], iterationChecks(it))
+		}
 		if it["run_id"] != runID || it["attempt"] != float64(1) {
 			t.Errorf("iteration %d: run_id %v attempt %v", i+1, it["run_id"], it["attempt"])
 		}
@@ -186,8 +189,8 @@ func TestRun01HappyPath(t *testing.T) {
 		t.Error("plan.md is not what vloop status --markdown renders")
 	}
 	wantIn(t, "journal", r.journal(), "## T1 — Task T1", "## T2 — Task T2", "- **Outcome:** done (review: PASS)", "## Run ended — complete")
-	if n := r.sessions(); n != 5 {
-		t.Errorf("%d sessions, want 5 (plan, then work and review twice)", n)
+	if n := r.sessions(); n != 6 {
+		t.Errorf("%d sessions, want 6 (plan, the gate review, then work and review twice)", n)
 	}
 	wantIn(t, "argv", strings.Join(r.argv(), "\n"), "-p /vloop:work T1 ", "-p /vloop:review T2 ")
 	r.wantClean()
@@ -291,10 +294,11 @@ func TestRun21ForeignState(t *testing.T) {
 	const other = "B20260101-1000-other"
 	r.write("docs/briefs/"+other+".loop-brief.md", strings.Replace(runBriefText(), runBriefName, other+".loop-brief", 1))
 	r.commitAll("another brief")
-	// verify never names a path, so gate-shape rule 3 has nothing to say about
-	// files the first run already committed.
-	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "true", "files": []string{}}),
-		planTask("T2", map[string]any{"verify": "true", "files": []string{}, "depends_on": []string{"T1"}})), defaultScript)
+	// The gates wait for a flag the work writes: T1.out and T2.out are already
+	// committed, so a gate on them alone would pass on the base.
+	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "test -f other.flag"}),
+		planTask("T2", map[string]any{"verify": "test -f other.flag", "depends_on": []string{"T1"}})),
+		defaultScript+"if [ \"$PHASE\" = work ]; then touch other.flag; fi\n")
 	res := r.vloop("run", "docs/briefs/"+other+".loop-brief.md")
 	wantExit(t, res, 0)
 	wantIn(t, "output", res.out+res.err, "resetting and planning fresh")
@@ -342,8 +346,8 @@ func TestRun21ForeignState(t *testing.T) {
 func TestRun30PlanOnly(t *testing.T) {
 	r := newRunRepo(t)
 	r.scripted(planJSON(t,
-		planTask("T1", map[string]any{"verify": "true", "files": []string{}}),
-		planTask("T2", map[string]any{"verify": "true", "files": []string{}, "depends_on": []string{"T1"}})), defaultScript)
+		planTask("T1", nil),
+		planTask("T2", map[string]any{"depends_on": []string{"T1"}})), defaultScript)
 
 	res := r.vloop("run", "--plan-only", runBrief)
 	wantExit(t, res, 0)
@@ -351,8 +355,8 @@ func TestRun30PlanOnly(t *testing.T) {
 	if n := len(r.iterations()); n != 0 {
 		t.Errorf("%d iterations ran, want 0", n)
 	}
-	if recs, _ := filepath.Glob(filepath.Join(r.dir, ".vloop", "state", "runs", runID, "*", "sessions", "*.json")); len(recs) != 1 {
-		t.Errorf("%d session records, want exactly one (the plan)", len(recs))
+	if recs, _ := filepath.Glob(filepath.Join(r.dir, ".vloop", "state", "runs", runID, "*", "sessions", "*.json")); len(recs) != 2 {
+		t.Errorf("%d session records, want two (the plan and the gate review)", len(recs))
 	}
 	for _, id := range []string{"T1", "T2"} {
 		r.wantTask(id, "pending", 0)
@@ -439,7 +443,7 @@ func TestRun40NoProposalTree(t *testing.T) {
 `
 		}
 		script += "esac\n"
-		r.scripted(planJSON(t, planTask("T1", map[string]any{"files": []string{"thing_one.txt"}})), script)
+		r.scripted(planJSON(t, planTask("T1", nil)), script)
 		res := r.vloop("run", "--max-iterations", "1", runBrief)
 		wantExit(t, res, 4)
 		r.wantIterations("T1:blocked")

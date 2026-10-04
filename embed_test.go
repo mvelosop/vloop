@@ -15,13 +15,13 @@ func TestPluginManifestIsEmbedded(t *testing.T) {
 
 func TestSchemasAreEmbedded(t *testing.T) {
 	ents, err := Schemas.ReadDir("schemas")
-	if err != nil || len(ents) != 10 {
+	if err != nil || len(ents) != 15 {
 		t.Fatalf("embedded schemas: %d entries, err %v", len(ents), err)
 	}
 }
 
 func TestFenceIsEmbedded(t *testing.T) {
-	for _, phase := range []string{"plan", "work", "review"} {
+	for _, phase := range []string{"plan", "work", "review", "gate-review"} {
 		b, err := Fence(phase)
 		if err != nil || len(b) == 0 {
 			t.Fatalf("embedded %s fence: %d bytes, err %v", phase, len(b), err)

@@ -29,8 +29,8 @@ func TestWorkedExampleB7PluginPath(t *testing.T) {
 			t.Errorf("skill %s has no SKILL.md: %v", e.Name(), err)
 		}
 	}
-	if strings.Join(got, " ") != "operate plan review work" {
-		t.Errorf("extracted skills = %q, want operate plan review work", got)
+	if strings.Join(got, " ") != "gate-review operate plan review work" {
+		t.Errorf("extracted skills = %q, want gate-review operate plan review work", got)
 	}
 	if _, err := os.Stat(filepath.Join(root, "evals")); !os.IsNotExist(err) {
 		t.Errorf("evals/ was extracted (stat err = %v)", err)

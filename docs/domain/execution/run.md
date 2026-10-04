@@ -18,6 +18,9 @@ sessions/NNN-<phase>.json   one session record each (session/v1)
 iterations.jsonl            one iteration record per line (iteration/v1)
 reports/NNN-verdict.json    the verdict of iteration NNN (verdict/v1)
 gates/T<n>.log              the last gate output per task
+gates/base-T<n>.log         the task's gate on the base, at acceptance
+checks/<name>.log           the last output of each check; final-<name>.log for the final pass
+reports/gate-review-<round>.json  the gate review's verdict
 run.log                     the driver's own log (the shell loop's is loop.log)
 ```
 
@@ -28,16 +31,19 @@ session or a gate runs. Before each commit it checks that HEAD is where it was
 (`gate_dispute` in a proposal) blocks its task at once and charges no attempt.
 
 Before planning, the preflight requires a `ready` brief that passes the check,
-with its dependencies consumed, and a clean tree (R-4). Every gate and session
+with its dependencies consumed, and a clean tree (R-4), at least one check, every
+check passing on the base, and the gate scratch folders git-ignored. The run folder a
+refusal before planning leaves for the same run id does not make the tree dirty;
+the plan commit records it. Every gate and session
 runs under a timeout — `run.gate-timeout` and `run.session-timeout`, in minutes
-— and leaves no process behind; a timed-out gate fails like any failed gate.
+— and leaves no process behind; a timed-out gate fails like any failed gate and is not re-run.
 
 A brief owns every run folder whose log says it planned from the brief or
 resumed its run id; a folder that did neither is ignored.
 
-## The iteration record — `iteration/v1`
+## The iteration record — `iteration/v2`
 
-`run_id`, `iteration`, `task`, `attempt`, `outcome`, `gate` (`{exit,
+`run_id`, `iteration`, `task`, `attempt`, `outcome`, `checks` (`[{name, exit, duration_ms, log}]`, the checks that ran), `gate` (`{exit,
 duration_ms, flaky}`, or null when no gate ran; `flaky` is true when the gate failed and then passed on its one immediate re-run, which charges no attempt and yields an `env` defect), `started`, `ended`.
 
 | Outcome | Meaning | Task becomes |
@@ -46,7 +52,15 @@ duration_ms, flaky}`, or null when no gate ran; `flaky` is true when the gate fa
 | `gate_failed` | a gate failed; no review | pending, attempts+1 |
 | `rejected` | review FAIL | pending, attempts+1 |
 | `blocked` | the work session could not finish | pending, attempts+1 |
+| `check_failed` | a gate passed and a check whose paths match the changes failed; no review | pending, attempts+1 |
 | `session_error` | a session failed to run | — the run halts |
+
+After a done iteration whose gates all passed, the driver runs the checks whose
+paths match what the iteration changed (untracked files included), stops at the
+first failure and never re-runs one. When the last task is done every check runs
+once more in a **final pass**: a check that fails there ends the run blocked,
+exit 2. A resume with every task done repeats the final pass. v1 records stay
+readable.
 
 The shell loop writes `gate_fail` and `review_fail` for the middle two; vloop
 reads both spellings.
@@ -82,7 +96,7 @@ with one exit code (R-3):
 | --- | --- | --- |
 | 0 | complete | — |
 | 1 | preflight or usage | after fixing the cause |
-| 2 | blocked | no — a human decides |
+| 2 | blocked, including a plan the gate review failed twice and a final pass that failed | no — a human decides |
 | 3 | stalled | yes, once understood |
 | 4 | max iterations | yes |
 | 5 | not converging | no |

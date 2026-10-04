@@ -391,10 +391,10 @@ vloop task validate
 
 ## vloop task verify
 
-Replace a task's verify command, recording why
+Record a change to a task's gate: a new verify command, a changed gate folder, or both
 
 ```
-vloop task verify <id> <command> [flags]
+vloop task verify <id> [<command>] [flags]
 ```
 
 - `--reason string`: why the gate is being replaced (required)

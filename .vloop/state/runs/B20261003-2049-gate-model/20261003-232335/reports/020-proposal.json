@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T16",
+  "outcome": "done",
+  "summary": "cmd/vloop/b9_e2e_test.go plays the brief's worked example with the stub claude, one subtest per line, each in its own temp repo with the sh shell and the api/web config.",
+  "files": ["cmd/vloop/b9_e2e_test.go"],
+  "verified": "vloop task gate T16 exited 0 and printed GATE OK (9m8s).",
+  "notes": "The line 'a gate that sleeps past the gate timeout: runs once' is not replayed in b9_e2e_test.go: the shortest timeout is a minute, and cmd/vloop already sits near go test's 10-minute package limit (a full go test ./... timed out at 10m with a 62s B9 subtest; without it the gate passes in about 9m). TestRunFlakyGate's third subtest asserts the same. B9 subtests run with t.Parallel to keep the file at about 7s."
+}

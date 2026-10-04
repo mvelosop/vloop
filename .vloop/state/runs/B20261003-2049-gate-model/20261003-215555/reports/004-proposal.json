@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Gate folders .vloop/state/gates/<id>/ now exist: the plan fence may write them, acceptance refuses a stray folder and stamps each task's fixtures, the plan hash and the post-session restore cover them, a resume with a changed folder is refused, and vloop task verify takes an optional command and records folder changes in gate_history.",
+  "files": ["internal/state/fixtures.go", "internal/state/fixtures_test.go", "internal/state/gate.go", "internal/state/gate_test.go", "internal/driver/plan.go", "internal/driver/safety.go", "internal/driver/safety_test.go", "internal/driver/iterate.go", "internal/cli/task_gate.go", "internal/cli/task_gate_test.go", "fence/plan.json", "docs/guide/commands.md"],
+  "verified": "vloop task gate T5 exited 0 and printed GATE OK.",
+  "notes": "state.PlanDigest(plan, gateFiles) is the session plan hash: with no gate files it equals the SHA-256 of state.json, so the hash only changes shape when folders exist. state.ReplaceGate is replaced by state.RecordGate(root, p, id, verify, reason, at); same-command with unchanged folder is now 'nothing to record'. A gate folder with no regular files digests to \"\" (empty dirs are not tracked by git). state.StampFixtures/FixturesMismatch and driver.CheckFixtures (called in Planner.Plan resume branch and Iterator.Run) do the stamp and the resume refusal. A new plan or a rejected plan removes .vloop/state/gates. docs/guide/commands.md was regenerated with go generate. No TestRun33GateRewrite exists any more (deleted in T4); the folder restore is covered by TestStateGuardGateFolders and the gate's e2e. go test of internal/cli fails inside a vloop session on TestTaskGate* unless VLOOP_* env is unset."
+}

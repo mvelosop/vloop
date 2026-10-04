@@ -164,8 +164,10 @@ func refsDiff(before, after []string) []string {
 // requireCleanTree refuses when git status lists a modified, staged or
 // untracked-not-ignored path, so `git add -A` cannot sweep stray files into the
 // driver's commits. .vloop/tmp/ never counts; a resume also tolerates
-// .vloop/state/, where the operator's task edits wait for the next iteration.
-func requireCleanTree(root string, resuming bool) error {
+// .vloop/state/, where the operator's task edits wait for the next iteration,
+// and a fresh run its own run id's folders under .vloop/state/runs/, which a
+// refusal before planning (a check failing on the base) leaves behind.
+func requireCleanTree(root string, resuming bool, runID string) error {
 	raw, err := gitCmd(root, "status", "--porcelain", "-z", "--untracked-files=all").Output() // untrimmed: entries start with a space
 	if err != nil {
 		return halt(ExitPreflight, "git status: %v", err)
@@ -182,7 +184,8 @@ func requireCleanTree(root string, resuming bool) error {
 			i++
 		}
 		f := e[3:]
-		if strings.HasPrefix(f, ".vloop/tmp/") || (resuming && strings.HasPrefix(f, ".vloop/state/")) {
+		if strings.HasPrefix(f, ".vloop/tmp/") || (resuming && strings.HasPrefix(f, ".vloop/state/")) ||
+			(runID != "" && strings.HasPrefix(f, ".vloop/state/runs/"+runID+"/")) {
 			continue
 		}
 		dirty = append(dirty, f)
@@ -273,7 +276,23 @@ func (p *Planner) Plan() (*PlanResult, error) {
 			return nil, halt(ExitPreflight, "%v", err)
 		}
 	}
-	if err := requireCleanTree(root, resuming); err != nil {
+	scratch, err := config.Get(root, "run.gate-scratch")
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	for _, d := range scratch.List {
+		if !GitIgnored(root, d) {
+			return nil, halt(ExitPreflight, "gate scratch %s is not ignored by git — add it to .gitignore", d)
+		}
+	}
+	checkDefs, err := config.Checks(root)
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	if len(checkDefs) == 0 {
+		return nil, halt(ExitPreflight, "no check configured — add a [[check]] to .vloop/config.toml")
+	}
+	if err := requireCleanTree(root, resuming, brief.RunID(briefPath)); err != nil {
 		return nil, err
 	}
 
@@ -284,6 +303,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 			t.show("read:   %s", planMarkdown)
 			return &PlanResult{Plan: existing}, nil
 		}
+		if err := CheckFixtures(root, existing); err != nil {
+			return nil, err
+		}
 		if _, err := p.workBranch(existing.RunID); err != nil {
 			return nil, err
 		}
@@ -291,20 +313,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 
 	runID := brief.RunID(briefPath)
-	if c, err := p.workBranch(runID); err != nil {
+	if err := p.workBranchFree(runID); err != nil {
 		return nil, err
-	} else if c != "" {
-		cur = c
 	}
-
-	if hasPlan { // another brief's plan: reset it
-		for _, f := range []string{state.FilePath, planMarkdown} {
-			if err := os.Remove(filepath.Join(root, filepath.FromSlash(f))); err != nil && !errors.Is(err, os.ErrNotExist) {
-				return nil, err
-			}
-		}
-	}
-
 	runDir, err := newRunDir(root, runID, p.now())
 	if err != nil {
 		return nil, err
@@ -317,6 +328,39 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	r := &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
 		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
 	t := term{p, r}
+
+	// Every check passes on the base before the branch is made or anything is
+	// planned: one that fails would be blamed on the first task.
+	shell, err := config.Get(root, "shell")
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	gt, err := config.Get(root, "run.gate-timeout")
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
+	gateMin, _ := strconv.Atoi(gt.Value)
+	if err := t.baseChecks(planChecks(checkDefs), shell.Value, time.Duration(gateMin)*time.Minute); err != nil {
+		return nil, err
+	}
+
+	if c, err := p.workBranch(runID); err != nil {
+		return nil, err
+	} else if c != "" {
+		cur = c
+	}
+
+	if hasPlan { // another brief's plan: reset it
+		for _, f := range []string{state.FilePath, planMarkdown} {
+			if err := os.Remove(filepath.Join(root, filepath.FromSlash(f))); err != nil && !errors.Is(err, os.ErrNotExist) {
+				return nil, err
+			}
+		}
+		if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir))); err != nil {
+			return nil, err
+		}
+	}
+
 	if p.PlanOnly && p.AwakeWarn != "" {
 		r.Logf("%s", AwakeWarning(p.AwakeWarn))
 	}
@@ -329,31 +373,12 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return nil, halt(ExitPreflight, "%v", err)
 	}
 	t.say("planning from %s using %s", briefPath, model)
-	before := refsState(root)
-	gguard := snapshotGit(root)
-	res, err := r.Run(Spec{Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
-	if err != nil {
-		return nil, halt(ExitPreflight, "planning session failed: %v", err)
-	}
-	if what := gguard.changed(); what != "" {
-		return nil, halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
-	}
-	if moved := refsDiff(before, refsState(root)); len(moved) > 0 {
-		t.warn("REFS MOVED plan — the planning session changed git refs; nothing was committed:")
-		for _, l := range moved {
-			t.warn("%s", l)
-		}
-		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
-		return nil, halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
-	}
-	if res.TimedOut {
-		return nil, halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
-	}
-	if res.ExitCode != 0 {
-		return nil, halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))
+	session := func() error { return p.planSession(t, r, runDir, briefPath, model, effort) }
+	if err := session(); err != nil {
+		return nil, err
 	}
 
-	plan, err := p.acceptPlan(t, runID, briefPath, cur)
+	plan, blocked, err := p.acceptPlan(t, runID, briefPath, cur, time.Duration(gateMin)*time.Minute, session)
 	if err != nil {
 		return nil, err
 	}
@@ -380,6 +405,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	if _, err := git(root, "commit", "-q", "-m", "[vloop] plan "+runID); err != nil {
 		return nil, halt(ExitPreflight, "cannot commit the plan: %v", err)
 	}
+	if blocked != nil { // the plan is kept, blocked, for the operator's amendment
+		return nil, blocked
+	}
 	if p.PlanOnly { // after the commit, so on the terminal only: the log is committed
 		t.show("")
 		t.show("═══ plan only ═══")
@@ -392,6 +420,48 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	return &PlanResult{Plan: rendered, Planned: true, RunDir: runDir}, nil
 }
 
+// planSession runs one plan session and refuses what it moved or how it ended.
+func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effort string) error {
+	root := p.Root
+	before := refsState(root)
+	gguard := snapshotGit(root)
+	res, err := r.Run(Spec{Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
+	if err != nil {
+		return halt(ExitPreflight, "planning session failed: %v", err)
+	}
+	if what := gguard.changed(); what != "" {
+		return halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
+	}
+	if moved := refsDiff(before, refsState(root)); len(moved) > 0 {
+		t.warn("REFS MOVED plan — the planning session changed git refs; nothing was committed:")
+		for _, l := range moved {
+			t.warn("%s", l)
+		}
+		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
+		return halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
+	}
+	if res.TimedOut {
+		return halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
+	}
+	if res.ExitCode != 0 {
+		return halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))
+	}
+	return nil
+}
+
+// CheckFixtures refuses a plan whose gate folder no longer matches the fixtures
+// stamped on a task: the change was not recorded by vloop task verify.
+func CheckFixtures(root string, plan *state.Plan) error {
+	id, err := state.FixturesMismatch(root, plan)
+	if err != nil {
+		return halt(ExitPreflight, "%v", err)
+	}
+	if id != "" {
+		return halt(ExitPreflight, "the gate fixtures of %s changed outside vloop task verify — record the change with vloop task verify %s --reason '<why>'", id, id)
+	}
+	return nil
+}
+
 // workBranch is R-2: on the default branch the run gets a branch named for its
 // run id, and the name is returned; anywhere else it runs where it is and the
 // result is "".
@@ -399,8 +469,8 @@ func (p *Planner) workBranch(runID string) (string, error) {
 	if !OnDefaultBranch(p.Root) {
 		return "", nil
 	}
-	if exists := gitCmd(p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil; exists {
-		return "", halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
+	if err := p.workBranchFree(runID); err != nil {
+		return "", err
 	}
 	if _, err := git(p.Root, "switch", "-q", "-c", runID); err != nil {
 		return "", halt(ExitPreflight, "cannot create branch %s: %v", runID, err)
@@ -409,6 +479,18 @@ func (p *Planner) workBranch(runID string) (string, error) {
 		fmt.Fprintf(p.Out, "created and switched to branch %s\n", runID)
 	}
 	return runID, nil
+}
+
+// workBranchFree refuses when the run would branch off the default branch and
+// the branch for its run id already exists.
+func (p *Planner) workBranchFree(runID string) error {
+	if !OnDefaultBranch(p.Root) {
+		return nil
+	}
+	if gitCmd(p.Root, "show-ref", "--verify", "--quiet", "refs/heads/"+runID).Run() == nil {
+		return halt(ExitPreflight, "branch %s exists — switch to it and re-run", runID)
+	}
+	return nil
 }
 
 // bareTerm is a terminal without a run: progress goes to stdout only.
@@ -451,8 +533,75 @@ var taskPointer = regexp.MustCompile(`^schema: /tasks/(\d+)`)
 
 // acceptPlan checks the plan the session wrote and, when it is fit, stamps it
 // and saves it as running. A plan that is not fit is removed — the session's
-// output is not a plan — and the problems are listed.
-func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Plan, error) {
+// output is not a plan — and the problems are listed. A round is the base run
+// of the gates and then the gate review; a plan that fails either goes back to
+// the plan session once. The plan the gate review failed twice is saved
+// blocked and returned with the halt that ends the run, for the caller to
+// commit first.
+func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeout time.Duration, revise func() error) (*state.Plan, *Halt, error) {
+	root := p.Root
+	for round := 1; ; round++ {
+		plan, err := p.loadPlan(t)
+		if err != nil {
+			return nil, nil, err
+		}
+		problems, err := p.baseGates(t, plan, gateTimeout)
+		if err != nil {
+			return nil, nil, err
+		}
+		reviewed := false
+		if len(problems) == 0 {
+			// The review runs vloop task gate, so the plan is stamped and saved first.
+			if plan, err = p.stampPlan(t, plan, runID, briefPath, branch); err != nil {
+				return nil, nil, err
+			}
+			if problems, err = p.gateReviewRound(t, round); err != nil {
+				return nil, nil, err
+			}
+			reviewed = true
+			plan.GateReview = state.GateReview{Rounds: round, Verdict: "PASS"}
+			if len(problems) > 0 {
+				plan.GateReview.Verdict = "FAIL"
+			}
+			if err := state.Save(root, plan); err != nil {
+				return nil, nil, err
+			}
+			if len(problems) == 0 {
+				return plan, nil, nil
+			}
+		}
+		for _, l := range problems {
+			t.warn("  %s", l)
+		}
+		if round >= planRounds {
+			if reviewed {
+				plan.Status = "blocked"
+				if err := state.Save(root, plan); err != nil {
+					return nil, nil, err
+				}
+				line := gateReviewFailedLine(root, t.r.RunDir, round)
+				t.r.Logf("%s", t.r.Mask(line)) // logged; the halt prints it, once
+				return plan, halt(ExitBlocked, "%s", line), nil
+			}
+			_ = os.Remove(state.Path(root))
+			_ = os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir)))
+			return nil, nil, halt(ExitPreflight, "the plan is not fit (%d problem(s)) after %d rounds, nothing was committed — see above and %s", len(problems), planRounds, relRunDir(root, t.r.RunDir)+"run.log")
+		}
+		t.say("sending %d problem(s) back to the plan session", len(problems))
+		if err := writeProblems(root, problems); err != nil {
+			return nil, nil, err
+		}
+		err = revise()
+		_ = os.Remove(filepath.Join(root, filepath.FromSlash(planProblems)))
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+}
+
+// loadPlan reads and checks the plan the session wrote: a plan that fails the
+// schema or the gate-shape checks is removed and halts, with no second round.
+func (p *Planner) loadPlan(t term) (*state.Plan, error) {
 	root := p.Root
 	data, err := os.ReadFile(state.Path(root))
 	if errors.Is(err, os.ErrNotExist) {
@@ -466,6 +615,7 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 			t.warn("  %s", l)
 		}
 		_ = os.Remove(state.Path(root))
+		_ = os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir)))
 		return halt(ExitPreflight, "the plan is not fit (%d problem(s)), nothing was committed — see above and %s", len(problems), relRunDir(root, t.r.RunDir)+"run.log")
 	}
 
@@ -496,6 +646,15 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	if len(rep.Problems) == 0 {
 		problems = append(problems, GateShapeProblems(root, &plan)...)
 	}
+	if len(rep.Problems) == 0 {
+		stray, err := state.StrayGateFolders(root, &plan)
+		if err != nil {
+			return nil, err
+		}
+		for _, id := range stray {
+			problems = append(problems, fmt.Sprintf("%s/%s is a gate folder for %s, which is not a task of the plan", state.GatesDir, id, id))
+		}
+	}
 	if len(problems) > 0 {
 		return nil, reject(problems)
 	}
@@ -508,16 +667,38 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	if ids := HeadDiffAdvisory(&plan); len(ids) > 0 {
 		t.warn("warning: %s diff against HEAD without reading VLOOP_ACTIVE_TASK or VLOOP_GATE_TASK — during another task's iteration the only uncommitted work in the tree is that task's, not this gate's", strings.Join(ids, " "))
 	}
+	return &plan, nil
+}
+
+// stampPlan stamps an accepted plan with what the driver holds and saves it as
+// running.
+func (p *Planner) stampPlan(t term, plan *state.Plan, runID, briefPath, branch string) (*state.Plan, error) {
+	root := p.Root
 
 	// The driver stamps what it already holds, rather than trusting the session
 	// to record it: which run, brief and branch the plan belongs to.
 	plan.RunID, plan.Brief, plan.Branch = runID, briefPath, branch
 	plan.Status = "running"
-	if err := state.Save(root, &plan); err != nil {
+	// The plan's checks are the config's, whatever the session wrote.
+	if defs, err := config.Checks(root); err == nil {
+		plan.Checks = planChecks(defs)
+	}
+	if v, err := config.Get(root, "run.gate-scratch"); err == nil {
+		plan.GateScratch = append([]string{}, v.List...)
+	}
+	// The planner may have run a gate while drafting it; acceptance leaves the
+	// scratch folders empty like every other gate run.
+	if err := state.EmptyScratch(root, plan.GateScratch); err != nil {
+		return nil, err
+	}
+	if err := state.StampFixtures(root, plan); err != nil {
+		return nil, err
+	}
+	if err := state.Save(root, plan); err != nil {
 		return nil, err
 	}
 	t.say("planned: %s — %d tasks", runID, len(plan.Tasks))
-	return &plan, nil
+	return plan, nil
 }
 
 // writeJournal opens the plan's journal, named for the run id so a resumed run
@@ -539,4 +720,11 @@ func writeJournal(root string, plan *state.Plan) error {
 	defer f.Close()
 	_, err = f.WriteString(b.String())
 	return err
+}
+
+// GitIgnored reports whether git ignores the repo-relative folder rel, as it
+// would the files a gate leaves in it.
+func GitIgnored(root, rel string) bool {
+	probe := strings.TrimSuffix(rel, "/") + "/.vloop-probe"
+	return gitCmd(root, "check-ignore", "-q", "--no-index", "--", probe).Run() == nil
 }

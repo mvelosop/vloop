@@ -140,3 +140,42 @@ func TestUpgradeRefusesSymlink(t *testing.T) {
 		t.Error("wrote through a symlink")
 	}
 }
+
+func TestUpgradeAddsStarterChecks(t *testing.T) {
+	d := upgradeFixture(t, "1.0.0")
+	// A 1.x repository has no check.
+	if err := os.WriteFile(filepath.Join(d, ".vloop/config.toml"), []byte("language = \"en\"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	b := Build{Version: "2.0.0", Commit: "c200"}
+	_, errs, code := runPluginCLI(t, b, d, "upgrade")
+	if code != 1 || !strings.Contains(errs, "vloop upgrade --yes") {
+		t.Fatalf("without --yes: code %d err %q", code, errs)
+	}
+	if strings.Contains(readFile(t, d, ".vloop/config.toml"), "[[check]]") {
+		t.Fatal("a refused upgrade added a check")
+	}
+	out, _, code := runPluginCLI(t, b, d, "upgrade", "--yes")
+	if code != 0 || !strings.Contains(out, "go test ./... && go vet ./...") || !strings.Contains(out, "starting point") {
+		t.Fatalf("code %d:\n%s", code, out)
+	}
+	list, _, _ := runPluginCLI(t, b, d, "config", "list")
+	if !strings.Contains(list, "check.go=go test ./... && go vet ./... (paths: **)\n") {
+		t.Errorf("config list:\n%s", list)
+	}
+}
+
+func TestUpgradeLeavesConfiguredChecks(t *testing.T) {
+	d := upgradeFixture(t, "1.0.0")
+	cfg := "language = \"en\"\n\n[[check]]\nname = \"mine\"\npaths = [\"**\"]\nrun = \"make test\"\n"
+	if err := os.WriteFile(filepath.Join(d, ".vloop/config.toml"), []byte(cfg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out, _, code := runPluginCLI(t, Build{Version: "2.0.0", Commit: "c200"}, d, "upgrade", "--yes")
+	if code != 0 || strings.Contains(out, "check") {
+		t.Fatalf("code %d:\n%s", code, out)
+	}
+	if got := readFile(t, d, ".vloop/config.toml"); got != cfg {
+		t.Errorf("config changed:\n%s", got)
+	}
+}

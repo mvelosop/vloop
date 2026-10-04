@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/schema"
 	"github.com/mvelosop/vloop/internal/state"
 )
@@ -35,12 +36,14 @@ var errSessionError = errors.New("session failed")
 
 const tmpDir = ".vloop/tmp"
 
-// Outcome names of an iteration (iteration/v1).
+// Outcome names of an iteration (iteration/v2).
 const (
 	OutDone       = "done"
 	OutGateFailed = "gate_failed"
 	OutRejected   = "rejected"
 	OutBlocked    = "blocked"
+
+	OutCheckFailed = "check_failed"
 )
 
 // Ending says how a run ended: the plan status it leaves and the exit code.
@@ -146,6 +149,9 @@ func (it *Iterator) Run() (Ending, error) {
 	if err := checkPlanRunID(plan); err != nil {
 		return Ending{}, err
 	}
+	if err := CheckFixtures(it.Root, plan); err != nil {
+		return Ending{}, err
+	}
 	it.plan = plan
 	it.branch = CurrentBranch(it.Root)
 	if it.RunDir == "" {
@@ -161,12 +167,29 @@ func (it *Iterator) Run() (Ending, error) {
 		it.r.Logf("%s", AwakeWarning(it.AwakeWarn))
 	}
 
+	// A resume takes the config's checks as they are now.
+	if defs, err := config.Checks(it.Root); err == nil {
+		if now := planChecks(defs); !sameChecks(plan.Checks, now) {
+			it.r.Logf("the checks changed since the plan was made: were %s, now %s", checkNames(plan.Checks), checkNames(now))
+			plan.Checks = now
+			if err := it.save(); err != nil {
+				return Ending{}, err
+			}
+		}
+	}
+
 	if it.resolved, err = ResolveRun(it.Root); err != nil {
 		return Ending{}, halt(ExitPreflight, "%v", err)
 	}
 	// The one read of the records on disk: the sessions before this phase, such
 	// as the plan session. Every later session is added as it finishes.
 	it.spent = it.spend()
+
+	if plan.GateReview.Verdict == "FAIL" {
+		if err := it.resumeBaseGates(); err != nil {
+			return Ending{}, err
+		}
+	}
 
 	if plan.Status != "running" || plan.Branch != it.branch {
 		plan.Status, plan.Branch = "running", it.branch
@@ -184,7 +207,16 @@ func (it *Iterator) Run() (Ending, error) {
 			if blocked > 0 {
 				end = Ending{Status: "blocked", Code: ExitBlocked}
 			} else {
-				end = Ending{Status: "complete"}
+				line, err := it.finalPass()
+				if err != nil {
+					return Ending{}, err
+				}
+				if line != "" {
+					it.warn("%s", line)
+					end = Ending{Status: "blocked", Code: ExitBlocked, Note: line}
+				} else {
+					end = Ending{Status: "complete"}
+				}
 			}
 			break
 		}
@@ -228,7 +260,7 @@ func (it *Iterator) Run() (Ending, error) {
 		}
 		// An iteration that closed nothing and charged no attempt made no
 		// recorded progress at all.
-		if nd, _, _ := counts(plan); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected {
+		if nd, _, _ := counts(plan); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected && res.outcome != OutCheckFailed {
 			stalls++
 			it.warn("   no recorded progress (%d/%d)", stalls, it.Budgets.StallLimit)
 			if stalls >= it.Budgets.StallLimit {
@@ -398,7 +430,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	gguard := snapshotGit(root)
 	inputs := snapshotInputs(root, it.RunDir)
 	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: planHash(guard.pre)})
+	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 	it.spent += wres.Cost
 	if err != nil {
 		return iterResult{}, err
@@ -453,19 +485,12 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		}
 	}
 
-	// A session does not rewrite the file its own gate runs. Restored from
-	// HEAD before any gate runs, and the work is not reviewable.
+	// A session does not touch the plan. Restored from HEAD before any gate
+	// runs, and the work is not reviewable.
 	tampered := ""
-	if guard.restoreIfTouched() {
+	if touched := guard.restoreTouched(); len(touched) > 0 {
 		tampered = it.r.Mask(tamperNote(PhaseWork))
-		it.warn("   STATE TAMPERING %s — %s was modified; restored, iteration failed", id, state.FilePath)
-	}
-	if moved := it.gateFilesMoved(task); len(moved) > 0 {
-		note := it.restoreGateFiles(id, moved)
-		if tampered != "" {
-			note = tampered + "; " + note
-		}
-		tampered = note
+		it.warn("   STATE TAMPERING %s — %s was modified; restored, iteration failed", id, strings.Join(touched, ", "))
 	}
 
 	// 2. gates: every done task, plus this one if it claims done or blocked
@@ -502,7 +527,23 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		t.Notes = fmt.Sprintf("regressed: verify failed during %s — see %s", id, it.relGate(gid))
 	}
 
-	// 3. review
+	// 3. checks: only when every gate that ran passed
+	var checkRuns []checkRun
+	failedCheck := ""
+	if dispute == "" && tampered == "" && outcome == OutDone && len(failed) == 0 {
+		var err error
+		checkRuns, err = it.runChecks(checksFor(plan.Checks, changedPaths(root, id)), "", iter)
+		if err != nil {
+			return iterResult{}, err
+		}
+		for _, c := range checkRuns {
+			if c.exit != 0 {
+				failedCheck = fmt.Sprintf("check %s failed — see %s", c.name, c.log)
+			}
+		}
+	}
+
+	// 4. review
 	verdict := "skipped"
 	var findings []string
 	gatePassed := outcome == OutBlocked && dispute == "" && own != nil && own.exit == 0
@@ -521,7 +562,13 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	case failed[id]:
 		outcome = OutGateFailed
 		it.warn("   GATE FAIL %s — review skipped, work that fails its own gate is not reviewable", id)
+	case failedCheck != "":
+		outcome = OutCheckFailed
+		it.warn("   CHECK FAIL %s — %s; review skipped", id, failedCheck)
 	default:
+		if err := it.writeChecksFile(checkRuns); err != nil {
+			return iterResult{}, err
+		}
 		model, effort := it.resolved.For(task, PhaseReview)
 		before := refsState(root)
 		guard := snapshotState(root)
@@ -529,7 +576,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		inputs := snapshotInputs(root, it.RunDir)
 		tree := snapshotTree(root)
 		_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: planHash(guard.pre)})
+		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 		it.spent += rres.Cost
 		if err != nil {
 			return iterResult{}, err
@@ -545,9 +592,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		for _, p := range treeChanged {
 			it.warn("vloop: the review session changed %s — reverted", p)
 		}
-		reviewTampered := guard.restoreIfTouched()
+		reviewTouched := guard.restoreTouched()
+		reviewTampered := len(reviewTouched) > 0
 		if reviewTampered {
-			it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, state.FilePath)
+			it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, strings.Join(reviewTouched, ", "))
 		}
 		if rres.TimedOut {
 			it.warn("   the review session for %s timed out after %s", id, it.sessionTimeout())
@@ -587,7 +635,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		it.say("   review: %s", verdict)
 	}
 
-	// 4. apply: the driver makes every status transition
+	// 5. apply: the driver makes every status transition
 	attempt := task.Attempts + 1
 	switch {
 	case dispute != "":
@@ -595,7 +643,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		task.Status, task.Notes = "blocked", dispute
 		it.say("   %s blocked — the operator resolves the disputed gate with vloop task verify", id)
 	default:
-		it.applyOutcome(task, outcome, summary, findings, tampered, gatePassed)
+		it.applyOutcome(task, outcome, summary, findings, tampered, gatePassed, failedCheck)
 	}
 	repeat := it.repeatBlocked(id, outcome, summary)
 	if task.Status == "pending" && task.Attempts >= it.Budgets.MaxAttempts {
@@ -611,10 +659,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		return iterResult{}, err
 	}
 
-	// 5. record
+	// 6. record
 	rec := map[string]any{
-		"schema": "iteration/v1", "run_id": plan.RunID, "iteration": iter, "task": id, "attempt": attempt,
-		"outcome": outcome, "gate": nil,
+		"schema": "iteration/v2", "run_id": plan.RunID, "iteration": iter, "task": id, "attempt": attempt,
+		"outcome": outcome, "gate": nil, "checks": checksRecord(checkRuns),
 		"started": started.Format(time.RFC3339), "ended": it.now().UTC().Format(time.RFC3339),
 	}
 	if own != nil {
@@ -636,7 +684,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		return iterResult{}, err
 	}
 
-	// 6. commit: one per iteration
+	// 7. commit: one per iteration
 	if err := it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome)); err != nil {
 		return iterResult{outcome: outcome, repeat: repeat}, err
 	}
@@ -706,6 +754,8 @@ type gateResult struct {
 	exit  int
 	ms    int64
 	flaky bool // failed, then passed on the immediate re-run
+	// timedOut: the gate hit its time limit; it is not re-run
+	timedOut bool
 }
 
 func (it *Iterator) relGate(id string) string {
@@ -753,16 +803,21 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	cmd.Stdout, cmd.Stderr = &out, &out
 	refsBefore := refsState(it.Root)
 	gguard := snapshotGit(it.Root)
+	tree := snapshotTreeIgnoring(it.Root, gateMayWrite(it.plan.GateScratch))
 	start := time.Now()
 	timedOut, runErr := state.RunGroup(cmd, it.gateTimeout())
 	d := time.Since(start)
+	restored := tree.revert()
+	if err := state.EmptyScratch(it.Root, it.plan.GateScratch); err != nil {
+		it.warn("   gate scratch of %s not emptied: %v", id, err)
+	}
 	if err := it.gitChanged(gguard, "gate"); err != nil {
 		return nil, err
 	}
 	if len(refsDiff(refsBefore, refsState(it.Root))) > 0 {
 		return nil, it.haltGit("the gate of %s moved git refs — nothing was committed; restore them, then re-run", id)
 	}
-	g := &gateResult{ms: d.Milliseconds()}
+	g := &gateResult{ms: d.Milliseconds(), timedOut: timedOut}
 	if runErr != nil {
 		var ee *exec.ExitError
 		if !errors.As(runErr, &ee) {
@@ -784,6 +839,15 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 			out.WriteByte('\n')
 		}
 		out.WriteString(state.GateTimedOutLine(id, it.Budgets.GateTimeout) + "\n")
+	}
+	if len(restored) > 0 {
+		if g.exit == 0 {
+			g.exit = 1
+		}
+		if out.Len() > 0 && !bytes.HasSuffix(out.Bytes(), []byte("\n")) {
+			out.WriteByte('\n')
+		}
+		out.WriteString(state.GateChangedTreeLine(id, restored) + "\n")
 	}
 	masked := []byte(it.r.Mask(out.String()))
 	if err := os.WriteFile(filepath.Join(dir, id+".log"), masked, 0o644); err != nil {
@@ -987,7 +1051,7 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 
 // applyOutcome is the status transition of an iteration that is not a gate
 // dispute: the driver's, never the session's.
-func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, findings []string, tampered string, gatePassed bool) {
+func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, findings []string, tampered string, gatePassed bool, failedCheck string) {
 	switch outcome {
 	case OutDone:
 		task.Status, task.Notes = "done", ""
@@ -998,6 +1062,9 @@ func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, find
 		if tampered != "" {
 			task.Notes = tampered
 		}
+	case OutCheckFailed:
+		task.Status, task.Attempts = "pending", task.Attempts+1
+		task.Notes = failedCheck
 	case OutRejected:
 		task.Status, task.Attempts = "pending", task.Attempts+1
 		task.Notes = it.r.Mask(strings.Join(findings, "; "))
@@ -1014,8 +1081,9 @@ func (it *Iterator) applyOutcome(task *state.Task, outcome, summary string, find
 // changed or untracked path with the digest and bytes it had. It is built from
 // git status, not a file-system walk.
 type treeGuard struct {
-	root  string
-	paths map[string]treeFile
+	root   string
+	paths  map[string]treeFile
+	ignore func(string) bool
 }
 
 type treeFile struct {
@@ -1030,8 +1098,29 @@ func reviewMayWrite(p string) bool {
 	return strings.HasPrefix(p, tmpDir+"/") || strings.HasPrefix(p, ".vloop/state/")
 }
 
+// gateMayWrite is where a gate may write without being failed: the run's
+// scratch space and its own gate scratch folders.
+func gateMayWrite(scratch []string) func(string) bool {
+	return func(p string) bool {
+		if strings.HasPrefix(p, tmpDir+"/") {
+			return true
+		}
+		for _, d := range scratch {
+			if strings.HasPrefix(p, strings.TrimSuffix(d, "/")+"/") {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 func snapshotTree(root string) treeGuard {
-	g := treeGuard{root: root, paths: map[string]treeFile{}}
+	return snapshotTreeIgnoring(root, reviewMayWrite)
+}
+
+// snapshotTreeIgnoring is snapshotTree leaving out the paths ignore names.
+func snapshotTreeIgnoring(root string, ignore func(string) bool) treeGuard {
+	g := treeGuard{root: root, paths: map[string]treeFile{}, ignore: ignore}
 	cmd := gitCmd(root, "status", "--porcelain", "-z", "--no-renames", "--untracked-files=all")
 	out, err := cmd.Output()
 	if err != nil {
@@ -1041,7 +1130,7 @@ func snapshotTree(root string) treeGuard {
 		if len(e) < 4 {
 			continue
 		}
-		if p := e[3:]; !reviewMayWrite(p) {
+		if p := e[3:]; !ignore(p) {
 			g.paths[p] = readTreeFile(root, p)
 		}
 	}
@@ -1060,7 +1149,7 @@ func readTreeFile(root, p string) treeFile {
 // revert undoes every change made since the snapshot outside what a review may
 // write, and returns the paths it had to put back.
 func (g treeGuard) revert() []string {
-	now := snapshotTree(g.root)
+	now := snapshotTreeIgnoring(g.root, g.ignore)
 	var changed []string
 	for p, f := range now.paths {
 		if old, ok := g.paths[p]; !ok || old.exists != f.exists || old.sum != f.sum {

@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T11",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop metrics --json` emits metrics/v2: time gains checks_ms and gate_review_ms; every per-phase object (cost, models, effort, missing records) gains gate-review; a check failure is a derived defect origin work, found-by gate, kind regression; the export's catchers do not change and defect/v1 and export/v1 do not version.", "met": true, "evidence": "internal/metrics/metrics.go: Schema is metrics/v2, ReportTime gains ChecksMS and GateReviewMS, PerPhase and ReportCost gain gate-review. internal/metrics/defects.go: check_failed derives work/regression/gate. The defect and export schemas are untouched. The gate's metrics/v2 validation and the matrix check pass."},
+    {"criterion": "For every consumed brief (B1–B8), the new binary's metrics less `schema` and the added keys equal v1.0.0's output exactly; v1 records remain readable.", "met": true, "evidence": "The gate compares the new binary against a build of the base commit for every consumed brief, and it passed (GATE OK). The new fields are nil or zero for v1 records, and the runs.go checks parsing is optional."},
+    {"criterion": "Closed briefs' snapshots under .vloop/state/metrics/ stay metrics/v1 and are not rewritten.", "met": true, "evidence": "git status shows no change under .vloop/state/metrics/. The diff only changes what is written when closing a new brief. No test asserts this explicitly."},
+    {"criterion": "Metrics and snapshot tests follow metrics/v2 and cover check time, gate-review time and the check-failure defect.", "met": true, "evidence": "time_test.go TestTimeChecksAndGateReview covers checks_ms, gate-review time, cost and models. defects_test.go TestDerivedCheckFailed covers the defect. runs_test.go covers parsing the checks and the gate-review session. The close, metrics and snapshot tests are moved to metrics/v2, and the metrics2.valid.json fixture exists."}
+  ],
+  "findings": [],
+  "notes": "The edits to existing tests only follow the schema bump the task requires. The final pass writes no iteration record, so its check time is not counted in checks_ms (the work session says so). Gate-review time is not included in agent_ms, which matches the brief's phase split. The text summary and the guide are left to T15."
+}

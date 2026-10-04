@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T16",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "cmd/vloop/b9_e2e_test.go plays every line of the brief's worked example with the stub claude in a temp repo, using the sh shell and the config the example gives, and asserts its exit codes, messages and effects; each case fails against the plan's base; it uses no absolute path in anything it commits.", "met": true, "evidence": "b9_e2e_test.go has one subtest per example line (run, no check, web fails on base, gitignore, round 2, gate review fails twice, oracle restored, operator edit and task verify, leftover.txt, check_failed, final pass, state/v1), each asserting exit codes, exact messages and effects; config is sh plus the api/web checks and gate-scratch. The sleeping-gate line is delegated to run_gates_test.go:196, which asserts the single run. No /Users in the file. The features are new in B9, so the cases cannot pass on the base."},
+    {"criterion": "go test ./... passes, as do gofmt -l ., go vet ./..., go mod tidy -diff and the linux and windows builds.", "met": true, "evidence": ".vloop/state/runs/.../gates/T16.log ends GATE OK, which includes all of these checks"},
+    {"criterion": "On this repository, vloop metrics --json for every consumed brief (B1–B8) from a build of the tree equals a build of the plan's base, less schema and the keys metrics/v2 adds.", "met": true, "evidence": "the gate compares the two binaries per consumed brief and passed (GATE OK)"},
+    {"criterion": "vloop status reads B8's committed state/v1 plan.", "met": true, "evidence": "the gate runs vloop status on the B8 plan from the base commit and checks for T18; it passed"}
+  ],
+  "findings": [],
+  "notes": "The 'gate sleeps past the timeout' line is not replayed in b9_e2e_test.go; the 1-minute minimum timeout would break the package's 10-minute limit, so TestRunFlakyGate covers it. No existing test file was modified."
+}
