@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The T1 work from the earlier attempt (intervention/v2 schema, parser, add writing v2, derived agreement) is kept. This attempt fixed the check failure: TestSchemasAreEmbedded now expects 16 embedded schemas.
 - **Files:** embed_test.go
 - **Notes for next iteration:** The check failure was embed_test.go counting 15 schema files; intervention.v2.json makes 16. TestWorkedExampleB6RealData and the internal/cli TestTaskGate* tests fail only when run inside a loop session: the clone carries the live plan's gate folders, or the plan counts as changed. They are not caused by this change.
+
+## T1 — Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement
+
+- **Outcome:** done (review: PASS)
+- **Summary:** intervention/v2 (schema, parser reading v1 and v2, add writing v2, one derived agreement) is in place from earlier attempts; this attempt fixed the remaining check failure in TestWorkedExampleB6RealData.
+- **Files:** cmd/vloop/b6_e2e_test.go
+- **Notes for next iteration:** TestWorkedExampleB6RealData clones HEAD, which carries the live plan's committed .vloop/state/gates/T*; the plan check refused them as gates for tasks not in the fresh plan. The test now removes the clone's .vloop/state/gates beside state.json. The change adds one cleanup step and weakens no assertion.

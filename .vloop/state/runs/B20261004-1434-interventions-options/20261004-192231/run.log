@@ -23,3 +23,8 @@ committing the plan
    Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement
    check go
    CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/002-go.fail.log; review skipped
+── iteration 3 (3 this run) · T1 · 0/11 done ──
+   Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement
+   check go
+   review: PASS
+   T1 done

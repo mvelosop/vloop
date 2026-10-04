@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T19:21:59Z",
+  "updated": "2026-10-04T19:32:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -51,9 +51,9 @@
         "TestListOrderFilterAndRoundTrip's assertion that a freshly added record's schema is intervention/v1 changes to intervention/v2, as a direct consequence of add writing v2; no other existing test is weakened or deleted."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 2,
-      "notes": "check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/002-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T2",

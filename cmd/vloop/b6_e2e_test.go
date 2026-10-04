@@ -255,6 +255,10 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if err := os.Remove(filepath.Join(clone, ".vloop", "state", "state.json")); err != nil && !os.IsNotExist(err) {
 		t.Fatal(err)
 	}
+	// Likewise its gate folders: they belong to the live plan, not the fresh one.
+	if err := os.RemoveAll(filepath.Join(clone, ".vloop", "state", "gates")); err != nil {
+		t.Fatal(err)
+	}
 	// The repository's own checks run its whole suite; the fixture run has its
 	// own passing one instead.
 	r.write(".vloop/config.toml", withoutChecks(r.read(".vloop/config.toml"))+"\n"+runCheckConfig)

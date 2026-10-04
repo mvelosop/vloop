@@ -1,0 +1,44 @@
+{
+ "schema": "verdict/v1",
+ "task": "T1",
+ "verdict": "PASS",
+ "criteria": [
+  {
+   "criterion": "schemas/intervention.v2.json is embedded and listed by `vloop schema list` beside intervention/v1: v1's JSON form plus `options` (an array of at most three strings), `recommended` ({option, why}), `decided` ({option, adjusted, text}, option 0 for other or none), `context`, `suggested` and `agreement` (one of recommended, other-option, adjusted, different, no-options).",
+   "met": true,
+   "evidence": "schemas/intervention.v2.json exists with the listed fields; schema_test.go, b2_e2e_test.go and internal/schema/schema_test.go list intervention/v2; embed_test.go count is 16"
+  },
+  {
+   "criterion": "A v2 record's frontmatter is v1's plus, in this order right after `by:`, `schema: intervention/v2`, `options: <0-3>`, `recommended: <0-3>`, `decided: <1|2|3|other|\"\">`, `adjusted: true` (only when adjusted) and `agreement: <\u2026>`; the body is the summary, then **Trigger.**, **Done.**, **Context.**, **Options.** (a numbered list 1. to 3., one line each), **Recommended.**, **Suggested.**, **Decided.**, **What would automate it.**, each only when it has content.",
+   "met": true,
+   "evidence": "render() in internal/intervention/intervention.go writes schema, options, recommended, decided, adjusted, agreement right after by:, then the sections in order; TestAddWritesRecord pins the bytes"
+  },
+  {
+   "criterion": "A record without `schema: intervention/v2` reads as v1 with agreement no-options, and its **Context.**, **Suggested.** and **Decided.** sections parse into context, suggested and decided.text; done holds only the **Done.** section.",
+   "met": true,
+   "evidence": "parse() defaults to v1 with agreement no-options and routes Context/Suggested/Decided to their own fields; TestParseV1AndV2Sections asserts Done holds only d"
+  },
+  {
+   "criterion": "agreement is derived in one place from the option count, decided and adjusted, exactly by the brief's I1 table; a record whose stored agreement, `options` count or numbered list disagree, or that has options and `decided: \"\"`, makes `vloop intervention list` exit 1 naming the file. Violation to rule against: an agreement computed from the decision's text, or a stored agreement trusted without re-deriving it.",
+   "met": true,
+   "evidence": "DeriveAgreement is the single derivation; parse() re-derives and rejects a stored mismatch, option count mismatch, non-numbered list and empty decision; List wraps the error with the file name; TestParseInvalidRecords covers each"
+  },
+  {
+   "criterion": "`vloop intervention add` with only v1's flags writes an intervention/v2 record with options 0, recommended 0, decided \"\" and agreement no-options; the v1 flags are unchanged.",
+   "met": true,
+   "evidence": "Add writes Schema intervention/v2, options 0, recommended 0, decided \"\", agreement no-options; v1 flags unchanged"
+  },
+  {
+   "criterion": "Committed tests the checks run: TestAddWritesRecord pins the v2 bytes; TestExistingRecordsParse reads v1 and v2 records, including a v1 record's Context, Suggested and Decided sections; new unit tests cover every row of the derivation table and each kind of invalid record; the schema lists in internal/cli/schema_test.go, cmd/vloop/b2_e2e_test.go (TestWorkedExampleB2Commands) and internal/schema/schema_test.go gain intervention/v2.",
+   "met": true,
+   "evidence": "TestAddWritesRecord, TestDeriveAgreement (every table row), TestParseInvalidRecords, TestParseV1AndV2Sections added; schema lists updated in the three files. TestExistingRecordsParse itself was not extended (the v1 section checks live in TestParseV1AndV2Sections), a minor deviation"
+  },
+  {
+   "criterion": "TestListOrderFilterAndRoundTrip's assertion that a freshly added record's schema is intervention/v1 changes to intervention/v2, as a direct consequence of add writing v2; no other existing test is weakened or deleted.",
+   "met": true,
+   "evidence": "TestListOrderFilterAndRoundTrip changed only v1 to v2; the b6 test change only removes the clone gates folder, no assertion weakened"
+  }
+ ],
+ "findings": [],
+ "notes": "TestExistingRecordsParse does not itself assert a real v1 record Context/Suggested/Decided; the in-memory TestParseV1AndV2Sections does. Go check passed (go.log)."
+}
