@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T11",
+  "outcome": "done",
+  "summary": "vloop metrics now emits metrics/v2: time.checks_ms and time.gate_review_ms, a gate-review entry in cost, models and effort, and a derived work/regression defect found by the gate for each check_failed iteration. v1 records are still read and the real-data output of B1-B8 is unchanged.",
+  "files": ["internal/runs/runs.go", "internal/runs/runs_test.go", "internal/metrics/metrics.go", "internal/metrics/time.go", "internal/metrics/defects.go", "internal/metrics/time_test.go", "internal/metrics/defects_test.go", "internal/closing/closing_test.go", "internal/cli/metrics_test.go", "internal/cli/close_test.go", "cmd/vloop/run_snapshot_test.go", "cmd/vloop/b4_e2e_test.go"],
+  "verified": "vloop task gate T11 exited 0 and printed GATE OK.",
+  "notes": "checks_ms sums iteration/v2 checks[].duration_ms and is null when no record lists any; the final pass writes no iteration record, so its time is not counted. gate-review sessions are session/v2 files named NNN-gate-review.json (the runs reader regex now allows a hyphen); their cost joins cost.total_usd but their time is not in agent_ms. The text summary (print.go) and docs/guide/metrics.md do not show the new keys yet (T15). Closing a brief now writes a metrics/v2 snapshot; existing snapshots were not touched. In a session, internal/cli tests need the VLOOP_* env unset."
+}

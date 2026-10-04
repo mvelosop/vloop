@@ -15,7 +15,7 @@ import (
 
 func fixtureReport(t *testing.T) *metrics.Report {
 	t.Helper()
-	data, err := os.ReadFile(filepath.Join("..", "schema", "testdata", "metrics.valid.json"))
+	data, err := os.ReadFile(filepath.Join("..", "schema", "testdata", "metrics2.valid.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func TestSnapshotWrite(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := string(data)
-	if !strings.HasSuffix(s, "}\n") || !strings.HasPrefix(s, "{\n  \"schema\": \"metrics/v1\",\n") {
+	if !strings.HasSuffix(s, "}\n") || !strings.HasPrefix(s, "{\n  \"schema\": \"metrics/v2\",\n") {
 		t.Fatalf("not 2-space indented with trailing newline:\n%s", s)
 	}
 	v, err := schema.Validate(metrics.Schema, data)

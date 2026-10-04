@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/16 done** · iteration 14
+**Status:** running · **11/16 done** · iteration 15
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T00:50:50Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T00:59:33Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T8** — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
 - [x] **T9** — Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
 - [x] **T10** — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
-- [ ] **T11** — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
+- [x] **T11** — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
 - [ ] **T12** — Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
 - [ ] **T13** — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
 - [ ] **T14** — Update the domain model and the execution and measurement docs for the gate model
@@ -280,7 +280,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T11 — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
 
-`pending` · depends on: T8, T10
+`done` · depends on: T8, T10
 
 **Files:** `internal/metrics/`, `internal/runs/`, `internal/cli/metrics.go`, `internal/cli/metrics_test.go`, `internal/cli/defect.go`, `internal/closing/`
 

@@ -134,3 +134,22 @@ func TestDerivedFlakyGate(t *testing.T) {
 		t.Errorf("matrix %v: want env/gate 1 and work/gate 0", x)
 	}
 }
+
+func TestDerivedCheckFailed(t *testing.T) {
+	m := &runs.Model{Folders: []runs.Folder{{
+		Iterations: []runs.Iteration{
+			{Iteration: 1, Task: "T1", Outcome: "check_failed"},
+			{Iteration: 2, Task: "T1", Outcome: "done"},
+		},
+	}}}
+	got := Derive(m, nil)
+	if len(got) != 1 {
+		t.Fatalf("%d defects, want 1: %+v", len(got), got)
+	}
+	if d := got[0]; d.Task != "T1" || d.Iteration != 1 || d.Origin != "work" || d.Kind != "regression" || d.FoundBy != "gate" {
+		t.Errorf("check-failure defect = %+v", d)
+	}
+	if ids := DerivedIDs("R", got); ids[0] != "R/i1-gate" {
+		t.Errorf("id = %v", ids)
+	}
+}

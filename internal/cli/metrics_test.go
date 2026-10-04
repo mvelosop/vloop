@@ -180,7 +180,7 @@ func TestMetricsCommandJSON(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("%d %s", code, errs)
 	}
-	if v, err := schema.Validate("metrics/v1", []byte(out)); err != nil || len(v) > 0 {
+	if v, err := schema.Validate("metrics/v2", []byte(out)); err != nil || len(v) > 0 {
 		t.Fatalf("does not validate: %v %v\n%s", v, err, out)
 	}
 	var doc struct {

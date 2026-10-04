@@ -74,6 +74,8 @@ func Derive(m *runs.Model, plan *runs.PlanDoc) []Derived {
 					d.Origin, d.Kind = "plan", "gate"
 				}
 				out = append(out, d)
+			case "check_failed":
+				out = append(out, Derived{Task: it.Task, Iteration: it.Iteration, Origin: "work", Kind: "regression", FoundBy: "gate", Summary: "check failed"})
 			case "rejected":
 				fs := verdicts[it.Iteration].Findings
 				if len(fs) == 0 {

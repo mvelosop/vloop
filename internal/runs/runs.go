@@ -71,6 +71,7 @@ type Iteration struct {
 	Attempt   int
 	Outcome   string // as written; see Canonical
 	GateMS    *int64 // nil when the record carries no gate duration
+	ChecksMS  *int64 // sum of the checks' durations; nil when the record lists none
 	Flaky     bool   // the gate failed, then passed on an immediate re-run
 	Started   time.Time
 	Ended     time.Time
@@ -274,7 +275,7 @@ func logOwns(logPath string, m *Model) (bool, error) {
 }
 
 var (
-	sessionName = regexp.MustCompile(`^(\d+)-([a-z]+)\.json$`)
+	sessionName = regexp.MustCompile(`^(\d+)-([a-z-]+)\.json$`)
 	verdictName = regexp.MustCompile(`^(\d+)-verdict\.json$`)
 )
 
@@ -430,6 +431,9 @@ func readIterations(p string) ([]Iteration, error) {
 				DurationMS *int64 `json:"duration_ms"`
 				Flaky      bool   `json:"flaky"`
 			} `json:"gate"`
+			Checks []struct {
+				DurationMS int64 `json:"duration_ms"`
+			} `json:"checks"`
 			Started string `json:"started"`
 			Ended   string `json:"ended"`
 		}
@@ -441,6 +445,13 @@ func readIterations(p string) ([]Iteration, error) {
 		if r.Gate != nil {
 			it.GateMS = r.Gate.DurationMS
 			it.Flaky = r.Gate.Flaky
+		}
+		if len(r.Checks) > 0 {
+			var ms int64
+			for _, c := range r.Checks {
+				ms += c.DurationMS
+			}
+			it.ChecksMS = &ms
 		}
 		out = append(out, it)
 	}

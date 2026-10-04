@@ -293,3 +293,24 @@ func TestOwnedCommitsPlanReadFromGit(t *testing.T) {
 		t.Error("reading must not create .vloop")
 	}
 }
+
+func TestVloopV2ChecksAndGateReviewSession(t *testing.T) {
+	root := t.TempDir()
+	base := ".vloop/state/runs/B2-x/20260101-100000/"
+	put(t, root, base+"iterations.jsonl",
+		`{"schema":"iteration/v2","run_id":"B2-x","iteration":1,"task":"T1","attempt":1,"outcome":"check_failed","gate":null,"checks":[{"name":"a","exit":0,"duration_ms":400},{"name":"b","exit":1,"duration_ms":600}],"started":"2026-01-01T10:00:00Z","ended":"2026-01-01T10:05:00Z"}`+"\n"+
+			`{"schema":"iteration/v2","run_id":"B2-x","iteration":2,"task":"T1","attempt":2,"outcome":"done","gate":null,"checks":[],"started":"2026-01-01T10:06:00Z","ended":"2026-01-01T10:07:00Z"}`+"\n")
+	put(t, root, base+"sessions/001-gate-review.json",
+		`{"schema":"session/v2","run_id":"B2-x","iteration":0,"phase":"gate-review","model":"sonnet","effort":null,"models_used":{},"started":"2026-01-01T10:00:00Z","duration_ms":2000,"cost_usd":0.3,"turns":1,"is_error":false,"permission_denials":[]}`)
+	m, err := Load(root, "B2-x")
+	if err != nil {
+		t.Fatal(err)
+	}
+	f := m.Folders[0]
+	if c := f.Iterations[0].ChecksMS; c == nil || *c != 1000 || f.Iterations[1].ChecksMS != nil {
+		t.Errorf("checks durations = %+v", f.Iterations)
+	}
+	if len(f.Sessions) != 1 || f.Sessions[0].Phase != "gate-review" || f.Sessions[0].DurationMS != 2000 {
+		t.Errorf("sessions = %+v", f.Sessions)
+	}
+}

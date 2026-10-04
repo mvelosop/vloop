@@ -13,9 +13,9 @@ import (
 )
 
 // Schema is the name of the document Report marshals to.
-const Schema = "metrics/v1"
+const Schema = "metrics/v2"
 
-// JSONLines is Lines as metrics/v1 spells it: added counts, deleted apart.
+// JSONLines is Lines as metrics/v2 spells it: added counts, deleted apart.
 type JSONLines struct {
 	Code    int    `json:"code"`
 	Test    int    `json:"test"`
@@ -38,12 +38,14 @@ type ReportSize struct {
 
 // ReportTime is the `time` object, in milliseconds.
 type ReportTime struct {
-	AgentMS  int64  `json:"agent_ms"`
-	WorkMS   int64  `json:"work_ms"`
-	ReviewMS int64  `json:"review_ms"`
-	PlanMS   int64  `json:"plan_ms"`
-	GatesMS  *int64 `json:"gates_ms"`
-	WallMS   *int64 `json:"wall_ms"`
+	AgentMS      int64  `json:"agent_ms"`
+	WorkMS       int64  `json:"work_ms"`
+	ReviewMS     int64  `json:"review_ms"`
+	PlanMS       int64  `json:"plan_ms"`
+	GatesMS      *int64 `json:"gates_ms"`
+	ChecksMS     *int64 `json:"checks_ms"`
+	GateReviewMS int64  `json:"gate_review_ms"`
+	WallMS       *int64 `json:"wall_ms"`
 }
 
 // ReportCost is the `cost` object, in unrounded USD.
@@ -52,14 +54,16 @@ type ReportCost struct {
 	Plan        float64  `json:"plan_usd"`
 	Work        float64  `json:"work_usd"`
 	Review      float64  `json:"review_usd"`
+	GateReview  float64  `json:"gate_review_usd"`
 	Per1000Code *float64 `json:"per_1000_code_lines_usd"`
 }
 
 // PerPhase holds one value per session phase.
 type PerPhase[T any] struct {
-	Plan   T `json:"plan"`
-	Work   T `json:"work"`
-	Review T `json:"review"`
+	Plan       T `json:"plan"`
+	Work       T `json:"work"`
+	Review     T `json:"review"`
+	GateReview T `json:"gate-review"`
 }
 
 // ReportDefects is the `defects` object.
@@ -90,7 +94,7 @@ type ReportTask struct {
 	Models   []string  `json:"models"`
 }
 
-// Report is the metrics/v1 document for one brief.
+// Report is the metrics/v2 document for one brief.
 type Report struct {
 	Schema  string             `json:"schema"`
 	Brief   string             `json:"brief"`
@@ -201,12 +205,12 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	t := CountTasks(m, plan, briefText)
 	r.Tasks = ReportTasks{t.Planned, t.Done, t.Blocked, t.FirstPass, t.Estimate}
 	r.Size = ReportSize{jsonLines(size.Delivered), jsonLines(size.Churn), size.TestCode(), size.Rework()}
-	r.Time = ReportTime{u.Time.AgentMS, u.Time.WorkMS, u.Time.ReviewMS, u.Time.PlanMS, u.Time.GateMS, u.Time.WallMS}
+	r.Time = ReportTime{u.Time.AgentMS, u.Time.WorkMS, u.Time.ReviewMS, u.Time.PlanMS, u.Time.GateMS, u.Time.ChecksMS, u.Time.GateReviewMS, u.Time.WallMS}
 	r.Rate = u.Rate
-	r.Cost = ReportCost{u.Cost.Total, u.Cost.Plan, u.Cost.Work, u.Cost.Review, u.Cost.Per1kCode}
+	r.Cost = ReportCost{u.Cost.Total, u.Cost.Plan, u.Cost.Work, u.Cost.Review, u.Cost.GateReview, u.Cost.Per1kCode}
 	r.Tokens = u.Tokens
-	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview])}
-	r.Effort = PerPhase[*string]{strp(u.Effort[PhasePlan]), strp(u.Effort[PhaseWork]), strp(u.Effort[PhaseReview])}
+	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview]), splitList(u.Models[PhaseGateReview])}
+	r.Effort = PerPhase[*string]{strp(u.Effort[PhasePlan]), strp(u.Effort[PhaseWork]), strp(u.Effort[PhaseReview]), strp(u.Effort[PhaseGateReview])}
 	r.PermissionDenials = u.Denials
 	r.Iterations = t.Iterations
 	r.IterationsPerClosed = t.IterationsPerClosed

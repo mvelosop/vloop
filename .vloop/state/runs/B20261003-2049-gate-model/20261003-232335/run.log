@@ -33,3 +33,7 @@
    Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
    review: PASS
    T10 done
+── iteration 15 (10 this run) · T11 · 10/16 done ──
+   Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
+   review: PASS
+   T11 done

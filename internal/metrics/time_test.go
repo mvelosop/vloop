@@ -270,3 +270,31 @@ func TestBriefEstimateReadsOnlyTheShapeSection(t *testing.T) {
 		}
 	}
 }
+
+func TestTimeChecksAndGateReview(t *testing.T) {
+	c1, c2 := int64(700), int64(300)
+	m := &runs.Model{Folders: []runs.Folder{{
+		Iterations: []runs.Iteration{
+			{Iteration: 1, Task: "T1", Outcome: "check_failed", ChecksMS: &c1},
+			{Iteration: 2, Task: "T1", Outcome: "done", ChecksMS: &c2},
+			{Iteration: 3, Task: "T2", Outcome: "done"},
+		},
+		Sessions: []runs.Session{
+			{Phase: "gate-review", DurationMS: 4000, CostUSD: 0.5, Effort: "high", Model: "g"},
+			{Phase: "work", Iteration: 1, DurationMS: 10, CostUSD: 0.1},
+		},
+	}}}
+	u := Aggregate(m, Counts{})
+	if u.Time.ChecksMS == nil || *u.Time.ChecksMS != 1000 {
+		t.Errorf("checks = %v, want 1000", u.Time.ChecksMS)
+	}
+	if u.Time.GateReviewMS != 4000 || u.Time.AgentMS != 10 {
+		t.Errorf("gate review %d agent %d, want 4000 and 10", u.Time.GateReviewMS, u.Time.AgentMS)
+	}
+	if u.Cost.GateReview != 0.5 || u.Cost.Total != 0.6 || u.Models["gate-review"] != "g" || u.Effort["gate-review"] != "high" {
+		t.Errorf("cost %+v models %v effort %v", u.Cost, u.Models, u.Effort)
+	}
+	if none := Aggregate(&runs.Model{}, Counts{}); none.Time.ChecksMS != nil {
+		t.Errorf("no records should leave checks nil: %v", none.Time.ChecksMS)
+	}
+}
