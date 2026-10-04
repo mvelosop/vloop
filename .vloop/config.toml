@@ -1,3 +1,10 @@
 [metrics]
   code = ["internal/brief/templates/**", "schemas/**"]
   stacks = ["go"]
+
+# The repository's tests and health checks — CLAUDE.md's toolchain — run by the
+# driver on the base, after every iteration, and once in full at the end.
+[[check]]
+  name = "go"
+  paths = ["**"]
+  run = "go test ./... && go vet ./... && test -z \"$(gofmt -l .)\" && go mod tidy -diff && GOOS=linux go build ./... && GOOS=windows go build ./..."
