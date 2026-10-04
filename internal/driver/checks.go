@@ -178,9 +178,14 @@ func checksFor(checks []state.PlanCheck, changed []string) []state.PlanCheck {
 	return out
 }
 
-// changedPaths is what the iteration changed: tracked changes against HEAD and
-// untracked files, less the driver's scratch folder.
-func changedPaths(root string) []string {
+// changedPaths is what the task has changed: tracked changes against HEAD and
+// untracked files, less the driver's scratch folder, plus what the task's
+// earlier attempts committed. A failed attempt is committed with its outcome,
+// so a retry that changes nothing new still runs the check that failed it.
+// Earlier attempts reach back to the newest driver commit that is not the
+// task's own (`[vloop] <id>: …`); an operator's commit in between is included,
+// which can only add checks. The driver's records under .vloop/ are left out.
+func changedPaths(root, id string) []string {
 	out, err := gitCmd(root, "status", "--porcelain", "-z", "--no-renames", "--untracked-files=all").Output()
 	if err != nil {
 		return nil
@@ -194,7 +199,37 @@ func changedPaths(root string) []string {
 			paths = append(paths, p)
 		}
 	}
+	since := lastOtherCommit(root, id)
+	if since == "" {
+		return paths
+	}
+	out, err = gitCmd(root, "diff", "--name-only", "-z", "--no-renames", since, "HEAD").Output()
+	if err != nil {
+		return paths
+	}
+	for _, p := range strings.Split(string(out), "\x00") {
+		if p != "" && !strings.HasPrefix(p, ".vloop/") && !slices.Contains(paths, p) {
+			paths = append(paths, p)
+		}
+	}
 	return paths
+}
+
+// lastOtherCommit is the newest commit whose subject is the driver's
+// (`[vloop] …`) but not this task's (`[vloop] <id>:`), or "" when there is none.
+func lastOtherCommit(root, id string) string {
+	out, err := gitCmd(root, "log", "--format=%H %s").Output()
+	if err != nil {
+		return ""
+	}
+	own := "[vloop] " + id + ":"
+	for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		sha, subject, ok := strings.Cut(l, " ")
+		if ok && strings.HasPrefix(subject, "[vloop] ") && !strings.HasPrefix(subject, own) {
+			return sha
+		}
+	}
+	return ""
 }
 
 // checkRun is one check's outcome in an iteration or the final pass.

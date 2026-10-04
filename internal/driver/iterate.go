@@ -532,7 +532,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	failedCheck := ""
 	if dispute == "" && tampered == "" && outcome == OutDone && len(failed) == 0 {
 		var err error
-		checkRuns, err = it.runChecks(checksFor(plan.Checks, changedPaths(root)), "", iter)
+		checkRuns, err = it.runChecks(checksFor(plan.Checks, changedPaths(root, id)), "", iter)
 		if err != nil {
 			return iterResult{}, err
 		}

@@ -223,11 +223,33 @@ fi
 	t.Run("web/test.sh fails only after T2: the final pass exits 2", func(t *testing.T) {
 		t.Parallel()
 		r := b9Repo(t)
+		// The web check runs on the base, after T2, and in the final pass; it
+		// starts failing on its third run, from nothing T2's iteration changed.
+		// A check that fails in T2's own iteration is check_failed, not this.
+		r.write(".gitignore", r.read(".gitignore")+".web-runs\n")
+		r.write("web/test.sh", "n=$(( $(cat .web-runs 2>/dev/null || echo 0) + 1 )); echo $n > .web-runs; [ $n -lt 3 ]\n")
+		r.commitAll("web breaks on its third run")
+		res := r.vloop("run", runBrief)
+		wantExit(t, res, 2)
+		wantIn(t, "stderr", res.err, "vloop: check web failed in the final pass — see .vloop/state/runs/", "/checks/final-web.log\n")
+	})
+
+	t.Run("a check that fails on T2's work fails every retry", func(t *testing.T) {
+		t.Parallel()
+		r := b9Repo(t)
 		r.write("web/test.sh", "test ! -f web/T2.out\n")
 		r.commitAll("web breaks once T2's file exists")
 		res := r.vloop("run", runBrief)
 		wantExit(t, res, 2)
-		wantIn(t, "stderr", res.err, "vloop: check web failed in the final pass — see .vloop/state/runs/", "/checks/final-web.log\n")
+		its := r.iterations()
+		for _, it := range its[1:] {
+			if it["task"] != "T2" || it["outcome"] != "check_failed" {
+				t.Errorf("iteration %v of %v is %v %v, want T2 check_failed", it["iteration"], len(its), it["task"], it["outcome"])
+			}
+		}
+		if strings.Contains(res.err, "final pass") {
+			t.Errorf("the final pass ran; T2 went done on the work its check failed:\n%s", res.err)
+		}
 	})
 
 	// "a gate that sleeps past the gate timeout: runs once" is played by
