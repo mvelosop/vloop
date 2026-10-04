@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 15,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T21:06:49Z",
+  "updated": "2026-10-04T22:04:38Z",
   "shell": "sh",
   "checks": [
     {
@@ -283,8 +283,8 @@
         "Committed tests: internal/cli/guide_test.go TestGuideDefectsCoversInterventions covers the intervention/v2 fields and values; a test the checks run exercises the index script's Agreement column and its by/agreement validation over fixture records in a temporary directory."
       ],
       "verify": "sh .vloop/state/gates/T9/gate.sh",
-      "status": "blocked",
-      "attempts": 3,
+      "status": "pending",
+      "attempts": 0,
       "notes": "gate failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/gates/T9.log"
     },
     {

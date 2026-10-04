@@ -5,6 +5,11 @@ phase: design
 kind: verification-finding
 automatable: partly
 by: assistant
+schema: intervention/v2
+options: 0
+recommended: 0
+decided: ""
+agreement: no-options
 occurred: 2026-10-01
 recorded: 2026-10-01T09:26:50Z
 ---

@@ -5,6 +5,11 @@ phase: close
 kind: ceremony
 automatable: yes
 by: assistant
+schema: intervention/v2
+options: 0
+recommended: 0
+decided: ""
+agreement: no-options
 occurred: 2026-09-30
 recorded: 2026-09-30T22:44:50Z
 ---
