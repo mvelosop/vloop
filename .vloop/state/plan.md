@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/11 done** · iteration 7
+**Status:** running · **5/11 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T19:50:07Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:02:18Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided · 1 attempt(s)
 - [x] **T3** — Correct a record with vloop intervention set: recommended, decided and adjusted, re-deriving agreement
 - [x] **T4** — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
-- [ ] **T5** — Add vloop intervention show <id>, resolving the ids written in its Context
+- [x] **T5** — Add vloop intervention show <id>, resolving the ids written in its Context
 - [ ] **T6** — Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
 - [ ] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
 - [ ] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
@@ -115,7 +115,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Add vloop intervention show <id>, resolving the ids written in its Context
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 A record's context names the run, task, commit, defects and other interventions it concerns; show prints the record and resolves those ids so a reader need not chase them. Only the Context section is scanned, so a link is something the recorder chose to name; no new reference fields are added.
 

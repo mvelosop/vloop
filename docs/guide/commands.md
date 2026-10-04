@@ -225,6 +225,14 @@ Set brief, phase, kind, automatable, by, occurred, recommended, decided, adjuste
 vloop intervention set <id> <field> <value>
 ```
 
+## vloop intervention show
+
+Print an intervention and resolve the ids named in its Context
+
+```
+vloop intervention show <id>
+```
+
 ## vloop metrics
 
 Summarise what a brief cost and delivered, from its runs and commits

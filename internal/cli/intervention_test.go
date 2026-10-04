@@ -1,7 +1,11 @@
 package cli
 
 import (
+	"os/exec"
+	"reflect"
+
 	"encoding/json"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"os"
 	"path/filepath"
 	"strings"
@@ -188,5 +192,96 @@ func TestInterventionMigrate(t *testing.T) {
 	code, out, _ = runDefect(t, dir, "intervention", "migrate")
 	if code != 0 || out != "nothing to migrate\n" || read() != want {
 		t.Fatalf("again: %d %q", code, out)
+	}
+}
+
+func TestInterventionShowLinks(t *testing.T) {
+	dir := t.TempDir()
+	git := func(args ...string) string {
+		t.Helper()
+		c := exec.Command("git", append([]string{"-C", dir}, args...)...)
+		c.Env = append(os.Environ(), "GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@example.invalid", "GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@example.invalid", "GIT_CONFIG_GLOBAL=/dev/null")
+		b, err := c.CombinedOutput()
+		if err != nil {
+			t.Fatalf("git %v: %v %s", args, err, b)
+		}
+		return strings.TrimSpace(string(b))
+	}
+	git("init", "-q", "-b", "main")
+	git("commit", "-q", "--allow-empty", "-m", "the subject for show")
+	sha := git("rev-parse", "--short=12", "HEAD")
+	os.MkdirAll(filepath.Join(dir, ".vloop/state/runs/B1-run/20260101-090000"), 0o755)
+	os.MkdirAll(filepath.Join(dir, ".vloop/state/runs/B20260101-0900-a/20260101-090000"), 0o755)
+	plan := func(title string) {
+		os.WriteFile(filepath.Join(dir, ".vloop/state/state.json"), []byte(`{"run_id":"B20260101-0900-a","tasks":[{"id":"T3","title":"`+title+`"}]}`), 0o644)
+	}
+	plan("Old title")
+	git("add", "-A")
+	git("commit", "-q", "-m", "[vloop] plan B20260101-0900-a")
+	plan("Latest title")
+	git("add", "-A")
+	git("commit", "-q", "-m", "[vloop] plan B20260101-0900-a")
+	plan("Drifted")
+	git("add", "-A")
+	git("commit", "-q", "-m", "a later change")
+
+	os.MkdirAll(filepath.Join(dir, "docs/briefs"), 0o755)
+	os.WriteFile(filepath.Join(dir, "docs/briefs/B20260101-0900-a.loop-brief.md"), []byte("---\nname: B20260101-0900-a.loop-brief\nstatus: ready\n---\n"), 0o644)
+	_, out, _ := runDefect(t, dir, "defect", "add", "the defect", "--found-by", "user", "--brief", "B20260101-0900-a.loop-brief")
+	did := strings.TrimSuffix(filepath.Base(strings.TrimSpace(out)), ".md")
+	_, out, _ = runDefect(t, dir, "intervention", "add", "the other one", "--phase", "run", "--kind", "repair", "--automatable", "no", "--by", "operator")
+	oid := strings.TrimSuffix(filepath.Base(strings.TrimSpace(out)), ".md")
+	ctx := "T3 in B20260101-0900-a; " + sha + " then " + did + " and " + oid + " and T3 again, not D20990101-0000-nope."
+	_, out, _ = runDefect(t, dir, "intervention", "add", "Show me", "--brief", "B20260101-0900-a.loop-brief", "--phase", "halt", "--kind", "repair", "--automatable", "no", "--by", "both", "--context", ctx+" Note T9 also.")
+	id := strings.TrimSuffix(filepath.Base(strings.TrimSpace(out)), ".md")
+
+	want := []intervention.Link{
+		{Ref: "T3", Kind: "task", Title: "Latest title"},
+		{Ref: "B20260101-0900-a", Kind: "run", Title: ".vloop/state/runs/B20260101-0900-a/20260101-090000"},
+		{Ref: sha, Kind: "commit", Title: "the subject for show"},
+		{Ref: did, Kind: "defect", Title: "the defect"},
+		{Ref: oid, Kind: "intervention", Title: "the other one"},
+		{Ref: "D20990101-0000-nope", Kind: "defect", Title: ""},
+		{Ref: "T9", Kind: "task", Title: ""},
+	}
+	code, out, _ := runDefect(t, dir, "--json", "intervention", "show", id)
+	var got struct {
+		ID, Summary, Agreement string
+		Links                  []intervention.Link
+	}
+	if code != 0 || json.Unmarshal([]byte(out), &got) != nil || got.ID != id || got.Summary != "Show me" || got.Agreement != "no-options" {
+		t.Fatalf("json %d %q", code, out)
+	}
+	if !reflect.DeepEqual(got.Links, want) {
+		t.Fatalf("links %+v\nwant %+v", got.Links, want)
+	}
+
+	code, out, _ = runDefect(t, dir, "intervention", "show", id)
+	i := strings.Index(out, "links:\n")
+	if code != 0 || i < 0 || !strings.HasPrefix(out, id+"\nShow me\n") || !strings.Contains(out, "\nContext\n") {
+		t.Fatalf("text %d %q", code, out)
+	}
+	lines := strings.Split(strings.TrimSpace(out[i+len("links:\n"):]), "\n")
+	if len(lines) != len(want) {
+		t.Fatalf("links text %q", lines)
+	}
+	for n, l := range lines {
+		title := want[n].Title
+		if title == "" {
+			title = "(not found)"
+		}
+		if strings.TrimSpace(l) != want[n].Ref+"  "+title {
+			t.Fatalf("link %d %q", n, l)
+		}
+	}
+
+	code, out, errs := runDefect(t, dir, "intervention", "show", "I20990101-0000-none")
+	if code != ExitProblems || out != "" || errs != "vloop: no intervention I20990101-0000-none\n" {
+		t.Fatalf("unknown %d %q %q", code, out, errs)
+	}
+	code, out, _ = runDefect(t, dir, "--json", "intervention", "show", "I20990101-0000-none")
+	var e struct{ Error string }
+	if code != ExitProblems || json.Unmarshal([]byte(out), &e) != nil || e.Error != "no intervention I20990101-0000-none" {
+		t.Fatalf("unknown json %d %q", code, out)
 	}
 }

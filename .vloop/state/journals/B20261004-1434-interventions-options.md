@@ -55,3 +55,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop intervention migrate inserts the five v2 no-options lines after by: in every v1 record and changes no other byte; --dry-run lists, a second run prints nothing to migrate, and upgrade leaves records alone.
 - **Files:** internal/intervention/intervention.go, internal/cli/intervention.go, internal/cli/intervention_test.go, internal/cli/upgrade_test.go, docs/guide/commands.md
 - **Notes for next iteration:** A record counts as v1 when its frontmatter has no schema: line. migrateText splits with SplitAfter so line endings and the body are preserved verbatim, and the inserted lines use the by: line's own ending. docs/guide/commands.md regenerated with go generate ./...; upgrade needed no change since it never touched records.
+
+## T5 — Add vloop intervention show <id>, resolving the ids written in its Context
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop intervention show <id> prints the record (id, summary, frontmatter, sections) then a links block resolving task, run, defect, intervention and commit ids named in Context, in order of first appearance; --json adds links [{ref, kind, title}]; an unknown id exits 1.
+- **Files:** internal/intervention/show.go, internal/cli/intervention.go, internal/cli/intervention_test.go, docs/guide/commands.md
+- **Notes for next iteration:** Only Context is scanned, word by word ([A-Za-z0-9-]+); hex words of 7-40 chars count as commits, so a plain word like 'defaced' prints (not found). Task titles come from the latest '[vloop] plan <run id>' commit via runs.PlanAt, run id being the record's brief minus .loop-brief. Unresolved links have an empty title in JSON. docs/guide/commands.md regenerated with go generate. TestTaskGate* in internal/cli fail only inside a loop session (plan changed), not from this change.

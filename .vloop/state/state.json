@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T19:50:07Z",
+  "updated": "2026-10-04T20:02:18Z",
   "shell": "sh",
   "checks": [
     {
@@ -140,7 +140,7 @@
         "Committed tests cover each kind of link, not-found, the order, the JSON form and the unknown id."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

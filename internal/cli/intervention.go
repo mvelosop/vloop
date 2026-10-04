@@ -20,7 +20,7 @@ func newIntervention(g *Globals) *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
-	cmd.AddCommand(newInterventionAdd(g), newInterventionList(g), newInterventionSet(g), newInterventionMigrate(g))
+	cmd.AddCommand(newInterventionAdd(g), newInterventionList(g), newInterventionSet(g), newInterventionMigrate(g), newInterventionShow(g))
 	return cmd
 }
 
@@ -165,4 +165,33 @@ func newInterventionMigrate(g *Globals) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&dry, "dry-run", false, "list the records that would be migrated and write nothing")
 	return cmd
+}
+
+func newInterventionShow(g *Globals) *cobra.Command {
+	return &cobra.Command{
+		Use:   "show <id>",
+		Short: "Print an intervention and resolve the ids named in its Context",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			root, err := g.root()
+			if err != nil {
+				return err
+			}
+			out := cmd.OutOrStdout()
+			v, err := intervention.Get(root, args[0])
+			if err != nil {
+				var none *intervention.NoInterventionError
+				if errors.As(err, &none) {
+					return jsonProblem(g, out, err)
+				}
+				return Problem(err)
+			}
+			s := intervention.Shown{Intervention: v, Links: intervention.Links(root, v)}
+			if g.JSON {
+				return json.NewEncoder(out).Encode(s)
+			}
+			fmt.Fprint(out, s.Text())
+			return nil
+		},
+	}
 }

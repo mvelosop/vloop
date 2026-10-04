@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop intervention show <id>` prints the id and summary, the frontmatter fields, then each section under its name, then `links` with one line per id found in the Context section only, in order of first appearance.", "met": true, "evidence": "internal/intervention/show.go Shown.Text prints id, summary, fields, sections, then links; Links scans v.Context only and dedupes in order of appearance. TestInterventionShowLinks checks the order, and the 'Note T9 also' id appears only in Context."},
+    {"criterion": "A defect id D<…> resolves to its summary; an intervention id I<…> to its summary; T<n> to the task's title in .vloop/state/state.json of the latest `[vloop] plan <run id>` commit for the record's brief; a 7-to-40-hex word git resolves to a commit to its subject; a run id B<YYYYMMDD-HHMM>-<slug> to its run folders under .vloop/state/runs/. An id that resolves to nothing prints `<ref>  (not found)`.", "met": true, "evidence": "show.go resolve/taskTitle/commitSubject/runFolders implement each kind. taskTitle greps the latest plan commit and reads the plan via runs.PlanAt. The test has two plan commits plus a later drifted state.json and expects 'Latest title'. Each kind and the not-found case are asserted. Text prints '<ref>  (not found)'."},
+    {"criterion": "`--json` prints the record's JSON form plus `links: [{ref, kind, title}]`.", "met": true, "evidence": "Shown.MarshalJSON appends links to the record JSON, and Links returns a non-nil slice. The test decodes the JSON and DeepEquals the links."},
+    {"criterion": "An unknown id exits 1 with `vloop: no intervention <id>` on stderr, and under --json prints `{\"error\": …}` on stdout as `vloop task show` does.", "met": true, "evidence": "internal/cli/intervention.go uses jsonProblem for NoInterventionError. The test asserts ExitProblems, empty stdout and the exact stderr text, and for --json the error field on stdout."},
+    {"criterion": "Committed tests cover each kind of link, not-found, the order, the JSON form and the unknown id.", "met": true, "evidence": "TestInterventionShowLinks in internal/cli/intervention_test.go covers task, run, commit, defect and intervention links. It also covers not-found, the order, the JSON form, the text form and the unknown id in both modes."}
+  ],
+  "findings": [],
+  "notes": "Any word of 7 to 40 hex characters in Context (e.g. 'decade', 'defaced') is treated as a commit ref and shown as not found, as the spec defines. No gate files or absolute paths were touched."
+}
