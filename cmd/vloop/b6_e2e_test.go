@@ -255,7 +255,9 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if err := os.Remove(filepath.Join(clone, ".vloop", "state", "state.json")); err != nil && !os.IsNotExist(err) {
 		t.Fatal(err)
 	}
-	r.write(".vloop/config.toml", r.read(".vloop/config.toml")+"\n"+runCheckConfig)
+	// The repository's own checks run its whole suite; the fixture run has its
+	// own passing one instead.
+	r.write(".vloop/config.toml", withoutChecks(r.read(".vloop/config.toml"))+"\n"+runCheckConfig)
 	r.write("docs/x.md", "x\n")
 	r.write("docs/briefs/"+runBriefName+".md", runBriefText())
 	r.commitAll("fixture brief")
@@ -273,4 +275,24 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if after := status(); after != before {
 		t.Errorf("the real-data check changed this repository:\n%s", after)
 	}
+}
+
+// withoutChecks drops every [[check]] table from a config file's text.
+func withoutChecks(toml string) string {
+	var out []string
+	skip := false
+	for _, l := range strings.Split(toml, "\n") {
+		t := strings.TrimSpace(l)
+		switch {
+		case t == "[[check]]":
+			skip = true
+			continue
+		case strings.HasPrefix(t, "["):
+			skip = false
+		}
+		if !skip {
+			out = append(out, l)
+		}
+	}
+	return strings.Join(out, "\n")
 }
