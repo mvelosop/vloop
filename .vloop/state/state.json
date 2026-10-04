@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 14,
+  "iteration": 15,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T20:55:49Z",
+  "updated": "2026-10-04T21:06:49Z",
   "shell": "sh",
   "checks": [
     {
@@ -331,7 +331,7 @@
         "Any defect the worked example exposes is fixed test first, in the package that owns it, without weakening an existing test."
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

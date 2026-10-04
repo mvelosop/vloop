@@ -80,3 +80,8 @@ vloop: work session changed .vloop/interventions/README-interventions.md — res
 vloop: work session changed .vloop/interventions/README-interventions.md — restored
    GATE FAIL T9 — review skipped, work that fails its own gate is not reviewable
    T9 hit the attempt ceiling — blocked
+── iteration 15 (15 this run) · T11 · 8/11 done ──
+   Close: the brief's worked example, line for line, as an end-to-end test
+   check go
+   review: PASS
+   T11 done

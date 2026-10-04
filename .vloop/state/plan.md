@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/11 done** · iteration 14
+**Status:** running · **9/11 done** · iteration 15
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:55:49Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T21:06:49Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
 - [ ] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain · **blocked**
 - [ ] **T10** — Migrate this repository's intervention records to intervention/v2 and refresh the index
-- [ ] **T11** — Close: the brief's worked example, line for line, as an end-to-end test
+- [x] **T11** — Close: the brief's worked example, line for line, as an end-to-end test
 
 ## Tasks
 
@@ -249,7 +249,7 @@ sh .vloop/state/gates/T10/gate.sh
 
 ### T11 — Close: the brief's worked example, line for line, as an end-to-end test
 
-`pending` · depends on: T3, T4, T5, T6, T7
+`done` · depends on: T3, T4, T5, T6, T7
 
 The close proves the pieces work together exactly as the brief's worked example says, in one temporary repository, threading the ids, paths and HEAD's sha it computes. It leaves the worked example behind as a committed end-to-end test, as every earlier brief did, so the checks keep running it.
 
