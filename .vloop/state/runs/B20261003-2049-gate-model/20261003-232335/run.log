@@ -25,3 +25,7 @@
    Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
    review: PASS
    T8 done
+── iteration 13 (8 this run) · T9 · 8/16 done ──
+   Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
+   review: PASS
+   T9 done

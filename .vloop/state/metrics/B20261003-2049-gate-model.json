@@ -8,7 +8,7 @@
     "planned": 16,
     "done": 3,
     "blocked": 1,
-    "first_pass": 4,
+    "first_pass": 5,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,30 +43,30 @@
     "rework": 1.0011848341232228
   },
   "time": {
-    "agent_ms": 6498258,
-    "work_ms": 6098707,
-    "review_ms": 399551,
+    "agent_ms": 7731419,
+    "work_ms": 7311705,
+    "review_ms": 419714,
     "plan_ms": 2493754,
-    "gates_ms": 170225,
+    "gates_ms": 181148,
     "wall_ms": 2714000
   },
   "rate": {
-    "code_per_min": 7.79285771663729,
-    "code_test_per_min": 13.175838817110678
+    "code_per_min": 6.549897243960002,
+    "code_test_per_min": 11.074293089017681
   },
   "cost": {
-    "total_usd": 16.3124936,
+    "total_usd": 17.3348684,
     "plan_usd": 9.2589652,
-    "work_usd": 5.5086086000000005,
-    "review_usd": 1.5449198000000002,
-    "per_1000_code_lines_usd": 19.3275990521327
+    "work_usd": 6.369564400000001,
+    "review_usd": 1.7063388000000002,
+    "per_1000_code_lines_usd": 20.53894360189574
   },
   "tokens": {
-    "input": 658,
-    "output": 311454,
-    "cache_read": 27770248,
-    "cache_creation": 1151613,
-    "cache_hit_ratio": 0.9601600745771832
+    "input": 722,
+    "output": 330895,
+    "cache_read": 29760952,
+    "cache_creation": 1259037,
+    "cache_hit_ratio": 0.9593897444839352
   },
   "models": {
     "plan": [
@@ -98,8 +98,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 11,
-  "iterations_per_closed": 3.6666666666666665,
+  "iterations": 12,
+  "iterations_per_closed": 4,
   "by_task": [
     {
       "id": "T1",
@@ -266,7 +266,7 @@
       "id": "T8",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -279,9 +279,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 1233161,
+      "cost_usd": 1.0223748000000001,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T9",

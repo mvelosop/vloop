@@ -294,10 +294,11 @@ func TestRun21ForeignState(t *testing.T) {
 	const other = "B20260101-1000-other"
 	r.write("docs/briefs/"+other+".loop-brief.md", strings.Replace(runBriefText(), runBriefName, other+".loop-brief", 1))
 	r.commitAll("another brief")
-	// verify never names a path, so gate-shape rule 3 has nothing to say about
-	// files the first run already committed.
-	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "true"}),
-		planTask("T2", map[string]any{"verify": "true", "depends_on": []string{"T1"}})), defaultScript)
+	// The gates wait for a flag the work writes: T1.out and T2.out are already
+	// committed, so a gate on them alone would pass on the base.
+	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "test -f other.flag"}),
+		planTask("T2", map[string]any{"verify": "test -f other.flag", "depends_on": []string{"T1"}})),
+		defaultScript+"if [ \"$PHASE\" = work ]; then touch other.flag; fi\n")
 	res := r.vloop("run", "docs/briefs/"+other+".loop-brief.md")
 	wantExit(t, res, 0)
 	wantIn(t, "output", res.out+res.err, "resetting and planning fresh")
@@ -345,8 +346,8 @@ func TestRun21ForeignState(t *testing.T) {
 func TestRun30PlanOnly(t *testing.T) {
 	r := newRunRepo(t)
 	r.scripted(planJSON(t,
-		planTask("T1", map[string]any{"verify": "true"}),
-		planTask("T2", map[string]any{"verify": "true", "depends_on": []string{"T1"}})), defaultScript)
+		planTask("T1", nil),
+		planTask("T2", map[string]any{"depends_on": []string{"T1"}})), defaultScript)
 
 	res := r.vloop("run", "--plan-only", runBrief)
 	wantExit(t, res, 0)

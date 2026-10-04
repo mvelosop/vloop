@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -308,8 +309,8 @@ func TestRun36GateDecayingBaseline(t *testing.T) {
 		}
 	}
 	for _, verify := range []string{
-		`test -z "$(git diff --name-only HEAD -- docs)"`,
-		`git diff --quiet HEAD -- docs`,
+		`test -f T1.out && test -z "$(git diff --name-only HEAD -- docs)"`,
+		`test -f T1.out && git diff --quiet HEAD -- docs`,
 	} {
 		r := newRunRepo(t)
 		r.planWith(planJSON(t, planTask("T1", map[string]any{"verify": verify})))
@@ -582,5 +583,91 @@ func TestRunPreflight(t *testing.T) {
 	wantIn(t, "stderr", res.err, "trust", "preflight failed")
 	if r.branch() != "main" || r.sessions() != 0 || r.has(".vloop/state/runs") || r.has(".vloop/state/state.json") {
 		t.Error("a refused preflight changed something")
+	}
+}
+
+// rounds makes the stub's plan sessions write the given plans in turn, and its
+// work sessions do the default work.
+func (r *runRepo) rounds(plans ...string) {
+	r.t.Helper()
+	for i, p := range plans {
+		if err := os.WriteFile(filepath.Join(r.stub, fmt.Sprintf("plan.%d.json", i+1)), []byte(p), 0o644); err != nil {
+			r.t.Fatal(err)
+		}
+	}
+	r.script(strings.Replace(defaultScript, `cp "$dir/plan.json" .vloop/state/state.json`,
+		`n=$(cat "$dir/pn" 2>/dev/null || echo 0); n=$((n+1)); echo $n > "$dir/pn"; cp "$dir/plan.$n.json" .vloop/state/state.json`, 1))
+}
+
+func (r *runRepo) planSessions() int {
+	n := 0
+	for _, l := range r.argv() {
+		if strings.HasPrefix(l, "-p /vloop:plan ") {
+			n++
+		}
+	}
+	return n
+}
+
+func TestRunBaseGatePasses(t *testing.T) {
+	// A gate that passes before the work exists proves nothing: it goes back to
+	// the plan session, once, and the revised plan runs.
+	r := newRunRepo(t)
+	r.rounds(planJSON(t, planTask("T1", map[string]any{"verify": "true"})),
+		planJSON(t, planTask("T1", nil)))
+	res := r.vloop("run", runBrief)
+	wantExit(t, res, 0)
+	wantIn(t, "output", r.outputs(res), "gate T1 passes on the base")
+	if n := r.planSessions(); n != 2 {
+		t.Errorf("%d plan sessions ran, want 2", n)
+	}
+	if !r.has(strings.TrimPrefix(filepath.ToSlash(r.runFolder()), filepath.ToSlash(r.dir)+"/") + "/gates/base-T1.log") {
+		t.Error("no gates/base-T1.log in the run folder")
+	}
+	r.wantTask("T1", "done", 0)
+}
+
+func TestRunBaseGateChangesTree(t *testing.T) {
+	// A gate that writes the tree on the base is sent back, and what it wrote
+	// does not survive.
+	r := newRunRepo(t)
+	r.rounds(planJSON(t, planTask("T1", map[string]any{"verify": "echo x >stray.txt; test -f T1.out"})),
+		planJSON(t, planTask("T1", nil)))
+	res := r.vloop("run", runBrief)
+	wantExit(t, res, 0)
+	wantIn(t, "output", r.outputs(res), "gate T1 changed the tree on the base")
+	if n := r.planSessions(); n != 2 {
+		t.Errorf("%d plan sessions ran, want 2", n)
+	}
+	if r.has("stray.txt") {
+		t.Error("stray.txt, written by a gate on the base, survived")
+	}
+}
+
+func TestRunBaseGateStillPassesAfterRevision(t *testing.T) {
+	// Two rounds are all there are: a second draft that still has the problem
+	// halts, and nothing is committed.
+	r := newRunRepo(t)
+	bad := planJSON(t, planTask("T1", map[string]any{"verify": "true"}))
+	r.rounds(bad, bad)
+	res := r.vloop("run", runBrief)
+	wantExit(t, res, 1)
+	wantIn(t, "stderr", res.err, "gate T1 passes on the base")
+	if n := r.planSessions(); n != 2 {
+		t.Errorf("%d plan sessions ran, want 2", n)
+	}
+	if n := r.planCommits(); n != 0 {
+		t.Errorf("%d plan commits, want 0", n)
+	}
+}
+
+func TestRunSchemaFailureHasNoSecondRound(t *testing.T) {
+	r := newRunRepo(t)
+	bad := strings.Replace(planJSON(t, planTask("T1", nil)), "state/v2", "state/v9", 1)
+	r.rounds(bad, planJSON(t, planTask("T1", nil)))
+	res := r.vloop("run", runBrief)
+	wantExit(t, res, 1)
+	if n := r.planSessions(); n != 1 {
+		t.Errorf("%d plan sessions ran, want 1", n)
 	}
 }

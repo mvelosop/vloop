@@ -370,31 +370,12 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return nil, halt(ExitPreflight, "%v", err)
 	}
 	t.say("planning from %s using %s", briefPath, model)
-	before := refsState(root)
-	gguard := snapshotGit(root)
-	res, err := r.Run(Spec{Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
-	if err != nil {
-		return nil, halt(ExitPreflight, "planning session failed: %v", err)
-	}
-	if what := gguard.changed(); what != "" {
-		return nil, halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
-	}
-	if moved := refsDiff(before, refsState(root)); len(moved) > 0 {
-		t.warn("REFS MOVED plan — the planning session changed git refs; nothing was committed:")
-		for _, l := range moved {
-			t.warn("%s", l)
-		}
-		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
-		return nil, halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
-	}
-	if res.TimedOut {
-		return nil, halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
-	}
-	if res.ExitCode != 0 {
-		return nil, halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))
+	session := func() error { return p.planSession(t, r, runDir, briefPath, model, effort) }
+	if err := session(); err != nil {
+		return nil, err
 	}
 
-	plan, err := p.acceptPlan(t, runID, briefPath, cur)
+	plan, err := p.acceptPlan(t, runID, briefPath, cur, time.Duration(gateMin)*time.Minute, session)
 	if err != nil {
 		return nil, err
 	}
@@ -431,6 +412,35 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		t.show("run it: vloop run")
 	}
 	return &PlanResult{Plan: rendered, Planned: true, RunDir: runDir}, nil
+}
+
+// planSession runs one plan session and refuses what it moved or how it ended.
+func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effort string) error {
+	root := p.Root
+	before := refsState(root)
+	gguard := snapshotGit(root)
+	res, err := r.Run(Spec{Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
+	if err != nil {
+		return halt(ExitPreflight, "planning session failed: %v", err)
+	}
+	if what := gguard.changed(); what != "" {
+		return halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
+	}
+	if moved := refsDiff(before, refsState(root)); len(moved) > 0 {
+		t.warn("REFS MOVED plan — the planning session changed git refs; nothing was committed:")
+		for _, l := range moved {
+			t.warn("%s", l)
+		}
+		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
+		return halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
+	}
+	if res.TimedOut {
+		return halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
+	}
+	if res.ExitCode != 0 {
+		return halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))
+	}
+	return nil
 }
 
 // CheckFixtures refuses a plan whose gate folder no longer matches the fixtures
@@ -518,7 +528,45 @@ var taskPointer = regexp.MustCompile(`^schema: /tasks/(\d+)`)
 // acceptPlan checks the plan the session wrote and, when it is fit, stamps it
 // and saves it as running. A plan that is not fit is removed — the session's
 // output is not a plan — and the problems are listed.
-func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Plan, error) {
+func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeout time.Duration, revise func() error) (*state.Plan, error) {
+	root := p.Root
+	var plan *state.Plan
+	for round := 1; ; round++ {
+		var err error
+		if plan, err = p.loadPlan(t); err != nil {
+			return nil, err
+		}
+		problems, err := p.baseGates(t, plan, gateTimeout)
+		if err != nil {
+			return nil, err
+		}
+		if len(problems) == 0 {
+			break
+		}
+		for _, l := range problems {
+			t.warn("  %s", l)
+		}
+		if round >= planRounds {
+			_ = os.Remove(state.Path(root))
+			_ = os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir)))
+			return nil, halt(ExitPreflight, "the plan is not fit (%d problem(s)) after %d rounds, nothing was committed — see above and %s", len(problems), planRounds, relRunDir(root, t.r.RunDir)+"run.log")
+		}
+		t.say("sending %d acceptance problem(s) back to the plan session", len(problems))
+		if err := writeProblems(root, problems); err != nil {
+			return nil, err
+		}
+		err = revise()
+		_ = os.Remove(filepath.Join(root, filepath.FromSlash(planProblems)))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return p.stampPlan(t, plan, runID, briefPath, branch)
+}
+
+// loadPlan reads and checks the plan the session wrote: a plan that fails the
+// schema or the gate-shape checks is removed and halts, with no second round.
+func (p *Planner) loadPlan(t term) (*state.Plan, error) {
 	root := p.Root
 	data, err := os.ReadFile(state.Path(root))
 	if errors.Is(err, os.ErrNotExist) {
@@ -584,6 +632,13 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	if ids := HeadDiffAdvisory(&plan); len(ids) > 0 {
 		t.warn("warning: %s diff against HEAD without reading VLOOP_ACTIVE_TASK or VLOOP_GATE_TASK — during another task's iteration the only uncommitted work in the tree is that task's, not this gate's", strings.Join(ids, " "))
 	}
+	return &plan, nil
+}
+
+// stampPlan stamps an accepted plan with what the driver holds and saves it as
+// running.
+func (p *Planner) stampPlan(t term, plan *state.Plan, runID, briefPath, branch string) (*state.Plan, error) {
+	root := p.Root
 
 	// The driver stamps what it already holds, rather than trusting the session
 	// to record it: which run, brief and branch the plan belongs to.
@@ -601,14 +656,14 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string) (*state.Pl
 	if err := state.EmptyScratch(root, plan.GateScratch); err != nil {
 		return nil, err
 	}
-	if err := state.StampFixtures(root, &plan); err != nil {
+	if err := state.StampFixtures(root, plan); err != nil {
 		return nil, err
 	}
-	if err := state.Save(root, &plan); err != nil {
+	if err := state.Save(root, plan); err != nil {
 		return nil, err
 	}
 	t.say("planned: %s — %d tasks", runID, len(plan.Tasks))
-	return &plan, nil
+	return plan, nil
 }
 
 // writeJournal opens the plan's journal, named for the run id so a resumed run

@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "After the plan session and its schema and gate-shape checks, the driver runs every task's gate on the base in plan order, with G3's scratch and tree rules; each must fail (non-zero exit, timeout included); logs are kept as gates/base-T<n>.log in the run folder.", "met": true, "evidence": "internal/driver/acceptance.go baseGates loops plan.Tasks in order after loadPlan, uses snapshotTreeIgnoring/revert and EmptyScratch, treats timeout as exit>=1, writes gates/base-<id>.log; TestRunBaseGatePasses checks the log"},
+    {"criterion": "A gate that passes is the acceptance problem `gate T<n> passes on the base`; one that changed the tree is `gate T<n> changed the tree on the base`; problems are reported and the plan session runs again with them, once.", "met": true, "evidence": "acceptance.go problem strings; plan.go acceptPlan loop with planRounds=2, writeProblems, revise(); TestRunBaseGatePasses, TestRunBaseGateChangesTree and TestRunBaseGateStillPassesAfterRevision assert two plan sessions and the messages"},
+    {"criterion": "A plan that fails the schema still halts as today, with no second round.", "met": true, "evidence": "loadPlan keeps the schema and shape halts outside the revision loop; TestRunSchemaFailureHasNoSecondRound asserts exit 1 and one plan session"},
+    {"criterion": "Every cmd/vloop test whose stub plan has a gate that passes on the base is adjusted only so its gates fail on the base; no assertion is weakened.", "met": true, "evidence": "diff of b8_e2e_test.go, run_iterate_test.go, run_plan_test.go, run_redact_test.go only changes verify commands to also require a work-written file; assertions are unchanged"},
+    {"criterion": "Tests cover both problems, the revision round and the schema halt.", "met": true, "evidence": "cmd/vloop/run_plan_test.go TestRunBaseGatePasses, TestRunBaseGateChangesTree (stray.txt removed), TestRunBaseGateStillPassesAfterRevision, TestRunSchemaFailureHasNoSecondRound"}
+  ],
+  "findings": [],
+  "notes": "plugin/skills/plan/SKILL.md does not yet read .vloop/tmp/plan-problems.md, so the revision session is not told of the problems by the skill; this is T12's work per the plan (the plan has a criterion for it), not a failure of T9. internal/driver/plan_test.go was listed in files but not changed; the tests live in cmd/vloop, which covers the criteria."
+}

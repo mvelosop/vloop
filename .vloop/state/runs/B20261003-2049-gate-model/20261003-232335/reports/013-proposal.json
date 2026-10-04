@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "After the plan's schema and gate-shape checks the driver now runs every gate on the base under the scratch and tree rules. A passing gate (`gate T<n> passes on the base`) or one that changed the tree (`gate T<n> changed the tree on the base`) goes back to the plan session for one revision round; a schema failure still halts with no second round.",
+  "files": ["internal/driver/plan.go", "internal/driver/acceptance.go", "cmd/vloop/run_plan_test.go", "cmd/vloop/run_iterate_test.go", "cmd/vloop/run_redact_test.go", "cmd/vloop/b8_e2e_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed GATE OK.",
+  "notes": "Problems reach the revision session as .vloop/tmp/plan-problems.md; the draft stays on disk and the file is removed after the round. The plan skill does not read it yet: adding it is T12 work, because the skill test (TestPluginSkills) requires any path the skill names to be in its On disk layout. Rounds are the planRounds const (2) in acceptance.go, for T10's gate review to share. Base gate logs are gates/base-T<n>.log. Gates run with VLOOP_ACTIVE_TASK and VLOOP_GATE_TASK both set to the task's id. Existing cmd/vloop stub plans were adjusted so their gates fail on the base (a work-written file); no assertion was weakened. plan_test.go in internal/driver was not changed; the new tests are in cmd/vloop/run_plan_test.go."
+}
