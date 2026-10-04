@@ -11,7 +11,7 @@ import (
 
 // Stamped at build time with -ldflags "-X main.version=… -X main.commit=…".
 var (
-	version = "1.0.0"
+	version = "2.0.0-beta.1"
 	commit  = "unknown"
 )
 
