@@ -90,3 +90,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The interventions index script gains an Agreement column and validates by and agreement; defects.md, metrics.md, the interventions README, domain-model.md and measurement-context.md document intervention/v2 and its commands.
 - **Files:** tools/interventions-index.sh, docs/guide/defects.md, docs/guide/metrics.md, .vloop/interventions/README-interventions.md, docs/domain/domain-model.md, docs/domain/measurement/measurement-context.md, internal/cli/guide_test.go, internal/cli/interventions_index_test.go
 - **Notes for next iteration:** The committed index block in .vloop/interventions/README-interventions.md still has the old four columns, so tools/interventions-index.sh --check fails until T10 runs --write (after migrating records). TestGuideDefectsCoversInterventions now checks both intervention/v1 and intervention/v2 words; the index tests are internal/cli/interventions_index_test.go and skip without bash.
+
+## T9 — Add the Agreement column to the interventions index, and document v2 in the guides and the domain
+
+- **Outcome:** gate_failed (review: skipped)
+- **Summary:** The interventions index gains an Agreement column and validates by and agreement; the guides, the interventions README and the domain docs document intervention/v2.
+- **Files:** tools/interventions-index.sh, docs/guide/defects.md, docs/guide/metrics.md, .vloop/interventions/README-interventions.md, docs/domain/domain-model.md, docs/domain/measurement/measurement-context.md, internal/cli/guide_test.go, internal/cli/interventions_index_test.go
+- **Notes for next iteration:** The previous attempt failed the gate only because README-interventions.md had no v2 text; added the v2 frontmatter rows and sections there. The committed index block still has the old four columns, so tools/interventions-index.sh --check fails until T10 runs --write after migrating records.

@@ -71,3 +71,7 @@ committing the plan
    Add the Agreement column to the interventions index, and document v2 in the guides and the domain
 vloop: work session changed .vloop/interventions/README-interventions.md — restored
    GATE FAIL T9 — review skipped, work that fails its own gate is not reviewable
+── iteration 13 (13 this run) · T9 · 8/11 done ──
+   Add the Agreement column to the interventions index, and document v2 in the guides and the domain
+vloop: work session changed .vloop/interventions/README-interventions.md — restored
+   GATE FAIL T9 — review skipped, work that fails its own gate is not reviewable
