@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop metrics --interventions` prints a header `kind  n  recommended  share  other-option  adjusted  different  no-options  automatable-yes  automatable-partly`, one row per kind in intervention/v1's kind order, then a `total` row, over every record in the repository including series-level ones.", "met": true, "evidence": "internal/metrics/interventions.go AgreementTable and PrintAgreementTable use intervention.Kinds order and a total row; intervention.List(root, \"\") reads every record. metrics_interventions_test.go checks header and rows."},
+    {"criterion": "share is recommended ÷ (n − no-options) as a whole percentage, `n/a` when n − no-options is 0.", "met": true, "evidence": "interventions.go finish(); the test asserts n/a (halt row) and 0%, 33%, 25%."},
+    {"criterion": "`--by phase` prints the same table by phase in phase order (first column phase); `--by kind` is the default; `--json` prints the rows.", "met": true, "evidence": "AgreementTable switches on Phases; test checks phase rows and header, --by kind equal to the default, and --json output."},
+    {"criterion": "`vloop metrics --workspace <file> --interventions` prints the same table over every repository the file lists, with a `repo` column first, then a total row over all of them.", "met": true, "evidence": "workspaceInterventions in internal/cli/workspace.go and WorkspaceAgreementTable; TestMetricsInterventionsWorkspace checks header, per-repo rows and total."},
+    {"criterion": "`--by task` with `--interventions` exits 2 with exactly `vloop: --by takes kind or phase with --interventions`.", "met": true, "evidence": "internal/cli/metrics.go returns errors.New, which root maps to a usage error (exit 2); TestMetricsInterventionsByTaskRefused asserts code 2, empty stdout and the exact stderr."},
+    {"criterion": "Committed tests cover the counts, share including n/a, both orders, the workspace table and the refusal.", "met": true, "evidence": "internal/cli/metrics_interventions_test.go has three tests covering these; the go check passed."}
+  ],
+  "findings": [],
+  "notes": "With --workspace, --by phase is silently ignored and the kind table is printed. The brief does not specify this case."
+}

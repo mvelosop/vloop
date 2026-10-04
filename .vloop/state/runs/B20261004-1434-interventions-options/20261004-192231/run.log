@@ -52,3 +52,8 @@ committing the plan
    check go
    review: PASS
    T5 done
+── iteration 9 (9 this run) · T6 · 5/11 done ──
+   Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
+   check go
+   review: PASS
+   T6 done

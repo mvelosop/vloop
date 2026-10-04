@@ -62,3 +62,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop intervention show <id> prints the record (id, summary, frontmatter, sections) then a links block resolving task, run, defect, intervention and commit ids named in Context, in order of first appearance; --json adds links [{ref, kind, title}]; an unknown id exits 1.
 - **Files:** internal/intervention/show.go, internal/cli/intervention.go, internal/cli/intervention_test.go, docs/guide/commands.md
 - **Notes for next iteration:** Only Context is scanned, word by word ([A-Za-z0-9-]+); hex words of 7-40 chars count as commits, so a plain word like 'defaced' prints (not found). Task titles come from the latest '[vloop] plan <run id>' commit via runs.PlanAt, run id being the record's brief minus .loop-brief. Unresolved links have an empty title in JSON. docs/guide/commands.md regenerated with go generate. TestTaskGate* in internal/cli fail only inside a loop session (plan changed), not from this change.
+
+## T6 — Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop metrics --interventions prints the agreement table by kind (default) or phase with a total row, --json rows, and a repo-first table across --workspace; --by task is refused with exit 2.
+- **Files:** internal/metrics/interventions.go, internal/cli/metrics.go, internal/cli/workspace.go, internal/cli/metrics_interventions_test.go, docs/guide/commands.md
+- **Notes for next iteration:** Counts are recomputed from intervention.List each run. Share is recommended/(n-no-options) rounded half up, n/a when the divisor is 0. Every kind or phase gets a row, zeros included; the workspace table prints every kind per repo then one total row. JSON rows use snake_case keys and repo only in the workspace form. docs/guide/commands.md regenerated with go generate. TestTaskGate* in internal/cli fail only inside a loop session (plan changed), not from this change.

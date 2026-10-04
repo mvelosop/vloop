@@ -10,6 +10,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/metrics"
 )
 
@@ -111,6 +112,37 @@ func workspaceMetrics(g *Globals, out, stderr io.Writer, file string, args []str
 		}
 	} else {
 		metrics.PrintWorkspaceTable(out, names, reports)
+	}
+	return err
+}
+
+func workspaceInterventions(g *Globals, out, stderr io.Writer, file string, args []string) error {
+	var names []string
+	var recs [][]intervention.Intervention
+	err := eachWorkspaceRepo(g, stderr, file, args, func(root string, r wsRepo) error {
+		rs, err := intervention.List(root, "")
+		if err != nil {
+			return Problem(err)
+		}
+		name := r.Name
+		if name == "" {
+			name = repoIdentity(root).Name
+		}
+		names = append(names, name)
+		recs = append(recs, rs)
+		return nil
+	})
+	var pe *ProblemError
+	if err != nil && !(errors.As(err, &pe) && err.Error() == "") {
+		return err
+	}
+	rows := metrics.WorkspaceAgreementTable(names, recs)
+	if g.JSON {
+		if e := json.NewEncoder(out).Encode(rows); e != nil {
+			return e
+		}
+	} else {
+		metrics.PrintAgreementTable(out, rows, "kind", true)
 	}
 	return err
 }

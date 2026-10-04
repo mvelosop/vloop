@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 8,
+  "iteration": 9,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T20:02:18Z",
+  "updated": "2026-10-04T20:16:04Z",
   "shell": "sh",
   "checks": [
     {
@@ -172,7 +172,7 @@
         "Committed tests cover the counts, share including n/a, both orders, the workspace table and the refusal."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

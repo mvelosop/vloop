@@ -242,6 +242,7 @@ vloop metrics [<brief>…] [flags]
 ```
 
 - `--by task`: break the summary down by task
+- `--interventions kind`: report agreement with the recommended option, by kind or phase, from the intervention records
 - `--workspace file`: show every repository the workspace file lists, with a repo column
 
 ## vloop metrics classify

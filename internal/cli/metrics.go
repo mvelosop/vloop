@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,16 +13,27 @@ import (
 
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/metrics"
 )
 
 func newMetrics(g *Globals) *cobra.Command {
 	var by, workspace string
+	var interventions bool
 	cmd := &cobra.Command{
 		Use:   "metrics [<brief>…]",
 		Short: "Summarise what a brief cost and delivered, from its runs and commits",
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if interventions {
+				if by != "" && by != "kind" && by != "phase" {
+					return errors.New("--by takes kind or phase with --interventions")
+				}
+				if workspace != "" {
+					return workspaceInterventions(g, cmd.OutOrStdout(), cmd.ErrOrStderr(), workspace, args)
+				}
+				return interventionMetrics(g, cmd.OutOrStdout(), by)
+			}
 			if by != "" && by != "task" {
 				return fmt.Errorf("unknown --by %q: want task", by)
 			}
@@ -84,6 +96,7 @@ func newMetrics(g *Globals) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&by, "by", "", "break the summary down by `task`")
+	cmd.Flags().BoolVar(&interventions, "interventions", false, "report agreement with the recommended option, by `kind` or phase, from the intervention records")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "show every repository the workspace `file` lists, with a repo column")
 	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g), newMetricsExport(g))
 	return cmd
@@ -205,4 +218,26 @@ func newMetricsClassify(g *Globals) *cobra.Command {
 			return nil
 		},
 	}
+}
+
+// interventionMetrics prints the agreement table over this repository's
+// intervention records, by kind (the default) or phase.
+func interventionMetrics(g *Globals, out io.Writer, by string) error {
+	root, err := g.root()
+	if err != nil {
+		return err
+	}
+	recs, err := intervention.List(root, "")
+	if err != nil {
+		return Problem(err)
+	}
+	if by == "" {
+		by = "kind"
+	}
+	rows := metrics.AgreementTable(recs, by)
+	if g.JSON {
+		return json.NewEncoder(out).Encode(rows)
+	}
+	metrics.PrintAgreementTable(out, rows, by, false)
+	return nil
 }
