@@ -2,12 +2,12 @@
   "schema": "metrics/v1",
   "brief": "B20261003-2049-gate-model.loop-brief",
   "run_id": "B20261003-2049-gate-model",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 16,
-    "done": 3,
-    "blocked": 1,
+    "done": 16,
+    "blocked": 0,
     "first_pass": 13,
     "estimate": {
       "min": 14,
@@ -16,31 +16,31 @@
   },
   "size": {
     "delivered": {
-      "code": 844,
-      "test": 583,
-      "docs": 29,
-      "other": 2,
+      "code": 1920,
+      "test": 1653,
+      "docs": 556,
+      "other": 208,
       "deleted": {
-        "code": 181,
-        "test": 385,
-        "docs": 2,
-        "other": 0
+        "code": 279,
+        "test": 427,
+        "docs": 191,
+        "other": 2
       }
     },
     "churn": {
-      "code": 845,
-      "test": 583,
-      "docs": 29,
-      "other": 2,
+      "code": 1946,
+      "test": 1669,
+      "docs": 559,
+      "other": 208,
       "deleted": {
-        "code": 182,
-        "test": 385,
-        "docs": 2,
-        "other": 0
+        "code": 305,
+        "test": 443,
+        "docs": 194,
+        "other": 2
       }
     },
-    "test_code_ratio": 0.6907582938388626,
-    "rework": 1.0011848341232228
+    "test_code_ratio": 0.8609375,
+    "rework": 1.0135416666666666
   },
   "time": {
     "agent_ms": 15710055,
@@ -48,18 +48,18 @@
     "review_ms": 595685,
     "plan_ms": 2493754,
     "gates_ms": 237692,
-    "wall_ms": 2714000
+    "wall_ms": 16803000
   },
   "rate": {
-    "code_per_min": 3.223413285313132,
-    "code_test_per_min": 5.450012746613554
+    "code_per_min": 7.332883303082007,
+    "code_test_per_min": 13.646037521829173
   },
   "cost": {
     "total_usd": 23.960947,
     "plan_usd": 9.2589652,
     "work_usd": 11.744610600000001,
     "review_usd": 2.9573712000000003,
-    "per_1000_code_lines_usd": 28.389747630331755
+    "per_1000_code_lines_usd": 12.479659895833334
   },
   "tokens": {
     "input": 1132,
@@ -85,10 +85,10 @@
     "review": null
   },
   "defects": {
-    "in_loop": 4,
-    "operator": 0,
+    "in_loop": 6,
+    "operator": 8,
     "escaped": 0,
-    "total": 4,
+    "total": 14,
     "removal_efficiency": 1
   },
   "records": {
@@ -99,7 +99,7 @@
   },
   "permission_denials": 8,
   "iterations": 20,
-  "iterations_per_closed": 6.666666666666667,
+  "iterations_per_closed": 1.25,
   "by_task": [
     {
       "id": "T1",
@@ -153,13 +153,13 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 166,
+        "test": 127,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 3,
+          "test": 6,
           "docs": 0,
           "other": 0
         }
@@ -222,13 +222,13 @@
       "kind": "feature",
       "attempts": 2,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 105,
+        "test": 145,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 16,
+          "test": 12,
           "docs": 0,
           "other": 0
         }
@@ -245,12 +245,12 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 189,
+        "test": 104,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
+          "code": 16,
           "test": 0,
           "docs": 0,
           "other": 0
@@ -268,13 +268,13 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
-        "docs": 0,
+        "code": 203,
+        "test": 174,
+        "docs": 8,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 11,
+          "test": 2,
           "docs": 0,
           "other": 0
         }
@@ -291,13 +291,13 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 191,
+        "test": 93,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 27,
+          "test": 11,
           "docs": 0,
           "other": 0
         }
@@ -314,13 +314,13 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 187,
+        "test": 143,
         "docs": 0,
-        "other": 0,
+        "other": 135,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 23,
+          "test": 17,
           "docs": 0,
           "other": 0
         }
@@ -337,13 +337,13 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 60,
+        "test": 71,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 27,
+          "test": 6,
           "docs": 0,
           "other": 0
         }
@@ -361,13 +361,13 @@
       "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
-        "docs": 0,
+        "test": 4,
+        "docs": 279,
         "other": 0,
         "deleted": {
           "code": 0,
-          "test": 0,
-          "docs": 0,
+          "test": 4,
+          "docs": 132,
           "other": 0
         }
       },
@@ -385,13 +385,13 @@
       "churn": {
         "code": 0,
         "test": 0,
-        "docs": 0,
-        "other": 0,
+        "docs": 122,
+        "other": 71,
         "deleted": {
           "code": 0,
           "test": 0,
-          "docs": 0,
-          "other": 0
+          "docs": 27,
+          "other": 2
         }
       },
       "agent_ms": 188244,
@@ -408,12 +408,12 @@
       "churn": {
         "code": 0,
         "test": 0,
-        "docs": 0,
+        "docs": 82,
         "other": 0,
         "deleted": {
           "code": 0,
           "test": 0,
-          "docs": 0,
+          "docs": 28,
           "other": 0
         }
       },
@@ -431,12 +431,12 @@
       "churn": {
         "code": 0,
         "test": 0,
-        "docs": 0,
+        "docs": 39,
         "other": 0,
         "deleted": {
           "code": 0,
           "test": 0,
-          "docs": 0,
+          "docs": 5,
           "other": 0
         }
       },
@@ -453,7 +453,7 @@
       "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
+        "test": 225,
         "docs": 0,
         "other": 0,
         "deleted": {
