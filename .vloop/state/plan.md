@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/11 done** · iteration 13
+**Status:** running · **8/11 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:54:58Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:55:49Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
 - [x] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
 - [x] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
-- [ ] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain · 2 attempt(s)
+- [ ] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain · **blocked**
 - [ ] **T10** — Migrate this repository's intervention records to intervention/v2 and refresh the index
 - [ ] **T11** — Close: the brief's worked example, line for line, as an end-to-end test
 
@@ -202,7 +202,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Add the Agreement column to the interventions index, and document v2 in the guides and the domain
 
-`pending` · 2 attempt(s) · depends on: T2, T3, T4, T5, T6, T7
+`blocked` · **blocked** · depends on: T2, T3, T4, T5, T6, T7
 
 The docs are how an operator learns the record and its commands, and the index is how the records are browsed. The index script gains an Agreement column and validates by and agreement too; the guides document every v2 field, flag, refusal and table; the domain stops calling interventions data without a command or schema.
 
