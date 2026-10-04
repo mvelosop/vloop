@@ -191,6 +191,10 @@ func runDoctor(b Build, root string) []doctorCheck {
 		}
 		rep, err := state.Check(root, areas)
 		switch {
+		case plan.Schema == state.SchemaV1 && plan.Status == "complete":
+			add("plan", resPass, "a complete "+state.SchemaV1+" plan — the next brief's plan replaces it")
+		case plan.Schema == state.SchemaV1:
+			add("plan", resWarning, "a "+state.SchemaV1+" plan — finish it with vloop 1.x or re-plan the brief")
 		case err != nil:
 			add("plan", resProblem, err.Error())
 		case len(rep.Problems) > 0:
@@ -320,7 +324,7 @@ func doctorTrusted(root string) bool {
 
 // doctorPlan reads just the plan's shell and status, leniently: validity is
 // the plan check's business.
-func doctorPlan(root string) (p struct{ Shell, Status string }, ok bool) {
+func doctorPlan(root string) (p struct{ Schema, Shell, Status string }, ok bool) {
 	raw, err := os.ReadFile(state.Path(root))
 	if err != nil {
 		return p, false

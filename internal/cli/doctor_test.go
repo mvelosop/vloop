@@ -253,6 +253,13 @@ func TestDoctorGateShellPlanAndBranch(t *testing.T) {
 	e.write(".vloop/state/state.json", strings.Replace(readFile(t, e.repo, ".vloop/state/state.json"), `"depends_on":[]`, `"depends_on":["T9"]`, 1))
 	e.want("plan", resProblem)
 
+	// A v1 plan is not validated as v2: a complete one is an earlier brief's,
+	// which the next brief's plan replaces; an unfinished one wants vloop 1.x.
+	e.write(".vloop/state/state.json", `{"schema":"state/v1","status":"complete","tasks":[]}`+"\n")
+	e.want("plan", resPass)
+	e.write(".vloop/state/state.json", `{"schema":"state/v1","status":"blocked","tasks":[]}`+"\n")
+	e.want("plan", resWarning)
+
 	e.plan("running", "sh")
 	e.git("checkout", "-q", "main")
 	e.want("branch", resProblem)

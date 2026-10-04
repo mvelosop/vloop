@@ -268,6 +268,30 @@ fi
 	// TestRunFlakyGate's third subtest: the shortest timeout is a minute, and the
 	// package's ten-minute limit has no room for a second one.
 
+	t.Run("a complete state/v1 plan of an earlier brief: the next brief plans", func(t *testing.T) {
+		t.Parallel()
+		r := b9Repo(t)
+		r.write(".vloop/state/state.json", `{"schema":"state/v1","run_id":"B20250101-0900-old","brief":"docs/briefs/B20250101-0900-old.loop-brief.md","status":"complete","tasks":[]}`+"\n")
+		r.commitAll("the v1 plan an earlier brief completed")
+		res := r.vloop("run", runBrief)
+		if res.code != 0 {
+			t.Fatalf("exit %d\nstdout: %s\nstderr: %s", res.code, res.out, res.err)
+		}
+		if r.plan()["schema"] != "state/v2" {
+			t.Errorf("the new plan is %v, want state/v2", r.plan()["schema"])
+		}
+	})
+
+	t.Run("an unfinished state/v1 plan of another brief: refused", func(t *testing.T) {
+		t.Parallel()
+		r := b9Repo(t)
+		r.write(".vloop/state/state.json", `{"schema":"state/v1","run_id":"B20250101-0900-old","brief":"docs/briefs/B20250101-0900-old.loop-brief.md","status":"blocked","tasks":[]}`+"\n")
+		r.commitAll("a v1 plan left blocked")
+		res := r.vloop("run", runBrief)
+		wantExit(t, res, 1)
+		wantIn(t, "stderr", res.err, "vloop: .vloop/state/state.json is a state/v1 plan — finish it with vloop 1.x or re-plan the brief\n")
+	})
+
 	t.Run("state.json is state/v1: refused", func(t *testing.T) {
 		t.Parallel()
 		r := b9Repo(t)

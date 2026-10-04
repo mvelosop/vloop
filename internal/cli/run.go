@@ -37,7 +37,9 @@ func newRun(b Build, g *Globals) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if p, err := state.Load(root); err == nil && p.Schema == state.SchemaV1 {
+			// vloop 2 never resumes a v1 plan; a complete one belongs to an
+			// earlier brief, and planning the next brief replaces it.
+			if p, err := state.Load(root); err == nil && p.Schema == state.SchemaV1 && p.Status != "complete" {
 				return Problem(fmt.Errorf("%s is a %s plan — finish it with vloop 1.x or re-plan the brief", state.FilePath, state.SchemaV1))
 			}
 			over := map[string]string{}

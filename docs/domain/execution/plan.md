@@ -4,7 +4,7 @@ description: Binds the Plan aggregate — state.json's fields, its lifecycle fro
 ---
 # Plan
 
-A brief decomposed into tasks, in `state.json` (`state/v2`; a `state/v1` plan is refused by `vloop run`). *Part of
+A brief decomposed into tasks, in `state.json` (`state/v2`; `vloop run` never resumes a `state/v1` plan — an unfinished one is refused, a complete one is replaced by the next brief's plan). *Part of
 [execution](execution-context.md).*
 
 ## Fields
