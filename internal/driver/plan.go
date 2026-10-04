@@ -375,7 +375,7 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return nil, err
 	}
 
-	plan, err := p.acceptPlan(t, runID, briefPath, cur, time.Duration(gateMin)*time.Minute, session)
+	plan, blocked, err := p.acceptPlan(t, runID, briefPath, cur, time.Duration(gateMin)*time.Minute, session)
 	if err != nil {
 		return nil, err
 	}
@@ -401,6 +401,9 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	if _, err := git(root, "commit", "-q", "-m", "[vloop] plan "+runID); err != nil {
 		return nil, halt(ExitPreflight, "cannot commit the plan: %v", err)
+	}
+	if blocked != nil { // the plan is kept, blocked, for the operator's amendment
+		return nil, blocked
 	}
 	if p.PlanOnly { // after the commit, so on the terminal only: the log is committed
 		t.show("")
@@ -527,41 +530,70 @@ var taskPointer = regexp.MustCompile(`^schema: /tasks/(\d+)`)
 
 // acceptPlan checks the plan the session wrote and, when it is fit, stamps it
 // and saves it as running. A plan that is not fit is removed — the session's
-// output is not a plan — and the problems are listed.
-func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeout time.Duration, revise func() error) (*state.Plan, error) {
+// output is not a plan — and the problems are listed. A round is the base run
+// of the gates and then the gate review; a plan that fails either goes back to
+// the plan session once. The plan the gate review failed twice is saved
+// blocked and returned with the halt that ends the run, for the caller to
+// commit first.
+func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeout time.Duration, revise func() error) (*state.Plan, *Halt, error) {
 	root := p.Root
-	var plan *state.Plan
 	for round := 1; ; round++ {
-		var err error
-		if plan, err = p.loadPlan(t); err != nil {
-			return nil, err
+		plan, err := p.loadPlan(t)
+		if err != nil {
+			return nil, nil, err
 		}
 		problems, err := p.baseGates(t, plan, gateTimeout)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
+		reviewed := false
 		if len(problems) == 0 {
-			break
+			// The review runs vloop task gate, so the plan is stamped and saved first.
+			if plan, err = p.stampPlan(t, plan, runID, briefPath, branch); err != nil {
+				return nil, nil, err
+			}
+			if problems, err = p.gateReviewRound(t, round); err != nil {
+				return nil, nil, err
+			}
+			reviewed = true
+			plan.GateReview = state.GateReview{Rounds: round, Verdict: "PASS"}
+			if len(problems) > 0 {
+				plan.GateReview.Verdict = "FAIL"
+			}
+			if err := state.Save(root, plan); err != nil {
+				return nil, nil, err
+			}
+			if len(problems) == 0 {
+				return plan, nil, nil
+			}
 		}
 		for _, l := range problems {
 			t.warn("  %s", l)
 		}
 		if round >= planRounds {
+			if reviewed {
+				plan.Status = "blocked"
+				if err := state.Save(root, plan); err != nil {
+					return nil, nil, err
+				}
+				line := gateReviewFailedLine(root, t.r.RunDir, round)
+				t.warn("%s", line)
+				return plan, halt(ExitBlocked, "%s", line), nil
+			}
 			_ = os.Remove(state.Path(root))
 			_ = os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir)))
-			return nil, halt(ExitPreflight, "the plan is not fit (%d problem(s)) after %d rounds, nothing was committed — see above and %s", len(problems), planRounds, relRunDir(root, t.r.RunDir)+"run.log")
+			return nil, nil, halt(ExitPreflight, "the plan is not fit (%d problem(s)) after %d rounds, nothing was committed — see above and %s", len(problems), planRounds, relRunDir(root, t.r.RunDir)+"run.log")
 		}
-		t.say("sending %d acceptance problem(s) back to the plan session", len(problems))
+		t.say("sending %d problem(s) back to the plan session", len(problems))
 		if err := writeProblems(root, problems); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		err = revise()
 		_ = os.Remove(filepath.Join(root, filepath.FromSlash(planProblems)))
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
-	return p.stampPlan(t, plan, runID, briefPath, branch)
 }
 
 // loadPlan reads and checks the plan the session wrote: a plan that fails the

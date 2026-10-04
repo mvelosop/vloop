@@ -185,6 +185,12 @@ func (it *Iterator) Run() (Ending, error) {
 	// as the plan session. Every later session is added as it finishes.
 	it.spent = it.spend()
 
+	if plan.GateReview.Verdict == "FAIL" {
+		if err := it.resumeBaseGates(); err != nil {
+			return Ending{}, err
+		}
+	}
+
 	if plan.Status != "running" || plan.Branch != it.branch {
 		plan.Status, plan.Branch = "running", it.branch
 		if err := it.save(); err != nil {

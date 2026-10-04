@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **9/16 done** · iteration 13
+**Status:** running · **10/16 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T00:26:07Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T00:50:50Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Run every check on the base before planning, refuse without one, and copy the checks into the plan
 - [x] **T8** — Run the matching checks after each iteration, end a failed one as check_failed, and run every check in a final pass
 - [x] **T9** — Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
-- [ ] **T10** — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
+- [x] **T10** — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
 - [ ] **T11** — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
 - [ ] **T12** — Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
 - [ ] **T13** — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
@@ -254,7 +254,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T10 — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
 
-`pending` · depends on: T1, T2, T9
+`done` · depends on: T1, T2, T9
 
 **Files:** `internal/driver/gatereview.go`, `internal/driver/gatereview_test.go`, `internal/driver/session.go`, `internal/driver/resolve.go`, `internal/driver/plan.go`, `internal/driver/extract.go`, `fence/gate-review.json`, `embed.go`, `embed_test.go`, `internal/cli/fence_test.go`, `internal/cli/run.go`, `cmd/vloop/run_harness_test.go`, `cmd/vloop/`
 

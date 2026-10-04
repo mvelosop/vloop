@@ -189,8 +189,8 @@ func TestRun01HappyPath(t *testing.T) {
 		t.Error("plan.md is not what vloop status --markdown renders")
 	}
 	wantIn(t, "journal", r.journal(), "## T1 — Task T1", "## T2 — Task T2", "- **Outcome:** done (review: PASS)", "## Run ended — complete")
-	if n := r.sessions(); n != 5 {
-		t.Errorf("%d sessions, want 5 (plan, then work and review twice)", n)
+	if n := r.sessions(); n != 6 {
+		t.Errorf("%d sessions, want 6 (plan, the gate review, then work and review twice)", n)
 	}
 	wantIn(t, "argv", strings.Join(r.argv(), "\n"), "-p /vloop:work T1 ", "-p /vloop:review T2 ")
 	r.wantClean()
@@ -355,8 +355,8 @@ func TestRun30PlanOnly(t *testing.T) {
 	if n := len(r.iterations()); n != 0 {
 		t.Errorf("%d iterations ran, want 0", n)
 	}
-	if recs, _ := filepath.Glob(filepath.Join(r.dir, ".vloop", "state", "runs", runID, "*", "sessions", "*.json")); len(recs) != 1 {
-		t.Errorf("%d session records, want exactly one (the plan)", len(recs))
+	if recs, _ := filepath.Glob(filepath.Join(r.dir, ".vloop", "state", "runs", runID, "*", "sessions", "*.json")); len(recs) != 2 {
+		t.Errorf("%d session records, want two (the plan and the gate review)", len(recs))
 	}
 	for _, id := range []string{"T1", "T2"} {
 		r.wantTask(id, "pending", 0)

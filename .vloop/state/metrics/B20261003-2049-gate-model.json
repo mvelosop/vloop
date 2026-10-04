@@ -8,7 +8,7 @@
     "planned": 16,
     "done": 3,
     "blocked": 1,
-    "first_pass": 5,
+    "first_pass": 6,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,30 +43,30 @@
     "rework": 1.0011848341232228
   },
   "time": {
-    "agent_ms": 7731419,
-    "work_ms": 7311705,
-    "review_ms": 419714,
+    "agent_ms": 9630803,
+    "work_ms": 9188716,
+    "review_ms": 442087,
     "plan_ms": 2493754,
-    "gates_ms": 181148,
+    "gates_ms": 188845,
     "wall_ms": 2714000
   },
   "rate": {
-    "code_per_min": 6.549897243960002,
-    "code_test_per_min": 11.074293089017681
+    "code_per_min": 5.258128527808117,
+    "code_test_per_min": 8.890224418462303
   },
   "cost": {
-    "total_usd": 17.3348684,
+    "total_usd": 18.321462,
     "plan_usd": 9.2589652,
-    "work_usd": 6.369564400000001,
-    "review_usd": 1.7063388000000002,
-    "per_1000_code_lines_usd": 20.53894360189574
+    "work_usd": 7.184752800000001,
+    "review_usd": 1.877744,
+    "per_1000_code_lines_usd": 21.70789336492891
   },
   "tokens": {
-    "input": 722,
-    "output": 330895,
-    "cache_read": 29760952,
-    "cache_creation": 1259037,
-    "cache_hit_ratio": 0.9593897444839352
+    "input": 792,
+    "output": 350973,
+    "cache_read": 31693280,
+    "cache_creation": 1358839,
+    "cache_hit_ratio": 0.9588650149452798
   },
   "models": {
     "plan": [
@@ -97,9 +97,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 6,
-  "iterations": 12,
-  "iterations_per_closed": 4,
+  "permission_denials": 7,
+  "iterations": 13,
+  "iterations_per_closed": 4.333333333333333,
   "by_task": [
     {
       "id": "T1",
@@ -289,7 +289,7 @@
       "id": "T9",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -302,9 +302,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 1899384,
+      "cost_usd": 0.9865936000000001,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T10",

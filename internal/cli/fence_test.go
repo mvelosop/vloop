@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var fencePhases = []string{"plan", "work", "review"}
+var fencePhases = []string{"plan", "work", "review", "gate-review"}
 
 // f10Forms are the bypasses the v1.0 review listed (F10): each must be denied
 // by every phase's fence.
@@ -120,7 +120,7 @@ func TestPhaseFenceWrites(t *testing.T) {
 		}
 		for _, tool := range []string{"Edit", "Write"} {
 			for _, x := range writes {
-				want := map[string]bool{"plan": x.plan, "work": x.work, "review": x.review}[phase]
+				want := map[string]bool{"plan": x.plan, "work": x.work, "review": x.review, "gate-review": x.review}[phase]
 				if got := writeAllowed(f.Permissions.Allow, f.Permissions.Deny, tool, x.path); got != want {
 					t.Errorf("%s fence: %s %s allowed = %v, want %v", phase, tool, x.path, got, want)
 				}

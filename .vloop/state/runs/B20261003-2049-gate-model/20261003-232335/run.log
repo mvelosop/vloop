@@ -29,3 +29,7 @@
    Run every gate on the base at acceptance and send a gate that passes or changes the tree back to the planner
    review: PASS
    T9 done
+── iteration 14 (9 this run) · T10 · 9/16 done ──
+   Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
+   review: PASS
+   T10 done

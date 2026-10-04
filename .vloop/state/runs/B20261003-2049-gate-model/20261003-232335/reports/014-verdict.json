@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T10",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A session of kind `gate-review` runs as `/vloop:gate-review` with no task, after the base run of the gates and before the first iteration, with model.gate-review (default sonnet) and effort.gate-review; there is no per-task override (task.model stays {work, review}).", "met": true, "evidence": "internal/driver/gatereview.go:34 uses ModelEffort(root, nil, PhaseGateReview); session.go Prompt drops the argument; plan.go acceptPlan runs it after baseGates; TestRunGateReviewPasses"},
+    {"criterion": "fence/gate-review.json reads the repo, allows `vloop task gate`, writes only .vloop/tmp/**, and denies the gate folders and the plan; embed_test.go and internal/cli/fence_test.go phase lists gain gate-review.", "met": true, "evidence": "fence/gate-review.json allows Bash(vloop task gate:*) and Edit/Write only under .vloop/tmp/**, denies Edit/Write under .vloop/state/**; both test phase lists gain gate-review"},
+    {"criterion": "The verdict is .vloop/tmp/gate-verdict.json, gate-verdict/v1; a missing or invalid one is FAIL; the plan's verdict is FAIL when any task's is. Verdicts are kept as reports/gate-review-<round>.json.", "met": true, "evidence": "gatereview.go validates against gate-verdict/v1, a missing or invalid file gives a problem, any task FAIL makes the plan FAIL, report written per round; TestRunGateReviewMissingVerdictFails"},
+    {"criterion": "A round is the base run plus the review; a failed first round runs the plan session again with the acceptance problems or the findings; a second failure ends the run with `vloop: the gate review failed the plan twice — see <verdict path>; amend the gates with vloop task verify, then re-run` (exit 2, plan blocked), the path repo-relative. state.json records gate_review {rounds, verdict}.", "met": true, "evidence": "plan.go acceptPlan loop with planRounds, gateReviewFailedLine uses relRunDir, ExitBlocked, plan.Status blocked, GateReview saved; TestRunGateReviewFailThenPass and FailsTwiceThenResumes"},
+    {"criterion": "Resuming a plan blocked at the gate review repeats the base run only; the review does not run again.", "met": true, "evidence": "iterate.go calls resumeBaseGates when gate_review.verdict is FAIL; the test asserts gate review count stays 2 and gates/base-T1.log exists"},
+    {"criterion": "Its session record is session/v2 with phase gate-review, iteration 0 and no task.", "met": true, "evidence": "session.go record sets session/v2 for PhaseGateReview, task is only set for work and review, so the key is omitted"},
+    {"criterion": "Every cmd/vloop run test's stub answers /vloop:gate-review with a passing verdict; tests cover a pass, a fail-then-pass, a fail twice, a missing verdict and the resume.", "met": true, "evidence": "run_harness_test.go stub writes a passing gate-verdict.json before the script; run_gatereview_test.go has the five tests"}
+  ],
+  "findings": [],
+  "notes": "The plan listed internal/driver/gatereview_test.go, which was not created; the cmd/vloop tests cover the behaviour. Existing run tests were changed only for session counts that rose by one. The resume sets gate_review.verdict to PASS after the base run, which is a reasonable reading of the operator's ruling."
+}
