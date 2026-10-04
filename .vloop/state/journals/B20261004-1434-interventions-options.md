@@ -123,3 +123,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The interventions index script has an Agreement column and validates by and agreement; the guides, the interventions README and the domain docs document intervention/v2, its flags, refusals and tables.
 - **Files:** tools/interventions-index.sh, docs/guide/defects.md, docs/guide/metrics.md, .vloop/interventions/README-interventions.md, docs/domain/domain-model.md, docs/domain/measurement/measurement-context.md, internal/cli/guide_test.go, internal/cli/interventions_index_test.go
 - **Notes for next iteration:** All files were already committed at HEAD (including the README v2 section the operator added); this attempt found nothing to change. The README's index block already has the Agreement column.
+
+## T9 — Add the Agreement column to the interventions index, and document v2 in the guides and the domain
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The index Agreement column, the v2 guides and the domain edits were already in place and the gate passes; this attempt fixes the go check that failed after them.
+- **Files:** internal/cli/intervention_test.go
+- **Notes for next iteration:** The previous attempt failed the go check only because TestExistingInterventionsValidate validated every record against intervention/v1, and this repo's records are now v2. It now validates each against the schema named in the record. This edits an existing test, which a v2 repo needs. Inside a session the VLOOP_* env makes TestTaskGate* fail; unset it to run go test.

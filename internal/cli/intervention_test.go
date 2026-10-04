@@ -76,8 +76,14 @@ func TestExistingInterventionsValidate(t *testing.T) {
 	for _, v := range vs {
 		f := filepath.Join(t.TempDir(), "i.json")
 		os.WriteFile(f, v, 0o644)
+		var head struct {
+			Schema string `json:"schema"`
+		}
+		if err := json.Unmarshal(v, &head); err != nil {
+			t.Fatal(err)
+		}
 		var so, se strings.Builder
-		if code := Execute(Build{}, []string{"schema", "validate", "intervention/v1", f}, &so, &se); code != 0 {
+		if code := Execute(Build{}, []string{"schema", "validate", head.Schema, f}, &so, &se); code != 0 {
 			t.Errorf("%s: %s%s", v, so.String(), se.String())
 		}
 	}

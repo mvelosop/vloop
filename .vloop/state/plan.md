@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **9/11 done** · iteration 16
+**Status:** running · **10/11 done** · iteration 17
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T22:05:55Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T22:08:49Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
 - [x] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
 - [x] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
-- [ ] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain · 1 attempt(s)
+- [x] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain · 1 attempt(s)
 - [ ] **T10** — Migrate this repository's intervention records to intervention/v2 and refresh the index
 - [x] **T11** — Close: the brief's worked example, line for line, as an end-to-end test
 
@@ -202,7 +202,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Add the Agreement column to the interventions index, and document v2 in the guides and the domain
 
-`pending` · 1 attempt(s) · depends on: T2, T3, T4, T5, T6, T7
+`done` · 1 attempt(s) · depends on: T2, T3, T4, T5, T6, T7
 
 The docs are how an operator learns the record and its commands, and the index is how the records are browsed. The index script gains an Agreement column and validates by and agreement too; the guides document every v2 field, flag, refusal and table; the domain stops calling interventions data without a command or schema.
 
@@ -214,8 +214,6 @@ The docs are how an operator learns the record and its commands, and the index i
 - .vloop/interventions/README-interventions.md documents the v2 frontmatter and the Context, Options, Recommended, Suggested and Decided sections.
 - docs/domain/domain-model.md changes in two places only: the intervention's vocabulary row reads "anything the operator did around a run besides testing, with the options the model proposed and the operator's decision" (dropping "not yet a vloop entity"), and the gaps line saying interventions have no command or schema is removed; docs/domain/measurement/measurement-context.md describes interventions as the entity they now are.
 - Committed tests: internal/cli/guide_test.go TestGuideDefectsCoversInterventions covers the intervention/v2 fields and values; a test the checks run exercises the index script's Agreement column and its by/agreement validation over fixture records in a temporary directory.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-230439/checks/016-go.fail.log
 
 <details><summary>verify command</summary>
 

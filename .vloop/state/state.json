@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 16,
+  "iteration": 17,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T22:05:55Z",
+  "updated": "2026-10-04T22:08:49Z",
   "shell": "sh",
   "checks": [
     {
@@ -283,9 +283,9 @@
         "Committed tests: internal/cli/guide_test.go TestGuideDefectsCoversInterventions covers the intervention/v2 fields and values; a test the checks run exercises the index script's Agreement column and its by/agreement validation over fixture records in a temporary directory."
       ],
       "verify": "sh .vloop/state/gates/T9/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-230439/checks/016-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T10",

@@ -2,3 +2,8 @@
    Add the Agreement column to the interventions index, and document v2 in the guides and the domain
    check go
    CHECK FAIL T9 — check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-230439/checks/016-go.fail.log; review skipped
+── iteration 17 (2 this run) · T9 · 9/11 done ──
+   Add the Agreement column to the interventions index, and document v2 in the guides and the domain
+   check go
+   review: PASS
+   T9 done
