@@ -8,7 +8,7 @@
     "planned": 16,
     "done": 3,
     "blocked": 1,
-    "first_pass": 12,
+    "first_pass": 13,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,30 +43,30 @@
     "rework": 1.0011848341232228
   },
   "time": {
-    "agent_ms": 12195136,
-    "work_ms": 11618427,
-    "review_ms": 576709,
+    "agent_ms": 15710055,
+    "work_ms": 15114370,
+    "review_ms": 595685,
     "plan_ms": 2493754,
-    "gates_ms": 225149,
+    "gates_ms": 237692,
     "wall_ms": 2714000
   },
   "rate": {
-    "code_per_min": 4.1524752163485505,
-    "code_test_per_min": 7.020831912001638
+    "code_per_min": 3.223413285313132,
+    "code_test_per_min": 5.450012746613554
   },
   "cost": {
-    "total_usd": 22.7211682,
+    "total_usd": 23.960947,
     "plan_usd": 9.2589652,
-    "work_usd": 10.665317000000002,
-    "review_usd": 2.796886,
-    "per_1000_code_lines_usd": 26.920815402843605
+    "work_usd": 11.744610600000001,
+    "review_usd": 2.9573712000000003,
+    "per_1000_code_lines_usd": 28.389747630331755
   },
   "tokens": {
-    "input": 1054,
-    "output": 438480,
-    "cache_read": 38490181,
-    "cache_creation": 1900022,
-    "cache_hit_ratio": 0.9529334776582962
+    "input": 1132,
+    "output": 464434,
+    "cache_read": 41110315,
+    "cache_creation": 2014036,
+    "cache_hit_ratio": 0.9532719900203784
   },
   "models": {
     "plan": [
@@ -98,8 +98,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 8,
-  "iterations": 19,
-  "iterations_per_closed": 6.333333333333333,
+  "iterations": 20,
+  "iterations_per_closed": 6.666666666666667,
   "by_task": [
     {
       "id": "T1",
@@ -450,7 +450,7 @@
       "id": "T16",
       "area": null,
       "kind": "test",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -463,9 +463,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 3514919,
+      "cost_usd": 1.2397788,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     }
   ]
 }

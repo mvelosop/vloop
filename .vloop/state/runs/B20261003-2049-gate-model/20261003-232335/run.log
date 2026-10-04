@@ -57,3 +57,8 @@
    Close B9: the worked example line for line, go test ./..., and the real-data check
    review: PASS
    T16 done
+
+═══ complete ═══
+run:    B20261003-2049-gate-model/20261003-232335  (15 iteration(s) this run)
+plan:   16/16 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261003-2049-gate-model.md
