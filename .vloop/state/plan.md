@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/11 done** · iteration 1
+**Status:** running · **0/11 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T19:11:46Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T19:21:59Z
 
 ## Progress
 
-- [ ] **T1** — Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement · 1 attempt(s)
+- [ ] **T1** — Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement · 2 attempt(s)
 - [ ] **T2** — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided
 - [ ] **T3** — Correct a record with vloop intervention set: recommended, decided and adjusted, re-deriving agreement
 - [ ] **T4** — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
@@ -24,7 +24,7 @@
 
 ### T1 — Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement
 
-`pending` · 1 attempt(s) · depends on: none
+`pending` · 2 attempt(s) · depends on: none
 
 Every later task stands on this record: it adds schemas/intervention.v2.json, teaches the parser the v2 frontmatter (options, recommended, decided, adjusted, agreement) and the Context, Options, Recommended, Suggested and Decided sections, and makes add write v2. It also fixes the blind spot the brief exists for: 66 v1 records hold Context, Suggested and Decided sections that today's parser folds into done. The agreement is derived from the option count, the decided choice and adjusted, never stored on trust or read from prose, so a record that disagrees with itself is invalid.
 
@@ -38,7 +38,7 @@ Every later task stands on this record: it adds schemas/intervention.v2.json, te
 - Committed tests the checks run: TestAddWritesRecord pins the v2 bytes; TestExistingRecordsParse reads v1 and v2 records, including a v1 record's Context, Suggested and Decided sections; new unit tests cover every row of the derivation table and each kind of invalid record; the schema lists in internal/cli/schema_test.go, cmd/vloop/b2_e2e_test.go (TestWorkedExampleB2Commands) and internal/schema/schema_test.go gain intervention/v2.
 - TestListOrderFilterAndRoundTrip's assertion that a freshly added record's schema is intervention/v1 changes to intervention/v2, as a direct consequence of add writing v2; no other existing test is weakened or deleted.
 
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/001-go.fail.log
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/002-go.fail.log
 
 <details><summary>verify command</summary>
 

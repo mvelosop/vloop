@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The T1 work from the earlier attempt (intervention/v2 schema, parser, add writing v2, derived agreement) is kept. This attempt fixed the check failure: TestSchemasAreEmbedded now expects 16 embedded schemas.",
+  "files": ["embed_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok.",
+  "notes": "The check failure was embed_test.go counting 15 schema files; intervention.v2.json makes 16. TestWorkedExampleB6RealData and the internal/cli TestTaskGate* tests fail only when run inside a loop session: the clone carries the live plan's gate folders, or the plan counts as changed. They are not caused by this change."
+}
