@@ -85,6 +85,36 @@ default, `pwsh` on Windows). A gate is written before the work exists, and the
 work session may not change it; only the operator does, with `vloop task verify
 <id> <command> --reason <text>`, which records the change in the task's history.
 
+**Gate fixtures.** What a gate needs besides its command (an oracle, a script,
+expected outputs) lives in the task's gate folder, `.vloop/state/gates/<id>/`.
+The plan session writes it, the plan stamps it, and the work session cannot
+change it: the driver restores it from the stamp. `vloop task verify <id>
+[<command>]` replaces a gate's command, its fixtures or both, and records the
+old ones, the reason and who replaced them.
+
+**Gate scratch.** A gate may copy its oracle into a git-ignored scratch folder
+named by `run.gate-scratch` (for example `web/.gate/`) to run it there. The
+folders are emptied after every gate, and a gate that changes anything else in
+the working tree fails. A gate that runs past `run.gate-timeout` is killed and
+is not run again.
+
+**The gate review.** Before any work, the driver runs every gate on the base.
+A gate that passes there proves nothing, and one that changes the tree is
+refused; both go back to the plan session. Then a separate gate-review session
+(`/vloop:gate-review`) judges the gates and answers `PASS` or `FAIL`. A `FAIL`
+sends its findings back to the plan session; after two rounds a plan still
+failing is saved blocked and the run ends with exit 2. Amend the gates, then
+`vloop run` again to resume.
+
+**Checks.** A `[[check]]` in `.vloop/config.toml` is a command that proves a
+part of the repository still works, scoped by path globs. The driver runs every
+check on the base before planning (and refuses to plan with none, or with one
+failing) and, after each iteration whose gate passed, the checks whose paths
+match the changes. A failing check ends the iteration as `check_failed`: no
+review, one attempt charged. When every task is done, all checks run once more
+in a final pass; a failure there ends the run blocked, exit 2. The fields and
+keys are in [configuration.md](configuration.md#checks).
+
 ## What is redacted
 
 Before anything is written under `.vloop/state/` (gate logs, session records,

@@ -5,9 +5,9 @@
   "base": "786f233d506336c3f7d634609223a0df9ad7eefe",
   "branch": "B20261003-2049-gate-model",
   "status": "running",
-  "iteration": 18,
+  "iteration": 19,
   "created": "2026-10-03T21:36:02Z",
-  "updated": "2026-10-04T01:14:28Z",
+  "updated": "2026-10-04T01:17:16Z",
   "shell": "sh",
   "tasks": [
     {
@@ -716,7 +716,7 @@
         "No README rewrite or help-text rewording (B11)."
       ],
       "verify": "GT=\"${VLOOP_GATE_TASK:-}\"; AT=\"${VLOOP_ACTIVE_TASK:-}\"; OWN=1; if [ -n \"$GT\" ] && [ \"$GT\" != \"$AT\" ]; then OWN=0; fi; for v in $(env | sed -n 's/^\\(VLOOP_[A-Z0-9_]*\\)=.*/\\1/p'); do unset \"$v\"; done; unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT; export LC_ALL=C TZ=UTC GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0; fail(){ echo \"GATE FAIL: $*\" >&2; exit 1; }; t=$(mktemp -d \"${TMPDIR:-/tmp}/gate.XXXXXX\") && t=$(cd \"$t\" && pwd -P) || fail mktemp; trap 'rm -rf \"$t\"' EXIT; mkdir -p \"$t/bin\" \"$t/s\"; go build -o \"$t/bin/vloop\" ./cmd/vloop || fail \"go build ./cmd/vloop\"; B=\"$t/bin/vloop\"; go run ./cmd/gendocs \"$t/commands.md\" || fail \"gendocs\"; cmp -s \"$t/commands.md\" docs/guide/commands.md || fail \"docs/guide/commands.md is not what gendocs generates from the command tree\"; grep -Fq \"verify <id> [<command>]\" docs/guide/commands.md || fail \"the commands reference does not show task verify <id> [<command>]\"; awk '/^## Gates and the gate shell/{f=1; next} f && /^## /{exit} f' docs/guide/concepts.md | tr \"\\n\" \" \" >\"$t/gs\"; for w in .vloop/state/gates/ \"gate review\" \"[[check]]\" gate-scratch; do grep -Fq -- \"$w\" \"$t/gs\" || fail \"Gates and the gate shell in docs/guide/concepts.md does not describe $w\"; done; tr \"\\n\" \" \" <docs/guide/metrics.md >\"$t/mt\"; for w in checks_ms gate_review_ms check_failed; do grep -Fq \"$w\" \"$t/mt\" || fail \"docs/guide/metrics.md does not describe $w\"; done; if [ \"$OWN\" = 1 ]; then go test . ./internal/... >\"$t/pk.out\" 2>&1 || fail \"go test . ./internal/...: $(grep -E -- '^(--- FAIL|FAIL|panic)' \"$t/pk.out\" | head -20) $(tail -c 1500 \"$t/pk.out\")\"; fi; test -z \"$(gofmt -l .)\" || fail \"gofmt -l . lists: $(gofmt -l . | head -5)\"; go vet ./... >\"$t/vet\" 2>&1 || fail \"go vet ./...: $(tail -c 1500 \"$t/vet\")\"; GOOS=windows go vet ./... >\"$t/wvet\" 2>&1 || fail \"GOOS=windows go vet ./...: $(tail -c 1500 \"$t/wvet\")\"; GOOS=linux go vet ./... >\"$t/lvet\" 2>&1 || fail \"GOOS=linux go vet ./...: $(tail -c 1500 \"$t/lvet\")\"; go mod tidy -diff >\"$t/tidy\" 2>&1 || fail \"go mod tidy -diff: $(head -c 600 \"$t/tidy\")\"; [ ! -s \"$t/tidy\" ] || fail \"go mod tidy -diff printed output\"; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./... || fail \"linux build\"; CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build ./... || fail \"windows build\"; echo \"GATE OK\"",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

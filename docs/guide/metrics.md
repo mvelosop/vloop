@@ -14,8 +14,8 @@ vloop metrics classify <path>…
 A `<brief>` is a loop brief's path or name. With none, one row per brief that
 has runs is printed. A brief with no runs is `vloop: no runs for <name>`, exit 1.
 `--by task` prints one row per task in plan order; `--json` prints one
-`metrics/v1` document per brief (an array when several). `vloop schema show
-metrics/v1` prints the schema; every key below is a property of it.
+`metrics/v2` document per brief (an array when several). `vloop schema show
+metrics/v2` prints the schema; every key below is a property of it.
 
 ## Where the numbers come from
 
@@ -120,6 +120,11 @@ Each of `delivered` and `churn` holds `code`, `test`, `docs` and `other`, and a
   and review sessions. **plan** (`plan_ms`) is reported apart.
 - **gates** (`gates_ms`): the sum of the gate durations in the iteration records;
   `null` (`n/a`) when none was recorded, as always for the shell loop.
+- **checks** (`checks_ms`): the sum of the check durations in the iteration
+  records, the checks the driver ran after each gate; `null` (`n/a`) when none
+  was recorded. The final pass writes no iteration record, so it is not counted.
+- **gate review** (`gate_review_ms`): the duration of the gate-review sessions,
+  the gate-review phase before any work. It is not part of `agent_ms`.
 - **wall** (`wall_ms`): the plan commit's committer time to the last run
   commit's. `null` without a run commit.
 - **lead_time** (`lead_time.plan_to_merge_ms`): the plan commit to the merge
@@ -134,7 +139,7 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 
 ## Cost and tokens
 
-- `cost.total_usd`, `cost.plan_usd`, `cost.work_usd` and `cost.review_usd` are
+- `cost.total_usd` (gate-review sessions included), `cost.plan_usd`, `cost.work_usd` and `cost.review_usd` are
   sums of the sessions' costs, unrounded in JSON and rounded to cents only for
   display. `cost.per_1000_code_lines_usd` is the total per 1,000 delivered code
   lines.
@@ -144,7 +149,7 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 
 ## Models and effort
 
-`models` lists, for each of `plan`, `work` and `review`, the models seen in the
+`models` lists, for each of `plan`, `gate-review`, `work` and `review`, the models seen in the
 sessions' model usage, sorted. `effort` gives each phase's effort level when the
 records carry it (`session/v1` does, the shell loop's do not), else `null`.
 
@@ -177,10 +182,13 @@ summary says so on a `records` line.
 
 - `defects` holds `in_loop`, `operator`, `escaped`, `total` and
   `removal_efficiency`; see [defects.md](defects.md).
+  Each iteration that ended `check_failed` derives a defect of kind
+  `regression` (origin `work`) found by the gate: a check caught what the
+  work broke.
 - `status` is the brief's frontmatter status. `merged` is the full SHA of the
   first commit on the default branch (`origin/HEAD`'s target, else `main`, else
   `master`) where the brief says `status: consumed`; `null` when not merged.
-- `schema` is always `metrics/v1`, and `brief` is the brief's file name.
+- `schema` is `metrics/v2` (snapshots and records of earlier briefs may be `metrics/v1`, still read), and `brief` is the brief's file name.
 
 ## The summary
 

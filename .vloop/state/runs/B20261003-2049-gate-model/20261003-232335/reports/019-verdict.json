@@ -1,0 +1,6 @@
+{"schema":"verdict/v1","task":"T15","verdict":"PASS","criteria":[
+{"criterion":"docs/guide/concepts.md 'Gates and the gate shell' describes the gate folder .vloop/state/gates/<id>/, run.gate-scratch, the gate review and [[check]] checks, consistent with the domain docs.","met":true,"evidence":"concepts.md diff adds Gate fixtures, Gate scratch, The gate review and Checks paragraphs, linking configuration.md#checks."},
+{"criterion":"docs/guide/commands.md is exactly what cmd/gendocs generates (it shows `task verify <id> [<command>]`).","met":true,"evidence":"commands.md unchanged and already matches; the gate compares it with gendocs output and passed."},
+{"criterion":"docs/guide/metrics.md describes checks_ms, gate_review_ms, the gate-review phase and the check_failed defect.","met":true,"evidence":"metrics.md diff adds checks_ms and gate_review_ms bullets, gate-review in models, and the check_failed regression defect, which matches internal/metrics/defects.go:77."},
+{"criterion":"No README rewrite or help-text rewording (B11).","met":true,"evidence":"Only concepts.md and metrics.md changed."}],
+"findings":[],"notes":"Some new metrics.md lines run past the wrapping width; this is cosmetic."}

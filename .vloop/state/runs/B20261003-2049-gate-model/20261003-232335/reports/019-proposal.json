@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T15",
+  "outcome": "done",
+  "summary": "concepts.md now explains gate fixtures, gate scratch, the gate review and checks; metrics.md describes checks_ms, gate_review_ms and the check_failed defect.",
+  "files": ["docs/guide/concepts.md", "docs/guide/metrics.md"],
+  "verified": "vloop task gate T15 exited 0 and printed GATE OK.",
+  "notes": "docs/guide/commands.md was already what gendocs generates; regenerating changed nothing. metrics.md also moved its schema mentions to metrics/v2."
+}
