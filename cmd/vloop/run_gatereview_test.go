@@ -83,6 +83,9 @@ func TestRunGateReviewFailsTwiceThenResumes(t *testing.T) {
 	res := r.vloop("run", runBrief)
 	wantExit(t, res, 2)
 	wantIn(t, "stderr", res.err, "vloop: the gate review failed the plan twice — see .vloop/state/runs/"+runID+"/")
+	if n := strings.Count(res.err, "the gate review failed the plan twice"); n != 1 {
+		t.Errorf("the refusal is printed %d times, want once (one line starting with vloop: ):\n%s", n, res.err)
+	}
 	wantIn(t, "stderr", res.err, "/reports/gate-review-2.json; amend the gates with vloop task verify, then re-run")
 	r.wantStatus("blocked")
 	if r.planSessions() != 2 || r.gateReviews() != 2 || strings.Contains(strings.Join(r.argv(), "\n"), "/vloop:work") {

@@ -580,7 +580,7 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeou
 					return nil, nil, err
 				}
 				line := gateReviewFailedLine(root, t.r.RunDir, round)
-				t.warn("%s", line)
+				t.r.Logf("%s", t.r.Mask(line)) // logged; the halt prints it, once
 				return plan, halt(ExitBlocked, "%s", line), nil
 			}
 			_ = os.Remove(state.Path(root))
