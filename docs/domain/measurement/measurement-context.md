@@ -40,5 +40,8 @@ M-1..M-7 in [`../domain-model.md`](../domain-model.md#measurement--m).
 - Gate time and configured effort are `n/a` for shell-loop runs.
 - The snapshot is written at close only; `vloop run` will also write it after
   every iteration *(planned, B6)*.
-- Interventions (`.vloop/interventions/`) are measurement's likely next entity:
-  recorded as data, analysed by hand, no command or schema yet.
+- Interventions (`.vloop/interventions/`) are an entity of their own:
+  `vloop intervention` records, corrects, migrates and shows them
+  (`intervention/v2`: the options the model proposed, its recommendation, the
+  operator's decision and the derived agreement), and `vloop metrics
+  --interventions` reports the agreement across briefs.

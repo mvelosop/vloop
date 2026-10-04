@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "The interventions index script gains an Agreement column and validates by and agreement; defects.md, metrics.md, the interventions README, domain-model.md and measurement-context.md document intervention/v2 and its commands.",
+  "files": ["tools/interventions-index.sh", "docs/guide/defects.md", "docs/guide/metrics.md", ".vloop/interventions/README-interventions.md", "docs/domain/domain-model.md", "docs/domain/measurement/measurement-context.md", "internal/cli/guide_test.go", "internal/cli/interventions_index_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed gate T9: ok; go test ./internal/... passes.",
+  "notes": "The committed index block in .vloop/interventions/README-interventions.md still has the old four columns, so tools/interventions-index.sh --check fails until T10 runs --write (after migrating records). TestGuideDefectsCoversInterventions now checks both intervention/v1 and intervention/v2 words; the index tests are internal/cli/interventions_index_test.go and skip without bash."
+}

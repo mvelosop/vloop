@@ -109,9 +109,11 @@ func TestGuideDefectsCoversSchema(t *testing.T) {
 
 func TestGuideDefectsCoversInterventions(t *testing.T) {
 	text := readGuide(t, "defects.md")
-	for _, w := range guideWords(t, "intervention/v1", true) {
-		if !strings.Contains(text, w) {
-			t.Errorf("defects.md does not mention the intervention field or value %q", w)
+	for _, name := range []string{"intervention/v1", "intervention/v2"} {
+		for _, w := range guideWords(t, name, true) {
+			if !strings.Contains(text, w) {
+				t.Errorf("defects.md does not mention the %s field or value %q", name, w)
+			}
 		}
 	}
 }
