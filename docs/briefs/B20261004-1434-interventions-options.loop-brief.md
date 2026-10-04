@@ -2,7 +2,7 @@
 name: B20261004-1434-interventions-options.loop-brief
 description: Make each intervention record the model's options, its recommendation and why, and the operator's decision, derive whether they agreed, and report that agreement by kind and phase — intervention/v2
 kind: brief
-status: draft
+status: ready
 created: 2026-10-04
 seeds: The second brief of the v2.0 series and the first run under the gate model; it records the evidence for which operator decisions a driver could take over
 depends-on: [B20261003-2049-gate-model.loop-brief]
