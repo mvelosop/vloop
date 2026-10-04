@@ -130,3 +130,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The index Agreement column, the v2 guides and the domain edits were already in place and the gate passes; this attempt fixes the go check that failed after them.
 - **Files:** internal/cli/intervention_test.go
 - **Notes for next iteration:** The previous attempt failed the go check only because TestExistingInterventionsValidate validated every record against intervention/v1, and this repo's records are now v2. It now validates each against the schema named in the record. This edits an existing test, which a v2 repo needs. Inside a session the VLOOP_* env makes TestTaskGate* fail; unset it to run go test.
+
+## T10 — Migrate this repository's intervention records to intervention/v2 and refresh the index
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The records were already intervention/v2 at HEAD and the index already regenerated, so nothing needed changing; the gate passes.
+- **Files:** none
+- **Notes for next iteration:** Built vloop migrate reports nothing to migrate and interventions-index.sh --write leaves the tree clean; the operator's earlier commit already did the migration and index. No files changed this attempt.

@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T10",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Every record under .vloop/interventions/ at the base is migrated by running the built `vloop intervention migrate`, and `git diff` shows only the five added frontmatter lines per record; no body byte, `recorded` or `backfilled` changes, and no options are reconstructed or agreement judged by hand.", "met": true, "evidence": "Operator commit 'Operator: the README's v2 section, this repository's records migrated' added 5 lines per record; gate T10 compares each record byte for byte with the built binary's migration of HEAD's copy and passes. The work session changed nothing."},
+    {"criterion": "`vloop intervention list --json` gives each of the 66 records with a Context section a non-empty context and a done free of `**Context.**`.", "met": true, "evidence": "gate.sh checks this with jq for every record that has a Context section; the gate passes (checks go exit 0)."},
+    {"criterion": "`vloop metrics --interventions` over the migrated records matches the counts of kind, phase and automatable in the index, with every record no-options.", "met": true, "evidence": "gate.sh compares the metrics tables with counts computed from the frontmatter; the sample record shows agreement: no-options; gate passes."},
+    {"criterion": "The index in .vloop/interventions/README-interventions.md is regenerated with `tools/interventions-index.sh --write` and `--check` passes.", "met": true, "evidence": "I ran tools/interventions-index.sh --check: 'index up to date', exit 0; no diff under .vloop/interventions or tools."},
+    {"criterion": "internal/cli/intervention_test.go TestExistingInterventionsValidate validates every record's JSON form against intervention/v2.", "met": true, "evidence": "internal/cli/intervention_test.go:67 lists all records as JSON and validates each against its own schema field, which is intervention/v2 for every migrated record; the go check passes."}
+  ],
+  "findings": [],
+  "notes": "The operator's earlier commit had already done the migration and the index, so this attempt's diff is empty (apart from run logs). The end state meets every criterion. TestExistingInterventionsValidate validates against the schema named in each record, not a hardcoded intervention/v2; the gate's own v2 check covers that."
+}

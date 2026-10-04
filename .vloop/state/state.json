@@ -5,9 +5,9 @@
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
   "status": "running",
-  "iteration": 17,
+  "iteration": 18,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T22:08:49Z",
+  "updated": "2026-10-04T22:10:41Z",
   "shell": "sh",
   "checks": [
     {
@@ -307,7 +307,7 @@
         "internal/cli/intervention_test.go TestExistingInterventionsValidate validates every record's JSON form against intervention/v2."
       ],
       "verify": "sh .vloop/state/gates/T10/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

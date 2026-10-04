@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/11 done** · iteration 17
+**Status:** running · **11/11 done** · iteration 18
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T22:08:49Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T22:10:41Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
 - [x] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
 - [x] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain · 1 attempt(s)
-- [ ] **T10** — Migrate this repository's intervention records to intervention/v2 and refresh the index
+- [x] **T10** — Migrate this repository's intervention records to intervention/v2 and refresh the index
 - [x] **T11** — Close: the brief's worked example, line for line, as an end-to-end test
 
 ## Tasks
@@ -225,7 +225,7 @@ sh .vloop/state/gates/T9/gate.sh
 
 ### T10 — Migrate this repository's intervention records to intervention/v2 and refresh the index
 
-`pending` · depends on: T4, T6, T9
+`done` · depends on: T4, T6, T9
 
 The brief's real-data check: the 77 existing records become v2 through the built `vloop intervention migrate`, so their Context, Suggested and Decided sections are finally read and the agreement table covers them, all as no-options because their options are never reconstructed. Only frontmatter lines are added.
 
