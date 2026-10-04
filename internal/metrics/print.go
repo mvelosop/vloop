@@ -81,18 +81,27 @@ func PrintSummary(out io.Writer, r *Report) {
 	line(" size      ", "delivered", r.Size.Delivered, "test:code "+optFloat(r.Size.TestCodeRatio, "%.2f"))
 	line("           ", "churn", r.Size.Churn, "rework "+optFloat(r.Size.Rework, "%.2f"))
 	t := r.Time
-	fmt.Fprintf(out, " time      agent %s min (work %s · review %s) · plan %s min · gates %s · wall %s min\n",
-		minutes(t.AgentMS), minutes(t.WorkMS), minutes(t.ReviewMS), minutes(t.PlanMS), optMinutes(t.GatesMS), optMinutes(t.WallMS))
+	// The gate review (v2) is shown only for a brief that had one, so a v1
+	// brief's summary is unchanged.
+	gr := r.Cost.GateReview != 0 || t.GateReviewMS != 0 || len(r.Models.GateReview) > 0
+	grTime, grCost, grModels := "", "", ""
+	if gr {
+		grTime = " · gate review " + minutes(t.GateReviewMS) + " min"
+		grCost = fmt.Sprintf(" · gate review %.2f", r.Cost.GateReview)
+		grModels = " · gate review " + joinModels(r.Models.GateReview)
+	}
+	fmt.Fprintf(out, " time      agent %s min (work %s · review %s) · plan %s min%s · gates %s · wall %s min\n",
+		minutes(t.AgentMS), minutes(t.WorkMS), minutes(t.ReviewMS), minutes(t.PlanMS), grTime, optMinutes(t.GatesMS), optMinutes(t.WallMS))
 	fmt.Fprintf(out, " rate      %s code lines/min · %s incl. tests\n",
 		optFloat(r.Rate.CodePerMin, "%.1f"), optFloat(r.Rate.CodeTestPerMin, "%.1f"))
 	per1k := "n/a"
 	if r.Cost.Per1000Code != nil {
 		per1k = fmt.Sprintf("$%.2f", *r.Cost.Per1000Code)
 	}
-	fmt.Fprintf(out, " cost      $%.2f · plan %.2f · work %.2f · review %.2f · %s per 1,000 code lines\n",
-		r.Cost.Total, r.Cost.Plan, r.Cost.Work, r.Cost.Review, per1k)
-	fmt.Fprintf(out, " models    plan %s · work %s · review %s\n",
-		joinModels(r.Models.Plan), joinModels(r.Models.Work), joinModels(r.Models.Review))
+	fmt.Fprintf(out, " cost      $%.2f · plan %.2f · work %.2f · review %.2f%s · %s per 1,000 code lines\n",
+		r.Cost.Total, r.Cost.Plan, r.Cost.Work, r.Cost.Review, grCost, per1k)
+	fmt.Fprintf(out, " models    plan %s · work %s · review %s%s\n",
+		joinModels(r.Models.Plan), joinModels(r.Models.Work), joinModels(r.Models.Review), grModels)
 	fmt.Fprintf(out, " defects   in-loop %d · operator %d · escaped %d · removal efficiency %s\n",
 		r.Defects.InLoop, r.Defects.Operator, r.Defects.Escaped, efficiency(r.Defects))
 	if n := len(r.Records.Missing); n > 0 {

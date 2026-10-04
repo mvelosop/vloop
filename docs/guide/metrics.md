@@ -197,12 +197,15 @@ summary says so on a `records` line.
  tasks     <p> planned (brief said <n>–<m>) · <d> done · <b> blocked · first-pass <f>/<p>
  size      delivered  code <n> · test <n> · docs <n> · test:code <r>
            churn      code <n> · test <n> · docs <n> · rework <r>
- time      agent <m> min (work <m> · review <m>) · plan <m> min · gates <m|n/a> · wall <m> min
+ time      agent <m> min (work <m> · review <m>) · plan <m> min[ · gate review <m> min] · gates <m|n/a> · wall <m> min
  rate      <r> code lines/min · <r> incl. tests
- cost      $<t> · plan <c> · work <c> · review <c> · $<c> per 1,000 code lines
- models    plan <models> · work <models> · review <models>
+ cost      $<t> · plan <c> · work <c> · review <c>[ · gate review <c>] · $<c> per 1,000 code lines
+ models    plan <models> · work <models> · review <models>[ · gate review <models>]
  defects   in-loop <n> · operator <n> · escaped <n> · removal efficiency <p>%
 ```
+
+The bracketed `gate review` parts appear only for a brief whose plan had a
+gate review (vloop 2 and later).
 
 The cross-brief table has one row per brief in name order: `brief`, `tasks`,
 `first-pass`, `code`, `test`, `t:c`, `agent` (minutes), `$/1k`, `in-loop`,
