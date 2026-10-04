@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/11 done** · iteration 6
+**Status:** running · **4/11 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T19:48:11Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T19:50:07Z
 
 ## Progress
 
 - [x] **T1** — Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement · 2 attempt(s)
 - [x] **T2** — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided · 1 attempt(s)
 - [x] **T3** — Correct a record with vloop intervention set: recommended, decided and adjusted, re-deriving agreement
-- [ ] **T4** — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
+- [x] **T4** — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
 - [ ] **T5** — Add vloop intervention show <id>, resolving the ids written in its Context
 - [ ] **T6** — Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
 - [ ] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
@@ -93,7 +93,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 The existing records move to v2 by the operator's explicit act, not silently: migrate inserts the five no-options lines after by: and changes nothing else, so the history the records hold is untouched and their options are never reconstructed. T10 runs it on this repository's own records.
 

@@ -179,3 +179,17 @@ func TestUpgradeLeavesConfiguredChecks(t *testing.T) {
 		t.Errorf("config changed:\n%s", got)
 	}
 }
+
+func TestUpgradeLeavesV1InterventionAlone(t *testing.T) {
+	d := upgradeFixture(t, "0.1.0")
+	rec := "---\nid: I20260101-0900-old\nbrief: \"\"\nphase: run\nkind: halt\nautomatable: yes\nby: operator\noccurred: 2026-01-01\nrecorded: 2026-01-01T09:00:00Z\n---\nold\n"
+	p := filepath.Join(d, ".vloop", "interventions", "I20260101-0900-old.md")
+	os.MkdirAll(filepath.Dir(p), 0o755)
+	os.WriteFile(p, []byte(rec), 0o644)
+	if _, _, code := runPluginCLI(t, Build{Version: "0.2.0", Commit: "y"}, d, "upgrade", "--yes"); code != 0 {
+		t.Fatalf("upgrade exit %d", code)
+	}
+	if b, _ := os.ReadFile(p); string(b) != rec {
+		t.Errorf("upgrade rewrote a v1 record:\n%s", b)
+	}
+}

@@ -207,6 +207,16 @@ vloop intervention list [flags]
 
 - `--brief string`: only interventions of this loop brief
 
+## vloop intervention migrate
+
+Move v1 intervention records to intervention/v2, inserting the no-options frontmatter lines and changing nothing else
+
+```
+vloop intervention migrate [flags]
+```
+
+- `--dry-run`: list the records that would be migrated and write nothing
+
 ## vloop intervention set
 
 Set brief, phase, kind, automatable, by, occurred, recommended, decided, adjusted of an intervention

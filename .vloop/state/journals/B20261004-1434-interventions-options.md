@@ -48,3 +48,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop intervention set now accepts recommended, decided and adjusted, validated against the record's option count and rewriting agreement (T1's derivation) in the same write; agreement and options are refused with the brief's messages.
 - **Files:** internal/intervention/intervention.go, internal/cli/intervention_test.go, docs/guide/commands.md
 - **Notes for next iteration:** Set updates frontmatter lines in place (adjusted: false deletes the line; deciding other clears adjusted). The agreement/options refusals are plain errors from intervention.Set, so exit 2; value or no-options refusals on the new fields are Problem errors (exit 1) and leave the file untouched. docs/guide/commands.md regenerated with go generate ./... because the set help text lists SetFields.
+
+## T4 — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop intervention migrate inserts the five v2 no-options lines after by: in every v1 record and changes no other byte; --dry-run lists, a second run prints nothing to migrate, and upgrade leaves records alone.
+- **Files:** internal/intervention/intervention.go, internal/cli/intervention.go, internal/cli/intervention_test.go, internal/cli/upgrade_test.go, docs/guide/commands.md
+- **Notes for next iteration:** A record counts as v1 when its frontmatter has no schema: line. migrateText splits with SplitAfter so line endings and the body are preserved verbatim, and the inserted lines use the by: line's own ending. docs/guide/commands.md regenerated with go generate ./...; upgrade needed no change since it never touched records.

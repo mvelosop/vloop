@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "vloop intervention migrate inserts the five v2 no-options lines after by: in every v1 record and changes no other byte; --dry-run lists, a second run prints nothing to migrate, and upgrade leaves records alone.",
+  "files": ["internal/intervention/intervention.go", "internal/cli/intervention.go", "internal/cli/intervention_test.go", "internal/cli/upgrade_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: ok.",
+  "notes": "A record counts as v1 when its frontmatter has no schema: line. migrateText splits with SplitAfter so line endings and the body are preserved verbatim, and the inserted lines use the by: line's own ending. docs/guide/commands.md regenerated with go generate ./...; upgrade needed no change since it never touched records."
+}

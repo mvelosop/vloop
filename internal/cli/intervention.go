@@ -20,7 +20,7 @@ func newIntervention(g *Globals) *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
-	cmd.AddCommand(newInterventionAdd(g), newInterventionList(g), newInterventionSet(g))
+	cmd.AddCommand(newInterventionAdd(g), newInterventionList(g), newInterventionSet(g), newInterventionMigrate(g))
 	return cmd
 }
 
@@ -131,4 +131,38 @@ func newInterventionSet(g *Globals) *cobra.Command {
 			return nil
 		},
 	}
+}
+
+func newInterventionMigrate(g *Globals) *cobra.Command {
+	var dry bool
+	cmd := &cobra.Command{
+		Use:   "migrate",
+		Short: "Move v1 intervention records to intervention/v2, inserting the no-options frontmatter lines and changing nothing else",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			root, err := g.root()
+			if err != nil {
+				return err
+			}
+			names, err := intervention.Migrate(root, dry)
+			if err != nil {
+				return Problem(err)
+			}
+			out := cmd.OutOrStdout()
+			if len(names) == 0 {
+				fmt.Fprintln(out, "nothing to migrate")
+				return nil
+			}
+			if dry {
+				for _, n := range names {
+					fmt.Fprintln(out, n)
+				}
+				return nil
+			}
+			fmt.Fprintf(out, "migrated %d record(s)\n", len(names))
+			return nil
+		},
+	}
+	cmd.Flags().BoolVar(&dry, "dry-run", false, "list the records that would be migrated and write nothing")
+	return cmd
 }

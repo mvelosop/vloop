@@ -166,3 +166,27 @@ func TestInterventionSetChoice(t *testing.T) {
 		}
 	}
 }
+
+func TestInterventionMigrate(t *testing.T) {
+	dir := t.TempDir()
+	idir := filepath.Join(dir, ".vloop", "interventions")
+	os.MkdirAll(idir, 0o755)
+	v1 := "---\nid: I20260101-0900-old\nbrief: \"\"\nphase: run\nkind: halt\nautomatable: yes\nby: operator\noccurred: 2026-01-01\nrecorded: 2026-01-01T09:00:00Z\nbackfilled: true\n---\nold  \n\n**Context.** keep   spacing\n"
+	want := strings.Replace(v1, "by: operator\n", "by: operator\nschema: intervention/v2\noptions: 0\nrecommended: 0\ndecided: \"\"\nagreement: no-options\n", 1)
+	path := filepath.Join(idir, "I20260101-0900-old.md")
+	os.WriteFile(path, []byte(v1), 0o644)
+	read := func() string { b, _ := os.ReadFile(path); return string(b) }
+
+	code, out, _ := runDefect(t, dir, "intervention", "migrate", "--dry-run")
+	if code != 0 || strings.TrimSpace(out) != "I20260101-0900-old.md" || read() != v1 {
+		t.Fatalf("dry run: %d %q", code, out)
+	}
+	code, out, _ = runDefect(t, dir, "intervention", "migrate")
+	if code != 0 || out != "migrated 1 record(s)\n" || read() != want {
+		t.Fatalf("migrate: %d %q\n%s", code, out, read())
+	}
+	code, out, _ = runDefect(t, dir, "intervention", "migrate")
+	if code != 0 || out != "nothing to migrate\n" || read() != want {
+		t.Fatalf("again: %d %q", code, out)
+	}
+}

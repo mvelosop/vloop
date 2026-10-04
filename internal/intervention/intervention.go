@@ -597,3 +597,78 @@ func Set(root, id, field, value string) error {
 	}
 	return os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0o644)
 }
+
+// Migrate rewrites every v1 record under Dir to intervention/v2 by inserting
+// the five no-options lines right after by: and changing no other byte. With
+// dryRun nothing is written. It returns the names of the records migrated (or,
+// on a dry run, that would be), in name order.
+func Migrate(root string, dryRun bool) ([]string, error) {
+	dir := filepath.Join(root, filepath.FromSlash(Dir))
+	ents, err := os.ReadDir(dir)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var done []string
+	for _, e := range ents {
+		if e.IsDir() || !strings.HasPrefix(e.Name(), "I") || !strings.HasSuffix(e.Name(), ".md") {
+			continue
+		}
+		path := filepath.Join(dir, e.Name())
+		b, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		out, ok, err := migrateText(string(b))
+		if err != nil {
+			return nil, fmt.Errorf("%s/%s: %w", Dir, e.Name(), err)
+		}
+		if !ok {
+			continue
+		}
+		if !dryRun {
+			if err := os.WriteFile(path, []byte(out), 0o644); err != nil {
+				return nil, err
+			}
+		}
+		done = append(done, e.Name())
+	}
+	return done, nil
+}
+
+// migrateText inserts the v2 lines after the by: line of a v1 record. ok is
+// false when the record already carries a schema line.
+func migrateText(text string) (string, bool, error) {
+	lines := strings.SplitAfter(text, "\n")
+	if strings.TrimRight(lines[0], "\r\n") != "---" {
+		return "", false, errors.New("missing frontmatter")
+	}
+	by := -1
+	for i := 1; i < len(lines); i++ {
+		l := strings.TrimRight(lines[i], "\r\n")
+		if l == "---" {
+			break
+		}
+		if strings.HasPrefix(l, "schema:") {
+			return text, false, nil
+		}
+		if by < 0 && strings.HasPrefix(l, "by:") {
+			by = i
+		}
+	}
+	if by < 0 {
+		return "", false, errors.New("no by: line in the frontmatter")
+	}
+	eol := "\n"
+	if strings.HasSuffix(lines[by], "\r\n") {
+		eol = "\r\n"
+	}
+	ins := strings.Join([]string{"schema: intervention/v2", "options: 0", "recommended: 0", `decided: ""`, "agreement: no-options"}, eol) + eol
+	if !strings.HasSuffix(lines[by], "\n") {
+		ins = eol + strings.TrimSuffix(ins, eol)
+	}
+	lines[by] += ins
+	return strings.Join(lines, ""), true, nil
+}
