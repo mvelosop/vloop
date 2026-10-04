@@ -45,6 +45,11 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 					return err
 				}
 			}
+			in.RecommendedSet = cmd.Flags().Changed("recommended")
+			in.DecidedOptionSet = cmd.Flags().Changed("decided-option")
+			if err := intervention.CheckOptions(in); err != nil {
+				return err
+			}
 			root, err := g.root()
 			if err != nil {
 				return err
@@ -66,6 +71,14 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 	f.StringVar(&in.Trigger, "trigger", "", "what made it necessary")
 	f.StringVar(&in.Done, "done", "", "what was done")
 	f.StringVar(&in.Automation, "automation", "", "what would automate it")
+	f.StringVar(&in.Context, "context", "", "the situation, and the ids it refers to")
+	f.StringArrayVar(&in.Options, "option", nil, "an option put to the operator (repeatable, at most three)")
+	f.IntVar(&in.Recommended, "recommended", 0, "the recommended option, 1 to the number of options")
+	f.StringVar(&in.Why, "why", "", "why that option is recommended")
+	f.IntVar(&in.DecidedOption, "decided-option", 0, "the option decided, 1 to the number of options")
+	f.BoolVar(&in.DecidedOther, "decided-other", false, "something other than the options was decided")
+	f.BoolVar(&in.Adjusted, "adjusted", false, "the decided option was adjusted")
+	f.StringVar(&in.Decided, "decided", "", "what was decided")
 	return cmd
 }
 
@@ -89,7 +102,7 @@ func newInterventionList(g *Globals) *cobra.Command {
 				return json.NewEncoder(out).Encode(vs)
 			}
 			for _, v := range vs {
-				fmt.Fprintf(out, "%s  %s  %s  %s\n", v.Phase, v.Kind, v.Automatable, v.ID)
+				fmt.Fprintf(out, "%s  %s  %s  %s  %s\n", v.Phase, v.Kind, v.Automatable, v.Agreement, v.ID)
 			}
 			return nil
 		},

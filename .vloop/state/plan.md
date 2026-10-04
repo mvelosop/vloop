@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/11 done** · iteration 3
+**Status:** running · **1/11 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T19:32:28Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T19:44:39Z
 
 ## Progress
 
 - [x] **T1** — Version the intervention record to intervention/v2: the schema, reading v1 and v2, writing v2, the derived agreement · 2 attempt(s)
-- [ ] **T2** — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided
+- [ ] **T2** — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided · 1 attempt(s)
 - [ ] **T3** — Correct a record with vloop intervention set: recommended, decided and adjusted, re-deriving agreement
 - [ ] **T4** — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
 - [ ] **T5** — Add vloop intervention show <id>, resolving the ids written in its Context
@@ -48,7 +48,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 This is how the operator skill records what the model proposed and what the operator decided, so the evidence for which decisions a driver could take over starts accumulating. Up to three real options are recorded as given, never padded; the recorder says which option was chosen, adjusted or that something else was, and vloop derives the agreement (T1's derivation). Every malformed combination is refused before anything is written, with the brief's exact message.
 
@@ -60,6 +60,8 @@ This is how the operator skill records what the model proposed and what the oper
 - Without options the record is no-options and every v1 flag works unchanged.
 - `vloop intervention list`'s text output gains the agreement as a column, and TestInterventionAddListSet pins the new format.
 - Committed tests in internal/cli/intervention_test.go (or beside it) cover each refusal's message, exit code and that nothing was written, and each agreement add can produce.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/checks/004-go.fail.log
 
 <details><summary>verify command</summary>
 

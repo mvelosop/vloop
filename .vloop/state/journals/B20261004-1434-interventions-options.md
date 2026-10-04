@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** intervention/v2 (schema, parser reading v1 and v2, add writing v2, one derived agreement) is in place from earlier attempts; this attempt fixed the remaining check failure in TestWorkedExampleB6RealData.
 - **Files:** cmd/vloop/b6_e2e_test.go
 - **Notes for next iteration:** TestWorkedExampleB6RealData clones HEAD, which carries the live plan's committed .vloop/state/gates/T*; the plan check refused them as gates for tasks not in the fresh plan. The test now removes the clone's .vloop/state/gates beside state.json. The change adds one cleanup step and weakens no assertion.
+
+## T2 — Record options with vloop intervention add: --context, --option, --recommended, --why, --decided-option, --decided-other, --adjusted, --decided
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** vloop intervention add takes --context, --option (max three), --recommended, --why, --decided-option, --decided-other, --adjusted and --decided; it writes the v2 record with the derived agreement and refuses malformed combinations with the brief's messages (exit 2, nothing written). list text gains an agreement column.
+- **Files:** internal/intervention/intervention.go, internal/cli/intervention.go, internal/cli/intervention_test.go
+- **Notes for next iteration:** Validation lives in intervention.CheckOptions, called by the CLI before the root is resolved and again by Add. Flag presence uses RecommendedSet/DecidedOptionSet (cmd.Flags().Changed) so --recommended 0 is refused, not read as unset. list text is now phase  kind  automatable  agreement  id.

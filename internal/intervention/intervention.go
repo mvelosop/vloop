@@ -109,6 +109,54 @@ func DeriveAgreement(options, recommended int, decided string, adjusted bool) (s
 // NewInput is what `intervention add` takes.
 type NewInput struct {
 	Summary, Brief, Phase, Kind, Automatable, By, Trigger, Done, Automation string
+
+	Context string
+	Options []string
+	// Why is the reason for the recommended option.
+	Why string
+	// Recommended and DecidedOption are 1-based; the *Set flags say whether
+	// the flag was given, so that 0 is refused rather than read as unset.
+	Recommended, DecidedOption       int
+	RecommendedSet, DecidedOptionSet bool
+	DecidedOther, Adjusted           bool
+	Decided                          string
+}
+
+// CheckOptions refuses a malformed combination of the options flags, with the
+// message the CLI prints; nothing is written before it passes.
+func CheckOptions(in NewInput) error {
+	n := len(in.Options)
+	if n == 0 {
+		if in.RecommendedSet || in.DecidedOptionSet || in.DecidedOther || in.Why != "" {
+			return errors.New("--recommended, --decided-option and --decided-other need options")
+		}
+		if in.Adjusted {
+			return errors.New("--adjusted needs --decided-option")
+		}
+		return nil
+	}
+	if n > MaxOptions {
+		return errors.New("at most three options")
+	}
+	if !in.RecommendedSet || in.Why == "" {
+		return errors.New("options need --recommended and --why")
+	}
+	if in.Recommended < 1 || in.Recommended > n {
+		return fmt.Errorf("--recommended must name an option, 1 to %d", n)
+	}
+	if in.DecidedOptionSet && in.DecidedOther {
+		return errors.New("--decided-option and --decided-other exclude each other")
+	}
+	if !in.DecidedOptionSet && !in.DecidedOther {
+		return errors.New("options need --decided-option or --decided-other")
+	}
+	if in.DecidedOptionSet && (in.DecidedOption < 1 || in.DecidedOption > n) {
+		return fmt.Errorf("--decided-option must name an option, 1 to %d", n)
+	}
+	if in.Adjusted && !in.DecidedOptionSet {
+		return errors.New("--adjusted needs --decided-option")
+	}
+	return nil
 }
 
 // Validate checks one enum value, returning the usage error the CLI reports.
@@ -142,12 +190,32 @@ func oneLine(s string) string { return strings.Join(strings.Fields(s), " ") }
 // Add writes a new intervention file and returns its repo-relative path.
 // Values are validated by the caller (Validate).
 func Add(root string, in NewInput, now time.Time) (string, error) {
+	if err := CheckOptions(in); err != nil {
+		return "", err
+	}
 	summary := oneLine(in.Summary)
 	v := Intervention{
 		Schema: "intervention/v2", Agreement: "no-options", Options: []string{}, Brief: defect.BriefName(in.Brief), Phase: in.Phase, Kind: in.Kind,
 		Automatable: in.Automatable, By: in.By, Occurred: now.Format("2006-01-02"),
 		Recorded: now.UTC().Format("2006-01-02T15:04:05Z"), Summary: summary,
 		Trigger: oneLine(in.Trigger), Done: oneLine(in.Done), Automation: oneLine(in.Automation),
+	}
+	v.Context, v.Decided.Text = oneLine(in.Context), oneLine(in.Decided)
+	for _, o := range in.Options {
+		v.Options = append(v.Options, oneLine(o))
+	}
+	if len(v.Options) > 0 {
+		v.Recommended = Recommended{Option: in.Recommended, Why: oneLine(in.Why)}
+		v.decision = "other"
+		if in.DecidedOptionSet {
+			v.Decided.Option, v.decision = in.DecidedOption, strconv.Itoa(in.DecidedOption)
+			v.Decided.Adjusted = in.Adjusted
+		}
+		a, err := DeriveAgreement(len(v.Options), in.Recommended, v.decision, in.Adjusted)
+		if err != nil {
+			return "", err
+		}
+		v.Agreement = a
 	}
 	dir := filepath.Join(root, filepath.FromSlash(Dir))
 	if err := os.MkdirAll(dir, 0o755); err != nil {
