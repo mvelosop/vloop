@@ -111,3 +111,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** cmd/vloop/b20261004_e2e_test.go plays the brief's worked example in one temporary repository after vloop init, computing ids, paths and HEAD's sha. No defect was exposed.
 - **Files:** cmd/vloop/b20261004_e2e_test.go
 - **Notes for next iteration:** The implementation already satisfied the example, so no package code changed. The v1 record is inlined in the test, not read from the gate fixtures. The test file is named b20261004_e2e_test.go after the brief's id.
+
+## Run ended — blocked
+
+- **Run:** `B20261004-1434-interventions-options` · 15 iteration(s) this run
+- **Plan:** 9/11 done, 1 blocked
