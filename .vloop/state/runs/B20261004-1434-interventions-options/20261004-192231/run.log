@@ -57,3 +57,8 @@ committing the plan
    check go
    review: PASS
    T6 done
+── iteration 10 (10 this run) · T7 · 6/11 done ──
+   Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
+   check go
+   review: PASS
+   T7 done

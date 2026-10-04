@@ -170,6 +170,7 @@ func b3Summary(sha string) []string {
 		"cost $2.10 · plan 1.00 · work 0.90 · review 0.20 · $140.00 per 1,000 code lines",
 		"models plan claude-opus-5-5 · work claude-sonnet-5-5 · review claude-sonnet-5-5",
 		"defects in-loop 1 · operator 0 · escaped 0 · removal efficiency 100%",
+		"interventions 0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0",
 	}
 }
 

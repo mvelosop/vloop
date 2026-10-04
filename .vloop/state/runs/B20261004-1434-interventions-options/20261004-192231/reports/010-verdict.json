@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop metrics <brief>` prints, on the line right after `defects`, `interventions  <n> · recommended <a> · other-option <b> · adjusted <c> · different <d> · no-options <e>`, counting the brief's records only; series-level records (brief \"\") belong to no brief.", "met": true, "evidence": "internal/metrics/print.go prints the line right after defects; metrics.go Build uses intervention.List(root, r.Brief), which skips records whose brief differs, so series-level records are excluded; the line is pinned in metrics_test.go and b3/b4 e2e tests"},
+    {"criterion": "Its JSON, and the snapshot `vloop brief close` writes, gain `interventions: {total, by_agreement: {…the five agreements…}}`; metrics/v2 declares it as optional; every other key of a brief's metrics is unchanged.", "met": true, "evidence": "Report.Interventions has json tag interventions with total and by_agreement (five keys); schemas/metrics.v2.json adds the property without adding it to the top-level required list; no other Report field changed"},
+    {"criterion": "Each intervention line of `vloop metrics export` gains `agreement` and `options` (the count) and still validates as export/v1. Violation to rule against: an option's text, the reason, the decision or the context anywhere in the export.", "met": true, "evidence": "export.go adds Agreement and len(v.Options) only; export.v1.json adds agreement (enum) and options (integer); no text fields are added"},
+    {"criterion": "Committed tests: the metrics and snapshot tests that pin the per-brief summary gain the interventions line; internal/cli/export_test.go TestExportInterventions gains agreement and options among the keys and asserts none of the four texts is exported.", "met": true, "evidence": "the interventions line was added to metrics_test.go, b3_e2e_test.go and b4_e2e_test.go; TestExportInterventions checks the agreement and options keys and values, and asserts that the ZQX sentinel strings (context, options, why, decided) are absent"}
+  ],
+  "findings": [],
+  "notes": "The summary tests only pin all-zero counts, so the per-brief filtering and the by_agreement counting are not exercised with nonzero data in committed tests. This is a gap in the plan and does not fail the task."
+}

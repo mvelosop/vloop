@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/11 done** · iteration 9
+**Status:** running · **7/11 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:16:04Z
+**Brief:** `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` · **Updated:** 2026-10-04T20:49:38Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Add vloop intervention migrate: v1 records to intervention/v2, frontmatter only
 - [x] **T5** — Add vloop intervention show <id>, resolving the ids written in its Context
 - [x] **T6** — Report agreement across briefs: vloop metrics --interventions, by kind and by phase, and across a workspace
-- [ ] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
+- [x] **T7** — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
 - [ ] **T8** — Teach the operator skills to propose options and record them, and add the operate-proposes-options eval case
 - [ ] **T9** — Add the Agreement column to the interventions index, and document v2 in the guides and the domain
 - [ ] **T10** — Migrate this repository's intervention records to intervention/v2 and refresh the index
@@ -160,7 +160,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Per brief, the summary and its JSON (and the snapshot written at close) gain the interventions count by agreement, so a brief's record shows how often the model's recommendation was taken. The export gains the agreement and the option count per intervention but never the options' text, the reason, the decision or the context. Both are additive keys on existing schemas, not new versions, and every other number stays as it was.
 

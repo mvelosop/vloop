@@ -69,3 +69,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop metrics --interventions prints the agreement table by kind (default) or phase with a total row, --json rows, and a repo-first table across --workspace; --by task is refused with exit 2.
 - **Files:** internal/metrics/interventions.go, internal/cli/metrics.go, internal/cli/workspace.go, internal/cli/metrics_interventions_test.go, docs/guide/commands.md
 - **Notes for next iteration:** Counts are recomputed from intervention.List each run. Share is recommended/(n-no-options) rounded half up, n/a when the divisor is 0. Every kind or phase gets a row, zeros included; the workspace table prints every kind per repo then one total row. JSON rows use snake_case keys and repo only in the workspace form. docs/guide/commands.md regenerated with go generate. TestTaskGate* in internal/cli fail only inside a loop session (plan changed), not from this change.
+
+## T7 — Add the interventions line and object to per-brief metrics and the close snapshot, and agreement and options to the export
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Per-brief metrics gain an interventions object (total, by_agreement) and a summary line after defects, which the close snapshot inherits; the export's intervention lines gain agreement and options (the count), never any text. metrics/v2 and export/v1 declare the keys as optional.
+- **Files:** internal/metrics/metrics.go, internal/metrics/print.go, internal/cli/export.go, schemas/metrics.v2.json, schemas/export.v1.json, internal/cli/export_test.go, internal/cli/metrics_test.go, cmd/vloop/b3_e2e_test.go, cmd/vloop/b4_e2e_test.go
+- **Notes for next iteration:** by_agreement keys are hyphenated (other-option, no-options), matching the agreement values. Interventions are counted from intervention.List(root, brief), so series-level records (brief empty) are excluded. TestTaskGate* in internal/cli fail only inside a loop session (plan changed during this session), not from this change.

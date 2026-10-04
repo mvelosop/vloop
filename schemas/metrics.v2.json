@@ -111,6 +111,25 @@
         "removal_efficiency": { "type": ["number", "null"], "description": "(in_loop + operator) / total; null with no defects" }
       }
     },
+    "interventions": {
+      "type": "object",
+      "description": "the brief's intervention records, counted by derived agreement; absent in snapshots written before options existed",
+      "required": ["total", "by_agreement"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "by_agreement": {
+          "type": "object",
+          "required": ["recommended", "other-option", "adjusted", "different", "no-options"],
+          "properties": {
+            "recommended": { "type": "integer", "minimum": 0 },
+            "other-option": { "type": "integer", "minimum": 0 },
+            "adjusted": { "type": "integer", "minimum": 0 },
+            "different": { "type": "integer", "minimum": 0 },
+            "no-options": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
     "records": {
       "type": "object",
       "required": ["missing"],

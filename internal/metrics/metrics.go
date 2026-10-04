@@ -9,6 +9,7 @@ import (
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -75,6 +76,19 @@ type ReportDefects struct {
 	RemovalEfficiency *float64 `json:"removal_efficiency"`
 }
 
+// ReportInterventions is the `interventions` object: the brief's records, and
+// how many fall under each agreement.
+type ReportInterventions struct {
+	Total       int `json:"total"`
+	ByAgreement struct {
+		Recommended int `json:"recommended"`
+		OtherOption int `json:"other-option"`
+		Adjusted    int `json:"adjusted"`
+		Different   int `json:"different"`
+		NoOptions   int `json:"no-options"`
+	} `json:"by_agreement"`
+}
+
 // MissingRecord is a session record that should exist and does not.
 type MissingRecord struct {
 	Task      string `json:"task"`
@@ -110,7 +124,9 @@ type Report struct {
 	Models  PerPhase[[]string] `json:"models"`
 	Effort  PerPhase[*string]  `json:"effort"`
 	Defects ReportDefects      `json:"defects"`
-	Records struct {
+	// Interventions counts the brief's intervention records by agreement.
+	Interventions ReportInterventions `json:"interventions"`
+	Records       struct {
 		Missing []MissingRecord `json:"missing"`
 	} `json:"records"`
 	LeadTime struct {
@@ -231,6 +247,27 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	dc := x.Counts()
 	r.Defects = ReportDefects{InLoop: dc.InLoop, Operator: dc.Operator, Escaped: dc.Escaped, Total: dc.All()}
 	r.Defects.RemovalEfficiency = fratio(float64(dc.InLoop+dc.Operator), float64(dc.All()))
+
+	ivs, err := intervention.List(root, r.Brief)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range ivs {
+		r.Interventions.Total++
+		a := &r.Interventions.ByAgreement
+		switch v.Agreement {
+		case "recommended":
+			a.Recommended++
+		case "other-option":
+			a.OtherOption++
+		case "adjusted":
+			a.Adjusted++
+		case "different":
+			a.Different++
+		default:
+			a.NoOptions++
+		}
+	}
 
 	r.ByTask = byTask(m, plan, size)
 	return r, nil

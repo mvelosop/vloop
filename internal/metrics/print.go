@@ -104,6 +104,9 @@ func PrintSummary(out io.Writer, r *Report) {
 		joinModels(r.Models.Plan), joinModels(r.Models.Work), joinModels(r.Models.Review), grModels)
 	fmt.Fprintf(out, " defects   in-loop %d · operator %d · escaped %d · removal efficiency %s\n",
 		r.Defects.InLoop, r.Defects.Operator, r.Defects.Escaped, efficiency(r.Defects))
+	ia := r.Interventions.ByAgreement
+	fmt.Fprintf(out, " interventions  %d · recommended %d · other-option %d · adjusted %d · different %d · no-options %d\n",
+		r.Interventions.Total, ia.Recommended, ia.OtherOption, ia.Adjusted, ia.Different, ia.NoOptions)
 	if n := len(r.Records.Missing); n > 0 {
 		var l []string
 		for _, m := range r.Records.Missing {
