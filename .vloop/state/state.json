@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261004-1434-interventions-options.loop-brief.md",
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
-  "status": "blocked",
-  "iteration": 15,
+  "status": "running",
+  "iteration": 16,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T22:04:38Z",
+  "updated": "2026-10-04T22:05:55Z",
   "shell": "sh",
   "checks": [
     {
@@ -284,8 +284,8 @@
       ],
       "verify": "sh .vloop/state/gates/T9/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": "gate failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-192231/gates/T9.log"
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261004-1434-interventions-options/20261004-230439/checks/016-go.fail.log"
     },
     {
       "id": "T10",

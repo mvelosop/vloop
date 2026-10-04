@@ -116,3 +116,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261004-1434-interventions-options` · 15 iteration(s) this run
 - **Plan:** 9/11 done, 1 blocked
+
+## T9 — Add the Agreement column to the interventions index, and document v2 in the guides and the domain
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** The interventions index script has an Agreement column and validates by and agreement; the guides, the interventions README and the domain docs document intervention/v2, its flags, refusals and tables.
+- **Files:** tools/interventions-index.sh, docs/guide/defects.md, docs/guide/metrics.md, .vloop/interventions/README-interventions.md, docs/domain/domain-model.md, docs/domain/measurement/measurement-context.md, internal/cli/guide_test.go, internal/cli/interventions_index_test.go
+- **Notes for next iteration:** All files were already committed at HEAD (including the README v2 section the operator added); this attempt found nothing to change. The README's index block already has the Agreement column.

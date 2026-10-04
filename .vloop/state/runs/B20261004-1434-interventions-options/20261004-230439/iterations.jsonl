@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":29710,"exit":1,"name":"go"}],"ended":"2026-10-04T22:05:55Z","gate":{"duration_ms":216,"exit":0},"iteration":16,"outcome":"check_failed","run_id":"B20261004-1434-interventions-options","schema":"iteration/v2","started":"2026-10-04T22:04:39Z","task":"T9"}
