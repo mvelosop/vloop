@@ -53,3 +53,7 @@
    Update the operator guides: concepts, the generated commands reference and metrics
    review: PASS
    T15 done
+── iteration 20 (15 this run) · T16 · 15/16 done ──
+   Close B9: the worked example line for line, go test ./..., and the real-data check
+   review: PASS
+   T16 done

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **15/16 done** · iteration 19
+**Status:** running · **16/16 done** · iteration 20
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T01:17:16Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T02:17:33Z
 
 ## Progress
 
@@ -23,7 +23,7 @@
 - [x] **T13** — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
 - [x] **T14** — Update the domain model and the execution and measurement docs for the gate model
 - [x] **T15** — Update the operator guides: concepts, the generated commands reference and metrics
-- [ ] **T16** — Close B9: the worked example line for line, go test ./..., and the real-data check
+- [x] **T16** — Close B9: the worked example line for line, go test ./..., and the real-data check
 
 ## Tasks
 
@@ -397,7 +397,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T16 — Close B9: the worked example line for line, go test ./..., and the real-data check
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
+`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
 
 **Files:** `cmd/vloop/b9_e2e_test.go`
 
