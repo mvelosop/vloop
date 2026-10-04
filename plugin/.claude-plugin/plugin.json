@@ -1,6 +1,6 @@
 {
   "name": "vloop",
-  "version": "1.0.0",
+  "version": "2.0.0-beta.1",
   "description": "The vloop autonomous loop for Claude Code: plan a brief into tasks, then work, gate, review and commit each one.",
   "author": { "name": "Miguel Veloso" }
 }
