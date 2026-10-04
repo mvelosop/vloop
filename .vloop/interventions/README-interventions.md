@@ -45,6 +45,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | partly | [I20261001-1040-planner-gate-checks-questioned](I20261001-1040-planner-gate-checks-questioned.md) |
 | design | decision | partly | [I20261002-2140-b8-designed-from-the-v1-0-review-securit](I20261002-2140-b8-designed-from-the-v1-0-review-securit.md) |
 | design | decision | no | [I20261003-2053-b9-s-forks-settled-gates-may-be-the-plan](I20261003-2053-b9-s-forks-settled-gates-may-be-the-plan.md) |
+| design | decision | no | [I20261004-1435-b10-s-forks-settled-options-as-body-sect](I20261004-1435-b10-s-forks-settled-options-as-body-sect.md) |
 | design | direction | no | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
@@ -100,6 +101,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | next | carry-forward | no | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |
 | next | ceremony | yes | [I20260930-1010-the-b4-draft-reached-main-inside-an-unre](I20260930-1010-the-b4-draft-reached-main-inside-an-unre.md) |
+| next | ceremony | partly | [I20261004-1337-v2-0-0-beta-1-released-as-a-pre-release](I20261004-1337-v2-0-0-beta-1-released-as-a-pre-release.md) |
 | next | direction | no | [I20260929-2130-the-metrics-and-defects-design-before-b2](I20260929-2130-the-metrics-and-defects-design-before-b2.md) |
 | next | direction | no | [I20260930-0955-a-project-level-driver-over-project-stat](I20260930-0955-a-project-level-driver-over-project-stat.md) |
 | next | direction | no | [I20260930-1654-a-documentation-layer-for-the-design-ste](I20260930-1654-a-documentation-layer-for-the-design-ste.md) |
