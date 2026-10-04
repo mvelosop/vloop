@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T13",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/evals/plan-checks-its-gates/ graders no longer score running gates on the base; they score judges in the gate folder and no repository suite in any verify.", "met": true, "evidence": "the two base-run graders are deleted; judges-not-task-written.md (llm, reads state.json) and no-repository-suite.md (regex not_contains on go test/pytest/sh tests/ in verify) are added; scaffold.sh comment updated"},
+    {"criterion": "A new eval suite invokes /vloop:gate-review on a scaffolded repository whose state/v2 plan plants five gates — a path typo, a judge that is a file its task writes, a grep of source text, one that passes on the base, and a sound one — with graders that require the four planted defects to be found with the right finding kind and the sound gate to PASS.", "met": true, "evidence": "plugin/evals/gate-review-planted-gates/: prompt.md is /vloop:gate-review; scaffold.sh plants T1 typo (wrong-reason), T2 source grep (not-contract), T3 task-written judge (task-reach), T4 passes on base (wrong-reason), T5 sound; graders finds-* and sound-gate-passes.md check kinds and verdicts, matching the gate-review skill's kinds and gate-verdict.json path"},
+    {"criterion": "Each scaffold runs offline in an empty directory and its planted plan passes `vloop task validate`.", "met": true, "evidence": "scaffold uses require_empty and no network; the T13 gate (gates/T13.log: GATE OK) scaffolds each case, runs task validate, and checks 1 pass / 4 fail on the base"},
+    {"criterion": "plugin/evals/README.md and docs/guide/evals.md list the new suite and the changed one.", "met": true, "evidence": "README.md table and docs/guide/evals.md skills table both list gate-review-planted-gates and the changed plan-checks-its-gates row; case count updated to 14"}
+  ],
+  "findings": [],
+  "notes": "T3's task-written judge is the single deliberate one and is documented in the scaffold header. No absolute paths seen in the diff."
+}

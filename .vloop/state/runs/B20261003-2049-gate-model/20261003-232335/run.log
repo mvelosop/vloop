@@ -41,3 +41,7 @@
    Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
    review: PASS
    T12 done
+── iteration 17 (12 this run) · T13 · 12/16 done ──
+   Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
+   review: PASS
+   T13 done

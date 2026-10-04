@@ -8,7 +8,7 @@
     "planned": 16,
     "done": 3,
     "blocked": 1,
-    "first_pass": 8,
+    "first_pass": 9,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,30 +43,30 @@
     "rework": 1.0011848341232228
   },
   "time": {
-    "agent_ms": 11482611,
-    "work_ms": 10986751,
-    "review_ms": 495860,
+    "agent_ms": 11833522,
+    "work_ms": 11319512,
+    "review_ms": 514010,
     "plan_ms": 2493754,
-    "gates_ms": 215263,
+    "gates_ms": 217861,
     "wall_ms": 2714000
   },
   "rate": {
-    "code_per_min": 4.410146786301478,
-    "code_test_per_min": 7.45649225598603
+    "code_per_min": 4.2793683909152325,
+    "code_test_per_min": 7.235377599331796
   },
   "cost": {
-    "total_usd": 20.3773018,
+    "total_usd": 21.267283400000004,
     "plan_usd": 9.2589652,
-    "work_usd": 8.886247800000001,
-    "review_usd": 2.2320888,
-    "per_1000_code_lines_usd": 24.143722511848345
+    "work_usd": 9.614506600000002,
+    "review_usd": 2.3938116000000003,
+    "per_1000_code_lines_usd": 25.198203080568724
   },
   "tokens": {
-    "input": 904,
-    "output": 389117,
-    "cache_read": 35278839,
-    "cache_creation": 1598105,
-    "cache_hit_ratio": 0.9566403928992819
+    "input": 960,
+    "output": 407059,
+    "cache_read": 36797587,
+    "cache_creation": 1699780,
+    "cache_hit_ratio": 0.9558230153741486
   },
   "models": {
     "plan": [
@@ -98,8 +98,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 7,
-  "iterations": 15,
-  "iterations_per_closed": 5,
+  "iterations": 16,
+  "iterations_per_closed": 5.333333333333333,
   "by_task": [
     {
       "id": "T1",
@@ -358,7 +358,7 @@
       "id": "T12",
       "area": null,
       "kind": "docs",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -371,9 +371,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 350911,
+      "cost_usd": 0.8899816000000002,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T13",

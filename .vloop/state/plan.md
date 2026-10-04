@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **12/16 done** · iteration 16
+**Status:** running · **13/16 done** · iteration 17
 
-**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T01:06:48Z
+**Brief:** `docs/briefs/B20261003-2049-gate-model.loop-brief.md` · **Updated:** 2026-10-04T01:11:23Z
 
 ## Progress
 
@@ -20,7 +20,7 @@
 - [x] **T10** — Add the gate-review session: its kind, fence, model and effort, verdict, rounds, exit 2 and resume
 - [x] **T11** — Move metrics to metrics/v2 with check and gate-review time, and derive a defect from each check failure
 - [x] **T12** — Rewrite the plan, review and work skills for the gate model and add /vloop:gate-review
-- [ ] **T13** — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
+- [x] **T13** — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
 - [ ] **T14** — Update the domain model and the execution and measurement docs for the gate model
 - [ ] **T15** — Update the operator guides: concepts, the generated commands reference and metrics
 - [ ] **T16** — Close B9: the worked example line for line, go test ./..., and the real-data check
@@ -327,7 +327,7 @@ GT="${VLOOP_GATE_TASK:-}"; AT="${VLOOP_ACTIVE_TASK:-}"; OWN=1; if [ -n "$GT" ] &
 
 ### T13 — Regrade plan-checks-its-gates and add the /vloop:gate-review eval suite with planted gates
 
-`pending` · depends on: T5, T12
+`done` · depends on: T5, T12
 
 **Files:** `plugin/evals/`, `docs/guide/evals.md`
 
