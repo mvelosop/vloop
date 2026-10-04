@@ -137,3 +137,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The records were already intervention/v2 at HEAD and the index already regenerated, so nothing needed changing; the gate passes.
 - **Files:** none
 - **Notes for next iteration:** Built vloop migrate reports nothing to migrate and interventions-index.sh --write leaves the tree clean; the operator's earlier commit already did the migration and index. No files changed this attempt.
+
+## Run ended — complete
+
+- **Run:** `B20261004-1434-interventions-options` · 3 iteration(s) this run
+- **Plan:** 11/11 done, 0 blocked

@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261004-1434-interventions-options.loop-brief.md",
   "base": "daa4477cc7c99cf354c64c0573a53a26f9d8891b",
   "branch": "B20261004-1434-interventions-options",
-  "status": "running",
+  "status": "complete",
   "iteration": 18,
   "created": "2026-10-04T18:55:00Z",
-  "updated": "2026-10-04T22:10:41Z",
+  "updated": "2026-10-04T22:10:44Z",
   "shell": "sh",
   "checks": [
     {
