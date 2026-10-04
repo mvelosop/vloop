@@ -209,7 +209,7 @@ vloop intervention list [flags]
 
 ## vloop intervention set
 
-Set brief, phase, kind, automatable, by, occurred of an intervention
+Set brief, phase, kind, automatable, by, occurred, recommended, decided, adjusted of an intervention
 
 ```
 vloop intervention set <id> <field> <value>

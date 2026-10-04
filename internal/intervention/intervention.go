@@ -30,7 +30,7 @@ var (
 )
 
 // SetFields are the fields `intervention set` may change.
-var SetFields = []string{"brief", "phase", "kind", "automatable", "by", "occurred"}
+var SetFields = []string{"brief", "phase", "kind", "automatable", "by", "occurred", "recommended", "decided", "adjusted"}
 
 // Agreements are the values of the derived agreement field.
 var Agreements = []string{"recommended", "other-option", "adjusted", "different", "no-options"}
@@ -488,8 +488,16 @@ func List(root, brief string) ([]Intervention, error) {
 }
 
 // Set changes one frontmatter field of a recorded intervention, keeping the
-// rest of the file. Validation happens before the file is touched.
+// rest of the file. Validation happens before the file is touched. The choice
+// fields (recommended, decided, adjusted) rewrite the derived agreement in the
+// same write; agreement and options are never set.
 func Set(root, id, field, value string) error {
+	switch field {
+	case "agreement":
+		return errors.New("agreement is derived — set decided, adjusted or recommended instead")
+	case "options":
+		return errors.New("options are recorded with the intervention, not set")
+	}
 	if !slices.Contains(SetFields, field) {
 		return fmt.Errorf("cannot set %q: want one of %s", field, strings.Join(SetFields, ", "))
 	}
@@ -504,25 +512,88 @@ func Set(root, id, field, value string) error {
 	if err != nil {
 		return fmt.Errorf("no intervention %s", id)
 	}
-	if _, err := parse(string(b)); err != nil {
+	v, err := parse(string(b))
+	if err != nil {
 		return err
 	}
-	line := field + ": " + value
-	if field == "brief" {
-		line = field + ": " + quote(defect.BriefName(value))
+	// updates maps a frontmatter key to its new line; "" removes the line.
+	updates := map[string]string{field: field + ": " + value}
+	switch field {
+	case "brief":
+		updates[field] = field + ": " + quote(defect.BriefName(value))
+	case "recommended", "decided", "adjusted":
+		n := len(v.Options)
+		if n == 0 {
+			return fmt.Errorf("cannot set %s: the record has no options", field)
+		}
+		rec, decided, adjusted := v.Recommended.Option, v.decision, v.Decided.Adjusted
+		switch field {
+		case "recommended":
+			r, err := strconv.Atoi(value)
+			if err != nil || r < 1 || r > n {
+				return fmt.Errorf("recommended must name an option, 1 to %d", n)
+			}
+			rec = r
+		case "decided":
+			if d, err := strconv.Atoi(value); value != "other" && (err != nil || d < 1 || d > n) {
+				return fmt.Errorf("decided must name an option, 1 to %d, or other", n)
+			}
+			decided = value
+		case "adjusted":
+			if value != "true" && value != "false" {
+				return fmt.Errorf("adjusted must be true or false")
+			}
+			adjusted = value == "true"
+		}
+		if decided == "other" {
+			adjusted = false
+		}
+		a, err := DeriveAgreement(n, rec, decided, adjusted)
+		if err != nil {
+			return err
+		}
+		updates["recommended"] = "recommended: " + strconv.Itoa(rec)
+		updates["decided"] = "decided: " + quote(decided)
+		updates["adjusted"] = ""
+		if adjusted {
+			updates["adjusted"] = "adjusted: true"
+		}
+		updates["agreement"] = "agreement: " + a
 	}
 	lines := strings.Split(string(b), "\n")
-	for i := 1; i < len(lines) && lines[i] != "---"; i++ {
-		if strings.HasPrefix(lines[i], field+":") {
-			lines[i] = line
-			return os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0o644)
-		}
-	}
-	for i := 1; i < len(lines); i++ { // field absent: insert before the closing fence
+	end := -1
+	for i := 1; i < len(lines); i++ {
 		if lines[i] == "---" {
-			lines = slices.Insert(lines, i, line)
-			return os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0o644)
+			end = i
+			break
 		}
 	}
-	return errors.New("unterminated frontmatter")
+	if end < 0 {
+		return errors.New("unterminated frontmatter")
+	}
+	keys := make([]string, 0, len(updates))
+	for k := range updates {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		line, found := updates[k], false
+		for i := 1; i < end; i++ {
+			if strings.HasPrefix(lines[i], k+":") {
+				found = true
+				if line == "" {
+					lines = slices.Delete(lines, i, i+1)
+					end--
+				} else {
+					lines[i] = line
+				}
+				break
+			}
+		}
+		if !found && line != "" { // field absent: insert before the closing fence
+			lines = slices.Insert(lines, end, line)
+			end++
+		}
+	}
+	return os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0o644)
 }

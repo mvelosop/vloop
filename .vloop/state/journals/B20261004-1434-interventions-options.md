@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop intervention add takes the options flags and refuses malformed combinations with the brief's messages; the previous check failure is fixed by regenerating docs/guide/commands.md, which now documents the new flags.
 - **Files:** internal/intervention/intervention.go, internal/cli/intervention.go, internal/cli/intervention_test.go, docs/guide/commands.md
 - **Notes for next iteration:** The earlier check failure was docs/guide/commands.md being stale: run go generate ./... after adding flags. TestTaskGate* in internal/cli fail only inside a loop session (plan changed during this session), not from this change.
+
+## T3 — Correct a record with vloop intervention set: recommended, decided and adjusted, re-deriving agreement
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop intervention set now accepts recommended, decided and adjusted, validated against the record's option count and rewriting agreement (T1's derivation) in the same write; agreement and options are refused with the brief's messages.
+- **Files:** internal/intervention/intervention.go, internal/cli/intervention_test.go, docs/guide/commands.md
+- **Notes for next iteration:** Set updates frontmatter lines in place (adjusted: false deletes the line; deciding other clears adjusted). The agreement/options refusals are plain errors from intervention.Set, so exit 2; value or no-options refusals on the new fields are Problem errors (exit 1) and leave the file untouched. docs/guide/commands.md regenerated with go generate ./... because the set help text lists SetFields.

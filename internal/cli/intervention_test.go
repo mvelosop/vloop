@@ -130,3 +130,39 @@ func TestInterventionAddOptions(t *testing.T) {
 		}
 	}
 }
+
+func TestInterventionSetChoice(t *testing.T) {
+	dir := t.TempDir()
+	_, out, _ := runDefect(t, dir, "intervention", "add", "Pick", "--phase", "run", "--kind", "decision", "--automatable", "no", "--by", "both",
+		"--option", "a", "--option", "b", "--recommended", "1", "--why", "w", "--decided-option", "1")
+	p := strings.TrimSpace(out)
+	id := strings.TrimSuffix(filepath.Base(p), ".md")
+	read := func() string { b, _ := os.ReadFile(filepath.Join(dir, p)); return string(b) }
+	set := func(f, v string) int { c, _, _ := runDefect(t, dir, "intervention", "set", id, f, v); return c }
+	for _, c := range []struct{ f, v, want string }{
+		{"decided", "2", "agreement: other-option\n"},
+		{"adjusted", "true", "agreement: adjusted\n"},
+		{"adjusted", "false", "agreement: other-option\n"},
+		{"recommended", "2", "agreement: recommended\n"},
+		{"decided", "other", "agreement: different\n"},
+	} {
+		if code := set(c.f, c.v); code != 0 || !strings.Contains(read(), c.want) {
+			t.Fatalf("set %s %s: %d\n%s", c.f, c.v, code, read())
+		}
+	}
+	if strings.Contains(read(), "adjusted:") {
+		t.Fatalf("adjusted lingers:\n%s", read())
+	}
+	before := read()
+	for _, c := range [][2]string{{"decided", "3"}, {"recommended", "3"}, {"adjusted", "maybe"}} {
+		if code := set(c[0], c[1]); code == 0 || read() != before {
+			t.Fatalf("set %s %s accepted or changed the file", c[0], c[1])
+		}
+	}
+	for f, msg := range map[string]string{"agreement": "vloop: agreement is derived — set decided, adjusted or recommended instead\n", "options": "vloop: options are recorded with the intervention, not set\n"} {
+		code, _, e := runDefect(t, dir, "intervention", "set", id, f, "1")
+		if code != 2 || e != msg || read() != before {
+			t.Fatalf("set %s: %d %q", f, code, e)
+		}
+	}
+}
