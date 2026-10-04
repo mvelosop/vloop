@@ -1,0 +1,54 @@
+{
+  "schema": "state/v2",
+  "run_id": "B20260101-0900-a",
+  "brief": "docs/briefs/B20260101-0900-a.loop-brief.md",
+  "base": "0000000000000000000000000000000000000000",
+  "branch": "B20260101-0900-a",
+  "status": "running",
+  "iteration": 0,
+  "created": "2026-01-01T09:00:00Z",
+  "updated": "2026-01-01T09:00:00Z",
+  "shell": "sh",
+  "checks": [],
+  "gate_scratch": [],
+  "gate_review": {
+    "rounds": 0,
+    "verdict": ""
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Build the widget",
+      "goal": "The widget. It exists.",
+      "kind": "feature",
+      "fixtures": "",
+      "references": [],
+      "depends_on": [],
+      "acceptance": [
+        "the widget exists"
+      ],
+      "verify": "true",
+      "status": "done",
+      "attempts": 1,
+      "notes": ""
+    },
+    {
+      "id": "T3",
+      "title": "A drifted title, not from a plan commit",
+      "goal": "The gate. It is fixed.",
+      "kind": "fix",
+      "fixtures": "",
+      "references": [],
+      "depends_on": [
+        "T1"
+      ],
+      "acceptance": [
+        "the gate passes"
+      ],
+      "verify": "true",
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    }
+  ]
+}

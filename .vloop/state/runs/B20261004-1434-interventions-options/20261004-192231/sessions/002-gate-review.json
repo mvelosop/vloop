@@ -1,0 +1,27 @@
+{
+  "cost_usd": 0.5728884,
+  "duration_ms": 109692,
+  "effort": null,
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 73968,
+      "cache_read_input_tokens": 903212,
+      "cost_usd": 0.5728884,
+      "input_tokens": 32,
+      "output_tokens": 9631
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "gate-review",
+  "run_id": "B20261004-1434-interventions-options",
+  "schema": "session/v2",
+  "started": "2026-10-04T18:54:26Z",
+  "turns": 19
+}

@@ -1,0 +1,17 @@
+ok  	github.com/mvelosop/vloop	0.869s
+?   	github.com/mvelosop/vloop/cmd/gendocs	[no test files]
+ok  	github.com/mvelosop/vloop/cmd/vloop	548.905s
+ok  	github.com/mvelosop/vloop/internal/brief	1.303s
+ok  	github.com/mvelosop/vloop/internal/classify	1.608s
+ok  	github.com/mvelosop/vloop/internal/cli	32.174s
+ok  	github.com/mvelosop/vloop/internal/closing	3.037s
+ok  	github.com/mvelosop/vloop/internal/config	2.691s
+ok  	github.com/mvelosop/vloop/internal/defect	4.621s
+ok  	github.com/mvelosop/vloop/internal/detect	3.784s
+ok  	github.com/mvelosop/vloop/internal/driver	9.299s
+ok  	github.com/mvelosop/vloop/internal/install	3.751s
+ok  	github.com/mvelosop/vloop/internal/intervention	3.650s
+ok  	github.com/mvelosop/vloop/internal/metrics	5.178s
+ok  	github.com/mvelosop/vloop/internal/runs	4.819s
+ok  	github.com/mvelosop/vloop/internal/schema	3.322s
+ok  	github.com/mvelosop/vloop/internal/state	3.980s
