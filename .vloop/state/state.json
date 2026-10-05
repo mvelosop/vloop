@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 17,
+  "iteration": 18,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T22:14:29Z",
+  "updated": "2026-10-05T22:18:44Z",
   "shell": "sh",
   "checks": [
     {
@@ -457,8 +457,8 @@
       ],
       "verify": "sh .vloop/state/gates/T14/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261005-0933-quality-pass/20261005-212917/checks/018-go.fail.log"
     },
     {
       "id": "T15",

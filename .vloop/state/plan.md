@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **11/17 done** · iteration 17
+**Status:** running · **11/17 done** · iteration 18
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T22:14:29Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T22:18:44Z
 
 ## Progress
 
@@ -21,7 +21,7 @@
 - [x] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes · 1 attempt(s)
 - [ ] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude · **blocked**
 - [ ] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
-- [ ] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
+- [ ] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges · 1 attempt(s)
 - [ ] **T15** — Bring the guides and the domain's CLI conventions up to v2
 - [ ] **T16** — Rewrite the README as a newcomer's page, last
 - [ ] **T17** — Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
@@ -339,7 +339,7 @@ sh .vloop/state/gates/T13/gate.sh
 
 ### T14 — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 Evals are the skills' gates, and two of them score sound sessions low. plan-checks-its-gates' fixture grader reads the trace, which ends before the planner writes its gate-folder fixtures, so a sound plan scores 0.67 (defect D20261004-1309). operate-proposes-options' two judge graders failed 3-0 on an answer that proposes two real options with a reasoned recommendation, because they judge everything the answer raises (defect D20261005-0757). This task makes the first judge the files themselves and the second judge only the options offered for the disputed gate. Running the evals is the operator's, at verification.
 
@@ -350,6 +350,8 @@ Evals are the skills' gates, and two of them score sound sessions low. plan-chec
 - operate-proposes-options' judge graders judge only the options offered for the disputed gate (count, realism, one recommendation with its reason); other problems or observations the answer raises do not lower their score, and their wording says so.
 - Both cases stay well-formed (case.yaml, prompt, scaffold, every grader with a known type, a weight and a description) and both scaffolds still build their repositories in an empty directory.
 - The proposal's notes say the cases need an operator eval run and give the command; scores and spend go in the run record (the operator's, not this session's).
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261005-0933-quality-pass/20261005-212917/checks/018-go.fail.log
 
 <details><summary>verify command</summary>
 
