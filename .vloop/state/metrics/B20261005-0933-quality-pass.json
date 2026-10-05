@@ -43,33 +43,33 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 4272562,
-    "work_ms": 3944590,
+    "agent_ms": 4298301,
+    "work_ms": 3970329,
     "review_ms": 327972,
     "plan_ms": 1735548,
-    "gates_ms": 93263,
-    "checks_ms": 2570361,
+    "gates_ms": 94699,
+    "checks_ms": 2751278,
     "gate_review_ms": 694700,
     "wall_ms": 998000
   },
   "rate": {
     "code_per_min": 0,
-    "code_test_per_min": 1.8677318199244388
+    "code_test_per_min": 1.856547505630713
   },
   "cost": {
-    "total_usd": 19.259762799999997,
+    "total_usd": 19.402866399999994,
     "plan_usd": 9.523685999999998,
-    "work_usd": 4.915067199999999,
+    "work_usd": 5.058170799999999,
     "review_usd": 1.9135246000000001,
     "gate_review_usd": 2.9074849999999994,
     "per_1000_code_lines_usd": null
   },
   "tokens": {
-    "input": 1072,
-    "output": 348785,
-    "cache_read": 37255764,
-    "cache_creation": 1361767,
-    "cache_hit_ratio": 0.96471029778058
+    "input": 1086,
+    "output": 351283,
+    "cache_read": 37431162,
+    "cache_creation": 1382521,
+    "cache_hit_ratio": 0.964353594375378
   },
   "models": {
     "plan": [
@@ -92,10 +92,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 7,
+    "in_loop": 8,
     "operator": 0,
     "escaped": 0,
-    "total": 7,
+    "total": 8,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -115,7 +115,7 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 17,
-  "iterations": 17,
+  "iterations": 18,
   "iterations_per_closed": null,
   "by_task": [
     {
@@ -419,7 +419,7 @@
       "id": "T14",
       "area": null,
       "kind": "test",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -432,9 +432,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 25739,
+      "cost_usd": 0.1431036,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T15",

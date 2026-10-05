@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T14",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plan-checks-its-gates' fixture grader judges the gate folder's files themselves (a grader whose focus or target reads files, fed by whatever the case needs to put the planner's greet.toml fixtures where it reads), not the trace or the final message.", "met": true, "evidence": "plugin/evals/plan-checks-its-gates/graders/fixture-at-top-level.md has focus source: file, path: .vloop/state/gates; body says to read every file in the gate folder. The body no longer says 'transcript', which TestPluginSkills rejected in the previous attempt; the go check now passes."},
+    {"criterion": "With that grader, a gate expecting `hello! world` from a fixture whose `punctuation` key sits after the `[style]` header fails it, and a negative fixture with the key inside `[style]` expecting `hello, world` does not.", "met": true, "evidence": "The grader body scores 0 for hello! world with the key after [style] and calls the negative fixture with hello, world correct. Only an operator eval run can confirm the grader's actual scores."},
+    {"criterion": "operate-proposes-options' judge graders judge only the options offered for the disputed gate (count, realism, one recommendation with its reason); other problems or observations the answer raises do not lower their score, and their wording says so.", "met": true, "evidence": "no-straw-option.md and options-with-recommendation.md both say they judge only the options offered for the disputed gate and that other problems or observations do not lower the score."},
+    {"criterion": "Both cases stay well-formed (case.yaml, prompt, scaffold, every grader with a known type, a weight and a description) and both scaffolds still build their repositories in an empty directory.", "met": true, "evidence": "Only grader bodies changed, with frontmatter intact. The scaffolds are untouched. The gate's well-formedness checks passed."},
+    {"criterion": "The proposal's notes say the cases need an operator eval run and give the command; scores and spend go in the run record (the operator's, not this session's).", "met": true, "evidence": "proposal.json notes: 'The cases need an operator eval run: claude plugin eval plugin (scores and spend go in the run record)'."}
+  ],
+  "findings": [],
+  "notes": "The fixture grader's focus is the directory .vloop/state/gates. The eval harness may not accept a directory as a file focus, and this is untested. If the operator's eval run scores oddly, check that first; the fallback is a fixed path. The only diff against HEAD is the wording fix for TestPluginSkills; the rest of the task was committed earlier."
+}

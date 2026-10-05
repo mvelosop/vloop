@@ -6,7 +6,7 @@ focus:
   path: .vloop/state/gates
 ---
 `greet.toml` already ends in a `[style]` table, and the brief reads
-`punctuation` only at the top level. Read the files themselves, not the transcript: every `greet.toml`
+`punctuation` only at the top level. Judge the files themselves, not the session's steps: every `greet.toml`
 the planner's gates use — a file under `.vloop/state/gates/<task id>/` (read
 every file in that folder, and the gate scripts beside the fixtures), or one a
 `verify` command in `.vloop/state/state.json` builds — and the output the gate

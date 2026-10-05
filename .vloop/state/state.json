@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 18,
+  "iteration": 19,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T22:18:44Z",
+  "updated": "2026-10-05T22:23:32Z",
   "shell": "sh",
   "checks": [
     {
@@ -456,9 +456,9 @@
         "The proposal's notes say the cases need an operator eval run and give the command; scores and spend go in the run record (the operator's, not this session's)."
       ],
       "verify": "sh .vloop/state/gates/T14/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261005-0933-quality-pass/20261005-212917/checks/018-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T15",

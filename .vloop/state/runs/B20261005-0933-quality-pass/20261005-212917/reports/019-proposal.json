@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T14",
+  "outcome": "done",
+  "summary": "plan-checks-its-gates' fixture grader now judges the gate folder's files (focus: file .vloop/state/gates); operate-proposes-options' two judges judge only the options offered for the disputed gate and say so. Fixed the previous attempt's check failure: TestPluginSkills rejected the grader body for saying 'transcript' without focus: trace.",
+  "files": ["plugin/evals/plan-checks-its-gates/graders/fixture-at-top-level.md", "plugin/evals/operate-proposes-options/graders/no-straw-option.md", "plugin/evals/operate-proposes-options/graders/options-with-recommendation.md"],
+  "verified": "vloop task gate T14 exited 0 (gate T14: ok); env -i go test ./internal/cli -run 'TestPluginSkills|TestSkillChecks' ok.",
+  "notes": "The cases need an operator eval run: claude plugin eval plugin (scores and spend go in the run record). The fixture grader's focus is the directory .vloop/state/gates because the scaffold does not know task ids; whether the eval harness accepts a directory as a file focus is untested, so if it scores oddly check that first (fallback: a fixed path). Keep the word 'transcript' out of llm grader bodies that do not use focus: trace; TestPluginSkills rejects it."
+}

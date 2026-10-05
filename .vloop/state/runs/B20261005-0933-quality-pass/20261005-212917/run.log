@@ -70,3 +70,8 @@
    Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
    check go
    CHECK FAIL T14 — check go failed — see .vloop/state/runs/B20261005-0933-quality-pass/20261005-212917/checks/018-go.fail.log; review skipped
+── iteration 19 (16 this run) · T14 · 11/17 done ──
+   Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
+   check go
+   review: PASS
+   T14 done
