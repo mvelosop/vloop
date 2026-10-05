@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 14,
+  "iteration": 15,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T21:58:42Z",
+  "updated": "2026-10-05T22:07:00Z",
   "shell": "sh",
   "checks": [
     {
@@ -367,8 +367,8 @@
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "No committed test covers a resumed run that closes nothing and halts with exit 5; the task required one and only the throwaway gate exercises it; A task that was done at run start, reverted by a gate regression and redone during the run is not counted as closed this run, because closed is keyed on done-at-start"
     },
     {
       "id": "T12",

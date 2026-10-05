@@ -52,3 +52,7 @@
    check go
    review: PASS
    T10 done
+── iteration 15 (12 this run) · T11 · 10/17 done ──
+   Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes
+   check go
+   review: FAIL

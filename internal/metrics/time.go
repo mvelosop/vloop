@@ -271,7 +271,8 @@ type Tasks struct {
 }
 
 // CountTasks counts tasks in the plan as committed at the last run commit.
-// A task is first-pass when it has iterations and every one ended `done`.
+// A task is first-pass when it has exactly one iteration and it ended `done`:
+// a task done, reverted by a gate regression and redone is not.
 // briefText is the brief's content, for its estimate; "" states none.
 func CountTasks(m *runs.Model, plan *runs.PlanDoc, briefText string) Tasks {
 	t := Tasks{Estimate: BriefEstimate(briefText)}
@@ -291,20 +292,11 @@ func CountTasks(m *runs.Model, plan *runs.PlanDoc, briefText string) Tasks {
 			case "blocked":
 				t.Blocked++
 			}
-			if os := outcomes[pt.ID]; len(os) > 0 && onlyDone(os) {
+			if os := outcomes[pt.ID]; len(os) == 1 && os[0] == "done" {
 				t.FirstPass++
 			}
 		}
 	}
 	t.IterationsPerClosed = fratio(float64(t.Iterations), float64(t.Done))
 	return t
-}
-
-func onlyDone(os []string) bool {
-	for _, o := range os {
-		if o != "done" {
-			return false
-		}
-	}
-	return true
 }

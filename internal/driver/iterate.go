@@ -199,6 +199,12 @@ func (it *Iterator) Run() (Ending, error) {
 	}
 
 	runIters, stalls := 0, 0
+	doneAtStart := map[string]bool{}
+	for _, t := range plan.Tasks {
+		if t.Status == "done" {
+			doneAtStart[t.ID] = true
+		}
+	}
 	it.blockedAt = map[string]blockedMark{}
 	end := Ending{Status: "halted", Code: ExitMaxIter}
 	for {
@@ -231,9 +237,15 @@ func (it *Iterator) Run() (Ending, error) {
 			end = Ending{Status: "halted", Code: ExitCostCeiling}
 			break
 		}
+		closed := 0
+		for _, t := range plan.Tasks {
+			if t.Status == "done" && !doneAtStart[t.ID] {
+				closed++
+			}
+		}
 		if runIters >= it.Budgets.ConvergenceMin &&
-			(done == 0 || float64(runIters)/float64(done) > it.Budgets.ConvergenceMax) {
-			it.warn("not converging: %d iteration(s) this run for %d closed task(s), over %.2f per closed task", runIters, done, it.Budgets.ConvergenceMax)
+			(closed == 0 || float64(runIters)/float64(closed) > it.Budgets.ConvergenceMax) {
+			it.warn("not converging: %d iteration(s) this run for %d closed task(s), over %.2f per closed task", runIters, closed, it.Budgets.ConvergenceMax)
 			end = Ending{Status: "halted", Code: ExitNotConverging}
 			break
 		}
