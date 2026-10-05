@@ -2,7 +2,7 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **12/17 done** · iteration 19
+**Status:** blocked · **12/17 done** · iteration 19
 
 **Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T22:23:32Z
 
