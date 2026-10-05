@@ -61,3 +61,7 @@
    check go
    review: PASS
    T11 done
+── iteration 17 (14 this run) · T12 · 11/17 done ──
+   Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
+   GATE DISPUTE T12 — blocked for the operator; no review, no attempt charged
+   T12 blocked — the operator resolves the disputed gate with vloop task verify

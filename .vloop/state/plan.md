@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **11/17 done** · iteration 16
+**Status:** running · **11/17 done** · iteration 17
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T22:12:19Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T22:14:29Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section · 1 attempt(s)
 - [x] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
 - [x] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes · 1 attempt(s)
-- [ ] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
+- [ ] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude · **blocked**
 - [ ] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
 - [ ] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
 - [ ] **T15** — Bring the guides and the domain's CLI conventions up to v2
@@ -290,7 +290,7 @@ sh .vloop/state/gates/T11/gate.sh
 
 ### T12 — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
 
-`pending` · depends on: T4
+`blocked` · **blocked** · depends on: T4
 
 vloop run supplies the plugin itself with --plugin-dir, and no marketplace exists while the repository is private, yet doctor warns "no enabled vloop plugin — run claude plugin install vloop@vloop" on every machine, cannot tell installed-but-disabled from absent, and swallows the error when `claude plugin list` fails. This task makes the check pass with the --plugin-dir hint, name the enable command for a disabled plugin, and warn with the error when the listing fails.
 
@@ -302,6 +302,8 @@ vloop run supplies the plugin itself with --plugin-dir, and no marketplace exist
 - An enabled vloop plugin of the binary's version passes, and one of another version keeps its version-mismatch warning.
 - Tests cover the four cases with a fake claude; the checks run them.
 - No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.
+
+**From the last attempt:** gate disputed: The gate's plugin() helper greps '^[^ ]* plugin ' with a trailing space, so it cannot match a passing check with an empty message, which is how doctor prints every other message-less pass. — The last clause runs plugin with an enabled vloop plugin of the binary's version; doctor prints '✓ plugin' and the grep returns '' ('does not pass: '''). The acceptance requires only that this case passes, not that it carries a message.
 
 <details><summary>verify command</summary>
 
