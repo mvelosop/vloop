@@ -103,6 +103,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261001-2310-eval-suite-first-run](I20261001-2310-eval-suite-first-run.md) |
 | verify | verification-finding | partly | no-options | [I20261002-1426-b7-s-acceptance-run-restarted-detached-t](I20261002-1426-b7-s-acceptance-run-restarted-detached-t.md) |
 | verify | verification-finding | partly | no-options | [I20261002-2118-the-url-shortener-benchmark-the-cost-dro](I20261002-2118-the-url-shortener-benchmark-the-cost-dro.md) |
+| verify | verification-finding | partly | recommended | [I20261005-0757-b10-verified-the-worked-example-held-by](I20261005-0757-b10-verified-the-worked-example-held-by.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

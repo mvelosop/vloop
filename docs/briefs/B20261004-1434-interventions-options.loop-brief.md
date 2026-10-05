@@ -9,6 +9,7 @@ depends-on: [B20261003-2049-gate-model.loop-brief]
 ---
 # Brief — vloop B10: interventions that weigh the model against the operator
 
+- **Status:** consumed — closed 2026-10-05 as run B20261004-1434-interventions-options. **Do not re-plan from this brief.**
 - **Starting point:** extends `main` after the v2.0.0-beta.1 release
   (`42ee0a6`, tag `v2.0.0-beta.1`) and the upgrade to it (`dc6c4a4`, PR #16).
   The planner pins the base it plans from as the **base** every gate compares
@@ -448,3 +449,67 @@ T11  -     test     1    0      274    0      0       1m25s   $0.39  claude-sonn
 - D20261005-0756-vloop-intervention-show-leaves-the-schem — bug, work, found by operator: vloop intervention show leaves the schema and options lines out of its frontmatter block and prints adjusted: false when the field is absent; migrate --dry-run prints bare file names, not repo-relative paths
 - D20261005-0757-operate-proposes-options-scored-0-5-its — gate, plan, found by operator: operate-proposes-options scored 0.5: its two judge graders failed 3-0 on a final answer that, read by the operator, proposes two real options, recommends one with its reason and pads nothing; the graders' wording or focus needs work
 <!-- vloop:run-record:end -->
+
+### Operator notes
+
+Written by hand, outside the generated markers.
+
+**The first brief run under the gate model** (v2.0.0-beta.1). The base check
+passed, the planner wrote 11 gates of about 32 characters each calling an oracle
+in its gate folder, every gate failed on the base, and the first real gate
+review passed all 11 in round 1 ($0.57, 1.8 min). Planning cost $6.97 in 22.4
+minutes against B9's $9.26 in 41.6: the base checks moved off the planner. Two
+runs, 18 iterations, $13.48; the wall time includes the 9-minute check after
+every iteration.
+
+**The checks caught what no gate would.** T1's first two attempts failed the
+`go` check: a schema count pinned by `embed_test.go`, and
+`TestWorkedExampleB6RealData`, broken by the operator's B9 repair (it removed the
+clone's plan but not its gate folders). T1's third attempt fixed both — the
+fixture correction exactly as the operator would have — and the review passed
+it. T2's check caught a stale generated command reference.
+
+**One halt, the brief's gap and the gate review's miss** (I20261004-2304, the
+first `intervention/v2` record with options). The brief put two writes under
+`.vloop/interventions/` — the README's v2 section (I9) and the migration (the
+real-data check) — which S-4 keeps from every session. T9 blocked after three
+attempts the driver restored; the gate review had passed both gates rather than
+finding them unpassable. By hand, with a build of the branch: the README section,
+`vloop intervention migrate` (77 records, 385 frontmatter lines added, no body
+byte changed) and the index. T9's and T10's gates passed unchanged; both were
+reset, and each still went through a work session and a review.
+
+**Verified outside the loop.** Refs: every commit on the work branch, `main`
+untouched at `dc6c4a4`. `go test ./...`, `go vet` (also windows), `gofmt`,
+`go mod tidy -diff`, both cross-builds, `.loop/tests/run-all.sh` (47/47), the
+interventions index, `claude plugin validate`. **The worked example by an
+independent session** with a fresh build: every line with the brief's exact
+messages and exit codes, plus field and section order, the migration's body
+bytes, `upgrade` leaving records alone, every link kind, and the export carrying
+no text. **Real data:** `vloop metrics --json` for B1–B9 equals beta.1's apart
+from the added `interventions` object; on this repository all 78 records parse as
+v2, every Context section reads into `context`, and `vloop metrics
+--interventions` equals the index's counts. No earlier test was deleted; every
+changed one is on the must-change list or recorded above.
+
+**Two fixes by hand, test first** (after the run's last commit, not in the
+delivered lines): `set adjusted` wrote the field after `recorded` instead of
+between `decided` and `agreement`; the workspace table ignored `--by phase`.
+**Carried to B11:** two unquoted `set` refusals exit 1, not 2
+(D20261005-0756-two-vloop-intervention-set-refusals-the); `show` leaves out the
+`schema` and `options` lines and `migrate --dry-run` prints bare file names
+(D20261005-0756-vloop-intervention-show-leaves-the-schem).
+
+**Eval** (one run, plugin arm): `operate-proposes-options` 0.5, $0.25. The two
+transcript graders passed (no gate edited or amended); the two judge graders
+failed 3–0 on an answer that proposes two real options, recommends one with its
+reason and asks before moving refs. Open as
+D20261005-0757-operate-proposes-options-scored-0-5-its, with D20261004-1309, for
+B11's eval work.
+
+**Permission denials:** five in the plan session and one in the gate review;
+the session records keep no command text, so they cannot be explained.
+
+**Next.** B11, the quality pass, last of the series; it runs from the release
+cut after this merges (v2.0.0-beta.2 if the operator wants the options in the
+driver's own records first).
