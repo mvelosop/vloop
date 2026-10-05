@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop intervention migrate` rewrites every v1 record under .vloop/interventions/ by inserting `schema: intervention/v2`, `options: 0`, `recommended: 0`, `decided: \"\"` and `agreement: no-options` right after `by:`, and changes no other byte of the file; `recorded` and `backfilled` are left as they are. Violation to rule against: a migration that re-renders the record, normalises whitespace, or touches the body.", "met": true, "evidence": "internal/intervention/intervention.go migrateText splits with SplitAfter and appends the five lines to the by: line only; TestInterventionMigrate compares byte for byte against a record with trailing spaces and backfilled: true"},
+    {"criterion": "It prints `migrated <n> record(s)`, or `nothing to migrate` when no record is v1, and is idempotent; v2 records are left byte for byte.", "met": true, "evidence": "internal/cli/intervention.go prints both messages; the test asserts both outputs and an unchanged file on the second run; records with a schema: line return ok=false"},
+    {"criterion": "`--dry-run` lists the files it would migrate and writes nothing.", "met": true, "evidence": "Migrate skips WriteFile when dryRun; the test asserts the listed name and that the file is unchanged"},
+    {"criterion": "`vloop upgrade` neither calls migrate nor rewrites any record.", "met": true, "evidence": "the diff does not touch the upgrade code; TestUpgradeLeavesV1InterventionAlone asserts the file is unchanged after upgrade --yes"},
+    {"criterion": "Committed tests cover the byte-for-byte insertion, the dry run, idempotence, and that upgrade leaves a v1 record alone.", "met": true, "evidence": "internal/cli/intervention_test.go TestInterventionMigrate and internal/cli/upgrade_test.go TestUpgradeLeavesV1InterventionAlone; the go check passed"}
+  ],
+  "findings": [],
+  "notes": "Migration only; docs/guide/commands.md updated. No pre-existing tests were modified. none."
+}

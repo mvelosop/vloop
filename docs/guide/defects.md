@@ -140,10 +140,12 @@ are `defects.in_loop`, `operator`, `escaped`, `total` and `removal_efficiency`
 
 An intervention is what the operator (or the assistant as their hands) did around
 a run besides testing it: a decision, a halt handled, a repair. Recording them
-shows what a driver could one day do itself. One file each:
+shows what a driver could one day do itself, and, where the assistant proposed
+options, how often the operator took its recommendation. One file each:
 `.vloop/interventions/I<YYYYMMDD-HHMM>-<slug>.md`, YAML frontmatter, then the
-summary line and three sections, **Trigger.**, **Done.** and **What would
-automate it.**
+summary line and the sections **Trigger.**, **Done.** and **What would automate
+it.**, plus, in a v2 record, **Context.**, **Options.**, **Recommended.**,
+**Suggested.** and **Decided.**
 
 ```
 ---
@@ -153,15 +155,23 @@ phase: halt          # setup | design | run | halt | verify | close | next
 kind: repair         # direction | decision | context-supply | halt | verification-finding | repair | carry-forward | ceremony
 automatable: partly  # yes | partly | no
 by: operator         # operator | assistant | both
+schema: intervention/v2
+options: 2           # 0 to 3
+recommended: 1       # the option the assistant recommended; 0 with no options
+decided: 2           # 1 to 3, other, or "" with no options
+agreement: other-option   # derived: recommended | other-option | adjusted | different | no-options
 occurred: 2026-01-01
 recorded: 2026-01-01T10:00:00Z
 ---
 ```
 
-The frontmatter is the `intervention/v1` schema (`vloop schema show
-intervention/v1`). Every field:
+The frontmatter is the `intervention/v2` schema (`vloop schema show
+intervention/v2`). A record written before options existed is `intervention/v1`
+(`vloop schema show intervention/v1`): it has no `schema:` line, and is still
+read, as a record with no options. Every field:
 
-- `schema`: always `intervention/v1` in the JSON form.
+- `schema`: `intervention/v2` (the JSON form says `intervention/v1` or
+  `intervention/v2`).
 - `id`: the file name without `.md`.
 - `brief`: the loop brief it belongs to, empty for a series-level one.
 - `phase`: `setup`, `design`, `run`, `halt`, `verify`, `close` or `next`.
@@ -169,18 +179,86 @@ intervention/v1`). Every field:
   `verification-finding`, `repair`, `carry-forward` or `ceremony`.
 - `automatable`: `yes`, `partly` or `no`: could a driver do it.
 - `by`: `operator`, `assistant` or `both`.
+- `options`: how many options the assistant proposed, 0 to 3.
+- `recommended`: the number of the option the assistant recommended.
+- `decided`: the option the operator chose, 1 to 3, or `other` when they chose
+  something that was not among the options. The number, not the option's text:
+  the text is in the Options section once.
+- `adjusted`: `true` when the operator took a numbered option but changed it.
+  Only with a numbered `decided`; otherwise the line is absent.
+- `agreement`: derived from the three above, never written by hand:
+  `recommended` (decided the recommended option as it stood), `other-option`
+  (decided another numbered option), `adjusted` (decided a numbered option,
+  changed), `different` (decided `other`: something none of the options
+  offered) or `no-options` (the record has no options, so it cannot agree or
+  disagree; every v1 record).
 - `occurred`: the date it happened; `recorded`: an RFC 3339 date-time.
 - `backfilled`: `true` on a record written after the fact.
 - `summary`, `trigger`, `done`, `automation`: the summary line and the three
-  sections, in the JSON form.
+  sections, in the JSON form. `context`, `options` (the option texts),
+  `recommended` (`option` and `why`), `suggested`, `decided` (`option`, `text`
+  and `adjusted`) and `agreement` are the v2 additions.
+
+The body sections of a v2 record: **Context.** names the ids it concerns (a
+task, run, defect, intervention or commit), **Options.** lists the numbered
+options, **Recommended.** gives the reason for the recommendation,
+**Suggested.** holds anything the assistant suggested beyond the options, and
+**Decided.** says what was decided, in the operator's words.
 
 `vloop intervention add "<summary>" --phase <p> --kind <k> --automatable <a>
 --by <b>` writes the file and prints its path; it also takes `--brief <name>`,
-`--trigger`, `--done` and `--automation`. `vloop intervention list [--brief
-<name>]` prints `<phase>  <kind>  <automatable>  <id>`, by phase, kind and id.
+`--trigger`, `--done` and `--automation`, and the flags that record options:
+
+- `--context <text>`: the Context section.
+- `--option <text>`: one option; repeat it, up to three times.
+- `--recommended <n>` and `--why <text>`: the recommended option's number and
+  the reason for it.
+- `--decided-option <n>`: the option the operator chose.
+- `--decided-other`: the operator chose something none of the options offered;
+  `--decided <text>` says what, in the Decided section.
+- `--adjusted`: the chosen option was changed; it goes with `--decided-option`.
+
+Without `--option` the record has no options and is `no-options`. A malformed
+combination is refused, exit 2, and nothing is written:
+
+- `at most three options`
+- `options need --recommended and --why`
+- `--recommended must name an option, 1 to <n>`
+- `options need --decided-option or --decided-other`
+- `--decided-option must name an option, 1 to <n>`
+- `--decided-option and --decided-other exclude each other`
+- `--adjusted needs --decided-option`
+- `--recommended, --decided-option and --decided-other need options`
+
+`vloop intervention list [--brief <name>]` prints `<phase>  <kind>
+<automatable>  <agreement>  <id>`, by phase, kind and id.
 `vloop intervention set <id> <field> <value>` changes `brief`, `phase`, `kind`,
-`automatable`, `by` or `occurred`.
+`automatable`, `by`, `occurred`, and, on a record with options, `recommended`
+(1 to the option count), `decided` (1 to the option count, or `other`) and
+`adjusted` (`true` or `false`); the derived agreement is rewritten in the same
+write, and deciding `other` clears `adjusted`. Two refusals, exit 2:
+
+- `agreement is derived — set decided, adjusted or recommended instead`
+- `options are recorded with the intervention, not set`
+
+Setting `recommended`, `decided` or `adjusted` on a record with no options is
+refused (`cannot set <field>: the record has no options`), exit 1.
+
+`vloop intervention migrate [--dry-run]` moves every v1 record to
+`intervention/v2`: it inserts the `schema`, `options`, `recommended`, `decided`
+and `agreement: no-options` lines after `by:` and changes no other byte, so
+`recorded` and `backfilled` stay as they were. `--dry-run` lists the records
+it would migrate and writes nothing; a second run finds nothing to migrate.
+
+`vloop intervention show <id>` prints the record, then a links block resolving
+every task, run, defect, intervention and commit id named in its Context, in
+order of first appearance, each with its title or `(not found)`; `--json` adds
+`links` as `{ref, kind, title}`. An unknown id exits 1. Only Context is read,
+so a link is something the recorder chose to name.
+
+The per-brief `interventions` line of `vloop metrics` and the `--interventions`
+table are in [metrics.md](metrics.md).
 
 `vloop metrics export` emits one intervention record per intervention, after the
-briefs, and every export record's `repo` carries `stacks`: the repository's
+briefs (with `agreement` and the count of `options`, never their text), and every export record's `repo` carries `stacks`: the repository's
 `metrics.stacks`, empty when unset.

@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T11",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Every line of the brief's worked example holds in a temporary repository with vloop init done: each add variant's options, recommended, decided and agreement; each listed refusal's exact message and exit 2; set decided 2 giving other-option and set agreement refused; a hand-edited agreement failing list with exit 1 naming the file; a v1 record's Context and Decided read into context and decided.text, then migrated (migrated 1 record(s), body unchanged) and a second migrate saying nothing to migrate; show's links for the defect (not found), HEAD's sha (its subject) and the run id (not found); the interventions table's repair and total rows; --by task refused; and every exported intervention carrying agreement and options with none of their texts.", "met": true, "evidence": "cmd/vloop/b20261004_e2e_test.go:113-121 the five add variants, :141-145 the five refusals with exact message and exit 2, :147-160 set, :162-166 hand-edited list exit 1, :172-208 v1 and migrate, :210-237 show links, :247-260 metrics and --by task, :262-294 export. Gate and go check passed."},
+    {"criterion": "A committed end-to-end test in cmd/vloop, following the b<N>_e2e_test.go convention, runs the worked example and computes ids, paths and the sha rather than hardcoding them.", "met": true, "evidence": "b20261004_e2e_test.go: sha from git rev-parse, record path and id from add's output, links parsed from show output."},
+    {"criterion": "Any defect the worked example exposes is fixed test first, in the package that owns it, without weakening an existing test.", "met": true, "evidence": "The diff only adds the new test file, so no existing test was touched. The proposal says no defect was exposed, and the passing test supports that."}
+  ],
+  "findings": [],
+  "notes": "The test does not cover the brief's real-data check on this repository, which is the operator's. The v1 record is inlined in the test rather than read from a fixture, and that is acceptable."
+}

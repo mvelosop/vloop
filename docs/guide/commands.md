@@ -180,14 +180,22 @@ Record an intervention as .vloop/interventions/I<stamp>-<slug>.md and print its 
 vloop intervention add "<summary>" [flags]
 ```
 
+- `--adjusted`: the decided option was adjusted
 - `--automatable string`: could a driver do it: yes, partly, no
 - `--automation string`: what would automate it
 - `--brief string`: the loop brief it belongs to (none: series-level)
 - `--by string`: who did it: operator, assistant, both
+- `--context string`: the situation, and the ids it refers to
+- `--decided string`: what was decided
+- `--decided-option int`: the option decided, 1 to the number of options (default 0)
+- `--decided-other`: something other than the options was decided
 - `--done string`: what was done
 - `--kind string`: kind: direction, decision, context-supply, halt, verification-finding, repair, carry-forward, ceremony
+- `--option stringArray`: an option put to the operator (repeatable, at most three)
 - `--phase string`: lifecycle phase: setup, design, run, halt, verify, close, next
+- `--recommended int`: the recommended option, 1 to the number of options (default 0)
 - `--trigger string`: what made it necessary
+- `--why string`: why that option is recommended
 
 ## vloop intervention list
 
@@ -199,12 +207,30 @@ vloop intervention list [flags]
 
 - `--brief string`: only interventions of this loop brief
 
+## vloop intervention migrate
+
+Move v1 intervention records to intervention/v2, inserting the no-options frontmatter lines and changing nothing else
+
+```
+vloop intervention migrate [flags]
+```
+
+- `--dry-run`: list the records that would be migrated and write nothing
+
 ## vloop intervention set
 
-Set brief, phase, kind, automatable, by, occurred of an intervention
+Set brief, phase, kind, automatable, by, occurred, recommended, decided, adjusted of an intervention
 
 ```
 vloop intervention set <id> <field> <value>
+```
+
+## vloop intervention show
+
+Print an intervention and resolve the ids named in its Context
+
+```
+vloop intervention show <id>
 ```
 
 ## vloop metrics
@@ -216,6 +242,7 @@ vloop metrics [<brief>…] [flags]
 ```
 
 - `--by task`: break the summary down by task
+- `--interventions kind`: report agreement with the recommended option, by kind or phase, from the intervention records
 - `--workspace file`: show every repository the workspace file lists, with a repo column
 
 ## vloop metrics classify

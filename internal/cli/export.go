@@ -39,6 +39,8 @@ type exportIntervention struct {
 	Occurred    string     `json:"occurred"`
 	Recorded    string     `json:"recorded"`
 	Backfilled  bool       `json:"backfilled,omitempty"`
+	Agreement   string     `json:"agreement"`
+	Options     int        `json:"options"`
 }
 
 type exportTask struct {
@@ -165,6 +167,7 @@ func exportRepoLines(g *Globals, out io.Writer, root, name string, args []string
 			Schema: exportSchema, Type: "intervention", Repo: repo, ID: v.ID, Brief: v.Brief,
 			Phase: v.Phase, Kind: v.Kind, Automatable: v.Automatable, By: v.By,
 			Occurred: v.Occurred, Recorded: v.Recorded, Backfilled: v.Backfilled,
+			Agreement: v.Agreement, Options: len(v.Options),
 		}
 		if err := enc.Encode(rec); err != nil {
 			return "", Problem(err)

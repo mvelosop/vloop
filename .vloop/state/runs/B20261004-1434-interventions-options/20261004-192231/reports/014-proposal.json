@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "The interventions README now documents the intervention/v2 frontmatter and the Context, Options, Recommended, Suggested and Decided sections, the last piece the gate lacked; the index script, guides and domain docs were already committed.",
+  "files": [".vloop/interventions/README-interventions.md"],
+  "verified": "vloop task gate T9 exited 0 and printed ok.",
+  "notes": "Earlier attempts' README edits were absent from the tree (the file was unchanged at HEAD), so this attempt re-added them; check the file is still modified after the driver's pass. The committed index block still has the old four columns until T10 runs tools/interventions-index.sh --write."
+}

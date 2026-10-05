@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Per-brief metrics gain an interventions object (total, by_agreement) and a summary line after defects, which the close snapshot inherits; the export's intervention lines gain agreement and options (the count), never any text. metrics/v2 and export/v1 declare the keys as optional.",
+  "files": ["internal/metrics/metrics.go", "internal/metrics/print.go", "internal/cli/export.go", "schemas/metrics.v2.json", "schemas/export.v1.json", "internal/cli/export_test.go", "internal/cli/metrics_test.go", "cmd/vloop/b3_e2e_test.go", "cmd/vloop/b4_e2e_test.go"],
+  "verified": "vloop task gate T7 exited 0 and printed gate T7: ok.",
+  "notes": "by_agreement keys are hyphenated (other-option, no-options), matching the agreement values. Interventions are counted from intervention.List(root, brief), so series-level records (brief empty) are excluded. TestTaskGate* in internal/cli fail only inside a loop session (plan changed during this session), not from this change."
+}

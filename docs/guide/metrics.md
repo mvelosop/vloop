@@ -190,6 +190,32 @@ summary says so on a `records` line.
   `master`) where the brief says `status: consumed`; `null` when not merged.
 - `schema` is `metrics/v2` (snapshots and records of earlier briefs may be `metrics/v1`, still read), and `brief` is the brief's file name.
 
+## Interventions
+
+`interventions` in the per-brief report counts the brief's recorded
+interventions (`.vloop/interventions/`, see [defects.md](defects.md)): `total`
+and `by_agreement`, whose keys are `recommended`, `other-option`, `adjusted`,
+`different` and `no-options`. The summary prints it as one line after the
+defects:
+
+```
+ interventions  <n> · recommended <n> · other-option <n> · adjusted <n> · different <n> · no-options <n>
+```
+
+Series-level records (no brief) are not counted in any brief. The line is part
+of the close snapshot too.
+
+`vloop metrics --interventions` reports agreement with the recommended option
+across every record, one row per kind (or `--by phase` for one row per phase),
+and a `total` row. Columns: `n` (records), `recommended`, `share`,
+`other-option`, `adjusted`, `different`, `no-options`, `automatable-yes` and
+`automatable-partly`. **share** = `recommended` / (`n` − `no-options`), a whole
+percentage, rounded half up, or `n/a` when no record has options: a record with
+no options cannot agree or disagree. `--json` prints the rows with snake_case
+keys. `--by task` is refused, exit 2. With `--workspace` the table has a
+leading `repo` column, each repository's kind rows in turn, then one `total`
+row over all of them.
+
 ## The summary
 
 ```

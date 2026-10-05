@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "intervention/v2 (schema, parser reading v1 and v2, add writing v2, one derived agreement) is in place from earlier attempts; this attempt fixed the remaining check failure in TestWorkedExampleB6RealData.",
+  "files": ["cmd/vloop/b6_e2e_test.go"],
+  "verified": "vloop task gate T1 printed gate T1: ok; go test ./cmd/vloop -run TestWorkedExampleB6RealData passed; gofmt and go vet clean.",
+  "notes": "TestWorkedExampleB6RealData clones HEAD, which carries the live plan's committed .vloop/state/gates/T*; the plan check refused them as gates for tasks not in the fresh plan. The test now removes the clone's .vloop/state/gates beside state.json. The change adds one cleanup step and weakens no assertion."
+}

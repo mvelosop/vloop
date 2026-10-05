@@ -8,7 +8,8 @@
 #
 # Rows sort by phase in lifecycle order, then kind, then id — which is also
 # chronological, since the id starts with I<YYYYMMDD-HHMM>. A record whose
-# phase, kind or automatable is outside the vocabulary fails the run: an index
+# phase, kind, automatable, by or agreement is outside the vocabulary fails the
+# run (a v1 record has no agreement and reads as no-options): an index
 # that silently sorts a typo to the top is worse than none.
 #
 # Plain bash and POSIX awk, so it runs on macOS's BSD tools and on Linux.
@@ -22,7 +23,7 @@ BEGIN_MARK="<!-- index:begin -->"
 END_MARK="<!-- index:end -->"
 
 table() {
-  printf '| Phase | Kind | Automatable | Id |\n| --- | --- | --- | --- |\n'
+  printf '| Phase | Kind | Automatable | Agreement | Id |\n| --- | --- | --- | --- | --- |\n'
   local f
   for f in "$DIR"/I*.md; do
     [[ -e "$f" ]] || continue
@@ -41,16 +42,23 @@ table() {
         for (i in kk) kinds[kk[i]] = 1
         split("yes partly no", aa, " ")
         for (i in aa) autos[aa[i]] = 1
+        split("operator assistant both", bb, " ")
+        for (i in bb) bys[bb[i]] = 1
+        split("recommended other-option adjusted different no-options", ag, " ")
+        for (i in ag) agrees[ag[i]] = 1
+        if (!("agreement" in a)) a["agreement"] = "no-options"
         bad = ""
         if (!(a["phase"] in order))      bad = bad " phase \"" a["phase"] "\""
         if (!(a["kind"] in kinds))       bad = bad " kind \"" a["kind"] "\""
         if (!(a["automatable"] in autos)) bad = bad " automatable \"" a["automatable"] "\""
+        if (!(a["by"] in bys))           bad = bad " by \"" a["by"] "\""
+        if (!(a["agreement"] in agrees)) bad = bad " agreement \"" a["agreement"] "\""
         if (a["id"] "" == "")            bad = bad " no id"
         if (bad != "") { print file ":" bad > "/dev/stderr"; exit 2 }
-        printf "%d\t%s\t%s\t%s\t%s\t%s\n", order[a["phase"]], a["phase"], a["kind"], a["automatable"], a["id"], file
+        printf "%d\t%s\t%s\t%s\t%s\t%s\t%s\n", order[a["phase"]], a["phase"], a["kind"], a["automatable"], a["agreement"], a["id"], file
       }' "$f"
-  done | sort -t "$(printf '\t')" -k1,1n -k3,3 -k5,5 |
-    awk -F '\t' '{ printf "| %s | %s | %s | [%s](%s) |\n", $2, $3, $4, $5, $6 }'
+  done | sort -t "$(printf '\t')" -k1,1n -k3,3 -k6,6 |
+    awk -F '\t' '{ printf "| %s | %s | %s | %s | [%s](%s) |\n", $2, $3, $4, $5, $6, $7 }'
 }
 
 # The index file with its marked block replaced by a fresh table.

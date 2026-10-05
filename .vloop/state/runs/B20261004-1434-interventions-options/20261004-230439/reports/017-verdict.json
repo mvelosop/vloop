@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "tools/interventions-index.sh prints an Agreement column read from the frontmatter (no-options for a v1 record) and fails, naming the file, on a `by` or `agreement` outside the vocabulary, as it does for phase, kind and automatable; it stays plain bash and POSIX awk.", "met": true, "evidence": "tools/interventions-index.sh: Agreement header, default no-options, by/agreement vocab checks printing file:bad to stderr, exit 2; awk only"},
+    {"criterion": "docs/guide/defects.md documents every v2 field and value, every add flag, every refusal message word for word, set's new fields and its two refusals, migrate with --dry-run, and show with its links.", "met": true, "evidence": "docs/guide/defects.md lines ~209-250 cover add flags, refusals, set refusals, migrate --dry-run; TestGuideDefectsCoversInterventions passes in the go check"},
+    {"criterion": "docs/guide/metrics.md documents the per-brief interventions line and the --interventions table: its columns, share, --by phase, --json and --workspace.", "met": true, "evidence": "docs/guide/metrics.md ~lines 205-220 describe the table, --by phase, --workspace"},
+    {"criterion": ".vloop/interventions/README-interventions.md documents the v2 frontmatter and the Context, Options, Recommended, Suggested and Decided sections.", "met": true, "evidence": "README-interventions.md rewritten in the branch diff against main (176 lines changed)"},
+    {"criterion": "docs/domain/domain-model.md changes in two places only: the intervention's vocabulary row reads \"anything the operator did around a run besides testing, with the options the model proposed and the operator's decision\" (dropping \"not yet a vloop entity\"), and the gaps line saying interventions have no command or schema is removed; docs/domain/measurement/measurement-context.md describes interventions as the entity they now are.", "met": true, "evidence": "git diff main on both files: exactly the vocabulary row and the gaps bullet in domain-model.md; measurement-context.md rewritten as an entity"},
+    {"criterion": "Committed tests: internal/cli/guide_test.go TestGuideDefectsCoversInterventions covers the intervention/v2 fields and values; a test the checks run exercises the index script's Agreement column and its by/agreement validation over fixture records in a temporary directory.", "met": true, "evidence": "guide_test.go:110 loops over intervention/v1 and v2; internal/cli/interventions_index_test.go has TestInterventionsIndexAgreementColumn and TestInterventionsIndexRefusesBadByAndAgreement; go check exit 0"}
+  ],
+  "findings": [],
+  "notes": "The docs and script were already in place from the earlier attempt; this attempt only changed TestExistingInterventionsValidate to validate each record against the schema it names, because the repo's records are now v2. That edit to a pre-existing test is a necessary consequence of the migration, not a loosened assertion (every record is still validated)."
+}

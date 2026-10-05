@@ -109,7 +109,7 @@ classDiagram
 | **defect** | a problem with an origin and a catcher; derived or recorded |
 | **stack preset** | built-in path globs that classify a language's lines |
 | **workspace** | a file listing several repos whose metrics are read together |
-| **intervention** | anything the operator did around a run besides testing *(recorded as data, not yet a vloop entity)* |
+| **intervention** | anything the operator did around a run besides testing, with the options the model proposed and the operator's decision |
 
 ## Identifiers
 
@@ -262,5 +262,3 @@ marked.
   metrics show them as `n/a`.
 - **`area` and `kind`** exist on tasks but no planner assigns them yet
   *(planned, B5)*.
-- **Interventions** are recorded as data (`.vloop/interventions/`), not yet a
-  vloop entity with a command or schema.

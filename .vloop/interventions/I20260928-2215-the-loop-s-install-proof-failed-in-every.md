@@ -5,6 +5,11 @@ phase: setup
 kind: repair
 automatable: yes
 by: assistant
+schema: intervention/v2
+options: 0
+recommended: 0
+decided: ""
+agreement: no-options
 occurred: 2026-09-28
 recorded: 2026-09-30T16:54:00Z
 backfilled: true

@@ -89,6 +89,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 		b3Brief + " consumed · not merged",
 		"tasks 2 planned (brief said 2–3) · 2 done · 0 blocked · first-pass 1/2",
 		"defects in-loop 1 · operator 1 · escaped 0 · removal efficiency 100%",
+		"interventions 0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0",
 		"recorded .vloop/defects/" + defect + ".md",
 		"wrote .vloop/state/metrics/" + b3Brief + ".json",
 		"updated " + b4File,

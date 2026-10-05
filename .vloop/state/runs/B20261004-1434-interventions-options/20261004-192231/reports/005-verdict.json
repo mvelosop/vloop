@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop intervention add` accepts `--context '<paragraph>'`, `--option '<sentence>'` (repeatable, at most three), `--recommended <n>`, `--why '<reason>'`, `--decided-option <n>`, `--decided-other`, `--adjusted` and `--decided '<sentence>'`, and writes options, recommended, decided, adjusted and the derived agreement in the frontmatter and the texts in the Context, Options, Recommended and Decided sections.", "met": true, "evidence": "internal/cli/intervention.go registers all eight flags; internal/intervention/intervention.go Add fills Options, Recommended, Decided, Adjusted and Agreement via DeriveAgreement. The gate T2 exits 0 and checks the written record. docs/guide/commands.md is regenerated."},
+    {"criterion": "Each refusal exits 2, writes nothing and prints exactly one stderr line, word for word as the brief's I2 quotes it: `vloop: at most three options`, `vloop: options need --recommended and --why`, `vloop: --recommended must name an option, 1 to <n>`, `vloop: options need --decided-option or --decided-other`, `vloop: --decided-option must name an option, 1 to <n>`, `vloop: --decided-option and --decided-other exclude each other`, `vloop: --adjusted needs --decided-option`, `vloop: --recommended, --decided-option and --decided-other need options`.", "met": true, "evidence": "CheckOptions in internal/intervention/intervention.go returns each message and is called before the root and any write. TestInterventionAddOptions asserts code 2, empty stdout, exact stderr line and no .vloop/interventions directory for ten refusal cases."},
+    {"criterion": "One or two options are recorded as one or two; nothing pads to three.", "met": true, "evidence": "Add appends only the given options. The test cases use two options and assert len(options)==2."},
+    {"criterion": "Without options the record is no-options and every v1 flag works unchanged.", "met": true, "evidence": "Add defaults Agreement to no-options with an empty Options list. TestInterventionAddListSet still passes with the v1 flags, and the list shows no-options."},
+    {"criterion": "`vloop intervention list`'s text output gains the agreement as a column, and TestInterventionAddListSet pins the new format.", "met": true, "evidence": "internal/cli/intervention.go:105 prints Agreement. The TestInterventionAddListSet expectations were updated to 'setup  repair  yes  no-options  I...'."},
+    {"criterion": "Committed tests in internal/cli/intervention_test.go (or beside it) cover each refusal's message, exit code and that nothing was written, and each agreement add can produce.", "met": true, "evidence": "TestInterventionAddOptions covers every refusal message and the four agreements: recommended, other-option, adjusted, different."}
+  ],
+  "findings": [],
+  "notes": "The only uncommitted change is the regenerated docs/guide/commands.md. The code was committed in HEAD by the previous check_failed iteration. The go check passed (exit 0). I did not verify that the Context/Options/Recommended/Decided body sections are rendered beyond the gate passing."
+}

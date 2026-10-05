@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T11",
+  "outcome": "done",
+  "summary": "cmd/vloop/b20261004_e2e_test.go plays the brief's worked example in one temporary repository after vloop init, computing ids, paths and HEAD's sha. No defect was exposed.",
+  "files": ["cmd/vloop/b20261004_e2e_test.go"],
+  "verified": "vloop task gate T11 exited 0 and printed ok; go test ./cmd/vloop -run InterventionsOptions passes.",
+  "notes": "The implementation already satisfied the example, so no package code changed. The v1 record is inlined in the test, not read from the gate fixtures. The test file is named b20261004_e2e_test.go after the brief's id."
+}

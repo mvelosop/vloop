@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "vloop intervention show <id> prints the record (id, summary, frontmatter, sections) then a links block resolving task, run, defect, intervention and commit ids named in Context, in order of first appearance; --json adds links [{ref, kind, title}]; an unknown id exits 1.",
+  "files": ["internal/intervention/show.go", "internal/cli/intervention.go", "internal/cli/intervention_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T5 exited 0 and printed ok.",
+  "notes": "Only Context is scanned, word by word ([A-Za-z0-9-]+); hex words of 7-40 chars count as commits, so a plain word like 'defaced' prints (not found). Task titles come from the latest '[vloop] plan <run id>' commit via runs.PlanAt, run id being the record's brief minus .loop-brief. Unresolved links have an empty title in JSON. docs/guide/commands.md regenerated with go generate. TestTaskGate* in internal/cli fail only inside a loop session (plan changed), not from this change."
+}

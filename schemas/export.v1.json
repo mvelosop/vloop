@@ -120,7 +120,9 @@
           "by": { "enum": ["operator", "assistant", "both"] },
           "occurred": { "type": "string" },
           "recorded": { "type": "string" },
-          "backfilled": { "type": "boolean" }
+          "backfilled": { "type": "boolean" },
+          "agreement": { "enum": ["recommended", "other-option", "adjusted", "different", "no-options"] },
+          "options": { "type": "integer", "minimum": 0, "maximum": 3, "description": "the number of options recorded; their text is never exported" }
         }
       }
     }

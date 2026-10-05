@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "The interventions index gains an Agreement column and validates by and agreement; the guides, the interventions README and the domain docs document intervention/v2.",
+  "files": ["tools/interventions-index.sh", "docs/guide/defects.md", "docs/guide/metrics.md", ".vloop/interventions/README-interventions.md", "docs/domain/domain-model.md", "docs/domain/measurement/measurement-context.md", "internal/cli/guide_test.go", "internal/cli/interventions_index_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed gate T9: ok.",
+  "notes": "The previous attempt failed the gate only because README-interventions.md had no v2 text; added the v2 frontmatter rows and sections there. The committed index block still has the old four columns, so tools/interventions-index.sh --check fails until T10 runs --write after migrating records."
+}

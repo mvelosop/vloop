@@ -5,6 +5,11 @@ phase: next
 kind: direction
 automatable: no
 by: operator
+schema: intervention/v2
+options: 0
+recommended: 0
+decided: ""
+agreement: no-options
 occurred: 2026-09-30
 recorded: 2026-09-30T18:56:52Z
 ---

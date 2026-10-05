@@ -1,0 +1,39 @@
+--- FAIL: TestSchemasAreEmbedded (0.00s)
+    embed_test.go:19: embedded schemas: 16 entries, err <nil>
+FAIL
+FAIL	github.com/mvelosop/vloop	0.415s
+?   	github.com/mvelosop/vloop/cmd/gendocs	[no test files]
+--- FAIL: TestWorkedExampleB6RealData (3.61s)
+    b6_e2e_test.go:266: exit 1, want 0
+        stdout: checking the base: all
+        created and switched to branch B20260101-0900-demo
+        planning from docs/briefs/B20260101-0900-demo.loop-brief.md using opus
+        
+        stderr:   .vloop/state/gates/T10 is a gate folder for T10, which is not a task of the plan
+          .vloop/state/gates/T11 is a gate folder for T11, which is not a task of the plan
+          .vloop/state/gates/T2 is a gate folder for T2, which is not a task of the plan
+          .vloop/state/gates/T3 is a gate folder for T3, which is not a task of the plan
+          .vloop/state/gates/T4 is a gate folder for T4, which is not a task of the plan
+          .vloop/state/gates/T5 is a gate folder for T5, which is not a task of the plan
+          .vloop/state/gates/T6 is a gate folder for T6, which is not a task of the plan
+          .vloop/state/gates/T7 is a gate folder for T7, which is not a task of the plan
+          .vloop/state/gates/T8 is a gate folder for T8, which is not a task of the plan
+          .vloop/state/gates/T9 is a gate folder for T9, which is not a task of the plan
+        vloop: the plan is not fit (10 problem(s)), nothing was committed — see above and .vloop/state/runs/B20260101-0900-demo/20261004-200422/run.log
+FAIL
+FAIL	github.com/mvelosop/vloop/cmd/vloop	544.577s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	31.245s
+ok  	github.com/mvelosop/vloop/internal/closing	0.960s
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	1.444s
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	1.831s
+ok  	github.com/mvelosop/vloop/internal/state	3.242s
+FAIL

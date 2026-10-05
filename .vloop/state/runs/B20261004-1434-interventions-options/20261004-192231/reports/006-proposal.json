@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "vloop intervention set now accepts recommended, decided and adjusted, validated against the record's option count and rewriting agreement (T1's derivation) in the same write; agreement and options are refused with the brief's messages.",
+  "files": ["internal/intervention/intervention.go", "internal/cli/intervention_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok.",
+  "notes": "Set updates frontmatter lines in place (adjusted: false deletes the line; deciding other clears adjusted). The agreement/options refusals are plain errors from intervention.Set, so exit 2; value or no-options refusals on the new fields are Problem errors (exit 1) and leave the file untouched. docs/guide/commands.md regenerated with go generate ./... because the set help text lists SetFields."
+}

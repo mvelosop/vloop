@@ -20,7 +20,7 @@ func newIntervention(g *Globals) *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
-	cmd.AddCommand(newInterventionAdd(g), newInterventionList(g), newInterventionSet(g))
+	cmd.AddCommand(newInterventionAdd(g), newInterventionList(g), newInterventionSet(g), newInterventionMigrate(g), newInterventionShow(g))
 	return cmd
 }
 
@@ -45,6 +45,11 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 					return err
 				}
 			}
+			in.RecommendedSet = cmd.Flags().Changed("recommended")
+			in.DecidedOptionSet = cmd.Flags().Changed("decided-option")
+			if err := intervention.CheckOptions(in); err != nil {
+				return err
+			}
 			root, err := g.root()
 			if err != nil {
 				return err
@@ -66,6 +71,14 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 	f.StringVar(&in.Trigger, "trigger", "", "what made it necessary")
 	f.StringVar(&in.Done, "done", "", "what was done")
 	f.StringVar(&in.Automation, "automation", "", "what would automate it")
+	f.StringVar(&in.Context, "context", "", "the situation, and the ids it refers to")
+	f.StringArrayVar(&in.Options, "option", nil, "an option put to the operator (repeatable, at most three)")
+	f.IntVar(&in.Recommended, "recommended", 0, "the recommended option, 1 to the number of options")
+	f.StringVar(&in.Why, "why", "", "why that option is recommended")
+	f.IntVar(&in.DecidedOption, "decided-option", 0, "the option decided, 1 to the number of options")
+	f.BoolVar(&in.DecidedOther, "decided-other", false, "something other than the options was decided")
+	f.BoolVar(&in.Adjusted, "adjusted", false, "the decided option was adjusted")
+	f.StringVar(&in.Decided, "decided", "", "what was decided")
 	return cmd
 }
 
@@ -89,7 +102,7 @@ func newInterventionList(g *Globals) *cobra.Command {
 				return json.NewEncoder(out).Encode(vs)
 			}
 			for _, v := range vs {
-				fmt.Fprintf(out, "%s  %s  %s  %s\n", v.Phase, v.Kind, v.Automatable, v.ID)
+				fmt.Fprintf(out, "%s  %s  %s  %s  %s\n", v.Phase, v.Kind, v.Automatable, v.Agreement, v.ID)
 			}
 			return nil
 		},
@@ -115,6 +128,69 @@ func newInterventionSet(g *Globals) *cobra.Command {
 				}
 				return Problem(err)
 			}
+			return nil
+		},
+	}
+}
+
+func newInterventionMigrate(g *Globals) *cobra.Command {
+	var dry bool
+	cmd := &cobra.Command{
+		Use:   "migrate",
+		Short: "Move v1 intervention records to intervention/v2, inserting the no-options frontmatter lines and changing nothing else",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			root, err := g.root()
+			if err != nil {
+				return err
+			}
+			names, err := intervention.Migrate(root, dry)
+			if err != nil {
+				return Problem(err)
+			}
+			out := cmd.OutOrStdout()
+			if len(names) == 0 {
+				fmt.Fprintln(out, "nothing to migrate")
+				return nil
+			}
+			if dry {
+				for _, n := range names {
+					fmt.Fprintln(out, n)
+				}
+				return nil
+			}
+			fmt.Fprintf(out, "migrated %d record(s)\n", len(names))
+			return nil
+		},
+	}
+	cmd.Flags().BoolVar(&dry, "dry-run", false, "list the records that would be migrated and write nothing")
+	return cmd
+}
+
+func newInterventionShow(g *Globals) *cobra.Command {
+	return &cobra.Command{
+		Use:   "show <id>",
+		Short: "Print an intervention and resolve the ids named in its Context",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			root, err := g.root()
+			if err != nil {
+				return err
+			}
+			out := cmd.OutOrStdout()
+			v, err := intervention.Get(root, args[0])
+			if err != nil {
+				var none *intervention.NoInterventionError
+				if errors.As(err, &none) {
+					return jsonProblem(g, out, err)
+				}
+				return Problem(err)
+			}
+			s := intervention.Shown{Intervention: v, Links: intervention.Links(root, v)}
+			if g.JSON {
+				return json.NewEncoder(out).Encode(s)
+			}
+			fmt.Fprint(out, s.Text())
 			return nil
 		},
 	}

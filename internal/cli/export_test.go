@@ -122,7 +122,9 @@ func TestExportInterventions(t *testing.T) {
 	dir := closeRepo(t, true, "")
 	for _, a := range [][]string{
 		{"Second", "--phase", "design", "--kind", "decision", "--automatable", "no", "--by", "both"},
-		{"First", "--phase", "run", "--kind", "halt", "--automatable", "partly", "--by", "operator", "--brief", closeName},
+		{"First", "--phase", "run", "--kind", "halt", "--automatable", "partly", "--by", "operator", "--brief", closeName,
+			"--context", "ZQXCONTEXT", "--option", "ZQXOPTONE", "--option", "ZQXOPTTWO", "--recommended", "1",
+			"--why", "ZQXWHY", "--decided-option", "2", "--decided", "ZQXDECIDED"},
 	} {
 		if code, _, errs := runCLI(t, dir, append([]string{"intervention", "add"}, a...)...); code != 0 {
 			t.Fatal(errs)
@@ -137,13 +139,25 @@ func TestExportInterventions(t *testing.T) {
 		t.Errorf("not in id order: %v %v", ivs[0]["id"], ivs[1]["id"])
 	}
 	for _, v := range ivs {
-		for _, k := range []string{"id", "brief", "phase", "kind", "automatable", "by", "occurred", "recorded"} {
+		for _, k := range []string{"id", "brief", "phase", "kind", "automatable", "by", "occurred", "recorded", "agreement", "options"} {
 			if _, ok := v[k]; !ok {
 				t.Errorf("intervention lacks %s: %v", k, v)
 			}
 		}
+		if v["brief"] == closeName && (v["agreement"] != "other-option" || v["options"] != float64(2)) {
+			t.Errorf("agreement/options = %v/%v, want other-option/2", v["agreement"], v["options"])
+		}
+		if v["brief"] != closeName && (v["agreement"] != "no-options" || v["options"] != float64(0)) {
+			t.Errorf("agreement/options = %v/%v, want no-options/0", v["agreement"], v["options"])
+		}
 		if v["schema"] != "export/v1" {
 			t.Errorf("schema %v", v["schema"])
+		}
+	}
+	raw, _ := json.Marshal(ivs)
+	for _, s := range []string{"ZQXCONTEXT", "ZQXOPTONE", "ZQXOPTTWO", "ZQXWHY", "ZQXDECIDED"} {
+		if strings.Contains(string(raw), s) {
+			t.Errorf("the export carries %s", s)
 		}
 	}
 	byBrief := exportInterventions(exportRecs(t, dir, closeName))
