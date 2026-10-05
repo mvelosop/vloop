@@ -12,7 +12,9 @@ var ErrInvalidPlan = errors.New("plan is not valid — run vloop task validate")
 // NoTaskError is returned when a task id is not in the plan.
 type NoTaskError struct{ ID string }
 
-func (e *NoTaskError) Error() string { return "no task " + e.ID }
+func (e *NoTaskError) Error() string {
+	return "no task " + e.ID + " — vloop task list shows the plan's tasks"
+}
 
 // Find returns the task with the given id, or nil.
 func (p *Plan) Find(id string) *Task {

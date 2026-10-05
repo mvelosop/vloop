@@ -29,7 +29,7 @@ const SchemaName = "state/v2"
 const SchemaV1 = "state/v1"
 
 // ErrNoPlan is returned by Load when the plan file does not exist.
-var ErrNoPlan = errors.New("no plan: " + FilePath)
+var ErrNoPlan = errors.New("no plan — vloop run <brief> makes one")
 
 // Plan is the plan document. Field order is the schema's key order.
 type Plan struct {

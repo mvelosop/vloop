@@ -89,7 +89,7 @@ func newMetricsExport(g *Globals) *cobra.Command {
 			if workspace != "" {
 				return workspaceExport(g, out, cmd.ErrOrStderr(), workspace, args)
 			}
-			root, err := g.root()
+			root, err := g.gitRoot()
 			if err != nil {
 				return err
 			}

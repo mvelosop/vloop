@@ -74,7 +74,7 @@ func runGit(root string, args ...string) (string, error) {
 
 func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string, opt closeOpts) error {
 	out := cmd.OutOrStdout()
-	root, err := g.root()
+	root, err := g.gitRoot()
 	if err != nil {
 		return err
 	}

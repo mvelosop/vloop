@@ -146,6 +146,15 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 		Short:         "Plan, run and review autonomous Claude loops",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		PersistentPreRunE: func(*cobra.Command, []string) error {
+			if g.Dir == "" {
+				return nil
+			}
+			if fi, err := os.Stat(g.Dir); err != nil || !fi.IsDir() {
+				return Problem(fmt.Errorf("-C %s: no such directory", g.Dir))
+			}
+			return nil
+		},
 	}
 	pf := root.PersistentFlags()
 	pf.StringVarP(&g.Dir, "dir", "C", "", "act as if started in `path`")

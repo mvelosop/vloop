@@ -172,7 +172,7 @@ func TestWorkedExampleB2PlantedFailures(t *testing.T) {
 		if err := os.Remove(s.dir + "/" + planPath); err != nil {
 			t.Fatal(err)
 		}
-		expect(t, s.run(nil, "task", "validate"), 1, "", "vloop: no plan: .vloop/state/state.json\n")
+		expect(t, s.run(nil, "task", "validate"), 1, "", "vloop: no plan — vloop run <brief> makes one\n")
 	})
 	t.Run("shell not on PATH", func(t *testing.T) {
 		s := b2Scratch(t)

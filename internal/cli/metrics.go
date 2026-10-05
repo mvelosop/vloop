@@ -15,6 +15,7 @@ import (
 	"github.com/mvelosop/vloop/internal/defect"
 	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/metrics"
+	"github.com/mvelosop/vloop/internal/runs"
 )
 
 func newMetrics(g *Globals) *cobra.Command {
@@ -41,7 +42,7 @@ func newMetrics(g *Globals) *cobra.Command {
 			if workspace != "" {
 				return workspaceMetrics(g, out, cmd.ErrOrStderr(), workspace, args)
 			}
-			root, err := g.root()
+			root, err := g.gitRoot()
 			if err != nil {
 				return err
 			}
@@ -56,6 +57,9 @@ func newMetrics(g *Globals) *cobra.Command {
 					return Problem(err)
 				}
 				if r == nil {
+					if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(runs.BriefPath(root, b)))); err != nil {
+						return Problem(fmt.Errorf("no brief %s — vloop brief list shows the briefs", defect.BriefName(b)))
+					}
 					return Problem(fmt.Errorf("no runs for %s", defect.BriefName(b)))
 				}
 				reports = append(reports, r)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -24,6 +25,19 @@ func (g *Globals) root() (string, error) {
 		dir = wd
 	}
 	return config.Root(dir), nil
+}
+
+// gitRoot is root for a command that needs git: it refuses a directory that is
+// not inside a git repository in one line, instead of letting git's own error out.
+func (g *Globals) gitRoot() (string, error) {
+	root, err := g.root()
+	if err != nil {
+		return "", err
+	}
+	if err := exec.Command("git", "-C", root, "rev-parse", "--git-dir").Run(); err != nil {
+		return "", Problem(fmt.Errorf("%s is not a git repository", root))
+	}
+	return root, nil
 }
 
 // configErr maps config errors: bad source values are problems (exit 1), and

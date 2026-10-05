@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/17 done** · iteration 7
+**Status:** running · **5/17 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:02:23Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:11:42Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Add one frontmatter reader and rewriter and move defects and interventions onto it
 - [x] **T3** — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
 - [x] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
-- [ ] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
+- [x] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
 - [ ] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
 - [ ] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
 - [ ] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
@@ -127,7 +127,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 Several refusals name a symptom but not the next step, or leak raw git text: `no plan: <path>`, `no task T99`, `no runs for nope` for a brief that does not exist, "no plan" for `-C /nonexistent`, and `git log … exit status 128` outside a repository. This task makes each one line on stderr, exit 1, in the exact words the brief quotes, naming the command to run next. The plan-file and remaining messages are T6's and T7's.
 

@@ -18,3 +18,8 @@
    check go
    review: PASS
    T4 done
+── iteration 8 (5 this run) · T5 · 4/17 done ──
+   Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
+   check go
+   review: PASS
+   T5 done

@@ -109,7 +109,7 @@ func TestRecordGate(t *testing.T) {
 	if err := RecordGate(root, p, "T1", "old", "r", at); err == nil {
 		t.Fatal("the same command counted as new")
 	}
-	if err := RecordGate(root, p, "T9", "x", "r", at); err == nil || err.Error() != "no task T9" {
+	if err := RecordGate(root, p, "T9", "x", "r", at); err == nil || err.Error() != "no task T9 — vloop task list shows the plan's tasks" {
 		t.Fatalf("unknown task: %v", err)
 	}
 	if err := RecordGate(root, p, "T1", "new", "why", at); err != nil {

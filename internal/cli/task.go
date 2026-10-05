@@ -107,7 +107,7 @@ func newTask(g *Globals) *cobra.Command {
 				}
 			}
 			if t == nil {
-				return jsonProblem(g, out, fmt.Errorf("no task %s", args[0]))
+				return jsonProblem(g, out, &state.NoTaskError{ID: args[0]})
 			}
 			root, err := g.root()
 			if err != nil {

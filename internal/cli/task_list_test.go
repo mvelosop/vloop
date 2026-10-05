@@ -67,7 +67,7 @@ func TestTaskListJSONMatchesStatus(t *testing.T) {
 func TestTaskListNoPlan(t *testing.T) {
 	root := statusRepo(t, "")
 	code, out, errOut := run(t, "-C", root, "task", "list")
-	if code != 1 || out != "" || errOut != "vloop: no plan: .vloop/state/state.json\n" {
+	if code != 1 || out != "" || errOut != "vloop: no plan — vloop run <brief> makes one\n" {
 		t.Fatalf("code %d out %q err %q", code, out, errOut)
 	}
 }
@@ -134,11 +134,11 @@ func TestTaskShowJSON(t *testing.T) {
 func TestTaskShowUnknownAndNoPlan(t *testing.T) {
 	root := taskRepo(t, "")
 	code, out, errOut := run(t, "-C", root, "task", "show", "T9")
-	if code != 1 || out != "" || errOut != "vloop: no task T9\n" {
+	if code != 1 || out != "" || errOut != "vloop: no task T9 — vloop task list shows the plan's tasks\n" {
 		t.Errorf("unknown: %d %q %q", code, out, errOut)
 	}
 	code, out, errOut = run(t, "-C", statusRepo(t, ""), "task", "show", "T1")
-	if code != 1 || out != "" || errOut != "vloop: no plan: .vloop/state/state.json\n" {
+	if code != 1 || out != "" || errOut != "vloop: no plan — vloop run <brief> makes one\n" {
 		t.Errorf("no plan: %d %q %q", code, out, errOut)
 	}
 }

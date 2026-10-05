@@ -69,6 +69,11 @@ func newDefectAdd(g *Globals) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if blame != "" {
+				if root, err = g.gitRoot(); err != nil {
+					return err
+				}
+			}
 			if in.Brief != "" {
 				in.Brief = defect.BriefName(in.Brief)
 				if err := defect.CheckBrief(root, in.Brief); err != nil {
