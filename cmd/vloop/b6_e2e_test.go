@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -242,9 +243,11 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The repository's working tree may be edited while this runs, so what must
-	// stay put is its history and its hooks: HEAD, every ref and each hook's
-	// content, which the clone's run must not move or write. (.git/config is left
+	// The repository's working tree may be edited while this runs, so the check
+	// is narrow: its history and hooks (HEAD, every ref, each hook's content)
+	// must not move, and no path the run wrote in its clone may have changed
+	// here — a run that leaked out of its clone writes exactly those paths, and
+	// someone editing other files is not mistaken for it. (.git/config is left
 	// out: editors rewrite it while a run is in progress.)
 	refs := func() string {
 		out := runGit(t, root, "rev-parse", "HEAD") + runGit(t, root, "for-each-ref", "--format=%(objectname) %(refname)")
@@ -258,9 +261,11 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 		return out
 	}
 	before := refs()
+	files := realFiles(t, root)
 
 	clone := filepath.Join(t.TempDir(), "clone")
 	runGit(t, root, "clone", "-q", root, clone)
+	cloneBase := strings.TrimSpace(runGit(t, clone, "rev-parse", "HEAD"))
 	runGit(t, clone, "config", "user.name", "gate")
 	runGit(t, clone, "config", "user.email", "gate@example.com")
 	runGit(t, clone, "config", "commit.gpgsign", "false")
@@ -304,6 +309,60 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if after := refs(); after != before {
 		t.Errorf("the real-data check moved this repository's refs:\n%s", after)
 	}
+	if leaked := leakedPaths(t, root, clone, cloneBase, files); len(leaked) > 0 {
+		t.Errorf("paths the run wrote in its clone changed in this repository: %v", leaked)
+	}
+}
+
+// realFiles is every tracked and untracked, not ignored, file of root with a
+// hash of its content.
+func realFiles(t *testing.T, root string) map[string]string {
+	t.Helper()
+	out := map[string]string{}
+	for _, p := range strings.Split(runGit(t, root, "ls-files", "-z", "-c", "-o", "--exclude-standard"), "\x00") {
+		if p == "" {
+			continue
+		}
+		b, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p)))
+		if err != nil {
+			out[p] = "missing"
+			continue
+		}
+		out[p] = fmt.Sprintf("%x", sha256.Sum256(b))
+	}
+	return out
+}
+
+// leakedPaths is every path the run wrote in its clone — committed since base,
+// or left changed in its working tree — whose state in root differs from before.
+func leakedPaths(t *testing.T, root, clone, base string, before map[string]string) []string {
+	t.Helper()
+	paths := map[string]bool{}
+	for _, p := range strings.Split(runGit(t, clone, "diff", "--name-only", "-z", base, "HEAD"), "\x00") {
+		paths[p] = true
+	}
+	for _, p := range strings.Split(runGit(t, clone, "ls-files", "-z", "-m", "-o", "-d", "--exclude-standard"), "\x00") {
+		paths[p] = true
+	}
+	var leaked []string
+	for p := range paths {
+		if p == "" {
+			continue
+		}
+		now := "missing"
+		if b, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p))); err == nil {
+			now = fmt.Sprintf("%x", sha256.Sum256(b))
+		}
+		was, ok := before[p]
+		if !ok {
+			was = "missing"
+		}
+		if now != was {
+			leaked = append(leaked, p)
+		}
+	}
+	sort.Strings(leaked)
+	return leaked
 }
 
 // withoutChecks drops every [[check]] table from a config file's text.
