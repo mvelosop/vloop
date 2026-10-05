@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/17 done** · iteration 5
+**Status:** running · **3/17 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T20:40:05Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T20:46:04Z
 
 ## Progress
 
 - [x] **T1** — Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
 - [x] **T2** — Add one frontmatter reader and rewriter and move defects and interventions onto it
-- [ ] **T3** — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
+- [x] **T3** — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
 - [ ] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
 - [ ] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
 - [ ] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
@@ -78,7 +78,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Briefs are read by internal/brief and by runs (FrontmatterStatus, release.go), and brief close rewrites a brief by hand: a BOM or CRLF brief fails `brief check` with "missing frontmatter", and `brief close` rewrites every `**Status:** ready to plan` line it finds (even one quoted mid-line) and appends its run record in LF, leaving mixed endings. This task moves every brief and run-record reader and the close rewrite onto T2's package, so close rewrites only the first `**Status:**` line it means to, as its comment says, and reads the clock once.
 

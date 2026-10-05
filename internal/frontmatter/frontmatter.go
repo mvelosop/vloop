@@ -72,6 +72,14 @@ func (d *Doc) Fields() []Field {
 // Body is the text after the closing fence, with LF endings.
 func (d *Doc) Body() string { return strings.Join(d.lines[d.end+1:], "\n") }
 
+// SetBody replaces the text after the closing fence; body uses LF endings.
+func (d *Doc) SetBody(body string) {
+	d.lines = append(d.lines[:d.end+1:d.end+1], strings.Split(body, "\n")...)
+}
+
+// Lines are the frontmatter lines, between the fences, in order.
+func (d *Doc) Lines() []string { return slices.Clone(d.lines[1:d.end]) }
+
 // Len is the number of frontmatter lines.
 func (d *Doc) Len() int { return d.end - 1 }
 

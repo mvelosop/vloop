@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T20:40:05Z",
+  "updated": "2026-10-05T20:46:04Z",
   "shell": "sh",
   "checks": [
     {
@@ -105,7 +105,7 @@
         "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

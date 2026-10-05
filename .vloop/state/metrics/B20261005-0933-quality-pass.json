@@ -8,7 +8,7 @@
     "planned": 17,
     "done": 0,
     "blocked": 1,
-    "first_pass": 0,
+    "first_pass": 1,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,33 +43,33 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 666184,
-    "work_ms": 567031,
-    "review_ms": 99153,
+    "agent_ms": 833345,
+    "work_ms": 713031,
+    "review_ms": 120314,
     "plan_ms": 1735548,
-    "gates_ms": 49376,
-    "checks_ms": 540926,
+    "gates_ms": 50933,
+    "checks_ms": 734471,
     "gate_review_ms": 694700,
     "wall_ms": 998000
   },
   "rate": {
     "code_per_min": 0,
-    "code_test_per_min": 11.978672558932667
+    "code_test_per_min": 9.57586593787687
   },
   "cost": {
-    "total_usd": 13.668058399999998,
+    "total_usd": 14.203145999999997,
     "plan_usd": 9.523685999999998,
-    "work_usd": 0.7164356000000001,
-    "review_usd": 0.5204518,
+    "work_usd": 1.1085598,
+    "review_usd": 0.6634152,
     "gate_review_usd": 2.9074849999999994,
     "per_1000_code_lines_usd": null
   },
   "tokens": {
-    "input": 550,
-    "output": 232331,
-    "cache_read": 28295662,
-    "cache_creation": 703242,
-    "cache_hit_ratio": 0.9757308534153781
+    "input": 590,
+    "output": 246010,
+    "cache_read": 28997130,
+    "cache_creation": 767723,
+    "cache_hit_ratio": 0.9741877518839548
   },
   "models": {
     "plan": [
@@ -114,8 +114,8 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 14,
-  "iterations": 4,
+  "permission_denials": 15,
+  "iterations": 5,
   "iterations_per_closed": null,
   "by_task": [
     {
@@ -145,7 +145,7 @@
       "id": "T2",
       "area": null,
       "kind": "fix",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -158,9 +158,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 167161,
+      "cost_usd": 0.5350876000000001,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T3",

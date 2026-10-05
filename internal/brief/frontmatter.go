@@ -1,9 +1,12 @@
 package brief
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
+
+	fmpkg "github.com/mvelosop/vloop/internal/frontmatter"
 )
 
 // Statuses are the values a brief's frontmatter status may take.
@@ -25,19 +28,18 @@ type frontmatter struct {
 // and block-list items. Anything else is unparseable.
 func parseFrontmatter(text string) frontmatter {
 	fm := frontmatter{Keys: map[string]string{}}
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	if len(lines) == 0 || strings.TrimSpace(lines[0]) != "---" {
+	doc, err := fmpkg.Parse(text)
+	switch {
+	case errors.Is(err, fmpkg.ErrMissing):
 		fm.Err = "missing frontmatter"
 		return fm
+	case err != nil:
+		fm.Err = "unparseable frontmatter: no closing ---"
+		return fm
 	}
-	closed := false
 	cur := ""
 	var block []string
-	for i, l := range lines[1:] {
-		if strings.TrimSpace(l) == "---" {
-			closed = true
-			break
-		}
+	for i, l := range doc.Lines() {
 		t := strings.TrimSpace(l)
 		if t == "" || strings.HasPrefix(t, "#") {
 			continue
@@ -62,10 +64,6 @@ func parseFrontmatter(text string) frontmatter {
 		}
 		fm.Keys[m[1]] = strings.Trim(v, `"'`)
 		cur = m[1]
-	}
-	if !closed {
-		fm.Err = "unparseable frontmatter: no closing ---"
-		return fm
 	}
 	fm.Name = fm.Keys["name"]
 	fm.Status = fm.Keys["status"]

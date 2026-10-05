@@ -8,3 +8,8 @@
    check go
    review: PASS
    T2 done
+── iteration 6 (3 this run) · T3 · 2/17 done ──
+   Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
+   check go
+   review: PASS
+   T3 done

@@ -188,3 +188,20 @@ func TestParseStatus(t *testing.T) {
 		t.Errorf("%q", got)
 	}
 }
+
+func TestBOMAndCRLFBriefChecksAndListsLikeItsLFTwin(t *testing.T) {
+	root, path, text := scratch(t)
+	crlf := "\xef\xbb\xbf" + strings.ReplaceAll(text, "\n", "\r\n")
+	want := run(root, path, text)
+	got := run(root, path, crlf)
+	if got.Failed() || got.Summary() != want.Summary() || strings.Join(got.Problems(), "|") != strings.Join(want.Problems(), "|") {
+		t.Fatalf("BOM+CRLF %+v, LF %+v", got.Lines, want.Lines)
+	}
+	if err := os.WriteFile(filepath.Join(root, path), []byte(crlf), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	entries, err := Load(root)
+	if err != nil || len(entries) != 1 || entries[0].Status != "ready" {
+		t.Fatalf("%+v %v", entries, err)
+	}
+}

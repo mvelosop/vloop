@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/mvelosop/vloop/internal/frontmatter"
 )
 
 // DefaultBranch resolves the branch a release lands on: origin/HEAD's target,
@@ -38,18 +40,13 @@ func StatusAt(root, sha, path string) string {
 }
 
 func frontmatterStatus(text string) string {
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	if len(lines) == 0 || strings.TrimSpace(lines[0]) != "---" {
+	doc, err := frontmatter.Parse(text)
+	if err != nil {
 		return ""
 	}
-	for _, l := range lines[1:] {
-		if strings.TrimSpace(l) == "---" {
-			return ""
-		}
-		if v, ok := strings.CutPrefix(l, "status:"); ok {
-			if i := strings.Index(v, " #"); i >= 0 {
-				v = v[:i]
-			}
+	for _, f := range doc.Fields() {
+		if f.Key == "status" {
+			v, _, _ := strings.Cut(f.Value, " #")
 			return strings.Trim(strings.TrimSpace(v), `"'`)
 		}
 	}
