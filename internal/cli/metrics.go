@@ -30,7 +30,7 @@ func newMetrics(g *Globals) *cobra.Command {
 					return errors.New("--by takes kind or phase with --interventions")
 				}
 				if workspace != "" {
-					return workspaceInterventions(g, cmd.OutOrStdout(), cmd.ErrOrStderr(), workspace, args)
+					return workspaceInterventions(g, cmd.OutOrStdout(), cmd.ErrOrStderr(), workspace, by, args)
 				}
 				return interventionMetrics(g, cmd.OutOrStdout(), by)
 			}

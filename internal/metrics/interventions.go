@@ -82,20 +82,20 @@ func AgreementTable(recs []intervention.Intervention, by string) []AgreementRow 
 	return rows
 }
 
-// WorkspaceAgreementTable is the kind table of each repository in turn, then
-// one total row over all of them. recs[i] belongs to repos[i].
-func WorkspaceAgreementTable(repos []string, recs [][]intervention.Intervention) []AgreementRow {
+// WorkspaceAgreementTable is the kind (or phase) table of each repository in
+// turn, then one total row over all of them. recs[i] belongs to repos[i].
+func WorkspaceAgreementTable(repos []string, recs [][]intervention.Intervention, by string) []AgreementRow {
 	var out []AgreementRow
 	var all []intervention.Intervention
 	for i, name := range repos {
-		rows := AgreementTable(recs[i], "kind")
+		rows := AgreementTable(recs[i], by)
 		for _, r := range rows[:len(rows)-1] {
 			r.Repo = name
 			out = append(out, r)
 		}
 		all = append(all, recs[i]...)
 	}
-	rows := AgreementTable(all, "kind")
+	rows := AgreementTable(all, by)
 	return append(out, rows[len(rows)-1])
 }
 

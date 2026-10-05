@@ -116,7 +116,10 @@ func workspaceMetrics(g *Globals, out, stderr io.Writer, file string, args []str
 	return err
 }
 
-func workspaceInterventions(g *Globals, out, stderr io.Writer, file string, args []string) error {
+func workspaceInterventions(g *Globals, out, stderr io.Writer, file, by string, args []string) error {
+	if by == "" {
+		by = "kind"
+	}
 	var names []string
 	var recs [][]intervention.Intervention
 	err := eachWorkspaceRepo(g, stderr, file, args, func(root string, r wsRepo) error {
@@ -136,13 +139,13 @@ func workspaceInterventions(g *Globals, out, stderr io.Writer, file string, args
 	if err != nil && !(errors.As(err, &pe) && err.Error() == "") {
 		return err
 	}
-	rows := metrics.WorkspaceAgreementTable(names, recs)
+	rows := metrics.WorkspaceAgreementTable(names, recs, by)
 	if g.JSON {
 		if e := json.NewEncoder(out).Encode(rows); e != nil {
 			return e
 		}
 	} else {
-		metrics.PrintAgreementTable(out, rows, "kind", true)
+		metrics.PrintAgreementTable(out, rows, by, true)
 	}
 	return err
 }

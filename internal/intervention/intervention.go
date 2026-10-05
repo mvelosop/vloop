@@ -590,8 +590,17 @@ func Set(root, id, field, value string) error {
 				break
 			}
 		}
-		if !found && line != "" { // field absent: insert before the closing fence
-			lines = slices.Insert(lines, end, line)
+		if !found && line != "" { // field absent: insert where I1 orders it
+			at := end
+			if k == "adjusted" { // between decided and agreement
+				for i := 1; i < end; i++ {
+					if strings.HasPrefix(lines[i], "agreement:") {
+						at = i
+						break
+					}
+				}
+			}
+			lines = slices.Insert(lines, at, line)
 			end++
 		}
 	}

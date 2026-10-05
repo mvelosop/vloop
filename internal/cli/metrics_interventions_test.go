@@ -108,3 +108,26 @@ func TestMetricsInterventionsWorkspace(t *testing.T) {
 		t.Errorf("total row %q", last)
 	}
 }
+
+// --by phase applies to the workspace table as to a repository's.
+func TestMetricsInterventionsWorkspaceByPhase(t *testing.T) {
+	ws := t.TempDir()
+	for _, n := range []string{"a", "b"} {
+		if err := os.MkdirAll(filepath.Join(ws, n, ".git"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	addRec(t, filepath.Join(ws, "a"), "halt", "repair", "yes")
+	addRec(t, filepath.Join(ws, "b"), "close", "ceremony", "partly")
+	f := wsFile(t, ws, "[[repo]]\npath = \"a\"\nname = \"a\"\n[[repo]]\npath = \"b\"\nname = \"b\"\n")
+	code, out, e := runCLI(t, t.TempDir(), "metrics", "--workspace", f, "--interventions", "--by", "phase")
+	if code != 0 {
+		t.Fatalf("%d %q", code, e)
+	}
+	got := collapse(out)
+	for _, w := range []string{"repo phase n recommended", "\na halt 1 0 n/a", "\nb close 1 0 n/a"} {
+		if !strings.Contains(got, w) {
+			t.Errorf("missing %q in\n%s", w, got)
+		}
+	}
+}

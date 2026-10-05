@@ -180,3 +180,27 @@ func TestParseV1AndV2Sections(t *testing.T) {
 		t.Fatalf("%+v %v", v, err)
 	}
 }
+
+// set adjusted writes the field where I1 puts it, between decided and
+// agreement, not at the end of the frontmatter.
+func TestSetAdjustedKeepsFieldOrder(t *testing.T) {
+	root := t.TempDir()
+	dir := filepath.Join(root, ".vloop", "interventions")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	rec := "---\nid: I20260101-0900-x\nbrief: \"\"\nphase: halt\nkind: repair\nautomatable: yes\nby: both\n" +
+		"schema: intervention/v2\noptions: 2\nrecommended: 1\ndecided: 2\nagreement: other-option\n" +
+		"occurred: 2026-01-01\nrecorded: 2026-01-01T09:00:00Z\n---\nx\n\n**Options.**\n1. a\n2. b\n\n**Recommended.** why\n"
+	p := filepath.Join(dir, "I20260101-0900-x.md")
+	if err := os.WriteFile(p, []byte(rec), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := Set(root, "I20260101-0900-x", "adjusted", "true"); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(p)
+	if !strings.Contains(string(b), "decided: 2\nadjusted: true\nagreement: adjusted\noccurred:") {
+		t.Fatalf("adjusted is not between decided and agreement:\n%s", b)
+	}
+}
