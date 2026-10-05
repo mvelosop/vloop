@@ -1,0 +1,17 @@
+{
+  "schema": "verdict/v1",
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A report the driver fails to copy into the run folder (copyReport: MkdirAll or WriteFile failing) is reported as an error in the run log, not silently dropped.", "met": true, "evidence": "internal/driver/iterate.go copyReport: both MkdirAll and WriteFile failures call it.warn with the report name and error"},
+    {"criterion": "A restore that fails (restoring a session's changed inputs, or reverting a gate's tree changes) is reported as a failure naming the path — never logged as \"restored\" — and the iteration or run does not proceed as if it had been restored.", "met": true, "evidence": "inputGuard.restore and treeGuard.revert return a failed list of 'path: err' entries that are kept out of the restored list; restoreInputs, runGate, baseGates and the review path halt or return an error on a non-empty failed list"},
+    {"criterion": "The plan is written to a temporary file, synced to disk (File.Sync, error checked) and only then renamed over the old one.", "met": true, "evidence": "internal/state/state.go Save: tmp.Sync() with its error checked, placed before Close and the rename"},
+    {"criterion": "`cmd/gendocs` refuses any argument that starts with `-` (usage message on stderr, non-zero exit, nothing written); `go generate ./...` still regenerates docs/guide/commands.md.", "met": true, "evidence": "cmd/gendocs/main.go checks strings.HasPrefix(os.Args[1], \"-\"), prints usage to stderr and exits 2; cmd/gendocs/main_test.go runs the built binary with --help, -h and -o; the gate passed"},
+    {"criterion": "The tracked file named `--help` at the repository root is deleted.", "met": true, "evidence": "git status shows 'D  --help' (staged deletion); the diff against HEAD removes the file; the gate passes"},
+    {"criterion": "The CLAUDE.md section `vloop init` and `vloop upgrade` write lists the session kinds plan, gate review, work and review, and names `/vloop:operate` as the operator's playbook (no `vloop-operator`); internal/install's tests that pin the section's text are updated to it.", "met": true, "evidence": "internal/install/section.go lists '(plan, gate review, work, review)' and names /vloop:operate; install_test.go TestSectionNamesSessionKindsAndOperatePlaybook asserts both and the absence of vloop-operator"},
+    {"criterion": "Tests cover the gendocs refusal, the section text and the driver's error paths where a test can reach them (for example an unwritable reports directory); the checks run them.", "met": true, "evidence": "gendocs main_test.go, install_test.go and safety_test.go TestInputGuardRestoreReportsFailure were added; the go check log shows cmd/gendocs, internal/driver and internal/install running and passing"},
+    {"criterion": "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review.", "met": true, "evidence": "The diff only changes return signatures and error handling in the touched functions; none of the B12 refactors appear"}
+  ],
+  "findings": [],
+  "notes": "The code changes from the earlier attempt are already in HEAD (83c7f71); this iteration only deleted --help. The revert failure paths in treeGuard and copyReport have no direct test; the gate-side tree failures are hard to reach, so this is acceptable."
+}

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/17 done** · iteration 12
+**Status:** running · **9/17 done** · iteration 13
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:46:38Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:50:47Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
 - [x] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
 - [x] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
-- [ ] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section · 1 attempt(s)
+- [x] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section · 1 attempt(s)
 - [ ] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
 - [ ] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes
 - [ ] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
@@ -220,7 +220,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section
 
-`pending` · 1 attempt(s) · depends on: T1
+`done` · 1 attempt(s) · depends on: T1
 
 The rest of the review's correctness findings: the driver ignores a failed write of a session's report and says "restored" even when a restore fails, and replaces the plan without syncing it to disk; `cmd/gendocs --help` wrote a file named `--help`, which is still tracked at the repository root; and the CLAUDE.md section `vloop init` writes lists only plan, work and review sessions and names `vloop-operator`, a skill the plugin does not ship. The gate sees only the last two; the driver's errors are the review's to judge from the diff.
 
@@ -234,8 +234,6 @@ The rest of the review's correctness findings: the driver ignores a failed write
 - The CLAUDE.md section `vloop init` and `vloop upgrade` write lists the session kinds plan, gate review, work and review, and names `/vloop:operate` as the operator's playbook (no `vloop-operator`); internal/install's tests that pin the section's text are updated to it.
 - Tests cover the gendocs refusal, the section text and the driver's error paths where a test can reach them (for example an unwritable reports directory); the checks run them.
 - No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review.
-
-**From the last attempt:** Done: copyReport warns on MkdirAll/WriteFile failure; inputGuard.restore and treeGuard.revert return a failure list naming paths and callers halt instead of logging restored; state.Save syncs before rename; gendocs refuses args starting with -; CLAUDE.md section lists plan, gate review, work, review and names /vloop:operate. Tests added. Not done: deleting the tracked file named --help at the repo root, because the permission classifier denied the git rm.
 
 <details><summary>verify command</summary>
 
