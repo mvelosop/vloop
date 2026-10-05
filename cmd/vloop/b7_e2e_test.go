@@ -14,6 +14,9 @@ import (
 func TestWorkedExampleB7PluginPath(t *testing.T) {
 	t.Parallel()
 	s := newScratch(t)
+	if err := os.Mkdir(filepath.Join(s.dir, ".vloop"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	res := s.run(nil, "plugin", "path")
 	if res.code != 0 {
 		t.Fatalf("plugin path: %+v", res)

@@ -81,3 +81,27 @@ func TestBrokenPlanMessages(t *testing.T) {
 		}
 	}
 }
+
+func TestPluginPathOutsideVloopRepo(t *testing.T) {
+	d := scratchRepo(t)
+	code, out, e := run(t, "-C", d, "plugin", "path")
+	if code != 1 || out != "" || e != "vloop: not in a vloop repository — run vloop init first\n" {
+		t.Fatalf("outside: %d %q %q", code, out, e)
+	}
+	if _, err := os.Stat(filepath.Join(d, ".vloop")); err == nil {
+		t.Fatal("plugin path created .vloop")
+	}
+}
+
+func TestInterventionShowSchemaOptionsBrief(t *testing.T) {
+	d := scratchRepo(t)
+	code, out, e := run(t, "-C", d, "intervention", "add", "no brief", "--phase", "run", "--kind", "repair", "--automatable", "no", "--by", "operator")
+	if code != 0 {
+		t.Fatalf("add: %d %q", code, e)
+	}
+	id := strings.TrimSuffix(filepath.Base(strings.TrimSpace(out)), ".md")
+	code, out, e = run(t, "-C", d, "intervention", "show", id)
+	if code != 0 || !strings.Contains(out, "\nschema: intervention/v2\n") || !strings.Contains(out, "\noptions: 0\n") || strings.Contains(out, "brief:") {
+		t.Fatalf("show: %d %q %q", code, out, e)
+	}
+}

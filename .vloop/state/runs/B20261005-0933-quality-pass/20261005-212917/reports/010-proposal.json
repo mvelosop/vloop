@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "brief check on drafts only prints `nothing checked: <n> draft brief(s) skipped`; plugin path refuses outside a vloop repository without writing; intervention show prints schema and options lines and omits an empty brief; migrate --dry-run prints repo-relative paths.",
+  "files": ["internal/cli/brief.go", "internal/cli/plugin.go", "internal/cli/intervention.go", "internal/intervention/show.go", "internal/cli/messages_test.go", "internal/cli/brief_test.go", "internal/cli/new_test.go", "internal/cli/plugin_test.go", "internal/cli/intervention_test.go", "cmd/vloop/e2e_test.go", "cmd/vloop/b5_e2e_test.go", "cmd/vloop/b7_e2e_test.go"],
+  "verified": "vloop task gate T7 exited 0 and printed gate T7: ok; go test ./... passes with VLOOP_PLAN_SHA256 unset.",
+  "notes": "Earlier tests changed because the contract changed: brief_test TestBriefCheckSkipped, new_test TestBriefNewWritesDraftThatChecksSkipped and cmd/vloop e2e_test (worked example) expected 'briefs ok' for a draft-only check, now 'nothing checked: 1 draft brief(s) skipped'; plugin_test TestPluginPathIdempotentAndClean and TestPluginPathLeavesOutEvals, cmd/vloop b7_e2e_test and b5_e2e_test 'stray file removed by plugin path' used a bare .git dir and expected exit 0, now they create .vloop/ first (a bare .git is refused); intervention_test TestInterventionMigrate expected dry-run output 'I20260101-0900-old.md', now '.vloop/interventions/I20260101-0900-old.md'. Mechanism: plugin path checks for .vloop at the resolved root; intervention.Migrate still returns bare names, the CLI prefixes intervention.Dir for the dry-run. Run go test with VLOOP_PLAN_SHA256 unset."
+}

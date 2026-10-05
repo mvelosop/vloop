@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path"
 	"strings"
 	"time"
 
@@ -156,7 +157,7 @@ func newInterventionMigrate(g *Globals) *cobra.Command {
 			}
 			if dry {
 				for _, n := range names {
-					fmt.Fprintln(out, n)
+					fmt.Fprintln(out, path.Join(intervention.Dir, n))
 				}
 				return nil
 			}

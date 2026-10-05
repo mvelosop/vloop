@@ -28,3 +28,8 @@
    check go
    review: PASS
    T6 done
+── iteration 10 (7 this run) · T7 · 6/17 done ──
+   Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
+   check go
+   review: PASS
+   T7 done

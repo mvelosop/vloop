@@ -357,6 +357,9 @@ func TestWorkedExampleB5PlantedFailures(t *testing.T) {
 
 	t.Run("stray file removed by plugin path", func(t *testing.T) {
 		r := b5New(t, false, false)
+		if err := os.MkdirAll(filepath.Join(r.dir, ".vloop"), 0o755); err != nil {
+			t.Fatal(err)
+		}
 		b5Expect(t, r.run("0.2.0", "plugin", "path"), 0, []string{".vloop/tmp/plugin/0.2.0"}, "")
 		r.write(".vloop/tmp/plugin/0.2.0/stray.txt", "not part of the plugin\n")
 		b5Expect(t, r.run("0.2.0", "plugin", "path"), 0, []string{".vloop/tmp/plugin/0.2.0"}, "")

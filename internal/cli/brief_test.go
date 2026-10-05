@@ -47,7 +47,7 @@ func TestBriefCheckSkipped(t *testing.T) {
 	d := scratchRepo(t)
 	rel := writeBrief(t, d, "draft")
 	_, out, _ := run(t, "-C", d, "brief", "check", rel)
-	if out != rel+"\n  - skipped: status is draft\nbriefs ok\n" {
+	if out != rel+"\n  - skipped: status is draft\nnothing checked: 1 draft brief(s) skipped\n" {
 		t.Fatalf("%q", out)
 	}
 }

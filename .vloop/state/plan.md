@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/17 done** · iteration 9
+**Status:** running · **7/17 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:20:30Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:35:10Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
 - [x] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
 - [x] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
-- [ ] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
+- [x] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
 - [ ] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
 - [ ] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section
 - [ ] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
@@ -175,7 +175,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
 
-`pending` · depends on: T3, T4
+`done` · depends on: T3, T4
 
 Four smaller messages mislead: `brief check` on only drafts says `briefs ok` when it checked nothing; `plugin path` outside a repository creates `.vloop/` wherever it is run (breaking C-1's nothing-global rule in spirit); `intervention show` hides the schema and options counts and prints an empty `brief:`; and `intervention migrate --dry-run` prints bare file names. This task makes each say what is true.
 

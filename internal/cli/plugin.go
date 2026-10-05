@@ -2,7 +2,10 @@ package cli
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -24,6 +27,9 @@ func newPlugin(b Build, g *Globals) *cobra.Command {
 			root, err := g.root()
 			if err != nil {
 				return Problem(err)
+			}
+			if _, err := os.Stat(filepath.Join(root, ".vloop")); err != nil {
+				return Problem(errors.New("not in a vloop repository — run vloop init first"))
 			}
 			rel, err := driver.ExtractPlugin(root, b.Version)
 			if err != nil {

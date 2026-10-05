@@ -41,7 +41,7 @@ func TestBriefNewWritesDraftThatChecksSkipped(t *testing.T) {
 			t.Fatalf("%s: wrote more than the brief", lang)
 		}
 		code, out, e = run(t, "-C", d, "brief", "check", rel)
-		if code != 0 || !strings.Contains(out, "  - skipped: status is draft\n") || !strings.HasSuffix(out, "briefs ok\n") {
+		if code != 0 || !strings.Contains(out, "  - skipped: status is draft\n") || !strings.HasSuffix(out, "nothing checked: 1 draft brief(s) skipped\n") {
 			t.Fatalf("%s: %d %q %q", lang, code, out, e)
 		}
 	}

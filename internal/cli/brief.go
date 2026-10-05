@@ -87,6 +87,7 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		}
 		return "\033[" + code + "m" + s + "\033[0m"
 	}
+	skipped := 0
 	for _, rel := range rels {
 		data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
 		if err != nil {
@@ -103,6 +104,7 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		switch {
 		case res.Skipped:
 			j.Result = "skipped"
+			skipped++
 		case res.Failed():
 			j.Result = "problems"
 			failed++
@@ -130,6 +132,8 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		}{failed == 0, docs}); err != nil {
 			return err
 		}
+	} else if failed == 0 && skipped == len(rels) {
+		fmt.Fprintf(out, "nothing checked: %d draft brief(s) skipped\n", skipped)
 	} else if failed == 0 {
 		fmt.Fprintln(out, "briefs ok")
 	} else {
