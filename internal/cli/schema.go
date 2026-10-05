@@ -87,6 +87,10 @@ func newSchema(g *Globals) *cobra.Command {
 				fmt.Fprintf(out, "%s: ok\n", path)
 			} else {
 				for _, v := range vs {
+					if v.Pointer == "" {
+						fmt.Fprintf(out, "%s: %s\n", path, v.Message)
+						continue
+					}
 					fmt.Fprintf(out, "%s: %s: %s\n", path, v.Pointer, v.Message)
 				}
 			}

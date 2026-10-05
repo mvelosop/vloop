@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 8,
+  "iteration": 9,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T21:11:42Z",
+  "updated": "2026-10-05T21:20:30Z",
   "shell": "sh",
   "checks": [
     {
@@ -209,7 +209,7 @@
         "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

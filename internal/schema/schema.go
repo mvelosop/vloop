@@ -11,6 +11,7 @@ import (
 	"io"
 	"sort"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 	"golang.org/x/text/language"
@@ -105,17 +106,14 @@ func Validate(name string, data []byte) ([]Violation, error) {
 	if err != nil {
 		return nil, err
 	}
+	if msg := JSONError(data); msg != "" {
+		return []Violation{{Pointer: "", Message: msg}}, nil
+	}
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.UseNumber()
 	var inst any
-	err = dec.Decode(&inst)
-	if err == nil {
-		if _, e := dec.Token(); !errors.Is(e, io.EOF) {
-			err = errors.New("unexpected data after the JSON document")
-		}
-	}
-	if err != nil {
-		return []Violation{{Pointer: "", Message: "not valid JSON: " + err.Error()}}, nil
+	if err := dec.Decode(&inst); err != nil {
+		return nil, err
 	}
 	verr := sch.Validate(inst)
 	if verr == nil {
@@ -151,4 +149,36 @@ func pointer(loc []string) string {
 		b.WriteString(strings.ReplaceAll(s, "/", "~1"))
 	}
 	return b.String()
+}
+
+// JSONError says where data stops being JSON: "not valid JSON (line l, column
+// c)", both 1-based, c counting characters. It is empty when data is one JSON
+// document.
+func JSONError(data []byte) string {
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+	var inst any
+	err := dec.Decode(&inst)
+	off := len(data)
+	switch {
+	case err == nil:
+		if _, e := dec.Token(); errors.Is(e, io.EOF) {
+			return ""
+		}
+		rest := data[dec.InputOffset():]
+		off = len(data) - len(bytes.TrimLeft(rest, " \t\r\n")) + 1
+	default:
+		var se *json.SyntaxError
+		if errors.As(err, &se) {
+			off = int(se.Offset)
+		}
+	}
+	off = min(off, len(data))
+	line := 1 + bytes.Count(data[:off], []byte("\n"))
+	start := bytes.LastIndexByte(data[:off], '\n') + 1
+	col := utf8.RuneCount(data[start:off])
+	if col == 0 {
+		col = 1
+	}
+	return fmt.Sprintf("not valid JSON (line %d, column %d)", line, col)
 }

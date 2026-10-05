@@ -8,7 +8,7 @@
     "planned": 17,
     "done": 0,
     "blocked": 1,
-    "first_pass": 3,
+    "first_pass": 4,
     "estimate": {
       "min": 14,
       "max": 18
@@ -43,33 +43,33 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 1759147,
-    "work_ms": 1593413,
-    "review_ms": 165734,
+    "agent_ms": 2112056,
+    "work_ms": 1917041,
+    "review_ms": 195015,
     "plan_ms": 1735548,
-    "gates_ms": 54532,
-    "checks_ms": 1104358,
+    "gates_ms": 56311,
+    "checks_ms": 1287613,
     "gate_review_ms": 694700,
     "wall_ms": 998000
   },
   "rate": {
     "code_per_min": 0,
-    "code_test_per_min": 4.536289463018156
+    "code_test_per_min": 3.778308908475912
   },
   "cost": {
-    "total_usd": 15.604413999999998,
+    "total_usd": 16.264634599999997,
     "plan_usd": 9.523685999999998,
-    "work_usd": 2.2205118000000006,
-    "review_usd": 0.9527312,
+    "work_usd": 2.6894490000000006,
+    "review_usd": 1.1440146,
     "gate_review_usd": 2.9074849999999994,
     "per_1000_code_lines_usd": null
   },
   "tokens": {
-    "input": 702,
-    "output": 277684,
-    "cache_read": 31408910,
-    "cache_creation": 918210,
-    "cache_hit_ratio": 0.9715751961267295
+    "input": 764,
+    "output": 289670,
+    "cache_read": 32611233,
+    "cache_creation": 993153,
+    "cache_hit_ratio": 0.9704236701815049
   },
   "models": {
     "plan": [
@@ -114,8 +114,8 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 15,
-  "iterations": 7,
+  "permission_denials": 16,
+  "iterations": 8,
   "iterations_per_closed": null,
   "by_task": [
     {
@@ -214,7 +214,7 @@
       "id": "T5",
       "area": null,
       "kind": "fix",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -227,9 +227,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 352909,
+      "cost_usd": 0.6602205999999999,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T6",

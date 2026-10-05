@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/schema"
 	"github.com/mvelosop/vloop/internal/state"
 )
 
@@ -21,6 +22,12 @@ func loadPlan(g *Globals, out io.Writer) (*state.Plan, error) {
 		return nil, err
 	}
 	p, err := state.Load(root)
+	if err == nil {
+		var vs []schema.Violation
+		if vs, err = state.Validate(root); err == nil && len(vs) > 0 {
+			err = state.ErrNotAPlan
+		}
+	}
 	if err != nil {
 		if g.JSON {
 			_ = json.NewEncoder(out).Encode(struct {

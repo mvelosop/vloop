@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -46,5 +47,37 @@ func TestNotAGitRepository(t *testing.T) {
 	code, out, errOut := run(t, "-C", dir, "metrics")
 	if code != 1 || out != "" || !strings.HasSuffix(errOut, " is not a git repository\n") || strings.Contains(errOut, "exit status") {
 		t.Errorf("%d %q %q", code, out, errOut)
+	}
+}
+
+func TestBrokenPlanMessages(t *testing.T) {
+	t.Parallel()
+	const p = ".vloop/state/state.json"
+	cases := []struct {
+		name, plan, want string
+	}{
+		{"first line", "{bad", "vloop: " + p + " is not valid JSON (line 1, column 2)\n"},
+		{"later line", "{\n  \"schema\": \"state/v2\",\n  \"run_id\": bad\n}\n", "vloop: " + p + " is not valid JSON (line 3, column 13)\n"},
+		{"schema", `{"version":"x"}`, "vloop: " + p + " is not a valid plan — vloop task validate lists the problems\n"},
+	}
+	for _, c := range cases {
+		root := statusRepo(t, c.plan)
+		code, out, errOut := run(t, "-C", root, "status")
+		if code != 1 || out != "" || errOut != c.want {
+			t.Errorf("%s: %d %q %q", c.name, code, out, errOut)
+		}
+		code, out, _ = run(t, "-C", root, "status", "--json")
+		var v struct{ Error string }
+		if code != 1 || json.Unmarshal([]byte(out), &v) != nil || v.Error != strings.TrimSuffix(strings.TrimPrefix(c.want, "vloop: "), "\n") {
+			t.Errorf("%s --json: %d %q", c.name, code, out)
+		}
+	}
+	root := statusRepo(t, "{\n  \"a\": bad}")
+	for _, args := range [][]string{{"task", "validate"}, {"schema", "validate", "state/v2", p}} {
+		code, out, errOut := run(t, append([]string{"-C", root}, args...)...)
+		want := p + ": not valid JSON (line 2, column 8)"
+		if code != 1 || !strings.Contains(out+errOut, want) || strings.Contains(out+errOut, ": :") {
+			t.Errorf("%v: %d %q %q", args, code, out, errOut)
+		}
 	}
 }

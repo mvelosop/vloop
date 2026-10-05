@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/17 done** · iteration 8
+**Status:** running · **6/17 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:11:42Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:20:30Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
 - [x] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
 - [x] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
-- [ ] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
+- [x] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
 - [ ] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
 - [ ] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
 - [ ] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section
@@ -151,7 +151,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 A plan with a JSON syntax error reaches the user as Go's `invalid character 'b' looking for beginning of object key string`, task validate prints `✗ schema: : not valid JSON` with an empty field, and a plan that fails its schema makes `status` print an empty line and exit 0. This task names the file, the line and the column of a syntax error, sends a schema-invalid plan to `vloop task validate`, and makes status and status --json exit 1 on either, with the error under --json.
 

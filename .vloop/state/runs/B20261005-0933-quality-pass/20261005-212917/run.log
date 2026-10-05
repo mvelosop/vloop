@@ -23,3 +23,8 @@
    check go
    review: PASS
    T5 done
+── iteration 9 (6 this run) · T6 · 5/17 done ──
+   Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
+   check go
+   review: PASS
+   T6 done
