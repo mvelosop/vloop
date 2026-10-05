@@ -207,6 +207,9 @@ func Save(root string, p *Plan) error {
 	if err := tmp.Chmod(0o644); err != nil && !errors.Is(err, errors.ErrUnsupported) {
 		return fail(err)
 	}
+	if err := tmp.Sync(); err != nil {
+		return fail(err)
+	}
 	if err := tmp.Close(); err != nil {
 		return fail(err)
 	}

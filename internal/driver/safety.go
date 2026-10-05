@@ -253,9 +253,9 @@ func (g inputGuard) walk() map[string]bool {
 
 // restore puts every changed, removed or added file back and returns the
 // repo-relative paths it touched, sorted. keep is a file the driver itself
-// wrote during the session, such as the session's own record.
-func (g inputGuard) restore(keep string) []string {
-	var changed []string
+// wrote during the session, such as the session's own record. A path that could
+// not be put back is not in the first list; the second names it and why.
+func (g inputGuard) restore(keep string) (changed, failed []string) {
 	now := g.walk()
 	for p, want := range g.files {
 		abs := filepath.Join(g.root, filepath.FromSlash(p))
@@ -263,8 +263,14 @@ func (g inputGuard) restore(keep string) []string {
 		if err == nil && bytes.Equal(got, want) {
 			continue
 		}
-		_ = os.MkdirAll(filepath.Dir(abs), 0o755)
-		_ = os.WriteFile(abs, want, 0o644)
+		err = os.MkdirAll(filepath.Dir(abs), 0o755)
+		if err == nil {
+			err = os.WriteFile(abs, want, 0o644)
+		}
+		if err != nil {
+			failed = append(failed, fmt.Sprintf("%s: %v", p, err))
+			continue
+		}
 		changed = append(changed, p)
 	}
 	for p := range now {
@@ -275,9 +281,13 @@ func (g inputGuard) restore(keep string) []string {
 		if keep != "" && filepath.Clean(abs) == filepath.Clean(keep) {
 			continue
 		}
-		_ = os.Remove(abs)
+		if err := os.Remove(abs); err != nil && !os.IsNotExist(err) {
+			failed = append(failed, fmt.Sprintf("%s: %v", p, err))
+			continue
+		}
 		changed = append(changed, p)
 	}
 	sort.Strings(changed)
-	return changed
+	sort.Strings(failed)
+	return changed, failed
 }

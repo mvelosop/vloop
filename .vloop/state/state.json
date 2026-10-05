@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 11,
+  "iteration": 12,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T21:40:03Z",
+  "updated": "2026-10-05T21:46:38Z",
   "shell": "sh",
   "checks": [
     {
@@ -300,8 +300,8 @@
       ],
       "verify": "sh .vloop/state/gates/T9/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "Done: copyReport warns on MkdirAll/WriteFile failure; inputGuard.restore and treeGuard.revert return a failure list naming paths and callers halt instead of logging restored; state.Save syncs before rename; gendocs refuses args starting with -; CLAUDE.md section lists plan, gate review, work, review and names /vloop:operate. Tests added. Not done: deleting the tracked file named --help at the repo root, because the permission classifier denied the git rm."
     },
     {
       "id": "T10",

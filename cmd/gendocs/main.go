@@ -5,12 +5,13 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/mvelosop/vloop/internal/cli"
 )
 
 func main() {
-	if len(os.Args) != 2 {
+	if len(os.Args) != 2 || strings.HasPrefix(os.Args[1], "-") {
 		fmt.Fprintln(os.Stderr, "usage: gendocs <output file>")
 		os.Exit(2)
 	}

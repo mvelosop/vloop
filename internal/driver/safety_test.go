@@ -179,3 +179,29 @@ func TestStateGuardGateFolders(t *testing.T) {
 }
 
 func planHashOfPlanOnly(g stateGuard) string { return state.PlanDigest(g.pre, nil) }
+
+func TestInputGuardRestoreReportsFailure(t *testing.T) {
+	root := t.TempDir()
+	cfg := filepath.Join(root, ".vloop", "config.toml")
+	if err := os.MkdirAll(filepath.Dir(cfg), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(cfg, []byte("a = 1\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	g := snapshotInputs(root, filepath.Join(root, ".vloop", "runs", "r"))
+	// a directory where the file was: it cannot be written back
+	if err := os.Remove(cfg); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(cfg, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	changed, failed := g.restore("")
+	if len(changed) != 0 {
+		t.Errorf("restore listed %v as restored", changed)
+	}
+	if len(failed) != 1 || !strings.Contains(failed[0], ".vloop/config.toml") {
+		t.Errorf("failed = %v, want one entry naming .vloop/config.toml", failed)
+	}
+}

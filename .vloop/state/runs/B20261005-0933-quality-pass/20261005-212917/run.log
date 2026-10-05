@@ -38,3 +38,6 @@
    check go
    review: PASS
    T8 done
+── iteration 12 (9 this run) · T9 · 8/17 done ──
+   Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section
+   work session reported blocked

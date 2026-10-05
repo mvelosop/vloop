@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "blocked",
+  "summary": "Done: copyReport warns on MkdirAll/WriteFile failure; inputGuard.restore and treeGuard.revert return a failure list naming paths and callers halt instead of logging restored; state.Save syncs before rename; gendocs refuses args starting with -; CLAUDE.md section lists plan, gate review, work, review and names /vloop:operate. Tests added. Not done: deleting the tracked file named --help at the repo root, because the permission classifier denied the git rm.",
+  "files": ["internal/driver/iterate.go", "internal/driver/acceptance.go", "internal/driver/safety.go", "internal/driver/safety_test.go", "internal/state/state.go", "internal/install/section.go", "internal/install/install_test.go", "cmd/gendocs/main.go", "cmd/gendocs/main_test.go"],
+  "verified": "vloop task gate T9 exited 1: only 'the file named --help at the repository root is still there'; go vet and go test ./internal/... ./cmd/gendocs pass (internal/cli needs VLOOP_PLAN_SHA256 unset).",
+  "notes": "The operator must run `git rm -- ./--help` (or rm ./--help); then the gate should pass. Nothing else is outstanding. restore/revert signatures now return (changed, failed []string)."
+}
