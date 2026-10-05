@@ -1,0 +1,5 @@
+── iteration 4 (1 this run) · T1 · 0/17 done ──
+   Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
+   check go
+   review: PASS
+   T1 done

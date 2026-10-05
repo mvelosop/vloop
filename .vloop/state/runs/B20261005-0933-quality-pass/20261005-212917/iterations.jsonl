@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":183883,"exit":0,"name":"go"}],"ended":"2026-10-05T20:33:47Z","gate":{"duration_ms":13063,"exit":0},"iteration":4,"outcome":"done","run_id":"B20261005-0933-quality-pass","schema":"iteration/v2","started":"2026-10-05T20:29:17Z","task":"T1"}

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "No new edits this attempt: the cmd/vloop tests already call t.Parallel(), and TestWorkedExampleB6RealData (operator-repaired in c340e1f) clones HEAD and fails if the run changes any path it wrote in the clone, refs or hooks, while tolerating other working-tree edits.",
+  "files": [],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go test -race ./cmd/vloop/ -run TestRun0 passed; go vet and gofmt clean.",
+  "notes": "Earlier attempts' parallel changes are already committed. Real-data test detects tracked-file leaks via leakedPaths (paths the run wrote in the clone compared with the real repo before and after), so the earlier refs-only weakening no longer applies. The full ./cmd/vloop suite was not rerun this attempt."
+}

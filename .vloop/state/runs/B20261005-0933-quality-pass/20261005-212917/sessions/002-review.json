@@ -1,0 +1,24 @@
+{
+  "cost_usd": 0.130741,
+  "duration_ms": 29744,
+  "effort": null,
+  "is_error": false,
+  "iteration": 4,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 17723,
+      "cache_read_input_tokens": 161705,
+      "cost_usd": 0.130741,
+      "input_tokens": 14,
+      "output_tokens": 2748
+    }
+  },
+  "permission_denials": [],
+  "phase": "review",
+  "run_id": "B20261005-0933-quality-pass",
+  "schema": "session/v1",
+  "started": "2026-10-05T20:33:16Z",
+  "task": "T1",
+  "turns": 8
+}
