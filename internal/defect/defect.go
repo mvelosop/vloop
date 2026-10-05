@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/frontmatter"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -187,13 +188,6 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	}
 }
 
-func quote(s string) string {
-	if s == "" || strings.ContainsAny(s, ":#\"'") || s != strings.TrimSpace(s) {
-		return strconv.Quote(s)
-	}
-	return s
-}
-
 func render(d Defect) string {
 	var b strings.Builder
 	b.WriteString("---\n")
@@ -202,38 +196,19 @@ func render(d Defect) string {
 		fmt.Fprintf(&b, "task: %s\n", d.Task)
 	}
 	fmt.Fprintf(&b, "origin: %s\nfound-by: %s\nkind: %s\nseverity: %s\nstatus: %s\n", d.Origin, d.FoundBy, d.Kind, d.Severity, d.Status)
-	fmt.Fprintf(&b, "fixed-by: %s\ncase: %s\ncreated: %s\n---\n%s\n", quote(d.FixedBy), quote(d.Case), d.Created, d.Summary)
+	fmt.Fprintf(&b, "fixed-by: %s\ncase: %s\ncreated: %s\n---\n%s\n", frontmatter.Quote(d.FixedBy), frontmatter.Quote(d.Case), d.Created, d.Summary)
 	return b.String()
-}
-
-func unquote(v string) string {
-	v = strings.TrimSpace(v)
-	if strings.HasPrefix(v, `"`) {
-		if u, err := strconv.Unquote(v); err == nil {
-			return u
-		}
-	}
-	return v
 }
 
 func parse(text string) (Defect, error) {
 	d := Defect{Schema: "defect/v1"}
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	if len(lines) == 0 || lines[0] != "---" {
-		return d, errors.New("missing frontmatter")
+	doc, err := frontmatter.Parse(text)
+	if err != nil {
+		return d, err
 	}
-	end := -1
-	for i, l := range lines[1:] {
-		if l == "---" {
-			end = i + 1
-			break
-		}
-		k, v, ok := strings.Cut(l, ":")
-		if !ok {
-			continue
-		}
-		v = unquote(v)
-		switch k {
+	for _, f := range doc.Fields() {
+		v := f.Value
+		switch f.Key {
 		case "id":
 			d.ID = v
 		case "brief":
@@ -258,10 +233,7 @@ func parse(text string) (Defect, error) {
 			d.Created = v
 		}
 	}
-	if end < 0 {
-		return d, errors.New("unterminated frontmatter")
-	}
-	d.Summary = strings.TrimRight(strings.Join(lines[end+1:], "\n"), "\n")
+	d.Summary = strings.TrimRight(doc.Body(), "\n")
 	return d, nil
 }
 
@@ -324,39 +296,22 @@ func Set(root, id, field, value string) error {
 			return err
 		}
 	}
-	line := field + ": " + quote(value)
+	line := field + ": " + frontmatter.Quote(value)
 	if field == "task" && value == "" {
 		line = ""
 	} else if field != "fixed-by" && field != "case" {
 		line = field + ": " + value
 	}
-	lines := strings.Split(string(b), "\n")
-	end := 0
-	for i := 1; i < len(lines); i++ {
-		if lines[i] == "---" {
-			end = i
-			break
-		}
-	}
-	found := -1
-	for i := 1; i < end; i++ {
-		if strings.HasPrefix(lines[i], field+":") {
-			found = i
-			break
-		}
+	doc, err := frontmatter.Parse(string(b))
+	if err != nil {
+		return err
 	}
 	switch {
-	case found >= 0 && line == "":
-		lines = slices.Delete(lines, found, found+1)
-	case found >= 0:
-		lines[found] = line
+	case doc.Replace(field, line):
 	case line != "": // task was absent: it follows brief
-		for i := 1; i < end; i++ {
-			if strings.HasPrefix(lines[i], "brief:") {
-				lines = slices.Insert(lines, i+1, line)
-				break
-			}
+		if i := doc.Find("brief"); i >= 0 {
+			doc.Insert(i+1, line)
 		}
 	}
-	return os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0o644)
+	return os.WriteFile(path, []byte(doc.String()), 0o644)
 }

@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/17 done** · iteration 4
+**Status:** running · **2/17 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T20:33:47Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T20:40:05Z
 
 ## Progress
 
 - [x] **T1** — Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
-- [ ] **T2** — Add one frontmatter reader and rewriter and move defects and interventions onto it
+- [x] **T2** — Add one frontmatter reader and rewriter and move defects and interventions onto it
 - [ ] **T3** — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
 - [ ] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
 - [ ] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
@@ -53,7 +53,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Add one frontmatter reader and rewriter and move defects and interventions onto it
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Frontmatter is parsed five ways today, with different trimming and quoting and no BOM handling, so `defect set` and `intervention set` on a CRLF or BOM record fail or corrupt it. This task adds the one package that reads and rewrites the frontmatter of Markdown records — a leading BOM ignored on read and preserved on write, CRLF read and written back as CRLF, no mixed endings, and a rewrite that touches only the lines it changes — and moves defect and intervention reading and setting onto it. T3 moves briefs, run records and brief close onto the same package.
 

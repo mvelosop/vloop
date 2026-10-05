@@ -205,3 +205,32 @@ func TestBlameMasterAndOriginHeadFallbacks(t *testing.T) {
 		t.Fatalf("origin/HEAD: %v %v", a, err)
 	}
 }
+
+func TestSetOnCRLFAndBOMRecords(t *testing.T) {
+	for name, tc := range map[string]struct{ bom, eol string }{
+		"CRLF": {"", "\r\n"}, "BOM": {"\xef\xbb\xbf", "\n"}, "BOM+CRLF": {"\xef\xbb\xbf", "\r\n"},
+	} {
+		dir := t.TempDir()
+		p, _ := Add(dir, NewInput{Summary: "x", FoundBy: "user", Brief: "B1.loop-brief"}, at)
+		id := strings.TrimSuffix(filepath.Base(p), ".md")
+		lf, _ := os.ReadFile(filepath.Join(dir, p))
+		rec := tc.bom + strings.ReplaceAll(string(lf), "\n", tc.eol)
+		if err := os.WriteFile(filepath.Join(dir, p), []byte(rec), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if ds, err := List(dir, ""); err != nil || len(ds) != 1 || ds[0].Brief != "B1.loop-brief" || ds[0].Summary != "x" {
+			t.Fatalf("%s: list %+v, %v", name, ds, err)
+		}
+		if err := Set(dir, id, "status", "fixed"); err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		if err := Set(dir, id, "task", ""); err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		got, _ := os.ReadFile(filepath.Join(dir, p))
+		want := tc.bom + strings.ReplaceAll(strings.Replace(string(lf), "status: open", "status: fixed", 1), "\n", tc.eol)
+		if string(got) != want {
+			t.Errorf("%s: got %q, want %q", name, got, want)
+		}
+	}
+}
