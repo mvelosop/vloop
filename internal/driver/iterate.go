@@ -237,12 +237,7 @@ func (it *Iterator) Run() (Ending, error) {
 			end = Ending{Status: "halted", Code: ExitCostCeiling}
 			break
 		}
-		closed := 0
-		for _, t := range plan.Tasks {
-			if t.Status == "done" && !doneAtStart[t.ID] {
-				closed++
-			}
-		}
+		closed := closedThisRun(plan, doneAtStart)
 		if runIters >= it.Budgets.ConvergenceMin &&
 			(closed == 0 || float64(runIters)/float64(closed) > it.Budgets.ConvergenceMax) {
 			it.warn("not converging: %d iteration(s) this run for %d closed task(s), over %.2f per closed task", runIters, closed, it.Budgets.ConvergenceMax)
@@ -288,6 +283,22 @@ func (it *Iterator) Run() (Ending, error) {
 	}
 	it.summary()
 	return end, nil
+}
+
+// closedThisRun counts the tasks that became done during this run. A task done
+// at run start that a gate regression reverted is forgotten from doneAtStart,
+// so its redo counts as closed.
+func closedThisRun(p *state.Plan, doneAtStart map[string]bool) int {
+	closed := 0
+	for _, t := range p.Tasks {
+		switch {
+		case t.Status != "done":
+			delete(doneAtStart, t.ID)
+		case !doneAtStart[t.ID]:
+			closed++
+		}
+	}
+	return closed
 }
 
 func counts(p *state.Plan) (done, blocked, pending int) {

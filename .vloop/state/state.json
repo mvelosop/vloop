@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 15,
+  "iteration": 16,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T22:07:00Z",
+  "updated": "2026-10-05T22:12:19Z",
   "shell": "sh",
   "checks": [
     {
@@ -366,9 +366,9 @@
         "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "No committed test covers a resumed run that closes nothing and halts with exit 5; the task required one and only the throwaway gate exercises it; A task that was done at run start, reverted by a gate regression and redone during the run is not counted as closed this run, because closed is keyed on done-at-start"
+      "notes": ""
     },
     {
       "id": "T12",

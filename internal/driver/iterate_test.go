@@ -166,3 +166,25 @@ func TestSessionTimeout(t *testing.T) {
 		t.Errorf("log %q", log.String())
 	}
 }
+
+func TestClosedThisRun(t *testing.T) {
+	plan := &state.Plan{Tasks: []state.Task{{ID: "T1", Status: "done"}, {ID: "T2", Status: "done"}, {ID: "T3", Status: "pending"}}}
+	atStart := map[string]bool{"T1": true, "T2": true}
+	// A resumed run that has closed nothing: convergence sees zero closes.
+	if got := closedThisRun(plan, atStart); got != 0 {
+		t.Errorf("resumed run closed %d, want 0", got)
+	}
+	plan.Tasks[2].Status = "done"
+	if got := closedThisRun(plan, atStart); got != 1 {
+		t.Errorf("after T3 closed = %d, want 1", got)
+	}
+	// T1 reverted by a gate regression, then redone: it is closed this run.
+	plan.Tasks[0].Status = "pending"
+	if got := closedThisRun(plan, atStart); got != 1 {
+		t.Errorf("while T1 is reverted closed = %d, want 1", got)
+	}
+	plan.Tasks[0].Status = "done"
+	if got := closedThisRun(plan, atStart); got != 2 {
+		t.Errorf("after T1 redone closed = %d, want 2", got)
+	}
+}

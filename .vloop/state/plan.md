@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/17 done** · iteration 15
+**Status:** running · **11/17 done** · iteration 16
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T22:07:00Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T22:12:19Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
 - [x] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section · 1 attempt(s)
 - [x] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
-- [ ] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes · 1 attempt(s)
+- [x] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes · 1 attempt(s)
 - [ ] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
 - [ ] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
 - [ ] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
@@ -267,7 +267,7 @@ sh .vloop/state/gates/T10/gate.sh
 
 ### T11 — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes
 
-`pending` · 1 attempt(s) · depends on: T10
+`done` · 1 attempt(s) · depends on: T10
 
 Two numbers are wrong. First-pass counts a task as first-pass when every iteration ended done, so a task reverted to pending by a gate regression and redone still counts. The driver's convergence halt (exit 5) divides this run's iterations by every done task in the plan, including those earlier runs closed, so a resumed run that closes nothing is never caught. This task fixes both; the brief's real-data check expects only these numbers to move.
 
@@ -279,8 +279,6 @@ Two numbers are wrong. First-pass counts a task as first-pass when every iterati
 - Tests cover a regressed-and-redone task's first-pass and a resumed run that closes nothing; the existing tests that pin metrics affected by this are updated and the proposal's notes list each changed number.
 - No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.
 - No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review.
-
-**From the last attempt:** No committed test covers a resumed run that closes nothing and halts with exit 5; the task required one and only the throwaway gate exercises it; A task that was done at run start, reverted by a gate regression and redone during the run is not counted as closed this run, because closed is keyed on done-at-start
 
 <details><summary>verify command</summary>
 
