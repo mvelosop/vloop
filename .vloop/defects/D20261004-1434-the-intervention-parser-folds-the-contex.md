@@ -5,8 +5,8 @@ origin: brief
 found-by: operator
 kind: spec-gap
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261004-1434-interventions-options.loop-brief
 case: ""
 created: 2026-10-04T13:34:26Z
 ---
