@@ -33,3 +33,8 @@
    check go
    review: PASS
    T7 done
+── iteration 11 (8 this run) · T8 · 7/17 done ──
+   Compare trust paths and find the pre-commit hook the way each OS and git do
+   check go
+   review: PASS
+   T8 done

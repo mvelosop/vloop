@@ -314,9 +314,14 @@ func doctorTrusted(root string) bool {
 	if real, err := filepath.EvalSymlinks(root); err == nil {
 		keys = append(keys, real)
 	}
-	for _, k := range keys {
-		if doc.Projects[k].Trusted {
-			return true
+	for key, proj := range doc.Projects {
+		if !proj.Trusted {
+			continue
+		}
+		for _, k := range keys {
+			if trustKeyMatch(hostOS, key, k) {
+				return true
+			}
 		}
 	}
 	return false

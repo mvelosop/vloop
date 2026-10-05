@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The trust lookup normalises both the repository path and each key in ~/.claude.json to `/` separators and compares them case-insensitively on Windows and macOS (case-sensitively elsewhere); the symlink-resolved root is still tried.", "met": true, "evidence": "internal/cli/platform.go trustKeyMatch replaces backslashes and uses EqualFold on windows/darwin; doctor.go iterates every Projects key against keys, which still includes the EvalSymlinks root"},
+    {"criterion": "The pre-commit hook check finds the hooks directory with `git rev-parse --git-path hooks` (which honours core.hooksPath and linked worktrees); on Windows a hook counts by its presence, elsewhere by its executable bit.", "met": true, "evidence": "run.go preCommitHook calls gitOut rev-parse --path-format=absolute --git-path hooks, then hookCounts(hostOS, perm)"},
+    {"criterion": "Both decisions are pure functions taking the OS (or its rule) as a parameter, with table tests covering Windows, macOS and Linux cases that run on every OS; the checks run them.", "met": true, "evidence": "platform.go trustKeyMatch/hookCounts take goos; platform_test.go has tables for windows, darwin, linux; go check passed"},
+    {"criterion": "`vloop doctor`'s trust line and `vloop run`'s preflight hook warning use these functions; their messages are unchanged.", "met": true, "evidence": "doctor.go doctorTrusted and run.go preCommitHook call them; no message strings in the diff"},
+    {"criterion": "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review.", "met": true, "evidence": "diff touches only the two decision sites plus the new platform files"}
+  ],
+  "findings": [],
+  "notes": "The git call itself (--path-format=absolute needs git 2.31+) and the linked-worktree path are not covered by a test; only the pure functions are. Not a finding."
+}

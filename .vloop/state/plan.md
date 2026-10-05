@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/17 done** · iteration 10
+**Status:** running · **8/17 done** · iteration 11
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:35:10Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:40:03Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
 - [x] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
 - [x] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
-- [ ] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
+- [x] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
 - [ ] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section
 - [ ] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
 - [ ] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes
@@ -198,7 +198,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Compare trust paths and find the pre-commit hook the way each OS and git do
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Two checks fail off the happy path: the trust lookup in ~/.claude.json compares paths byte for byte, so a Windows key with backslashes or a key in another letter case on Windows or macOS is not found; and the pre-commit hook check looks in `.git/hooks` with the executable bit, which misses a linked worktree (where `.git` is a file) and every hook on Windows. This task makes both OS-aware pure functions, tested on every OS, used by doctor and run's preflight.
 

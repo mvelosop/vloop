@@ -181,17 +181,13 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 // preCommitHook is the executable pre-commit hook git would run, repo-relative
 // when it is inside the repository; "" when there is none.
 func preCommitHook(root string) string {
-	dir, err := gitOut(root, "config", "core.hooksPath")
-	if err != nil || dir == "" {
-		dir = ".git/hooks"
-	}
-	full := dir
-	if !filepath.IsAbs(full) {
-		full = filepath.Join(root, dir)
+	full, err := gitOut(root, "rev-parse", "--path-format=absolute", "--git-path", "hooks")
+	if err != nil || full == "" {
+		return ""
 	}
 	hook := filepath.Join(full, "pre-commit")
 	fi, err := os.Stat(hook)
-	if err != nil || fi.IsDir() || fi.Mode()&0o111 == 0 {
+	if err != nil || fi.IsDir() || !hookCounts(hostOS, uint32(fi.Mode().Perm())) {
 		return ""
 	}
 	if rel, err := filepath.Rel(root, hook); err == nil && !strings.HasPrefix(rel, "..") {
