@@ -1,0 +1,62 @@
+{
+  "schema": "state/v2",
+  "run_id": "B20260101-0900-demo",
+  "brief": "docs/briefs/B20260101-0900-demo.loop-brief.md",
+  "base": "",
+  "branch": "",
+  "status": "planning",
+  "iteration": 0,
+  "created": "2026-01-01T09:00:00Z",
+  "updated": "2026-01-01T09:00:00Z",
+  "shell": "sh",
+  "checks": [
+    {
+      "name": "all",
+      "paths": [
+        "**"
+      ],
+      "run": "true"
+    }
+  ],
+  "gate_scratch": [],
+  "gate_review": {
+    "rounds": 0,
+    "verdict": ""
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Task T1",
+      "goal": "Do T1.",
+      "kind": "feature",
+      "fixtures": "",
+      "references": [],
+      "depends_on": [],
+      "acceptance": [
+        "T1.out exists"
+      ],
+      "verify": "test -f T1.out",
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T2",
+      "title": "Task T2",
+      "goal": "Do T2.",
+      "kind": "feature",
+      "fixtures": "",
+      "references": [],
+      "depends_on": [
+        "T1"
+      ],
+      "acceptance": [
+        "T2.out exists"
+      ],
+      "verify": "test -f T2.out",
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    }
+  ]
+}

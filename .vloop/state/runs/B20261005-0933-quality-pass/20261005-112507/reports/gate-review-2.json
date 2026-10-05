@@ -1,0 +1,93 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "PASS",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T5",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T6",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T7",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T8",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T9",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T10",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T11",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T12",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T13",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T14",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T15",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T16",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T17",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "All 17 gates fail on the base at a behavioural assertion (re-run with vloop task gate, each 1-14s); the later halves of T1, T3, T10, T11 and T15 were run separately on the base and fail at their own assertions, not at fixture or path errors. T8 asserts case-insensitive trust unconditionally, so it is only passable on macOS/Windows hosts, which is this repo operator host; T14 judges only the grader files, not what the judges say, which the review covers."
+}
+

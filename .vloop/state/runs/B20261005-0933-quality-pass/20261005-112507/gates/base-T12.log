@@ -1,0 +1,1 @@
+GATE FAIL: with no marketplace plugin, doctor prints '! plugin no enabled vloop plugin — run claude plugin install vloop@vloop', want '✓ plugin the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir "$(vloop plugin path)"'

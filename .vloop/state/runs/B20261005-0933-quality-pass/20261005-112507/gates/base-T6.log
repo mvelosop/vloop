@@ -1,0 +1,1 @@
+GATE FAIL: vloop status printed 'vloop: .vloop/state/state.json: invalid character 'b' looking for beginning of object key string' on stderr, want exactly 'vloop: .vloop/state/state.json is not valid JSON (line 1, column 2)'

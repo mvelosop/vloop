@@ -1,0 +1,1 @@
+GATE FAIL: the run folder is named 20261005-163257 under TZ=Asia/Kolkata, but the UTC clock read 20261005-110257 to 20261005-110259: it is not named in UTC

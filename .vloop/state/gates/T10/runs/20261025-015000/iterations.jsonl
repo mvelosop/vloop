@@ -1,0 +1,1 @@
+{"attempt": 1, "checks": [], "ended": "2026-10-25T00:50:59Z", "gate": {"duration_ms": 10, "exit": 1}, "iteration": 1, "outcome": "gate_failed", "run_id": "B20260101-0900-demo", "schema": "iteration/v2", "started": "2026-10-25T00:50:05Z", "task": "T1"}

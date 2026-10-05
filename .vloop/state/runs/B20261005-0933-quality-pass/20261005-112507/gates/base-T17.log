@@ -1,0 +1,1 @@
+GATE FAIL: vloop -C /nonexistent status printed 'vloop: no plan: .vloop/state/state.json' on stderr, want 'vloop: -C /nonexistent: no such directory'

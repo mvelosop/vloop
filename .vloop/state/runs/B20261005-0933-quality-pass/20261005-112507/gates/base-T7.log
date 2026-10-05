@@ -1,0 +1,5 @@
+GATE FAIL: brief check on drafts only does not print 'nothing checked: 2 draft brief(s) skipped': docs/briefs/B20261005-1202-getting-started.loop-brief.md
+  - skipped: status is draft
+docs/briefs/B20261005-1202-second-draft.loop-brief.md
+  - skipped: status is draft
+briefs ok

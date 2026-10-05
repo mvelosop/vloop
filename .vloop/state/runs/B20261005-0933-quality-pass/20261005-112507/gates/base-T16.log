@@ -1,0 +1,1 @@
+GATE FAIL: README.md has no heading matching 'prerequisite' after line 0 (want, in order: prerequisites, install, quickstart, the loop, commands, exit codes, guides, What changed in 2.0): # vloop|## The loop in one paragraph|## Briefs|## Commands|## Configuration|## Files|## Guides|## Exit codes|## Skills|
