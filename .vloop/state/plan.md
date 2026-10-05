@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/17 done** · iteration 0
+**Status:** running · **0/17 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T11:07:56Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T11:15:45Z
 
 ## Progress
 
-- [ ] **T1** — Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
+- [ ] **T1** — Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree · 1 attempt(s)
 - [ ] **T2** — Add one frontmatter reader and rewriter and move defects and interventions onto it
 - [ ] **T3** — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
 - [ ] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
@@ -30,7 +30,7 @@
 
 ### T1 — Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 The repository's go check takes about nine minutes after every iteration, almost all of it cmd/vloop's end-to-end tests run one at a time; this task goes first so every later iteration's check is cheaper. Every cmd/vloop test that builds its own temporary repository and changes no process-wide state (environment, working directory) calls t.Parallel(); one that must stay serial says why in a comment. TestWorkedExampleB6RealData clones the repository's HEAD and must stop failing when someone edits the working tree while it runs. The speed target (at most half the base time on the same machine) is measured once by the operator at verification, never by a gate.
 
@@ -42,6 +42,8 @@ The repository's go check takes about nine minutes after every iteration, almost
 - Parallel tests do not share a temporary directory, stub, home or port; each test's harness state is its own.
 - No production code changes in this task, and no test's assertions are loosened to make it parallel.
 - `go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race.
+
+**From the last attempt:** TestWorkedExampleB6RealData now compares only HEAD and refs, so writes to the real repository's tracked files go undetected; the working-tree-edit tolerance should keep detecting them, for example by comparing the content of tracked files that the run could write to, or the tracked-file hashes at HEAD against the index/objects
 
 <details><summary>verify command</summary>
 

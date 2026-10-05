@@ -186,6 +186,7 @@ func b5Code(t *testing.T, r result, code int) {
 }
 
 func TestWorkedExampleB5Session(t *testing.T) {
+	t.Parallel()
 	r := b5New(t, false, false)
 	r.write("go.mod", "module example.com/shop\n\ngo 1.22\n")
 	r.write("package.json", `{"dependencies":{"react":"^18.0.0"}}`+"\n")
@@ -234,6 +235,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 }
 
 func TestWorkedExampleB5Monorepo(t *testing.T) {
+	t.Parallel()
 	r := b5New(t, false, false)
 	r.write("go.mod", "module example.com/shop\n")
 	r.write("services/api/Api.sln", "")
@@ -260,6 +262,7 @@ func TestWorkedExampleB5Monorepo(t *testing.T) {
 }
 
 func TestWorkedExampleB5PlantedFailures(t *testing.T) {
+	t.Parallel()
 	t.Run("no .git", func(t *testing.T) {
 		r := b5New(t, true, false)
 		b5Expect(t, r.run("0.2.0", "init"), 1, nil, "vloop: not a git repository — run git init first\n")

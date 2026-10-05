@@ -1,0 +1,17 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "Every top-level test in cmd/vloop that builds its own temporary repository and sets no environment variable or working directory of the test process calls t.Parallel() — including TestRun01HappyPath, TestRun09DependencyOrder, TestWorkedExampleB3Commands, TestRunGateReviewPasses and TestRunChecksScopedToWhatChanged.", "met": true, "evidence": "A scan of cmd/vloop/*_test.go finds every top-level Test function calls t.Parallel(), except TestMain, which is not a test. The diff adds t.Parallel() across 25 files."},
+    {"criterion": "A cmd/vloop test left serial carries a comment saying why (what process-wide state it touches); no test made parallel calls os.Setenv, t.Setenv, os.Chdir or t.Chdir, or mutates a package-level variable another test reads.", "met": true, "evidence": "No test is left serial. grep finds no Setenv or Chdir in the tests, only reads of os.Getenv and os.Environ."},
+    {"criterion": "TestWorkedExampleB6RealData still clones the repository's HEAD (not its working tree) and still runs vloop run in the clone; it passes while files in the repository's working tree are edited or added during its run, and it still fails if the run writes into the real repository's tracked files or refs.", "met": false, "evidence": "b6_e2e_test.go: the git status comparison was replaced by a check of HEAD and for-each-ref only. A run that writes into the real repository's tracked files (without moving a ref) no longer fails the test, so the 'tracked files' half of the criterion is lost. The clone and the run in the clone are unchanged."},
+    {"criterion": "Parallel tests do not share a temporary directory, stub, home or port; each test's harness state is its own.", "met": true, "evidence": "The tests use newRunRepo, newScratch and t.TempDir, which are per-test. The diff adds no shared state."},
+    {"criterion": "No production code changes in this task, and no test's assertions are loosened to make it parallel.", "met": false, "evidence": "No production code changed. But TestWorkedExampleB6RealData's assertion was weakened from a full porcelain status comparison to refs only (b6_e2e_test.go, refs := func()...)."},
+    {"criterion": "`go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race.", "met": true, "evidence": "The checks.json go check ran with exit 0. The driver ran the gate, and its log is under .vloop/state/runs/.../gates/T1.log. I did not rerun the tests."}
+  ],
+  "findings": [
+    {"summary": "TestWorkedExampleB6RealData now compares only HEAD and refs, so writes to the real repository's tracked files go undetected; the working-tree-edit tolerance should keep detecting them, for example by comparing the content of tracked files that the run could write to, or the tracked-file hashes at HEAD against the index/objects", "kind": "bug"}
+  ],
+  "notes": "The parallelisation is complete and clean. Only the real-data test needs a check that still catches tracked-file writes while ignoring concurrent edits in the working tree. For example, it could snapshot the specific tracked paths a vloop run is known to write, such as .vloop/state/ and docs/, or make the clone's run unable to reach the real repository at all."
+}

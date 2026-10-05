@@ -59,6 +59,7 @@ func (r *runRepo) sessionFiles() []string {
 // TestRun10Containment: nothing is written outside the repository and nothing
 // persisted names the machine, even when a session reports an absolute path.
 func TestRun10Containment(t *testing.T) {
+	t.Parallel()
 	for _, user := range []string{"harnessuser", "us"} {
 		t.Run(user, func(t *testing.T) { run10Containment(t, user) })
 	}
@@ -111,6 +112,7 @@ fi
 // TestRun13EmptyRunSignals: a run with no iterations closes nothing, records
 // nothing, and still prints its end-of-run report.
 func TestRun13EmptyRunSignals(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	res := r.vloop("run", "--max-iterations", "0", runBrief)
@@ -129,6 +131,7 @@ func TestRun13EmptyRunSignals(t *testing.T) {
 // TestRun14RenderedViews: plan.md tracks state and is what vloop status
 // --markdown renders; the journal opens with the plan and closes with the end.
 func TestRun14RenderedViews(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -156,6 +159,7 @@ func TestRun14RenderedViews(t *testing.T) {
 // TestRun15TelemetryContract: every record validates against its schema and
 // session files sort in run order.
 func TestRun15TelemetryContract(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -207,6 +211,7 @@ func TestRun15TelemetryContract(t *testing.T) {
 // TestRun18PreflightUntrusted: an untrusted workspace is refused before any
 // session, branch, plan or commit.
 func TestRun18PreflightUntrusted(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	head := r.head()
@@ -220,6 +225,7 @@ func TestRun18PreflightUntrusted(t *testing.T) {
 // TestRun20ParallelSafeLayout: runs live under the run id, the journal is one
 // per plan, and a resumed run appends to it in a folder of its own.
 func TestRun20ParallelSafeLayout(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", "--max-iterations", "1", runBrief), 4)
@@ -255,6 +261,7 @@ func TestRun20ParallelSafeLayout(t *testing.T) {
 // TestRun22RunLock: a live lock stops a second run, a dead one is cleared, and
 // the lock is released at the end and never committed.
 func TestRun22RunLock(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	head := r.head()
@@ -284,6 +291,7 @@ func TestRun22RunLock(t *testing.T) {
 // TestRun23GitIdentity: no git identity is refused before spending; a
 // pre-commit hook is warned about and not blocked on.
 func TestRun23GitIdentity(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	head := r.head()
@@ -308,6 +316,7 @@ func TestRun23GitIdentity(t *testing.T) {
 // TestRun24StateTampering: a session that edits the plan has it restored, and
 // the iteration fails whatever the gate said.
 func TestRun24StateTampering(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = work ] && [ "$TASK" = T1 ] && [ "$ATTEMPT" = 1 ]; then
   sed 's/"verify": "test -f T1.out"/"verify": "true"/' .vloop/state/state.json > st.tmp && mv st.tmp .vloop/state/state.json
@@ -337,6 +346,7 @@ fi
 // TestRunSessionRecordMissing: a session that prints nothing leaves no record
 // and a log line, a normal one leaves its record, and metrics reports the gap.
 func TestRunSessionRecordMissing(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = review ] && [ "$TASK" = T1 ] && [ "$ATTEMPT" = 1 ]; then
   printf '{"schema":"verdict/v1","task":"T1","verdict":"FAIL","criteria":[],"findings":["no"],"notes":"n"}\n' > .vloop/tmp/verdict.json

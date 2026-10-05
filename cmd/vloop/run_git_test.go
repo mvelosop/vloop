@@ -11,6 +11,7 @@ import (
 // nothing, when a session or gate changes .git/config, the hooks or the refs.
 
 func TestRunHooksPlanted(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = work ]; then printf '#!/bin/sh\ngit branch evil\n' > .git/hooks/post-commit; chmod +x .git/hooks/post-commit; fi
 `)
@@ -28,6 +29,7 @@ func TestRunHooksPlanted(t *testing.T) {
 }
 
 func TestRunGitConfigPlanted(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = work ]; then printf '#!/bin/sh\ntouch fsm.ran\n' > fsm.sh; chmod +x fsm.sh; printf '[core]\n\tfsmonitor = ./fsm.sh\n' >> .git/config; fi
 `)
@@ -40,6 +42,7 @@ func TestRunGitConfigPlanted(t *testing.T) {
 }
 
 func TestRunGateMovesRefs(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "git commit --allow-empty -qm x && true"})), defaultScript)
 	res := r.runWith(nil, runBrief)

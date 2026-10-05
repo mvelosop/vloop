@@ -10,6 +10,7 @@ import (
 // TestRunGateLogRedacted: a gate that dumps the environment leaves the value
 // of a secret-named variable out of the committed gate log.
 func TestRunGateLogRedacted(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "env; test -f T1.out"})), defaultScript)
 	wantExit(t, r.runWith([]string{"FOO_TOKEN=s3cr3t-value", "SHORT_KEY=abc123"}, runBrief), 0)

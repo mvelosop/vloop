@@ -41,6 +41,7 @@ func oneTask(t *testing.T) string { return planJSON(t, planTask("T1", nil)) }
 // TestRun04AttemptCeiling: a task that keeps failing review is blocked, not
 // retried forever.
 func TestRun04AttemptCeiling(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(oneTask(t), defaultScript+reviewFails)
 	res := r.runWith([]string{"VLOOP_RUN_MAX_ATTEMPTS=2", "VLOOP_RUN_CONVERGENCE_MIN=99"}, runBrief)
@@ -54,6 +55,7 @@ func TestRun04AttemptCeiling(t *testing.T) {
 // TestRun05MaxIterationsResumable: budgets are per run and checked between
 // iterations, so raising one and re-running just works with no state edit.
 func TestRun05MaxIterationsResumable(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	res := r.runWith([]string{"VLOOP_RUN_MAX_ITERATIONS=1"}, runBrief)
@@ -88,6 +90,7 @@ func (r *runRepo) runFolderName() string {
 
 // TestRun06CostCeilingResumable: the same promise for the cost ceiling.
 func TestRun06CostCeilingResumable(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), "STUB_COST=1.00\n"+defaultScript)
 	wantExit(t, r.runWith(nil, "--cost-ceiling", "2", runBrief), 6)
@@ -104,6 +107,7 @@ func TestRun06CostCeilingResumable(t *testing.T) {
 // TestRun07ConvergenceHalt: every gate is green and every review thorough, and
 // nothing ever closes.
 func TestRun07ConvergenceHalt(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(oneTask(t), defaultScript+reviewFails)
 	wantExit(t, r.runWith([]string{"VLOOP_RUN_CONVERGENCE_MIN=2", "VLOOP_RUN_MAX_ATTEMPTS=99"}, runBrief), 5)
@@ -116,6 +120,7 @@ func TestRun07ConvergenceHalt(t *testing.T) {
 // progress. Each attempt touches a fresh marker so the repeat-blocked halt never
 // fires: something changes every time.
 func TestRun11Stall(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(oneTask(t), defaultScript+blockedWork(`  : > "attempt-$ATTEMPT.marker"
 `))
@@ -128,6 +133,7 @@ func TestRun11Stall(t *testing.T) {
 // TestRun19SessionError: a claude session that dies is an infrastructure
 // failure, not the task's: no attempt is charged.
 func TestRun19SessionError(t *testing.T) {
+	t.Parallel()
 	for name, script := range map[string]string{
 		"exits non-zero": `if [ "$PHASE" = work ]; then STUB_EXIT=9; rm -f .vloop/tmp/proposal.json; else :; fi
 `,
@@ -158,6 +164,7 @@ esac
 // session changed something, the retry is allowed and the rule is re-evaluated
 // on the next pair.
 func TestRun42RepeatBlockedHalts(t *testing.T) {
+	t.Parallel()
 	plan := func(t *testing.T) string {
 		return planJSON(t, planTask("T1", nil))
 	}
@@ -199,6 +206,7 @@ func TestRun42RepeatBlockedHalts(t *testing.T) {
 // snapshots every ref and HEAD before each session and compares after; any
 // difference halts with exit 9 and commits nothing.
 func TestRun44RefsMovedHalts(t *testing.T) {
+	t.Parallel()
 	loopCommits := func(r *runRepo, prefix string) int {
 		n := 0
 		for _, s := range r.subjects("--all") {
@@ -262,6 +270,7 @@ func TestRun44RefsMovedHalts(t *testing.T) {
 // TestRunBudgetPrecedence: a flag beats the environment, which beats the file,
 // which beats the default.
 func TestRunBudgetPrecedence(t *testing.T) {
+	t.Parallel()
 	fresh := func(t *testing.T, fileValue string) *runRepo {
 		r := newRunRepo(t)
 		r.scripted(twoTasks(t), defaultScript)

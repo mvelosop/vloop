@@ -31,6 +31,7 @@ func refusedBeforePlanning(t *testing.T, r *runRepo, head string, res result, li
 }
 
 func TestRunPlansNewestReadyBrief(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	// vloop init leaves a newer draft beside the ready brief.
 	r.write("docs/briefs/B20260102-0900-newer.loop-brief.md",
@@ -43,6 +44,7 @@ func TestRunPlansNewestReadyBrief(t *testing.T) {
 }
 
 func TestRunRefusesDraftBriefs(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.write(runBriefPath, strings.Replace(runBriefText(), "status: ready", "status: draft", 1))
 	r.commitAll("all drafts")
@@ -55,6 +57,7 @@ func TestRunRefusesDraftBriefs(t *testing.T) {
 }
 
 func TestRunRefusesUncheckedBrief(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.write(runBriefPath, strings.Replace(runBriefText(), "## Worked example", "## Example", 1))
 	r.commitAll("an unchecked brief")
@@ -66,6 +69,7 @@ func TestRunRefusesUncheckedBrief(t *testing.T) {
 }
 
 func TestRunRefusesUnconsumedDependency(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	const base = "B20251201-0900-base"
 	r.write("docs/briefs/"+base+".loop-brief.md", strings.ReplaceAll(runBriefText(), runBriefName, base+".loop-brief"))
@@ -77,6 +81,7 @@ func TestRunRefusesUnconsumedDependency(t *testing.T) {
 }
 
 func TestRunRefusesDirtyTree(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	head := strings.TrimSpace(r.git("rev-parse", "HEAD"))
 	r.write(".env", "API_KEY=x\n")
@@ -103,6 +108,7 @@ func TestRunRefusesDirtyTree(t *testing.T) {
 }
 
 func TestRunResumeAllowsStateEdits(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", "--max-iterations", "1", runBriefPath), 4)
@@ -124,6 +130,7 @@ func TestRunResumeAllowsStateEdits(t *testing.T) {
 }
 
 func TestRunRefusesNoCheck(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.write(".vloop/config.toml", "")
 	r.commitAll("no check")
@@ -136,6 +143,7 @@ func TestRunRefusesNoCheck(t *testing.T) {
 }
 
 func TestRunBaseCheckFailureRefuses(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.write(".vloop/config.toml", "[[check]]\nname = \"api\"\npaths = [\"api/**\"]\nrun = \"true\"\n[[check]]\nname = \"web\"\npaths = [\"web/**\"]\nrun = \"echo broken; exit 1\"\n")
 	r.commitAll("a failing check")
@@ -160,6 +168,7 @@ func TestRunBaseCheckFailureRefuses(t *testing.T) {
 }
 
 func TestRunCopiesChecksIntoThePlan(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.write(".vloop/config.toml", "[[check]]\nname = \"api\"\npaths = [\"api/**\"]\nrun = \"true\"\n[[check]]\nname = \"web\"\npaths = [\"web/**\"]\nrun = \"true\"\n")
 	r.commitAll("two checks")
@@ -205,6 +214,7 @@ func TestRunCopiesChecksIntoThePlan(t *testing.T) {
 }
 
 func TestRunBaseCheckMovingARefHalts(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.write(".vloop/config.toml", "[[check]]\nname = \"refs\"\npaths = [\"**\"]\nrun = \"git branch moved-by-check\"\n")
 	r.commitAll("a check that moves a ref")

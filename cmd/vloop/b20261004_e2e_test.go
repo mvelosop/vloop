@@ -63,6 +63,7 @@ func body(text string) string {
 }
 
 func TestWorkedExampleInterventionsOptions(t *testing.T) {
+	t.Parallel()
 	s := newScratch(t)
 	git := func(args ...string) string {
 		t.Helper()

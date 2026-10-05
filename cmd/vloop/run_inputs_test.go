@@ -9,6 +9,7 @@ import (
 // among them; a review session that changes one fails.
 
 func TestRunCostRecordsZeroed(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", nil), planTask("T2", map[string]any{"depends_on": []string{"T1"}}),
 		planTask("T3", map[string]any{"depends_on": []string{"T2"}})), defaultScript+`if [ "$PHASE" = work ] && [ "$TASK" != T1 ]; then
@@ -21,6 +22,7 @@ fi
 }
 
 func TestRunSessionInputsRestored(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	orig := r.read(".vloop/config.toml")
 	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = work ]; then printf '\n[model]\nreview = "haiku"\n' >> .vloop/config.toml; fi
@@ -36,6 +38,7 @@ func TestRunSessionInputsRestored(t *testing.T) {
 }
 
 func TestRunReviewInputsFail(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	orig := r.read(".vloop/config.toml")
 	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = review ] && [ "$ATTEMPT" = 1 ]; then printf '\n# edited\n' >> .vloop/config.toml; fi

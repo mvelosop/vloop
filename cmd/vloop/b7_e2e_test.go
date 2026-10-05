@@ -12,6 +12,7 @@ import (
 // and an intervention is added, listed and exported with repo.stacks.
 
 func TestWorkedExampleB7PluginPath(t *testing.T) {
+	t.Parallel()
 	s := newScratch(t)
 	res := s.run(nil, "plugin", "path")
 	if res.code != 0 {
@@ -38,6 +39,7 @@ func TestWorkedExampleB7PluginPath(t *testing.T) {
 }
 
 func TestWorkedExampleB7Interventions(t *testing.T) {
+	t.Parallel()
 	s := newScratch(t)
 	s.write(".vloop/config.toml", "[metrics]\nstacks = [\"go\"]\n")
 

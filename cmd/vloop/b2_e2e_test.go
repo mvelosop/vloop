@@ -63,6 +63,7 @@ func hasLine(out, line string) bool {
 }
 
 func TestWorkedExampleB2Commands(t *testing.T) {
+	t.Parallel()
 	s := b2Scratch(t)
 
 	expect(t, s.run(nil, "status"), 0,
@@ -129,6 +130,7 @@ func TestWorkedExampleB2Commands(t *testing.T) {
 }
 
 func TestWorkedExampleB2PlantedFailures(t *testing.T) {
+	t.Parallel()
 	problem := func(t *testing.T, s *scratch, re string) {
 		t.Helper()
 		r := s.run(nil, "task", "validate")

@@ -41,6 +41,7 @@ func b6Lines(r *runRepo, prefix string) []string {
 func b6Squash(s string) string { return strings.Join(strings.Fields(s), " ") }
 
 func TestWorkedExampleB6(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	res := r.vloop("run", runBrief)
@@ -64,6 +65,7 @@ func TestWorkedExampleB6(t *testing.T) {
 }
 
 func TestWorkedExampleB6Sessions(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -115,6 +117,7 @@ func TestWorkedExampleB6Sessions(t *testing.T) {
 }
 
 func TestWorkedExampleB6BranchExists(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	r.git("branch", runID)
@@ -126,6 +129,7 @@ func TestWorkedExampleB6BranchExists(t *testing.T) {
 }
 
 func TestWorkedExampleB6GateDispute(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = work ] && [ "$TASK" = T2 ]; then
   printf '{"schema":"proposal/v1","task":"T2","outcome":"blocked","summary":"s","files":[],"verified":"v","notes":"n","gate_dispute":{"reason":"r","evidence":"e"}}\n' > .vloop/tmp/proposal.json
@@ -142,6 +146,7 @@ fi
 }
 
 func TestWorkedExampleB6FlakyGate(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	seen := filepath.Join(r.stub, "flaky.seen")
 	verify := `test -f T1.out && { [ -f "` + seen + `" ] || { : > "` + seen + `"; exit 1; }; }`
@@ -176,6 +181,7 @@ func TestWorkedExampleB6FlakyGate(t *testing.T) {
 }
 
 func TestWorkedExampleB6SilentReview(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = review ] && [ "$TASK" = T1 ]; then STUB_SILENT=1; fi
 `)
@@ -196,6 +202,7 @@ func TestWorkedExampleB6SilentReview(t *testing.T) {
 }
 
 func TestWorkedExampleB6RefsMoved(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = work ] && [ "$TASK" = T1 ]; then git checkout -q -b other; fi
 `)
@@ -210,6 +217,7 @@ func TestWorkedExampleB6RefsMoved(t *testing.T) {
 }
 
 func TestWorkedExampleB6MaxIterations(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", "--max-iterations", "1", runBrief), 4)
@@ -226,13 +234,18 @@ func TestWorkedExampleB6MaxIterations(t *testing.T) {
 // repository, which has the shell loop's .loop/, B4's snapshots and no
 // .vloop/tmp/ ignore line, and checks this repository is untouched.
 func TestWorkedExampleB6RealData(t *testing.T) {
+	t.Parallel()
 	src := newRunRepo(t) // for its stub, home and helpers; its own repository is unused
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
 	}
-	status := func() string { return runGit(t, root, "status", "--porcelain", "--untracked-files=all") }
-	before := status()
+	// The repository's working tree may be edited while this runs, so what must
+	// stay put is its history: HEAD and every ref, which the clone's run must not move.
+	refs := func() string {
+		return runGit(t, root, "rev-parse", "HEAD") + runGit(t, root, "for-each-ref", "--format=%(objectname) %(refname)")
+	}
+	before := refs()
 
 	clone := filepath.Join(t.TempDir(), "clone")
 	runGit(t, root, "clone", "-q", root, clone)
@@ -276,8 +289,8 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if s := r.git("ls-files", ".vloop/tmp"); s != "" {
 		t.Errorf(".vloop/tmp/ was committed in the clone:\n%s", s)
 	}
-	if after := status(); after != before {
-		t.Errorf("the real-data check changed this repository:\n%s", after)
+	if after := refs(); after != before {
+		t.Errorf("the real-data check moved this repository's refs:\n%s", after)
 	}
 }
 

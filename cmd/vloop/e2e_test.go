@@ -117,6 +117,7 @@ func expect(t *testing.T, r result, code int, out, errOut string) {
 }
 
 func TestWorkedExampleEnglishSession(t *testing.T) {
+	t.Parallel()
 	s := newScratch(t)
 
 	r := s.run(nil, "version", "--json")
@@ -203,6 +204,7 @@ func esFixture(t *testing.T) *scratch {
 }
 
 func TestWorkedExampleSpanishBrief(t *testing.T) {
+	t.Parallel()
 	s := esFixture(t)
 	pa := "docs/briefs/" + nameA + ".md"
 	r := s.run(nil, "brief", "check", pa)
@@ -214,6 +216,7 @@ func TestWorkedExampleSpanishBrief(t *testing.T) {
 }
 
 func TestWorkedExamplePlantedFailures(t *testing.T) {
+	t.Parallel()
 	pa := "docs/briefs/" + nameA + ".md"
 	pb := "docs/briefs/" + nameB + ".md"
 	cases := []struct {

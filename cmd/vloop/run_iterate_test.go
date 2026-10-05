@@ -131,6 +131,7 @@ func twoTasks(t *testing.T) string {
 }
 
 func TestRun01HappyPath(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	base := strings.TrimSpace(r.git("rev-parse", "main"))
@@ -197,6 +198,7 @@ func TestRun01HappyPath(t *testing.T) {
 }
 
 func TestRun02ReviewFail(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", nil)), defaultScript+`if [ "$PHASE" = review ] && [ ! -f "$dir/reviewed" ]; then
   : > "$dir/reviewed"
@@ -226,6 +228,7 @@ fi
 }
 
 func TestRun09DependencyOrder(t *testing.T) {
+	t.Parallel()
 	// T1 is listed first but depends on T2: file order and ready order disagree.
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", map[string]any{"depends_on": []string{"T2"}}), planTask("T2", nil)), defaultScript)
@@ -234,6 +237,7 @@ func TestRun09DependencyOrder(t *testing.T) {
 }
 
 func TestRun16ReviewFailsClosed(t *testing.T) {
+	t.Parallel()
 	for name, verdict := range map[string]string{
 		"no verdict":                   `true`,
 		"a verdict failing its schema": `printf '{"verdict":"PASS"}\n' > .vloop/tmp/verdict.json`,
@@ -261,6 +265,7 @@ func TestRun16ReviewFailsClosed(t *testing.T) {
 }
 
 func TestRun17StaleHandoff(t *testing.T) {
+	t.Parallel()
 	// Only T1 reports. T2's session writes nothing, leaving T1's proposal on
 	// disk as the most recent one: it must not be taken for T2's.
 	r := newRunRepo(t)
@@ -283,6 +288,7 @@ func TestRun17StaleHandoff(t *testing.T) {
 }
 
 func TestRun21ForeignState(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -344,6 +350,7 @@ func TestRun21ForeignState(t *testing.T) {
 }
 
 func TestRun30PlanOnly(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t,
 		planTask("T1", nil),
@@ -387,6 +394,7 @@ func TestRun30PlanOnly(t *testing.T) {
 }
 
 func TestRun37GateTaskEnv(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	envLog := filepath.Join(r.stub, "env.log")
 	rec := func(id string) map[string]any {
@@ -432,6 +440,7 @@ func TestRun37GateTaskEnv(t *testing.T) {
 }
 
 func TestRun40NoProposalTree(t *testing.T) {
+	t.Parallel()
 	run := func(t *testing.T, edit bool) (r *runRepo, notes, journal, out string) {
 		r = newRunRepo(t)
 		script := `case "$PHASE" in
@@ -476,6 +485,7 @@ func TestRun40NoProposalTree(t *testing.T) {
 }
 
 func TestRunMaxIterations(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", "--max-iterations", "1", runBrief), 4)
@@ -493,6 +503,7 @@ func TestRunMaxIterations(t *testing.T) {
 }
 
 func TestRunGateFailure(t *testing.T) {
+	t.Parallel()
 	// A gate that fails once, then passes: no review for the failed iteration,
 	// one attempt charged, and the retry is not another task's.
 	r := newRunRepo(t)
@@ -510,6 +521,7 @@ func TestRunGateFailure(t *testing.T) {
 }
 
 func TestRunHeadCheck(t *testing.T) {
+	t.Parallel()
 	// A gate that moves HEAD off the run's branch: nothing may be committed.
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "test -f T1.out && git checkout -q main"})), defaultScript)

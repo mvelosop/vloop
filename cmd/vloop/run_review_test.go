@@ -6,6 +6,7 @@ import "testing"
 // reverted and fails the verdict.
 
 func TestRunReviewChangesReverted(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.commitFile("src.txt", "orig\n")
 	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = review ] && [ "$ATTEMPT" = 1 ]; then echo tampered >> src.txt; echo new > review-new.txt; fi

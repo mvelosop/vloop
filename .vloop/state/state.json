@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T11:07:56Z",
+  "updated": "2026-10-05T11:15:45Z",
   "shell": "sh",
   "checks": [
     {
@@ -47,8 +47,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "TestWorkedExampleB6RealData now compares only HEAD and refs, so writes to the real repository's tracked files go undetected; the working-tree-edit tolerance should keep detecting them, for example by comparing the content of tracked files that the run could write to, or the tracked-file hashes at HEAD against the index/objects"
     },
     {
       "id": "T2",

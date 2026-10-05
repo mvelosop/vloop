@@ -175,6 +175,7 @@ func b3Summary(sha string) []string {
 }
 
 func TestWorkedExampleB3Commands(t *testing.T) {
+	t.Parallel()
 	s, sha := b3Fixture(t, b3Opts{})
 	brief := b3Brief + ".loop-brief"
 
@@ -212,6 +213,7 @@ func TestWorkedExampleB3Commands(t *testing.T) {
 }
 
 func TestWorkedExampleB3PlantedFailures(t *testing.T) {
+	t.Parallel()
 	brief := b3Brief + ".loop-brief"
 
 	t.Run("trailer removed", func(t *testing.T) {

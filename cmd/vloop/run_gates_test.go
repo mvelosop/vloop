@@ -41,6 +41,7 @@ const clobberOnce = `if [ "$PHASE" = work ] && [ "$TASK" = T2 ] && [ ! -f "$dir/
 // TestRun03GateRegression: a later task breaks an earlier one; re-running every
 // done task's gate is what sees it.
 func TestRun03GateRegression(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+clobberOnce)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -57,6 +58,7 @@ func TestRun03GateRegression(t *testing.T) {
 // TestRun41RegressionNamesBoth: the regression line names the reverted task
 // and the task whose iteration caused it.
 func TestRun41RegressionNamesBoth(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+clobberOnce)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -101,6 +103,7 @@ func says(text string) bool {
 }
 
 func TestRun39BlockedGatePasses(t *testing.T) {
+	t.Parallel()
 	blk := func(t *testing.T, make string) (*runRepo, result) {
 		r := newRunRepo(t)
 		r.scripted(planJSON(t, planTask("T1", nil)), planOnlyScript+strings.Replace(blockedProposal, `"$MAKE"`, `"`+make+`"`, 1))
@@ -157,6 +160,7 @@ func TestRun39BlockedGatePasses(t *testing.T) {
 }
 
 func TestRunFlakyGate(t *testing.T) {
+	t.Parallel()
 	t.Run("a gate that fails once, then passes on the immediate re-run", func(t *testing.T) {
 		r := newRunRepo(t)
 		seen := filepath.Join(r.stub, "flaky.seen")
@@ -208,6 +212,7 @@ func TestRunFlakyGate(t *testing.T) {
 }
 
 func TestRunGateDispute(t *testing.T) {
+	t.Parallel()
 	const dispute = `if [ "$PHASE" = work ] && [ "$TASK" = T1 ]; then
   printf '{"schema":"proposal/v1","task":"T1","outcome":"blocked","summary":"s","files":[],"verified":"v","notes":"n","gate_dispute":{"reason":"the gate reads the wrong file","evidence":"a.txt is written to out/a.txt"}}\n' > .vloop/tmp/proposal.json
 fi
@@ -264,6 +269,7 @@ func gatePlanScript(folders ...string) string {
 // TestRunRefusesStrayGateFolder: a gate folder whose id is not a task of the
 // plan refuses the plan, exit 1, and nothing is committed.
 func TestRunRefusesStrayGateFolder(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", nil)), gatePlanScript("T1", "T9"))
 	res := r.vloop("run", runBrief)
@@ -280,6 +286,7 @@ func TestRunRefusesStrayGateFolder(t *testing.T) {
 // TestRunRefusesChangedGateFixtures: resuming a plan whose gate folder no
 // longer matches the task's fixtures refuses, exit 1, with no session started.
 func TestRunRefusesChangedGateFixtures(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", nil)), gatePlanScript("T1"))
 	wantExit(t, r.vloop("run", "--plan-only", runBrief), 0)
@@ -299,6 +306,7 @@ func TestRunRefusesChangedGateFixtures(t *testing.T) {
 const scratchConfig = "run.gate-scratch = [\"web/.gate/\"]\n" + runCheckConfig
 
 func TestRunGateScratch(t *testing.T) {
+	t.Parallel()
 	t.Run("a scratch folder git does not ignore is refused before planning", func(t *testing.T) {
 		r := newRunRepo(t)
 		r.write(".vloop/config.toml", scratchConfig)
@@ -344,6 +352,7 @@ func TestRunGateScratch(t *testing.T) {
 }
 
 func TestRunGateChangedTree(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.commitFile("web/keep.txt", "keep\n")
 	r.scripted(planJSON(t,
