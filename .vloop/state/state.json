@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 3,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T11:24:34Z",
+  "updated": "2026-10-05T20:29:16Z",
   "shell": "sh",
   "checks": [
     {
@@ -46,8 +46,8 @@
         "`go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "blocked",
-      "attempts": 3,
+      "status": "pending",
+      "attempts": 0,
       "notes": "TestWorkedExampleB6RealData no longer fails when the run writes tracked files in the real repository; the status check was weakened to refs and hooks, so it does not meet the criterion.; The gate does not detect the loss of tracked-file write detection."
     },
     {

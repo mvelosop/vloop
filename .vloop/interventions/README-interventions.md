@@ -81,11 +81,14 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | halt | partly | no-options | [I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt](I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt.md) |
 | run | halt | partly | no-options | [I20260930-2149-t6-gate-contradicted-its-own-acceptance](I20260930-2149-t6-gate-contradicted-its-own-acceptance.md) |
 | run | halt | partly | no-options | [I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table](I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table.md) |
+| run | repair | no | recommended | [I20261005-1204-t](I20261005-1204-t.md) |
+| run | repair | no | no-options | [I20261005-1205-no-brief](I20261005-1205-no-brief.md) |
 | halt | halt | yes | no-options | [I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new](I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new.md) |
 | halt | repair | partly | no-options | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
 | halt | repair | yes | no-options | [I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th](I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th.md) |
 | halt | repair | partly | recommended | [I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio](I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio.md) |
 | halt | repair | partly | other-option | [I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac](I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac.md) |
+| halt | repair | partly | recommended | [I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l](I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | halt | partly | no-options | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |
