@@ -2,12 +2,12 @@
   "schema": "metrics/v2",
   "brief": "B20261004-1434-interventions-options.loop-brief",
   "run_id": "B20261004-1434-interventions-options",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 11,
-    "done": 9,
-    "blocked": 1,
+    "done": 11,
+    "blocked": 0,
     "first_pass": 8,
     "estimate": {
       "min": 8,
@@ -17,29 +17,29 @@
   "size": {
     "delivered": {
       "code": 980,
-      "test": 786,
+      "test": 793,
       "docs": 209,
       "other": 56,
       "deleted": {
         "code": 27,
-        "test": 13,
+        "test": 14,
         "docs": 26,
         "other": 5
       }
     },
     "churn": {
       "code": 981,
-      "test": 786,
+      "test": 793,
       "docs": 209,
       "other": 56,
       "deleted": {
         "code": 28,
-        "test": 13,
+        "test": 14,
         "docs": 26,
         "other": 5
       }
     },
-    "test_code_ratio": 0.8020408163265306,
+    "test_code_ratio": 0.8091836734693878,
     "rework": 1.0010204081632652
   },
   "time": {
@@ -50,11 +50,11 @@
     "gates_ms": 34337,
     "checks_ms": 4578714,
     "gate_review_ms": 109692,
-    "wall_ms": 7833000
+    "wall_ms": 11667000
   },
   "rate": {
     "code_per_min": 17.87738847838797,
-    "code_test_per_min": 32.215783727380774
+    "code_test_per_min": 32.343479359369255
   },
   "cost": {
     "total_usd": 13.4797222,
@@ -93,9 +93,9 @@
   },
   "defects": {
     "in_loop": 10,
-    "operator": 0,
+    "operator": 5,
     "escaped": 0,
-    "total": 10,
+    "total": 15,
     "removal_efficiency": 1
   },
   "records": {
@@ -106,7 +106,7 @@
   },
   "permission_denials": 6,
   "iterations": 18,
-  "iterations_per_closed": 2,
+  "iterations_per_closed": 1.6363636363636365,
   "by_task": [
     {
       "id": "T1",
@@ -299,12 +299,12 @@
       "attempts": 5,
       "churn": {
         "code": 0,
-        "test": 108,
+        "test": 115,
         "docs": 106,
         "other": 13,
         "deleted": {
           "code": 0,
-          "test": 3,
+          "test": 4,
           "docs": 16,
           "other": 5
         }
