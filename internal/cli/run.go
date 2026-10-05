@@ -48,7 +48,7 @@ func newRun(b Build, g *Globals) *cobra.Command {
 					continue
 				}
 				if err := config.Check(root, f.key, budgets[i]); err != nil {
-					return fmt.Errorf("--%s: %v", f.flag, err)
+					return Usage(fmt.Errorf("--%s: %v", f.flag, err))
 				}
 				over[f.key] = budgets[i]
 			}

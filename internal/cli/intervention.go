@@ -33,11 +33,11 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			in.Summary = args[0]
 			if strings.TrimSpace(in.Summary) == "" {
-				return errors.New("the summary must not be empty")
+				return Usage(errors.New("the summary must not be empty"))
 			}
 			for _, v := range []struct{ f, v string }{{"phase", in.Phase}, {"kind", in.Kind}, {"automatable", in.Automatable}, {"by", in.By}} {
 				if v.v == "" {
-					return fmt.Errorf("--%s is required", v.f)
+					return Usage(fmt.Errorf("--%s is required", v.f))
 				}
 			}
 			for _, v := range []struct{ f, v string }{{"phase", in.Phase}, {"kind", in.Kind}, {"automatable", in.Automatable}, {"by", in.By}} {
@@ -48,7 +48,7 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 			in.RecommendedSet = cmd.Flags().Changed("recommended")
 			in.DecidedOptionSet = cmd.Flags().Changed("decided-option")
 			if err := intervention.CheckOptions(in); err != nil {
-				return err
+				return Usage(err)
 			}
 			root, err := g.root()
 			if err != nil {
@@ -123,8 +123,9 @@ func newInterventionSet(g *Globals) *cobra.Command {
 			}
 			if err := intervention.Set(root, args[0], args[1], args[2]); err != nil {
 				var inv *config.InvalidValueError
-				if errors.As(err, &inv) || !contains(intervention.SetFields, args[1]) {
-					return err
+				var cu *config.UsageError
+				if errors.As(err, &inv) || errors.As(err, &cu) || !contains(intervention.SetFields, args[1]) {
+					return Usage(err)
 				}
 				return Problem(err)
 			}

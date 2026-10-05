@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/17 done** · iteration 6
+**Status:** running · **4/17 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T20:46:04Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:02:23Z
 
 ## Progress
 
 - [x] **T1** — Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
 - [x] **T2** — Add one frontmatter reader and rewriter and move defects and interventions onto it
 - [x] **T3** — Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
-- [ ] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
+- [x] **T4** — Make exit 2 opt-in, for usage only; every other failure exits 1
 - [ ] **T5** — Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
 - [ ] **T6** — Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
 - [ ] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
@@ -102,7 +102,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Make exit 2 opt-in, for usage only; every other failure exits 1
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 Any error a command returns that is not wrapped as a problem exits 2 today, so about 84 failures that are not usage exit 2 and a script cannot tell a typo from a failure. This task inverts the default: exit 2 only for an unknown command or flag, a wrong argument count, and an invalid value for a flag or a settable field (config set, task set, defect set, intervention set, --by and the like); every other failure exits 1. "Invalid value" means a value checked against its vocabulary or format; a missing file, brief, task or record is not usage. The guide's account of the change is T15's.
 

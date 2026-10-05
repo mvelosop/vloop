@@ -66,7 +66,10 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		}
 		rels[i] = filepath.ToSlash(rel)
 		if !strings.HasSuffix(rels[i], brief.Suffix) {
-			return fmt.Errorf("not a loop brief: %s", rels[i])
+			if _, err := os.Stat(abs); err != nil {
+				return fmt.Errorf("no such file: %s", rels[i])
+			}
+			return Usage(fmt.Errorf("not a loop brief: %s", rels[i]))
 		}
 	}
 	lang, err := config.Get(root, "language")

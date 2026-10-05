@@ -94,7 +94,13 @@ type Value struct {
 	List   []string
 }
 
-// UnknownKeyError and InvalidValueError are usage errors (exit 2).
+// UnknownKeyError, InvalidValueError and UsageError are usage errors (exit 2).
+// UsageError wraps another package's invalid-value message unchanged.
+type UsageError struct{ Err error }
+
+func (e *UsageError) Error() string { return e.Err.Error() }
+func (e *UsageError) Unwrap() error { return e.Err }
+
 type UnknownKeyError struct{ Key string }
 
 func (e *UnknownKeyError) Error() string { return fmt.Sprintf("unknown config key %q", e.Key) }

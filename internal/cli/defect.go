@@ -49,10 +49,10 @@ func newDefectAdd(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			in.Summary = args[0]
 			if strings.TrimSpace(in.Summary) == "" {
-				return errors.New("the summary must not be empty")
+				return Usage(errors.New("the summary must not be empty"))
 			}
 			if in.FoundBy == "" {
-				return errors.New("--found-by is required")
+				return Usage(errors.New("--found-by is required"))
 			}
 			for _, v := range []struct{ f, v string }{{"found-by", in.FoundBy}, {"origin", in.Origin}, {"kind", in.Kind}, {"severity", in.Severity}} {
 				if v.v == "" {
@@ -63,7 +63,7 @@ func newDefectAdd(g *Globals) *cobra.Command {
 				}
 			}
 			if in.Brief == "" && blame == "" {
-				return errors.New("pass --brief or --blame <file>:<line>")
+				return Usage(errors.New("pass --brief or --blame <file>:<line>"))
 			}
 			root, err := g.root()
 			if err != nil {
@@ -78,7 +78,7 @@ func newDefectAdd(g *Globals) *cobra.Command {
 				i := strings.LastIndex(blame, ":")
 				n, aerr := strconv.Atoi(blame[i+1:])
 				if i <= 0 || aerr != nil || n < 1 {
-					return fmt.Errorf("invalid value %q for blame: want <file>:<line>", blame)
+					return Usage(fmt.Errorf("invalid value %q for blame: want <file>:<line>", blame))
 				}
 				a, err := defect.Blame(root, blame[:i], n)
 				if err != nil {
@@ -219,7 +219,7 @@ func newDefectSet(g *Globals) *cobra.Command {
 			if err := defect.Set(root, args[0], args[1], args[2]); err != nil {
 				var inv *config.InvalidValueError
 				if errors.As(err, &inv) || !contains(defect.SetFields, args[1]) {
-					return err
+					return Usage(err)
 				}
 				return Problem(err)
 			}

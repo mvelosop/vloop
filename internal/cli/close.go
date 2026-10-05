@@ -34,15 +34,15 @@ func newBriefClose(g *Globals) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if none == (len(findings) > 0) {
-				return errors.New(closeFindingsMsg)
+				return Usage(errors.New(closeFindingsMsg))
 			}
 			for _, f := range findings {
 				if strings.TrimSpace(f) == "" {
-					return errors.New("a finding must not be empty")
+					return Usage(errors.New("a finding must not be empty"))
 				}
 			}
 			if cmd.Flags().Changed("abandon") && strings.TrimSpace(abandon) == "" {
-				return errors.New("an abandon needs a reason: --abandon \"<reason>\"")
+				return Usage(errors.New("an abandon needs a reason: --abandon \"<reason>\""))
 			}
 			return runBriefClose(g, cmd, args[0], findings, closeOpts{abandon: cmd.Flags().Changed("abandon"), reason: strings.TrimSpace(abandon), dry: dry})
 		},

@@ -44,7 +44,7 @@ func newSchema(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			doc, err := schema.Document(args[0])
 			if err != nil {
-				return err
+				return Usage(err)
 			}
 			_, err = cmd.OutOrStdout().Write(doc)
 			return err
@@ -58,7 +58,7 @@ func newSchema(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name, path := args[0], args[1]
 			if _, err := schema.Document(name); err != nil {
-				return err
+				return Usage(err)
 			}
 			read := path
 			if g.Dir != "" && !filepath.IsAbs(read) {

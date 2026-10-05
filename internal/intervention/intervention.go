@@ -466,12 +466,12 @@ func List(root, brief string) ([]Intervention, error) {
 func Set(root, id, field, value string) error {
 	switch field {
 	case "agreement":
-		return errors.New("agreement is derived — set decided, adjusted or recommended instead")
+		return &config.UsageError{Err: errors.New("agreement is derived — set decided, adjusted or recommended instead")}
 	case "options":
-		return errors.New("options are recorded with the intervention, not set")
+		return &config.UsageError{Err: errors.New("options are recorded with the intervention, not set")}
 	}
 	if !slices.Contains(SetFields, field) {
-		return fmt.Errorf("cannot set %q: want one of %s", field, strings.Join(SetFields, ", "))
+		return &config.UsageError{Err: fmt.Errorf("cannot set %q: want one of %s", field, strings.Join(SetFields, ", "))}
 	}
 	if err := Validate(field, value); err != nil {
 		return err
@@ -503,17 +503,17 @@ func Set(root, id, field, value string) error {
 		case "recommended":
 			r, err := strconv.Atoi(value)
 			if err != nil || r < 1 || r > n {
-				return fmt.Errorf("recommended must name an option, 1 to %d", n)
+				return &config.UsageError{Err: fmt.Errorf("recommended must name an option, 1 to %d", n)}
 			}
 			rec = r
 		case "decided":
 			if d, err := strconv.Atoi(value); value != "other" && (err != nil || d < 1 || d > n) {
-				return fmt.Errorf("decided must name an option, 1 to %d, or other", n)
+				return &config.UsageError{Err: fmt.Errorf("decided must name an option, 1 to %d, or other", n)}
 			}
 			decided = value
 		case "adjusted":
 			if value != "true" && value != "false" {
-				return fmt.Errorf("adjusted must be true or false")
+				return &config.UsageError{Err: fmt.Errorf("adjusted must be true or false")}
 			}
 			adjusted = value == "true"
 		}

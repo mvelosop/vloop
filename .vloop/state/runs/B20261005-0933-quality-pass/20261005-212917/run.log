@@ -13,3 +13,8 @@
    check go
    review: PASS
    T3 done
+── iteration 7 (4 this run) · T4 · 3/17 done ──
+   Make exit 2 opt-in, for usage only; every other failure exits 1
+   check go
+   review: PASS
+   T4 done

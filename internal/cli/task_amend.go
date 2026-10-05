@@ -80,7 +80,7 @@ func newTaskAmend(g *Globals) []*cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, field, value := args[0], args[1], args[2]
 			if !slices.Contains(settableFields, field) {
-				return fmt.Errorf("cannot set %q: want one of %s", field, strings.Join(settableFields, ", "))
+				return Usage(fmt.Errorf("cannot set %q: want one of %s", field, strings.Join(settableFields, ", ")))
 			}
 			root, err := g.root()
 			if err != nil {

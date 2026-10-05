@@ -27,7 +27,7 @@ func newMetrics(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if interventions {
 				if by != "" && by != "kind" && by != "phase" {
-					return errors.New("--by takes kind or phase with --interventions")
+					return Usage(errors.New("--by takes kind or phase with --interventions"))
 				}
 				if workspace != "" {
 					return workspaceInterventions(g, cmd.OutOrStdout(), cmd.ErrOrStderr(), workspace, by, args)
@@ -35,7 +35,7 @@ func newMetrics(g *Globals) *cobra.Command {
 				return interventionMetrics(g, cmd.OutOrStdout(), by)
 			}
 			if by != "" && by != "task" {
-				return fmt.Errorf("unknown --by %q: want task", by)
+				return Usage(fmt.Errorf("unknown --by %q: want task", by))
 			}
 			out := cmd.OutOrStdout()
 			if workspace != "" {
@@ -135,7 +135,7 @@ func newMetricsStacks(g *Globals) *cobra.Command {
 			names := classify.Names()
 			if len(args) == 1 {
 				if _, ok := classify.Lookup(args[0]); !ok {
-					return fmt.Errorf("unknown stack %q", args[0])
+					return Usage(fmt.Errorf("unknown stack %q", args[0]))
 				}
 				names = args
 			}

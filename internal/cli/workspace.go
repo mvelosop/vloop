@@ -50,7 +50,7 @@ func loadWorkspace(g *Globals, file string) (dir string, repos []wsRepo, err err
 // the returned error then makes the command exit 1 without a second message.
 func eachWorkspaceRepo(g *Globals, stderr io.Writer, file string, args []string, fn func(root string, r wsRepo) error) error {
 	if len(args) > 0 {
-		return errors.New("--workspace takes no <brief> arguments")
+		return Usage(errors.New("--workspace takes no <brief> arguments"))
 	}
 	dir, repos, err := loadWorkspace(g, file)
 	if err != nil {

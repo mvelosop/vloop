@@ -96,7 +96,7 @@ func newStatus(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			out := cmd.OutOrStdout()
 			if markdown && g.JSON {
-				return errors.New("--json and --markdown are mutually exclusive")
+				return Usage(errors.New("--json and --markdown are mutually exclusive"))
 			}
 			p, err := loadPlan(g, out)
 			if err != nil {

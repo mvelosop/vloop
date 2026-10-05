@@ -56,6 +56,13 @@ func TestBriefCheckUsageAndMissing(t *testing.T) {
 	d := scratchRepo(t)
 	rel := writeBrief(t, d, "ready")
 	code, out, e := run(t, "-C", d, "brief", "check", rel, "docs/notes.md")
+	if code != 1 || out != "" || e != "vloop: no such file: docs/notes.md\n" {
+		t.Fatalf("missing file: %d %q %q", code, out, e)
+	}
+	if err := os.WriteFile(filepath.Join(d, "docs", "notes.md"), []byte("notes\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, e = run(t, "-C", d, "brief", "check", rel, "docs/notes.md")
 	if code != 2 || out != "" || e != "vloop: not a loop brief: docs/notes.md\n" {
 		t.Fatalf("%d %q %q", code, out, e)
 	}

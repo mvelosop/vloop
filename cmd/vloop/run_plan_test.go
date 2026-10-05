@@ -268,7 +268,7 @@ func TestRun29BriefTypo(t *testing.T) {
 	}
 
 	res := r.vloop("run", "docs/briefs/"+runBriefName+"-typo.md")
-	wantExit(t, res, 2)
+	wantExit(t, res, 1)
 	if want := "vloop: brief not found: docs/briefs/" + runBriefName + "-typo.md\n"; res.err != want {
 		t.Errorf("stderr = %q, want %q", res.err, want)
 	}

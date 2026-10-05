@@ -156,7 +156,7 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 	}
 	expect(t, s.run(nil, "brief", "new", "pagos-base"), 1, "", "vloop: brief exists: "+path+"\n")
 	expect(t, s.run(nil, "brief", "check", path), 0, path+"\n  - skipped: status is draft\nbriefs ok\n", "")
-	expect(t, s.run(nil, "brief", "check", "docs/notes.md"), 2, "", "vloop: not a loop brief: docs/notes.md\n")
+	expect(t, s.run(nil, "brief", "check", "docs/notes.md"), 1, "", "vloop: no such file: docs/notes.md\n")
 
 	// vloop wrote only under .vloop/ and docs/briefs/, and nothing in home.
 	filepath.WalkDir(s.dir, func(p string, d os.DirEntry, err error) error {
