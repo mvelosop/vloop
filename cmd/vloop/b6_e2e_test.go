@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -241,9 +243,19 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 		t.Fatal(err)
 	}
 	// The repository's working tree may be edited while this runs, so what must
-	// stay put is its history: HEAD and every ref, which the clone's run must not move.
+	// stay put is its history and its hooks: HEAD, every ref and each hook's
+	// content, which the clone's run must not move or write. (.git/config is left
+	// out: editors rewrite it while a run is in progress.)
 	refs := func() string {
-		return runGit(t, root, "rev-parse", "HEAD") + runGit(t, root, "for-each-ref", "--format=%(objectname) %(refname)")
+		out := runGit(t, root, "rev-parse", "HEAD") + runGit(t, root, "for-each-ref", "--format=%(objectname) %(refname)")
+		hooks := filepath.Join(root, ".git", "hooks")
+		entries, _ := os.ReadDir(hooks)
+		for _, e := range entries {
+			b, _ := os.ReadFile(filepath.Join(hooks, e.Name()))
+			sum := sha256.Sum256(b)
+			out += fmt.Sprintf("hook %s %x\n", e.Name(), sum)
+		}
+		return out
 	}
 	before := refs()
 

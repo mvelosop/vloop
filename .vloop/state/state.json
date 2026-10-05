@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-05T11:17:10Z",
+  "updated": "2026-10-05T11:24:34Z",
   "shell": "sh",
   "checks": [
     {
@@ -46,9 +46,9 @@
         "`go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
-      "attempts": 2,
-      "notes": "TestWorkedExampleB6RealData still compares only HEAD and refs, so writes to the real repository's tracked files go undetected. The proposal claims a hooks comparison that is not in the file; this attempt changed no test code."
+      "status": "blocked",
+      "attempts": 3,
+      "notes": "TestWorkedExampleB6RealData no longer fails when the run writes tracked files in the real repository; the status check was weakened to refs and hooks, so it does not meet the criterion.; The gate does not detect the loss of tracked-file write detection."
     },
     {
       "id": "T2",
