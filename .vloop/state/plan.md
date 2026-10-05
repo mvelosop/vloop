@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **9/17 done** · iteration 13
+**Status:** running · **10/17 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:50:47Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-05T21:58:42Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
 - [x] **T8** — Compare trust paths and find the pre-commit hook the way each OS and git do
 - [x] **T9** — Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section · 1 attempt(s)
-- [ ] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
+- [x] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
 - [ ] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes
 - [ ] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
 - [ ] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
@@ -245,7 +245,7 @@ sh .vloop/state/gates/T9/gate.sh
 
 ### T10 — Name new run folders in UTC and order existing ones by their records' timestamps
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Run folders are named in local time while every record inside is UTC, and folders are ordered by name, so a DST fall-back reorders runs and mis-pairs gate failures with commits. New folders are named in UTC; existing folders keep their names (renaming would break the run records that cite them) and are ordered by their records' timestamps wherever folder order matters. The real-data check (T17) requires every consumed brief's metrics to stay as they are.
 

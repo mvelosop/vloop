@@ -514,11 +514,11 @@ func relRunDir(root, dir string) string {
 	return dir
 }
 
-// newRunDir creates .vloop/state/runs/<run id>/<YYYYMMDD-HHMMSS>/ with its
+// newRunDir creates .vloop/state/runs/<run id>/<YYYYMMDD-HHMMSS>/ (UTC) with its
 // sessions/ folder, suffixing -2, -3… when a run already took that second.
 func newRunDir(root, runID string, now time.Time) (string, error) {
 	base := filepath.Join(root, filepath.FromSlash(runsDir), runID)
-	stamp := now.Format(runFolderStamp)
+	stamp := now.UTC().Format(runFolderStamp)
 	dir := filepath.Join(base, stamp)
 	for n := 2; ; n++ {
 		if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {

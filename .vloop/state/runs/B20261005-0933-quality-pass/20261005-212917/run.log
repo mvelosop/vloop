@@ -47,3 +47,8 @@
    check go
    review: PASS
    T9 done
+── iteration 14 (11 this run) · T10 · 9/17 done ──
+   Name new run folders in UTC and order existing ones by their records' timestamps
+   check go
+   review: PASS
+   T10 done
