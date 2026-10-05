@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":179587,"exit":0,"name":"go"}],"ended":"2026-10-05T11:15:45Z","gate":{"duration_ms":11805,"exit":0},"iteration":1,"outcome":"rejected","run_id":"B20261005-0933-quality-pass","schema":"iteration/v2","started":"2026-10-05T11:07:56Z","task":"T1"}
+{"attempt":2,"checks":[{"duration_ms":1531,"exit":0,"name":"go"}],"ended":"2026-10-05T11:17:10Z","gate":{"duration_ms":12162,"exit":0},"iteration":2,"outcome":"rejected","run_id":"B20261005-0933-quality-pass","schema":"iteration/v2","started":"2026-10-05T11:15:45Z","task":"T1"}

@@ -46,3 +46,7 @@ committing the plan
    Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
    check go
    review: FAIL
+── iteration 2 (2 this run) · T1 · 0/17 done ──
+   Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
+   check go
+   review: FAIL
