@@ -1,0 +1,3 @@
+changed numbers (for the run record):
+docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md: first-pass, iterations per closed [15,1.2777777777777777] -> [14,1.2777777777777777]
+gate T17: ok

@@ -22,3 +22,8 @@
    check go
    review: PASS
    T16 done
+── iteration 25 (6 this run) · T17 · 16/17 done ──
+   Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
+   check go
+   review: PASS
+   T17 done

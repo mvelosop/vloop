@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **16/17 done** · iteration 24
+**Status:** running · **17/17 done** · iteration 25
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:44:50Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:50:44Z
 
 ## Progress
 
@@ -24,7 +24,7 @@
 - [x] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges · 1 attempt(s)
 - [x] **T15** — Bring the guides and the domain's CLI conventions up to v2 · 1 attempt(s)
 - [x] **T16** — Rewrite the README as a newcomer's page, last
-- [ ] **T17** — Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
+- [x] **T17** — Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
 
 ## Tasks
 
@@ -407,7 +407,7 @@ sh .vloop/state/gates/T16/gate.sh
 
 ### T17 — Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
+`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
 
 The brief ends with a worked example and a real-data check; this task proves both on the finished tree. The worked example becomes a committed end-to-end test in cmd/vloop (as each earlier brief's did), line for line, in temporary directories. The real-data check reads this repository with the new binary and with v2.0.0-beta.2: every consumed brief's metrics --json must be equal except first-pass and convergence where a task regressed and was redone, and the lists must read every record as before. The suite's speed is measured by the operator, not here.
 
