@@ -38,7 +38,7 @@ GOOS=linux go build ./...   GOOS=windows go build ./...
 <!-- vloop:begin -->
 ## vloop
 
-Sessions started by the vloop loop (plan, work, review) follow these rules:
+Sessions started by the vloop loop (plan, gate review, work, review) follow these rules:
 
 1. Use repo-relative paths only, in files, logs and commit messages.
 2. A work session does one task and stops; it does not start the next one.
@@ -46,9 +46,9 @@ Sessions started by the vloop loop (plan, work, review) follow these rules:
 4. A task is done only when its gate passes and the review passes it.
 5. Halting cleanly with an account of what blocked you is a success; faking progress is the only failure.
 
-In an interactive session you are the operator's hands: follow the operator skill (vloop-operator), not these session rules.
+In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules.
 
-Written by vloop 2.0.0-beta.2.
+Written by vloop 2.0.0.
 <!-- vloop:end -->
 
 <!-- loop:begin -->
