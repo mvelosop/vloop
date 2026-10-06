@@ -204,3 +204,38 @@ func TestSetAdjustedKeepsFieldOrder(t *testing.T) {
 		t.Fatalf("adjusted is not between decided and agreement:\n%s", b)
 	}
 }
+
+func TestSetOnCRLFAndBOMRecords(t *testing.T) {
+	for name, tc := range map[string]struct{ bom, eol string }{
+		"CRLF": {"", "\r\n"}, "BOM": {"\xef\xbb\xbf", "\n"}, "BOM+CRLF": {"\xef\xbb\xbf", "\r\n"},
+	} {
+		root := t.TempDir()
+		dir := filepath.Join(root, ".vloop", "interventions")
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		lf := "---\nid: I20260101-0900-x\nbrief: \"\"\nphase: halt\nkind: repair\nautomatable: yes\nby: both\n" +
+			"schema: intervention/v2\noptions: 2\nrecommended: 1\ndecided: 2\nagreement: other-option\n" +
+			"occurred: 2026-01-01\nrecorded: 2026-01-01T09:00:00Z\n---\nx\n\n**Options.**\n1. a\n2. b\n\n**Recommended.** why\n"
+		p := filepath.Join(dir, "I20260101-0900-x.md")
+		if err := os.WriteFile(p, []byte(tc.bom+strings.ReplaceAll(lf, "\n", tc.eol)), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if vs, err := List(root, ""); err != nil || len(vs) != 1 || len(vs[0].Options) != 2 {
+			t.Fatalf("%s: list %+v, %v", name, vs, err)
+		}
+		if err := Set(root, "I20260101-0900-x", "adjusted", "true"); err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		if err := Set(root, "I20260101-0900-x", "phase", "run"); err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		want := strings.Replace(lf, "phase: halt", "phase: run", 1)
+		want = strings.Replace(want, "decided: 2\nagreement: other-option", "decided: 2\nadjusted: true\nagreement: adjusted", 1)
+		want = tc.bom + strings.ReplaceAll(want, "\n", tc.eol)
+		got, _ := os.ReadFile(p)
+		if string(got) != want {
+			t.Errorf("%s: got %q, want %q", name, got, want)
+		}
+	}
+}

@@ -28,7 +28,7 @@ func newBriefNew(g *Globals) *cobra.Command {
 func runBriefNew(g *Globals, cmd *cobra.Command, slug string, dryRun bool, now time.Time) error {
 	out := cmd.OutOrStdout()
 	if !brief.ValidSlug(slug) {
-		return fmt.Errorf("invalid slug %q: want lower-case letters, digits and single hyphens", slug)
+		return Usage(fmt.Errorf("invalid slug %q: want lower-case letters, digits and single hyphens", slug))
 	}
 	root, err := g.root()
 	if err != nil {

@@ -117,6 +117,7 @@ func expect(t *testing.T, r result, code int, out, errOut string) {
 }
 
 func TestWorkedExampleEnglishSession(t *testing.T) {
+	t.Parallel()
 	s := newScratch(t)
 
 	r := s.run(nil, "version", "--json")
@@ -154,8 +155,8 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 		t.Fatalf("brief new printed %q", path)
 	}
 	expect(t, s.run(nil, "brief", "new", "pagos-base"), 1, "", "vloop: brief exists: "+path+"\n")
-	expect(t, s.run(nil, "brief", "check", path), 0, path+"\n  - skipped: status is draft\nbriefs ok\n", "")
-	expect(t, s.run(nil, "brief", "check", "docs/notes.md"), 2, "", "vloop: not a loop brief: docs/notes.md\n")
+	expect(t, s.run(nil, "brief", "check", path), 0, path+"\n  - skipped: status is draft\nnothing checked: 1 draft brief(s) skipped\n", "")
+	expect(t, s.run(nil, "brief", "check", "docs/notes.md"), 1, "", "vloop: no such file: docs/notes.md\n")
 
 	// vloop wrote only under .vloop/ and docs/briefs/, and nothing in home.
 	filepath.WalkDir(s.dir, func(p string, d os.DirEntry, err error) error {
@@ -203,6 +204,7 @@ func esFixture(t *testing.T) *scratch {
 }
 
 func TestWorkedExampleSpanishBrief(t *testing.T) {
+	t.Parallel()
 	s := esFixture(t)
 	pa := "docs/briefs/" + nameA + ".md"
 	r := s.run(nil, "brief", "check", pa)
@@ -214,6 +216,7 @@ func TestWorkedExampleSpanishBrief(t *testing.T) {
 }
 
 func TestWorkedExamplePlantedFailures(t *testing.T) {
+	t.Parallel()
 	pa := "docs/briefs/" + nameA + ".md"
 	pb := "docs/briefs/" + nameB + ".md"
 	cases := []struct {

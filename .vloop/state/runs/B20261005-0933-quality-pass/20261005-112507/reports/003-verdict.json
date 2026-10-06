@@ -1,0 +1,18 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "Every top-level test in cmd/vloop that builds its own temporary repository and sets no environment variable or working directory of the test process calls t.Parallel() — including TestRun01HappyPath, TestRun09DependencyOrder, TestWorkedExampleB3Commands, TestRunGateReviewPasses and TestRunChecksScopedToWhatChanged.", "met": true, "evidence": "t.Parallel() added across cmd/vloop/*_test.go (commit 264d862); only TestMain lacks it."},
+    {"criterion": "A cmd/vloop test left serial carries a comment saying why (what process-wide state it touches); no test made parallel calls os.Setenv, t.Setenv, os.Chdir or t.Chdir, or mutates a package-level variable another test reads.", "met": true, "evidence": "grep for Setenv/Chdir in cmd/vloop/*_test.go finds none; no serial tests remain."},
+    {"criterion": "TestWorkedExampleB6RealData still clones the repository's HEAD (not its working tree) and still runs vloop run in the clone; it passes while files in the repository's working tree are edited or added during its run, and it still fails if the run writes into the real repository's tracked files or refs.", "met": false, "evidence": "cmd/vloop/b6_e2e_test.go:246-259: the porcelain status comparison was replaced by HEAD, refs and .git/hooks hashes. A write to a tracked file in the real repository is no longer detected."},
+    {"criterion": "Parallel tests do not share a temporary directory, stub, home or port; each test's harness state is its own.", "met": true, "evidence": "Each test uses newRunRepo/b6Repo, which build their own dirs."},
+    {"criterion": "No production code changes in this task, and no test's assertions are loosened to make it parallel.", "met": false, "evidence": "No production code changed. The real-data test's status assertion (git status --porcelain) was weakened to refs plus hooks, which drops the check for tracked-file writes."},
+    {"criterion": "`go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race.", "met": true, "evidence": "The go check passed (.vloop/tmp/checks.json exit 0). I did not run the -race command myself, as the review rules say."}
+  ],
+  "findings": [
+    {"summary": "TestWorkedExampleB6RealData no longer fails when the run writes tracked files in the real repository; the status check was weakened to refs and hooks, so it does not meet the criterion.", "kind": "bug"},
+    {"summary": "The gate does not detect the loss of tracked-file write detection.", "kind": "gate-gap"}
+  ],
+  "notes": "A fix needs a comparison that ignores concurrent edits yet catches the clone's run writing into the real repo, such as hashing the tracked files the run could touch (for example .vloop/state and .loop/state) or checking that the clone's remote and objects are untouched."
+}

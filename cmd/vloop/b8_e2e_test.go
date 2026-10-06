@@ -15,6 +15,7 @@ import (
 // per-feature tests pin the details; this one pins that the example holds as
 // the brief wrote it.
 func TestWorkedExampleB8(t *testing.T) {
+	t.Parallel()
 	t.Run("newest draft, older ready: plans the ready one", func(t *testing.T) {
 		r := newRunRepo(t)
 		r.write("docs/briefs/B20260102-0900-newer.loop-brief.md",

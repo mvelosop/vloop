@@ -1,14 +1,13 @@
 #!/bin/sh
-# Gate T4 — `vloop intervention migrate` (brief I4): every v1 record gains the
-# five v2 frontmatter lines after by: and not one other byte changes; a v2
-# record is left alone; --dry-run lists and writes nothing; a second run says
-# nothing to migrate; `vloop upgrade` rewrites no record. Judges the built
-# binary in temporary repositories over the fixture records beside this gate.
+# Gate T4 — exit 2 is for usage only (brief Q2): an unknown command or flag, a
+# wrong argument count, an invalid value for a flag or a settable field. Every
+# other failure exits 1. The brief's table of changed codes, then a matrix of
+# usage errors that must stay 2 and of failures that must be 1.
 set -u
 fail() { echo "GATE FAIL: $*" >&2; exit 1; }
 for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
 unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT
-export LC_ALL=C TZ=UTC GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
+export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
 export GIT_AUTHOR_NAME=gate GIT_AUTHOR_EMAIL=gate@example.invalid GIT_COMMITTER_NAME=gate GIT_COMMITTER_EMAIL=gate@example.invalid
 G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
 t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
@@ -17,65 +16,63 @@ go build -o "$t/vloop" ./cmd/vloop || fail "go build ./cmd/vloop"
 GOOS=linux go build -o "$t/vloop-linux" ./cmd/vloop || fail "GOOS=linux go build ./cmd/vloop"
 GOOS=windows go build -o "$t/vloop.exe" ./cmd/vloop || fail "GOOS=windows go build ./cmd/vloop"
 B="$t/vloop"
-# newrepo <name>: a git repository under $t with vloop init done; sets R.
-newrepo() {
-  R="$t/$1"
-  mkdir -p "$R" && git -C "$R" init -q -b main && git -C "$R" commit -q --allow-empty -m "gate base" || fail "git init $1"
-  (cd "$R" && "$B" init </dev/null) >"$t/init.out" 2>&1 || fail "vloop init in $1: $(cat "$t/init.out")"
-}
-# run <args>: vloop in $R; stdout in $t/out, stderr in $t/err; returns its exit code.
+mkdir -p "$t/home" "$t/bin" && printf '#!/bin/sh\nexit 1\n' >"$t/bin/claude" && chmod +x "$t/bin/claude" || fail "fake home"
+export HOME="$t/home" PATH="$t/bin:$PATH"
+R="$t/r"
+mkdir -p "$R" && git -C "$R" init -q -b main && git -C "$R" commit -q --allow-empty -m "gate base" || fail "git init"
+(cd "$R" && "$B" init </dev/null) >"$t/init.out" 2>&1 || fail "vloop init: $(cat "$t/init.out")"
 run() { (cd "$R" && "$B" "$@") >"$t/out" 2>"$t/err"; }
-V1A=I20260928-2215-the-loop-s-install-proof-failed-in-every.md
-V1B=I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md
-V2=I20260101-0900-v2-other-option.md
-# migrated <file>: the fixture with the five v2 lines inserted after its by: line.
-migrated() {
-  awk 'NR > 1 && /^---$/ { fm++ } { print } fm == 0 && /^by: / { print "schema: intervention/v2"; print "options: 0"; print "recommended: 0"; print "decided: \"\""; print "agreement: no-options" }' "$1"
+# code <want> <args...>: vloop exits want, and a failure says so in one stderr line starting "vloop: ".
+code() {
+  want=$1; shift
+  run "$@"; got=$?
+  [ "$got" = "$want" ] || fail "vloop $* exited $got, want $want — stderr: $(cat "$t/err")"
+  grep -q '^vloop: ' "$t/err" || fail "vloop $* exited $got without a 'vloop: ' line on stderr: $(cat "$t/err")"
 }
-# snap: a checksum of every file under .vloop/interventions/.
-snap() { (cd "$R/.vloop/interventions" && cksum I*.md) 2>/dev/null; }
+# exact <want> <stderr> <args...>: as code, and stderr is exactly that one line.
+exact() {
+  want=$1; msg=$2; shift 2
+  code "$want" "$@"
+  [ "$(cat "$t/err")" = "$msg" ] && [ "$(wc -l <"$t/err" | tr -d ' ')" = 1 ] || fail "vloop $* printed '$(cat "$t/err")' on stderr, want exactly '$msg'"
+}
 
-# --- vloop upgrade rewrites no record ---
-newrepo u
-mkdir -p "$R/.vloop/interventions" && cp "$G/records/$V1A" "$R/.vloop/interventions/" || fail "copy"
-git -C "$R" add -A && git -C "$R" commit -q -m "a v1 record" || fail "commit the v1 record"
-run upgrade </dev/null || fail "vloop upgrade failed in a freshly initialised repository: $(cat "$t/err")"
-cmp -s "$G/records/$V1A" "$R/.vloop/interventions/$V1A" || fail "vloop upgrade rewrote a v1 intervention record"
+BRIEF=$(cd "$R/docs/briefs" && ls *.loop-brief.md | head -1) || fail "vloop init wrote no brief"
+run defect add "a defect" --found-by operator --brief "${BRIEF%.md}" || fail "defect add: $(cat "$t/err")"
+DID=$(basename "$(cat "$t/out")" .md)
+run intervention add "two options" --phase run --kind repair --automatable no --by operator \
+  --option "replace the gate" --option "reset the task" --recommended 1 --why "the gate is wrong" --decided-option 1 \
+  || fail "intervention add: $(cat "$t/err")"
+IID=$(basename "$(cat "$t/out")" .md)
+mkdir -p "$R/.vloop/state" && cp "$G/plan.json" "$R/.vloop/state/state.json" || fail "plan fixture"
+run task show T1 || fail "the plan fixture does not load: $(cat "$t/err")"
 
-# --- migrate ---
-newrepo m
-mkdir -p "$R/.vloop/interventions" && cp "$G"/records/I*.md "$R/.vloop/interventions/" || fail "copy"
-s0=$(snap)
-run intervention migrate --dry-run || fail "vloop intervention migrate --dry-run failed: $(cat "$t/err")"
-grep -Fq "$V1A" "$t/out" || fail "migrate --dry-run does not list the v1 record $V1A: $(cat "$t/out")"
-grep -Fq "$V1B" "$t/out" || fail "migrate --dry-run does not list the v1 record $V1B: $(cat "$t/out")"
-grep -Fq "$V2" "$t/out" && fail "migrate --dry-run lists the v2 record $V2, which has nothing to migrate"
-[ "$(snap)" = "$s0" ] || fail "migrate --dry-run wrote to a record"
-run intervention migrate || fail "vloop intervention migrate failed: $(cat "$t/err")"
-[ "$(cat "$t/out")" = "migrated 2 record(s)" ] || fail "migrate printed '$(cat "$t/out")', want 'migrated 2 record(s)'"
-for f in $V1A $V1B; do
-  migrated "$G/records/$f" >"$t/want"
-  cmp -s "$t/want" "$R/.vloop/interventions/$f" || fail "the migrated $f is not the v1 file with schema, options, recommended, decided and agreement inserted after by: and nothing else changed: $(diff "$t/want" "$R/.vloop/interventions/$f" | head -8 | tr '\n' '|')"
-done
-cmp -s "$G/records/$V2" "$R/.vloop/interventions/$V2" || fail "migrate changed a record that was already v2"
-s1=$(snap)
-run intervention migrate || fail "a second vloop intervention migrate failed: $(cat "$t/err")"
-[ "$(cat "$t/out")" = "nothing to migrate" ] || fail "a second migrate printed '$(cat "$t/out")', want 'nothing to migrate'"
-[ "$(snap)" = "$s1" ] || fail "a second migrate changed a record"
-run intervention list --json || fail "vloop intervention list --json after migrate failed: $(cat "$t/err")"
-cp "$t/out" "$t/l.json"
-for f in $V1A $V1B; do
-  id=${f%.md}
-  jq -e --arg id "$id" '[.[] | select(.id == $id)] | length == 1 and (.[0] | .schema == "intervention/v2" and .agreement == "no-options")' "$t/l.json" >/dev/null 2>&1 \
-    || fail "$id does not read as an intervention/v2 no-options record after migrate"
-  jq --arg id "$id" '.[] | select(.id == $id)' "$t/l.json" >"$t/one.json"
-  "$B" schema validate intervention/v2 "$t/one.json" >"$t/v" 2>&1 || fail "the migrated $id does not validate as intervention/v2: $(cat "$t/v")"
-done
-jq -e '[.[] | select(.id == "I20260928-2215-the-loop-s-install-proof-failed-in-every")][0] | (.context | startswith("Before B1")) and .backfilled == true and .recorded == "2026-09-30T16:54:00Z"' "$t/l.json" >/dev/null 2>&1 \
-  || fail "the migrated record lost its context, backfilled or recorded"
+# --- the brief's table ---
+exact 1 "vloop: brief not found: docs/briefs/nope.md" run docs/briefs/nope.md
+exact 1 "vloop: no such file: missing.md" brief check missing.md
+code 2 intervention set "$IID" decided 5
+code 2 intervention set "$IID" recommended 9
 
-# --- a repository with nothing to migrate ---
-newrepo e
-run intervention migrate || fail "vloop intervention migrate with no records failed: $(cat "$t/err")"
-[ "$(cat "$t/out")" = "nothing to migrate" ] || fail "migrate with no records printed '$(cat "$t/out")', want 'nothing to migrate'"
+# --- usage: exit 2 ---
+code 2 --bogus
+code 2 nosuchcommand
+code 2 intervention list --bogus
+code 2 status extra-argument
+code 2 brief check
+code 2 task show
+code 2 task show T1 T2
+code 2 run --max-attempts 0
+code 2 run --plan-only=maybe
+code 2 config set language 5x
+code 2 task set T1 kind bogus
+code 2 defect set "$DID" status bogus
+code 2 intervention set "$IID" phase bogus
+code 2 intervention add "x" --phase run --kind repair --automatable no --by bogus
+
+# --- not usage: exit 1 ---
+code 1 defect set D20990101-0000-nope status fixed
+code 1 intervention show I20990101-0000-nope
+code 1 intervention set I20990101-0000-nope phase run
+code 1 task show T99
+code 1 schema validate state/v2 no-such-file.json
+code 1 brief check docs/no-such-brief.loop-brief.md
 echo "gate T4: ok"

@@ -46,7 +46,7 @@ func TestCheckPluginMessages(t *testing.T) {
 
 func TestPluginPathIdempotentAndClean(t *testing.T) {
 	d := t.TempDir()
-	os.Mkdir(filepath.Join(d, ".git"), 0o755)
+	os.Mkdir(filepath.Join(d, ".vloop"), 0o755)
 	b := Build{Version: "9.9.9"}
 	out, _, code := runPluginCLI(t, b, d, "plugin", "path")
 	if code != 0 || out != ".vloop/tmp/plugin/9.9.9\n" {
@@ -94,7 +94,7 @@ func TestPluginPathRefusesSymlink(t *testing.T) {
 
 func TestPluginPathLeavesOutEvals(t *testing.T) {
 	d := t.TempDir()
-	os.Mkdir(filepath.Join(d, ".git"), 0o755)
+	os.Mkdir(filepath.Join(d, ".vloop"), 0o755)
 	b := Build{Version: "9.9.9"}
 	x := filepath.Join(d, ".vloop/tmp/plugin/9.9.9")
 	if _, _, code := runPluginCLI(t, b, d, "plugin", "path"); code != 0 {

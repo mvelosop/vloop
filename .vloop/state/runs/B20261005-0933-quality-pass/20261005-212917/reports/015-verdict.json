@@ -1,0 +1,18 @@
+{
+  "schema": "verdict/v1",
+  "task": "T11",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "A task with more than one iteration that ended `done` (it was done, reverted by a gate regression, and redone) is not first-pass in `vloop metrics` (text, --json, --by task) or in the close snapshot.", "met": true, "evidence": "internal/metrics/time.go CountTasks now requires len(os)==1 && os[0]==\"done\"; covered by the new unit test. --by task and the close snapshot were not shown to share this path, but the diff changes the one counter."},
+    {"criterion": "The convergence check divides this run's iterations by the number of tasks this run closed (done during this run), not by every done task in the plan; with run.convergence-min reached and nothing closed this run, the run halts not converging, exit 5.", "met": true, "evidence": "internal/driver/iterate.go: closed counts tasks done now and not done at run start; closed==0 halts with ExitNotConverging."},
+    {"criterion": "A clean run's first-pass and a single run's convergence behave as before.", "met": true, "evidence": "With a clean run, every task starts not-done, so closed equals done; first-pass is unchanged for single-iteration tasks."},
+    {"criterion": "Tests cover a regressed-and-redone task's first-pass and a resumed run that closes nothing; the existing tests that pin metrics affected by this are updated and the proposal's notes list each changed number.", "met": false, "evidence": "internal/metrics/time_test.go:302 covers first-pass, but no committed Go test covers a resumed run that closes nothing. The proposal says only the gate's stubbed run covers it, and the gate dies with the run. The diff contains no driver test."},
+    {"criterion": "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.", "met": true, "evidence": "The diff only adds a test; no earlier test was changed."},
+    {"criterion": "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review.", "met": true, "evidence": "The diff touches only the two counters and removes the now-unused onlyDone helper."}
+  ],
+  "findings": [
+    {"summary": "No committed test covers a resumed run that closes nothing and halts with exit 5; the task required one and only the throwaway gate exercises it", "kind": "bug"},
+    {"summary": "A task that was done at run start, reverted by a gate regression and redone during the run is not counted as closed this run, because closed is keyed on done-at-start", "kind": "bug"}
+  ],
+  "notes": "Add a driver test for the resumed-run case: convergence-min reached, nothing closed, exit 5. Consider counting a task as closed when it becomes done again after a revert in this run."
+}

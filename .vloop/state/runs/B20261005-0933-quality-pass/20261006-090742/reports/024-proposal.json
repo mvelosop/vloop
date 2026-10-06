@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T16",
+  "outcome": "done",
+  "summary": "README.md is rewritten as a 110-line newcomer's page in the brief's order: prerequisites, install, quickstart, the loop, everyday commands, exit codes, guides, skills, What changed in 2.0. It has no command table and no marketplace step.",
+  "files": ["README.md", "internal/cli/readme_test.go"],
+  "verified": "vloop task gate T16 exited 0 and printed gate T16: ok; go test ./internal/cli -run 'Readme|Guide' passes.",
+  "notes": "Edited the existing internal/cli/readme_test.go minimally: a claudeFlags allowlist (--plugin-dir) because the README must name that claude flag, which the test otherwise rejects as unknown. The 200-line cap and other checks are untouched. The install line pins v2.0.0-beta.2 because the gate requires a digit after @v; update it at each release."
+}

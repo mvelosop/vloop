@@ -1,0 +1,1 @@
+GATE FAIL: plugin/evals/plan-checks-its-gates/graders/fixture-at-top-level.md judges the planner's greet.toml fixtures but does not read a file: its focus is the trace (which ends before the gate folders are written) or the final message

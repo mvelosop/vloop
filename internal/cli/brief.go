@@ -18,9 +18,13 @@ import (
 func newBrief(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "brief",
-		Short: "Check loop briefs",
-		Args:  cobra.NoArgs,
-		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+		Short: "Write, check, list and close loop briefs",
+		Long: `A brief says what a run builds. Write one with vloop brief new, check that it
+is fit to plan with vloop brief check, see the briefs in dependency order with
+vloop brief list, run one with vloop run, and when the run is done record its
+findings and mark it consumed with vloop brief close.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
 	cmd.AddCommand(&cobra.Command{
 		Use:   "check <path>...",
@@ -66,7 +70,10 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		}
 		rels[i] = filepath.ToSlash(rel)
 		if !strings.HasSuffix(rels[i], brief.Suffix) {
-			return fmt.Errorf("not a loop brief: %s", rels[i])
+			if _, err := os.Stat(abs); err != nil {
+				return fmt.Errorf("no such file: %s", rels[i])
+			}
+			return Usage(fmt.Errorf("not a loop brief: %s", rels[i]))
 		}
 	}
 	lang, err := config.Get(root, "language")
@@ -84,15 +91,16 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		}
 		return "\033[" + code + "m" + s + "\033[0m"
 	}
+	skipped := 0
 	for _, rel := range rels {
 		data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
 		if err != nil {
 			if !errors.Is(err, os.ErrNotExist) {
 				return Problem(err)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "vloop: no such brief: %s\n", rel)
+			fmt.Fprintf(cmd.ErrOrStderr(), "vloop: no such file: %s\n", rel)
 			failed++
-			docs = append(docs, briefJSON{rel, "problems", []string{"no such brief: " + rel}, []string{}})
+			docs = append(docs, briefJSON{rel, "problems", []string{"no such file: " + rel}, []string{}})
 			continue
 		}
 		res := brief.Check(root, brief.Parse(rel, string(data)), set)
@@ -100,6 +108,7 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		switch {
 		case res.Skipped:
 			j.Result = "skipped"
+			skipped++
 		case res.Failed():
 			j.Result = "problems"
 			failed++
@@ -127,6 +136,8 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 		}{failed == 0, docs}); err != nil {
 			return err
 		}
+	} else if failed == 0 && skipped == len(rels) {
+		fmt.Fprintf(out, "nothing checked: %d draft brief(s) skipped\n", skipped)
 	} else if failed == 0 {
 		fmt.Fprintln(out, "briefs ok")
 	} else {

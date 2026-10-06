@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -94,5 +95,17 @@ func TestReadRejectsWrongSchema(t *testing.T) {
 	os.WriteFile(filepath.Join(root, ".vloop", "install.json"), []byte(`{"schema":"state/v1"}`), 0o644)
 	if _, err := Read(root); err == nil {
 		t.Fatal("want an error")
+	}
+}
+
+func TestSectionNamesSessionKindsAndOperatePlaybook(t *testing.T) {
+	s := Section("1.2.3")
+	for _, want := range []string{"(plan, gate review, work, review)", "/vloop:operate"} {
+		if !strings.Contains(s, want) {
+			t.Errorf("section lacks %q:\n%s", want, s)
+		}
+	}
+	if strings.Contains(s, "vloop-operator") {
+		t.Errorf("section names vloop-operator, a skill the plugin does not ship")
 	}
 }

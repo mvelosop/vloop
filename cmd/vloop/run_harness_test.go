@@ -244,6 +244,7 @@ func (r *runRepo) claude(args ...string) result {
 }
 
 func TestRunHarness(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 
 	if b := strings.TrimSpace(r.git("rev-parse", "--abbrev-ref", "HEAD")); b != "main" {

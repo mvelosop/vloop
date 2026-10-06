@@ -163,6 +163,7 @@ func planRejected(t *testing.T, r *runRepo, res result) {
 }
 
 func TestRun08PlanValidation(t *testing.T) {
+	t.Parallel()
 	// A plan with no verify command or no acceptance is a planning failure,
 	// caught before any iteration inherits it.
 	for name, tc := range map[string]struct {
@@ -190,6 +191,7 @@ func TestRun08PlanValidation(t *testing.T) {
 }
 
 func TestRun25GateShape(t *testing.T) {
+	t.Parallel()
 	// A gate that parses a structure and then substring-matches its
 	// re-serialised text has thrown away the parse; so is one that asserts on
 	// source text. Refused before a single iteration is spent.
@@ -218,6 +220,7 @@ func TestRun25GateShape(t *testing.T) {
 }
 
 func TestRun27DanglingReference(t *testing.T) {
+	t.Parallel()
 	// A reference that does not resolve costs a session an attempt to discover;
 	// it is checked at plan time. One that does resolve is not flagged.
 	r := newRunRepo(t)
@@ -241,6 +244,7 @@ func TestRun27DanglingReference(t *testing.T) {
 }
 
 func TestRun29BriefTypo(t *testing.T) {
+	t.Parallel()
 	// A typo must not be able to destroy a committed plan.
 	r := newRunRepo(t)
 	plan := planJSON(t, planTask("T1", map[string]any{"status": "done", "attempts": 1}))
@@ -264,7 +268,7 @@ func TestRun29BriefTypo(t *testing.T) {
 	}
 
 	res := r.vloop("run", "docs/briefs/"+runBriefName+"-typo.md")
-	wantExit(t, res, 2)
+	wantExit(t, res, 1)
 	if want := "vloop: brief not found: docs/briefs/" + runBriefName + "-typo.md\n"; res.err != want {
 		t.Errorf("stderr = %q, want %q", res.err, want)
 	}
@@ -288,6 +292,7 @@ func TestRun29BriefTypo(t *testing.T) {
 }
 
 func TestRun36GateDecayingBaseline(t *testing.T) {
+	t.Parallel()
 	// Rule 4: a gate may not diff, log or rev-list against a ref other than
 	// HEAD — that baseline decays the moment another task commits. A range that
 	// merely ends in HEAD is still rejected; HEAD itself is fine.
@@ -321,6 +326,7 @@ func TestRun36GateDecayingBaseline(t *testing.T) {
 }
 
 func TestRun38HeadDiffAdvisory(t *testing.T) {
+	t.Parallel()
 	// A gate that diffs against HEAD without reading VLOOP_ACTIVE_TASK or
 	// VLOOP_GATE_TASK reads another task's in-progress edits as its own
 	// regression. An advisory: it names the task and the plan is still committed.
@@ -361,6 +367,7 @@ func TestRun38HeadDiffAdvisory(t *testing.T) {
 }
 
 func TestRun43BriefAlreadyRun(t *testing.T) {
+	t.Parallel()
 	// Nothing retires a brief, so a spent one reads plannable forever. Its
 	// journal's existence is the check: the run refuses before touching the
 	// plan or starting a session, unless --replan.
@@ -424,6 +431,7 @@ func TestRun43BriefAlreadyRun(t *testing.T) {
 }
 
 func TestRunWorkBranch(t *testing.T) {
+	t.Parallel()
 	// R-2: on the default branch the run creates <run id> and switches to it.
 	r := newRunRepo(t)
 	r.planWith(planJSON(t, planTask("T1", nil)))
@@ -476,6 +484,7 @@ func TestRunWorkBranch(t *testing.T) {
 }
 
 func TestRunPlanCommit(t *testing.T) {
+	t.Parallel()
 	// What the plan phase leaves: the stamped plan, plan.md, the journal, the
 	// plan session's record, and one commit holding them — never .vloop/tmp.
 	r := newRunRepo(t)
@@ -571,6 +580,7 @@ func exec1(r *runRepo, args ...string) string {
 }
 
 func TestRunPreflight(t *testing.T) {
+	t.Parallel()
 	// Preflight is doctor's checks, and refuses before any branch, session or
 	// file change — an untrusted workspace included.
 	r := newRunRepo(t)
@@ -610,6 +620,7 @@ func (r *runRepo) planSessions() int {
 }
 
 func TestRunBaseGatePasses(t *testing.T) {
+	t.Parallel()
 	// A gate that passes before the work exists proves nothing: it goes back to
 	// the plan session, once, and the revised plan runs.
 	r := newRunRepo(t)
@@ -628,6 +639,7 @@ func TestRunBaseGatePasses(t *testing.T) {
 }
 
 func TestRunBaseGateChangesTree(t *testing.T) {
+	t.Parallel()
 	// A gate that writes the tree on the base is sent back, and what it wrote
 	// does not survive.
 	r := newRunRepo(t)
@@ -645,6 +657,7 @@ func TestRunBaseGateChangesTree(t *testing.T) {
 }
 
 func TestRunBaseGateStillPassesAfterRevision(t *testing.T) {
+	t.Parallel()
 	// Two rounds are all there are: a second draft that still has the problem
 	// halts, and nothing is committed.
 	r := newRunRepo(t)
@@ -662,6 +675,7 @@ func TestRunBaseGateStillPassesAfterRevision(t *testing.T) {
 }
 
 func TestRunSchemaFailureHasNoSecondRound(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	bad := strings.Replace(planJSON(t, planTask("T1", nil)), "state/v2", "state/v9", 1)
 	r.rounds(bad, planJSON(t, planTask("T1", nil)))

@@ -1,0 +1,22 @@
+{
+  "schema": "verdict/v1",
+  "task": "T15",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "concepts.md's exit-code table states 1 as \"problems or failure, including a failed plan session or a mid-run error\" and 2 as \"usage\" (and, for vloop run, still \"blocked\", R-3); the general sentence above it says 2 is usage only.", "met": true, "evidence": "docs/guide/concepts.md Exit codes: rows for 1 and 2 and the sentence \"`2` only on a usage error\" in the diff"},
+    {"criterion": "concepts.md has a \"What changed in 2.0\" section covering the gate model (state/v2, gate folders, the gate review, [[check]]), intervention/v2 and `vloop intervention migrate`, metrics/v2, and Q2's exit-code change with its table.", "met": true, "evidence": "new section in concepts.md with four bullets covering all of these and linking to the exit-code table"},
+    {"criterion": "concepts.md's doctor paragraph lists the checks in the order `vloop doctor` prints them, including `checks` and `self-hosting`; its Skills section says the plugin ships five skills and names all five, /vloop:gate-review included.", "met": false, "evidence": "Skills part is met (five, gate-review added). The doctor list drops `stacks`, which internal/cli/doctor.go adds between plugin and self-hosting, and the old text named it (\"scoped stacks\"), so the list is not the full printed order."},
+    {"criterion": "concepts.md's plugin install text no longer tells a reader to add a marketplace that does not exist; it gives the --plugin-dir way, matching T12's doctor message.", "met": true, "evidence": "concepts.md now shows claude --plugin-dir \"$(vloop plugin path)\""},
+    {"criterion": "configuration.md says a key's environment name is `VLOOP_` and the key upper-cased with `.` and `-` turned into `_`.", "met": true, "evidence": "configuration.md Keys paragraph in the diff"},
+    {"criterion": "metrics.md's synopsis shows --workspace, --interventions and `vloop metrics export`, and its messages match T5's.", "met": false, "evidence": "The synopsis writes `--interventions kind`, but internal/cli/metrics.go:108 defines --interventions as a boolean flag and `kind`/`phase` are values of --by. A reader typing it as shown would pass `kind` as a brief. The body of metrics.md says `--by phase`, so the synopsis contradicts it."},
+    {"criterion": "Every shell-loop reference in the guides is kept and marked \"legacy: the shell loop that built vloop's first briefs, in this repository only\" (the full phrase at least once, \"legacy\" on each mention).", "met": true, "evidence": "The full phrase appears in concepts.md and metrics.md; defects.md, evals.md and the metrics.md notes carry \"legacy\". metrics.md:30 \"A shell-loop folder\" has no marker of its own, but it sits in the bullet that opens with the legacy phrase."},
+    {"criterion": "docs/domain/platform/platform-context.md's CLI conventions read: exit `0` ok, `1` problems or failure, `2` usage only; a refusal is one stderr line starting `vloop: `, after any checks `doctor` or a preflight prints. Nothing else in the domain changes.", "met": true, "evidence": "The platform-context.md diff changes only that paragraph"},
+    {"criterion": "The guide tests (internal/cli guide and README completeness tests) pass, updated only where the text they pin changed.", "met": true, "evidence": "The go check exited 0 and the T15 gate logged ok; the diff touches no Go files"}
+  ],
+  "findings": [
+    {"summary": "metrics.md synopsis shows `--interventions kind`, but --interventions is a boolean flag and kind/phase belong to --by; it should read `--interventions [--by kind|phase]`", "kind": "bug"},
+    {"summary": "concepts.md's doctor check list omits `stacks`, which vloop doctor prints between plugin and self-hosting", "kind": "bug"},
+    {"summary": "The gate does not catch a wrong flag shape in the synopsis or an incomplete doctor list", "kind": "gate-gap"}
+  ],
+  "notes": "The other edits are correct and in scope. I did not check whether `gate scratch` is printed unconditionally; the order should be confirmed against internal/cli/doctor.go."
+}

@@ -82,14 +82,14 @@ func newMetricsExport(g *Globals) *cobra.Command {
 	var workspace string
 	cmd := &cobra.Command{
 		Use:   "export [<brief>…]",
-		Short: "Print briefs, tasks, defects and interventions as JSON Lines (export/v1), with the repository's identity",
+		Short: "Show briefs, tasks, defects and interventions as JSON Lines (export/v1), with the repository's identity",
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			out := cmd.OutOrStdout()
 			if workspace != "" {
 				return workspaceExport(g, out, cmd.ErrOrStderr(), workspace, args)
 			}
-			root, err := g.root()
+			root, err := g.gitRoot()
 			if err != nil {
 				return err
 			}

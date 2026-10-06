@@ -199,6 +199,12 @@ func (it *Iterator) Run() (Ending, error) {
 	}
 
 	runIters, stalls := 0, 0
+	doneAtStart := map[string]bool{}
+	for _, t := range plan.Tasks {
+		if t.Status == "done" {
+			doneAtStart[t.ID] = true
+		}
+	}
 	it.blockedAt = map[string]blockedMark{}
 	end := Ending{Status: "halted", Code: ExitMaxIter}
 	for {
@@ -231,9 +237,10 @@ func (it *Iterator) Run() (Ending, error) {
 			end = Ending{Status: "halted", Code: ExitCostCeiling}
 			break
 		}
+		closed := closedThisRun(plan, doneAtStart)
 		if runIters >= it.Budgets.ConvergenceMin &&
-			(done == 0 || float64(runIters)/float64(done) > it.Budgets.ConvergenceMax) {
-			it.warn("not converging: %d iteration(s) this run for %d closed task(s), over %.2f per closed task", runIters, done, it.Budgets.ConvergenceMax)
+			(closed == 0 || float64(runIters)/float64(closed) > it.Budgets.ConvergenceMax) {
+			it.warn("not converging: %d iteration(s) this run for %d closed task(s), over %.2f per closed task", runIters, closed, it.Budgets.ConvergenceMax)
 			end = Ending{Status: "halted", Code: ExitNotConverging}
 			break
 		}
@@ -276,6 +283,22 @@ func (it *Iterator) Run() (Ending, error) {
 	}
 	it.summary()
 	return end, nil
+}
+
+// closedThisRun counts the tasks that became done during this run. A task done
+// at run start that a gate regression reverted is forgotten from doneAtStart,
+// so its redo counts as closed.
+func closedThisRun(p *state.Plan, doneAtStart map[string]bool) int {
+	closed := 0
+	for _, t := range p.Tasks {
+		switch {
+		case t.Status != "done":
+			delete(doneAtStart, t.ID)
+		case !doneAtStart[t.ID]:
+			closed++
+		}
+	}
+	return closed
 }
 
 func counts(p *state.Plan) (done, blocked, pending int) {
@@ -334,18 +357,22 @@ func (it *Iterator) readReport(name, schemaName string) ([]byte, bool) {
 
 // restoreInputs puts back what the session changed among the driver's inputs,
 // saying so in the run log, and notes a gate refused for a changed plan. It
-// reports whether anything had to be restored. keep is the session's own record.
-func (it *Iterator) restoreInputs(g inputGuard, phase, keep string) bool {
-	changed := g.restore(keep)
+// reports whether anything had to be restored, and fails when something could
+// not be. keep is the session's own record.
+func (it *Iterator) restoreInputs(g inputGuard, phase, keep string) (bool, error) {
+	changed, failed := g.restore(keep)
 	for _, p := range changed {
 		it.warn("vloop: %s session changed %s — restored", phase, p)
+	}
+	if len(failed) > 0 {
+		return len(changed) > 0, halt(ExitPreflight, "%s session changed inputs the driver could not restore: %s", phase, strings.Join(failed, "; "))
 	}
 	refused := filepath.Join(it.Root, filepath.FromSlash(GateRefusedFile))
 	if _, err := os.Stat(refused); err == nil {
 		it.warn("vloop: %s session ran vloop task gate against a changed plan — refused", phase)
 		_ = os.Remove(refused)
 	}
-	return len(changed) > 0
+	return len(changed) > 0, nil
 }
 
 // gitChanged halts when .git/config or the hooks differ from the guard.
@@ -435,7 +462,9 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	if err != nil {
 		return iterResult{}, err
 	}
-	it.restoreInputs(inputs, PhaseWork, wres.Path)
+	if _, err := it.restoreInputs(inputs, PhaseWork, wres.Path); err != nil {
+		return iterResult{}, err
+	}
 	if err := it.gitChanged(gguard, PhaseWork); err != nil {
 		return iterResult{}, err
 	}
@@ -581,14 +610,20 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		if err != nil {
 			return iterResult{}, err
 		}
-		inputsChanged := it.restoreInputs(inputs, PhaseReview, rres.Path)
+		inputsChanged, err := it.restoreInputs(inputs, PhaseReview, rres.Path)
+		if err != nil {
+			return iterResult{}, err
+		}
 		if err := it.gitChanged(gguard, PhaseReview); err != nil {
 			return iterResult{}, err
 		}
 		if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
 			return iterResult{}, err
 		}
-		treeChanged := tree.revert()
+		treeChanged, treeFailed := tree.revert()
+		if len(treeFailed) > 0 {
+			return iterResult{}, halt(ExitPreflight, "the review session changed files the driver could not revert: %s", strings.Join(treeFailed, "; "))
+		}
 		for _, p := range treeChanged {
 			it.warn("vloop: the review session changed %s — reverted", p)
 		}
@@ -807,7 +842,10 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	start := time.Now()
 	timedOut, runErr := state.RunGroup(cmd, it.gateTimeout())
 	d := time.Since(start)
-	restored := tree.revert()
+	restored, revertFailed := tree.revert()
+	if len(revertFailed) > 0 {
+		return nil, halt(ExitPreflight, "gate %s changed the tree and the driver could not revert it: %s", id, strings.Join(revertFailed, "; "))
+	}
 	if err := state.EmptyScratch(it.Root, it.plan.GateScratch); err != nil {
 		it.warn("   gate scratch of %s not emptied: %v", id, err)
 	}
@@ -901,10 +939,13 @@ func (it *Iterator) copyReport(name, dest string) {
 		return
 	}
 	dir := filepath.Join(it.RunDir, "reports")
-	if os.MkdirAll(dir, 0o755) != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		it.warn("vloop: could not keep %s in the run folder: %v", name, err)
 		return
 	}
-	_ = os.WriteFile(filepath.Join(dir, dest), []byte(it.r.Mask(string(data))), 0o644)
+	if err := os.WriteFile(filepath.Join(dir, dest), []byte(it.r.Mask(string(data))), 0o644); err != nil {
+		it.warn("vloop: could not keep %s in the run folder: %v", name, err)
+	}
 }
 
 func (it *Iterator) journalPath() string {
@@ -1148,9 +1189,8 @@ func readTreeFile(root, p string) treeFile {
 
 // revert undoes every change made since the snapshot outside what a review may
 // write, and returns the paths it had to put back.
-func (g treeGuard) revert() []string {
+func (g treeGuard) revert() (changed, failed []string) {
 	now := snapshotTreeIgnoring(g.root, g.ignore)
-	var changed []string
 	for p, f := range now.paths {
 		if old, ok := g.paths[p]; !ok || old.exists != f.exists || old.sum != f.sum {
 			changed = append(changed, p)
@@ -1162,22 +1202,29 @@ func (g treeGuard) revert() []string {
 		}
 	}
 	sort.Strings(changed)
+	var reverted []string
 	for _, p := range changed {
 		abs := filepath.Join(g.root, filepath.FromSlash(p))
+		var err error
 		if old, ok := g.paths[p]; ok {
 			if old.exists {
-				_ = os.MkdirAll(filepath.Dir(abs), 0o755)
-				_ = os.WriteFile(abs, old.data, 0o644)
-			} else {
-				_ = os.Remove(abs)
+				err = os.MkdirAll(filepath.Dir(abs), 0o755)
+				if err == nil {
+					err = os.WriteFile(abs, old.data, 0o644)
+				}
+			} else if err = os.Remove(abs); os.IsNotExist(err) {
+				err = nil
 			}
+		} else if gitCmd(g.root, "cat-file", "-e", "HEAD:"+p).Run() == nil {
+			err = gitCmd(g.root, "checkout", "HEAD", "--", p).Run()
+		} else if err = os.Remove(abs); os.IsNotExist(err) {
+			err = nil
+		}
+		if err != nil {
+			failed = append(failed, fmt.Sprintf("%s: %v", p, err))
 			continue
 		}
-		if err := gitCmd(g.root, "cat-file", "-e", "HEAD:"+p).Run(); err == nil {
-			_ = gitCmd(g.root, "checkout", "HEAD", "--", p).Run()
-		} else {
-			_ = os.Remove(abs)
-		}
+		reverted = append(reverted, p)
 	}
-	return changed
+	return reverted, failed
 }

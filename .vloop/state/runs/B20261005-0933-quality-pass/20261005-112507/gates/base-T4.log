@@ -1,0 +1,1 @@
+GATE FAIL: vloop run docs/briefs/nope.md exited 2, want 1 — stderr: vloop: brief not found: docs/briefs/nope.md

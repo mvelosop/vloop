@@ -62,6 +62,7 @@ func (r *runRepo) wantScratchEmpty() {
 }
 
 func TestWorkedExampleB9(t *testing.T) {
+	t.Parallel()
 	t.Run("the run: base logs, gate review, scoped checks, empty scratch, final pass", func(t *testing.T) {
 		t.Parallel()
 		r := b9Repo(t)

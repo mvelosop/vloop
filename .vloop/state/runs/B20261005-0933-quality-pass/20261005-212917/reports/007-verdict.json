@@ -1,0 +1,17 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The default for an error returned from a command is exit 1; exit 2 is produced only by an explicit usage error (a type or wrapper the CLI package defines) and by cobra's own unknown-command, unknown-flag, flag-parse and argument-count errors.", "met": true, "evidence": "internal/cli/root.go Execute returns ExitUsage only for UsageError/config usage types or when no RunE started (markRan/g.ran); otherwise ExitProblems"},
+    {"criterion": "`vloop run docs/briefs/nope.md` exits 1 with its message unchanged (`vloop: brief not found: docs/briefs/nope.md`); vloop run's own endings (R-3, including 2 for blocked) are unchanged.", "met": true, "evidence": "ExitError still wins in Execute; exit_codes_test.go case 'run missing brief' asserts 1 and the exact message; run_plan_test.go updated to 1"},
+    {"criterion": "`vloop brief check missing.md` exits 1 with exactly `vloop: no such file: missing.md`.", "met": true, "evidence": "brief.go os.Stat branch; exit_codes_test.go asserts exit 1 and the whole stderr line"},
+    {"criterion": "`vloop intervention set <id> decided <n>` and `recommended <n>` with a number outside the record's options exit 2, as does any other invalid value for a settable field; unknown commands and flags and wrong argument counts stay 2.", "met": true, "evidence": "intervention.Set returns config.UsageError for range errors; intervention.go maps it to Usage; tests cover decided 5, recommended 9, invalid field, unknown command/flag, argument count"},
+    {"criterion": "No non-usage failure path still exits 2: the review checks the diff for errors returned without the usage marker that are not usage, and for usage errors (invalid values, argument counts) that now exit 1.", "met": true, "evidence": "Reviewed the whole diff: every Usage() wrap is a vocabulary/format/required-flag/flag-combination check; missing file/record/plan stay unmarked and exit 1. No PreRun hooks exist, so g.ran cannot misclassify."},
+    {"criterion": "Tests pin the exit code of every row of the brief's Q2 table and of representative usage errors (unknown flag, argument count, invalid flag value, invalid field value); the checks run them.", "met": true, "evidence": "internal/cli/exit_codes_test.go TestExitCodesOptInUsage covers all four Q2 rows plus the usage cases; go check log passes"},
+    {"criterion": "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.", "met": true, "evidence": "Three tests changed (run_plan_test TestRun29BriefTypo, e2e_test worked example, brief_test TestBriefCheckUsageAndMissing), all for the Q2 contract, all listed in proposal notes with old and new expectations; brief_test keeps the exit-2 'not a loop brief' case on an existing file"},
+    {"criterion": "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review.", "met": true, "evidence": "Diff touches only error classification and the tests; none of the listed refactors appear"}
+  ],
+  "findings": [],
+  "notes": "Existing-file 'not a loop brief' stays exit 2 (judged an invalid argument value). Proposal notes that VLOOP_PLAN_SHA256 set in a driver session makes TaskGate tests fail for an unrelated reason."
+}

@@ -15,14 +15,14 @@ import (
 func newSchema(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "schema",
-		Short: "List, print and validate against the embedded JSON Schemas",
+		Short: "List, show and validate against the embedded JSON Schemas",
 		Args:  cobra.NoArgs,
 		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "list",
-		Short: "Print the schema names",
+		Short: "List the schema names",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			out := cmd.OutOrStdout()
@@ -39,12 +39,12 @@ func newSchema(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "show <name>",
-		Short: "Print a schema document",
+		Short: "Show a schema document",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			doc, err := schema.Document(args[0])
 			if err != nil {
-				return err
+				return Usage(err)
 			}
 			_, err = cmd.OutOrStdout().Write(doc)
 			return err
@@ -58,7 +58,7 @@ func newSchema(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name, path := args[0], args[1]
 			if _, err := schema.Document(name); err != nil {
-				return err
+				return Usage(err)
 			}
 			read := path
 			if g.Dir != "" && !filepath.IsAbs(read) {
@@ -87,6 +87,10 @@ func newSchema(g *Globals) *cobra.Command {
 				fmt.Fprintf(out, "%s: ok\n", path)
 			} else {
 				for _, v := range vs {
+					if v.Pointer == "" {
+						fmt.Fprintf(out, "%s: %s\n", path, v.Message)
+						continue
+					}
 					fmt.Fprintf(out, "%s: %s: %s\n", path, v.Pointer, v.Message)
 				}
 			}

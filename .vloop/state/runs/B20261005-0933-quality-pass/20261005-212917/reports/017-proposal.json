@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T12",
+  "outcome": "blocked",
+  "summary": "Implemented doctor's plugin check: --plugin-dir hint pass when no vloop plugin, 'installed but disabled' warning, stderr/parse error in the warning; enabled same-version plugin passes with an empty message. The gate's last clause cannot see that pass line.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go"],
+  "verified": "vloop task gate T12 exited 1: GATE FAIL: an enabled vloop plugin of the binary's version does not pass: ''. go test ./internal/cli passed.",
+  "notes": "Changed existing test: TestDoctorPlugin expected `[]` -> warning, now pass (contract change: no marketplace plugin passes). Added TestDoctorPluginMessages and a pluginErr field in the fake claude. The enabled-plugin pass keeps an empty message, so doctor prints '✓ plugin' with no trailing space, and the gate's plugin() helper greps '^[^ ]* plugin ' (trailing space) and finds nothing. Fixing it would mean adding a message to a pass the acceptance does not ask for and changing the pinned doctor output in TestDoctor's '✓ plugin\\n' expectation. Gate needs grep '^[^ ]* plugin' (no trailing space), or the acceptance must require a message.",
+  "gate_dispute": {
+    "reason": "The gate's plugin() helper greps '^[^ ]* plugin ' with a trailing space, so it cannot match a passing check with an empty message, which is how doctor prints every other message-less pass.",
+    "evidence": "The last clause runs plugin with an enabled vloop plugin of the binary's version; doctor prints '✓ plugin' and the grep returns '' ('does not pass: '''). The acceptance requires only that this case passes, not that it carries a message."
+  }
+}

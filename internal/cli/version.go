@@ -62,7 +62,7 @@ func newVersion(b Build, g *Globals) *cobra.Command {
 	var check string
 	cmd := &cobra.Command{
 		Use:   "version",
-		Short: "Print the vloop and embedded plugin versions",
+		Short: "Show the vloop and embedded plugin versions",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if cmd.Flags().Changed("check-plugin") {

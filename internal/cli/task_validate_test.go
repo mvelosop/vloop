@@ -63,7 +63,7 @@ func TestTaskValidateJSON(t *testing.T) {
 func TestTaskValidateNoPlan(t *testing.T) {
 	root := statusRepo(t, "")
 	code, out, errOut := run(t, "-C", root, "task", "validate")
-	if code != 1 || out != "" || errOut != "vloop: no plan: .vloop/state/state.json\n" {
+	if code != 1 || out != "" || errOut != "vloop: no plan — vloop run <brief> makes one\n" {
 		t.Fatalf("code %d out %q err %q", code, out, errOut)
 	}
 	code, out, _ = run(t, "-C", root, "task", "validate", "--json")

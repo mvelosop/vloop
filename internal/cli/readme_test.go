@@ -18,6 +18,9 @@ import (
 
 const readmeLineCap = 200
 
+// claudeFlags are flags of the claude CLI that the README may name.
+var claudeFlags = map[string]bool{"--plugin-dir": true}
+
 // walk collects the path of every runnable leaf command (without the root
 // name) and every flag name in the tree.
 func walk(c *cobra.Command, path string, cmds, flags map[string]bool) {
@@ -58,7 +61,7 @@ func readmeProblems(text string, guides []string) []string {
 	delete(flags, "help")
 
 	for _, m := range regexp.MustCompile(`--[a-z][a-z-]*`).FindAllString(text, -1) {
-		if !flags[strings.TrimPrefix(m, "--")] {
+		if !flags[strings.TrimPrefix(m, "--")] && !claudeFlags[m] {
 			out = append(out, "README names "+m+", which no command has")
 		}
 	}

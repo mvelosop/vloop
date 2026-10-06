@@ -188,7 +188,7 @@ func TestInterventionMigrate(t *testing.T) {
 	read := func() string { b, _ := os.ReadFile(path); return string(b) }
 
 	code, out, _ := runDefect(t, dir, "intervention", "migrate", "--dry-run")
-	if code != 0 || strings.TrimSpace(out) != "I20260101-0900-old.md" || read() != v1 {
+	if code != 0 || strings.TrimSpace(out) != ".vloop/interventions/I20260101-0900-old.md" || read() != v1 {
 		t.Fatalf("dry run: %d %q", code, out)
 	}
 	code, out, _ = runDefect(t, dir, "intervention", "migrate")

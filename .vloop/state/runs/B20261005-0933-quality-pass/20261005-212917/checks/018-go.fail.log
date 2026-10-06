@@ -1,0 +1,22 @@
+ok  	github.com/mvelosop/vloop	0.376s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	2.506s
+ok  	github.com/mvelosop/vloop/cmd/vloop	180.318s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+--- FAIL: TestPluginSkills (0.02s)
+    skills_test.go:41: eval plan-checks-its-gates: llm grader fixture-at-top-level.md judges the transcript but has no focus: trace
+FAIL
+FAIL	github.com/mvelosop/vloop/internal/cli	48.826s
+ok  	github.com/mvelosop/vloop/internal/closing	(cached)
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	7.945s
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/state	(cached)
+FAIL

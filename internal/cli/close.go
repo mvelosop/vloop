@@ -17,6 +17,7 @@ import (
 
 	"github.com/mvelosop/vloop/internal/closing"
 	"github.com/mvelosop/vloop/internal/defect"
+	fmpkg "github.com/mvelosop/vloop/internal/frontmatter"
 	"github.com/mvelosop/vloop/internal/metrics"
 	"github.com/mvelosop/vloop/internal/runs"
 )
@@ -33,15 +34,15 @@ func newBriefClose(g *Globals) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if none == (len(findings) > 0) {
-				return errors.New(closeFindingsMsg)
+				return Usage(errors.New(closeFindingsMsg))
 			}
 			for _, f := range findings {
 				if strings.TrimSpace(f) == "" {
-					return errors.New("a finding must not be empty")
+					return Usage(errors.New("a finding must not be empty"))
 				}
 			}
 			if cmd.Flags().Changed("abandon") && strings.TrimSpace(abandon) == "" {
-				return errors.New("an abandon needs a reason: --abandon \"<reason>\"")
+				return Usage(errors.New("an abandon needs a reason: --abandon \"<reason>\""))
 			}
 			return runBriefClose(g, cmd, args[0], findings, closeOpts{abandon: cmd.Flags().Changed("abandon"), reason: strings.TrimSpace(abandon), dry: dry})
 		},
@@ -73,7 +74,7 @@ func runGit(root string, args ...string) (string, error) {
 
 func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string, opt closeOpts) error {
 	out := cmd.OutOrStdout()
-	root, err := g.root()
+	root, err := g.gitRoot()
 	if err != nil {
 		return err
 	}
@@ -121,11 +122,11 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 		return Problem(fmt.Errorf(`the plan is not complete (%d/%d done) — finish it, or pass --abandon "<reason>"`, done, planned))
 	}
 
-	status, statusText := "consumed", "consumed — closed "+time.Now().Format("2006-01-02")+" as run "+runID+". **Do not re-plan from this brief.**"
+	now := time.Now()
+	status, statusText := "consumed", "consumed — closed "+now.Format("2006-01-02")+" as run "+runID+". **Do not re-plan from this brief.**"
 	if opt.abandon {
 		status, statusText = "abandoned", "abandoned — "+opt.reason
 	}
-	now := time.Now()
 	var files []string
 	report, err := metrics.Build(root, briefPath, c)
 	if err != nil {
@@ -162,10 +163,14 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 	if err != nil {
 		return Problem(err)
 	}
-	doc = setFrontmatterStatus(doc, status)
-	doc = statusLine.ReplaceAllString(doc, "${1}**Status:** "+statusText)
-	doc = closing.PutRunRecord(doc, closing.Render(closing.Record{Name: name, Date: now, Report: report, Derived: derived, Recorded: recorded}))
-	if err := os.WriteFile(full, []byte(doc), 0o644); err != nil {
+	fm, err := fmpkg.Parse(doc)
+	if err != nil {
+		return Problem(fmt.Errorf("%s: %w", briefPath, err))
+	}
+	fm.Replace("status", "status: "+status)
+	body := rewriteStatusLine(fm.Body(), statusText)
+	fm.SetBody(closing.PutRunRecord(body, closing.Render(closing.Record{Name: name, Date: now, Report: report, Derived: derived, Recorded: recorded})))
+	if err := os.WriteFile(full, []byte(fm.String()), 0o644); err != nil {
 		return Problem(err)
 	}
 	files = append(files, snap, briefPath)
@@ -208,39 +213,20 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 	return nil
 }
 
-// statusLine matches the body line the brief template starts with; only its
-// first occurrence is rewritten, and what precedes `**Status:**` is kept.
-var statusLine = regexp.MustCompile(`(?m)^([^\n]*?)\*\*Status:\*\* ready to plan[^\n]*`)
+// statusLine matches the body line the brief template starts with; what
+// precedes `**Status:**` is kept, and a `**Status:**` quoted mid-line is not it.
+var statusLine = regexp.MustCompile(`^([ \t>*+-]*?)\*\*Status:\*\* ready to plan.*$`)
 
-// setFrontmatterStatus sets `status:` in the leading frontmatter block,
-// leaving every other byte alone.
-func setFrontmatterStatus(doc, status string) string {
-	off := 0
-	first := true
-	for off < len(doc) {
-		end := len(doc)
-		if i := strings.IndexByte(doc[off:], '\n'); i >= 0 {
-			end = off + i
+// rewriteStatusLine rewrites the first line statusLine matches and no other.
+func rewriteStatusLine(body, statusText string) string {
+	lines := strings.Split(body, "\n")
+	for i, l := range lines {
+		if statusLine.MatchString(l) {
+			lines[i] = statusLine.ReplaceAllString(l, "${1}**Status:** "+statusText)
+			break
 		}
-		line := strings.TrimRight(doc[off:end], " \t\r")
-		switch {
-		case first:
-			if line != "---" {
-				return doc
-			}
-			first = false
-		case line == "---":
-			return doc
-		case strings.HasPrefix(line, "status:"):
-			cr := ""
-			if strings.HasSuffix(doc[off:end], "\r") {
-				cr = "\r"
-			}
-			return doc[:off] + "status: " + status + cr + doc[end:]
-		}
-		off = end + 1
 	}
-	return doc
+	return strings.Join(lines, "\n")
 }
 
 // closeDryRun prints what the close would do, counting the pending findings as

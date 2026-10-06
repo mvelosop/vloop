@@ -1,0 +1,17 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "Every top-level test in cmd/vloop that builds its own temporary repository and sets no environment variable or working directory of the test process calls t.Parallel() — including TestRun01HappyPath, TestRun09DependencyOrder, TestWorkedExampleB3Commands, TestRunGateReviewPasses and TestRunChecksScopedToWhatChanged.", "met": true, "evidence": "t.Parallel() is present across the cmd/vloop/*_test.go files (added in the previous attempt, already in HEAD)."},
+    {"criterion": "A cmd/vloop test left serial carries a comment saying why (what process-wide state it touches); no test made parallel calls os.Setenv, t.Setenv, os.Chdir or t.Chdir, or mutates a package-level variable another test reads.", "met": true, "evidence": "No test is left serial and no Setenv/Chdir was added."},
+    {"criterion": "TestWorkedExampleB6RealData still clones the repository's HEAD (not its working tree) and still runs vloop run in the clone; it passes while files in the repository's working tree are edited or added during its run, and it still fails if the run writes into the real repository's tracked files or refs.", "met": false, "evidence": "cmd/vloop/b6_e2e_test.go still compares only rev-parse HEAD and for-each-ref (refs := func()...). A write to the real repository's tracked files without moving a ref goes undetected. The proposal claims a .git/hooks comparison, but git status shows no change to b6_e2e_test.go in this attempt and grep finds no 'hooks' in it."},
+    {"criterion": "Parallel tests do not share a temporary directory, stub, home or port; each test's harness state is its own.", "met": true, "evidence": "Tests use per-test newRunRepo and t.TempDir; no shared state was added."},
+    {"criterion": "No production code changes in this task, and no test's assertions are loosened to make it parallel.", "met": false, "evidence": "No production code changed, but TestWorkedExampleB6RealData's full git status comparison was weakened to HEAD and refs only, and this attempt did not restore it."},
+    {"criterion": "`go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race.", "met": true, "evidence": ".vloop/tmp/checks.json: go check exit 0; I did not rerun the tests."}
+  ],
+  "findings": [
+    {"summary": "TestWorkedExampleB6RealData still compares only HEAD and refs, so writes to the real repository's tracked files go undetected. The proposal claims a hooks comparison that is not in the file; this attempt changed no test code.", "kind": "bug"}
+  ],
+  "notes": "The proposal's account does not match the tree: b6_e2e_test.go is unchanged in the working tree and contains no hooks check. Restore detection of writes to the real repository, for example by hashing the tracked files a run could write to (.vloop/state/, docs/) taken from HEAD rather than the working tree, or by comparing git ls-tree HEAD with the object database."
+}

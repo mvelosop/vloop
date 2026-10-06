@@ -153,3 +153,14 @@ func TestResolveBudgetsPrecedence(t *testing.T) {
 		t.Errorf("flag: %+v", b)
 	}
 }
+
+func TestNewRunDirIsNamedInUTC(t *testing.T) {
+	at := time.Date(2026, 1, 2, 8, 34, 5, 0, time.FixedZone("IST", 5*3600+1800))
+	dir, err := newRunDir(t.TempDir(), "B1", at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := filepath.Base(dir); got != "20260102-030405" {
+		t.Errorf("folder %s, want the UTC stamp 20260102-030405", got)
+	}
+}

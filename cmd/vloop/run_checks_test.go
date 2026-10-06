@@ -33,6 +33,7 @@ func iterationChecks(rec map[string]any) string {
 func jsonNum(v any) string { return fmt.Sprint(int(v.(float64))) }
 
 func TestRunChecksScopedToWhatChanged(t *testing.T) {
+	t.Parallel()
 	r := checksRepo(t, twoChecks)
 	r.scripted(planJSON(t,
 		planTask("T1", map[string]any{"verify": "test -f api/T1.out"}),
@@ -55,6 +56,7 @@ func TestRunChecksScopedToWhatChanged(t *testing.T) {
 }
 
 func TestRunCheckFailedEndsIterationWithoutReview(t *testing.T) {
+	t.Parallel()
 	r := checksRepo(t, twoChecks)
 	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "test -f api/T1.out"})),
 		strings.Replace(defaultScript, `touch "$TASK.out"`, `touch api/"$TASK.out"; echo "exit 1" > api/test.sh`, 1))
@@ -86,6 +88,7 @@ func countArgv(r *runRepo, prefix string) int {
 }
 
 func TestRunChecksNotRunAfterFailedGateAndNeverRerun(t *testing.T) {
+	t.Parallel()
 	r := checksRepo(t, "[[check]]\nname = \"count\"\npaths = [\"**\"]\nrun = \"echo x >> .vloop/tmp/count; test $(wc -l < .vloop/tmp/count) -ne 2\"\n")
 	r.scripted(planJSON(t, planTask("T1", nil)),
 		defaultScript+`if [ "$PHASE:$ATTEMPT" = work:1 ]; then rm -f T1.out; fi`+"\n")
@@ -107,6 +110,7 @@ func TestRunChecksNotRunAfterFailedGateAndNeverRerun(t *testing.T) {
 }
 
 func TestRunFinalPassFailureAndResume(t *testing.T) {
+	t.Parallel()
 	r := checksRepo(t, twoChecks)
 	r.write("web/test.sh", "test ! -f api/T1.out\n")
 	r.commitAll("web breaks when api/T1.out exists")

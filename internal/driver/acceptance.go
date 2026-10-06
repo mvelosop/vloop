@@ -70,7 +70,10 @@ func (p *Planner) baseGates(t term, plan *state.Plan, timeout time.Duration) ([]
 		gguard := snapshotGit(root)
 		tree := snapshotTreeIgnoring(root, gateMayWrite(scratch.List))
 		timedOut, runErr := state.RunGroup(cmd, timeout)
-		restored := tree.revert()
+		restored, revertFailed := tree.revert()
+		if len(revertFailed) > 0 {
+			return nil, fmt.Errorf("gate %s changed the tree on the base and the driver could not revert it: %s", task.ID, strings.Join(revertFailed, "; "))
+		}
 		if err := state.EmptyScratch(root, scratch.List); err != nil {
 			t.warn("   gate scratch of %s not emptied: %v", task.ID, err)
 		}

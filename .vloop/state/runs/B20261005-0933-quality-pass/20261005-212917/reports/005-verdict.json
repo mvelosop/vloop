@@ -1,0 +1,17 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "One package (under internal/) owns reading and rewriting Markdown frontmatter; internal/defect and internal/intervention read and rewrite their records only through it — no frontmatter splitting, line-ending or BOM handling of their own remains in either.", "met": true, "evidence": "internal/frontmatter/frontmatter.go; the diff removes the line splitting, quote/unquote and eol handling from defect.go and intervention.go (parse, Set, migrateText)"},
+    {"criterion": "A record with a leading UTF-8 BOM reads like the same record without it, and a rewrite keeps the BOM.", "met": true, "evidence": "Parse cuts the BOM and String restores it; frontmatter_test.go TestParseReadsEveryVariantAlike; the BOM cases in both TestSetOnCRLFAndBOMRecords"},
+    {"criterion": "A record with CRLF endings reads like its LF twin, and a rewrite writes every line CRLF; a rewrite never leaves a file with mixed endings.", "met": true, "evidence": "String joins all lines with one eol; TestMixedInputWritesOneEnding covers mixed input"},
+    {"criterion": "A set changes only the lines of the fields it sets; every other byte of the file, body included, is unchanged.", "met": true, "evidence": "Replace and Insert touch single lines; the Set tests compare the whole file with the expected bytes"},
+    {"criterion": "`vloop defect set` and `vloop intervention set` on CRLF and BOM + CRLF records exit 0 and change the field; `defect list`, `intervention list` and `intervention show` read such records.", "met": true, "evidence": "TestSetOnCRLFAndBOMRecords in defect_test.go and intervention_test.go call List and Set on CRLF, BOM and BOM+CRLF records; show uses the same parse path"},
+    {"criterion": "Values are parsed exactly as today for LF records without a BOM: quoting, trimming and the fields read are unchanged, so every existing record in .vloop/defects and .vloop/interventions reads as before.", "met": true, "evidence": "Quote and Unquote are moved verbatim; Fields applies Cut(':') and the same unquote; the existing tests pass in the checks log"},
+    {"criterion": "The package has its own table-driven tests (LF, CRLF, BOM, BOM + CRLF, mixed input, quoted values, a missing or unterminated frontmatter), and defect and intervention tests cover set on a CRLF and a BOM record; the checks run them.", "met": true, "evidence": "internal/frontmatter/frontmatter_test.go covers all listed cases; the go check log is green"},
+    {"criterion": "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review.", "met": true, "evidence": "the diff touches only frontmatter handling in defect and intervention, plus the new package"}
+  ],
+  "findings": [],
+  "notes": "A file with mixed endings is normalised to the first line's ending on rewrite; the task allows this. Migrate now goes through the package and so normalises mixed files too."
+}

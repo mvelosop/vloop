@@ -10,6 +10,7 @@ import (
 // TestRunSymlinkedProposal: a proposal.json that is a symlink is read as
 // missing, and what it points at never reaches .vloop/state/.
 func TestRunSymlinkedProposal(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = work ]; then
   printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"SECRET: made","files":[],"verified":"ok","notes":"none"}\n' "$TASK" > "$dir/outside.json"
@@ -35,6 +36,7 @@ fi
 // TestRunBadRunID: a committed plan whose run_id is not a plain name is refused
 // before anything is written.
 func TestRunBadRunID(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", "--plan-only", runBrief), 0)

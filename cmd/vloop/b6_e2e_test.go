@@ -1,10 +1,13 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -41,6 +44,7 @@ func b6Lines(r *runRepo, prefix string) []string {
 func b6Squash(s string) string { return strings.Join(strings.Fields(s), " ") }
 
 func TestWorkedExampleB6(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	res := r.vloop("run", runBrief)
@@ -64,6 +68,7 @@ func TestWorkedExampleB6(t *testing.T) {
 }
 
 func TestWorkedExampleB6Sessions(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -115,6 +120,7 @@ func TestWorkedExampleB6Sessions(t *testing.T) {
 }
 
 func TestWorkedExampleB6BranchExists(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	r.git("branch", runID)
@@ -126,6 +132,7 @@ func TestWorkedExampleB6BranchExists(t *testing.T) {
 }
 
 func TestWorkedExampleB6GateDispute(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = work ] && [ "$TASK" = T2 ]; then
   printf '{"schema":"proposal/v1","task":"T2","outcome":"blocked","summary":"s","files":[],"verified":"v","notes":"n","gate_dispute":{"reason":"r","evidence":"e"}}\n' > .vloop/tmp/proposal.json
@@ -142,6 +149,7 @@ fi
 }
 
 func TestWorkedExampleB6FlakyGate(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	seen := filepath.Join(r.stub, "flaky.seen")
 	verify := `test -f T1.out && { [ -f "` + seen + `" ] || { : > "` + seen + `"; exit 1; }; }`
@@ -176,6 +184,7 @@ func TestWorkedExampleB6FlakyGate(t *testing.T) {
 }
 
 func TestWorkedExampleB6SilentReview(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = review ] && [ "$TASK" = T1 ]; then STUB_SILENT=1; fi
 `)
@@ -196,6 +205,7 @@ func TestWorkedExampleB6SilentReview(t *testing.T) {
 }
 
 func TestWorkedExampleB6RefsMoved(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = work ] && [ "$TASK" = T1 ]; then git checkout -q -b other; fi
 `)
@@ -210,6 +220,7 @@ func TestWorkedExampleB6RefsMoved(t *testing.T) {
 }
 
 func TestWorkedExampleB6MaxIterations(t *testing.T) {
+	t.Parallel()
 	r := b6Repo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", "--max-iterations", "1", runBrief), 4)
@@ -226,16 +237,35 @@ func TestWorkedExampleB6MaxIterations(t *testing.T) {
 // repository, which has the shell loop's .loop/, B4's snapshots and no
 // .vloop/tmp/ ignore line, and checks this repository is untouched.
 func TestWorkedExampleB6RealData(t *testing.T) {
+	t.Parallel()
 	src := newRunRepo(t) // for its stub, home and helpers; its own repository is unused
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
 	}
-	status := func() string { return runGit(t, root, "status", "--porcelain", "--untracked-files=all") }
-	before := status()
+	// The repository's working tree may be edited while this runs, so the check
+	// is narrow: its history and hooks (HEAD, every ref, each hook's content)
+	// must not move, and no path the run wrote in its clone may have changed
+	// here — a run that leaked out of its clone writes exactly those paths, and
+	// someone editing other files is not mistaken for it. (.git/config is left
+	// out: editors rewrite it while a run is in progress.)
+	refs := func() string {
+		out := runGit(t, root, "rev-parse", "HEAD") + runGit(t, root, "for-each-ref", "--format=%(objectname) %(refname)")
+		hooks := filepath.Join(root, ".git", "hooks")
+		entries, _ := os.ReadDir(hooks)
+		for _, e := range entries {
+			b, _ := os.ReadFile(filepath.Join(hooks, e.Name()))
+			sum := sha256.Sum256(b)
+			out += fmt.Sprintf("hook %s %x\n", e.Name(), sum)
+		}
+		return out
+	}
+	before := refs()
+	files := realFiles(t, root)
 
 	clone := filepath.Join(t.TempDir(), "clone")
 	runGit(t, root, "clone", "-q", root, clone)
+	cloneBase := strings.TrimSpace(runGit(t, clone, "rev-parse", "HEAD"))
 	runGit(t, clone, "config", "user.name", "gate")
 	runGit(t, clone, "config", "user.email", "gate@example.com")
 	runGit(t, clone, "config", "commit.gpgsign", "false")
@@ -276,9 +306,63 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 	if s := r.git("ls-files", ".vloop/tmp"); s != "" {
 		t.Errorf(".vloop/tmp/ was committed in the clone:\n%s", s)
 	}
-	if after := status(); after != before {
-		t.Errorf("the real-data check changed this repository:\n%s", after)
+	if after := refs(); after != before {
+		t.Errorf("the real-data check moved this repository's refs:\n%s", after)
 	}
+	if leaked := leakedPaths(t, root, clone, cloneBase, files); len(leaked) > 0 {
+		t.Errorf("paths the run wrote in its clone changed in this repository: %v", leaked)
+	}
+}
+
+// realFiles is every tracked and untracked, not ignored, file of root with a
+// hash of its content.
+func realFiles(t *testing.T, root string) map[string]string {
+	t.Helper()
+	out := map[string]string{}
+	for _, p := range strings.Split(runGit(t, root, "ls-files", "-z", "-c", "-o", "--exclude-standard"), "\x00") {
+		if p == "" {
+			continue
+		}
+		b, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p)))
+		if err != nil {
+			out[p] = "missing"
+			continue
+		}
+		out[p] = fmt.Sprintf("%x", sha256.Sum256(b))
+	}
+	return out
+}
+
+// leakedPaths is every path the run wrote in its clone — committed since base,
+// or left changed in its working tree — whose state in root differs from before.
+func leakedPaths(t *testing.T, root, clone, base string, before map[string]string) []string {
+	t.Helper()
+	paths := map[string]bool{}
+	for _, p := range strings.Split(runGit(t, clone, "diff", "--name-only", "-z", base, "HEAD"), "\x00") {
+		paths[p] = true
+	}
+	for _, p := range strings.Split(runGit(t, clone, "ls-files", "-z", "-m", "-o", "-d", "--exclude-standard"), "\x00") {
+		paths[p] = true
+	}
+	var leaked []string
+	for p := range paths {
+		if p == "" {
+			continue
+		}
+		now := "missing"
+		if b, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p))); err == nil {
+			now = fmt.Sprintf("%x", sha256.Sum256(b))
+		}
+		was, ok := before[p]
+		if !ok {
+			was = "missing"
+		}
+		if now != was {
+			leaked = append(leaked, p)
+		}
+	}
+	sort.Strings(leaked)
+	return leaked
 }
 
 // withoutChecks drops every [[check]] table from a config file's text.

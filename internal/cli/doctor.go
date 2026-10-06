@@ -314,9 +314,14 @@ func doctorTrusted(root string) bool {
 	if real, err := filepath.EvalSymlinks(root); err == nil {
 		keys = append(keys, real)
 	}
-	for _, k := range keys {
-		if doc.Projects[k].Trusted {
-			return true
+	for key, proj := range doc.Projects {
+		if !proj.Trusted {
+			continue
+		}
+		for _, k := range keys {
+			if trustKeyMatch(hostOS, key, k) {
+				return true
+			}
 		}
 	}
 	return false
@@ -335,6 +340,10 @@ func doctorPlan(root string) (p struct{ Schema, Shell, Status string }, ok bool)
 
 func doctorPlugin(b Build) (string, string, string) {
 	out, err := exec.Command("claude", "plugin", "list", "--json").Output()
+	var stderr string
+	if ee := (*exec.ExitError)(nil); errors.As(err, &ee) {
+		stderr = strings.TrimSpace(string(ee.Stderr))
+	}
 	var list []struct {
 		ID      string `json:"id"`
 		Version string `json:"version"`
@@ -344,11 +353,18 @@ func doctorPlugin(b Build) (string, string, string) {
 		err = json.Unmarshal(out, &list)
 	}
 	if err != nil {
-		return "plugin", resWarning, "cannot read claude plugin list --json"
+		if stderr != "" {
+			err = errors.New(stderr)
+		}
+		return "plugin", resWarning, "cannot read claude plugin list --json: " + err.Error()
 	}
-	found := ""
+	found, disabled := "", false
 	for _, p := range list {
-		if !p.Enabled || !strings.HasPrefix(p.ID, "vloop@") {
+		if !strings.HasPrefix(p.ID, "vloop@") {
+			continue
+		}
+		if !p.Enabled {
+			disabled = true
 			continue
 		}
 		if p.Version == b.Version {
@@ -357,7 +373,10 @@ func doctorPlugin(b Build) (string, string, string) {
 		found = p.Version
 	}
 	if found == "" {
-		return "plugin", resWarning, "no enabled vloop plugin — run claude plugin install vloop@vloop"
+		if disabled {
+			return "plugin", resWarning, "installed but disabled — claude plugin enable vloop@vloop"
+		}
+		return "plugin", resPass, `the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir "$(vloop plugin path)"`
 	}
 	return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — update the one that is behind", found, b.Version)
 }

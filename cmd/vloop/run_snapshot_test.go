@@ -20,6 +20,7 @@ func (r *runRepo) snapshotAt(rev string) map[string]any {
 func tasksDone(m map[string]any) float64 { return m["tasks"].(map[string]any)["done"].(float64) }
 
 func TestRunSnapshot(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -48,6 +49,7 @@ func TestRunSnapshot(t *testing.T) {
 }
 
 func TestRunSummary(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	res := r.vloop("run", runBrief)
@@ -66,6 +68,7 @@ func TestRunSummary(t *testing.T) {
 
 // A flaky gate costs the environment a defect, not the work.
 func TestRunSnapshotFlakyDefect(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	seen := r.stub + "/flaky.seen"
 	verify := `test -f T1.out && { [ -f "` + seen + `" ] || { : > "` + seen + `"; exit 1; }; }`

@@ -1,0 +1,37 @@
+#!/bin/sh
+# Stub claude for the gate: logs argv, answers doctor's probes, and plays the
+# plan, work, review and gate-review sessions from files beside it.
+dir=$(dirname "$0")
+echo "$*" >> "$dir/argv.log"
+case "$1" in
+  --version) echo "2.0.0 (Claude Code)"; exit 0;;
+  plugin) echo '[{"id":"vloop@vloop","version":"2.0.0-beta.2","enabled":true}]'; exit 0;;
+esac
+prompt=""; MODEL=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -p) prompt="$2"; shift 2;;
+    --model) MODEL="$2"; shift 2;;
+    *) shift;;
+  esac
+done
+cmd="${prompt%% *}"; ARG="${prompt#* }"
+case "$cmd" in
+  /vloop:plan) PHASE=plan; TASK="";;
+  /vloop:work) PHASE=work; TASK="$ARG";;
+  /vloop:review) PHASE=review; TASK="$ARG";;
+  /vloop:gate-review) PHASE=gate-review; TASK="";;
+  *) echo "stub claude: unrecognised prompt: $prompt" >&2; exit 64;;
+esac
+STUB_EXIT=0
+mkdir -p .vloop/tmp
+case "$PHASE" in
+  plan) mkdir -p .vloop/state; cp "$dir/plan.json" .vloop/state/state.json;;
+  gate-review) echo '{"schema":"gate-verdict/v1","verdict":"PASS","tasks":[],"notes":"none"}' > .vloop/tmp/gate-verdict.json;;
+  work) touch "$TASK.out"
+    printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$TASK" "$TASK" > .vloop/tmp/proposal.json;;
+  review) printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"none"}\n' "$TASK" > .vloop/tmp/verdict.json;;
+esac
+if [ -f "$dir/script.sh" ]; then . "$dir/script.sh"; fi
+printf '{"type":"result","subtype":"success","is_error":false,"duration_ms":1000,"num_turns":3,"total_cost_usd":0.1,"session_id":"stub","permission_denials":[],"modelUsage":{"%s":{"costUSD":0.1}}}\n' "$MODEL"
+exit "$STUB_EXIT"

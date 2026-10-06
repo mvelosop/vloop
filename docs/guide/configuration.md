@@ -11,8 +11,8 @@ environment or the file.
 
 ## Keys
 
-The variable of a key is `VLOOP_` and the key in upper case with `.` turned into
-`_`. List keys are TOML arrays in the file and comma-joined text in the
+The variable of a key is `VLOOP_` and the key in upper case with `.` and `-` turned
+into `_`. List keys are TOML arrays in the file and comma-joined text in the
 environment and in `config set`.
 
 | Key | Default | Valid values | Environment variable | Effect |

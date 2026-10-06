@@ -95,8 +95,8 @@ with one exit code (R-3):
 | Exit | Ending | Resumable as is |
 | --- | --- | --- |
 | 0 | complete | — |
-| 1 | preflight or usage | after fixing the cause |
-| 2 | blocked, including a plan the gate review failed twice and a final pass that failed | no — a human decides |
+| 1 | preflight or failure | after fixing the cause |
+| 2 | usage, or blocked, including a plan the gate review failed twice and a final pass that failed | no — a human decides |
 | 3 | stalled | yes, once understood |
 | 4 | max iterations | yes |
 | 5 | not converging | no |

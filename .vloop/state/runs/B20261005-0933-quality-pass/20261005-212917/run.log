@@ -1,0 +1,83 @@
+── iteration 4 (1 this run) · T1 · 0/17 done ──
+   Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree
+   check go
+   review: PASS
+   T1 done
+── iteration 5 (2 this run) · T2 · 1/17 done ──
+   Add one frontmatter reader and rewriter and move defects and interventions onto it
+   check go
+   review: PASS
+   T2 done
+── iteration 6 (3 this run) · T3 · 2/17 done ──
+   Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line
+   check go
+   review: PASS
+   T3 done
+── iteration 7 (4 this run) · T4 · 3/17 done ──
+   Make exit 2 opt-in, for usage only; every other failure exits 1
+   check go
+   review: PASS
+   T4 done
+── iteration 8 (5 this run) · T5 · 4/17 done ──
+   Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository
+   check go
+   review: PASS
+   T5 done
+── iteration 9 (6 this run) · T6 · 5/17 done ──
+   Report a plan that is not valid JSON, or not a valid plan, with its location and the next step
+   check go
+   review: PASS
+   T6 done
+── iteration 10 (7 this run) · T7 · 6/17 done ──
+   Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths
+   check go
+   review: PASS
+   T7 done
+── iteration 11 (8 this run) · T8 · 7/17 done ──
+   Compare trust paths and find the pre-commit hook the way each OS and git do
+   check go
+   review: PASS
+   T8 done
+── iteration 12 (9 this run) · T9 · 8/17 done ──
+   Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section
+   work session reported blocked
+   no recorded progress (1/2)
+── iteration 13 (10 this run) · T9 · 8/17 done ──
+   Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section
+   check go
+   review: PASS
+   T9 done
+── iteration 14 (11 this run) · T10 · 9/17 done ──
+   Name new run folders in UTC and order existing ones by their records' timestamps
+   check go
+   review: PASS
+   T10 done
+── iteration 15 (12 this run) · T11 · 10/17 done ──
+   Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes
+   check go
+   review: FAIL
+── iteration 16 (13 this run) · T11 · 10/17 done ──
+   Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes
+   check go
+   review: PASS
+   T11 done
+── iteration 17 (14 this run) · T12 · 11/17 done ──
+   Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
+   GATE DISPUTE T12 — blocked for the operator; no review, no attempt charged
+   T12 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 18 (15 this run) · T14 · 11/17 done ──
+   Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
+   check go
+   CHECK FAIL T14 — check go failed — see .vloop/state/runs/B20261005-0933-quality-pass/20261005-212917/checks/018-go.fail.log; review skipped
+── iteration 19 (16 this run) · T14 · 11/17 done ──
+   Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges
+   check go
+   review: PASS
+   T14 done
+4 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261005-0933-quality-pass/20261005-212917  (16 iteration(s) this run)
+plan:   12/17 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

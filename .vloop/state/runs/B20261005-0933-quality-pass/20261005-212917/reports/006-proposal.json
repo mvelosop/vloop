@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Brief parsing, runs' status read and brief close now go through internal/frontmatter; close rewrites only the first template status line, keeps BOM and CRLF throughout (run record included) and reads the clock once.",
+  "files": ["internal/frontmatter/frontmatter.go", "internal/brief/frontmatter.go", "internal/runs/release.go", "internal/cli/close.go", "internal/brief/check_test.go", "internal/cli/close_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; go vet, gofmt, go mod tidy -diff and linux/windows builds clean.",
+  "notes": "Added Doc.Lines and Doc.SetBody to the frontmatter package. internal/brief keeps its key/value/block-list validation (depends-on, scalar checks) but runs it over Doc.Lines, so the fence/BOM/CRLF parsing is the package's. brief close now errors if the brief has no parseable frontmatter (before it silently skipped the status rewrite). The status-line regex allows only markdown prefix chars (space, tab, > * + -) before **Status:**. In this session go test ./internal/cli TestTaskGate* fail ('plan was changed during this session') because they run inside a driver session; unrelated."
+}

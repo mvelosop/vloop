@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Every top-level test in cmd/vloop that builds its own temporary repository and sets no environment variable or working directory of the test process calls t.Parallel() — including TestRun01HappyPath, TestRun09DependencyOrder, TestWorkedExampleB3Commands, TestRunGateReviewPasses and TestRunChecksScopedToWhatChanged.", "met": true, "evidence": "a per-function scan of cmd/vloop/*_test.go finds every Test function calling t.Parallel(); only TestMain does not, and it is not a test."},
+    {"criterion": "A cmd/vloop test left serial carries a comment saying why (what process-wide state it touches); no test made parallel calls os.Setenv, t.Setenv, os.Chdir or t.Chdir, or mutates a package-level variable another test reads.", "met": true, "evidence": "No test is left serial. grep for Setenv and Chdir in cmd/vloop/*_test.go finds nothing. I did not audit package-level variables line by line."},
+    {"criterion": "TestWorkedExampleB6RealData still clones the repository's HEAD (not its working tree) and still runs vloop run in the clone; it passes while files in the repository's working tree are edited or added during its run, and it still fails if the run writes into the real repository's tracked files or refs.", "met": true, "evidence": "cmd/vloop/b6_e2e_test.go:~268 runs git clone of the real repo and r.vloop(\"run\") in the clone. It compares refs and hooks before and after. leakedPaths (b6_e2e_test.go:336) collects every path the run wrote in the clone, committed or left in the working tree, and compares its hash in the real repo before and after. So a tracked-file leak is caught, and unrelated working-tree edits are ignored."},
+    {"criterion": "Parallel tests do not share a temporary directory, stub, home or port; each test's harness state is its own.", "met": true, "evidence": "The harness builds per-test state with t.TempDir() (b6_e2e_test.go uses src.home and a t.TempDir() clone). The diff adds only t.Parallel() calls and no shared state."},
+    {"criterion": "No production code changes in this task, and no test's assertions are loosened to make it parallel.", "met": true, "evidence": "The diff from base to HEAD shows no non-test Go files changed. The 192 added lines in the 25 test files are almost all t.Parallel() calls (4 deletions). The B6 real-data test was rewritten, but leakedPaths still catches tracked-file writes."},
+    {"criterion": "`go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race.", "met": true, "evidence": ".vloop/tmp/checks.json shows the go check exited 0, and the gate ran before this review. I did not run the tests myself."}
+  ],
+  "findings": [],
+  "notes": "This attempt made no new edits. The parallel changes and the real-data test repair are already committed (c340e1f). The earlier refs-only weakening is gone, because tracked-file write detection is now in leakedPaths. The gate cannot tell that detection apart from its absence, so a mutation check at verification would settle it. The speed target is left to the operator."
+}

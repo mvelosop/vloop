@@ -169,8 +169,42 @@ func Load(root, brief string) (*Model, error) {
 	if err != nil {
 		return nil, err
 	}
+	sortFolders(shell)
+	sortFolders(vl)
 	m.Folders = append(shell, vl...)
 	return m, nil
+}
+
+// start is the earliest timestamp among a folder's iteration and session
+// records; ok is false for a folder with none.
+func (f Folder) start() (t time.Time, ok bool) {
+	note := func(c time.Time) {
+		if !c.IsZero() && (!ok || c.Before(t)) {
+			t, ok = c, true
+		}
+	}
+	for _, it := range f.Iterations {
+		note(it.Started)
+	}
+	for _, s := range f.Sessions {
+		note(s.Started)
+	}
+	return t, ok
+}
+
+// sortFolders orders folders by the earliest timestamp of their records, which
+// are UTC, rather than by name: older folders are named in local time, so a
+// DST fall-back sorts a later run first. A folder with no timestamped record
+// is ordered by name against the others.
+func sortFolders(fs []Folder) {
+	sort.SliceStable(fs, func(a, b int) bool {
+		ta, oka := fs[a].start()
+		tb, okb := fs[b].start()
+		if oka && okb && !ta.Equal(tb) {
+			return ta.Before(tb)
+		}
+		return fs[a].Path < fs[b].Path
+	})
 }
 
 func shellFolders(root string, m *Model) ([]Folder, error) {

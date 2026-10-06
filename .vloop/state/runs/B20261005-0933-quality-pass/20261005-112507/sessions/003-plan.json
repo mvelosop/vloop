@@ -1,0 +1,23 @@
+{
+  "cost_usd": 0.362348,
+  "duration_ms": 35268,
+  "effort": null,
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 33252,
+      "cache_read_input_tokens": 163760,
+      "cost_usd": 0.362348,
+      "input_tokens": 10,
+      "output_tokens": 3177
+    }
+  },
+  "permission_denials": [],
+  "phase": "plan",
+  "run_id": "B20261005-0933-quality-pass",
+  "schema": "session/v1",
+  "started": "2026-10-05T11:01:51Z",
+  "turns": 6
+}

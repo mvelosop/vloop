@@ -40,7 +40,7 @@ func TestInitWritesEverything(t *testing.T) {
 	if code != 0 || errs != "" {
 		t.Fatalf("code %d, stderr %q", code, errs)
 	}
-	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  claude plugin marketplace add mvelosop/vloop\n  claude plugin install vloop@vloop\n  vloop doctor\n"} {
+	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  vloop doctor\n  claude --plugin-dir \"$(vloop plugin path)\"   for an interactive session with the plugin\n"} {
 		if !strings.Contains(out, want) {
 			t.Errorf("output lacks %q:\n%s", want, out)
 		}

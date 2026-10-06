@@ -46,7 +46,7 @@ printed and applied by `vloop schema list|show|validate`:
 
 Every command takes `-C/--dir`, `--json`, `--no-color` (or `NO_COLOR`), `-q`,
 `-v`. With `--json`, stdout carries exactly one JSON document (JSON Lines for
-`metrics export`). Exit codes: `0` ok, `1` problems or failure, `2` usage.
-Errors are one stderr line starting `vloop: `. The driver's own exit codes are
+`metrics export`). Exit codes: `0` ok, `1` problems or failure, `2` usage only.
+A refusal is one stderr line starting `vloop: `, after any checks `doctor` or a preflight prints. The driver's own exit codes are
 R-3's. The full command reference is generated from the binary:
 [`docs/guide/commands.md`](../../guide/commands.md).

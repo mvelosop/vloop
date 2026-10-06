@@ -1,0 +1,1 @@
+GATE FAIL: doctor does not trust a repository whose trusted key differs only in case (macOS paths are case-insensitive): ! trust this folder is not marked trusted in the Claude settings — run claude here once and accept the trust dialog

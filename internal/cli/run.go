@@ -30,8 +30,22 @@ func newRun(b Build, g *Globals) *cobra.Command {
 	budgets := make([]string, len(runBudgetFlags))
 	cmd := &cobra.Command{
 		Use:   "run [<brief>]",
-		Short: "Plan a brief into tasks, on a work branch, and commit the plan",
-		Args:  cobra.MaximumNArgs(1),
+		Short: "Plan a brief and work it, task by task, on a work branch",
+		Long: `Plan a brief into tasks and work them one by one on a work branch.
+
+The brief is the argument or, when omitted, the newest brief with status ready;
+a plan already in progress is resumed. A run plans the brief (a plan session, a
+gate review, one commit), then per task: a work session, its gate, an
+independent review session and one commit.
+
+To resume a run that halted, fix what it reported and run vloop run again on the
+work branch. Use --replan to plan a brief again deliberately.
+
+Exit codes: 0 complete; 1 preflight or failure; 2 usage or blocked; 3 stalled; 4 max
+iterations; 5 not converging; 6 cost ceiling; 7 session error; 8 repeat blocked;
+9 refs or repository configuration moved. Each is described, with whether the
+run can resume, in docs/guide/concepts.md#exit-codes.`,
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()
 			if err != nil {
@@ -48,7 +62,7 @@ func newRun(b Build, g *Globals) *cobra.Command {
 					continue
 				}
 				if err := config.Check(root, f.key, budgets[i]); err != nil {
-					return fmt.Errorf("--%s: %v", f.flag, err)
+					return Usage(fmt.Errorf("--%s: %v", f.flag, err))
 				}
 				over[f.key] = budgets[i]
 			}
@@ -181,17 +195,13 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 // preCommitHook is the executable pre-commit hook git would run, repo-relative
 // when it is inside the repository; "" when there is none.
 func preCommitHook(root string) string {
-	dir, err := gitOut(root, "config", "core.hooksPath")
-	if err != nil || dir == "" {
-		dir = ".git/hooks"
-	}
-	full := dir
-	if !filepath.IsAbs(full) {
-		full = filepath.Join(root, dir)
+	full, err := gitOut(root, "rev-parse", "--path-format=absolute", "--git-path", "hooks")
+	if err != nil || full == "" {
+		return ""
 	}
 	hook := filepath.Join(full, "pre-commit")
 	fi, err := os.Stat(hook)
-	if err != nil || fi.IsDir() || fi.Mode()&0o111 == 0 {
+	if err != nil || fi.IsDir() || !hookCounts(hostOS, uint32(fi.Mode().Perm())) {
 		return ""
 	}
 	if rel, err := filepath.Rel(root, hook); err == nil && !strings.HasPrefix(rel, "..") {

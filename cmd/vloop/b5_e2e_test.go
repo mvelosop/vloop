@@ -186,6 +186,7 @@ func b5Code(t *testing.T, r result, code int) {
 }
 
 func TestWorkedExampleB5Session(t *testing.T) {
+	t.Parallel()
 	r := b5New(t, false, false)
 	r.write("go.mod", "module example.com/shop\n\ngo 1.22\n")
 	r.write("package.json", `{"dependencies":{"react":"^18.0.0"}}`+"\n")
@@ -197,7 +198,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		t.Fatalf("init stderr: %q", init.err)
 	}
 	lines := b5Lines(init.out)
-	if len(lines) != 13 {
+	if len(lines) != 12 {
 		t.Fatalf("init printed %d lines: %q", len(lines), init.out)
 	}
 	brief := regexp.MustCompile(`^wrote docs/briefs/B\d{8}-\d{4}-primeros-pasos\.loop-brief\.md$`)
@@ -208,8 +209,8 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		"check go: go test ./... && go vet ./... (paths: **)", "check javascript: npm test (paths: **)",
 		"each check is a starting point — edit it in .vloop/config.toml",
 		"wrote .vloop/config.toml", "wrote .vloop/install.json", lines[6],
-		"updated .gitignore", "wrote CLAUDE.md", "next:", "claude plugin marketplace add mvelosop/vloop",
-		"claude plugin install vloop@vloop", "vloop doctor"}
+		"updated .gitignore", "wrote CLAUDE.md", "next:", "vloop doctor",
+		`claude --plugin-dir "$(vloop plugin path)" for an interactive session with the plugin`}
 	if strings.Join(lines, "\n") != strings.Join(want, "\n") {
 		t.Fatalf("init printed %q, want %q", lines, want)
 	}
@@ -234,6 +235,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 }
 
 func TestWorkedExampleB5Monorepo(t *testing.T) {
+	t.Parallel()
 	r := b5New(t, false, false)
 	r.write("go.mod", "module example.com/shop\n")
 	r.write("services/api/Api.sln", "")
@@ -260,6 +262,7 @@ func TestWorkedExampleB5Monorepo(t *testing.T) {
 }
 
 func TestWorkedExampleB5PlantedFailures(t *testing.T) {
+	t.Parallel()
 	t.Run("no .git", func(t *testing.T) {
 		r := b5New(t, true, false)
 		b5Expect(t, r.run("0.2.0", "init"), 1, nil, "vloop: not a git repository — run git init first\n")
@@ -354,6 +357,9 @@ func TestWorkedExampleB5PlantedFailures(t *testing.T) {
 
 	t.Run("stray file removed by plugin path", func(t *testing.T) {
 		r := b5New(t, false, false)
+		if err := os.MkdirAll(filepath.Join(r.dir, ".vloop"), 0o755); err != nil {
+			t.Fatal(err)
+		}
 		b5Expect(t, r.run("0.2.0", "plugin", "path"), 0, []string{".vloop/tmp/plugin/0.2.0"}, "")
 		r.write(".vloop/tmp/plugin/0.2.0/stray.txt", "not part of the plugin\n")
 		b5Expect(t, r.run("0.2.0", "plugin", "path"), 0, []string{".vloop/tmp/plugin/0.2.0"}, "")

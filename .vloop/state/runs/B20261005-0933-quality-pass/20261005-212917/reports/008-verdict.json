@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "With no plan, every command that needs one (task show, task list, status, and the others) prints exactly `vloop: no plan — vloop run <brief> makes one` and exits 1.", "met": true, "evidence": "internal/state/state.go ErrNoPlan carries the text; status, task list, task show, task validate, task reset and the B2 e2e test pin it"},
+    {"criterion": "An unknown task id prints exactly `vloop: no task T<n> — vloop task list shows the plan's tasks` and exits 1, for every task subcommand that takes an id.", "met": true, "evidence": "internal/state/amend.go NoTaskError carries the text; task.go show uses it; tests pin show, reset, note, drop, set, gate and verify"},
+    {"criterion": "`vloop metrics <name>` for a brief that does not exist prints exactly `vloop: no brief <name> — vloop brief list shows the briefs` (exit 1); a brief that exists with no runs keeps `vloop: no runs for <name>` (exit 1).", "met": true, "evidence": "internal/cli/metrics.go checks the brief file before the no-runs message; messages_test.go pins both"},
+    {"criterion": "`-C <dir>` naming no directory makes every command print exactly `vloop: -C <dir>: no such directory` and exit 1, before anything else runs; nothing is created at <dir>.", "met": true, "evidence": "root.go PersistentPreRunE (no other command overrides it); messages_test.go checks status, version, task list and init, and that the directory was not created"},
+    {"criterion": "A command that needs git, run outside a git repository, prints `vloop: <dir> is not a git repository` (exit 1) — no raw `git … exit status 128` or `fatal:` text reaches the user; `vloop metrics` in such a directory no longer exits 0.", "met": true, "evidence": "config.go gitRoot is used by metrics, export, brief close and defect --blame; TestNotAGitRepository pins metrics. Other git users (intervention show, status) swallow git errors rather than print them"},
+    {"criterion": "Tests pin each message and exit code above; the checks run them.", "met": true, "evidence": "internal/cli/messages_test.go plus the updated existing tests; checks/go.log exit 0"},
+    {"criterion": "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.", "met": true, "evidence": "diff of the existing tests only swaps the expected message text; none deleted; the proposal's notes list each one with old and new text"}
+  ],
+  "findings": [],
+  "notes": "gitRoot is applied to metrics, export, brief close and defect --blame only. Other commands that call git (run, doctor) were not exercised here, since running the binary outside the repo was denied. The proposal says intervention show was not moved; it hides git failures, so nothing leaks. The tests cover the git-outside-a-repo case only for metrics."
+}

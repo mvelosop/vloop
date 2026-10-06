@@ -43,7 +43,15 @@ func CheckBytes(root string, data []byte, areas []string) (*Report, error) {
 	}
 	r := &Report{Problems: []string{}, Warnings: []string{}}
 	for _, v := range violations {
-		r.Problems = append(r.Problems, fmt.Sprintf("schema: %s: %s", v.Pointer, v.Message))
+		if v.Pointer == "" && strings.HasPrefix(v.Message, "not valid JSON") {
+			r.Problems = append(r.Problems, FilePath+": "+v.Message)
+			continue
+		}
+		if v.Pointer == "" {
+			r.Problems = append(r.Problems, "schema: "+v.Message)
+		} else {
+			r.Problems = append(r.Problems, fmt.Sprintf("schema: %s: %s", v.Pointer, v.Message))
+		}
 	}
 	var p Plan
 	if err := json.Unmarshal(data, &p); err != nil {

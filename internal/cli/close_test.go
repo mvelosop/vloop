@@ -283,3 +283,30 @@ func compactJSON(t *testing.T, b []byte) string {
 	out, _ := json.Marshal(v)
 	return string(out)
 }
+
+func TestCloseCRLFBriefRewritesFirstStatusLineOnly(t *testing.T) {
+	tail := "\n**Status:** ready to plan\nQuoted: **Status:** ready to plan, here.\n"
+	lfDir := closeRepo(t, true, tail)
+	crDir := closeRepo(t, true, tail)
+	p := filepath.Join("docs", "briefs", closeName+".md")
+	raw, err := os.ReadFile(filepath.Join(crDir, p))
+	if err != nil {
+		t.Fatal(err)
+	}
+	crlf := "\xef\xbb\xbf" + strings.ReplaceAll(string(raw), "\n", "\r\n")
+	write(t, crDir, filepath.ToSlash(p), crlf)
+	gitIn(t, crDir, "2026-01-01T09:11:00Z", "commit", "-qam", "crlf")
+	for _, d := range []string{lfDir, crDir} {
+		if code, _, errs := runCLI(t, d, "brief", "close", closeName, "--no-findings"); code != 0 {
+			t.Fatalf("exit %d: %s", code, errs)
+		}
+	}
+	lf, _ := os.ReadFile(filepath.Join(lfDir, p))
+	cr, _ := os.ReadFile(filepath.Join(crDir, p))
+	if got := strings.Count(string(lf), "ready to plan"); got != 2 {
+		t.Fatalf("LF close left %d 'ready to plan', want 2 (the later status line and the quoted one):\n%s", got, lf)
+	}
+	if want := "\xef\xbb\xbf" + strings.ReplaceAll(string(lf), "\n", "\r\n"); string(cr) != want {
+		t.Errorf("CRLF close differs from the LF close:\n%q\nwant\n%q", cr, want)
+	}
+}

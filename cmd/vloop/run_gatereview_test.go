@@ -44,6 +44,7 @@ func (r *runRepo) wantReport(name string) {
 }
 
 func TestRunGateReviewPasses(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -60,6 +61,7 @@ func TestRunGateReviewPasses(t *testing.T) {
 }
 
 func TestRunGateReviewFailThenPass(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$ATTEMPT" = 1 ]; then
 `+failingGateReview+`fi
@@ -78,6 +80,7 @@ func TestRunGateReviewFailThenPass(t *testing.T) {
 }
 
 func TestRunGateReviewFailsTwiceThenResumes(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+failingGateReview)
 	res := r.vloop("run", runBrief)
@@ -110,6 +113,7 @@ func TestRunGateReviewFailsTwiceThenResumes(t *testing.T) {
 }
 
 func TestRunGateReviewMissingVerdictFails(t *testing.T) {
+	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(twoTasks(t), defaultScript+`if [ "$PHASE" = gate-review ] && [ "$ATTEMPT" = 1 ]; then rm -f .vloop/tmp/gate-verdict.json; fi
 `)

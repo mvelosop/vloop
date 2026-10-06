@@ -16,6 +16,7 @@ import (
 
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/frontmatter"
 )
 
 // Dir is the repo-relative folder the intervention files live in.
@@ -247,18 +248,11 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	}
 }
 
-func quote(s string) string {
-	if s == "" || strings.ContainsAny(s, ":#\"'") || s != strings.TrimSpace(s) {
-		return strconv.Quote(s)
-	}
-	return s
-}
-
 func render(v Intervention) string {
 	var b strings.Builder
 	b.WriteString("---\n")
-	fmt.Fprintf(&b, "id: %s\nbrief: %s\nphase: %s\nkind: %s\nautomatable: %s\nby: %s\n", v.ID, quote(v.Brief), v.Phase, v.Kind, v.Automatable, v.By)
-	fmt.Fprintf(&b, "schema: intervention/v2\noptions: %d\nrecommended: %d\ndecided: %s\n", len(v.Options), v.Recommended.Option, quote(v.decision))
+	fmt.Fprintf(&b, "id: %s\nbrief: %s\nphase: %s\nkind: %s\nautomatable: %s\nby: %s\n", v.ID, frontmatter.Quote(v.Brief), v.Phase, v.Kind, v.Automatable, v.By)
+	fmt.Fprintf(&b, "schema: intervention/v2\noptions: %d\nrecommended: %d\ndecided: %s\n", len(v.Options), v.Recommended.Option, frontmatter.Quote(v.decision))
 	if v.Decided.Adjusted {
 		b.WriteString("adjusted: true\n")
 	}
@@ -289,16 +283,6 @@ func render(v Intervention) string {
 	return b.String()
 }
 
-func unquote(v string) string {
-	v = strings.TrimSpace(v)
-	if strings.HasPrefix(v, `"`) {
-		if u, err := strconv.Unquote(v); err == nil {
-			return u
-		}
-	}
-	return v
-}
-
 var (
 	sectionRe = regexp.MustCompile(`^\*\*(Trigger|Done|Context|Options|Recommended|Suggested|Decided|What would automate it)\.\*\*\s*`)
 	optionRe  = regexp.MustCompile(`^(\d+)\.\s+(.*)$`)
@@ -306,11 +290,10 @@ var (
 
 func parse(text string) (Intervention, error) {
 	v := Intervention{Schema: "intervention/v1", Options: []string{}, Agreement: "no-options"}
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	if len(lines) == 0 || lines[0] != "---" {
-		return v, errors.New("missing frontmatter")
+	doc, err := frontmatter.Parse(text)
+	if err != nil {
+		return v, err
 	}
-	end := -1
 	var nOptions, nRecommended int
 	var stored string
 	var adjusted bool
@@ -321,16 +304,8 @@ func parse(text string) (Intervention, error) {
 		}
 		return n, nil
 	}
-	for i, l := range lines[1:] {
-		if l == "---" {
-			end = i + 1
-			break
-		}
-		k, val, ok := strings.Cut(l, ":")
-		if !ok {
-			continue
-		}
-		val = unquote(val)
+	for _, f := range doc.Fields() {
+		k, val := f.Key, f.Value
 		var err error
 		switch k {
 		case "id":
@@ -368,16 +343,13 @@ func parse(text string) (Intervention, error) {
 			return v, err
 		}
 	}
-	if end < 0 {
-		return v, errors.New("unterminated frontmatter")
-	}
 	v2 := v.Schema == "intervention/v2"
 	// The summary is the first body line; each section runs to the next marker.
 	var cur *string
 	var list []string
 	inOptions := false
 	var summary []string
-	for _, l := range lines[end+1:] {
+	for _, l := range strings.Split(doc.Body(), "\n") {
 		if m := sectionRe.FindStringSubmatch(l); m != nil && (v2 || m[1] != "Options" && m[1] != "Recommended") {
 			inOptions = false
 			switch m[1] {
@@ -494,12 +466,12 @@ func List(root, brief string) ([]Intervention, error) {
 func Set(root, id, field, value string) error {
 	switch field {
 	case "agreement":
-		return errors.New("agreement is derived — set decided, adjusted or recommended instead")
+		return &config.UsageError{Err: errors.New("agreement is derived — set decided, adjusted or recommended instead")}
 	case "options":
-		return errors.New("options are recorded with the intervention, not set")
+		return &config.UsageError{Err: errors.New("options are recorded with the intervention, not set")}
 	}
 	if !slices.Contains(SetFields, field) {
-		return fmt.Errorf("cannot set %q: want one of %s", field, strings.Join(SetFields, ", "))
+		return &config.UsageError{Err: fmt.Errorf("cannot set %q: want one of %s", field, strings.Join(SetFields, ", "))}
 	}
 	if err := Validate(field, value); err != nil {
 		return err
@@ -520,7 +492,7 @@ func Set(root, id, field, value string) error {
 	updates := map[string]string{field: field + ": " + value}
 	switch field {
 	case "brief":
-		updates[field] = field + ": " + quote(defect.BriefName(value))
+		updates[field] = field + ": " + frontmatter.Quote(defect.BriefName(value))
 	case "recommended", "decided", "adjusted":
 		n := len(v.Options)
 		if n == 0 {
@@ -531,17 +503,17 @@ func Set(root, id, field, value string) error {
 		case "recommended":
 			r, err := strconv.Atoi(value)
 			if err != nil || r < 1 || r > n {
-				return fmt.Errorf("recommended must name an option, 1 to %d", n)
+				return &config.UsageError{Err: fmt.Errorf("recommended must name an option, 1 to %d", n)}
 			}
 			rec = r
 		case "decided":
 			if d, err := strconv.Atoi(value); value != "other" && (err != nil || d < 1 || d > n) {
-				return fmt.Errorf("decided must name an option, 1 to %d, or other", n)
+				return &config.UsageError{Err: fmt.Errorf("decided must name an option, 1 to %d, or other", n)}
 			}
 			decided = value
 		case "adjusted":
 			if value != "true" && value != "false" {
-				return fmt.Errorf("adjusted must be true or false")
+				return &config.UsageError{Err: fmt.Errorf("adjusted must be true or false")}
 			}
 			adjusted = value == "true"
 		}
@@ -553,23 +525,16 @@ func Set(root, id, field, value string) error {
 			return err
 		}
 		updates["recommended"] = "recommended: " + strconv.Itoa(rec)
-		updates["decided"] = "decided: " + quote(decided)
+		updates["decided"] = "decided: " + frontmatter.Quote(decided)
 		updates["adjusted"] = ""
 		if adjusted {
 			updates["adjusted"] = "adjusted: true"
 		}
 		updates["agreement"] = "agreement: " + a
 	}
-	lines := strings.Split(string(b), "\n")
-	end := -1
-	for i := 1; i < len(lines); i++ {
-		if lines[i] == "---" {
-			end = i
-			break
-		}
-	}
-	if end < 0 {
-		return errors.New("unterminated frontmatter")
+	doc, err := frontmatter.Parse(string(b))
+	if err != nil {
+		return err
 	}
 	keys := make([]string, 0, len(updates))
 	for k := range updates {
@@ -577,34 +542,18 @@ func Set(root, id, field, value string) error {
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		line, found := updates[k], false
-		for i := 1; i < end; i++ {
-			if strings.HasPrefix(lines[i], k+":") {
-				found = true
-				if line == "" {
-					lines = slices.Delete(lines, i, i+1)
-					end--
-				} else {
-					lines[i] = line
-				}
-				break
-			}
-		}
-		if !found && line != "" { // field absent: insert where I1 orders it
-			at := end
+		line := updates[k]
+		if !doc.Replace(k, line) && line != "" { // field absent: insert where I1 orders it
+			at := doc.Len()
 			if k == "adjusted" { // between decided and agreement
-				for i := 1; i < end; i++ {
-					if strings.HasPrefix(lines[i], "agreement:") {
-						at = i
-						break
-					}
+				if i := doc.Find("agreement"); i >= 0 {
+					at = i
 				}
 			}
-			lines = slices.Insert(lines, at, line)
-			end++
+			doc.Insert(at, line)
 		}
 	}
-	return os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0o644)
+	return os.WriteFile(path, []byte(doc.String()), 0o644)
 }
 
 // Migrate rewrites every v1 record under Dir to intervention/v2 by inserting
@@ -650,34 +599,19 @@ func Migrate(root string, dryRun bool) ([]string, error) {
 // migrateText inserts the v2 lines after the by: line of a v1 record. ok is
 // false when the record already carries a schema line.
 func migrateText(text string) (string, bool, error) {
-	lines := strings.SplitAfter(text, "\n")
-	if strings.TrimRight(lines[0], "\r\n") != "---" {
-		return "", false, errors.New("missing frontmatter")
+	doc, err := frontmatter.Parse(text)
+	if err != nil {
+		return "", false, err
 	}
-	by := -1
-	for i := 1; i < len(lines); i++ {
-		l := strings.TrimRight(lines[i], "\r\n")
-		if l == "---" {
-			break
-		}
-		if strings.HasPrefix(l, "schema:") {
-			return text, false, nil
-		}
-		if by < 0 && strings.HasPrefix(l, "by:") {
-			by = i
-		}
+	if doc.Find("schema") >= 0 {
+		return text, false, nil
 	}
+	by := doc.Find("by")
 	if by < 0 {
 		return "", false, errors.New("no by: line in the frontmatter")
 	}
-	eol := "\n"
-	if strings.HasSuffix(lines[by], "\r\n") {
-		eol = "\r\n"
+	for i, l := range []string{"schema: intervention/v2", "options: 0", "recommended: 0", `decided: ""`, "agreement: no-options"} {
+		doc.Insert(by+1+i, l)
 	}
-	ins := strings.Join([]string{"schema: intervention/v2", "options: 0", "recommended: 0", `decided: ""`, "agreement: no-options"}, eol) + eol
-	if !strings.HasSuffix(lines[by], "\n") {
-		ins = eol + strings.TrimSuffix(ins, eol)
-	}
-	lines[by] += ins
-	return strings.Join(lines, ""), true, nil
+	return doc.String(), true, nil
 }

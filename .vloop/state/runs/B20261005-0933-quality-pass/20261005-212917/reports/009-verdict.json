@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A plan that is not valid JSON makes `vloop status` print exactly `vloop: .vloop/state/state.json is not valid JSON (line <l>, column <c>)` and exit 1, where <l> and <c> are the 1-based line and column of the character the JSON decoder rejected (`{bad` is line 1, column 2).", "met": true, "evidence": "internal/schema/schema.go JSONError uses SyntaxError.Offset; state.Load wraps it; messages_test.go TestBrokenPlanMessages pins line 1 col 2 and line 3 col 13 (hand-checked)"},
+    {"criterion": "A plan that is valid JSON but fails the state schema makes `vloop status` print exactly `vloop: .vloop/state/state.json is not a valid plan — vloop task validate lists the problems` and exit 1.", "met": true, "evidence": "state.ErrNotAPlan; loadPlan in internal/cli/status.go runs state.Validate; test 'schema' case and TestStatusSchemaInvalidPlanRefuses"},
+    {"criterion": "`vloop status --json` exits 1 on either, with one JSON object `{\"error\": \"<the message without the vloop: prefix>\"}` on stdout.", "met": true, "evidence": "loadPlan JSON branch; TestBrokenPlanMessages unmarshals stdout and compares error for all three cases"},
+    {"criterion": "`vloop task validate` and `vloop schema validate <schema> <file>` on a file that is not JSON print `<path>: not valid JSON (line <l>, column <c>)` with no empty field, and exit 1.", "met": true, "evidence": "validate.go CheckBytes and cli/schema.go skip the empty pointer; test asserts the line 2 column 8 text and no ': :' for both commands"},
+    {"criterion": "A valid plan's status, status --json and task validate output are unchanged.", "met": true, "evidence": "only error paths changed; existing status/validate tests unchanged and the go check passed"},
+    {"criterion": "Tests pin these messages for a syntax error on the first line and on a later line, and for a schema-invalid plan; the checks run them.", "met": true, "evidence": "TestBrokenPlanMessages in internal/cli/messages_test.go; go check exit 0"},
+    {"criterion": "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.", "met": true, "evidence": "only TestStatusSchemaInvalidPlanStillReads changed, to the new exit 1 contract, and proposal notes list it with the old and new expectation"}
+  ],
+  "findings": [],
+  "notes": "loadPlan is shared, so every command using it now refuses a schema-invalid plan, not only status; the proposal says so. Not a scope problem since the task asked for status, but worth knowing."
+}

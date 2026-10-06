@@ -1,0 +1,35 @@
+── iteration 20 (1 this run) · T12 · 12/17 done ──
+   Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
+   check go
+   review: PASS
+   T12 done
+── iteration 21 (2 this run) · T13 · 13/17 done ──
+   Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
+   check go
+   review: PASS
+   T13 done
+── iteration 22 (3 this run) · T15 · 14/17 done ──
+   Bring the guides and the domain's CLI conventions up to v2
+   check go
+   review: FAIL
+── iteration 23 (4 this run) · T15 · 14/17 done ──
+   Bring the guides and the domain's CLI conventions up to v2
+   check go
+   review: PASS
+   T15 done
+── iteration 24 (5 this run) · T16 · 15/17 done ──
+   Rewrite the README as a newcomer's page, last
+   check go
+   review: PASS
+   T16 done
+── iteration 25 (6 this run) · T17 · 16/17 done ──
+   Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
+   check go
+   review: PASS
+   T17 done
+   check go
+
+═══ complete ═══
+run:    B20261005-0933-quality-pass/20261006-090742  (6 iteration(s) this run)
+plan:   17/17 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261005-0933-quality-pass.md

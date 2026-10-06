@@ -123,7 +123,7 @@ func TestTaskGateShellInvocation(t *testing.T) {
 
 func TestTaskGateUnknownTask(t *testing.T) {
 	root := gateRepo(t, "sh", "true")
-	if code, out, errOut := run(t, "-C", root, "task", "gate", "T9"); code != 1 || out != "" || errOut != "vloop: no task T9\n" {
+	if code, out, errOut := run(t, "-C", root, "task", "gate", "T9"); code != 1 || out != "" || errOut != "vloop: no task T9 — vloop task list shows the plan's tasks\n" {
 		t.Fatalf("code %d out %q err %q", code, out, errOut)
 	}
 }
@@ -160,7 +160,7 @@ func TestTaskVerifyRefusals(t *testing.T) {
 	p, _ := state.Load(root)
 	refuse(t, root, 1, "vloop: nothing to record — T2's gate and fixtures are unchanged\n", "task", "verify", "T2", p.Tasks[1].Verify, "--reason", "r")
 	refuse(t, root, 1, "vloop: nothing to record — T2's gate and fixtures are unchanged\n", "task", "verify", "T2", "--reason", "r")
-	refuse(t, root, 1, "vloop: no task T9\n", "task", "verify", "T9", "x", "--reason", "r")
+	refuse(t, root, 1, "vloop: no task T9 — vloop task list shows the plan's tasks\n", "task", "verify", "T9", "x", "--reason", "r")
 	if code, out, _ := run(t, "-C", root, "task", "verify", "T2", "", "--reason", "r"); code == 0 || out != "" {
 		t.Fatalf("empty command: code %d out %q", code, out)
 	}

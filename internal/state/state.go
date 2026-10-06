@@ -29,7 +29,10 @@ const SchemaName = "state/v2"
 const SchemaV1 = "state/v1"
 
 // ErrNoPlan is returned by Load when the plan file does not exist.
-var ErrNoPlan = errors.New("no plan: " + FilePath)
+var ErrNoPlan = errors.New("no plan — vloop run <brief> makes one")
+
+// ErrNotAPlan is returned when the plan file is JSON but not a plan.
+var ErrNotAPlan = errors.New(FilePath + " is not a valid plan — vloop task validate lists the problems")
 
 // Plan is the plan document. Field order is the schema's key order.
 type Plan struct {
@@ -121,7 +124,10 @@ func Load(root string) (*Plan, error) {
 	}
 	var p Plan
 	if err := json.Unmarshal(data, &p); err != nil {
-		return nil, fmt.Errorf("%s: %w", FilePath, err)
+		if msg := schema.JSONError(data); msg != "" {
+			return nil, errors.New(FilePath + " is " + msg)
+		}
+		return nil, ErrNotAPlan
 	}
 	return &p, nil
 }
@@ -199,6 +205,9 @@ func Save(root string, p *Plan) error {
 		return fail(err)
 	}
 	if err := tmp.Chmod(0o644); err != nil && !errors.Is(err, errors.ErrUnsupported) {
+		return fail(err)
+	}
+	if err := tmp.Sync(); err != nil {
 		return fail(err)
 	}
 	if err := tmp.Close(); err != nil {

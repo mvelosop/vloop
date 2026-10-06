@@ -63,6 +63,7 @@ func hasLine(out, line string) bool {
 }
 
 func TestWorkedExampleB2Commands(t *testing.T) {
+	t.Parallel()
 	s := b2Scratch(t)
 
 	expect(t, s.run(nil, "status"), 0,
@@ -129,6 +130,7 @@ func TestWorkedExampleB2Commands(t *testing.T) {
 }
 
 func TestWorkedExampleB2PlantedFailures(t *testing.T) {
+	t.Parallel()
 	problem := func(t *testing.T, s *scratch, re string) {
 		t.Helper()
 		r := s.run(nil, "task", "validate")
@@ -160,7 +162,7 @@ func TestWorkedExampleB2PlantedFailures(t *testing.T) {
 		s.plant(func(m map[string]any) { b2Task(m, 1)["effort"] = map[string]any{"work": "turbo"} })
 		problem(t, s, `schema: /tasks/1/effort/work: .+`)
 		before := s.read(planPath)
-		expect(t, s.run(nil, "task", "note", "T2", "x"), 1, "", "vloop: plan is not valid — run vloop task validate\n")
+		expect(t, s.run(nil, "task", "note", "T2", "x"), 1, "", "vloop: .vloop/state/state.json is not a valid plan — vloop task validate lists the problems\n")
 		if s.read(planPath) != before {
 			t.Fatal("task note modified an invalid plan")
 		}
@@ -170,7 +172,7 @@ func TestWorkedExampleB2PlantedFailures(t *testing.T) {
 		if err := os.Remove(s.dir + "/" + planPath); err != nil {
 			t.Fatal(err)
 		}
-		expect(t, s.run(nil, "task", "validate"), 1, "", "vloop: no plan: .vloop/state/state.json\n")
+		expect(t, s.run(nil, "task", "validate"), 1, "", "vloop: no plan — vloop run <brief> makes one\n")
 	})
 	t.Run("shell not on PATH", func(t *testing.T) {
 		s := b2Scratch(t)

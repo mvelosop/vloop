@@ -2,7 +2,10 @@
 type: llm
 weight: 3
 ---
-Read the session's final answer to the operator. Score 1 if it proposes between
+Read the session's final answer to the operator. Judge only the options offered
+for the disputed gate (their count, their realism, one recommendation with its
+reason); other problems or observations the answer raises do not lower the
+score. Score 1 if it proposes between
 one and three options for what to do about the disputed gate, recommends exactly
 one of them and gives the reason for that recommendation. Score 0 if it proposes
 more than three, proposes none, or recommends without a reason.

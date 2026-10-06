@@ -92,9 +92,9 @@ func TestTaskResetChanges(t *testing.T) {
 
 func TestTaskResetRefusals(t *testing.T) {
 	root := amendRepo(t, "")
-	refuse(t, root, 1, "vloop: no task T9\n", "task", "reset", "T9")
+	refuse(t, root, 1, "vloop: no task T9 — vloop task list shows the plan's tasks\n", "task", "reset", "T9")
 	empty := statusRepo(t, "")
-	if code, _, errOut := run(t, "-C", empty, "task", "reset", "T1"); code != 1 || errOut != "vloop: no plan: .vloop/state/state.json\n" {
+	if code, _, errOut := run(t, "-C", empty, "task", "reset", "T1"); code != 1 || errOut != "vloop: no plan — vloop run <brief> makes one\n" {
 		t.Fatalf("code %d err %q", code, errOut)
 	}
 }
@@ -109,7 +109,7 @@ func TestTaskNoteChanges(t *testing.T) {
 
 func TestTaskNoteUnknownTask(t *testing.T) {
 	root := amendRepo(t, "")
-	refuse(t, root, 1, "vloop: no task T9\n", "task", "note", "T9", "x")
+	refuse(t, root, 1, "vloop: no task T9 — vloop task list shows the plan's tasks\n", "task", "note", "T9", "x")
 }
 
 func TestTaskDropChanges(t *testing.T) {
@@ -120,7 +120,7 @@ func TestTaskDropChanges(t *testing.T) {
 func TestTaskDropRefusals(t *testing.T) {
 	root := amendRepo(t, "")
 	refuse(t, root, 1, "vloop: T2 depends on T1\n", "task", "drop", "T1")
-	refuse(t, root, 1, "vloop: no task T9\n", "task", "drop", "T9")
+	refuse(t, root, 1, "vloop: no task T9 — vloop task list shows the plan's tasks\n", "task", "drop", "T9")
 }
 
 func TestTaskSetChanges(t *testing.T) {
@@ -154,7 +154,7 @@ func TestTaskSetRefusals(t *testing.T) {
 	refuse(t, root, 2, `vloop: invalid value "bug" for kind: want one of feature, fix, refactor, test, docs, chore`+"\n", "task", "set", "T2", "kind", "bug")
 	refuse(t, root, 2, `vloop: invalid value "turbo" for effort.work: want one of low, medium, high, xhigh, max`+"\n", "task", "set", "T2", "effort.work", "turbo")
 	refuse(t, root, 2, "vloop: cannot set \"title\"", "task", "set", "T2", "title", "x")
-	refuse(t, root, 1, "vloop: no task T9\n", "task", "set", "T9", "kind", "fix")
+	refuse(t, root, 1, "vloop: no task T9 — vloop task list shows the plan's tasks\n", "task", "set", "T9", "kind", "fix")
 	// T3 has no area and areas is set, so clearing T2's area would fail validate
 	// only for the cleared task; the plan already has that problem, so any write is refused.
 	refuse(t, root, 1, "vloop: refusing to write", "task", "set", "T2", "area", "")
@@ -182,6 +182,11 @@ func TestTaskAmendInvalidPlan(t *testing.T) {
 		{"task", "drop", "T3"},
 		{"task", "set", "T3", "kind", "fix"},
 	} {
-		refuse(t, root, 1, "vloop: plan is not valid — run vloop task validate\n", args...)
+		refuse(t, root, 1, "vloop: .vloop/state/state.json is not a valid plan — vloop task validate lists the problems\n", args...)
 	}
+	// A plan that is not JSON says where, as status does (B11 Q3).
+	if err := os.WriteFile(state.Path(root), []byte("{bad"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	refuse(t, root, 1, "vloop: .vloop/state/state.json is not valid JSON (line 1, column 2)\n", "task", "note", "T2", "x")
 }

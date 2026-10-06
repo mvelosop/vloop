@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "A plan that is not JSON now reports file, line and column (status, status --json, task validate, schema validate); a schema-invalid plan makes status and status --json exit 1 and points to vloop task validate.",
+  "files": ["internal/schema/schema.go", "internal/state/state.go", "internal/state/validate.go", "internal/cli/status.go", "internal/cli/schema.go", "internal/cli/status_test.go", "internal/cli/messages_test.go"],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: ok; go vet, gofmt, go mod tidy -diff, linux/windows builds clean.",
+  "notes": "One earlier test changed because the contract changed: internal/cli/status_test.go TestStatusSchemaInvalidPlanStillReads (now TestStatusSchemaInvalidPlanRefuses) expected exit 0 and the task line printed for a schema-invalid plan; it now expects exit 1, empty stdout and the 'is not a valid plan' line. Mechanism: schema.JSONError(data) gives 'not valid JSON (line l, column c)' (column counts characters); schema.Validate uses it; state.Load turns a decode failure into '<path> is <that>' or state.ErrNotAPlan; cli loadPlan also runs state.Validate, so every command using loadPlan refuses a schema-invalid plan, not only status. Violations at pointer '' print without the empty field. Run go test ./internal/cli with VLOOP_PLAN_SHA256 unset (TestTaskGate* fail inside a driver session otherwise)."
+}

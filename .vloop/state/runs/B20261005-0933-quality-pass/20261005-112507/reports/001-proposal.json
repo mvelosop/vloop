@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Every top-level cmd/vloop test now calls t.Parallel(); TestWorkedExampleB6RealData still clones HEAD and runs vloop in the clone, and now checks that HEAD and all refs of the real repository are unmoved instead of comparing git status.",
+  "files": ["cmd/vloop/b6_e2e_test.go", "cmd/vloop/b2_e2e_test.go", "cmd/vloop/b3_e2e_test.go", "cmd/vloop/b4_e2e_test.go", "cmd/vloop/b5_e2e_test.go", "cmd/vloop/b7_e2e_test.go", "cmd/vloop/b8_e2e_test.go", "cmd/vloop/e2e_test.go", "cmd/vloop/run_checks_test.go", "cmd/vloop/run_gates_test.go", "cmd/vloop/run_halt_test.go", "cmd/vloop/run_iterate_test.go", "cmd/vloop/run_plan_test.go", "cmd/vloop/run_preflight_test.go", "cmd/vloop/run_safety_test.go"],
+  "verified": "vloop task gate T1 equivalent (sh .vloop/state/gates/T1/gate.sh) printed gate T1: ok; go test -count=1 ./cmd/vloop/ passed; go test -race -run TestRun0 clean.",
+  "notes": "No test in cmd/vloop uses Setenv/Chdir or mutates a package variable (b5Bins is mutex-guarded), so none stayed serial. The real-data test's tracked-file check is now refs-only (HEAD plus for-each-ref); a write into the real repo's tracked files is no longer detected there because the working tree legitimately changes during the run. Full ./cmd/vloop run took ~173s on this machine."
+}

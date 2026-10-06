@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T17",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A committed cmd/vloop test (TestWorkedExampleB11 or similar, parallel like its neighbours) runs every line of the brief's worked example against the built binary in temporary directories and asserts its output and exit code; the checks run it.", "met": true, "evidence": "cmd/vloop/b20261005_e2e_test.go: TestWorkedExampleB11 calls t.Parallel() and covers every line of the worked example (messages and exit codes, drafts, outside-repo, CRLF/BOM, gendocs, doctor, --help); the go check passed."},
+    {"criterion": "Run on this repository, `vloop metrics --json` for every consumed brief (B1–B10) equals v2.0.0-beta.2's except first_pass and iterations_per_closed; the proposal's notes list each changed number with its brief and task (for the operator's run record).", "met": true, "evidence": "gates/T17.log prints the only changed numbers: B20261002-2135-vloop-v1-security first-pass 15 -> 14; proposal notes list it with brief and task T10."},
+    {"criterion": "`vloop defect list`, `vloop intervention list` and `vloop brief list` print exactly what v2.0.0-beta.2 prints on this repository.", "met": true, "evidence": "gate compares them against a v2.0.0-beta.2 build and ended 'gate T17: ok'."},
+    {"criterion": "If the comparison finds a difference beyond those two fields, the task fixes its cause in the code (not the test or the data) or halts with an account of it.", "met": true, "evidence": "No difference beyond first-pass/iterations_per_closed was found; no production code changed."},
+    {"criterion": "No production behaviour changes in this task beyond fixes the comparison forces, each named in the proposal's notes.", "met": true, "evidence": "Diff outside run logs is only the new test file."}
+  ],
+  "findings": [],
+  "notes": "none"
+}

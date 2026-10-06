@@ -109,7 +109,7 @@ func TestStatusMarkdown(t *testing.T) {
 func TestStatusMissingPlan(t *testing.T) {
 	root := statusRepo(t, "")
 	code, out, errOut := run(t, "-C", root, "status")
-	if code != 1 || out != "" || errOut != "vloop: no plan: .vloop/state/state.json\n" {
+	if code != 1 || out != "" || errOut != "vloop: no plan — vloop run <brief> makes one\n" {
 		t.Fatalf("code %d out %q err %q", code, out, errOut)
 	}
 	code, out, _ = run(t, "-C", root, "status", "--json")
@@ -119,11 +119,11 @@ func TestStatusMissingPlan(t *testing.T) {
 	}
 }
 
-func TestStatusSchemaInvalidPlanStillReads(t *testing.T) {
+func TestStatusSchemaInvalidPlanRefuses(t *testing.T) {
 	root := statusRepo(t, strings.Replace(statusPlan, `"notes":"watch the path"`, `"notes":"watch the path","effort":{"work":"turbo"}`, 1))
-	code, out, _ := run(t, "-C", root, "status")
-	if code != 0 || !strings.Contains(out, "  T2  pending  config/feature  Config  (1 attempt)\n") {
-		t.Fatalf("code %d out %q", code, out)
+	code, out, errOut := run(t, "-C", root, "status")
+	if code != 1 || out != "" || errOut != "vloop: .vloop/state/state.json is not a valid plan — vloop task validate lists the problems\n" {
+		t.Fatalf("code %d out %q err %q", code, out, errOut)
 	}
 }
 

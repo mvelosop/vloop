@@ -314,3 +314,24 @@ func TestVloopV2ChecksAndGateReviewSession(t *testing.T) {
 		t.Errorf("sessions = %+v", f.Sessions)
 	}
 }
+
+func TestFoldersAreOrderedByTheirRecordsNotTheirNames(t *testing.T) {
+	root := t.TempDir()
+	// A DST fall-back: the later run's local name sorts first.
+	base := ".vloop/state/runs/B1-x/"
+	put(t, root, base+"20261025-011000/iterations.jsonl", `{"iteration":1,"task":"T1","started":"2026-10-25T01:10:00Z"}`+"\n")
+	put(t, root, base+"20261025-015000/iterations.jsonl", `{"iteration":1,"task":"T1","started":"2026-10-25T00:50:00Z"}`+"\n")
+	put(t, root, base+"20261026-000000/sessions/001-plan.json", `{"phase":"plan"}`)
+	m, err := Load(root, briefPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got []string
+	for _, f := range m.Folders {
+		got = append(got, filepath.Base(f.Path))
+	}
+	want := "20261025-015000 20261025-011000 20261026-000000"
+	if strings.Join(got, " ") != want {
+		t.Errorf("folders %v, want %s", got, want)
+	}
+}

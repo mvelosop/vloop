@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +15,7 @@ import (
 const (
 	ExitOK       = 0
 	ExitProblems = 1 // the command ran and found problems or failed
-	ExitUsage    = 2 // unknown command, flag or config key, missing argument, invalid value
+	ExitUsage    = 2 // unknown command or flag, wrong argument count, invalid value for a flag or a settable field
 )
 
 // Build is the build-time identity stamped into the binary.
@@ -30,6 +31,8 @@ type Globals struct {
 	NoColor bool
 	Quiet   bool
 	Verbose bool
+
+	ran bool // a command's RunE started: anything cobra rejected before that is usage
 }
 
 // Color reports whether output to w may be coloured: only when w is a
@@ -46,8 +49,11 @@ func (g *Globals) Color(w io.Writer) bool {
 	return err == nil && st.Mode()&os.ModeCharDevice != 0
 }
 
-// ProblemError makes a command exit 1: it ran and found problems. Any other
-// error returned from a command is a usage error and exits 2.
+// ProblemError marks an error as a problem the command found. Every error
+// returned from a command exits 1 unless it is a usage error (UsageError, a
+// config.UsageError, InvalidValueError or UnknownKeyError, or one cobra rejected
+// before the command ran); Problem is kept for readability where the failure is
+// the point.
 type ProblemError struct{ Err error }
 
 func (e *ProblemError) Error() string { return e.Err.Error() }
@@ -55,6 +61,16 @@ func (e *ProblemError) Unwrap() error { return e.Err }
 
 // Problem wraps err so the command exits 1.
 func Problem(err error) error { return &ProblemError{Err: err} }
+
+// UsageError makes a command exit 2: the invocation, not the repository, is
+// wrong — an invalid value for a flag or a settable field.
+type UsageError struct{ Err error }
+
+func (e *UsageError) Error() string { return e.Err.Error() }
+func (e *UsageError) Unwrap() error { return e.Err }
+
+// Usage wraps err so the command exits 2.
+func Usage(err error) error { return &UsageError{Err: err} }
 
 // ExitError makes a command exit with a specific code, as `vloop run` does for
 // its own endings (R-3).
@@ -69,7 +85,7 @@ func (e *ExitError) Unwrap() error { return e.Err }
 // Execute runs the command tree and returns the process exit code. Errors are
 // printed to stderr as one line starting "vloop: "; nothing goes to stdout.
 func Execute(b Build, args []string, stdout, stderr io.Writer) int {
-	root, _ := NewRoot(b)
+	root, g := NewRoot(b)
 	root.SetArgs(args)
 	root.SetOut(stdout)
 	root.SetErr(stderr)
@@ -88,7 +104,29 @@ func Execute(b Build, args []string, stdout, stderr io.Writer) int {
 	if errors.As(err, &pe) {
 		return ExitProblems
 	}
-	return ExitUsage
+	var ue *UsageError
+	var cu *config.UsageError
+	var inv *config.InvalidValueError
+	var unk *config.UnknownKeyError
+	if errors.As(err, &ue) || errors.As(err, &cu) || errors.As(err, &inv) || errors.As(err, &unk) || !g.ran {
+		return ExitUsage
+	}
+	return ExitProblems
+}
+
+// markRan wraps every RunE so Execute can tell cobra's own rejections (unknown
+// command, flag-parse and argument-count errors), which happen before any RunE
+// starts, from a command that ran and failed.
+func markRan(c *cobra.Command, g *Globals) {
+	if run := c.RunE; run != nil {
+		c.RunE = func(cmd *cobra.Command, args []string) error {
+			g.ran = true
+			return run(cmd, args)
+		}
+	}
+	for _, sub := range c.Commands() {
+		markRan(sub, g)
+	}
 }
 
 func oneLine(s string) string {
@@ -104,10 +142,30 @@ func oneLine(s string) string {
 func NewRoot(b Build) (*cobra.Command, *Globals) {
 	g := &Globals{}
 	root := &cobra.Command{
-		Use:           "vloop",
-		Short:         "Plan, run and review autonomous Claude loops",
+		Use:   "vloop",
+		Short: "Plan, run and review autonomous Claude loops",
+		Long: `vloop packages an autonomous loop for Claude Code. A brief is a markdown file in
+docs/briefs/ that says what to build, what is out of scope and how to know it
+is done; it is the unit of work.
+
+The loop, in three sentences: vloop run plans the brief into tasks, each with a
+gate (a verify command). For each task a fresh work session does the task, the
+gate runs, an independent review session judges it, and the driver makes one
+commit. The run ends when every task is done or something needs a human; run it
+again on the work branch to resume.
+
+Start with vloop init in your repository, then vloop brief new to draft a brief.`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		PersistentPreRunE: func(*cobra.Command, []string) error {
+			if g.Dir == "" {
+				return nil
+			}
+			if fi, err := os.Stat(g.Dir); err != nil || !fi.IsDir() {
+				return Problem(fmt.Errorf("-C %s: no such directory", g.Dir))
+			}
+			return nil
+		},
 	}
 	pf := root.PersistentFlags()
 	pf.StringVarP(&g.Dir, "dir", "C", "", "act as if started in `path`")
@@ -129,5 +187,6 @@ func NewRoot(b Build) (*cobra.Command, *Globals) {
 	root.AddCommand(newUpgrade(b, g))
 	root.AddCommand(newDoctor(b, g))
 	root.AddCommand(newRun(b, g))
+	markRan(root, g)
 	return root, g
 }

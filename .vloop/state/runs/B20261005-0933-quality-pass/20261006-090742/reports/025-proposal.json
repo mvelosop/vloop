@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T17",
+  "outcome": "done",
+  "summary": "Added cmd/vloop/b20261005_e2e_test.go with TestWorkedExampleB11 (parallel), which plays every line of the brief's worked example against the built binary in temporary directories. The real-data comparison against v2.0.0-beta.2 shows one changed number.",
+  "files": ["cmd/vloop/b20261005_e2e_test.go"],
+  "verified": "vloop task gate T17 exited 0 and printed gate T17: ok; go test ./cmd/vloop -run TestWorkedExampleB11 passed.",
+  "notes": "Changed numbers for the run record (the only ones): brief B20261002-2135-vloop-v1-security, tasks.first_pass 15 -> 14 (iterations_per_closed unchanged at 1.2777...); the task is T10, which was redone after T11 regressed it (journal: T10 done, then T10 again). Every other metrics --json field for B1-B10 equals beta.2's; defect list, intervention list and brief list print identically. No production code changed, no fixes were forced. The test builds cmd/gendocs into a temp dir and uses a fake claude on PATH for doctor (skipped on windows)."
+}

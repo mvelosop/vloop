@@ -202,7 +202,11 @@ func (s Shown) Text() string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "%s\n%s\n\n", v.ID, v.Summary)
 	field := func(k, val string) { fmt.Fprintf(&b, "%s: %s\n", k, val) }
-	field("brief", v.Brief)
+	if v.Brief != "" {
+		field("brief", v.Brief)
+	}
+	field("schema", v.Schema)
+	field("options", fmt.Sprint(len(v.Options)))
 	field("phase", v.Phase)
 	field("kind", v.Kind)
 	field("automatable", v.Automatable)

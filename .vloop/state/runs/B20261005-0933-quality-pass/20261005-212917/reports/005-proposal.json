@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "New internal/frontmatter package (Parse, Fields, Body, Find, Replace, Insert, String, Quote, Unquote) with BOM and CRLF handling; defect and intervention read, set and migrate only through it.",
+  "files": ["internal/frontmatter/frontmatter.go", "internal/frontmatter/frontmatter_test.go", "internal/defect/defect.go", "internal/defect/defect_test.go", "internal/intervention/intervention.go", "internal/intervention/intervention_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go vet, gofmt, go mod tidy -diff and linux/windows builds clean.",
+  "notes": "A file is CRLF if its first line ends CRLF; String writes every line in that ending, so mixed input is normalised on rewrite (intervention migrate included). Quote/Unquote moved into the package too. T3 can use Doc for briefs, run records and close. go test ./internal/cli: only TestTaskGate* fail ('plan was changed during this session') because they run inside a driver session; unrelated to this change."
+}

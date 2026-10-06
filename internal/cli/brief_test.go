@@ -47,7 +47,7 @@ func TestBriefCheckSkipped(t *testing.T) {
 	d := scratchRepo(t)
 	rel := writeBrief(t, d, "draft")
 	_, out, _ := run(t, "-C", d, "brief", "check", rel)
-	if out != rel+"\n  - skipped: status is draft\nbriefs ok\n" {
+	if out != rel+"\n  - skipped: status is draft\nnothing checked: 1 draft brief(s) skipped\n" {
 		t.Fatalf("%q", out)
 	}
 }
@@ -56,6 +56,13 @@ func TestBriefCheckUsageAndMissing(t *testing.T) {
 	d := scratchRepo(t)
 	rel := writeBrief(t, d, "ready")
 	code, out, e := run(t, "-C", d, "brief", "check", rel, "docs/notes.md")
+	if code != 1 || out != "" || e != "vloop: no such file: docs/notes.md\n" {
+		t.Fatalf("missing file: %d %q %q", code, out, e)
+	}
+	if err := os.WriteFile(filepath.Join(d, "docs", "notes.md"), []byte("notes\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, e = run(t, "-C", d, "brief", "check", rel, "docs/notes.md")
 	if code != 2 || out != "" || e != "vloop: not a loop brief: docs/notes.md\n" {
 		t.Fatalf("%d %q %q", code, out, e)
 	}
@@ -64,7 +71,7 @@ func TestBriefCheckUsageAndMissing(t *testing.T) {
 	}
 	miss := "docs/briefs/B20260101-0999-z.loop-brief.md"
 	code, out, e = run(t, "-C", d, "brief", "check", miss)
-	if code != 1 || e != "vloop: no such brief: "+miss+"\n" || out != "1 brief(s) need work\n" {
+	if code != 1 || e != "vloop: no such file: "+miss+"\n" || out != "1 brief(s) need work\n" {
 		t.Fatalf("%d %q %q", code, out, e)
 	}
 }

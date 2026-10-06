@@ -22,8 +22,12 @@ func newDefect(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "defect",
 		Short: "Record, list and update defects the loop cannot see",
-		Args:  cobra.NoArgs,
-		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+		Long: `A defect is a problem the loop did not catch itself: found by the operator after
+a task was marked done. Record one with vloop defect add, list them (or the
+origin by catcher matrix) with vloop defect list, and update one as it is fixed
+with vloop defect set.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
 	cmd.AddCommand(newDefectAdd(g), newDefectList(g), newDefectSet(g))
 	return cmd
@@ -49,10 +53,10 @@ func newDefectAdd(g *Globals) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			in.Summary = args[0]
 			if strings.TrimSpace(in.Summary) == "" {
-				return errors.New("the summary must not be empty")
+				return Usage(errors.New("the summary must not be empty"))
 			}
 			if in.FoundBy == "" {
-				return errors.New("--found-by is required")
+				return Usage(errors.New("--found-by is required"))
 			}
 			for _, v := range []struct{ f, v string }{{"found-by", in.FoundBy}, {"origin", in.Origin}, {"kind", in.Kind}, {"severity", in.Severity}} {
 				if v.v == "" {
@@ -63,11 +67,16 @@ func newDefectAdd(g *Globals) *cobra.Command {
 				}
 			}
 			if in.Brief == "" && blame == "" {
-				return errors.New("pass --brief or --blame <file>:<line>")
+				return Usage(errors.New("pass --brief or --blame <file>:<line>"))
 			}
 			root, err := g.root()
 			if err != nil {
 				return err
+			}
+			if blame != "" {
+				if root, err = g.gitRoot(); err != nil {
+					return err
+				}
 			}
 			if in.Brief != "" {
 				in.Brief = defect.BriefName(in.Brief)
@@ -78,7 +87,7 @@ func newDefectAdd(g *Globals) *cobra.Command {
 				i := strings.LastIndex(blame, ":")
 				n, aerr := strconv.Atoi(blame[i+1:])
 				if i <= 0 || aerr != nil || n < 1 {
-					return fmt.Errorf("invalid value %q for blame: want <file>:<line>", blame)
+					return Usage(fmt.Errorf("invalid value %q for blame: want <file>:<line>", blame))
 				}
 				a, err := defect.Blame(root, blame[:i], n)
 				if err != nil {
@@ -117,7 +126,7 @@ func newDefectList(g *Globals) *cobra.Command {
 	var matrix bool
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "Print the recorded defects, or with --matrix the origin × catcher counts",
+		Short: "List the recorded defects, or with --matrix the origin × catcher counts",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			root, err := g.root()
@@ -209,7 +218,7 @@ func defectMatrix(root, brief string) (metrics.Matrix, error) {
 func newDefectSet(g *Globals) *cobra.Command {
 	return &cobra.Command{
 		Use:   "set <id> <field> <value>",
-		Short: "Set " + strings.Join(defect.SetFields, ", ") + " of a defect",
+		Short: "Set one field of a defect: " + strings.Join(defect.SetFields, ", "),
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()
@@ -219,7 +228,7 @@ func newDefectSet(g *Globals) *cobra.Command {
 			if err := defect.Set(root, args[0], args[1], args[2]); err != nil {
 				var inv *config.InvalidValueError
 				if errors.As(err, &inv) || !contains(defect.SetFields, args[1]) {
-					return err
+					return Usage(err)
 				}
 				return Problem(err)
 			}

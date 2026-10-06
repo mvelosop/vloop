@@ -6,7 +6,9 @@ the run folders, git, the plan stored in git and the defect files. Defects are
 explained in [defects.md](defects.md).
 
 ```
-vloop metrics [<brief>…] [--by task] [--json]
+vloop metrics [<brief>…] [--by task] [--interventions] [--by kind|phase] [--json]
+vloop metrics --workspace <file> [--json]
+vloop metrics export
 vloop metrics stacks [name]
 vloop metrics classify <path>…
 ```
@@ -23,7 +25,8 @@ A brief's **run id** is its file name without `.loop-brief` (`run_id`). Metrics
 are keyed by brief, not by run folder: a brief can span several runs, and its
 plan session can sit in another branch's folder.
 
-- **Run folders**: the shell loop's `.loop/state/runs/<any>/<folder>/` and
+- **Run folders**: legacy: the shell loop that built vloop's first briefs, in
+  this repository only (`.loop/state/runs/<any>/<folder>/`), and
   vloop's `.vloop/state/runs/<run id>/<folder>/`. A shell-loop folder belongs to
   a brief if its `loop.log` says `planning from <brief path>` or `resuming <run
   id>`. Sessions give cost, duration, models and tokens; `iterations.jsonl`
@@ -34,7 +37,7 @@ plan session can sit in another branch's folder.
   latest plan commit, the last run commit after it and the task commits between
   them. With several plan commits (a re-plan) only the latest counts.
 
-vloop only reads `.loop/`; it never writes there. `metrics` and `defect list`
+vloop only reads the legacy `.loop/`; it never writes there. `metrics` and `defect list`
 write nothing at all.
 
 ## Line classification
@@ -119,7 +122,7 @@ Each of `delivered` and `churn` holds `code`, `test`, `docs` and `other`, and a
 - **agent** (`time.agent_ms`) = `work_ms` + `review_ms`: the durations of the work
   and review sessions. **plan** (`plan_ms`) is reported apart.
 - **gates** (`gates_ms`): the sum of the gate durations in the iteration records;
-  `null` (`n/a`) when none was recorded, as always for the shell loop.
+  `null` (`n/a`) when none was recorded, as always for the legacy shell loop.
 - **checks** (`checks_ms`): the sum of the check durations in the iteration
   records, the checks the driver ran after each gate; `null` (`n/a`) when none
   was recorded. The final pass writes no iteration record, so it is not counted.
@@ -151,7 +154,7 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 
 `models` lists, for each of `plan`, `gate-review`, `work` and `review`, the models seen in the
 sessions' model usage, sorted. `effort` gives each phase's effort level when the
-records carry it (`session/v1` does, the shell loop's do not), else `null`.
+records carry it (`session/v1` does, the legacy shell loop's do not), else `null`.
 
 ## Tasks and iterations
 

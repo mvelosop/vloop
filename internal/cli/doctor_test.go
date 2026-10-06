@@ -11,12 +11,13 @@ import (
 )
 
 type doctorEnv struct {
-	t       *testing.T
-	repo    string
-	home    string
-	stub    string
-	build   Build
-	plugins string
+	t         *testing.T
+	repo      string
+	home      string
+	stub      string
+	build     Build
+	plugins   string
+	pluginErr string // when set, `plugin list` prints it to stderr and exits 3
 }
 
 // doctorCheckConfig is a config with the one check a repository needs to pass
@@ -80,8 +81,12 @@ func (e *doctorEnv) claude(present bool) {
 	}
 	path := bin
 	if present {
+		list := "echo '" + e.plugins + "'; exit 0"
+		if e.pluginErr != "" {
+			list = "echo '" + e.pluginErr + "' >&2; exit 3"
+		}
 		script := "#!/bin/sh\nif [ \"$*\" = \"--version\" ]; then echo 2.1.0; exit 0; fi\n" +
-			"if [ \"$*\" = \"plugin list --json\" ]; then echo '" + e.plugins + "'; exit 0; fi\nexit 3\n"
+			"if [ \"$*\" = \"plugin list --json\" ]; then " + list + "; fi\nexit 3\n"
 		if err := os.WriteFile(filepath.Join(e.stub, "claude"), []byte(script), 0o755); err != nil {
 			e.t.Fatal(err)
 		}
@@ -273,7 +278,7 @@ func TestDoctorPlugin(t *testing.T) {
 	e := newDoctorEnv(t)
 	e.want("plugin", resPass)
 	for plugins, want := range map[string]string{
-		`[]`: resWarning,
+		`[]`: resPass,
 		`[{"id":"vloop@vloop","version":"0.1.0","enabled":false}]`:                                                      resWarning,
 		`[{"id":"vloop@vloop","version":"0.0.9","enabled":true}]`:                                                       resWarning,
 		`[{"id":"other@x","version":"0.1.0","enabled":true},{"id":"vloop@elsewhere","version":"0.1.0","enabled":true}]`: resPass,
@@ -284,6 +289,33 @@ func TestDoctorPlugin(t *testing.T) {
 	}
 	e.claude(false)
 	e.want("plugin", resNA)
+}
+
+func TestDoctorPluginMessages(t *testing.T) {
+	e := newDoctorEnv(t)
+	for plugins, want := range map[string]string{
+		`[]`: `the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir "$(vloop plugin path)"`,
+		`[{"id":"vloop@vloop","version":"0.1.0","enabled":false}]`: "installed but disabled — claude plugin enable vloop@vloop",
+		`[{"id":"vloop@vloop","version":"0.0.9","enabled":true}]`:  "the vloop plugin is 0.0.9 but this binary is 0.1.0 — update the one that is behind",
+	} {
+		e.plugins = plugins
+		e.claude(true)
+		if c := e.want("plugin", map[bool]string{true: resPass, false: resWarning}[strings.HasPrefix(want, "the plugin is")]); c.Message != want {
+			t.Errorf("%s: message %q, want %q", plugins, c.Message, want)
+		}
+	}
+	e.plugins = `[]`
+	e.pluginErr = "the registry is locked"
+	e.claude(true)
+	if c := e.want("plugin", resWarning); !strings.Contains(c.Message, "the registry is locked") {
+		t.Errorf("failing list: message %q does not name stderr", c.Message)
+	}
+	e.pluginErr = ""
+	e.plugins = "garbage"
+	e.claude(true)
+	if c := e.want("plugin", resWarning); !strings.Contains(c.Message, "invalid character") {
+		t.Errorf("garbage list: message %q does not name the parse error", c.Message)
+	}
 }
 
 func TestDoctorStacks(t *testing.T) {

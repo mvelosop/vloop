@@ -51,6 +51,7 @@ func b4Err(t *testing.T, r result, code int, err string) {
 }
 
 func TestWorkedExampleB4Close(t *testing.T) {
+	t.Parallel()
 	s := b4Fixture(t, b3Opts{})
 	before := b4Refs(t, s)
 
@@ -184,6 +185,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 }
 
 func TestWorkedExampleB4Workspace(t *testing.T) {
+	t.Parallel()
 	shop := b4Fixture(t, b3Opts{})
 	// The second repository has a brief of its own, from B3's builder.
 	api, _, _ := b3PreMerge(t, b3Opts{})
@@ -249,6 +251,7 @@ func TestWorkedExampleB4Workspace(t *testing.T) {
 }
 
 func TestWorkedExampleB4PlantedFailures(t *testing.T) {
+	t.Parallel()
 	t.Run("HEAD on main", func(t *testing.T) {
 		s := b4Fixture(t, b3Opts{})
 		b3Git(t, s.dir, "2026-01-01T09:15:00Z", "checkout", "-q", "main")

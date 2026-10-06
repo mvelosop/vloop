@@ -59,6 +59,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | partly | no-options | [I20261002-2140-b8-designed-from-the-v1-0-review-securit](I20261002-2140-b8-designed-from-the-v1-0-review-securit.md) |
 | design | decision | no | no-options | [I20261003-2053-b9-s-forks-settled-gates-may-be-the-plan](I20261003-2053-b9-s-forks-settled-gates-may-be-the-plan.md) |
 | design | decision | no | no-options | [I20261004-1435-b10-s-forks-settled-options-as-body-sect](I20261004-1435-b10-s-forks-settled-options-as-body-sect.md) |
+| design | decision | no | adjusted | [I20261005-0935-b11-s-forks-settled-user-facing-quality](I20261005-0935-b11-s-forks-settled-user-facing-quality.md) |
 | design | direction | no | no-options | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | no-options | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | no-options | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
@@ -80,10 +81,15 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | halt | partly | no-options | [I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt](I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt.md) |
 | run | halt | partly | no-options | [I20260930-2149-t6-gate-contradicted-its-own-acceptance](I20260930-2149-t6-gate-contradicted-its-own-acceptance.md) |
 | run | halt | partly | no-options | [I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table](I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table.md) |
+| run | repair | no | recommended | [I20261005-1204-t](I20261005-1204-t.md) |
+| run | repair | no | no-options | [I20261005-1205-no-brief](I20261005-1205-no-brief.md) |
 | halt | halt | yes | no-options | [I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new](I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new.md) |
 | halt | repair | partly | no-options | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
 | halt | repair | yes | no-options | [I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th](I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th.md) |
 | halt | repair | partly | recommended | [I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio](I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio.md) |
+| halt | repair | partly | other-option | [I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac](I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac.md) |
+| halt | repair | partly | recommended | [I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l](I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l.md) |
+| halt | repair | partly | recommended | [I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr](I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | halt | partly | no-options | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |
@@ -104,6 +110,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261002-1426-b7-s-acceptance-run-restarted-detached-t](I20261002-1426-b7-s-acceptance-run-restarted-detached-t.md) |
 | verify | verification-finding | partly | no-options | [I20261002-2118-the-url-shortener-benchmark-the-cost-dro](I20261002-2118-the-url-shortener-benchmark-the-cost-dro.md) |
 | verify | verification-finding | partly | recommended | [I20261005-0757-b10-verified-the-worked-example-held-by](I20261005-0757-b10-verified-the-worked-example-held-by.md) |
+| verify | verification-finding | partly | recommended | [I20261006-1028-b11-verified-the-worked-example-held-by](I20261006-1028-b11-verified-the-worked-example-held-by.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
@@ -117,6 +124,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | next | carry-forward | partly | no-options | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |
 | next | ceremony | yes | no-options | [I20260930-1010-the-b4-draft-reached-main-inside-an-unre](I20260930-1010-the-b4-draft-reached-main-inside-an-unre.md) |
 | next | ceremony | partly | no-options | [I20261004-1337-v2-0-0-beta-1-released-as-a-pre-release](I20261004-1337-v2-0-0-beta-1-released-as-a-pre-release.md) |
+| next | ceremony | partly | recommended | [I20261005-0906-v2-0-0-beta-2-released-so-b11-runs-on-a](I20261005-0906-v2-0-0-beta-2-released-so-b11-runs-on-a.md) |
 | next | direction | no | no-options | [I20260929-2130-the-metrics-and-defects-design-before-b2](I20260929-2130-the-metrics-and-defects-design-before-b2.md) |
 | next | direction | no | no-options | [I20260930-0955-a-project-level-driver-over-project-stat](I20260930-0955-a-project-level-driver-over-project-stat.md) |
 | next | direction | no | no-options | [I20260930-1654-a-documentation-layer-for-the-design-ste](I20260930-1654-a-documentation-layer-for-the-design-ste.md) |

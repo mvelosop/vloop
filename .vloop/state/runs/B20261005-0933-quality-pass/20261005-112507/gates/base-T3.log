@@ -1,0 +1,4 @@
+GATE FAIL: brief check fails on a ready brief saved with a BOM and CRLF endings: docs/briefs/B20260101-0900-demo.loop-brief.md
+  ✗ missing frontmatter
+  1 problem(s), 0 warning(s)
+1 brief(s) need work

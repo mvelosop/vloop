@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop brief check <paths>` where every path is a draft prints `nothing checked: <n> draft brief(s) skipped` instead of `briefs ok` and exits 0; when at least one brief is checked the summary is as before.", "met": true, "evidence": "internal/cli/brief.go counts skipped and prints the new line only when skipped == len(rels); otherwise briefs ok as before; brief_test.go and new_test.go assert it"},
+    {"criterion": "`vloop plugin path` outside a vloop repository (no `.vloop/` found, whether or not in a git repository) prints exactly `vloop: not in a vloop repository — run vloop init first`, exits 1, and writes nothing anywhere; inside one it extracts and prints `.vloop/tmp/plugin/<version>` as before.", "met": true, "evidence": "internal/cli/plugin.go stats .vloop at root before ExtractPlugin; messages_test.go TestPluginPathOutsideVloopRepo asserts exit 1, exact stderr, empty stdout and no .vloop created; existing tests still pass inside a .vloop dir"},
+    {"criterion": "`vloop intervention show` prints a `schema: <schema>` line and an `options: <n>` line among the record's fields, and omits the `brief:` line when the record has no brief.", "met": true, "evidence": "internal/intervention/show.go Text() adds schema and options and guards brief; TestInterventionShowSchemaOptionsBrief asserts them"},
+    {"criterion": "`vloop intervention migrate --dry-run` prints each record it would migrate as a repo-relative path (`.vloop/interventions/<id>.md`), from any working directory in the repository, and writes nothing.", "met": true, "evidence": "internal/cli/intervention.go prints path.Join(intervention.Dir, n), a root-relative constant independent of cwd; TestInterventionMigrate asserts the path and unchanged file"},
+    {"criterion": "Tests pin each of these; the checks run them.", "met": true, "evidence": "Tests added or updated for all four; checks.json shows the go check exit 0"},
+    {"criterion": "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.", "met": true, "evidence": "All changed earlier tests (brief, new, e2e, plugin, b5, b7, intervention migrate) change only for the new contract, and each is listed in proposal notes with old and new expectation"}
+  ],
+  "findings": [],
+  "notes": "The dry-run path from a subdirectory is not tested directly, but the output is a constant prefix so it holds by construction."
+}

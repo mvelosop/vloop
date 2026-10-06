@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -24,6 +25,19 @@ func (g *Globals) root() (string, error) {
 		dir = wd
 	}
 	return config.Root(dir), nil
+}
+
+// gitRoot is root for a command that needs git: it refuses a directory that is
+// not inside a git repository in one line, instead of letting git's own error out.
+func (g *Globals) gitRoot() (string, error) {
+	root, err := g.root()
+	if err != nil {
+		return "", err
+	}
+	if err := exec.Command("git", "-C", root, "rev-parse", "--git-dir").Run(); err != nil {
+		return "", Problem(fmt.Errorf("%s is not a git repository", root))
+	}
+	return root, nil
 }
 
 // configErr maps config errors: bad source values are problems (exit 1), and
@@ -61,7 +75,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "list",
-		Short: "Print every key with its value and source",
+		Short: "List every key with its value and source",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			out := cmd.OutOrStdout()
@@ -97,7 +111,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "get <key>",
-		Short: "Print the resolved value of a key",
+		Short: "Show the resolved value of a key",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			out := cmd.OutOrStdout()
@@ -123,7 +137,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "set <key> <value>",
-		Short: "Write a key to .vloop/config.toml ('' removes it)",
+		Short: "Set one key in .vloop/config.toml: any key config list shows ('' removes it)",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()
@@ -136,7 +150,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "path",
-		Short: "Print the config file path, relative to the repo root",
+		Short: "Show the config file path, relative to the repo root",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			fmt.Fprintln(cmd.OutOrStdout(), config.FilePath)

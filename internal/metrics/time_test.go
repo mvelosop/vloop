@@ -298,3 +298,15 @@ func TestTimeChecksAndGateReview(t *testing.T) {
 		t.Errorf("no records should leave checks nil: %v", none.Time.ChecksMS)
 	}
 }
+
+func TestTasksDoneRevertedAndRedoneIsNotFirstPass(t *testing.T) {
+	m := &runs.Model{Folders: []runs.Folder{{Iterations: []runs.Iteration{
+		{Iteration: 1, Task: "T1", Outcome: "done"},
+		{Iteration: 2, Task: "T2", Outcome: "done"},
+		{Iteration: 3, Task: "T1", Outcome: "done"},
+	}}}}
+	plan := &runs.PlanDoc{Tasks: []runs.PlanTask{{ID: "T1", Status: "done"}, {ID: "T2", Status: "done"}}}
+	if got := CountTasks(m, plan, ""); got.FirstPass != 1 {
+		t.Errorf("first-pass = %d, want 1", got.FirstPass)
+	}
+}

@@ -1,0 +1,1 @@
+GATE FAIL: defect list fails on a CRLF and a BOM record: vloop: .vloop/defects/D20261005-1202-a-defect-saved-with-a-bom.md: missing frontmatter

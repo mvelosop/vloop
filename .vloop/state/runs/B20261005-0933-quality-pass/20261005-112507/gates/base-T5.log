@@ -1,0 +1,1 @@
+GATE FAIL: vloop task show T1 printed 'vloop: no plan: .vloop/state/state.json' on stderr, want exactly 'vloop: no plan — vloop run <brief> makes one'

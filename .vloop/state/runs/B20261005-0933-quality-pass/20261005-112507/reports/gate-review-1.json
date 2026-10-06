@@ -1,0 +1,34 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "FAIL",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []},
+    {"task": "T7", "verdict": "PASS", "findings": []},
+    {"task": "T8", "verdict": "PASS", "findings": []},
+    {"task": "T9", "verdict": "PASS", "findings": []},
+    {"task": "T10", "verdict": "PASS", "findings": []},
+    {"task": "T11", "verdict": "PASS", "findings": []},
+    {"task": "T12", "verdict": "PASS", "findings": []},
+    {"task": "T13", "verdict": "PASS", "findings": []},
+    {"task": "T14", "verdict": "PASS", "findings": []},
+    {
+      "task": "T15",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "its section() helper stops at the next heading of any level, so a 'What changed in 2.0' section written with ### subsections (as concepts.md does elsewhere, e.g. '### The stamped release build') is read as empty or truncated and fails the state/v2, gate review, intervention/v2, metrics/v2 and usage-only checks; the brief pins no such flat structure",
+          "kind": "pins-unnamed"
+        }
+      ]
+    },
+    {"task": "T16", "verdict": "PASS", "findings": []},
+    {"task": "T17", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Every gate was run on the base with vloop task gate and each fails at a behavioural assertion; I also re-ran each with fail() turned into a report to see every assertion, and found no wrong-reason, typo or unbuilt fixture past the first failure. Read back or matched against the pinned text: T3 (status lines 12/16/30 of brief.md), T6 (line 3, column 13), T10 (records.missing order T2/2 T1/1), T11 (first-pass 2/2 and convergence exit 2 versus the wanted 5), T12 (the stub claude), T15 (doctor prints checks and self-hosting in a fresh repository), T16 (link, table and heading matchers), T17 (the real-data comparison already passes base against v2.0.0-beta.2). T1 and T14 judge task-written tests or graders by design (brief Q1 and Q10), so no finding; T14 cannot judge operate-proposes-options beyond well-formedness. T8 asserts case-insensitive trust matching, which holds only on macOS or Windows hosts, the brief's stated gate host. No gate takes longer than 15 s (T1)."
+}
+

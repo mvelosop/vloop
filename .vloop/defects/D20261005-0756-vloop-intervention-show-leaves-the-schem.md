@@ -6,8 +6,8 @@ origin: work
 found-by: operator
 kind: bug
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261005-0933-quality-pass.loop-brief
 case: ""
 created: 2026-10-05T06:56:34Z
 ---
