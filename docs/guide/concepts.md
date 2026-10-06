@@ -120,9 +120,11 @@ keys are in [configuration.md](configuration.md#checks).
 
 ## What changed in 0.8
 
-0.8 follows 0.7. The `v1.0.0` and `v2.0.0*` tags in this repository's history
-were its numbering before it went public; `go.mod` retracts `v1.0.0`, and Go
-ignores the `v2` tags, so `go install …@latest` resolves to the 0.x line. The
+0.8 follows 0.7. Before the repository went public its releases were tagged
+`v1.0.0`, `v2.0.0-beta.1`, `v2.0.0-beta.2` and `v2.0.0` (commits `fc0b67a`,
+`42ee0a6`, `27871b2`, `d219473`); those tags were removed, and `go.mod` retracts
+`v1.0.0` in case a copy surfaces, so `go install …@latest` resolves to the 0.x
+line. Run records and PRs that name them are history. The
 `v2` in schema names (`state/v2`, `intervention/v2`, `metrics/v2`) is a format
 version, unrelated to the release number.
 
