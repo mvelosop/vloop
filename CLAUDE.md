@@ -48,7 +48,7 @@ Sessions started by the vloop loop (plan, gate review, work, review) follow thes
 
 In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules.
 
-Written by vloop 2.0.0.
+Written by vloop 0.8.0.
 <!-- vloop:end -->
 
 <!-- loop:begin -->

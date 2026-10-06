@@ -16,37 +16,24 @@ not every step.
 
 ## Install
 
-The repository is private, so install from a clone of the release tag, built
-stamped (`v2.0.0` is the current release):
-
 ```
-git clone https://github.com/mvelosop/vloop && cd vloop && git checkout v2.0.0
-go build -ldflags "-X main.version=2.0.0 -X main.commit=$(git rev-parse HEAD)" \
-  -o "$(go env GOPATH)/bin/vloop" ./cmd/vloop
+go install github.com/mvelosop/vloop/cmd/vloop@latest
 ```
 
-Or with `go install`, pointing Go at the private module and naming the tag's
-commit — the module path has no `/v2`, so `@v2.0.0` itself does not resolve, and
-this build reports its commit as unknown:
+The plugin ships inside the binary, and `vloop run` hands it to its own sessions.
+For an interactive Claude Code session with the plugin, install it from this
+repository's marketplace:
 
 ```
-export GOPRIVATE=github.com/mvelosop   # skip the public proxy and checksum database
-go install github.com/mvelosop/vloop/cmd/vloop@$(git ls-remote https://github.com/mvelosop/vloop refs/tags/v2.0.0^{} | cut -f1)
+claude plugin marketplace add mvelosop/vloop
+claude plugin install vloop@vloop
 ```
 
-Both need git access to the repository: `gh auth login` (HTTPS), or an SSH key
-with git's `url.<base>.insteadOf` mapping `https://github.com/` to
-`git@github.com:` in your user git config.
-
-The plugin ships inside the binary. With no marketplace while the repository is
-private, hand it to Claude Code with `--plugin-dir`, from inside a repository
-where you ran `vloop init`:
+or, without installing it, from inside a repository where you ran `vloop init`:
 
 ```
 claude --plugin-dir "$(vloop plugin path)"
 ```
-
-`vloop run` passes it to its own sessions for you.
 
 ## Quickstart
 
@@ -116,7 +103,7 @@ The plugin's five skills: `/vloop:plan`, `/vloop:gate-review`, `/vloop:work` and
 `/vloop:review` are the sessions `vloop run` starts; `/vloop:operate` is yours, to
 run, verify, close and merge a brief.
 
-## What changed in 2.0
+## What changed in 0.8
 
 - **A gate model.** A task's gate can carry fixtures; the gates are judged before
   any work starts, and `[[check]]` entries prove the repository still works.
@@ -126,4 +113,8 @@ run, verify, close and merge a brief.
 - **Metrics across repositories**: `--workspace` and `vloop metrics export`.
 - **Plain messages**: each error says what to do next, and the help is rewritten.
 
-The details are in [docs/guide/concepts.md](docs/guide/concepts.md#what-changed-in-20).
+The details are in [docs/guide/concepts.md](docs/guide/concepts.md#what-changed-in-08).
+
+## License
+
+MIT — see [LICENSE](LICENSE).

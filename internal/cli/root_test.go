@@ -27,7 +27,7 @@ func TestVersionJSON(t *testing.T) {
 	if err := json.Unmarshal([]byte(out), &m); err != nil {
 		t.Fatal(err)
 	}
-	want := map[string]string{"version": "1.2.3", "commit": "abc", "plugin": "2.0.0",
+	want := map[string]string{"version": "1.2.3", "commit": "abc", "plugin": "0.8.0",
 		"go": runtime.Version(), "os": runtime.GOOS, "arch": runtime.GOARCH}
 	for k, v := range want {
 		if m[k] != v {
@@ -50,7 +50,7 @@ func TestVersionJSON(t *testing.T) {
 
 func TestVersionText(t *testing.T) {
 	_, out, _ := run(t, "version")
-	want := "vloop 1.2.3 (commit abc, plugin 2.0.0, " + runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH + ")\n"
+	want := "vloop 1.2.3 (commit abc, plugin 0.8.0, " + runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH + ")\n"
 	if out != want {
 		t.Errorf("got %q, want %q", out, want)
 	}

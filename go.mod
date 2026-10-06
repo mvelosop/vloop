@@ -13,3 +13,7 @@ require (
 )
 
 require github.com/inconshreveable/mousetrap v1.1.0 // indirect
+
+// v1.0.0 (and the v2.0.0 tags, which Go ignores without a /v2 path) were the
+// numbering before the repository went public; this line continues as v0.8.0.
+retract v1.0.0
