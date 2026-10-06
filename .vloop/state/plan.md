@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **15/17 done** · iteration 23
+**Status:** running · **16/17 done** · iteration 24
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:38:48Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:44:50Z
 
 ## Progress
 
@@ -23,7 +23,7 @@
 - [x] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
 - [x] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges · 1 attempt(s)
 - [x] **T15** — Bring the guides and the domain's CLI conventions up to v2 · 1 attempt(s)
-- [ ] **T16** — Rewrite the README as a newcomer's page, last
+- [x] **T16** — Rewrite the README as a newcomer's page, last
 - [ ] **T17** — Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
 
 ## Tasks
@@ -385,7 +385,7 @@ sh .vloop/state/gates/T15/gate.sh
 
 ### T16 — Rewrite the README as a newcomer's page, last
 
-`pending` · depends on: T15
+`done` · depends on: T15
 
 A newcomer who reads the README today cannot install vloop or make a first run: it says running tasks is "next", names a marketplace that does not exist, and is mostly reference tables the generated guides now hold. This task rewrites it in the v1 review's outline updated for v2, after everything else, so it describes what this run built. No command table — docs/guide/commands.md is that.
 

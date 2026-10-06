@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 23,
+  "iteration": 24,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-06T08:38:48Z",
+  "updated": "2026-10-06T08:44:50Z",
   "shell": "sh",
   "checks": [
     {
@@ -557,7 +557,7 @@
         "Every relative link in README.md resolves."
       ],
       "verify": "sh .vloop/state/gates/T16/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
