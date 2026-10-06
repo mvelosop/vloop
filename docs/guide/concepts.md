@@ -203,10 +203,24 @@ the binary carries no commit. Build releases with the stamped build:
 go build -ldflags "-X main.version=<v> -X main.commit=<sha>" -o vloop ./cmd/vloop
 ```
 
-Release steps: set the version in `plugin.json`, tag the release commit
-(`v<v>`), then build with the tag's version and commit sha. A binary stamped
-with HEAD still draws the self-hosting warning; build the next vloop with a
-released one.
+Release steps, as vloop's own releases are made:
+
+1. **A release branch and PR** (`release/v<v>`) that sets the version in
+   `cmd/vloop/main.go` and `plugin/.claude-plugin/plugin.json`, and in the tests
+   that pin it (`cmd/vloop/e2e_test.go`, `cmd/vloop/run_harness_test.go`,
+   `internal/cli/root_test.go`). The full suite and `claude plugin validate` pass
+   before it merges.
+2. **Squash-merge** it to the default branch, with the operator's go-ahead.
+3. **Tag** the merge commit: `git tag -a v<v> -m "<what it carries>"`, then push
+   the tag. A version with a suffix (`2.0.0-beta.1`) is a pre-release; upgrading
+   to or from one needs `vloop upgrade --yes`.
+4. **Build stamped** with the tag's version and the merge commit's sha (the
+   command above) wherever the released vloop runs.
+5. **Upgrade the repository** with `vloop upgrade --yes` on its own branch, in its
+   own PR: it refreshes the install stamp and the `CLAUDE.md` section.
+
+A binary stamped with HEAD still draws the self-hosting warning; build the next
+vloop with a released one.
 
 ## Setting up a repository
 
