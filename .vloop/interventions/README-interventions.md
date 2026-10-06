@@ -89,6 +89,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | partly | recommended | [I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio](I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio.md) |
 | halt | repair | partly | other-option | [I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac](I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac.md) |
 | halt | repair | partly | recommended | [I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l](I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l.md) |
+| halt | repair | partly | recommended | [I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr](I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | halt | partly | no-options | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |

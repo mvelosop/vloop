@@ -40,7 +40,7 @@ VER=$("$B" version | awk '{ print $2; exit }')
 plugin() {
   printf '%s\n' "$1" >"$t/bin/plugins.out"; printf '%s' "$2" >"$t/bin/plugins.err"; echo "$3" >"$t/bin/plugins.code"
   (cd "$R" && "$B" doctor) >"$t/doctor.out" 2>&1
-  grep '^[^ ]* plugin ' "$t/doctor.out" | head -1
+  grep -E '^[^ ]* plugin( |$)' "$t/doctor.out" | head -1
 }
 
 line=$(plugin '[]' '' 0)
