@@ -153,10 +153,10 @@ run's grader verdicts; the HTML report shows the same per case and arm.
 
 ## The reviewer calibration
 
-The review cases are a port of the shell loop's reviewer calibration
+The review cases are a port of the legacy shell loop's reviewer calibration
 (`.loop/tests/reviewer-calibration/`). Two runs of the loop produced 21
 work/review pairs and no rejections: a reviewer with nothing to catch and one
 that cannot catch look the same. The calibration plants the defect instead. Its
 baseline is the bar: every case caught, `06-gate-rewrite` allowed to miss (its
 code is right and its violation purely structural; the driver restores a
-rewritten gate anyway). `RESULTS.md` there records the shell loop's scores.
+rewritten gate anyway). `RESULTS.md` there records the legacy shell loop's scores.

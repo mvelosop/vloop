@@ -15,7 +15,7 @@ and says why (see [Exit codes](#exit-codes)).
 
 ## Skills
 
-The plugin ships four skills. The first three are the sessions of the loop;
+The plugin ships five skills. The first four are the sessions of the loop;
 `vloop run` starts each one, you do not.
 
 - `/vloop:plan` reads the brief and its binding references and writes the plan
@@ -25,6 +25,9 @@ The plugin ships four skills. The first three are the sessions of the loop;
   references, does the task, runs its gate, and writes `proposal/v1`
   (`done`, or `blocked`, with a `gate_dispute` when the gate is wrong). It never
   commits or sets a status.
+- `/vloop:gate-review` judges every gate of a fresh plan before any work starts
+  and writes a `PASS` or `FAIL` verdict with findings (see [Gates and the gate
+  shell](#gates-and-the-gate-shell)).
 - `/vloop:review` reads the diff and the proposal and writes `verdict/v1`:
   `PASS` or `FAIL`, per-criterion evidence, and findings of kind `bug`,
   `spec-gap` or `gate-gap`. It fails closed.
@@ -59,7 +62,7 @@ nobody points at is a convention that gets broken.
 
 ## Plans and tasks
 
-The plan is `.vloop/state/state.json` (schema `state/v1`): a list of tasks, each
+The plan is `.vloop/state/state.json` (schema `state/v2`): a list of tasks, each
 with a goal, acceptance criteria, a `verify` command, its dependencies, its
 references and a status. The work session only proposes an outcome; the gate and
 the review decide. `vloop status` and `vloop task list` read the plan, and the
@@ -115,6 +118,22 @@ review, one attempt charged. When every task is done, all checks run once more
 in a final pass; a failure there ends the run blocked, exit 2. The fields and
 keys are in [configuration.md](configuration.md#checks).
 
+## What changed in 2.0
+
+- **The gate model.** The plan is `state/v2`: a task's gate may have a
+  gate folder of fixtures, stamped by the plan. Before any work the driver runs the
+  gates on the base and a gate review judges them; `[[check]]` entries prove
+  the repository still works after each iteration and at the end. See [Gates
+  and the gate shell](#gates-and-the-gate-shell).
+- **Interventions.** Records are `intervention/v2`, with options and a
+  recommendation; `vloop intervention migrate` converts older records.
+  `vloop metrics --interventions` reports agreement.
+- **Metrics.** `metrics/v2` documents; `--workspace` and `metrics export` read
+  across repositories. See [metrics.md](metrics.md).
+- **Exit codes.** Exit `2` now means usage only; every other failure,
+  including a failed plan session or a mid-run error, exits `1`. For `vloop run`
+  `2` stays blocked (R-3). See [Exit codes](#exit-codes).
+
 ## What is redacted
 
 Before anything is written under `.vloop/state/` (gate logs, session records,
@@ -130,15 +149,15 @@ the file path when there is one — never the command or the content.
 ## Exit codes
 
 Every vloop command exits `0` on success, `1` when it ran and found problems or
-failed, and `2` on a usage error (an unknown command, flag or config key, a
-missing argument, an invalid value). `vloop run` uses the same numbers and adds
-its own, one per way a run can end:
+failed, and `2` only on a usage error (an unknown command, flag or config key, a
+missing argument, an invalid value). `vloop run` uses the same numbers and
+adds its own, one per way a run can end:
 
 | Exit | Ending | Resumable as is |
 | --- | --- | --- |
 | `0` | complete: every task is done | — |
-| `1` | preflight or usage: a refusal before anything ran, or a plan that is not fit | after fixing the cause |
-| `2` | blocked: tasks remain but none can run (or the brief was not found) | no — a human decides |
+| `1` | problems or failure, including a failed plan session or a mid-run error | after fixing the cause |
+| `2` | usage; for `vloop run` also blocked: tasks remain but none can run (R-3) | no — a human decides |
 | `3` | stalled: iterations in a row closed nothing and charged no attempt | yes, once understood |
 | `4` | max iterations: `run.max-iterations` is spent | yes |
 | `5` | not converging: too many iterations per closed task | no |
@@ -148,7 +167,8 @@ its own, one per way a run can end:
 | `9` | refs or repository configuration moved: a session or a gate changed a ref, `.git/config` or the git hooks; nothing was committed | no — restore the refs first |
 
 Resuming is running `vloop run` again on the work branch. Errors go to stderr as
-one line starting with `vloop: `.
+one line starting with `vloop: `, after any checks `vloop doctor` or a preflight
+prints.
 
 ## Metrics and defects
 
@@ -203,18 +223,19 @@ rewrites the stamp. It refuses a repository set up by a newer vloop, and a
 breaking jump (a new major version, or a new minor while 0.x) or a pre-release
 needs `--yes`.
 
-`vloop doctor` checks the setup without writing anything: git, the stamp, the
-config, `claude`, workspace trust, the gate shell, the plan, the default branch,
-the plugin version and scoped stacks. It exits 1 on a problem.
+`vloop doctor` checks the setup without writing anything: git, the install stamp,
+the config, the `[[check]]` entries (`checks`), `claude`, workspace trust, the
+gate shell, the plan, the branch, the plugin and `self-hosting`. It exits 1 on a problem.
 
 The plugin ships inside the binary: `vloop plugin path` extracts it to
-`.vloop/tmp/plugin/<version>/`. To install it in Claude Code, from a session:
+`.vloop/tmp/plugin/<version>/`. `vloop run` hands it to its sessions with `--plugin-dir`; for an interactive
+session start Claude Code the same way:
 
 ```
-claude plugin marketplace add mvelosop/vloop
+claude --plugin-dir "$(vloop plugin path)"
 ```
 
-then install the plugin from that marketplace. `vloop version --check-plugin
+`vloop version --check-plugin
 <dir>` compares an installed plugin with the binary.
 
 ## The .vloop/ layout
@@ -229,7 +250,8 @@ vloop keeps its files under `.vloop/` in the repository root:
 - `.vloop/state/metrics/<run id>.json`: the metrics snapshot `brief close` freezes.
 - `.vloop/defects/`: one Markdown file per recorded defect.
 
-The shell loop's own state lives in `.loop/`; vloop only reads it.
+Legacy: the shell loop that built vloop's first briefs, in this repository only.
+Its state lives in `.loop/`; vloop only reads it.
 
 ## The flow
 

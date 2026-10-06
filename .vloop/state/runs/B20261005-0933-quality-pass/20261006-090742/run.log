@@ -8,3 +8,7 @@
    check go
    review: PASS
    T13 done
+── iteration 22 (3 this run) · T15 · 14/17 done ──
+   Bring the guides and the domain's CLI conventions up to v2
+   check go
+   review: FAIL

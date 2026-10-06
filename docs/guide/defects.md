@@ -29,7 +29,7 @@ recomputed on every call, so a later correction needs no migration:
   `kind: bug`, `found-by: gate`;
 - each `review_fail` / `rejected` iteration is one defect per finding in the
   verdict, `found-by: review`, `origin: work`. The `kind` comes from the finding;
-  it is `bug` for the shell loop's plain-string findings. A `spec-gap` finding is
+  it is `bug` for the legacy shell loop's plain-string findings. A `spec-gap` finding is
   `origin: brief` and a `gate-gap` finding `origin: plan`. An empty findings
   list is one defect;
 - an iteration whose gate failed and then passed on its immediate re-run

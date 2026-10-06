@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 21,
+  "iteration": 22,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-06T08:27:31Z",
+  "updated": "2026-10-06T08:33:36Z",
   "shell": "sh",
   "checks": [
     {
@@ -519,8 +519,8 @@
       ],
       "verify": "sh .vloop/state/gates/T15/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "metrics.md synopsis shows `--interventions kind`, but --interventions is a boolean flag and kind/phase belong to --by; it should read `--interventions [--by kind|phase]`; concepts.md's doctor check list omits `stacks`, which vloop doctor prints between plugin and self-hosting; The gate does not catch a wrong flag shape in the synopsis or an incomplete doctor list"
     },
     {
       "id": "T16",
