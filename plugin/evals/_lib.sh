@@ -198,20 +198,26 @@ PY
 
 commit_all() { git add -A && git commit -qm "$1"; }
 
-# A task file from the calibration lacks what state/v1 requires of a task; add
-# it, and wrap the task in a plan. $1 = task.json, $2 = kind, $3 = the brief.
+# A task file from the calibration lacks what state/v2 requires of a task; add
+# it, and wrap the task in a plan whose gate review passed and whose one check
+# always passes. $1 = task.json, $2 = kind, $3 = the brief.
 write_state() {
   python3 - "$1" "${2:-feature}" "${3:-docs/briefs/runstat-cli.md}" <<'PY'
 import json, subprocess, sys
 task = json.load(open(sys.argv[1]))
 task.setdefault("kind", sys.argv[2])
 task.setdefault("references", [])
+task.pop("files", None)
+task.setdefault("fixtures", "")
 task.update(status="pending", attempts=0, notes="")
 base = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-plan = {"schema": "state/v1", "run_id": "eval", "brief": sys.argv[3],
+plan = {"schema": "state/v2", "run_id": "eval", "brief": sys.argv[3],
         "base": base, "branch": "vloop/eval", "status": "running", "iteration": 1,
         "created": "2026-10-01T00:00:00Z", "updated": "2026-10-01T00:00:00Z",
-        "shell": "bash", "tasks": [task]}
+        "shell": "bash",
+        "checks": [{"name": "all", "paths": ["**"], "run": "true"}],
+        "gate_scratch": [], "gate_review": {"rounds": 1, "verdict": "PASS"},
+        "tasks": [task]}
 json.dump(plan, open(".vloop/state/state.json", "w"), indent=2)
 PY
 }
