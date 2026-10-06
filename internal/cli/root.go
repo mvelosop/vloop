@@ -142,8 +142,19 @@ func oneLine(s string) string {
 func NewRoot(b Build) (*cobra.Command, *Globals) {
 	g := &Globals{}
 	root := &cobra.Command{
-		Use:           "vloop",
-		Short:         "Plan, run and review autonomous Claude loops",
+		Use:   "vloop",
+		Short: "Plan, run and review autonomous Claude loops",
+		Long: `vloop packages an autonomous loop for Claude Code. A brief is a markdown file in
+docs/briefs/ that says what to build, what is out of scope and how to know it
+is done; it is the unit of work.
+
+The loop, in three sentences: vloop run plans the brief into tasks, each with a
+gate (a verify command). For each task a fresh work session does the task, the
+gate runs, an independent review session judges it, and the driver makes one
+commit. The run ends when every task is done or something needs a human; run it
+again on the work branch to resume.
+
+Start with vloop init in your repository, then vloop brief new to draft a brief.`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRunE: func(*cobra.Command, []string) error {

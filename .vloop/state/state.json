@@ -5,9 +5,9 @@
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
   "status": "running",
-  "iteration": 20,
+  "iteration": 21,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-06T08:13:44Z",
+  "updated": "2026-10-06T08:27:31Z",
   "shell": "sh",
   "checks": [
     {
@@ -443,7 +443,7 @@
         "No command, flag or behaviour is added or removed; only help text changes."
       ],
       "verify": "sh .vloop/state/gates/T13/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -75,7 +75,7 @@ func newTaskAmend(g *Globals) []*cobra.Command {
 	}
 	set := &cobra.Command{
 		Use:   "set <id> <field> <value>",
-		Short: "Set (or with '' clear) " + strings.Join(settableFields, ", "),
+		Short: "Set or clear one field of a task: " + strings.Join(settableFields, ", "),
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, field, value := args[0], args[1], args[2]

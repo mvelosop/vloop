@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T13",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Shorts: `run` is \"Plan a brief and work it, task by task, on a work branch\"; `brief` is \"Write, check, list and close loop briefs\"; `task` is \"Show, amend, gate and reset the plan's tasks\".", "met": true, "evidence": "internal/cli/run.go:33, brief.go:21, task.go:70 carry the exact strings"},
+    {"criterion": "Every `list` subcommand's Short begins \"List \", every `show` subcommand's Short begins \"Show \", other Shorts that print one thing or a report use \"Show\" consistently, and every `set` Short names its settable fields as a sentence.", "met": true, "evidence": "config/defect/intervention/schema/task list and show Shorts changed; config get/path, metrics stacks, version now Show; the three set Shorts and task set read 'Set one field of ...: <fields>'. export still says 'Print ... as JSON Lines', a stream rather than a report; left as is."},
+    {"criterion": "The root's Long says what a brief is, gives the loop in three sentences and says where to start (`vloop init`, `vloop brief new`).", "met": true, "evidence": "internal/cli/root.go Long: brief definition, three-sentence loop, 'Start with vloop init ... then vloop brief new'"},
+    {"criterion": "`run`'s Long says how the brief is chosen, what a run does, how to resume, and gives the exit codes with where they are documented (docs/guide/concepts.md).", "met": true, "evidence": "internal/cli/run.go Long covers brief choice, run steps, resume/--replan, exit codes 0-9 matching the table in docs/guide/concepts.md:137-148 and linking #exit-codes"},
+    {"criterion": "`brief`, `task`, `metrics`, `defect` and `intervention` have Long help saying what the group is for and its common flow.", "met": true, "evidence": "Long added in brief.go, task.go, metrics.go, defect.go, intervention.go"},
+    {"criterion": "docs/guide/commands.md is regenerated from the tree and committed; the tests that pin Shorts or help text are updated to the new text.", "met": true, "evidence": "docs/guide/commands.md modified in the diff; go check exit 0 (checks.json), so the staleness test and existing tests pass; no test pinned the old text"},
+    {"criterion": "No command, flag or behaviour is added or removed; only help text changes.", "met": true, "evidence": "diff of internal/cli touches only Short/Long strings and formatting"}
+  ],
+  "findings": [],
+  "notes": "No test was added for the new Long texts; the gate script and the generated-docs staleness test cover them."
+}

@@ -22,7 +22,7 @@ func newSchema(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "list",
-		Short: "Print the schema names",
+		Short: "List the schema names",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			out := cmd.OutOrStdout()
@@ -39,7 +39,7 @@ func newSchema(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "show <name>",
-		Short: "Print a schema document",
+		Short: "Show a schema document",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			doc, err := schema.Document(args[0])

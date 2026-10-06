@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **13/17 done** · iteration 20
+**Status:** running · **14/17 done** · iteration 21
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:13:44Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:27:31Z
 
 ## Progress
 
@@ -20,7 +20,7 @@
 - [x] **T10** — Name new run folders in UTC and order existing ones by their records' timestamps
 - [x] **T11** — Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes · 1 attempt(s)
 - [x] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
-- [ ] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
+- [x] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
 - [x] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges · 1 attempt(s)
 - [ ] **T15** — Bring the guides and the domain's CLI conventions up to v2
 - [ ] **T16** — Rewrite the README as a newcomer's page, last
@@ -313,7 +313,7 @@ sh .vloop/state/gates/T12/gate.sh
 
 ### T13 — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
 
-`pending` · depends on: T5, T6, T7, T12
+`done` · depends on: T5, T6, T7, T12
 
 The help still describes earlier briefs (`run` "…and commit the plan", `brief` "Check loop briefs", `task` "Inspect the plan's tasks"), mixes Print, Show and List for the same kind of command, and has no Long text: the root help does not say what a brief is or where to start, and `run --help` does not say how the brief is chosen or how to resume. This task fixes the Shorts and verbs, adds Long help where the brief lists it, and regenerates docs/guide/commands.md. It runs after the message and exit-code tasks so the help describes what they built.
 

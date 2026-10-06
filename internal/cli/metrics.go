@@ -24,7 +24,12 @@ func newMetrics(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "metrics [<brief>…]",
 		Short: "Summarise what a brief cost and delivered, from its runs and commits",
-		Args:  cobra.ArbitraryArgs,
+		Long: `Report what a brief's loop produced, what it cost and how long it took, from
+its runs and commits. Name briefs to report on them, or none for all of them.
+vloop metrics classify shows how paths are classified, vloop metrics stacks the
+built-in stack presets, and vloop metrics export prints everything as JSON
+Lines.`,
+		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if interventions {
 				if by != "" && by != "kind" && by != "phase" {
@@ -132,7 +137,7 @@ func allReports(root string, c *classify.Classifier) ([]*metrics.Report, error) 
 func newMetricsStacks(g *Globals) *cobra.Command {
 	return &cobra.Command{
 		Use:   "stacks [name]",
-		Short: "Print the built-in stack presets",
+		Short: "Show the built-in stack presets",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			out := cmd.OutOrStdout()

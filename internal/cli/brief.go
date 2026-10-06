@@ -18,9 +18,13 @@ import (
 func newBrief(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "brief",
-		Short: "Check loop briefs",
-		Args:  cobra.NoArgs,
-		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+		Short: "Write, check, list and close loop briefs",
+		Long: `A brief says what a run builds. Write one with vloop brief new, check that it
+is fit to plan with vloop brief check, see the briefs in dependency order with
+vloop brief list, run one with vloop run, and when the run is done record its
+findings and mark it consumed with vloop brief close.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
 	cmd.AddCommand(&cobra.Command{
 		Use:   "check <path>...",

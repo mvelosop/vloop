@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T13",
+  "outcome": "done",
+  "summary": "Shorts now describe the current commands with consistent List/Show verbs and set Shorts naming their fields; root, run, brief, task, metrics, defect and intervention have Long help; docs/guide/commands.md regenerated.",
+  "files": ["internal/cli/root.go", "internal/cli/run.go", "internal/cli/brief.go", "internal/cli/task.go", "internal/cli/task_amend.go", "internal/cli/metrics.go", "internal/cli/defect.go", "internal/cli/intervention.go", "internal/cli/config.go", "internal/cli/schema.go", "internal/cli/version.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T13 exited 0 and printed ok; go vet, gofmt and go test ./internal/cli ./cmd/gendocs pass under env -i.",
+  "notes": "No test pinned the changed Shorts, so no test changed. Verbs: list commands say List, show commands say Show, version/config get/config path/metrics stacks say Show. Run go test under env -i inside a loop session: inherited VLOOP_* vars make ./internal/cli gate tests fail."
+}

@@ -15,7 +15,7 @@ These work on every command.
 
 ## vloop brief
 
-Check loop briefs
+Write, check, list and close loop briefs
 
 ```
 vloop brief
@@ -70,7 +70,7 @@ vloop config
 
 ## vloop config get
 
-Print the resolved value of a key
+Show the resolved value of a key
 
 ```
 vloop config get <key>
@@ -78,7 +78,7 @@ vloop config get <key>
 
 ## vloop config list
 
-Print every key with its value and source
+List every key with its value and source
 
 ```
 vloop config list
@@ -86,7 +86,7 @@ vloop config list
 
 ## vloop config path
 
-Print the config file path, relative to the repo root
+Show the config file path, relative to the repo root
 
 ```
 vloop config path
@@ -127,7 +127,7 @@ vloop defect add "<summary>" [flags]
 
 ## vloop defect list
 
-Print the recorded defects, or with --matrix the origin × catcher counts
+List the recorded defects, or with --matrix the origin × catcher counts
 
 ```
 vloop defect list [flags]
@@ -138,7 +138,7 @@ vloop defect list [flags]
 
 ## vloop defect set
 
-Set status, fixed-by, case, severity, origin, kind, task of a defect
+Set one field of a defect: status, fixed-by, case, severity, origin, kind, task
 
 ```
 vloop defect set <id> <field> <value>
@@ -199,7 +199,7 @@ vloop intervention add "<summary>" [flags]
 
 ## vloop intervention list
 
-Print the recorded interventions by phase, kind and id
+List the recorded interventions by phase, kind and id
 
 ```
 vloop intervention list [flags]
@@ -219,7 +219,7 @@ vloop intervention migrate [flags]
 
 ## vloop intervention set
 
-Set brief, phase, kind, automatable, by, occurred, recommended, decided, adjusted of an intervention
+Set one field of an intervention: brief, phase, kind, automatable, by, occurred, recommended, decided, adjusted
 
 ```
 vloop intervention set <id> <field> <value>
@@ -227,7 +227,7 @@ vloop intervention set <id> <field> <value>
 
 ## vloop intervention show
 
-Print an intervention and resolve the ids named in its Context
+Show an intervention and resolve the ids named in its Context
 
 ```
 vloop intervention show <id>
@@ -265,7 +265,7 @@ vloop metrics export [<brief>…] [flags]
 
 ## vloop metrics stacks
 
-Print the built-in stack presets
+Show the built-in stack presets
 
 ```
 vloop metrics stacks [name]
@@ -289,7 +289,7 @@ vloop plugin path
 
 ## vloop run
 
-Plan a brief into tasks, on a work branch, and commit the plan
+Plan a brief and work it, task by task, on a work branch
 
 ```
 vloop run [<brief>] [flags]
@@ -312,7 +312,7 @@ vloop schema
 
 ## vloop schema list
 
-Print the schema names
+List the schema names
 
 ```
 vloop schema list
@@ -320,7 +320,7 @@ vloop schema list
 
 ## vloop schema show
 
-Print a schema document
+Show a schema document
 
 ```
 vloop schema show <name>
@@ -346,7 +346,7 @@ vloop status [flags]
 
 ## vloop task
 
-Inspect the plan's tasks
+Show, amend, gate and reset the plan's tasks
 
 ```
 vloop task
@@ -370,7 +370,7 @@ vloop task gate <id>
 
 ## vloop task list
 
-Print one line per task
+List the plan's tasks, one line each
 
 ```
 vloop task list
@@ -394,7 +394,7 @@ vloop task reset <id>
 
 ## vloop task set
 
-Set (or with '' clear) area, kind, model.work, model.review, effort.work, effort.review
+Set or clear one field of a task: area, kind, model.work, model.review, effort.work, effort.review
 
 ```
 vloop task set <id> <field> <value>
@@ -402,7 +402,7 @@ vloop task set <id> <field> <value>
 
 ## vloop task show
 
-Print a task with the model and effort its sessions resolve to
+Show a task with the model and effort its sessions resolve to
 
 ```
 vloop task show <id>
@@ -439,7 +439,7 @@ vloop upgrade [flags]
 
 ## vloop version
 
-Print the vloop and embedded plugin versions
+Show the vloop and embedded plugin versions
 
 ```
 vloop version [flags]

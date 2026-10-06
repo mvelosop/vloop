@@ -3,3 +3,8 @@
    check go
    review: PASS
    T12 done
+── iteration 21 (2 this run) · T13 · 13/17 done ──
+   Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
+   check go
+   review: PASS
+   T13 done

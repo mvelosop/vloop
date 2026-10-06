@@ -18,8 +18,12 @@ func newIntervention(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "intervention",
 		Short: "Record, list and update operator interventions",
-		Args:  cobra.NoArgs,
-		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+		Long: `An intervention is something the operator had to do by hand during a run:
+amend a gate, reset a task, decide a halt. Record one with vloop intervention
+add, list them with vloop intervention list, show one with vloop intervention
+show and update one with vloop intervention set.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
 	cmd.AddCommand(newInterventionAdd(g), newInterventionList(g), newInterventionSet(g), newInterventionMigrate(g), newInterventionShow(g))
 	return cmd
@@ -87,7 +91,7 @@ func newInterventionList(g *Globals) *cobra.Command {
 	var brief string
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "Print the recorded interventions by phase, kind and id",
+		Short: "List the recorded interventions by phase, kind and id",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			root, err := g.root()
@@ -115,7 +119,7 @@ func newInterventionList(g *Globals) *cobra.Command {
 func newInterventionSet(g *Globals) *cobra.Command {
 	return &cobra.Command{
 		Use:   "set <id> <field> <value>",
-		Short: "Set " + strings.Join(intervention.SetFields, ", ") + " of an intervention",
+		Short: "Set one field of an intervention: " + strings.Join(intervention.SetFields, ", "),
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()
@@ -172,7 +176,7 @@ func newInterventionMigrate(g *Globals) *cobra.Command {
 func newInterventionShow(g *Globals) *cobra.Command {
 	return &cobra.Command{
 		Use:   "show <id>",
-		Short: "Print an intervention and resolve the ids named in its Context",
+		Short: "Show an intervention and resolve the ids named in its Context",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()

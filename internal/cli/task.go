@@ -67,14 +67,19 @@ func effortText(r resolvedSession) string {
 func newTask(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "task",
-		Short: "Inspect the plan's tasks",
-		Args:  cobra.NoArgs,
-		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+		Short: "Show, amend, gate and reset the plan's tasks",
+		Long: `The plan is the task list vloop run works from. List it with vloop task list,
+show one task with vloop task show, and check the plan's structure with vloop
+task validate. When a run halts, the operator can amend the plan: reset a task,
+replace its notes, drop it, set its fields, or record a change to its gate with
+vloop task verify. vloop task gate runs a task's verify command.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "list",
-		Short: "Print one line per task",
+		Short: "List the plan's tasks, one line each",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			out := cmd.OutOrStdout()
@@ -92,7 +97,7 @@ func newTask(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "show <id>",
-		Short: "Print a task with the model and effort its sessions resolve to",
+		Short: "Show a task with the model and effort its sessions resolve to",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			out := cmd.OutOrStdout()

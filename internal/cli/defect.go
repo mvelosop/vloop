@@ -22,8 +22,12 @@ func newDefect(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "defect",
 		Short: "Record, list and update defects the loop cannot see",
-		Args:  cobra.NoArgs,
-		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+		Long: `A defect is a problem the loop did not catch itself: found by the operator after
+a task was marked done. Record one with vloop defect add, list them (or the
+origin by catcher matrix) with vloop defect list, and update one as it is fixed
+with vloop defect set.`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}
 	cmd.AddCommand(newDefectAdd(g), newDefectList(g), newDefectSet(g))
 	return cmd
@@ -122,7 +126,7 @@ func newDefectList(g *Globals) *cobra.Command {
 	var matrix bool
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "Print the recorded defects, or with --matrix the origin × catcher counts",
+		Short: "List the recorded defects, or with --matrix the origin × catcher counts",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			root, err := g.root()
@@ -214,7 +218,7 @@ func defectMatrix(root, brief string) (metrics.Matrix, error) {
 func newDefectSet(g *Globals) *cobra.Command {
 	return &cobra.Command{
 		Use:   "set <id> <field> <value>",
-		Short: "Set " + strings.Join(defect.SetFields, ", ") + " of a defect",
+		Short: "Set one field of a defect: " + strings.Join(defect.SetFields, ", "),
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()

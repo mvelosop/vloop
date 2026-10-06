@@ -75,7 +75,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "list",
-		Short: "Print every key with its value and source",
+		Short: "List every key with its value and source",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			out := cmd.OutOrStdout()
@@ -111,7 +111,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "get <key>",
-		Short: "Print the resolved value of a key",
+		Short: "Show the resolved value of a key",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			out := cmd.OutOrStdout()
@@ -150,7 +150,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "path",
-		Short: "Print the config file path, relative to the repo root",
+		Short: "Show the config file path, relative to the repo root",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			fmt.Fprintln(cmd.OutOrStdout(), config.FilePath)
