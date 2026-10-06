@@ -124,7 +124,7 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 	if r.code != 0 || r.err != "" {
 		t.Fatalf("version: %+v", r)
 	}
-	want := `{"version":"2.0.0","commit":"unknown","plugin":"2.0.0","go":"` + runtime.Version() +
+	want := `{"version":"0.8.0","commit":"unknown","plugin":"0.8.0","go":"` + runtime.Version() +
 		`","os":"` + runtime.GOOS + `","arch":"` + runtime.GOARCH + `"}` + "\n"
 	if r.out != want {
 		t.Fatalf("version --json = %q, want %q", r.out, want)

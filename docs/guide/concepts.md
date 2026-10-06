@@ -118,7 +118,13 @@ review, one attempt charged. When every task is done, all checks run once more
 in a final pass; a failure there ends the run blocked, exit 2. The fields and
 keys are in [configuration.md](configuration.md#checks).
 
-## What changed in 2.0
+## What changed in 0.8
+
+0.8 follows 0.7. The `v1.0.0` and `v2.0.0*` tags in this repository's history
+were its numbering before it went public; `go.mod` retracts `v1.0.0`, and Go
+ignores the `v2` tags, so `go install …@latest` resolves to the 0.x line. The
+`v2` in schema names (`state/v2`, `intervention/v2`, `metrics/v2`) is a format
+version, unrelated to the release number.
 
 - **The gate model.** The plan is `state/v2`: a task's gate may have a
   gate folder of fixtures, stamped by the plan. Before any work the driver runs the
@@ -212,13 +218,13 @@ Release steps, as vloop's own releases are made:
    before it merges.
 2. **Squash-merge** it to the default branch, with the operator's go-ahead.
 3. **Tag** the merge commit: `git tag -a v<v> -m "<what it carries>"`, then push
-   the tag. A version with a suffix (`2.0.0-beta.1`) is a pre-release; upgrading
+   the tag. A version with a suffix (`0.9.0-beta.1`) is a pre-release; upgrading
    to or from one needs `vloop upgrade --yes`.
 4. **Build stamped** with the tag's version and the merge commit's sha (the
    command above) wherever the released vloop runs.
 5. **Upgrade the repository** with `vloop upgrade --yes` on its own branch, in its
-   own PR: it refreshes the install stamp and the `CLAUDE.md` section. The same
-   PR points the README's Install section at the new tag.
+   own PR: it refreshes the install stamp and the `CLAUDE.md` section. The README
+   installs `@latest`, so it needs no change.
 
 A binary stamped with HEAD still draws the self-hosting warning; build the next
 vloop with a released one.
