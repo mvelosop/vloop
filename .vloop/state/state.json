@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261005-0933-quality-pass.loop-brief.md",
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
-  "status": "running",
+  "status": "complete",
   "iteration": 25,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-06T08:50:44Z",
+  "updated": "2026-10-06T08:53:47Z",
   "shell": "sh",
   "checks": [
     {
