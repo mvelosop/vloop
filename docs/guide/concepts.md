@@ -217,7 +217,8 @@ Release steps, as vloop's own releases are made:
 4. **Build stamped** with the tag's version and the merge commit's sha (the
    command above) wherever the released vloop runs.
 5. **Upgrade the repository** with `vloop upgrade --yes` on its own branch, in its
-   own PR: it refreshes the install stamp and the `CLAUDE.md` section.
+   own PR: it refreshes the install stamp and the `CLAUDE.md` section. The same
+   PR points the README's Install section at the new tag.
 
 A binary stamped with HEAD still draws the self-hosting warning; build the next
 vloop with a released one.
@@ -243,8 +244,10 @@ gate shell, the plan, the branch, the plugin, the scoped `stacks` (printed only
 when `metrics.stacks` has scoped entries) and `self-hosting`. It exits 1 on a problem.
 
 The plugin ships inside the binary: `vloop plugin path` extracts it to
-`.vloop/tmp/plugin/<version>/`. `vloop run` hands it to its sessions with `--plugin-dir`; for an interactive
-session start Claude Code the same way:
+`.vloop/tmp/plugin/<version>/`, and refuses outside a repository where `vloop
+init` ran. `vloop run` hands it to its sessions with `--plugin-dir`; for an
+interactive session, from inside such a repository, start Claude Code the same
+way:
 
 ```
 claude --plugin-dir "$(vloop plugin path)"
