@@ -1,0 +1,18 @@
+{
+  "schema": "verdict/v1",
+  "task": "T15",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "concepts.md's exit-code table states 1 as \"problems or failure, including a failed plan session or a mid-run error\" and 2 as \"usage\" (and, for vloop run, still \"blocked\", R-3); the general sentence above it says 2 is usage only.", "met": true, "evidence": "docs/guide/concepts.md lines 151-160: sentence says 2 only on a usage error; table rows 1 and 2 as required"},
+    {"criterion": "concepts.md has a \"What changed in 2.0\" section covering the gate model (state/v2, gate folders, the gate review, [[check]]), intervention/v2 and `vloop intervention migrate`, metrics/v2, and Q2's exit-code change with its table.", "met": true, "evidence": "concepts.md lines 121-135 cover all four bullets and link to the Exit codes table"},
+    {"criterion": "concepts.md's doctor paragraph lists the checks in the order `vloop doctor` prints them, including `checks` and `self-hosting`; its Skills section says the plugin ships five skills and names all five, /vloop:gate-review included.", "met": true, "evidence": "diff adds `stacks` between plugin and self-hosting, matching the doctor output order; line 18 says five skills; /vloop:gate-review is listed"},
+    {"criterion": "concepts.md's plugin install text no longer tells a reader to add a marketplace that does not exist; it gives the --plugin-dir way, matching T12's doctor message.", "met": true, "evidence": "concepts.md line 236 gives claude --plugin-dir \"$(vloop plugin path)\"; grep for marketplace finds nothing"},
+    {"criterion": "configuration.md says a key's environment name is `VLOOP_` and the key upper-cased with `.` and `-` turned into `_`.", "met": true, "evidence": "configuration.md line 14"},
+    {"criterion": "metrics.md's synopsis shows --workspace, --interventions and `vloop metrics export`, and its messages match T5's.", "met": true, "evidence": "metrics.md lines 9-13; --interventions is now a boolean with a separate --by kind|phase"},
+    {"criterion": "Every shell-loop reference in the guides is kept and marked \"legacy: the shell loop that built vloop's first briefs, in this repository only\" (the full phrase at least once, \"legacy\" on each mention).", "met": true, "evidence": "concepts.md line 254 and metrics.md line 28 carry the full phrase; the other mentions in metrics.md, evals.md and defects.md say legacy"},
+    {"criterion": "docs/domain/platform/platform-context.md's CLI conventions read: exit `0` ok, `1` problems or failure, `2` usage only; a refusal is one stderr line starting `vloop: `, after any checks `doctor` or a preflight prints. Nothing else in the domain changes.", "met": true, "evidence": "platform-context.md lines 48-50 match the required text; the diff touches no other domain file"},
+    {"criterion": "The guide tests (internal/cli guide and README completeness tests) pass, updated only where the text they pin changed.", "met": true, "evidence": "the go check exited 0 (checks.json) and the gate passes; no test file in the diff"}
+  ],
+  "findings": [],
+  "notes": "The retry fixed both items from the earlier notes (the --interventions flag shape and the missing `stacks` in the doctor list). Not covered by the diff: concepts.md says the plugin ships five skills and calls the first four the loop's sessions. That wording is fine, but it is not checked mechanically. The line in platform-context.md is long; this is cosmetic only."
+}

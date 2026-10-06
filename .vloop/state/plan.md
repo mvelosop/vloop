@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **14/17 done** · iteration 22
+**Status:** running · **15/17 done** · iteration 23
 
-**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:33:36Z
+**Brief:** `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` · **Updated:** 2026-10-06T08:38:48Z
 
 ## Progress
 
@@ -22,7 +22,7 @@
 - [x] **T12** — Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
 - [x] **T13** — Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference
 - [x] **T14** — Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges · 1 attempt(s)
-- [ ] **T15** — Bring the guides and the domain's CLI conventions up to v2 · 1 attempt(s)
+- [x] **T15** — Bring the guides and the domain's CLI conventions up to v2 · 1 attempt(s)
 - [ ] **T16** — Rewrite the README as a newcomer's page, last
 - [ ] **T17** — Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2
 
@@ -359,7 +359,7 @@ sh .vloop/state/gates/T14/gate.sh
 
 ### T15 — Bring the guides and the domain's CLI conventions up to v2
 
-`pending` · 1 attempt(s) · depends on: T4, T12, T13
+`done` · 1 attempt(s) · depends on: T4, T12, T13
 
 The guides still describe v1 in places: the exit-code table says 1 is only a refusal before anything ran, configuration.md omits that `-` becomes `_` in environment names, metrics.md's synopsis lacks --workspace, --interventions and metrics export, the doctor check list misses checks and self-hosting, the skills list says four, and shell-loop references read as if every repository had one. There is also no account of what changed in 2.0, including T4's exit-code change. This task fixes the guides and updates the domain's CLI conventions to the qualified one-line rule.
 
@@ -374,8 +374,6 @@ The guides still describe v1 in places: the exit-code table says 1 is only a ref
 - Every shell-loop reference in the guides is kept and marked "legacy: the shell loop that built vloop's first briefs, in this repository only" (the full phrase at least once, "legacy" on each mention).
 - docs/domain/platform/platform-context.md's CLI conventions read: exit `0` ok, `1` problems or failure, `2` usage only; a refusal is one stderr line starting `vloop: `, after any checks `doctor` or a preflight prints. Nothing else in the domain changes.
 - The guide tests (internal/cli guide and README completeness tests) pass, updated only where the text they pin changed.
-
-**From the last attempt:** metrics.md synopsis shows `--interventions kind`, but --interventions is a boolean flag and kind/phase belong to --by; it should read `--interventions [--by kind|phase]`; concepts.md's doctor check list omits `stacks`, which vloop doctor prints between plugin and self-hosting; The gate does not catch a wrong flag shape in the synopsis or an incomplete doctor list
 
 <details><summary>verify command</summary>
 

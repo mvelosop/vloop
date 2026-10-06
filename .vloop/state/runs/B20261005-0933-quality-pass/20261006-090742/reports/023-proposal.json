@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T15",
+  "outcome": "done",
+  "summary": "Fixed the two review findings on the earlier v2 guide update: metrics.md's synopsis now reads `[--interventions] [--by kind|phase]`, and concepts.md's doctor paragraph lists `stacks` between plugin and self-hosting.",
+  "files": ["docs/guide/metrics.md", "docs/guide/concepts.md"],
+  "verified": "vloop task gate T15 exited 0 and printed gate T15: ok.",
+  "notes": "The rest of the T15 edits (exit-code table, What changed in 2.0, skills, env names, legacy marks, platform-context) were committed by the earlier attempt and the review accepted them. doctor prints stacks only when metrics.stacks has scoped entries. The gate does not check the synopsis flag shape or the stacks check. Run go test under env -i inside a loop session: inherited VLOOP_* vars make ./internal/cli gate tests fail."
+}

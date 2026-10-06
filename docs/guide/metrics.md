@@ -6,7 +6,7 @@ the run folders, git, the plan stored in git and the defect files. Defects are
 explained in [defects.md](defects.md).
 
 ```
-vloop metrics [<brief>…] [--by task] [--interventions kind] [--json]
+vloop metrics [<brief>…] [--by task] [--interventions] [--by kind|phase] [--json]
 vloop metrics --workspace <file> [--json]
 vloop metrics export
 vloop metrics stacks [name]

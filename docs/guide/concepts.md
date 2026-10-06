@@ -225,7 +225,8 @@ needs `--yes`.
 
 `vloop doctor` checks the setup without writing anything: git, the install stamp,
 the config, the `[[check]]` entries (`checks`), `claude`, workspace trust, the
-gate shell, the plan, the branch, the plugin and `self-hosting`. It exits 1 on a problem.
+gate shell, the plan, the branch, the plugin, the scoped `stacks` (printed only
+when `metrics.stacks` has scoped entries) and `self-hosting`. It exits 1 on a problem.
 
 The plugin ships inside the binary: `vloop plugin path` extracts it to
 `.vloop/tmp/plugin/<version>/`. `vloop run` hands it to its sessions with `--plugin-dir`; for an interactive
