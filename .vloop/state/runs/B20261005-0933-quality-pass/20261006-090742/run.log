@@ -1,0 +1,5 @@
+── iteration 20 (1 this run) · T12 · 12/17 done ──
+   Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude
+   check go
+   review: PASS
+   T12 done

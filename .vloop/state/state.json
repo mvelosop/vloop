@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261005-0933-quality-pass.loop-brief.md",
   "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
   "branch": "B20261005-0933-quality-pass",
-  "status": "blocked",
-  "iteration": 19,
+  "status": "running",
+  "iteration": 20,
   "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-06T08:07:20Z",
+  "updated": "2026-10-06T08:13:44Z",
   "shell": "sh",
   "checks": [
     {
@@ -394,9 +394,9 @@
         "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now."
       ],
       "verify": "sh .vloop/state/gates/T12/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
-      "notes": "gate disputed: The gate's plugin() helper greps '^[^ ]* plugin ' with a trailing space, so it cannot match a passing check with an empty message, which is how doctor prints every other message-less pass. — The last clause runs plugin with an enabled vloop plugin of the binary's version; doctor prints '✓ plugin' and the grep returns '' ('does not pass: '''). The acceptance requires only that this case passes, not that it carries a message.",
+      "notes": "",
       "gate_history": [
         {
           "verify": "sh .vloop/state/gates/T12/gate.sh",

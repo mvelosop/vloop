@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T12",
+  "outcome": "done",
+  "summary": "Doctor's plugin check passes with the --plugin-dir hint when no vloop plugin is installed, warns 'installed but disabled — claude plugin enable vloop@vloop' for a disabled one, and warns with the stderr/exit/parse error when claude plugin list fails. An enabled plugin of the binary's version passes; another version keeps its mismatch warning.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go"],
+  "verified": "vloop task gate T12 exited 0 and printed gate T12: ok; go test ./internal/cli/ ok under env -i.",
+  "notes": "Implementation was written in the earlier attempt and is already committed; this attempt re-verified it after the operator fixed the gate's grep. Changed existing test: TestDoctorPlugin expected `[]` (no plugin) -> warning, now pass (contract change). TestDoctor's '✓ plugin\\n' expectation unchanged. Added TestDoctorPluginMessages and a pluginErr field in the fake claude. Run go test under env -i inside a loop session: inherited VLOOP_* vars make ./internal/cli fail."
+}

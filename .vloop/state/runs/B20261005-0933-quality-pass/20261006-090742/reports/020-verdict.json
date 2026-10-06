@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T12",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "With no vloop marketplace plugin installed, doctor's plugin check passes with exactly `the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir \"$(vloop plugin path)\"`.", "met": true, "evidence": "internal/cli/doctor.go:379 returns resPass with that exact text; doctor_test.go:297 asserts the message for `[]`"},
+    {"criterion": "A vloop plugin that is installed but disabled is a warning: `installed but disabled — claude plugin enable vloop@vloop`.", "met": true, "evidence": "doctor.go:377; doctor_test.go:298 asserts the exact message and a warning"},
+    {"criterion": "When `claude plugin list --json` fails or prints something that is not its JSON, the check is a warning that names the error (the command's stderr or exit status, or the parse error) instead of a fixed text.", "met": true, "evidence": "doctor.go:359 returns a warning built from err; doctor_test.go:307-318 covers a failing list (stderr named) and garbage output (parse error named)"},
+    {"criterion": "An enabled vloop plugin of the binary's version passes, and one of another version keeps its version-mismatch warning.", "met": true, "evidence": "doctor.go:371 passes; doctor.go:381 keeps the mismatch warning; doctor_test.go:283 and 299 cover the mismatch, and TestDoctor's '✓ plugin' expectation covers the match"},
+    {"criterion": "Tests cover the four cases with a fake claude; the checks run them.", "met": true, "evidence": "TestDoctorPlugin and TestDoctorPluginMessages in internal/cli/doctor_test.go use the fake claude (plugins and pluginErr fields); the go check ran with exit 0"},
+    {"criterion": "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.", "met": true, "evidence": "Only the `[]` case of TestDoctorPlugin changed, from warning to pass, which is this task's contract change; the proposal's notes list it with the old and new expectation"}
+  ],
+  "findings": [],
+  "notes": "The implementation was committed in an earlier attempt (8aec5fb), so git diff HEAD shows only state.json; I judged the code in HEAD. No absolute paths seen."
+}
