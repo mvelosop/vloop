@@ -6,8 +6,8 @@ origin: plan
 found-by: gate
 kind: gate
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261005-0933-quality-pass.loop-brief
 case: ""
 created: 2026-10-06T08:07:38Z
 ---

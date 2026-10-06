@@ -6,8 +6,8 @@ origin: brief
 found-by: review
 kind: spec-gap
 severity: medium
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261005-0933-quality-pass.loop-brief
 case: ""
 created: 2026-10-05T20:29:16Z
 ---
