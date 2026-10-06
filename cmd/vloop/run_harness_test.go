@@ -37,7 +37,7 @@ dir=$(dirname "$0")
 echo "$*" >> "$dir/argv.log"
 case "$1" in
   --version) echo "2.0.0 (Claude Code)"; exit 0;;
-  plugin) echo '[{"id":"vloop@vloop","version":"2.0.0-beta.2","enabled":true}]'; exit 0;;
+  plugin) echo '[{"id":"vloop@vloop","version":"2.0.0","enabled":true}]'; exit 0;;
 esac
 prompt=""; MODEL=""
 while [ $# -gt 0 ]; do
