@@ -41,7 +41,7 @@ independent review session and one commit.
 To resume a run that halted, fix what it reported and run vloop run again on the
 work branch. Use --replan to plan a brief again deliberately.
 
-Exit codes: 0 complete; 1 preflight or usage; 2 blocked; 3 stalled; 4 max
+Exit codes: 0 complete; 1 preflight or failure; 2 usage or blocked; 3 stalled; 4 max
 iterations; 5 not converging; 6 cost ceiling; 7 session error; 8 repeat blocked;
 9 refs or repository configuration moved. Each is described, with whether the
 run can resume, in docs/guide/concepts.md#exit-codes.`,

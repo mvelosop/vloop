@@ -98,9 +98,9 @@ func runBriefCheck(g *Globals, cmd *cobra.Command, args []string) error {
 			if !errors.Is(err, os.ErrNotExist) {
 				return Problem(err)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "vloop: no such brief: %s\n", rel)
+			fmt.Fprintf(cmd.ErrOrStderr(), "vloop: no such file: %s\n", rel)
 			failed++
-			docs = append(docs, briefJSON{rel, "problems", []string{"no such brief: " + rel}, []string{}})
+			docs = append(docs, briefJSON{rel, "problems", []string{"no such file: " + rel}, []string{}})
 			continue
 		}
 		res := brief.Check(root, brief.Parse(rel, string(data)), set)

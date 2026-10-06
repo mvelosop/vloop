@@ -182,6 +182,11 @@ func TestTaskAmendInvalidPlan(t *testing.T) {
 		{"task", "drop", "T3"},
 		{"task", "set", "T3", "kind", "fix"},
 	} {
-		refuse(t, root, 1, "vloop: plan is not valid — run vloop task validate\n", args...)
+		refuse(t, root, 1, "vloop: .vloop/state/state.json is not a valid plan — vloop task validate lists the problems\n", args...)
 	}
+	// A plan that is not JSON says where, as status does (B11 Q3).
+	if err := os.WriteFile(state.Path(root), []byte("{bad"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	refuse(t, root, 1, "vloop: .vloop/state/state.json is not valid JSON (line 1, column 2)\n", "task", "note", "T2", "x")
 }

@@ -162,7 +162,7 @@ func TestWorkedExampleB2PlantedFailures(t *testing.T) {
 		s.plant(func(m map[string]any) { b2Task(m, 1)["effort"] = map[string]any{"work": "turbo"} })
 		problem(t, s, `schema: /tasks/1/effort/work: .+`)
 		before := s.read(planPath)
-		expect(t, s.run(nil, "task", "note", "T2", "x"), 1, "", "vloop: plan is not valid — run vloop task validate\n")
+		expect(t, s.run(nil, "task", "note", "T2", "x"), 1, "", "vloop: .vloop/state/state.json is not a valid plan — vloop task validate lists the problems\n")
 		if s.read(planPath) != before {
 			t.Fatal("task note modified an invalid plan")
 		}

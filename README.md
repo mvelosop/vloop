@@ -76,8 +76,9 @@ Every command and flag is in [docs/guide/commands.md](docs/guide/commands.md).
 
 ## Exit codes
 
-`0` is success, `1` is problems or failure, and `2` is a usage error. `vloop run`
-adds 3–9, one per way a run can end, and says which can be resumed. They are in
+`0` is success, `1` is problems or failure, and `2` is a usage error — for
+`vloop run`, also a blocked run. `vloop run` adds 3–9, one per way a run can end,
+and says which can be resumed. They are in
 [docs/guide/concepts.md](docs/guide/concepts.md#exit-codes). Errors go to stderr
 as one line starting with `vloop: `, once the checks `vloop doctor` and a
 preflight print have run.
@@ -91,11 +92,11 @@ preflight print have run.
 - [docs/guide/defects.md](docs/guide/defects.md): origin and catcher, derived and recorded defects.
 - [docs/guide/evals.md](docs/guide/evals.md): testing the skills against a real model.
 
-## Skills
+### Skills
 
-The plugin carries five skills. `/vloop:plan`, `/vloop:gate-review`, `/vloop:work`
-and `/vloop:review` are the sessions `vloop run` starts; `/vloop:operate` is yours,
-to run, verify, close and merge a brief.
+The plugin's five skills: `/vloop:plan`, `/vloop:gate-review`, `/vloop:work` and
+`/vloop:review` are the sessions `vloop run` starts; `/vloop:operate` is yours, to
+run, verify, close and merge a brief.
 
 ## What changed in 2.0
 

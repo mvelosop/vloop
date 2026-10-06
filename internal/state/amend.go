@@ -1,13 +1,12 @@
 package state
 
 import (
-	"errors"
 	"fmt"
 )
 
 // ErrInvalidPlan is returned by Amend when the plan on disk already fails its
 // schema; nothing is written.
-var ErrInvalidPlan = errors.New("plan is not valid — run vloop task validate")
+var ErrInvalidPlan = ErrNotAPlan
 
 // NoTaskError is returned when a task id is not in the plan.
 type NoTaskError struct{ ID string }
@@ -30,6 +29,9 @@ func (p *Plan) Find(id string) *Task {
 // refuses (writing nothing) a plan that already fails its schema, and a result
 // that would fail task validate; areas is the configured area list.
 func Amend(root string, areas []string, change func(*Plan) error) error {
+	if _, err := Load(root); err != nil { // not JSON says where, as status does
+		return err
+	}
 	violations, err := Validate(root)
 	if err != nil {
 		return err

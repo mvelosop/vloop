@@ -137,7 +137,7 @@ func newConfig(g *Globals) *cobra.Command {
 
 	cmd.AddCommand(&cobra.Command{
 		Use:   "set <key> <value>",
-		Short: "Write a key to .vloop/config.toml ('' removes it)",
+		Short: "Set one key in .vloop/config.toml: any key config list shows ('' removes it)",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()

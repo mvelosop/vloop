@@ -15,7 +15,7 @@ import (
 func newSchema(g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "schema",
-		Short: "List, print and validate against the embedded JSON Schemas",
+		Short: "List, show and validate against the embedded JSON Schemas",
 		Args:  cobra.NoArgs,
 		RunE:  func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
 	}

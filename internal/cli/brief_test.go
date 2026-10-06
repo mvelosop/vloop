@@ -71,7 +71,7 @@ func TestBriefCheckUsageAndMissing(t *testing.T) {
 	}
 	miss := "docs/briefs/B20260101-0999-z.loop-brief.md"
 	code, out, e = run(t, "-C", d, "brief", "check", miss)
-	if code != 1 || e != "vloop: no such brief: "+miss+"\n" || out != "1 brief(s) need work\n" {
+	if code != 1 || e != "vloop: no such file: "+miss+"\n" || out != "1 brief(s) need work\n" {
 		t.Fatalf("%d %q %q", code, out, e)
 	}
 }

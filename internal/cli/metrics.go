@@ -23,7 +23,7 @@ func newMetrics(g *Globals) *cobra.Command {
 	var interventions bool
 	cmd := &cobra.Command{
 		Use:   "metrics [<brief>…]",
-		Short: "Summarise what a brief cost and delivered, from its runs and commits",
+		Short: "Show what a brief cost and delivered, from its runs and commits",
 		Long: `Report what a brief's loop produced, what it cost and how long it took, from
 its runs and commits. Name briefs to report on them, or none for all of them.
 vloop metrics classify shows how paths are classified, vloop metrics stacks the
@@ -32,6 +32,9 @@ Lines.`,
 		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if interventions {
+				if len(args) > 0 {
+					return Usage(errors.New("--interventions reports every record; it takes no brief"))
+				}
 				if by != "" && by != "kind" && by != "phase" {
 					return Usage(errors.New("--by takes kind or phase with --interventions"))
 				}
@@ -105,7 +108,7 @@ Lines.`,
 		},
 	}
 	cmd.Flags().StringVar(&by, "by", "", "break the summary down by `task`")
-	cmd.Flags().BoolVar(&interventions, "interventions", false, "report agreement with the recommended option, by `kind` or phase, from the intervention records")
+	cmd.Flags().BoolVar(&interventions, "interventions", false, "report agreement with the recommended option, by kind (or phase, with --by phase), from the intervention records")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "show every repository the workspace `file` lists, with a repo column")
 	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g), newMetricsExport(g))
 	return cmd

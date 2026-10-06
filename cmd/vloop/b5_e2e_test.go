@@ -198,7 +198,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		t.Fatalf("init stderr: %q", init.err)
 	}
 	lines := b5Lines(init.out)
-	if len(lines) != 13 {
+	if len(lines) != 12 {
 		t.Fatalf("init printed %d lines: %q", len(lines), init.out)
 	}
 	brief := regexp.MustCompile(`^wrote docs/briefs/B\d{8}-\d{4}-primeros-pasos\.loop-brief\.md$`)
@@ -209,8 +209,8 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		"check go: go test ./... && go vet ./... (paths: **)", "check javascript: npm test (paths: **)",
 		"each check is a starting point — edit it in .vloop/config.toml",
 		"wrote .vloop/config.toml", "wrote .vloop/install.json", lines[6],
-		"updated .gitignore", "wrote CLAUDE.md", "next:", "claude plugin marketplace add mvelosop/vloop",
-		"claude plugin install vloop@vloop", "vloop doctor"}
+		"updated .gitignore", "wrote CLAUDE.md", "next:", "vloop doctor",
+		`claude --plugin-dir "$(vloop plugin path)" for an interactive session with the plugin`}
 	if strings.Join(lines, "\n") != strings.Join(want, "\n") {
 		t.Fatalf("init printed %q, want %q", lines, want)
 	}

@@ -94,7 +94,7 @@ vloop config path
 
 ## vloop config set
 
-Write a key to .vloop/config.toml ('' removes it)
+Set one key in .vloop/config.toml: any key config list shows ('' removes it)
 
 ```
 vloop config set <key> <value>
@@ -235,14 +235,14 @@ vloop intervention show <id>
 
 ## vloop metrics
 
-Summarise what a brief cost and delivered, from its runs and commits
+Show what a brief cost and delivered, from its runs and commits
 
 ```
 vloop metrics [<brief>…] [flags]
 ```
 
 - `--by task`: break the summary down by task
-- `--interventions kind`: report agreement with the recommended option, by kind or phase, from the intervention records
+- `--interventions`: report agreement with the recommended option, by kind (or phase, with --by phase), from the intervention records
 - `--workspace file`: show every repository the workspace file lists, with a repo column
 
 ## vloop metrics classify
@@ -255,7 +255,7 @@ vloop metrics classify <path>…
 
 ## vloop metrics export
 
-Print briefs, tasks, defects and interventions as JSON Lines (export/v1), with the repository's identity
+Show briefs, tasks, defects and interventions as JSON Lines (export/v1), with the repository's identity
 
 ```
 vloop metrics export [<brief>…] [flags]
@@ -304,7 +304,7 @@ vloop run [<brief>] [flags]
 
 ## vloop schema
 
-List, print and validate against the embedded JSON Schemas
+List, show and validate against the embedded JSON Schemas
 
 ```
 vloop schema
