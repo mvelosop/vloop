@@ -16,13 +16,31 @@ not every step.
 
 ## Install
 
+The repository is private, so install from a clone of the release tag, built
+stamped (`v2.0.0` is the current release):
+
 ```
-go install github.com/mvelosop/vloop/cmd/vloop@v2.0.0-beta.2
+git clone https://github.com/mvelosop/vloop && cd vloop && git checkout v2.0.0
+go build -ldflags "-X main.version=2.0.0 -X main.commit=$(git rev-parse HEAD)" \
+  -o "$(go env GOPATH)/bin/vloop" ./cmd/vloop
 ```
 
-Use a release tag; `v2.0.0-beta.2` is the current one. The plugin ships inside the
-binary. While the repository is private there is no marketplace; hand the plugin
-to Claude Code with `--plugin-dir` for an interactive session:
+Or with `go install`, pointing Go at the private module and naming the tag's
+commit — the module path has no `/v2`, so `@v2.0.0` itself does not resolve, and
+this build reports its commit as unknown:
+
+```
+export GOPRIVATE=github.com/mvelosop   # skip the public proxy and checksum database
+go install github.com/mvelosop/vloop/cmd/vloop@$(git ls-remote https://github.com/mvelosop/vloop refs/tags/v2.0.0^{} | cut -f1)
+```
+
+Both need git access to the repository: `gh auth login` (HTTPS), or an SSH key
+with git's `url.<base>.insteadOf` mapping `https://github.com/` to
+`git@github.com:` in your user git config.
+
+The plugin ships inside the binary. With no marketplace while the repository is
+private, hand it to Claude Code with `--plugin-dir`, from inside a repository
+where you ran `vloop init`:
 
 ```
 claude --plugin-dir "$(vloop plugin path)"
