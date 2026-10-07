@@ -34,7 +34,14 @@ housekeeping.
 - `D20261004-1309` — `plan-checks-its-gates`' fixture grader cannot see the gate-folder files (judge reads a truncated trace; a file focus cannot name a folder). Needs a deterministic grader.
 - `D20261005-0757` and `D20261006-1028` — `operate-proposes-options`: its scenario is unrealistic (plan and work committed on `main`, a missing work branch, a one-task plan for a larger brief), so the session rightly proposes a restart and the gate-only judges fail. Redesign the scaffold.
 - `D20261005-1125-the-driver-s-git-config-guard-cannot-tel` — the `.git/config` guard cannot tell an editor's write (VS Code's `vscode-merge-base`) from a gate's; B11's first acceptance halted with exit 9.
+  **Second occurrence**, in another repository on another machine:
+  `~/source/incostas/visum-monorepo`, `D20261007-1243` (a plan-only run halted
+  with exit 9 while VS Code was open). A recurring field problem, not a one-off.
 - `D20261005-1125-an-exit-9-during-plan-acceptance-discard` — an exit 9 during acceptance discards a finished, unstamped plan ($8.23 lost in B11) and its run folder.
+  **Second occurrence** in the same visum-monorepo run: $5.51 lost, and its
+  run folder is gone, so `vloop metrics` reports $18.84 for the brief without
+  it (`D20261007-1451-el-coste-de-vloop-metrics…`). A second consequence:
+  metrics under-report what a brief cost.
 - `D20261006-1102` — the module path has no `/v2`. **Moot since the renumbering to 0.8.0**; close it with that reason.
 
 ## Findings to take up
@@ -51,7 +58,15 @@ housekeeping.
    the operator, 2026-10-06.
 2. **`go install` builds report "commit unknown".** The binary could read the
    module version Go embeds (`runtime/debug.ReadBuildInfo`) so installed copies
-   identify themselves; only the stamped build carries a commit today.
+   identify themselves; only the stamped build carries a commit today. Limit:
+   `go install module@version` embeds the module version (`Main.Version`,
+   e.g. `v0.8.0`) but **no** VCS settings. Go records `vcs.revision` only when
+   it builds inside a git checkout. So the fix can replace "commit unknown"
+   with the module version (e.g. `v0.8.0 (module)`) but cannot recover the sha.
+   Until then the workaround is a stamped `go install`:
+   `go install -ldflags "-X main.version=0.8.0 -X main.commit=<sha>" github.com/mvelosop/vloop/cmd/vloop@v0.8.0`,
+   with the sha from `git ls-remote https://github.com/mvelosop/vloop 'v0.8.0^{}'`.
+   Raised again by the operator, 2026-10-07.
 3. **Masking misses the dashed `-Users-<name>-` form** of a path (Claude Code's
    project-folder slug); one permission-denial record in B9's run kept the
    username (`.vloop/state/runs/B20261003-2049-gate-model/20261003-215555/sessions/001-plan.json`).
@@ -75,14 +90,32 @@ housekeeping.
 8. **Releases are manual ceremony** (five steps in `docs/guide/concepts.md` →
    "The stamped release build"): a `vloop release` command is the recurring
    "what would automate it".
+9. **Session time is the CLI's `duration_ms`, which can be badly wrong.** In
+   visum-monorepo (`D20261007-1451-vloop-metrics-subestima-los-tiempos…`) the
+   plan session's record says `duration_ms: 20083` (20 s) and `turns: 3`, yet
+   it wrote 309k output tokens and ran from 11:44:11Z to the gate review's
+   start at 12:23:22Z, about 39 minutes. `vloop metrics` showed the plan at
+   0.3 min and the run at 30.7 min of a real ~71. The driver copies the
+   figure (`internal/driver/session.go`) rather than timing the session it
+   started. Why the CLI's figure is short (subagents? only the last turn?) is
+   unconfirmed. Candidate: record the driver's own wall-clock time per session,
+   keeping the CLI's figure beside it. Relates to field note 4 (elapsed time
+   during a run).
+10. **A denied Bash call is recorded without its command.** The session record
+    keeps only `tool_name` and a `file_path`
+    (`internal/driver/session.go`, the `permission_denials` loop), deliberately
+    dropping the rest of `tool_input`. In visum-monorepo 5 Bash denials (gate
+    review 1, T1 2, T2 1, review 1) cannot be analysed; only one is explained,
+    by the journal (`D20261007-1451-5-denegaciones-de-bash…`). Candidate: keep
+    the command, masked and truncated. Depends on finding 3 (masking misses a
+    path form). The gate-review denial relates to finding 7.
 
 ## Field notes: first use of 0.8.0 in another repo
 
 Raised by the operator while using v0.8.0 outside this repository, 2026-10-06.
 Batched here for the triage; nothing below is fixed or recorded as a defect yet.
-**The batch is still open**: the operator is adding notes; the triage starts
-when they say so. Open offer: run field note 3's no-plugin test in a scratch
-repo.
+**The batch closed on 2026-10-07**, when the operator started the triage. Open
+offer: run field note 3's no-plugin test in a scratch repo.
 
 1. **No documented way to retire the shell loop** from a repo that had it
    installed (`.loop/install.sh`) and now runs `vloop`. Few users will need it,
@@ -161,3 +194,43 @@ repo.
    paragraph in `docs/guide/concepts.md` (who does what: driver vs plan, work
    and review sessions vs operator), linked from the README's "The loop in one
    paragraph"; check the skills' uses against that definition.
+7. **The install line assumes Go's bin directory is on `PATH`.** `go install`
+   writes the binary to `$GOBIN`, or `$(go env GOPATH)/bin` (`~/go/bin` by
+   default), and never touches `PATH`; the official Go installer on macOS and
+   most Linux packages do not add that directory either. A first-time Go user
+   can run the README's install line and get `command not found: vloop`.
+   `README.md` → "Install" says nothing of it. Candidate: one comment line after
+   the install command (`export PATH="$PATH:$(go env GOPATH)/bin"`), and the
+   same hint wherever the guide repeats the install, naming the file per shell:
+   - **zsh** (the macOS default): `~/.zprofile`, read once at login (macOS
+     terminals open login shells); `~/.zshrc` also works, read by every
+     interactive shell.
+   - **bash**: `~/.bash_profile` on macOS, `~/.profile` on most Linux.
+   - **PowerShell (Windows)**: the Go MSI installer usually adds
+     `%USERPROFILE%\go\bin` to the user `PATH` already. If not, set it once
+     for the user, which new terminals inherit:
+     `[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$(go env GOPATH)\bin", 'User')`
+     (not `$env:Path`, which merges the machine `PATH` into the user one),
+     or per session in `$PROFILE` with `$env:Path += ";$(go env GOPATH)\bin"`.
+     The user-variable form is preferred because it also reaches `cmd` and
+     apps started outside PowerShell.
+
+   Raised by the operator, 2026-10-07.
+8. **When gate folders are cleared is documented nowhere.** `.vloop/state/gates/`
+   is never cleared on `vloop brief close`. It goes only when a plan is replaced:
+   when the next brief is planned (`internal/driver/plan.go`, the reset of
+   another brief's plan, with `state.json` and `plan.md`), or when a new plan is
+   rejected as unfit. Between briefs the last plan's folders stay in the working
+   tree and in git (today B11's `T1`–`T17`); earlier ones live in history. That
+   seems deliberate (the last plan's gates stay checkable), but
+   `docs/guide/concepts.md` describes the gate folder without saying when it
+   goes. Candidate: one sentence there on the lifecycle of `state.json`,
+   `plan.md` and the gate folders. Raised by the operator, 2026-10-07.
+9. **A docs-only brief measures as zero delivered code.** In visum-monorepo
+   (`D20261007-1451-el-tama-o-entregado…`), `metrics.stacks` lists only
+   `csharp@legacy/...` (what `vloop init` detected); the brief delivered 3487
+   lines of shell scripts and docs, so `code` and `test` are 0 — correct for
+   that config — while the same row shows `efficiency 100%`. Mostly a config
+   issue, low priority. Questions for the triage: should `init` detect shell
+   and docs, and should metrics say "nothing measured" instead of a 0 beside a
+   percentage? Raised by the operator, 2026-10-07.
