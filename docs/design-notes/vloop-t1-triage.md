@@ -232,14 +232,17 @@ where it goes. The proposed order, by what the field pays for today:
 5. **P6 verification phase** — after P4 gives the evals to measure it with.
 6. **P7 release** — whenever the release ceremony next hurts.
 
-## Forks for the operator
+## Decisions
 
-1. **P3's shape**: `.vloop/repo-guidelines.md`, a file the skills read
-   (settled 2026-10-08: the name says the repository owns it).
-2. **P6**: a verification phase in the loop (proposed), or keep it the
-   operator's step, with the operator skill running the verification agent.
-3. **The per-task review**: keep as is (proposed until P6 measures), or review
-   only tasks whose gate the gate review flagged as weak, or a cheaper model.
-4. **Order**: P1 first (proposed), or B12 first as the roadmap had it.
-5. **P1's size**: one brief (proposed), or the two exit-9 defects alone first,
-   as a patch release.
+Settled by the operator on 2026-10-08:
+
+1. **P3's shape**: `.vloop/repo-guidelines.md`, a file the skills read; the
+   name says the repository owns it.
+2. **P6**: a verification phase in the loop, not the operator's step.
+3. **The per-task review**: kept as is until P6 measures what it catches.
+4. **Order**: P1 first, as above; the roadmap's B12 (code health) moves after
+   the learning loop.
+5. **P1's size**: one brief, not a patch release for the exit-9 defects alone.
+
+The briefs: B12 is P1, B13 P2, B14 P3–P5, B15 code health, B16 P6, B17 P7
+(`docs/design-notes/vloop-v2.0-roadmap.md`).
