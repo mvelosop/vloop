@@ -245,4 +245,4 @@ Settled by the operator on 2026-10-08:
 5. **P1's size**: one brief, not a patch release for the exit-9 defects alone.
 
 The briefs: B12 is P1, B13 P2, B14 P3–P5, B15 code health, B16 P6, B17 P7
-(`docs/design-notes/vloop-v2.0-roadmap.md`).
+(`docs/design-notes/vloop-roadmap-b12-b17.md`).
