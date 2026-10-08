@@ -1,11 +1,19 @@
 ---
 name: vloop-v2.0-roadmap
-description: The briefs that take vloop from v1.0 to v2.0 — the gate model, interventions that weigh the model's options against the operator's decision, and the quality pass — what each owns, depends on, and the references each brief must cite. Read before writing any of them; each section is that brief's design input.
+description: The briefs that took vloop from v1.0 to v0.8.0 (planned as v2.0; renumbered before going public), and the ones the T1 triage set after it — the gate model, interventions that weigh the model's options against the operator's decision, and the quality pass — what each owns, depends on, and the references each brief must cite. Read before writing any of them; each section is that brief's design input.
 kind: design-note
 status: draft
 created: 2026-10-03
 ---
-# vloop — the v2.0 roadmap
+# vloop — the v2.0 roadmap, released as 0.8.0
+
+**Renumbered.** This series was planned and built as v2.0 and released as
+**v0.8.0**: before going public, the operator renumbered it (`docs/guide/concepts.md`
+→ "What changed in 0.8"; `.vloop/interventions/I20261006-1237-renumbered-to-0-8-0-before-going-public.md`).
+The `v1.0.0` and `v2.*` tags were deleted then (`docs/guide/concepts.md` lists
+them and their commits, which stay). "v1.0"
+and "v2.0" in the sections below are that history and stay as written; the
+file keeps its name because consumed briefs cite it.
 
 v1.0 (tag `v1.0.0`, `fc0b67a`) is B1–B8, as `docs/design-notes/vloop-roadmap.md`
 records. This note is the plan to the next release, built from the horizon's
@@ -30,8 +38,8 @@ predecessor in `depends-on:`.
 | B9 | `docs/briefs/B20261003-2049-gate-model.loop-brief.md` — **consumed** | **The gate model.** A gate judges a contract, by exercising the product, with its judge — the verify and planner-owned gate fixtures — out of every task's reach. A gate may be the planner's oracle test; it never runs the repository's suite. The task's `files` goes, and so does gate-file detection. The plan gains named **checks**, scoped by path, that the driver runs, authoritatively, after every iteration and once in full at the end. The driver runs every gate on the base; an independent **gate review** session precedes the work. `state/v2` | B8 |
 | B10 | `docs/briefs/B20261004-1434-interventions-options.loop-brief.md` — **consumed** | **Interventions that weigh the model against the operator.** Each record carries the model's **three options**, the one it recommends **and why**, and the operator's decision. A derived `agreement` per record; `vloop metrics` reports it by kind and phase; a self-contained context paragraph; `vloop intervention show`. `intervention/v2` | B9 |
 | B11 | `docs/briefs/B20261005-0933-quality-pass.loop-brief.md` — **consumed** | **The quality pass**, for everything a user meets: exit 2 for usage only, actionable messages, help, the guides, `doctor`'s plugin check, metrics ordering and counts, one CRLF- and BOM-safe frontmatter reader and rewriter, the evals' graders; the suite faster first and **the README rewritten last** | B10 |
-| — | **v2.0.0**, tagged after B11 | | |
-| T1 | `docs/design-notes/vloop-t1-triage.md` — **done** (2026-10-08), a **design act**, not a loop brief | **Triage of defects and interventions** (B1–B11, with B10's options and agreement): what they say about the skills and about repo-specific guidelines that could automate interventions; a design note whose proposals seed later briefs | v2.0.0 |
+| — | **v0.8.0**, tagged after B11 (planned as v2.0.0) | | |
+| T1 | `docs/design-notes/vloop-t1-triage.md` — **done** (2026-10-08), a **design act**, not a loop brief | **Triage of defects and interventions** (B1–B11, with B10's options and agreement): what they say about the skills and about repo-specific guidelines that could automate interventions; a design note whose proposals seed later briefs | v0.8.0 |
 | B12 | not written | **Field reliability** (T1 P1): the `.git/config` guard ignores editor keys; an exit 9 during plan acceptance keeps the plan and its run folder; session wall-clock time; denied Bash commands recorded, masked (with the dashed `-Users-<name>-` form); running cost, ceiling warnings and `vloop status` during a run; the installed version identifies itself; metrics say "not measured" | T1 |
 | B13 | not written | **Docs and onboarding** (T1 P2): the CLI is driven by asking `/vloop:operate`, and how to get it; the driver defined; the name explained; the install's `PATH`; gate-folder lifecycle; retiring the shell loop | B12 |
 | B14 | not written | **The learning loop** (T1 P3–P5): `.vloop/repo-guidelines.md` read by the skills; every gate-review miss an eval case, with the open eval defects; `vloop brief check` rules for the repeating spec gaps | B13 |
@@ -39,7 +47,7 @@ predecessor in `depends-on:`.
 | B16 | not written | **A brief-level verification phase** (T1 P6): `/vloop:verify` after the last task, a findings table the operator reads before close | B15 |
 | B17 | not written | **`vloop release`** (T1 P7): bump, tag, stamped build, module-path and public-install checks | B16 |
 
-After B11: v2.0 is tagged by the operator, as v1.0 was. Then the triage (T1), set by the operator on 2026-10-05, which on 2026-10-08 reordered what follows: B12–B17 above, code health moved to B15. The release steps are in
+After B11: v0.8.0 was tagged by the operator (planned as v2.0). Then the triage (T1), set by the operator on 2026-10-05, which on 2026-10-08 reordered what follows: B12–B17 above, code health moved to B15. The release steps are in
 `docs/guide/concepts.md` → "The stamped release build".
 
 ## Decisions every brief in this series inherits

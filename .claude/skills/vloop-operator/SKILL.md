@@ -47,9 +47,16 @@ and bring the operator a proposal:
 2. Run it **detached**, so it outlives your session's background-task limit
    (2 hours; a killed driver leaves a `.vloop/tmp/.running` lock), and keep the
    Mac awake (an idle-sleeping Mac stalled B7's acceptance run for over an hour):
-   `nohup caffeinate -i vloop run <brief path> > <scratchpad>/run.log 2>&1 &`.
+   `nohup caffeinate -i vloop run <brief path> > <scratchpad>/run.log 2>&1 & echo $!`.
    Then wait in the background for the log's end, without polling in the
-   foreground. `vloop status` shows progress. `--plan-only` first when the
+   foreground. **Watch the driver by the process id printed**, never by a
+   `pgrep -f` pattern: in B10–B11 the pattern matched the watcher itself and hid
+   a halt.
+   **Ask the operator to close VS Code (or any editor open on the repository)
+   for the run.** VS Code writes `branch.*.vscode-merge-base` into `.git/config`
+   when a branch is created, and the driver's guard cannot tell that from a
+   gate's write: it halted B11's acceptance and a visum-monorepo plan with exit 9
+   (`D20261005-1125-the-driver-s-git-config…`, open until B12). `vloop status` shows progress. `--plan-only` first when the
    operator wants to see the task split. B1–B7 ran under `.loop/run.sh`.
 3. Resuming on another branch than the one that planned needs the brief path
    again; the driver refuses without it (exit 1) and says so.
@@ -69,7 +76,7 @@ branch.
 | 3 | stalled | read the notes. A **gate defect** the work session diagnosed, whose fix keeps the gate's intent, you may fix: `vloop task verify <id> '<cmd>' --reason '…'`, then `vloop task reset <id>`, `vloop task gate <id>` once by hand, resume. Record it later as a `plan`/`gate` defect |
 | 4, 6 | budget | resumable; tell the operator |
 | 5, 7, 8 | needs a human | report, don't retry blindly |
-| 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog`, `git show-ref` against what the log lists; restore refs (nothing was committed); tell the operator |
+| 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog`, `git show-ref` against what the log lists; restore refs (nothing was committed); tell the operator. If the only change is an editor's key in `.git/config` (`vscode-merge-base`), it is the guard defect, not a session: say so, and record it as a recurrence. A halt during plan acceptance discards the plan and its run folder; note the lost session's cost from the log before cleaning, since `vloop metrics` will not have it |
 
 Anything that is a design decision rather than a mechanical defect goes back to
 the operator, even when you could guess.
