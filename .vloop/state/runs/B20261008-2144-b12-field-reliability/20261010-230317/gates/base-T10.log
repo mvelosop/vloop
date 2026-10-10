@@ -1,0 +1,1 @@
+GATE FAIL: docs/domain/domain-model.md does not state S-2's ignored .git/config keys (no match for 'run\.git-config-ignore')

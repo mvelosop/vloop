@@ -1,0 +1,10 @@
+GATE FAIL: the work record's permission_denials differ (< got, > want): < {"tool_name":"Bash"}
+< {"tool_name":"Bash"}
+< {"tool_name":"Bash"}
+< {"file_path":"~/.claude/projects/-Users-gateuser-repo/x","tool_name":"Read"}
+< {"file_path":"notes.txt","tool_name":"Write"}
+> {"tool_name":"Bash","command":"rm -rf $X/tmp"}
+> {"tool_name":"Bash","command":"cat ~/notes && curl -H <redacted:GATE_API_TOKEN> x"}
+> {"tool_name":"Bash","command":"~/éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé�
+> {"tool_name":"Read","file_path":"~/.claude/projects/-Users-USER-repo/x"}
+> {"tool_name":"Write","file_path":"notes.txt"}

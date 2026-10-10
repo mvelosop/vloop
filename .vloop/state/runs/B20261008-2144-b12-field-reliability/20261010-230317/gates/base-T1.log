@@ -1,0 +1,2 @@
+GATE FAIL: vs.out: exit 9, want 0 (the run continues) — work changed .git/config — nothing was committed; restore it, then re-run
+vloop: work changed .git/config — nothing was committed; restore it, then re-run

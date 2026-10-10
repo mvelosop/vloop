@@ -1,61 +1,73 @@
 #!/bin/sh
-# Gate T10 — run folders that order right (brief Q7). A new run folder is named
-# in UTC whatever the local zone: a stubbed one-task vloop run under a zone far
-# from UTC must name its folder with a UTC stamp between the UTC clock before
-# and after the run. Existing folders keep their names and are ordered by their
-# records' timestamps: two folders a DST fall-back named out of order (the later
-# run's local name sorts first) must be read earlier-run first, which metrics
-# --json shows in the order of the missing session records it lists.
+# Gate T10 — the domain and the guides follow the brief ("The domain, updated"),
+# and docs/guide/commands.md is regenerated.
 set -u
 fail() { echo "GATE FAIL: $*" >&2; exit 1; }
 for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
-unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT TZ
+unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT
 export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
 export GIT_AUTHOR_NAME=gate GIT_AUTHOR_EMAIL=gate@example.invalid GIT_COMMITTER_NAME=gate GIT_COMMITTER_EMAIL=gate@example.invalid
 G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+top=$(pwd -P)
 t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
 trap 'rm -rf "$t"' EXIT
 go build -o "$t/vloop" ./cmd/vloop || fail "go build ./cmd/vloop"
 GOOS=linux go build -o "$t/vloop-linux" ./cmd/vloop || fail "GOOS=linux go build ./cmd/vloop"
 GOOS=windows go build -o "$t/vloop.exe" ./cmd/vloop || fail "GOOS=windows go build ./cmd/vloop"
 B="$t/vloop"
-mkdir -p "$t/home" "$t/stub" || fail mkdir
-cp "$G/claude" "$t/stub/claude" && chmod +x "$t/stub/claude" && cp "$G/plan.json" "$t/stub/plan.json" || fail "stub claude"
-export HOME="$t/home" PATH="$t/stub:$PATH"
+# Go keeps its caches under HOME unless told; keep the real ones across the change.
+GOMODCACHE=$(go env GOMODCACHE) GOCACHE=$(go env GOCACHE) GOPATH=$(go env GOPATH) || fail "go env"
+export GOMODCACHE GOCACHE GOPATH GOPROXY=off
+mkdir -p "$t/Users/gateuser" || fail mkdir
+export HOME="$t/Users/gateuser"
 N=B20260101-0900-demo
-# runrepo <name>: a vloop repository on main with a ready brief and a check,
-# committed, trusted by the fake home.
+BRIEF=docs/briefs/$N.loop-brief.md
+trust() { printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$R" >"$HOME/.claude.json"; }
+# runrepo <name> [<plan>]: a vloop repository on main with a ready brief and a
+# check (after $CONFIG, when set), committed; its own stub claude playing
+# <plan> (plan.json by default) from $t/<name>.stub.
 runrepo() {
-  R="$t/$1"
-  mkdir -p "$R" && git -C "$R" init -q -b main || fail "git init $1"
+  R="$t/$1" S="$t/$1.stub"
+  mkdir -p "$R" "$S" && git -C "$R" init -q -b main || fail "git init $1"
+  cp "$G/claude" "$S/claude" && chmod +x "$S/claude" && cp "$G/${2:-plan.json}" "$S/plan.json" || fail "stub for $1"
   git -C "$R" config user.name gate && git -C "$R" config user.email gate@example.invalid || fail "identity"
-  printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$R" >"$HOME/.claude.json"
+  trust
   (cd "$R" && "$B" init </dev/null) >"$t/init.out" 2>&1 || fail "vloop init in $1: $(cat "$t/init.out")"
-  printf '[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' >"$R/.vloop/config.toml" || fail config
-  mkdir -p "$R/docs/briefs" && echo x >"$R/docs/x.md" && cp "$G/brief.md" "$R/docs/briefs/$N.loop-brief.md" || fail brief
+  printf '%s[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' "${CONFIG:-}" >"$R/.vloop/config.toml" || fail config
+  mkdir -p "$R/docs/briefs" && echo x >"$R/docs/x.md" && cp "$G/brief.md" "$R/$BRIEF" || fail brief
   git -C "$R" add -A && git -C "$R" commit -q -m harness || fail "commit $1"
 }
+# vrun <out> [VAR=value...]: vloop run <brief> in $R with its stub on PATH;
+# stdout in $t/<out>, stderr in $t/<out>.err; returns vloop's exit code.
+vrun() {
+  o=$1; shift
+  trust
+  (cd "$R" && env PATH="$S:$PATH" "$@" "$B" run "$BRIEF") >"$t/$o" 2>"$t/$o.err"
+}
+# records <glob>: the session records of the brief's run folders matching <glob>, one path per line.
+records() { ls "$R"/.vloop/state/runs/"$N"/*/sessions/$1 2>/dev/null; }
 
-# --- a new run folder is named in UTC ---
-runrepo utc
-before=$(date -u +%Y%m%d-%H%M%S)
-(cd "$R" && TZ=Asia/Kolkata "$B" run "docs/briefs/$N.loop-brief.md") >"$t/run.out" 2>&1 || fail "the stubbed run failed: $(tail -15 "$t/run.out")"
-after=$(date -u +%Y%m%d-%H%M%S)
-folders=$(ls "$R/.vloop/state/runs/$N")
-[ "$(echo "$folders" | wc -l | tr -d ' ')" = 1 ] || fail "expected one run folder, found: $folders"
-stamp=$(echo "$folders" | cut -c1-15)
-echo "$stamp" | grep -q '^[0-9]\{8\}-[0-9]\{6\}$' || fail "the run folder '$folders' is not named <YYYYMMDD-HHMMSS>"
-if [ "$stamp" \< "$before" ] || [ "$stamp" \> "$after" ]; then
-  fail "the run folder is named $folders under TZ=Asia/Kolkata, but the UTC clock read $before to $after: it is not named in UTC"
-fi
-
-# --- existing folders ordered by their records' timestamps ---
-runrepo order
-for f in 20261025-015000 20261025-011000; do
-  mkdir -p "$R/.vloop/state/runs/$N/$f" && cp -R "$G/runs/$f/." "$R/.vloop/state/runs/$N/$f/" || fail "fixture folder $f"
-done
-(cd "$R" && "$B" metrics "$N" --json) >"$t/m.json" 2>"$t/err" || fail "metrics --json on the fixture folders failed: $(cat "$t/err")"
-got=$(jq -r '.records.missing | map("\(.task)/\(.iteration)") | join(" ")' "$t/m.json") || fail "metrics --json has no records.missing list: $(head -c 300 "$t/m.json")"
-[ "$got" = "T1/1 T2/2" ] || fail "the folders are not read in the order of their records' timestamps: missing records '$got', want 'T1/1 T2/2' (folder 20261025-015000 ran at 00:50Z, before 20261025-011000 at 01:10Z)"
-ls "$R/.vloop/state/runs/$N" | tr '\n' ' ' | grep -q '^20261025-011000 20261025-015000 $' || fail "the existing run folders were renamed: $(ls "$R/.vloop/state/runs/$N")"
+# The docs say what this brief changed. Each check names the document and what
+# it must now state; how it is worded is the review's to judge.
+# has <file> <label> <pattern...>: the file matches every extended pattern, case-insensitively.
+has() {
+  f=$1 label=$2; shift 2
+  [ -f "$f" ] || fail "$f is missing"
+  for p in "$@"; do grep -Eiq -- "$p" "$f" || fail "$f does not state $label (no match for '$p')"; done
+}
+has docs/domain/domain-model.md "S-2's ignored .git/config keys" 'run\.git-config-ignore'
+has docs/domain/execution/plan.md "that acceptance resumes after a halt, and the stamp on load" 'resum[a-z]* (the )?acceptance' 'stamp'
+has docs/domain/execution/run.md "the resume of acceptance after exit 9" 'resum[a-z]* (the )?acceptance'
+awk '/^\| *9 *\|/' docs/domain/execution/run.md | grep -iq 'accept' || fail "docs/domain/execution/run.md's exit table row for 9 does not say what happens during acceptance"
+has docs/domain/execution/session.md "the record's ended, wall_ms and a denial's command" '`ended`' '`wall_ms`' '`command`'
+has docs/domain/measurement/metrics.md "session time from wall_ms, the wall from the first plan session and n/a" 'wall_ms' 'plan session' 'n/a'
+has docs/guide/configuration.md "the new key and its environment name" 'run\.git-config-ignore' 'VLOOP_RUN_GIT_CONFIG_IGNORE'
+awk '/\*\*wall\*\*/ { on = 1 } on && /^$/ { exit } on' docs/guide/metrics.md | grep -iq 'plan session' \
+  || fail "docs/guide/metrics.md's wall entry does not start the wall at the plan session"
+has docs/guide/metrics.md "the n/a for unmeasured size" 'match no stack'
+has docs/guide/concepts.md "resuming acceptance, the per-session line and status's running line" 'resum[a-z]* (the )?acceptance' 'running:' 'gate review ·|work T[0-9]+ ·'
+# The command reference is regenerated.
+go build -o "$t/gendocs" ./cmd/gendocs || fail "go build ./cmd/gendocs"
+(cd "$t" && "$t/gendocs" "$t/commands.md") >"$t/gd.out" 2>&1 || fail "gendocs: $(cat "$t/gd.out")"
+cmp -s "$t/commands.md" docs/guide/commands.md || fail "docs/guide/commands.md is stale: $(diff "$t/commands.md" docs/guide/commands.md | head -6)"
 echo "gate T10: ok"

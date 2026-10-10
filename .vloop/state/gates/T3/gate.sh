@@ -1,74 +1,84 @@
 #!/bin/sh
-# Gate T3 — briefs and brief close through the one frontmatter reader and
-# rewriter (brief Q8). A ready brief saved with a BOM and CRLF endings checks and
-# lists like its LF twin; brief close rewrites only the first `**Status:**` line
-# (the one the template starts with), not a later one nor one quoted mid-line,
-# keeps the BOM, and leaves every line CRLF, the run record it appends included.
-# The reference for the closed file is the same close of an LF twin in a second
-# repository, converted to CRLF with the BOM.
+# Gate T3 — the driver times every session (brief R3, the record): a stub plan
+# session that runs 3 s and reports duration_ms 20 leaves a record with
+# duration_ms 20, wall_ms >= 3000 and ended; every record has both; the
+# session schemas declare them, optional, with no version change.
 set -u
 fail() { echo "GATE FAIL: $*" >&2; exit 1; }
 for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
 unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT
-export LC_ALL=C TZ=UTC GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
+export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
 export GIT_AUTHOR_NAME=gate GIT_AUTHOR_EMAIL=gate@example.invalid GIT_COMMITTER_NAME=gate GIT_COMMITTER_EMAIL=gate@example.invalid
 G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+top=$(pwd -P)
 t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
 trap 'rm -rf "$t"' EXIT
 go build -o "$t/vloop" ./cmd/vloop || fail "go build ./cmd/vloop"
 GOOS=linux go build -o "$t/vloop-linux" ./cmd/vloop || fail "GOOS=linux go build ./cmd/vloop"
 GOOS=windows go build -o "$t/vloop.exe" ./cmd/vloop || fail "GOOS=windows go build ./cmd/vloop"
 B="$t/vloop"
-mkdir -p "$t/home" "$t/bin" && printf '#!/bin/sh\nexit 1\n' >"$t/bin/claude" && chmod +x "$t/bin/claude" || fail "fake home"
-export HOME="$t/home" PATH="$t/bin:$PATH"
-N=B20260101-0900-demo.loop-brief
-F=docs/briefs/$N.md
-crlf() { awk '{ printf "%s\r\n", $0 }' "$1"; }
-bom() { printf '\357\273\277'; }
-allcrlf() { awk '{ if (substr($0, length($0), 1) != "\r") bad++ } END { exit bad > 0 }' "$1"; }
-# brepo <name> <crlf|lf>: an init'd repository holding the fixture brief (BOM +
-# CRLF, or plain LF), one run folder for it, all committed, on a work branch.
-brepo() {
-  R="$t/$1"
-  mkdir -p "$R" && git -C "$R" init -q -b main && git -C "$R" commit -q --allow-empty -m "gate base" || fail "git init $1"
+# Go keeps its caches under HOME unless told; keep the real ones across the change.
+GOMODCACHE=$(go env GOMODCACHE) GOCACHE=$(go env GOCACHE) GOPATH=$(go env GOPATH) || fail "go env"
+export GOMODCACHE GOCACHE GOPATH GOPROXY=off
+mkdir -p "$t/Users/gateuser" || fail mkdir
+export HOME="$t/Users/gateuser"
+N=B20260101-0900-demo
+BRIEF=docs/briefs/$N.loop-brief.md
+trust() { printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$R" >"$HOME/.claude.json"; }
+# runrepo <name> [<plan>]: a vloop repository on main with a ready brief and a
+# check (after $CONFIG, when set), committed; its own stub claude playing
+# <plan> (plan.json by default) from $t/<name>.stub.
+runrepo() {
+  R="$t/$1" S="$t/$1.stub"
+  mkdir -p "$R" "$S" && git -C "$R" init -q -b main || fail "git init $1"
+  cp "$G/claude" "$S/claude" && chmod +x "$S/claude" && cp "$G/${2:-plan.json}" "$S/plan.json" || fail "stub for $1"
+  git -C "$R" config user.name gate && git -C "$R" config user.email gate@example.invalid || fail "identity"
+  trust
   (cd "$R" && "$B" init </dev/null) >"$t/init.out" 2>&1 || fail "vloop init in $1: $(cat "$t/init.out")"
-  mkdir -p "$R/docs/briefs" && echo x >"$R/docs/x.md" || fail "docs"
-  if [ "$2" = crlf ]; then { bom; crlf "$G/brief.md"; } >"$R/$F"; else cp "$G/brief.md" "$R/$F"; fi
-  mkdir -p "$R/.vloop/state/runs/B20260101-0900-demo/20260101-090000" && echo "planning from $F" >"$R/.vloop/state/runs/B20260101-0900-demo/20260101-090000/run.log" || fail "run folder"
-  git -C "$R" add -A && git -C "$R" commit -q -m fixture && git -C "$R" checkout -q -b work || fail "commit the fixture in $1"
+  printf '%s[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' "${CONFIG:-}" >"$R/.vloop/config.toml" || fail config
+  mkdir -p "$R/docs/briefs" && echo x >"$R/docs/x.md" && cp "$G/brief.md" "$R/$BRIEF" || fail brief
+  git -C "$R" add -A && git -C "$R" commit -q -m harness || fail "commit $1"
 }
-run() { (cd "$R" && "$B" "$@") >"$t/out" 2>"$t/err"; }
+# vrun <out> [VAR=value...]: vloop run <brief> in $R with its stub on PATH;
+# stdout in $t/<out>, stderr in $t/<out>.err; returns vloop's exit code.
+vrun() {
+  o=$1; shift
+  trust
+  (cd "$R" && env PATH="$S:$PATH" "$@" "$B" run "$BRIEF") >"$t/$o" 2>"$t/$o.err"
+}
+# records <glob>: the session records of the brief's run folders matching <glob>, one path per line.
+records() { ls "$R"/.vloop/state/runs/"$N"/*/sessions/$1 2>/dev/null; }
 
-brepo lf lf
-LF=$R
-run brief check "$F" || fail "the LF fixture brief does not check: $(cat "$t/out" "$t/err")"
-brepo crlf crlf
+# A plan session that runs 3 s and reports duration_ms 20.
+runrepo w
+cat >"$S/script.sh" <<'EOF'
+[ "$PHASE" = plan ] && STUB_SLEEP=3 && STUB_DUR=20
+EOF
+vrun w.out; got=$?
+[ "$got" = 0 ] || fail "the stubbed run exited $got, want 0 — $(tail -5 "$t/w.out.err")"
+P=$(records '*-plan.json')
+[ "$(echo "$P" | grep -c .)" = 1 ] || fail "want one plan session record, found: $P"
+jq -e '.schema == "session/v1" and .duration_ms == 20' "$P" >/dev/null || fail "the plan record does not keep duration_ms 20 as claude reported it, in session/v1: $(jq -c '{schema, duration_ms}' "$P")"
+jq -e '(.wall_ms | type) == "number" and .wall_ms >= 3000 and .wall_ms < 60000' "$P" >/dev/null \
+  || fail "the plan record's wall_ms is not the driver's measurement of a 3 s session: $(jq -c '{wall_ms, duration_ms}' "$P")"
+for f in $(records '*.json'); do
+  jq -e '(.ended | type) == "string" and (.ended | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")) and (.wall_ms | type) == "number" and .wall_ms >= 0 and ((.ended | fromdateiso8601) >= (.started | fromdateiso8601))' "$f" >/dev/null \
+    || fail "$(basename "$f") has no ended (RFC 3339 UTC, like started, not before it) or no wall_ms: $(jq -c '{started, ended, wall_ms}' "$f")"
+done
+jq -e '((.ended | fromdateiso8601) - (.started | fromdateiso8601)) >= 2' "$P" >/dev/null \
+  || fail "the plan record's ended is not about 3 s after its started: $(jq -c '{started, ended}' "$P")"
+GR=$(records '*-gate-review.json')
+[ -n "$GR" ] && jq -e '.schema == "session/v2"' $GR >/dev/null || fail "the gate review record is not session/v2"
 
-# --- read ---
-run brief check "$F" || fail "brief check fails on a ready brief saved with a BOM and CRLF endings: $(cat "$t/out" "$t/err" | head -5)"
-run brief list --json || fail "brief list --json: $(cat "$t/err")"
-jq -e --arg n "$N" 'map(select(.name == $n)) | length == 1 and .[0].status == "ready" and .[0].path == "docs/briefs/\($n).md"' "$t/out" >/dev/null \
-  || fail "brief list does not read the BOM + CRLF brief's name and status: $(cat "$t/out")"
-
-# --- close ---
-(cd "$LF" && "$B" brief close "$N" --abandon "the gate abandons it" --no-findings) >"$t/lf.out" 2>&1 || fail "brief close of the LF twin failed: $(cat "$t/lf.out")"
-run brief close "$N" --abandon "the gate abandons it" --no-findings || fail "brief close of a BOM + CRLF brief failed: $(cat "$t/err")"
-
-# Only the first status line changes, in the LF twin as in the CRLF brief.
-grep -n 'Status:\*\*' "$LF/$F" >"$t/status.lines"
-awk 'NR == 1' "$t/status.lines" | grep -q '^12:\*\*Status:\*\* abandoned — the gate abandons it$' \
-  || fail "brief close did not rewrite the first **Status:** line to 'abandoned — <reason>': $(head -1 "$t/status.lines")"
-grep -q '^16:A thing\. Quoted later: \*\*Status:\*\* ready to plan, as the template says\.$' "$t/status.lines" \
-  || fail "brief close rewrote a **Status:** quoted in the middle of a line: $(grep '^16:' "$t/status.lines")"
-[ "$(grep -c ':\*\*Status:\*\* ready to plan$' "$t/status.lines")" = 1 ] \
-  || fail "brief close rewrote a later **Status:** line too: $(cat "$t/status.lines")"
-sed -n '/^---$/,/^---$/p' "$LF/$F" | grep -q '^status: abandoned$' || fail "brief close did not set status: abandoned in the frontmatter"
-
-head -c 3 "$R/$F" | od -An -tx1 | tr -d ' \n' | grep -q '^efbbbf$' || fail "brief close dropped the brief's BOM"
-allcrlf "$R/$F" || fail "brief close left a CRLF brief with lines that do not end CRLF (mixed line endings)"
-{ bom; crlf "$LF/$F"; } >"$t/want"
-cmp -s "$R/$F" "$t/want" || fail "brief close of a BOM + CRLF brief differs from the close of its LF twin by more than the BOM and endings: $(diff "$t/want" "$R/$F" | head -6 | od -c | head -6)"
-run brief list --json || fail "brief list --json after close: $(cat "$t/err")"
-jq -e --arg n "$N" 'map(select(.name == $n)) | .[0].status == "abandoned"' "$t/out" >/dev/null \
-  || fail "brief list does not read the closed BOM + CRLF brief as abandoned"
+# The schemas declare both fields, optional: today's record and one without them validate; a wrong type does not.
+(cd "$R" && "$B" schema validate session/v1 "$P") >"$t/out" 2>&1 || fail "the plan record does not validate as session/v1: $(cat "$t/out")"
+(cd "$R" && "$B" schema validate session/v2 $GR) >"$t/out" 2>&1 || fail "the gate review record does not validate as session/v2: $(cat "$t/out")"
+for s in v1 v2; do
+  jq 'del(.ended, .wall_ms)' "$P" >"$t/old.json" || fail jq
+  (cd "$R" && "$B" schema validate "session/$s" "$t/old.json") >"$t/out" 2>&1 || fail "a record without ended and wall_ms no longer validates as session/$s: $(cat "$t/out")"
+  jq '.wall_ms = "long"' "$P" >"$t/bad.json" || fail jq
+  (cd "$R" && "$B" schema validate "session/$s" "$t/bad.json") >"$t/out" 2>&1 && fail "session/$s accepts a wall_ms that is not a number: it does not declare wall_ms"
+  jq '.ended = 5' "$P" >"$t/bad.json" || fail jq
+  (cd "$R" && "$B" schema validate "session/$s" "$t/bad.json") >"$t/out" 2>&1 && fail "session/$s accepts an ended that is not a string: it does not declare ended"
+done
 echo "gate T3: ok"

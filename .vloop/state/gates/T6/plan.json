@@ -1,7 +1,7 @@
 {
   "schema": "state/v2",
-  "run_id": "B20260101-0900-demo",
-  "brief": "docs/briefs/B20260101-0900-demo.loop-brief.md",
+  "run_id": "",
+  "brief": "",
   "base": "",
   "branch": "",
   "status": "planning",
@@ -36,24 +36,6 @@
         "T1.out exists"
       ],
       "verify": "test -f T1.out",
-      "status": "pending",
-      "attempts": 0,
-      "notes": ""
-    },
-    {
-      "id": "T2",
-      "title": "Task T2",
-      "goal": "Do T2.",
-      "kind": "feature",
-      "fixtures": "",
-      "references": [],
-      "depends_on": [
-        "T1"
-      ],
-      "acceptance": [
-        "T2.out exists"
-      ],
-      "verify": "test -f T2.out",
       "status": "pending",
       "attempts": 0,
       "notes": ""

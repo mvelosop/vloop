@@ -9,11 +9,9 @@ depends-on: []
 ---
 # Brief
 
-**Status:** ready to plan
 
 ## What it is
 
-A thing. Quoted later: **Status:** ready to plan, as the template says.
 
 ## Why this shape, and what was rejected
 
@@ -27,7 +25,6 @@ Because.
 
 An unknown id exits 1.
 
-**Status:** ready to plan
 
 ## Worked example
 

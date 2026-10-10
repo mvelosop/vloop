@@ -1,0 +1,1 @@
+GATE FAIL: a binary installed at v0.88.8: version --json keys are ["version","commit","plugin","go","os","arch"], want version,commit,module,plugin,go,os,arch (the build's module version is 'v0.88.8')
