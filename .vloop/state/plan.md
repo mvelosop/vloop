@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/11 done** · iteration 0
+**Status:** running · **0/11 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-10T23:33:52Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-10T23:45:32Z
 
 ## Progress
 
-- [ ] **T1** — Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed
+- [ ] **T1** — Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed · 1 attempt(s)
 - [ ] **T2** — Stamp the plan on load and resume acceptance after a halt instead of planning again
 - [ ] **T3** — Record ended and wall_ms, the driver's own measurement, on every session record
 - [ ] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
@@ -24,7 +24,7 @@
 
 ### T1 — Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 The driver hashes .git/config's bytes around every session, gate and check, so VS Code's branch.<name>.vscode-merge-base — written when the work branch is created — halts a run with exit 9 and blames whoever was running. This task makes the guard compare the file's keys and values, leave out keys matching an ignore pattern (one built in, more from the new config key run.git-config-ignore), refuse patterns that would blind it to keys that run code, and name the changed keys in the halt. It goes first so no later task's run can trip on an editor key.
 
@@ -41,6 +41,8 @@ The driver hashes .git/config's bytes around every session, gate and check, so V
 - Only these existing tests change, and only as the brief states: TestRunGitConfigPlanted (cmd/vloop/run_git_test.go) and the hooks/config subtests of TestWorkedExampleB8 (cmd/vloop/b8_e2e_test.go) expect the key named; TestWorkedExampleEnglishSession (cmd/vloop/e2e_test.go) expects the new key in config list. No other assertion is weakened.
 - docs/guide/configuration.md lists run.git-config-ignore with its environment name, its built-in pattern and the protected sections; docs/guide/commands.md is regenerated if any help text changed.
 - No refactor from B15's list (one git wrapper, the env filters, planSHA, driver.counts, the budget keys, the id generators, long functions) is folded in.
+
+**From the last attempt:** configEntries cannot tell a valueless key (true) from an empty value: both give "" after strings.Cut, so e.g. core.fsmonitor changing from empty to bare changes meaning without halting; a test for it is missing; values of a repeated key are sorted before comparing, so reordering them (order-significant in git) never halts
 
 <details><summary>verify command</summary>
 

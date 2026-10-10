@@ -70,6 +70,9 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 			if err != nil {
 				return configErr(g, cmd.OutOrStdout(), err)
 			}
+			if _, err := config.Get(root, "run.git-config-ignore"); err != nil {
+				return configErr(g, cmd.OutOrStdout(), err)
+			}
 
 			briefPath := ""
 			if len(args) == 1 {

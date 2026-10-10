@@ -30,3 +30,7 @@ checking the gate of T11 on the base
 planned: B20261008-2144-b12-field-reliability — 11 tasks
 reviewing the gates using sonnet (round 2)
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/11 done ──
+   Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed
+   check go
+   review: FAIL

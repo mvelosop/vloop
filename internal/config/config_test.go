@@ -49,7 +49,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
-		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
+		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.git-config-ignore", "", false}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -535,5 +535,38 @@ func TestSetKeepsCheckTables(t *testing.T) {
 	cs, err := Checks(root)
 	if err != nil || len(cs) != 2 || cs[0].Name != "api" || cs[1].Run != "sh web/test.sh" {
 		t.Fatalf("checks after set = %+v, %v", cs, err)
+	}
+}
+
+func TestGitConfigIgnoreRefusesProtectedPatterns(t *testing.T) {
+	root := scratch(t)
+	for value, want := range map[string]string{
+		"core.*":           "run.git-config-ignore: core.* would ignore core.* — the guard must see it",
+		"*":                "run.git-config-ignore: * would ignore core.* — the guard must see it",
+		"filter.lfs.*":     "run.git-config-ignore: filter.lfs.* would ignore filter.* — the guard must see it",
+		"gitlens.*,core.*": "run.git-config-ignore: core.* would ignore core.* — the guard must see it",
+	} {
+		err := Set(root, "run.git-config-ignore", value)
+		var cu *UsageError
+		if !errors.As(err, &cu) || err.Error() != want {
+			t.Errorf("Set %q = %v, want usage error %q", value, err, want)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(root, ".vloop", "config.toml")); err == nil {
+		t.Error("a refused value wrote the file")
+	}
+	if err := Set(root, "run.git-config-ignore", "gitlens.*,branch.*.vscode-merge-base"); err != nil {
+		t.Errorf("a harmless list was refused: %v", err)
+	}
+}
+
+func TestGitConfigIgnoreProtectedFromSourceIsAProblem(t *testing.T) {
+	root := scratch(t)
+	t.Setenv("VLOOP_RUN_GIT_CONFIG_IGNORE", "core.*")
+	_, err := Get(root, "run.git-config-ignore")
+	var pe *ProtectedPatternError
+	var cu *UsageError
+	if !errors.As(err, &pe) || errors.As(err, &cu) {
+		t.Errorf("Get = %v, want a bare protected pattern error", err)
 	}
 }
