@@ -87,3 +87,40 @@ func TestGitGuardValueChangeAndRemoval(t *testing.T) {
 		t.Errorf("changed = %q, want %q", got, want)
 	}
 }
+
+func rewriteConfig(t *testing.T, root, from, to string) {
+	t.Helper()
+	p := filepath.Join(root, ".git", "config")
+	data, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), from) {
+		t.Fatalf("config has no %q", from)
+	}
+	if err := os.WriteFile(p, []byte(strings.Replace(string(data), from, to, 1)), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGitGuardValuelessKeyIsNotAnEmptyValue(t *testing.T) {
+	t.Parallel()
+	root := guardRepo(t)
+	appendConfig(t, root, "[core]\n\tfsmonitor\n")
+	g := snapshotGit(root)
+	rewriteConfig(t, root, "\tfsmonitor\n", "\tfsmonitor =\n")
+	if got, want := g.changed(), ".git/config (core.fsmonitor)"; got != want {
+		t.Errorf("bare -> empty: changed = %q, want %q", got, want)
+	}
+}
+
+func TestGitGuardRepeatedKeyOrderMatters(t *testing.T) {
+	t.Parallel()
+	root := guardRepo(t)
+	appendConfig(t, root, "[remote \"o\"]\n\tfetch = a\n\tfetch = b\n")
+	g := snapshotGit(root)
+	rewriteConfig(t, root, "\tfetch = a\n\tfetch = b\n", "\tfetch = b\n\tfetch = a\n")
+	if got, want := g.changed(), ".git/config (remote.o.fetch)"; got != want {
+		t.Errorf("reordered: changed = %q, want %q", got, want)
+	}
+}

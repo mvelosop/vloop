@@ -39,7 +39,7 @@ func gitCmd(root string, args ...string) *exec.Cmd {
 type gitGuard struct {
 	root   string
 	ignore []string
-	config map[string][]string // key -> its values, sorted
+	config map[string][]string // key -> its values, in file order
 	hooks  string
 }
 
@@ -84,6 +84,11 @@ func (g gitGuard) changed() string {
 // unparsedKey stands for a config git cannot read, held by a digest of its bytes.
 const unparsedKey = "(unreadable)"
 
+// valueless stands for a key written without "=" (true), which git -z lists
+// without a newline; a NUL cannot occur in a real value, so it never collides
+// with an empty one.
+const valueless = "\x00valueless"
+
 // configEntries reads the file's own entries — keys and values, include
 // directives as entries, the included files never — through git, leaving out
 // keys an ignore pattern matches. A missing file has none.
@@ -106,14 +111,14 @@ func configEntries(path string, ignore []string) map[string][]string {
 		if e == "" {
 			continue
 		}
-		key, val, _ := strings.Cut(e, "\n")
+		key, val, found := strings.Cut(e, "\n")
+		if !found {
+			val = valueless
+		}
 		if gitcfg.Ignored(ignore, key) {
 			continue
 		}
 		out[key] = append(out[key], val)
-	}
-	for _, vals := range out {
-		slices.Sort(vals)
 	}
 	return out
 }

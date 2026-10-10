@@ -5,9 +5,9 @@
   "base": "615dd19c754de2f82c977c0434d796dcd214955f",
   "branch": "B20261008-2144-b12-field-reliability",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-10T23:21:09Z",
-  "updated": "2026-10-10T23:45:32Z",
+  "updated": "2026-10-10T23:50:06Z",
   "shell": "sh",
   "checks": [
     {
@@ -59,9 +59,9 @@
         "No refactor from B15's list (one git wrapper, the env filters, planSHA, driver.counts, the budget keys, the id generators, long functions) is folded in."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "configEntries cannot tell a valueless key (true) from an empty value: both give \"\" after strings.Cut, so e.g. core.fsmonitor changing from empty to bare changes meaning without halting; a test for it is missing; values of a repeated key are sorted before comparing, so reordering them (order-significant in git) never halts"
+      "notes": ""
     },
     {
       "id": "T2",
