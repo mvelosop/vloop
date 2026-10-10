@@ -2,7 +2,7 @@
 name: B20261008-2144-b12-field-reliability.loop-brief
 description: Make the driver's instruments trustworthy in the field — a .git/config guard that ignores editor bookkeeping, plan acceptance that survives a halt, session time measured by the driver, denied Bash commands recorded, the run's cost and progress visible while it runs, an installed binary that names its version, and metrics that say when nothing was measured
 kind: brief
-status: draft
+status: ready
 created: 2026-10-08
 seeds: The first brief after the T1 triage (its P1); docs and onboarding follow as B13
 depends-on: [B20261005-0933-quality-pass.loop-brief]
