@@ -20,12 +20,28 @@ brief, as the operator chooses. Each brief names its predecessor in
 
 | # | Brief | Owns | Depends on |
 | --- | --- | --- | --- |
-| B12 | `docs/briefs/B20261008-2144-field-reliability.loop-brief.md` — **draft** | **Field reliability** (T1 P1): the `.git/config` guard ignores editor keys; an exit 9 during plan acceptance keeps the plan and its run folder; session wall-clock time; denied Bash commands recorded, masked (with the dashed `-Users-<name>-` form); running cost, ceiling warnings and `vloop status` during a run; the installed version identifies itself; metrics say "not measured" | T1 |
+| B12 | `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` — **draft** | **Field reliability** (T1 P1): the `.git/config` guard ignores editor keys; an exit 9 during plan acceptance keeps the plan and its run folder; session wall-clock time; denied Bash commands recorded, masked (with the dashed `-Users-<name>-` form); running cost, ceiling warnings and `vloop status` during a run; the installed version identifies itself; metrics say "not measured" | T1 |
 | B13 | not written | **Docs and onboarding** (T1 P2): the CLI is driven by asking `/vloop:operate`, and how to get it; the driver defined; the name explained; the install's `PATH`; gate-folder lifecycle; retiring the shell loop | B12 |
 | B14 | not written | **The learning loop** (T1 P3–P5): `.vloop/repo-guidelines.md` read by the skills; every gate-review miss an eval case, with the open eval defects; `vloop brief check` rules for the repeating spec gaps | B13 |
 | B15 | not written | **Code health, no behaviour change**: one git wrapper, the duplicated env filters, `planSHA`, `driver.counts`, budget keys, the id generators, long functions, `TestMain`, a Windows run harness — the review's findings B11 left out | B14 |
 | B16 | not written | **A brief-level verification phase** (T1 P6): `/vloop:verify` after the last task, a findings table the operator reads before close | B15 |
 | B17 | not written | **`vloop release`** (T1 P7): bump, tag, stamped build, module-path and public-install checks | B16 |
+
+## Naming: the series number in the slug
+
+From B12 on, a brief's slug starts with its series number in lower case:
+`vloop brief new b13-docs-onboarding` writes
+`docs/briefs/B<YYYYMMDD-HHMM>-b13-docs-onboarding.loop-brief.md`, so the run id,
+work branch, journal and PR all show where the brief sits in the series. Set by
+the operator on 2026-10-10, who works in several repositories at once.
+
+- The number goes in when the file is created, and only then: until a brief is
+  written its number may still move (code health went from B12 to B15); once it
+  exists, its name is fixed.
+- B1–B11 keep their names; the convention starts at B12.
+- It is this repository's convention, not vloop's: the slug is free text.
+  Carrying the number in a frontmatter field that `brief list` shows is a
+  possible vloop feature, not planned.
 
 ## Decisions every brief in this series inherits
 
