@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/11 done** · iteration 4
+**Status:** running · **2/11 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:13:54Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:17:56Z
 
 ## Progress
 
 - [x] **T1** — Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed · 1 attempt(s)
 - [x] **T2** — Stamp the plan on load and resume acceptance after a halt instead of planning again · 1 attempt(s)
-- [ ] **T3** — Record ended and wall_ms, the driver's own measurement, on every session record
+- [ ] **T3** — Record ended and wall_ms, the driver's own measurement, on every session record · **blocked**
 - [ ] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
 - [ ] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
 - [ ] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
@@ -78,7 +78,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Record ended and wall_ms, the driver's own measurement, on every session record
 
-`pending` · depends on: T1
+`blocked` · **blocked** · depends on: T1
 
 A session's duration_ms is copied from the claude CLI's JSON, which recorded 20 seconds for a plan session that ran 39 minutes. This task makes the driver time every session itself, from the process start to its exit, and record it as wall_ms with an ended timestamp, beside the CLI's duration_ms. The metrics read it in the next task.
 
@@ -89,6 +89,8 @@ A session's duration_ms is copied from the claude CLI's JSON, which recorded 20 
 - Violation the review must rule against: a schema version bump for the session record, or wall_ms derived from the CLI's duration_ms rather than measured by the driver.
 - Committed tests cover the new fields: TestSessionFieldMapping (internal/driver/session_test.go) is updated for them, and TestRun15TelemetryContract (cmd/vloop/run_safety_test.go) only if it lists the record's keys. No other assertion is weakened.
 - No refactor from B15's list is folded in.
+
+**From the last attempt:** gate disputed: The v2 iteration of the optional-fields loop validates the plan's session/v1 record against session/v2, which can never pass because the schema pins its schema const. — for s in v1 v2: jq 'del(.ended, .wall_ms)' "$P" then schema validate session/$s; for v2 the output is '/schema: value must be session/v2' since $P has schema session/v1. $GR (session/v2) should be used for v2.
 
 <details><summary>verify command</summary>
 

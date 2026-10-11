@@ -317,8 +317,10 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 
-	started := r.now().UTC()
+	// Wall clock, not monotonic: the measurement includes any time the machine slept.
+	started := r.now().Round(0).UTC()
 	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
+	ended := r.now().Round(0).UTC()
 	res := Result{TimedOut: timedOut}
 	if runErr != nil {
 		ee, ok := runErr.(*exec.ExitError)
@@ -343,7 +345,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		r.Logf("SESSION RECORD MISSING %s %s (iteration %d)", s.Phase, orDash(task), s.Iteration)
 		return res, nil
 	}
-	rec, out := r.record(s, task, started, raw)
+	rec, out := r.record(s, task, started, ended, raw)
 	data, err := r.maskRecord(rec)
 	if err != nil {
 		return res, err
@@ -381,7 +383,7 @@ type output struct {
 
 // record maps claude's JSON onto session/v1 (session/v2 for a gate review). Fields claude did not print are
 // zero values of the same type; none is made up beyond that.
-func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]json.RawMessage) (map[string]any, output) {
+func (r *Runner) record(s Spec, task string, started, ended time.Time, raw map[string]json.RawMessage) (map[string]any, output) {
 	var o output
 	get := func(k string, v any) { _ = json.Unmarshal(raw[k], v) }
 	var dur float64
@@ -450,7 +452,9 @@ func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]j
 		"effort":             effort,
 		"models_used":        used,
 		"started":            started.Format(time.RFC3339),
+		"ended":              ended.Format(time.RFC3339),
 		"duration_ms":        int64(dur),
+		"wall_ms":            max(ended.Sub(started).Milliseconds(), 0),
 		"cost_usd":           o.Cost,
 		"turns":              o.Turns,
 		"is_error":           o.IsError,

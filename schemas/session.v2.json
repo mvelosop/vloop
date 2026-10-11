@@ -27,7 +27,9 @@
       }
     },
     "started": { "type": "string", "format": "date-time" },
+    "ended": { "type": "string", "format": "date-time" },
     "duration_ms": { "type": "integer" },
+    "wall_ms": { "type": "integer" },
     "cost_usd": { "type": "number" },
     "turns": { "type": "integer" },
     "is_error": { "type": "boolean" },

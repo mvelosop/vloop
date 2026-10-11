@@ -136,7 +136,7 @@ func TestSessionFieldMapping(t *testing.T) {
 	want := map[string]any{
 		"schema": "session/v1", "run_id": "B1-x", "iteration": 3.0, "phase": "work", "task": "T2",
 		"model": "sonnet", "effort": "high", "started": "2026-01-02T03:04:05Z",
-		"duration_ms": 1234.0, "cost_usd": 0.5, "turns": 7.0, "is_error": false,
+		"ended": "2026-01-02T03:04:05Z", "wall_ms": 0.0, "duration_ms": 1234.0, "cost_usd": 0.5, "turns": 7.0, "is_error": false,
 		"permission_denials": []any{map[string]any{"tool_name": "Bash"}},
 		"models_used": map[string]any{
 			"claude-a": map[string]any{"input_tokens": 1.0, "output_tokens": 2.0, "cache_read_input_tokens": 3.0, "cache_creation_input_tokens": 4.0, "cost_usd": 0.25},

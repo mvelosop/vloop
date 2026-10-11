@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The plan is stamped (planning) as soon as it loads and becomes running only when the gate review passes; vloop run resumes acceptance with no plan session whenever a plan has not passed its gate review. A runs test now pins that the resumed acceptance folder is owned and its sessions counted.
 - **Files:** internal/driver/plan.go, cmd/vloop/run_git_test.go, internal/runs/runs_test.go
 - **Notes for next iteration:** Earlier attempt's plan.go work is unchanged in the tree. The review's finding that the resumed folder is not owned came from reading logOwns, which only serves shell-loop loop.log folders; vloop folders are owned by sitting under .vloop/state/runs/<run id>/, so no code change was needed, only the new test TestVloopResumedAcceptanceFolderIsOwned. Domain docs for the lifecycle and resume are T10's.
+
+## T3 — Record ended and wall_ms, the driver's own measurement, on every session record
+
+- **Outcome:** blocked (review: skipped)
+- **Summary:** Implemented ended and wall_ms on every session record (driver-measured around the session process, duration_ms untouched) and declared both as optional in session.v1.json and session.v2.json; the gate fails only on a clause no correct implementation can pass.
+- **Files:** internal/driver/session.go, internal/driver/session_test.go, schemas/session.v1.json, schemas/session.v2.json
+- **Notes for next iteration:** The gate's for-loop over v1 and v2 validates $P, the plan record (schema session/v1), against session/v2; the v2 schema's const 'session/v2' rejects it regardless of ended/wall_ms. A correct fix needs a session/v2 record (the gate review one, $GR) for the v2 iteration. ended and wall_ms are taken from r.now() before and after state.RunGroup, rounded to strip the monotonic reading so sleep time counts; the test clock is fixed, so TestSessionFieldMapping expects wall_ms 0 and ended == started. TestRun15TelemetryContract lists only cost/turns/duration/is_error/denials keys, so it is unchanged.

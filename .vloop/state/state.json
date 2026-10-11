@@ -5,9 +5,9 @@
   "base": "615dd19c754de2f82c977c0434d796dcd214955f",
   "branch": "B20261008-2144-b12-field-reliability",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-10-10T23:21:09Z",
-  "updated": "2026-10-11T00:13:54Z",
+  "updated": "2026-10-11T00:17:56Z",
   "shell": "sh",
   "checks": [
     {
@@ -137,9 +137,9 @@
         "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 0,
-      "notes": ""
+      "notes": "gate disputed: The v2 iteration of the optional-fields loop validates the plan's session/v1 record against session/v2, which can never pass because the schema pins its schema const. — for s in v1 v2: jq 'del(.ended, .wall_ms)' \"$P\" then schema validate session/$s; for v2 the output is '/schema: value must be session/v2' since $P has schema session/v1. $GR (session/v2) should be used for v2."
     },
     {
       "id": "T4",

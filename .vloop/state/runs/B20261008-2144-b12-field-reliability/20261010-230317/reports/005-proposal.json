@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "blocked",
+  "summary": "Implemented ended and wall_ms on every session record (driver-measured around the session process, duration_ms untouched) and declared both as optional in session.v1.json and session.v2.json; the gate fails only on a clause no correct implementation can pass.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go", "schemas/session.v1.json", "schemas/session.v2.json"],
+  "verified": "vloop-built gate.sh ran every check up to the v2 loop and then exited 1: 'a record without ended and wall_ms no longer validates as session/v2' (/schema: value must be 'session/v2'). go test ./internal/driver ./internal/schema ./internal/cli ./internal/metrics and cmd/vloop -run Telemetry|Session|Run15 pass.",
+  "notes": "The gate's for-loop over v1 and v2 validates $P, the plan record (schema session/v1), against session/v2; the v2 schema's const 'session/v2' rejects it regardless of ended/wall_ms. A correct fix needs a session/v2 record (the gate review one, $GR) for the v2 iteration. ended and wall_ms are taken from r.now() before and after state.RunGroup, rounded to strip the monotonic reading so sleep time counts; the test clock is fixed, so TestSessionFieldMapping expects wall_ms 0 and ended == started. TestRun15TelemetryContract lists only cost/turns/duration/is_error/denials keys, so it is unchanged.",
+  "gate_dispute": {
+    "reason": "The v2 iteration of the optional-fields loop validates the plan's session/v1 record against session/v2, which can never pass because the schema pins its schema const.",
+    "evidence": "for s in v1 v2: jq 'del(.ended, .wall_ms)' \"$P\" then schema validate session/$s; for v2 the output is '/schema: value must be session/v2' since $P has schema session/v1. $GR (session/v2) should be used for v2."
+  }
+}

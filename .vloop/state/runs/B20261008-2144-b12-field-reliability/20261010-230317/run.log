@@ -48,3 +48,7 @@ committing the plan
    check go
    review: PASS
    T2 done
+── iteration 5 (5 this run) · T3 · 2/11 done ──
+   Record ended and wall_ms, the driver's own measurement, on every session record
+   GATE DISPUTE T3 — blocked for the operator; no review, no attempt charged
+   T3 blocked — the operator resolves the disputed gate with vloop task verify
