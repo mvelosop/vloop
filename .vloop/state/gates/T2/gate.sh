@@ -1,106 +1,54 @@
 #!/bin/sh
-# Gate T2 — doctor's new `gate edits` check (brief D2): printed right after
-# plugin; passes only for the listed Edit forms in the user, project or local
-# settings; warns otherwise, and names a settings file it cannot read; is `-`
-# with no claude; is in --json; writes no file; and changes no exit code.
+# Gate T2 — vloop run hands .vloop/repo-guidelines.md to every session (brief
+# L1): with a non-empty file every session's arguments carry
+# --append-system-prompt-file .vloop/repo-guidelines.md; with no file, or an
+# empty one, they are exactly today's.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-newrepo r
-# clear: no settings file anywhere.
-clear() { rm -rf "$R/.claude" "$HOME/.claude"; }
-# put <user|project|local> <json>: write that settings file.
-put() {
-  case "$1" in
-  user) f="$HOME/.claude/settings.json" ;;
-  project) f="$R/.claude/settings.json" ;;
-  local) f="$R/.claude/settings.local.json" ;;
-  esac
-  mkdir -p "$(dirname "$f")" && printf '%s\n' "$2" >"$f" || fail "write $1 settings"
+FLAG='--append-system-prompt-file .vloop/repo-guidelines.md'
+# norm <out>: the logged sessions with the run-specific paths masked.
+norm() { sed -e "s#$t/[a-z]*/#<repo>/#g" -e "s/\$/ /" "$t/stub/argv.log" >"$t/argv.$1"; }
+# phases <out>: each of the four session kinds appears at least once.
+phases() {
+  for p in /vloop:plan /vloop:gate-review /vloop:work /vloop:review; do
+    grep -Fq -- "-p $p" "$t/argv.$1" || fail "$1: no $p session was started: $(cat "$t/argv.$1")"
+  done
 }
-# after <out>: the line printed right after the plugin line.
-after() { awk 'p { print; exit } /^[^ ]+ plugin( |$)/ { p = 1 }' "$t/$1"; }
-# expect <out> <line>: the line after plugin is exactly <line>.
-expect() { a=$(after "$1"); [ "$a" = "$2" ] || fail "$1: after the plugin line want '$2', got '$a' in:
-$(cat "$t/$1")"; }
-# allow <where> <entry>: a settings file whose permissions.allow is [<entry>].
-allow() { put "$1" "{\"permissions\":{\"allow\":[\"$2\"]}}"; }
 
-# --- the worked example: no settings files, no plugin ---
-clear; plugins '[]'
-st0=$(git -C "$R" status --porcelain --untracked-files=all)
-doc none
-expect none "$GATE_W"
-has none "$PLUGIN_W"
-[ "$got" = 0 ] || fail "none: exit $got, want 0 (both lines are warnings)"
-has none 'doctor: 0 problem(s), 2 warning(s)'
-[ -e "$R/.claude" ] && fail "doctor created $R/.claude"
-[ -e "$HOME/.claude" ] && fail "doctor created ~/.claude"
-[ "$(git -C "$R" status --porcelain --untracked-files=all)" = "$st0" ] || fail "doctor changed the repository"
+# No file: today's arguments, and no flag.
+runrepo none
+[ ! -e "$R/.vloop/repo-guidelines.md" ] || { rm "$R/.vloop/repo-guidelines.md" && commit "no guidelines"; }
+vrun none.run
+[ "$got" = 0 ] || fail "vloop run with no guidelines file: exit $got: $(tail -n 20 "$t/none.run")"
+norm none; phases none
+grep -Fq -- '--append-system-prompt-file' "$t/argv.none" && fail "no guidelines file, yet a session got --append-system-prompt-file: $(cat "$t/argv.none")"
 
-# --- passing forms, in each of the three files ---
-n=0
-for spec in \
-  'project|Edit(./.vloop/state/gates/**)' 'project|Edit(.vloop/state/gates/**)' \
-  'local|Edit(.vloop/**)' 'local|Edit(./.vloop/**)' 'user|Edit' \
-  'project|Edit(**)' 'user|Edit(./**)' 'local|Edit(.vloop/state/**)' 'user|Edit(./.vloop/state/**)'; do
-  n=$((n + 1)); clear
-  allow "${spec%%|*}" "${spec#*|}"
-  doc pass$n
-  expect pass$n '✓ gate edits'
-done
-# a pass in one file is enough when the others exist and do not allow it
-clear; put user '{"permissions":{"allow":["Bash(ls:*)"]}}'; put project '{}'; allow local 'Edit(./.vloop/state/gates/**)'
-doc mix
-expect mix '✓ gate edits'
+# An empty file: byte for byte the same arguments as no file.
+runrepo empty
+: >"$R/.vloop/repo-guidelines.md" && commit "empty guidelines"
+vrun empty.run
+[ "$got" = 0 ] || fail "vloop run with an empty guidelines file: exit $got: $(tail -n 20 "$t/empty.run")"
+norm empty
+cmp -s "$t/argv.none" "$t/argv.empty" || fail "an empty guidelines file changed the sessions' arguments:
+no file:
+$(cat "$t/argv.none")
+empty file:
+$(cat "$t/argv.empty")"
 
-# --- forms outside the list warn, never pass ---
-n=0
-for spec in \
-  'project|Edit(./src/**)' 'project|Edit(/.vloop/**)' 'project|Edit(~/.vloop/**)' \
-  'local|Edit(.vloop/state/gates/*)' 'local|Edit(.vloop/state/gates/)' 'user|Write(.vloop/**)' \
-  'project|Edit(././.vloop/**)' 'user|MultiEdit' 'local|Edit(.vloop/state/gates/T1/**)'; do
-  n=$((n + 1)); clear
-  allow "${spec%%|*}" "${spec#*|}"
-  doc warn$n
-  expect warn$n "$GATE_W"
-done
-clear; put project '{"permissions":{"allow":["Edit(./src/**)","Bash(go:*)"]}}'; doc we
-expect we "$GATE_W"
-clear; put project '{"permissions":{"deny":["Edit(.vloop/**)"],"ask":["Edit"],"defaultMode":"acceptEdits"}}'; doc deny
-expect deny "$GATE_W"
-clear; put project '{}'; put user '{"permissions":{}}'; doc empty
-expect empty "$GATE_W"
-
-# --- a file that is not JSON is named ---
-for spec in 'project|.claude/settings.json' 'local|.claude/settings.local.json' 'user|~/.claude/settings.json'; do
-  clear; put "${spec%%|*}" '{"permissions":'
-  doc bad
-  a=$(after bad)
-  case "$a" in
-  "! gate edits cannot read ${spec#*|}: "?*) ;;
-  *) fail "bad ${spec%%|*}: want '! gate edits cannot read ${spec#*|}: <error>', got '$a'" ;;
-  esac
-done
-
-# --- doctor writes no settings file ---
-clear; allow project 'Edit(./src/**)'; allow user 'Edit(.vloop/**)'
-cp "$R/.claude/settings.json" "$t/p.keep" && cp "$HOME/.claude/settings.json" "$t/u.keep" || fail keep
-doc keep
-cmp -s "$R/.claude/settings.json" "$t/p.keep" || fail "doctor changed .claude/settings.json"
-cmp -s "$HOME/.claude/settings.json" "$t/u.keep" || fail "doctor changed ~/.claude/settings.json"
-[ -e "$R/.claude/settings.local.json" ] && fail "doctor wrote .claude/settings.local.json"
-
-# --- no claude: both are n/a ---
-clear; docnc nc
-has nc '- plugin'
-expect nc '- gate edits'
-
-# --- --json: a check named "gate edits", right after plugin ---
-clear; doc j1 --json
-names=$("$JQ" -r '[.checks[].name] | (index("plugin")|tostring) + " " + (index("gate edits")|tostring)' "$t/j1")
-p=${names% *} e=${names#* }
-[ "$e" != null ] && [ "$e" = $((p + 1)) ] || fail "--json: 'gate edits' is not the check right after plugin ($names)"
-[ "$("$JQ" -r '.checks[] | select(.name=="gate edits") | .result + "|" + .message' "$t/j1")" = "warning|${GATE_W#! gate edits }" ] || fail "--json: gate edits is not the warning"
-allow project 'Edit(./.vloop/state/gates/**)'; doc j2 --json
-[ "$("$JQ" -r '.checks[] | select(.name=="gate edits") | .result + "|" + .message' "$t/j2")" = "pass|" ] || fail "--json: gate edits does not pass with no message"
+# A non-empty file: every session gets the flag, and nothing else changes.
+runrepo full
+printf '# Repository guidelines\n\n- A lesson. (D20261011-1455)\n' >"$R/.vloop/repo-guidelines.md" && commit "guidelines"
+vrun full.run
+[ "$got" = 0 ] || fail "vloop run with a guidelines file: exit $got: $(tail -n 20 "$t/full.run")"
+norm full; phases full
+n=$(wc -l <"$t/argv.full" | tr -d ' ')
+k=$(grep -Fc -- " $FLAG " "$t/argv.full")
+[ "$n" -gt 0 ] && [ "$k" = "$n" ] || fail "$k of $n sessions got '$FLAG':
+$(cat "$t/argv.full")"
+sed -e "s# $FLAG # #" "$t/argv.full" >"$t/stripped"
+cmp -s "$t/stripped" "$t/argv.none" || fail "with the flag removed, the sessions' arguments differ from today's:
+with the file, flag removed:
+$(cat "$t/stripped")
+no file:
+$(cat "$t/argv.none")"
 echo "gate T2: ok"

@@ -1,59 +1,37 @@
 #!/bin/sh
-# Gate T7 — close (brief: Worked example, Real-data check): the worked example
-# line for line on a fresh build; the real-data check in this repository against
-# a build of the plan's base; every relative link in the README, the guides and
-# the domain model resolves to an existing file and heading.
+# Gate T7 — the three eval repairs (brief L7): plan-checks-its-gates' fixture
+# grader reads files under .vloop/state/gates/, not the trace;
+# operate-proposes-options' scaffold puts the plan and the iterations on a work
+# branch named for the run id, main untouched, with at least three tasks, the
+# first done and the second blocked on a gate dispute.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-BASE=6b67e496945aa7fd599ea807cbf5d9e1362cc9f8
-after() { awk 'p { print; exit } /^[^ ]+ plugin( |$)/ { p = 1 }' "$t/$1"; }
-expect() { a=$(after "$1"); [ "$a" = "$2" ] || fail "$1: after the plugin line want '$2', got '$a'"; }
-clear() { rm -rf "$R/.claude" "$HOME/.claude"; }
+PC=plugin/evals/plan-checks-its-gates/graders
+for f in "$PC"/*.md; do
+  fm=$(awk 'NR == 1 && $0 == "---" { p = 1; next } p && $0 == "---" { exit } p { print }' "$f")
+  if printf '%s\n' "$fm" | grep -Eq '^(focus|target): trace$' && grep -q 'greet\.toml' "$f"; then
+    fail "$f judges the gate-folder fixtures from the trace"
+  fi
+done
+grep -h '^ *path: ' "$PC"/*.md | sed 's/^ *path: *//; s/^["'\'']//; s/["'\'']$//' | grep -q '^\.vloop/state/gates/.*[^/]$' ||
+  fail "no grader of plan-checks-its-gates reads a file under .vloop/state/gates/"
 
-# --- the worked example ---
-newrepo r
-tail -n 7 "$t/r.init" | cmp -s - "$G/next.txt" || fail "vloop init does not end with D3's seven lines"
-grep -Fq 'If /vloop:operate is not available, the vloop plugin is not loaded' "$R/CLAUDE.md" || fail "the new CLAUDE.md lacks D3's sentence"
-clear; plugins '[]'; doc ex
-[ "$got" = 0 ] || fail "ex: exit $got, want 0"
-has ex "$PLUGIN_W"
-expect ex "$GATE_W"
-has ex 'doctor: 0 problem(s), 2 warning(s)'
-plugins "[{\"id\":\"vloop@vloop\",\"version\":\"$V\",\"enabled\":true}]"; doc ok
-has ok '✓ plugin'
-mkdir -p "$R/.claude" && printf '{"permissions":{"allow":["Edit(./.vloop/state/gates/**)"]}}\n' >"$R/.claude/settings.json" || fail settings
-doc p1; expect p1 '✓ gate edits'
-clear; mkdir -p "$R/.claude" && printf '{"permissions":{"allow":["Edit(.vloop/**)"]}}\n' >"$R/.claude/settings.local.json" || fail settings
-doc p2; expect p2 '✓ gate edits'
-clear; mkdir -p "$HOME/.claude" && printf '{"permissions":{"allow":["Edit"]}}\n' >"$HOME/.claude/settings.json" || fail settings
-doc p3; expect p3 '✓ gate edits'
-clear; mkdir -p "$R/.claude" && printf '{"permissions":{"allow":["Edit(./src/**)","Bash(go:*)"]}}\n' >"$R/.claude/settings.json" || fail settings
-doc w1; expect w1 "$GATE_W"
-printf '{"permissions":\n' >"$R/.claude/settings.json"
-doc w2
-case "$(after w2)" in "! gate edits cannot read .claude/settings.json: "?*) ;; *) fail "w2: got '$(after w2)'" ;; esac
-clear; docnc nc
-has nc '- plugin'
-expect nc '- gate edits'
-doc js --json
-"$JQ" -e '[.checks[] | select(.name == "gate edits" and .result != "" )] | length == 1' "$t/js" >/dev/null || fail "--json has no check named 'gate edits'"
-
-# --- the real-data check, in this repository, against the base's build ---
-mkdir -p "$t/base" && git -C "$top" archive "$BASE" | tar -x -C "$t/base" || fail "git archive $BASE"
-(cd "$t/base" && go build -buildvcs=false -o "$t/vloop-base" ./cmd/vloop) || fail "build of the base"
-plugins '[]'
-(cd "$top" && env PATH="$t/stub:$SYS" STUB_PLUGINS="$t/plugins.json" "$t/vloop-base" doctor --json) >"$t/before.json" 2>/dev/null
-(cd "$top" && env PATH="$t/stub:$SYS" STUB_PLUGINS="$t/plugins.json" "$B" doctor --json) >"$t/after.json" 2>/dev/null
-(cd "$top" && env PATH="$t/stub:$SYS" STUB_PLUGINS="$t/plugins.json" "$B" doctor) >"$t/after.txt" 2>/dev/null
-has after.txt '✓ gate edits'
-has after.txt "$PLUGIN_W"
-b=$("$JQ" -c '[.checks[] | select(.name != "plugin" and .name != "gate edits") | [.name, .result]]' "$t/before.json")
-a=$("$JQ" -c '[.checks[] | select(.name != "plugin" and .name != "gate edits") | [.name, .result]]' "$t/after.json")
-[ -n "$b" ] && [ "$a" = "$b" ] || fail "real data: another check's result changed:
-before $b
-after  $a"
-[ "$("$JQ" -c '[.checks[].name]' "$t/after.json")" = "$("$JQ" -c '[.checks[].name] | (index("plugin") + 1) as $i | .[:$i] + ["gate edits"] + .[$i:]' "$t/before.json")" ] || fail "real data: the checks are not the base's with 'gate edits' after plugin"
-
-# --- every link resolves ---
-(cd "$top" && go run "$G/links.go" README.md docs/guide/*.md docs/domain/domain-model.md) || fail "a link in the README, the guides or the domain model does not resolve"
+S="$t/operate"
+mkdir -p "$S" || fail mkdir
+(cd "$S" && bash "$top/plugin/evals/operate-proposes-options/scaffold.sh") >"$t/scaffold.log" 2>&1 ||
+  fail "operate-proposes-options/scaffold.sh exits non-zero: $(tail -n 20 "$t/scaffold.log")"
+P="$S/.vloop/state/state.json"
+[ -f "$P" ] || fail "the operate scaffold left no .vloop/state/state.json in the working tree"
+"$B" schema validate state/v2 "$P" >"$t/validate" 2>&1 || fail "the operate plan is not state/v2: $(cat "$t/validate")"
+id=$("$JQ" -r .run_id "$P")
+br=$(git -C "$S" symbolic-ref --quiet --short HEAD) || fail "the operate scaffold leaves HEAD detached"
+[ -n "$id" ] && [ "$br" = "$id" ] || fail "the work branch is '$br', not the run id '$id'"
+[ "$("$JQ" -r .branch "$P")" = "$id" ] || fail "the plan's branch is not the run id"
+git -C "$S" rev-parse --verify -q main >/dev/null || fail "the operate scaffold has no main"
+git -C "$S" cat-file -e main:.vloop/state/state.json 2>/dev/null && fail "main holds a plan: the plan belongs on the work branch, main untouched"
+[ "$(git -C "$S" rev-list --count main..HEAD)" -ge 2 ] || fail "the work branch does not carry the plan and an iteration as commits of its own"
+[ "$("$JQ" '.tasks | length' "$P")" -ge 3 ] || fail "the operate plan has fewer than three tasks"
+[ "$("$JQ" -r '.tasks[0].status' "$P")" = done ] || fail "the first task is not done"
+[ "$("$JQ" -r '.tasks[1].status' "$P")" = blocked ] || fail "the second task is not blocked"
+"$JQ" -r '.tasks[1].notes' "$P" | grep -iq 'dispute' || fail "the second task's notes do not record a gate dispute"
 echo "gate T7: ok"

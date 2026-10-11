@@ -1,0 +1,13 @@
+GATE FAIL: after the interventions line want
+' instructions  plan 362 · gate review n/a · work 312 · review n/a words · guidelines 6 rules', got
+'' in:
+B20260101-0900-demo  ready · not merged
+ tasks     1 planned (brief said 2–3) · 1 done · 0 blocked · first-pass 1/1
+ size      delivered  code 0 · test 0 · docs 0 · test:code n/a
+           churn      code 0 · test 0 · docs 0 · rework n/a
+ time      agent 0.0 min (work 0.0 · review 0.0) · plan 0.0 min · gate review 0.0 min · gates 0.0 · wall 0.0 min
+ rate      0.0 code lines/min · 0.0 incl. tests
+ cost      $0.40 · plan 0.10 · work 0.10 · review 0.10 · gate review 0.10 · n/a per 1,000 code lines
+ models    plan opus · work sonnet · review sonnet · gate review sonnet
+ defects   in-loop 0 · operator 0 · escaped 0 · removal efficiency n/a
+ interventions  0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0

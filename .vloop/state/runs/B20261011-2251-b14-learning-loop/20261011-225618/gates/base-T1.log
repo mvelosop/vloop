@@ -1,3 +1,10 @@
+GATE FAIL: en: vloop init wrote no .vloop/repo-guidelines.md:
+detected stacks: none
+wrote .vloop/config.toml
+wrote .vloop/install.json
+wrote docs/briefs/B20261012-0029-getting-started.loop-brief.md
+wrote .gitignore
+wrote CLAUDE.md
 next:
   vloop doctor
   get /vloop:operate for your Claude Code sessions, once:
