@@ -20,3 +20,10 @@ committing the plan
    review T1 · 0m21s · $0.11 · run $2.61 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/7 done ──
+   Add doctor's `gate edits` check of the operator's permission to edit gate folders
+   work T2 · 6m03s · $0.29 · run $2.91 / $40.00
+   check go
+   review T2 · 0m28s · $0.14 · run $3.05 / $40.00
+   review: PASS
+   T2 done

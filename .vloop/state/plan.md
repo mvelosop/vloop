@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/7 done** · iteration 1
+**Status:** running · **2/7 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T20:45:35Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T20:55:16Z
 
 ## Progress
 
 - [x] **T1** — Make doctor's plugin check warn when no vloop plugin is listed
-- [ ] **T2** — Add doctor's `gate edits` check of the operator's permission to edit gate folders
+- [x] **T2** — Add doctor's `gate edits` check of the operator's permission to edit gate folders
 - [ ] **T3** — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
 - [ ] **T4** — Explain the name, PATH, and asking rather than typing in the README
 - [ ] **T5** — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
@@ -43,7 +43,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Add doctor's `gate edits` check of the operator's permission to edit gate folders
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 A gate repair means the operator's interactive session edits .vloop/state/gates/<id>/; under Claude Code's auto mode with no allow rule that edit is refused, and B12's T3 sat blocked overnight on it (brief D2). This task adds a doctor check that reads the user, project and local Claude Code settings and warns, printing the rule to add, when none allows it. It only reads; permissions stay the user's choice.
 

@@ -172,7 +172,7 @@ func (e *doctorEnv) plan(status, shell string) {
 func TestDoctorWorkedExampleText(t *testing.T) {
 	e := newDoctorEnv(t)
 	out, code := e.run("doctor")
-	want := "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n✓ plugin\n- self-hosting\ndoctor: 0 problem(s), 0 warning(s)\n"
+	want := "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n✓ plugin\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n- self-hosting\ndoctor: 0 problem(s), 1 warning(s)\n"
 	if code != 0 || out != want {
 		t.Errorf("exit %d, output:\n%s\nwant:\n%s", code, out, want)
 	}
@@ -418,4 +418,123 @@ func TestDoctorSelfHostingInstalledRelease(t *testing.T) {
 	e.want("self-hosting", resPass)
 	e.build.Module = "v0.8.1-0.20260101000000-abcdef123456"
 	e.want("self-hosting", resWarning)
+}
+
+// gateEditsEnv points the doctor's home seam at the fake home, so the test
+// sets it the same way on every OS.
+func gateEditsEnv(t *testing.T) *doctorEnv {
+	e := newDoctorEnv(t)
+	old := userHomeDir
+	userHomeDir = func() (string, error) { return e.home, nil }
+	t.Cleanup(func() { userHomeDir = old })
+	return e
+}
+
+func (e *doctorEnv) settings(where, content string) {
+	e.t.Helper()
+	p := map[string]string{
+		"user":    filepath.Join(e.home, ".claude", "settings.json"),
+		"project": filepath.Join(e.repo, ".claude", "settings.json"),
+		"local":   filepath.Join(e.repo, ".claude", "settings.local.json"),
+	}[where]
+	os.MkdirAll(filepath.Dir(p), 0o755)
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		e.t.Fatal(err)
+	}
+}
+
+func allowOnly(entry string) string {
+	b, _ := json.Marshal(map[string]any{"permissions": map[string]any{"allow": []string{entry}}})
+	return string(b)
+}
+
+func TestDoctorGateEditsPassForms(t *testing.T) {
+	e := gateEditsEnv(t)
+	for _, where := range []string{"user", "project", "local"} {
+		for _, entry := range []string{"Edit", "Edit(**)", "Edit(./**)", "Edit(.vloop/**)", "Edit(./.vloop/**)",
+			"Edit(.vloop/state/**)", "Edit(./.vloop/state/**)", "Edit(.vloop/state/gates/**)", "Edit(./.vloop/state/gates/**)"} {
+			os.RemoveAll(filepath.Join(e.home, ".claude"))
+			os.RemoveAll(filepath.Join(e.repo, ".claude"))
+			e.settings(where, allowOnly(entry))
+			if c := e.want("gate edits", resPass); c.Message != "" {
+				t.Errorf("%s %s: message %q", where, entry, c.Message)
+			}
+		}
+	}
+}
+
+func TestDoctorGateEditsWarnForms(t *testing.T) {
+	e := gateEditsEnv(t)
+	for _, entry := range []string{"Edit(./src/**)", "Edit(/.vloop/**)", "Edit(~/.vloop/**)", "Edit(.vloop/state/gates/*)",
+		"Edit(././.vloop/**)", "Write(.vloop/**)", "MultiEdit", "Edit(.vloop/state/gates/T1/**)"} {
+		e.settings("project", allowOnly(entry))
+		e.want("gate edits", resWarning)
+	}
+	e.settings("project", `{"permissions":{"deny":["Edit(.vloop/**)"],"ask":["Edit"],"defaultMode":"acceptEdits"}}`)
+	e.want("gate edits", resWarning)
+	e.settings("project", `{}`)
+	e.want("gate edits", resWarning)
+}
+
+func TestDoctorGateEditsOrderAndUnreadable(t *testing.T) {
+	e := gateEditsEnv(t)
+	e.settings("user", `{"permissions":{"allow":["Bash(ls:*)"]}}`)
+	e.settings("project", `{}`)
+	e.settings("local", allowOnly("Edit(./.vloop/state/gates/**)"))
+	e.want("gate edits", resPass)
+
+	for where, shown := range map[string]string{"user": "~/.claude/settings.json", "project": ".claude/settings.json", "local": ".claude/settings.local.json"} {
+		os.RemoveAll(filepath.Join(e.home, ".claude"))
+		os.RemoveAll(filepath.Join(e.repo, ".claude"))
+		e.settings(where, `{"permissions":`)
+		c := e.want("gate edits", resWarning)
+		if !strings.HasPrefix(c.Message, "cannot read "+shown+": ") {
+			t.Errorf("%s: message %q", where, c.Message)
+		}
+	}
+	// the files are read in order: an unreadable user file is named even when
+	// a later one allows the edit; an earlier pass is not undone by a later one.
+	os.RemoveAll(filepath.Join(e.repo, ".claude"))
+	e.settings("user", `{"permissions":`)
+	e.settings("project", allowOnly("Edit"))
+	if c := e.want("gate edits", resWarning); !strings.HasPrefix(c.Message, "cannot read ~/.claude/settings.json: ") {
+		t.Errorf("message %q", c.Message)
+	}
+	e.settings("user", allowOnly("Edit"))
+	e.settings("project", `{"permissions":`)
+	e.want("gate edits", resPass)
+}
+
+func TestDoctorGateEditsNoClaudeAndWritesNothing(t *testing.T) {
+	e := gateEditsEnv(t)
+	e.claude(false)
+	e.want("gate edits", resNA)
+	if _, err := os.Stat(filepath.Join(e.repo, ".claude")); err == nil {
+		t.Error("doctor created .claude/")
+	}
+	e.claude(true)
+	e.want("gate edits", resWarning)
+	for _, p := range []string{filepath.Join(e.home, ".claude"), filepath.Join(e.repo, ".claude")} {
+		if _, err := os.Stat(p); err == nil {
+			t.Errorf("doctor created %s", p)
+		}
+	}
+}
+
+func TestDoctorGateEditsFollowsPlugin(t *testing.T) {
+	e := gateEditsEnv(t)
+	out, _ := e.run("--json", "doctor")
+	var doc struct{ Checks []doctorCheck }
+	if err := json.Unmarshal([]byte(out), &doc); err != nil {
+		t.Fatal(err)
+	}
+	for i, c := range doc.Checks {
+		if c.Name == "plugin" {
+			if i+1 >= len(doc.Checks) || doc.Checks[i+1].Name != "gate edits" {
+				t.Errorf("gate edits is not right after plugin: %v", doc.Checks)
+			}
+			return
+		}
+	}
+	t.Error("no plugin check")
 }

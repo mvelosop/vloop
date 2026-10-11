@@ -1,0 +1,271 @@
+{
+  "schema": "metrics/v2",
+  "brief": "B20261011-2100-b13-docs-onboarding.loop-brief",
+  "run_id": "B20261011-2100-b13-docs-onboarding",
+  "status": "ready",
+  "merged": null,
+  "tasks": {
+    "planned": 7,
+    "done": 1,
+    "blocked": 0,
+    "first_pass": 1,
+    "estimate": {
+      "min": 6,
+      "max": 9
+    }
+  },
+  "size": {
+    "delivered": {
+      "code": 1,
+      "test": 6,
+      "docs": 0,
+      "other": 0,
+      "deleted": {
+        "code": 1,
+        "test": 4,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "churn": {
+      "code": 1,
+      "test": 6,
+      "docs": 0,
+      "other": 0,
+      "deleted": {
+        "code": 1,
+        "test": 4,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 6,
+    "rework": 1
+  },
+  "time": {
+    "agent_ms": 499508,
+    "work_ms": 478873,
+    "review_ms": 20635,
+    "plan_ms": 427841,
+    "gates_ms": 1811,
+    "checks_ms": 184366,
+    "gate_review_ms": 79155,
+    "wall_ms": null
+  },
+  "rate": {
+    "code_per_min": 0.12011819630516428,
+    "code_test_per_min": 0.8408273741361499
+  },
+  "cost": {
+    "total_usd": 2.6137836999999995,
+    "plan_usd": 1.9570521999999997,
+    "work_usd": 0.17791040000000005,
+    "review_usd": 0.1071077,
+    "gate_review_usd": 0.3717134,
+    "per_1000_code_lines_usd": 2613.7836999999995
+  },
+  "tokens": {
+    "input": 130,
+    "output": 57818,
+    "cache_read": 3235056,
+    "cache_creation": 183328,
+    "cache_hit_ratio": 0.9463339919040846
+  },
+  "models": {
+    "plan": [
+      "claude-opus-5-5"
+    ],
+    "work": [
+      "claude-sonnet-5-5"
+    ],
+    "review": [
+      "claude-sonnet-5-5"
+    ],
+    "gate-review": [
+      "claude-sonnet-5-5"
+    ]
+  },
+  "effort": {
+    "plan": null,
+    "work": null,
+    "review": null,
+    "gate-review": null
+  },
+  "defects": {
+    "in_loop": 0,
+    "operator": 0,
+    "escaped": 0,
+    "total": 0,
+    "removal_efficiency": null
+  },
+  "interventions": {
+    "total": 1,
+    "by_agreement": {
+      "recommended": 1,
+      "other-option": 0,
+      "adjusted": 0,
+      "different": 0,
+      "no-options": 0
+    }
+  },
+  "records": {
+    "missing": []
+  },
+  "lead_time": {
+    "plan_to_merge_ms": null
+  },
+  "permission_denials": 2,
+  "iterations": 1,
+  "iterations_per_closed": 1,
+  "by_task": [
+    {
+      "id": "T1",
+      "area": null,
+      "kind": "fix",
+      "attempts": 1,
+      "churn": {
+        "code": 1,
+        "test": 6,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 1,
+          "test": 4,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 499508,
+      "cost_usd": 0.28501810000000005,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T2",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": []
+    },
+    {
+      "id": "T3",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": []
+    },
+    {
+      "id": "T4",
+      "area": null,
+      "kind": "docs",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": []
+    },
+    {
+      "id": "T5",
+      "area": null,
+      "kind": "docs",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": []
+    },
+    {
+      "id": "T6",
+      "area": null,
+      "kind": "docs",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": []
+    },
+    {
+      "id": "T7",
+      "area": null,
+      "kind": "test",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": []
+    }
+  ]
+}

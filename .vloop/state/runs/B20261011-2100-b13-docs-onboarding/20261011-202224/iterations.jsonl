@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":184366,"exit":0,"name":"go"}],"ended":"2026-10-11T20:45:35Z","gate":{"duration_ms":1811,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261011-2100-b13-docs-onboarding","schema":"iteration/v2","started":"2026-10-11T20:34:09Z","task":"T1"}
+{"attempt":1,"checks":[{"duration_ms":183742,"exit":0,"name":"go"}],"ended":"2026-10-11T20:55:16Z","gate":{"duration_ms":3279,"exit":0},"iteration":2,"outcome":"done","run_id":"B20261011-2100-b13-docs-onboarding","schema":"iteration/v2","started":"2026-10-11T20:45:35Z","task":"T2"}

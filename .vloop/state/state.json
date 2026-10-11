@@ -5,9 +5,9 @@
   "base": "6b67e496945aa7fd599ea807cbf5d9e1362cc9f8",
   "branch": "B20261011-2100-b13-docs-onboarding",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-11T20:31:28Z",
-  "updated": "2026-10-11T20:45:35Z",
+  "updated": "2026-10-11T20:55:16Z",
   "shell": "sh",
   "checks": [
     {
@@ -85,7 +85,7 @@
         "No earlier test is weakened: only the tests the brief lists change, and only as it states"
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
