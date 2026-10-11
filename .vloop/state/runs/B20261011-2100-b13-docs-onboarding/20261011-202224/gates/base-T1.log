@@ -1,0 +1,12 @@
+GATE FAIL: empty: no line '! plugin /vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session' in:
+✓ git
+✓ install
+✓ config
+✓ claude
+✓ trust
+✓ gate shell
+- plan
+- branch
+✓ plugin the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir "$(vloop plugin path)"
+- self-hosting
+doctor: 0 problem(s), 0 warning(s)
