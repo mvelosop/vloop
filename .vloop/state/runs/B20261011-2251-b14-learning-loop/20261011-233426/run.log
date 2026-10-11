@@ -36,3 +36,12 @@ checking the gate of T13 on the base
    work session reported blocked
    T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
    T2 hit the attempt ceiling — blocked
+   T2 blocked twice with nothing changed since the first attempt — halting rather than spending a third identical session. First diagnosis: The implementation from the previous attempt is in place (WithGuidelines in internal/driver/session.go, called from Runner.Run; tests in internal/driver/session_test.go) and the gate passes, but the flag spelling could not be confirmed against `claude --help`: running claude is denied in this session. Per acceptance 3 the task halts instead of guessing.
+
+═══ halted ═══
+run:    B20261011-2251-b14-learning-loop/20261011-233426  (4 iteration(s) this run)
+plan:   1/13 done, 1 blocked
+T2 blocked twice with nothing changed since the first attempt — halting rather than spending a third identical session. First diagnosis: The implementation from the previous attempt is in place (WithGuidelines in internal/driver/session.go, called from Runner.Run; tests in internal/driver/session_test.go) and the gate passes, but the flag spelling could not be confirmed against `claude --help`: running claude is denied in this session. Per acceptance 3 the task halts instead of guessing.
+
+T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.

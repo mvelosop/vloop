@@ -7,7 +7,7 @@
   "tasks": {
     "planned": 13,
     "done": 1,
-    "blocked": 0,
+    "blocked": 1,
     "first_pass": 1,
     "estimate": {
       "min": 11,
@@ -43,33 +43,33 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 343098,
-    "work_ms": 295817,
+    "agent_ms": 364843,
+    "work_ms": 317562,
     "review_ms": 47281,
     "plan_ms": 1408556,
-    "gates_ms": 15431,
+    "gates_ms": 22534,
     "checks_ms": 379640,
     "gate_review_ms": 506209,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 7.869471696133466,
-    "code_test_per_min": 19.58624066593218
+    "code_per_min": 7.400443478427707,
+    "code_test_per_min": 18.41888154630896
   },
   "cost": {
-    "total_usd": 10.030228000000001,
+    "total_usd": 10.111257100000001,
     "plan_usd": 7.870528600000002,
-    "work_usd": 0.4403828,
+    "work_usd": 0.5214119,
     "review_usd": 0.2174705,
     "gate_review_usd": 1.5018460999999999,
-    "per_1000_code_lines_usd": 222.89395555555558
+    "per_1000_code_lines_usd": 224.69460222222227
   },
   "tokens": {
-    "input": 426,
-    "output": 185216,
-    "cache_read": 19897557,
-    "cache_creation": 563049,
-    "cache_hit_ratio": 0.9724610664799312
+    "input": 438,
+    "output": 186407,
+    "cache_read": 20030268,
+    "cache_creation": 577005,
+    "cache_hit_ratio": 0.9719792751363798
   },
   "models": {
     "plan": [
@@ -114,9 +114,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 15,
-  "iterations": 3,
-  "iterations_per_closed": 3,
+  "permission_denials": 16,
+  "iterations": 4,
+  "iterations_per_closed": 4,
   "by_task": [
     {
       "id": "T1",
@@ -145,7 +145,7 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 2,
+      "attempts": 3,
       "churn": {
         "code": 12,
         "test": 18,
@@ -158,8 +158,8 @@
           "other": 0
         }
       },
-      "agent_ms": 104248,
-      "cost_usd": 0.3555814,
+      "agent_ms": 125993,
+      "cost_usd": 0.4366105,
       "models": [
         "claude-sonnet-5-5"
       ]
