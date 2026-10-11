@@ -40,45 +40,24 @@ From `vloop brief new <slug>`, which writes
 and `depends-on:` the previous brief's name. Pin decisions, leave mechanics
 open.
 
-**Start with an executive summary**, right after the header bullets, in two
-layers. The operator reads it first and decides from it.
+**Start with an executive summary**, right after the header bullets, short
+enough to grasp the brief's goal in a minute: one or two sentences on the
+problem, a bold **The goal:** line saying in plain words what changes for the
+user, then one bullet per item (requirement or defect) —
+`**<id> — <what it achieves>.**` and one or two sentences on why it matters —
+and a closing line on what does not change. Outcomes, not mechanisms; the
+summary restates the contract and never adds to it.
 
-1. **The overview:** one or two sentences on the problem, a bold
-   **The goal:** line saying in plain words what changes for the user, then
-   one bullet per item (requirement or defect) — `**<id> — <what it achieves>.**`
-   and one or two sentences on why it matters. Outcomes, not mechanisms: the
-   operator should grasp the brief's goal from this list alone.
-2. **The blocks:** a short block per item, with enough to judge the item
-   without reading the contract, and a closing line on what does not change.
-   Each block, as a `###` heading `<id> — <title>` followed by:
+Details come when the operator asks for them, in the conversation, not in the
+brief. Explain an item as a short block: one sentence on what it does;
+**Today:** what is wrong, with the evidence (the run, the number, the message
+the user sees); **After:** what changes, as bullets quoting the exact messages
+or output the contract pins; and, only where they apply, one line each of
+**Safety:**, **Unchanged:**, **Side effect:**, **Limit:**, **Not included:**.
 
-   - **one sentence** saying what the item does, in plain words;
-   - **Today:** what is wrong, with the concrete evidence (the run, the number,
-     the message the user sees);
-   - **After:** what changes, as bullets, quoting the exact messages, commands
-     or output lines the contract pins;
-   - only where they apply, one line each: **Safety:**, **Unchanged:**, **Side
-     effect:**, **Limit:**, **Not included:**.
-
-A block, for example:
-
-```
-### R3 — sessions timed by the driver
-
-R3 makes the driver time each session itself instead of trusting the CLI's figure.
-
-- **Today:** `duration_ms` is copied from the CLI; in visum-monorepo it said
-  20 seconds for a plan session that ran 39 minutes.
-- **After:**
-  - Each session record gains `ended` and `wall_ms`, the driver's own measurement.
-  - Metrics use `wall_ms` when a record has it and `duration_ms` otherwise.
-- **Side effect:** every past brief's wall time changes; the real-data check lists each.
-```
-
-The executive summary restates the contract; it never adds to it. (Set by the
-operator on 2026-10-11 with B13's one-line form; the per-item blocks, from the
-B12 explanations the operator found most useful, and the overview above
-them, from B14 on: the blocks alone did not make B14's goal quick to grasp.)
+(Set by the operator on 2026-10-11: B13's one-line form, then B14's per-item
+blocks, which were too long to grasp the goal quickly; the short form stays in
+the brief and the blocks are given on request.)
 
 Every brief so far also carried:
 
