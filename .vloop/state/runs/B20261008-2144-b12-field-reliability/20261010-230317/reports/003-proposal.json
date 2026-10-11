@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The plan is stamped (run_id, brief, branch, status planning) as soon as it loads and becomes running only when the gate review passes it; vloop run now resumes acceptance, with no plan session, whenever a plan is planning or has no passed gate review.",
+  "files": ["internal/driver/plan.go", "cmd/vloop/run_git_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed ok; go test ./cmd/vloop ./internal/driver ./internal/cli, go vet, gofmt, go mod tidy -diff and the linux/windows builds are clean.",
+  "notes": "Planner.Plan takes the acceptance-resume path when needsAcceptance(plan): status planning, or status not blocked with gate_review not PASS and iteration 0. It opens a new run folder, logs 'resuming acceptance of <run id>: round <n>', skips plan session and base checks, and calls acceptPlan from round n = plan sessions recorded across the run id's folders (1..2). acceptPlan stamps via stampPlan(status) before the base gates; the 'planned:' line now prints after the base gates pass, as before. Blocked plans keep the iterator's resumeBaseGates path. New tests: TestRunBaseGateHaltResumesAcceptance and TestRunGateReviewHaltResumesAcceptance in cmd/vloop/run_git_test.go. Domain docs (plan.md lifecycle/acceptance, run.md) are not updated here; that is T10. When running go test inside a vloop session, unset VLOOP_PLAN_SHA256 or TestTaskGate* fail."
+}

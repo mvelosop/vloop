@@ -39,3 +39,7 @@ committing the plan
    check go
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/11 done ──
+   Stamp the plan on load and resume acceptance after a halt instead of planning again
+   check go
+   review: FAIL
