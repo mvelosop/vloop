@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop init now ends with D3's seven lines (install commands, --plugin-dir, ask rather than type), and the CLAUDE.md section's interactive paragraph carries D3's text about an unloaded plugin.
 - **Files:** internal/cli/init.go, internal/install/section.go, internal/cli/init_test.go, cmd/vloop/b5_e2e_test.go, internal/install/install_test.go, internal/cli/b11_verify_test.go
 - **Notes for next iteration:** TestInitDoesNotPointAtAMarketplace (internal/cli/b11_verify_test.go) asserted init does NOT mention marketplace, which D3 reverses; renamed to TestInitPointsAtBothWaysToLoadThePlugin and now asserts the three commands are present. b5_e2e_test.go line count for init output went 12 -> 16. No help text changed, so docs/guide/commands.md untouched; this repo's CLAUDE.md not rewritten. task_gate_test failures in a full internal/cli run come from running inside a live session (plan held by the driver), not from this change.
+
+## T4 — Explain the name, PATH, and asking rather than typing in the README
+
+- **Outcome:** done (review: PASS)
+- **Summary:** README now explains the name (verification loop), the PATH note after go install with a link to the guide, a 'You ask; the skill drives' section before 'Everyday commands', and links 'driver' to the guide.
+- **Files:** README.md
+- **Notes for next iteration:** The 5 TestTaskGate* failures say 'the plan was changed during this session'; they fail because the tests run inside a driver-held session and do not touch the README. The PATH link targets docs/guide/concepts.md#setting-up-a-repository (existing heading, which T5 extends); the-driver anchor does not exist until T5 adds it.

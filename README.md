@@ -1,7 +1,9 @@
 # vloop
 
-vloop is a Go command-line tool and Claude Code plugin that runs an autonomous
-loop. You write a **brief** (what to build and why); vloop has Claude plan it
+vloop (short for **verification loop**) is a Go command-line tool and Claude Code
+plugin that runs an autonomous loop. What the loop is about is the gate and the
+independent review: nothing counts as done until a check passes and a separate
+session agrees. You write a **brief** (what to build and why); vloop has Claude plan it
 into tasks, then for each task a fresh work session does it, a gate checks it, an
 independent review judges it, and vloop makes one commit. You read the result,
 not every step.
@@ -19,6 +21,16 @@ not every step.
 ```
 go install github.com/mvelosop/vloop/cmd/vloop@latest
 ```
+
+`go install` puts the binary in `$(go env GOPATH)/bin` (`~/go/bin` by default),
+which is often not on your PATH. If `vloop` is not found, add it:
+
+```
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+The file to put that line in, per shell, is in
+[docs/guide/concepts.md](docs/guide/concepts.md#setting-up-a-repository).
 
 The plugin ships inside the binary, and `vloop run` hands it to its own sessions.
 For an interactive Claude Code session with the plugin, install it from this
@@ -57,14 +69,23 @@ In a git repository, on a clean tree:
 
 A **plan** session splits the brief into tasks, each with acceptance criteria and
 a **gate**: a verify command, often with a gate folder of fixtures. Before any
-work, the driver runs the gates on the base and a **gate review** judges them. Then
+work, [the driver](docs/guide/concepts.md#the-driver) runs the gates on the base and a **gate review** judges them. Then
 for each task a **work** session does it, the gates run, the repository's
 `[[check]]` entries run, an independent **review** session judges the diff, and the
 driver makes **one commit**. Every session is a fresh Claude session; they share
 only files in the repository. A task that fails is tried again, and a run that
 cannot go on halts and says why.
 
+## You ask; the skill drives
+
+With the plugin loaded, you do not have to type vloop's commands. Ask Claude Code
+in plain words ("run this brief", "what did that cost?", "record this as a
+defect") and the `/vloop:operate` skill runs the right vloop commands, checks the
+result and tells you what happened. Merging and pushing stay yours.
+
 ## Everyday commands
+
+What you can ask for, and the command the skill runs for it:
 
 - `vloop status`, `vloop task list`, `vloop task show <id>`: where the run stands.
 - `vloop brief list`: briefs in dependency order, ready or blocked.

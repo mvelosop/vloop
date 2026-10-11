@@ -34,3 +34,10 @@ committing the plan
    review T3 · 0m19s · $0.11 · run $3.36 / $40.00
    review: PASS
    T3 done
+── iteration 4 (4 this run) · T4 · 3/7 done ──
+   Explain the name, PATH, and asking rather than typing in the README
+   work T4 · 6m04s · $0.13 · run $3.48 / $40.00
+   check go
+   review T4 · 0m21s · $0.11 · run $3.59 / $40.00
+   review: PASS
+   T4 done

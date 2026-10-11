@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/7 done** · iteration 3
+**Status:** running · **4/7 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:03:06Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:12:50Z
 
 ## Progress
 
 - [x] **T1** — Make doctor's plugin check warn when no vloop plugin is listed
 - [x] **T2** — Add doctor's `gate edits` check of the operator's permission to edit gate folders
 - [x] **T3** — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
-- [ ] **T4** — Explain the name, PATH, and asking rather than typing in the README
+- [x] **T4** — Explain the name, PATH, and asking rather than typing in the README
 - [ ] **T5** — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
 - [ ] **T6** — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
 - [ ] **T7** — Close: commit the worked example as a test and pass the real-data check
@@ -92,7 +92,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Explain the name, PATH, and asking rather than typing in the README
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 The README assumes the reader already knows what vloop's name means, has Go's bin directory on PATH, and will type commands rather than ask Claude Code (brief D4). This task fixes the README so a newcomer installs successfully and learns that /vloop:operate drives vloop for them.
 
