@@ -17,6 +17,37 @@ depends-on: [B20261008-2144-b12-field-reliability.loop-brief]
   (intervention recorded with this brief).
 - **Run by:** `vloop run` from the released v0.9.0.
 
+## Executive summary
+
+vloop is meant to be driven by asking, through `/vloop:operate`, but nothing
+tells a new user so, checks that the skill is loaded, or explains the basics.
+Seven items, each a gap a user meets today:
+
+- **D1 — `doctor` hides a missing skill.** It passes when no vloop plugin is
+  installed, so `/vloop:operate` is silently absent. It will warn, naming the
+  two ways to load it.
+- **D2 — gate repairs can stall on a permission.** Nothing checks that the
+  operator's session may edit `.vloop/state/gates/`; B12's T3 sat blocked
+  overnight on it. A new `doctor` check, `gate edits`, warns and prints the
+  rule to add; vloop never writes it.
+- **D3 — `init` and `CLAUDE.md` don't say how to get the skill.** `init`'s
+  closing lines and the `CLAUDE.md` section will give the install commands and
+  say to ask Claude Code rather than type commands.
+- **D4 — the README assumes too much.** It will explain the name (verification
+  loop), warn that Go's bin directory may not be on `PATH`, say "you ask; the
+  skill drives", and link "driver" to its definition.
+- **D5 — the guide leaves basics undefined.** It will define the driver, give
+  `PATH` per shell, state how vloop's sessions load plugins (measured), say when
+  gate folders are replaced, and list the new `doctor` checks.
+- **D6 — no way to retire the shell loop.** A guide section lists what to
+  remove and what to keep, and the docs stop saying the old layout is read "in
+  this repository only".
+- **D7 — two playbooks in this repository.** This repository's `CLAUDE.md`
+  will say its own operator skill wins over `/vloop:operate` here.
+
+Only D1–D3 change code, and only text and two warnings: no exit code, file
+format or plugin skill changes.
+
 ## What it is
 
 A user who installs vloop today meets a tool that is meant to be driven by
