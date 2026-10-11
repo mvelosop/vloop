@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "vloop init now writes .vloop/repo-guidelines.md (title, one sentence, `## Pinning tests` and `## External formats` each with one sentence and a commented-out L3/L4 example), English or Spanish prose by language; an existing file is kept and no line is printed for it.",
+  "files": ["internal/cli/init.go", "internal/cli/init_test.go", "cmd/vloop/b5_e2e_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go test ./cmd/vloop passes; go test ./internal/cli passes except TestTaskGate* (see notes).",
+  "notes": "The init step sits between the install.json stamp and the starter brief, so the line follows `wrote .vloop/install.json`. It is skipped, not 'kept', when the file exists (no output). Template and path const (guidelinesPath, guidelinesTemplate) are in internal/cli/init.go; later tasks can reuse guidelinesPath. TestTaskGate* in internal/cli fail with 'the plan was changed during this session' when go test is run from inside a driver work session; unrelated to this change and not caused by it."
+}

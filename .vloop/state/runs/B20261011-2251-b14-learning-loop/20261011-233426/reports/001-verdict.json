@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "vloop init writes .vloop/repo-guidelines.md when it does not exist and prints `wrote .vloop/repo-guidelines.md` on the line right after `wrote .vloop/install.json`", "met": true, "evidence": "internal/cli/init.go step appended right after the install.json step; init_test.go asserts the adjacent two-line sequence; b5_e2e_test.go expects it at index 6"},
+    {"criterion": "An existing .vloop/repo-guidelines.md is kept byte for byte and init prints no line for it; init still exits 0", "met": true, "evidence": "step is only appended when readRepoFile reports not exists; TestInitKeepsExistingGuidelines asserts bytes unchanged, no output mention, exit 0"},
+    {"criterion": "The template is short: a title, one sentence saying the file holds this repository's lessons and every loop session receives it, then `## Pinning tests` and `## External formats`, each with one sentence and one example line in the format L3 (`- when `<phrase>`: `<name>`, …`) or L4 (`- `<phrase>`: `<path>``) reads, inside an HTML comment so it is not a rule", "met": true, "evidence": "guidelinesTemplate in internal/cli/init.go: title, one sentence, two sections each with one sentence and one commented L3/L4 example line"},
+    {"criterion": "The prose follows `language` (C-4): `vloop init --language es` writes Spanish prose; the two headings are exactly `## Pinning tests` and `## External formats` in every language", "met": true, "evidence": "guidelinesTemplate has an es branch with English headings; TestInitGuidelinesTemplate checks both headings and Spanish prose for en and es"},
+    {"criterion": "TestInitWritesEverything (internal/cli/init_test.go) and TestWorkedExampleB5Session (cmd/vloop/b5_e2e_test.go) change only by the new `wrote .vloop/repo-guidelines.md` line; committed tests cover the template in both languages and the kept existing file. Violation: the behaviour shipped with no committed test the checks run", "met": true, "evidence": "both diffs only add the new line (and shift indices/count 16->17 in B5); new TestInitGuidelinesTemplate and TestInitKeepsExistingGuidelines; go check passed"},
+    {"criterion": "vloop upgrade does not write the file (out of scope); no schema or exit code changes", "met": true, "evidence": "diff touches only runInit and tests; no upgrade, schema or exit-code changes"},
+    {"criterion": "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state", "met": true, "evidence": "no assertion removed or loosened; TestInitDryRun gained one extra 'would write' assertion, a strengthening not listed in the brief"}
+  ],
+  "findings": [],
+  "notes": "TestInitDryRun gained an additional assertion beyond the tests the brief lists; harmless (adds coverage) but technically outside the listed set."
+}

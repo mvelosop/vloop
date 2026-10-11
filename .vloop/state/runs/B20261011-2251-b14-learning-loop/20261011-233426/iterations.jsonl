@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":194026,"exit":0,"name":"go"}],"ended":"2026-10-11T23:42:10Z","gate":{"duration_ms":1262,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261011-2251-b14-learning-loop","schema":"iteration/v2","started":"2026-10-11T23:34:55Z","task":"T1"}

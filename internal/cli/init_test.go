@@ -40,7 +40,7 @@ func TestInitWritesEverything(t *testing.T) {
 	if code != 0 || errs != "" {
 		t.Fatalf("code %d, stderr %q", code, errs)
 	}
-	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  vloop doctor\n  get /vloop:operate for your Claude Code sessions, once:\n    claude plugin marketplace add mvelosop/vloop\n    claude plugin install vloop@vloop\n  or, for one session: claude --plugin-dir \"$(vloop plugin path)\"\n  then ask Claude Code for what you want (\"run the brief docs/briefs/<name>\"); /vloop:operate drives vloop\n"} {
+	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "wrote .vloop/install.json\nwrote .vloop/repo-guidelines.md\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  vloop doctor\n  get /vloop:operate for your Claude Code sessions, once:\n    claude plugin marketplace add mvelosop/vloop\n    claude plugin install vloop@vloop\n  or, for one session: claude --plugin-dir \"$(vloop plugin path)\"\n  then ask Claude Code for what you want (\"run the brief docs/briefs/<name>\"); /vloop:operate drives vloop\n"} {
 		if !strings.Contains(out, want) {
 			t.Errorf("output lacks %q:\n%s", want, out)
 		}
@@ -133,7 +133,7 @@ func TestInitDryRun(t *testing.T) {
 	if code != 0 {
 		t.Fatal(code)
 	}
-	for _, want := range []string{"would write .vloop/config.toml\n", "would write .vloop/install.json\n", "would write .gitignore\n", "would write CLAUDE.md\n"} {
+	for _, want := range []string{"would write .vloop/config.toml\n", "would write .vloop/install.json\n", "would write .vloop/repo-guidelines.md\n", "would write .gitignore\n", "would write CLAUDE.md\n"} {
 		if !strings.Contains(out, want) {
 			t.Errorf("lacks %q:\n%s", want, out)
 		}
@@ -209,5 +209,50 @@ func TestInitWithNoStackWritesNoCheck(t *testing.T) {
 	out, _, code := runPluginCLI(t, initBuild, d, "init")
 	if code != 0 || strings.Contains(out, "starting point") || strings.Contains(readFile(t, d, ".vloop/config.toml"), "[[check]]") {
 		t.Errorf("code %d:\n%s", code, out)
+	}
+}
+
+func TestInitGuidelinesTemplate(t *testing.T) {
+	for _, lang := range []string{"en", "es"} {
+		d := initRepo(t, map[string]string{"go.mod": "module a\n"})
+		if _, _, code := runPluginCLI(t, initBuild, d, "init", "--language", lang); code != 0 {
+			t.Fatalf("%s: code %d", lang, code)
+		}
+		got := readFile(t, d, ".vloop/repo-guidelines.md")
+		for _, h := range []string{"\n## Pinning tests\n", "\n## External formats\n"} {
+			if !strings.Contains(got, h) {
+				t.Errorf("%s: no %q in:\n%s", lang, h, got)
+			}
+		}
+		inComment := false
+		for _, l := range strings.Split(got, "\n") {
+			if strings.HasPrefix(l, "<!--") {
+				inComment = true
+			}
+			if strings.HasPrefix(l, "- ") && !inComment {
+				t.Errorf("%s: rule outside a comment: %q", lang, l)
+			}
+			if strings.Contains(l, "-->") {
+				inComment = false
+			}
+		}
+		if lang == "es" && !strings.Contains(got, "lecciones") {
+			t.Errorf("es prose is not Spanish:\n%s", got)
+		}
+	}
+}
+
+func TestInitKeepsExistingGuidelines(t *testing.T) {
+	const mine = "# Mine\n\n- keep me (D20261011-1455)\n"
+	d := initRepo(t, map[string]string{"go.mod": "module a\n", ".vloop/repo-guidelines.md": mine})
+	out, _, code := runPluginCLI(t, initBuild, d, "init")
+	if code != 0 {
+		t.Fatalf("code %d", code)
+	}
+	if got := readFile(t, d, ".vloop/repo-guidelines.md"); got != mine {
+		t.Errorf("file changed: %q", got)
+	}
+	if strings.Contains(out, "repo-guidelines.md") {
+		t.Errorf("init printed a line for the kept file:\n%s", out)
 	}
 }

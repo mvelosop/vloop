@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md",
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
-  "status": "blocked",
-  "iteration": 0,
+  "status": "running",
+  "iteration": 1,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-11T23:34:10Z",
+  "updated": "2026-10-11T23:42:10Z",
   "shell": "sh",
   "checks": [
     {
@@ -21,7 +21,7 @@
   "gate_scratch": [],
   "gate_review": {
     "rounds": 2,
-    "verdict": "FAIL"
+    "verdict": "PASS"
   },
   "tasks": [
     {
@@ -47,7 +47,7 @@
         "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state"
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

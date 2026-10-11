@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **0/13 done** · iteration 0
+**Status:** running · **1/13 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-11T23:33:02Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-11T23:42:10Z
 
 ## Progress
 
-- [ ] **T1** — Make vloop init write an empty .vloop/repo-guidelines.md
+- [x] **T1** — Make vloop init write an empty .vloop/repo-guidelines.md
 - [ ] **T2** — Hand .vloop/repo-guidelines.md to every session vloop run starts
 - [ ] **T3** — Add the guidelines paragraph to the four session skills and teach the gate review the two rules it missed
 - [ ] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
@@ -26,7 +26,7 @@
 
 ### T1 — Make vloop init write an empty .vloop/repo-guidelines.md
 
-`pending` · depends on: none
+`done` · depends on: none
 
 A lesson about one repository has nowhere to live; L2 gives every new repository the file from day one, so the place for lessons exists before the first one. Later tasks hand this file to every session (T2), read its two sections in brief check (T4, T5) and count its rules in doctor (T8), so the template's headings and commented-out examples are what they all read.
 

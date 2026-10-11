@@ -198,17 +198,17 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		t.Fatalf("init stderr: %q", init.err)
 	}
 	lines := b5Lines(init.out)
-	if len(lines) != 16 {
+	if len(lines) != 17 {
 		t.Fatalf("init printed %d lines: %q", len(lines), init.out)
 	}
 	brief := regexp.MustCompile(`^wrote docs/briefs/B\d{8}-\d{4}-primeros-pasos\.loop-brief\.md$`)
-	if !brief.MatchString(lines[6]) {
-		t.Fatalf("starter brief line: %q", lines[6])
+	if !brief.MatchString(lines[7]) {
+		t.Fatalf("starter brief line: %q", lines[7])
 	}
 	want := []string{"detected stacks: go, javascript, react",
 		"check go: go test ./... && go vet ./... (paths: **)", "check javascript: npm test (paths: **)",
 		"each check is a starting point — edit it in .vloop/config.toml",
-		"wrote .vloop/config.toml", "wrote .vloop/install.json", lines[6],
+		"wrote .vloop/config.toml", "wrote .vloop/install.json", "wrote .vloop/repo-guidelines.md", lines[7],
 		"updated .gitignore", "wrote CLAUDE.md", "next:", "vloop doctor",
 		"get /vloop:operate for your Claude Code sessions, once:",
 		"claude plugin marketplace add mvelosop/vloop",

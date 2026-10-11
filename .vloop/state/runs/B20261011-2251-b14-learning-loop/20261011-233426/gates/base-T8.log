@@ -1,0 +1,13 @@
+GATE FAIL: seed: after the gate edits line want '✓ guidelines 6 rule(s)', got '- self-hosting' in:
+✓ git
+✓ install
+✓ config
+✓ claude
+✓ trust
+✓ gate shell
+- plan
+- branch
+✓ plugin
+! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add "Edit(./.vloop/state/gates/**)" to permissions.allow in .claude/settings.json
+- self-hosting
+doctor: 0 problem(s), 1 warning(s)
