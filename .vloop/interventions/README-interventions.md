@@ -45,6 +45,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 <!-- index:begin -->
 | Phase | Kind | Automatable | Agreement | Id |
 | --- | --- | --- | --- | --- |
+| setup | decision | partly | no-options | [I20261011-2233-b13-ran-from-the-unmerged-design-branch](I20261011-2233-b13-ran-from-the-unmerged-design-branch.md) |
 | setup | repair | yes | no-options | [I20260928-2215-the-loop-s-install-proof-failed-in-every](I20260928-2215-the-loop-s-install-proof-failed-in-every.md) |
 | design | carry-forward | yes | no-options | [I20260929-2150-b1-s-open-items-carried-into-b2](I20260929-2150-b1-s-open-items-carried-into-b2.md) |
 | design | context-supply | partly | no-options | [I20260929-1222-the-design-conversation-was-reachable-on](I20260929-1222-the-design-conversation-was-reachable-on.md) |
@@ -117,6 +118,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261002-2118-the-url-shortener-benchmark-the-cost-dro](I20261002-2118-the-url-shortener-benchmark-the-cost-dro.md) |
 | verify | verification-finding | partly | recommended | [I20261005-0757-b10-verified-the-worked-example-held-by](I20261005-0757-b10-verified-the-worked-example-held-by.md) |
 | verify | verification-finding | partly | recommended | [I20261006-1028-b11-verified-the-worked-example-held-by](I20261006-1028-b11-verified-the-worked-example-held-by.md) |
+| verify | verification-finding | partly | no-options | [I20261011-2233-verification-t3-changed-testinitdoesnotp](I20261011-2233-verification-t3-changed-testinitdoesnotp.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
