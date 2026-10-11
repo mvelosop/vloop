@@ -100,3 +100,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261008-2144-b12-field-reliability` · 3 iteration(s) this run
 - **Plan:** 7/11 done, 1 blocked
+
+## T4 — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Metrics take each session's time from wall_ms when the record has it and from duration_ms otherwise, in every per-phase figure, agent time and per-task times; a brief's wall starts at its first plan session's started, else the plan commit.
+- **Files:** internal/runs/runs.go, internal/metrics/time.go, internal/metrics/metrics.go, internal/metrics/time_test.go
+- **Notes for next iteration:** Implementation was already in the tree from the earlier blocked attempt (Session.WallMS *int64 and Session.TimeMS() in internal/runs); this session verified it against the corrected gate and changed nothing. No existing test needed changing, so there are no changed numbers to list; tests added: TestTimeFromWallMSWhereRecorded and TestTimeWallStartsAtFirstPlanSession. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.

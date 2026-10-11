@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **7/11 done** · iteration 12
+**Status:** running · **8/11 done** · iteration 13
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T08:52:45Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T09:01:53Z
 
 ## Progress
 
 - [x] **T1** — Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed · 1 attempt(s)
 - [x] **T2** — Stamp the plan on load and resume acceptance after a halt instead of planning again · 1 attempt(s)
 - [x] **T3** — Record ended and wall_ms, the driver's own measurement, on every session record
-- [ ] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session · **blocked**
+- [x] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
 - [x] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
 - [x] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
 - [x] **T7** — Record the session in flight in the run lock and show the live run in vloop status
@@ -100,7 +100,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
 
-`blocked` · **blocked** · depends on: T3
+`done` · depends on: T3
 
 vloop metrics showed a 39-minute plan as 0.3 minutes and a 71-minute run as 30.7, because it sums the CLI's duration_ms and starts the wall at the plan commit, which leaves planning out. With wall_ms on the records (T3), this task makes every session time come from wall_ms where a record has it, and the wall run from the first plan session's started to the last run commit.
 
@@ -111,8 +111,6 @@ vloop metrics showed a 39-minute plan as 0.3 minutes and a 71-minute run as 30.7
 - For a brief whose records have no wall_ms, every number except the wall time is what v0.8.0 computes.
 - Committed tests cover both sources of session time and both starts of the wall. The metrics tests whose wall time or table changes — TestMetricsCommandSummary, TestMetricsCommandCrossBrief (internal/cli/metrics_test.go), TestTimeCostWorkedExample (internal/metrics/time_test.go) and the worked-example summaries of B3, B4 and B6 (cmd/vloop/b3_e2e_test.go, b4_e2e_test.go, b6_e2e_test.go) — change only where the wall time changes, and each changed number is listed in the task's notes.
 - No refactor from B15's list is folded in.
-
-**From the last attempt:** gate disputed: The review_ms clause sums wall_ms over *-review.json, which also matches the gate-review session records, so it expects review_ms to include gate review time that the metrics (and the acceptance) report separately as gate_review_ms. — Session files are named NNN-<phase>.json and the gate-review phase is gate-review, so glob *-review.json matches NNN-gate-review.json; output: 'metrics time.review_ms is 15, want 27'.
 
 <details><summary>verify command</summary>
 
