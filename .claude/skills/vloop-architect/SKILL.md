@@ -38,7 +38,15 @@ reply as "choices to review".
 From `vloop brief new <slug>`, which writes
 `docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md` from the template, frontmatter `status: draft`
 and `depends-on:` the previous brief's name. Pin decisions, leave mechanics
-open. Every brief so far also carried:
+open.
+
+**Start with an executive summary**, right after the header bullets: one or two
+sentences on the problem, then one line per item (requirement or defect), each
+saying what is wrong today and what changes, and a closing line on what does
+not change. Succinct: the operator reads it first, and decides from it. (Set by
+the operator on 2026-10-11, starting with B13.)
+
+Every brief so far also carried:
 
 - a worked example with exact values, **plus** planted failures;
 - a real-data check where the slice can read this repo's history;
