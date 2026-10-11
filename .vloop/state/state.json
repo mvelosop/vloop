@@ -5,9 +5,9 @@
   "base": "6b67e496945aa7fd599ea807cbf5d9e1362cc9f8",
   "branch": "B20261011-2100-b13-docs-onboarding",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-10-11T20:31:28Z",
-  "updated": "2026-10-11T21:12:50Z",
+  "updated": "2026-10-11T21:17:22Z",
   "shell": "sh",
   "checks": [
     {
@@ -188,7 +188,7 @@
         "The guide tests pass; every link added resolves to an existing heading; no plugin skill (plugin/skills/) is edited, and the skills' uses of \"the driver\" are consistent with the new definition"
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

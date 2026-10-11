@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/7 done** · iteration 4
+**Status:** running · **5/7 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:12:50Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:17:22Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Add doctor's `gate edits` check of the operator's permission to edit gate folders
 - [x] **T3** — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
 - [x] **T4** — Explain the name, PATH, and asking rather than typing in the README
-- [ ] **T5** — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
+- [x] **T5** — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
 - [ ] **T6** — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
 - [ ] **T7** — Close: commit the worked example as a test and pass the real-data check
 
@@ -115,7 +115,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 The concepts guide leaves the driver undefined, says nothing about PATH, how vloop's sessions load plugins or when gate folders go, and offers no way to retire the shell loop; it and the metrics guide also say the legacy layout is read 'in this repository only', which is wrong (brief D5, D6). This task writes those sections so the README's links have somewhere to land and the docs agree with the domain.
 

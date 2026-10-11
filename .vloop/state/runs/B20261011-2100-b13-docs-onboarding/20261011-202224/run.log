@@ -41,3 +41,10 @@ committing the plan
    review T4 · 0m21s · $0.11 · run $3.59 / $40.00
    review: PASS
    T4 done
+── iteration 5 (5 this run) · T5 · 4/7 done ──
+   Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
+   work T5 · 0m48s · $0.23 · run $3.82 / $40.00
+   check go
+   review T5 · 0m21s · $0.11 · run $3.93 / $40.00
+   review: PASS
+   T5 done

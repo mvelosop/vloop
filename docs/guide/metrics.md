@@ -25,8 +25,8 @@ A brief's **run id** is its file name without `.loop-brief` (`run_id`). Metrics
 are keyed by brief, not by run folder: a brief can span several runs, and its
 plan session can sit in another branch's folder.
 
-- **Run folders**: legacy: the shell loop that built vloop's first briefs, in
-  this repository only (`.loop/state/runs/<any>/<folder>/`), and
+- **Run folders**: legacy: the shell loop's, in any repository that has
+  `.loop/state/` (`.loop/state/runs/<any>/<folder>/`), and
   vloop's `.vloop/state/runs/<run id>/<folder>/`. A shell-loop folder belongs to
   a brief if its `loop.log` says `planning from <brief path>` or `resuming <run
   id>`. Sessions give cost, duration, models and tokens; `iterations.jsonl`

@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** README now explains the name (verification loop), the PATH note after go install with a link to the guide, a 'You ask; the skill drives' section before 'Everyday commands', and links 'driver' to the guide.
 - **Files:** README.md
 - **Notes for next iteration:** The 5 TestTaskGate* failures say 'the plan was changed during this session'; they fail because the tests run inside a driver-held session and do not touch the README. The PATH link targets docs/guide/concepts.md#setting-up-a-repository (existing heading, which T5 extends); the-driver anchor does not exist until T5 adds it.
+
+## T5 — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The concepts guide now has '## The driver' (with a who-does-what table), PATH per shell, plugin loading, gate-folder lifecycle, the doctor 'gate edits' and plugin warning, and '## Retiring the shell loop'; both guides say vloop reads .loop/state/ in any repository that has it.
+- **Files:** docs/guide/concepts.md, docs/guide/metrics.md
+- **Notes for next iteration:** Anchors added: #the-driver, #retiring-the-shell-loop; #setting-up-a-repository now carries the PATH text. No plugin skill was edited; their uses of 'the driver' (applies verdicts, runs gates, keeps logs) agree with the definition.
