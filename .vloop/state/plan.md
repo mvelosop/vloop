@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/13 done** · iteration 1
+**Status:** running · **1/13 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-11T23:42:10Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-11T23:46:43Z
 
 ## Progress
 
 - [x] **T1** — Make vloop init write an empty .vloop/repo-guidelines.md
-- [ ] **T2** — Hand .vloop/repo-guidelines.md to every session vloop run starts
+- [ ] **T2** — Hand .vloop/repo-guidelines.md to every session vloop run starts · 1 attempt(s)
 - [ ] **T3** — Add the guidelines paragraph to the four session skills and teach the gate review the two rules it missed
 - [ ] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
 - [ ] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
@@ -50,7 +50,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Hand .vloop/repo-guidelines.md to every session vloop run starts
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 A rule written in a skill is not a check: the gate review missed twice with its rule written down. L1 makes the driver hand the repository's lessons to every session — plan, gate review, work and review — as the file's content, through `claude --append-system-prompt-file`, so no session has to choose to read it. With no file, or an empty one, nothing changes, byte for byte.
 
@@ -63,6 +63,8 @@ A rule written in a skill is not a check: the gate review missed twice with its 
 - The session record is unchanged: no new field in session/v2 or any schema
 - TestSessionArgs (internal/driver/session_test.go) changes only if the function it calls gains a parameter, and the arguments it pins with no guidelines file do not change; committed tests cover the flag with a non-empty file and its absence with no file and an empty file. Violation: the behaviour shipped with no committed test the checks run
 - No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state
+
+**From the last attempt:** Flag spelling was not confirmed against `claude --help` (command denied in the work session); the task proceeded as done instead of halting as the criterion requires
 
 <details><summary>verify command</summary>
 

@@ -1,0 +1,35 @@
+{
+  "cost_usd": 0.147381,
+  "duration_ms": 49369,
+  "effort": null,
+  "ended": "2026-10-11T23:43:00Z",
+  "is_error": false,
+  "iteration": 2,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 20359,
+      "cache_read_input_tokens": 282110,
+      "cost_usd": 0.147381,
+      "input_tokens": 22,
+      "output_tokens": 3769
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cat .vloop/state/gates/T2/gate.sh; tail -30 .vloop/state/journals/B20261011-2251-b14-learning-loop.md; cat internal/driver/session.go | head -150; grep -rn \"SessionArgs\\|sessionArgs\" --include=*.go . …",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "claude --help | grep -i append",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261011-2251-b14-learning-loop",
+  "schema": "session/v1",
+  "started": "2026-10-11T23:42:10Z",
+  "task": "T2",
+  "turns": 12,
+  "wall_ms": 50310
+}

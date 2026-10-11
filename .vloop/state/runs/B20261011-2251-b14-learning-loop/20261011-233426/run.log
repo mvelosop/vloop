@@ -18,3 +18,9 @@ checking the gate of T13 on the base
    review T1 · 0m20s · $0.10 · run $0.30 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/13 done ──
+   Hand .vloop/repo-guidelines.md to every session vloop run starts
+   work T2 · 0m50s · $0.15 · run $0.45 / $40.00
+   check go
+   review T2 · 0m28s · $0.12 · run $0.57 / $40.00
+   review: FAIL

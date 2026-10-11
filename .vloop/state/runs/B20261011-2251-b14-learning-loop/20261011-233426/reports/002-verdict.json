@@ -1,0 +1,18 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "When .vloop/repo-guidelines.md exists in the repository root and is not empty, every session vloop run starts (plan, gate review, work, review) gets `--append-system-prompt-file .vloop/repo-guidelines.md` added to its claude arguments, as one contiguous pair", "met": true, "evidence": "internal/driver/session.go:107 appends the pair in WithGuidelines; session.go:342 routes every Runner.Run (all four session kinds) through it; TestWithGuidelines asserts the contiguous pair"},
+    {"criterion": "When the file is missing or empty, every session's arguments are exactly today's. Violation: any session's arguments changing when there is no guidelines file", "met": true, "evidence": "session.go:102 returns args unchanged on missing, non-regular or zero-size file; TestWithGuidelines covers no file and empty file with DeepEqual"},
+    {"criterion": "The flag and its spelling were confirmed against `claude --help`; had it been absent, the task halts and says so instead of guessing", "met": false, "evidence": "proposal.json notes that `claude --help` was denied in the work session and the spelling is unconfirmed, yet outcome is 'done'; my own attempt to run it was also denied, so nothing in the evidence confirms the flag"},
+    {"criterion": "The file is read from the repository root only, never from HOME or any global location; a file over 16 KiB is still handed over whole", "met": true, "evidence": "session.go:102 stats filepath.Join(root, GuidelinesFile) only and passes the path, no size cap; the test writes 20 KiB and still expects the flag"},
+    {"criterion": "The session record is unchanged: no new field in session/v2 or any schema", "met": true, "evidence": "diff touches only internal/driver/session.go and session_test.go; no schema or record struct changed"},
+    {"criterion": "TestSessionArgs (internal/driver/session_test.go) changes only if the function it calls gains a parameter, and the arguments it pins with no guidelines file do not change; committed tests cover the flag with a non-empty file and its absence with no file and an empty file. Violation: the behaviour shipped with no committed test the checks run", "met": true, "evidence": "Args is untouched and TestSessionArgs is not in the diff; TestWithGuidelines is added in the same package and covers non-empty, none and empty; the go check passed"},
+    {"criterion": "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state", "met": true, "evidence": "session_test.go diff is purely additive"}
+  ],
+  "findings": [
+    {"summary": "Flag spelling was not confirmed against `claude --help` (command denied in the work session); the task proceeded as done instead of halting as the criterion requires", "kind": "spec-gap"}
+  ],
+  "notes": "The code and tests are sound, and the brief's design note says the flag is the one `claude --help` lists. The only unmet criterion is the confirmation, which a session whose sandbox denies `claude --help` cannot perform. The operator should run `claude --help | grep append-system-prompt` once and either accept the task or adjust the criterion."
+}

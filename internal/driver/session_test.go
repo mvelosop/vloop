@@ -35,6 +35,25 @@ func TestSessionArgs(t *testing.T) {
 	}
 }
 
+func TestWithGuidelines(t *testing.T) {
+	base := []string{"-p", "/vloop:work T1", "--output-format", "json"}
+	root := t.TempDir()
+	if got := WithGuidelines(base, root); !reflect.DeepEqual(got, base) {
+		t.Errorf("no file: %q", got)
+	}
+	os.MkdirAll(filepath.Join(root, ".vloop"), 0o755)
+	path := filepath.Join(root, GuidelinesFile)
+	os.WriteFile(path, nil, 0o644)
+	if got := WithGuidelines(base, root); !reflect.DeepEqual(got, base) {
+		t.Errorf("empty file: %q", got)
+	}
+	os.WriteFile(path, []byte(strings.Repeat("x", 20<<10)), 0o644)
+	want := append(append([]string{}, base...), "--append-system-prompt-file", ".vloop/repo-guidelines.md")
+	if got := WithGuidelines(base, root); !reflect.DeepEqual(got, want) {
+		t.Errorf("non-empty file:\n got %q\nwant %q", got, want)
+	}
+}
+
 func clearEnv(t *testing.T) {
 	for _, k := range []string{"VLOOP_MODEL_PLAN", "VLOOP_MODEL_WORK", "VLOOP_MODEL_REVIEW",
 		"VLOOP_EFFORT_PLAN", "VLOOP_EFFORT_WORK", "VLOOP_EFFORT_REVIEW"} {
