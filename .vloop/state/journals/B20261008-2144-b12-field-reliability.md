@@ -128,3 +128,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** cmd/vloop/b12_e2e_test.go plays the brief's worked example end to end on the built binary and the suite's stub claude; the real-data check passes against v0.8.0 with only the wall time changed on four briefs.
 - **Files:** cmd/vloop/b12_e2e_test.go, cmd/vloop/run_harness_test.go
 - **Notes for next iteration:** Changed wall times for the run record: B20261002-2135-vloop-v1-security wall_ms 48581000 -> 50119000; B20261003-2049-gate-model 16803000 -> 19299000; B20261004-1434-interventions-options 11667000 -> 13140000; B20261005-0933-quality-pass 78351000 -> 80885000 (plan time now counts). The harness stub in run_harness_test.go gained STUB_SLEEP and STUB_DENIALS (defaults 0 and []); existing scripts are unaffected. The version module line goes in-process through cli.Build{Module} since the build-info seam is unexported. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.
+
+## Run ended — complete
+
+- **Run:** `B20261008-2144-b12-field-reliability` · 4 iteration(s) this run
+- **Plan:** 11/11 done, 0 blocked
