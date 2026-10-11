@@ -441,3 +441,43 @@ T11  -     test     1    0      351    0      0       6m22s   $0.86  claude-sonn
 - D20261011-1455-the-brief-s-must-change-list-omitted-tes — spec-gap, brief, found by operator: the brief's must-change list omitted TestConfigListDefaults, TestConfigListJSONOrderAndNull and TestDefaultsEveryRow, which pin config list; R1's new key changed all three
 - D20261011-1458-run-git-config-ignore-accepts-a-mixed-ca — spec-gap, brief, found by operator: run.git-config-ignore accepts a mixed-case pattern (includeIf.*, Core.*) that never matches git's lower-case keys, with no warning; the guard stays safe
 <!-- vloop:run-record:end -->
+
+### Operator notes
+
+Written by hand, outside the generated markers.
+
+**Run under v0.8.0, in three runs, on a branch from `design/t1-triage`.** PR #27
+(the triage and this brief) was still open when the run started, so the work
+branch was cut from it (I20261011-0003). The plan (11 tasks) passed the gate
+review in round 2: round 1 caught an unpassable gate in T1. VS Code was closed
+for the run; no exit 9.
+
+**Two blocks, both unpassable gates the gate review passed.** T3's gate
+validated the plan's session/v1 record against session/v2, whose `schema` const
+rejects it (D20261011-0844); T4's summed review time over `*-review.json`, which
+also matches `NNN-gate-review.json` (D20261011-0953). Each work session disputed
+its gate with the exact cause; each fix kept the gate's intent, went through
+`vloop task verify`, and passed by hand on the committed work (I20261011-1027 ×2).
+T3's sat blocked overnight: Claude Code's auto-mode classifier denied the
+assistant's edit of the gate file, until the operator allowed
+`Edit(./.vloop/state/gates/**)` in `.claude/settings.json` (4a5958f). The wall
+time above includes that night.
+
+**Verified outside the loop.** Refs: every commit on the work branch, `main`
+untouched at `7bd76f6`. `go test ./...`, `go vet`, `gofmt`, `go mod tidy -diff`,
+both cross-builds. **The worked example by an independent session** with a fresh
+build: 37 checks, every R1–R7 line and exit code, the planted failures. The
+real-data check is T11's committed test. The new binary names its commit
+(`vloop 0.8.0 (commit 185ce2f…)`). Tests changed beyond the must-change list:
+the three `config list` tests (D20261011-1455) and `e2e_test.go`'s build, now
+`-buildvcs=false` so its unstamped binary stays `commit unknown` under R6.
+**Denials:** 9 Bash denials in the run's sessions, commands not kept — the run
+used v0.8.0, before R4.
+
+**Accepted as is.** `version --json` of a stamped build in a checkout carries
+`module` (a pseudo-version); the brief allows it, though its worked example says
+"as today".
+
+**Still open.** D20261011-1458 (mixed-case ignore patterns match nothing,
+unwarned) → B15. D20261011-0844, D20261011-0953 and D20261011-1455 → B14's
+repo-guidelines seeds and gate-review eval cases (triage P3, P4).
