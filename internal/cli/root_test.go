@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"github.com/spf13/cobra"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"testing"
 )
@@ -81,4 +82,40 @@ func newProblemCmd() *cobra.Command {
 	return &cobra.Command{Use: "boom", RunE: func(*cobra.Command, []string) error {
 		return Problem(errors.New("found problems"))
 	}}
+}
+
+func TestResolveBuild(t *testing.T) {
+	defer func(f func() (*debug.BuildInfo, bool)) { readBuildInfo = f }(readBuildInfo)
+	info := func(mod string, kv ...string) func() (*debug.BuildInfo, bool) {
+		return func() (*debug.BuildInfo, bool) {
+			bi := &debug.BuildInfo{Main: debug.Module{Version: mod}}
+			for i := 0; i+1 < len(kv); i += 2 {
+				bi.Settings = append(bi.Settings, debug.BuildSetting{Key: kv[i], Value: kv[i+1]})
+			}
+			return bi, true
+		}
+	}
+	cases := []struct {
+		name, stamp, mod string
+		kv               []string
+		commit, module   string
+	}{
+		{"stamped", "abc", "", []string{"vcs.revision", "r1"}, "abc", ""},
+		{"revision", "unknown", "(devel)", []string{"vcs.revision", "r1", "vcs.modified", "false"}, "r1", ""},
+		{"dirty", "unknown", "", []string{"vcs.revision", "r1", "vcs.modified", "true"}, "r1-dirty", ""},
+		{"installed", "unknown", "v0.8.0", nil, "unknown", "v0.8.0"},
+		{"nothing", "unknown", "(devel)", nil, "unknown", ""},
+	}
+	for _, c := range cases {
+		readBuildInfo = info(c.mod, c.kv...)
+		b := Resolve("1.0.0", c.stamp)
+		if b.Commit != c.commit || b.Module != c.module {
+			t.Errorf("%s: got commit %q module %q, want %q %q", c.name, b.Commit, b.Module, c.commit, c.module)
+		}
+	}
+	for v, want := range map[string]bool{"v0.8.0": true, "v0.8.0-rc1": false, "v0.0.0-20260101-abcdef": false, "": false} {
+		if isRelease(v) != want {
+			t.Errorf("isRelease(%q) = %v", v, !want)
+		}
+	}
 }

@@ -63,3 +63,7 @@ committing the plan
    check go
    review: PASS
    T7 done
+── iteration 8 (8 this run) · T8 · 4/11 done ──
+   Name the commit from the build's VCS revision and the version from the module, when no stamp did
+   check go
+   review: FAIL

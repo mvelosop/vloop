@@ -17,6 +17,7 @@ import (
 type versionInfo struct {
 	Version string `json:"version"`
 	Commit  string `json:"commit"`
+	Module  string `json:"module,omitempty"`
 	Plugin  string `json:"plugin"`
 	Go      string `json:"go"`
 	OS      string `json:"os"`
@@ -73,10 +74,15 @@ func newVersion(b Build, g *Globals) *cobra.Command {
 			if err != nil {
 				return Problem(err)
 			}
-			v := versionInfo{b.Version, b.Commit, plugin, runtime.Version(), runtime.GOOS, runtime.GOARCH}
+			v := versionInfo{b.Version, b.Commit, b.Module, plugin, runtime.Version(), runtime.GOOS, runtime.GOARCH}
 			out := cmd.OutOrStdout()
 			if g.JSON {
 				return json.NewEncoder(out).Encode(v)
+			}
+			if v.Module != "" && (v.Commit == "" || v.Commit == "unknown") {
+				_, err = fmt.Fprintf(out, "vloop %s (module %s, plugin %s, %s %s/%s)\n",
+					v.Version, v.Module, v.Plugin, v.Go, v.OS, v.Arch)
+				return err
 			}
 			_, err = fmt.Fprintf(out, "vloop %s (commit %s, plugin %s, %s %s/%s)\n",
 				v.Version, v.Commit, v.Plugin, v.Go, v.OS, v.Arch)

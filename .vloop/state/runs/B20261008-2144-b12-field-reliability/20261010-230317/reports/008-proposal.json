@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "cli.Resolve completes the Build from Go's build info: stamped commit, else the VCS revision (-dirty when modified), else unknown, plus the module version. version prints/emits module for an unknown commit; doctor's self-hosting passes a release module version.",
+  "files": ["internal/cli/buildinfo.go", "internal/cli/root.go", "internal/cli/version.go", "internal/cli/doctor.go", "cmd/vloop/main.go", "internal/cli/root_test.go", "internal/cli/doctor_test.go", "cmd/vloop/e2e_test.go"],
+  "verified": "vloop task gate T8 exited 0 and printed gate T8: ok; go test ./internal/cli and TestWorkedExampleEnglishSession pass with VLOOP_PLAN_SHA256 unset.",
+  "notes": "Seam is the readBuildInfo var in internal/cli/buildinfo.go (TestResolveBuild injects it). The e2e test's go build now passes -buildvcs=false so its unstamped binary stays commit unknown without a module (otherwise it picks up the checkout's revision, which is the new behaviour). TestVersionJSON/TestVersionText/TestDoctorSelfHostingUnstamped needed no change. docs/guide/concepts.md still says go install carries no commit; left for the docs task. internal/cli task-gate tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset."
+}

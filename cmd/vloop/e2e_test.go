@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 	if runtime.GOOS == "windows" {
 		binPath += ".exe"
 	}
-	if out, err := exec.Command("go", "build", "-o", binPath, ".").CombinedOutput(); err != nil {
+	if out, err := exec.Command("go", "build", "-buildvcs=false", "-o", binPath, ".").CombinedOutput(); err != nil {
 		os.RemoveAll(dir)
 		panic("build failed: " + err.Error() + "\n" + string(out))
 	}

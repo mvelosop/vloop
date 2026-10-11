@@ -407,3 +407,13 @@ func TestDoctorChecksAndGateScratch(t *testing.T) {
 		t.Errorf("a problem once the folder is ignored:\n%s", out)
 	}
 }
+
+func TestDoctorSelfHostingInstalledRelease(t *testing.T) {
+	e := newDoctorEnv(t)
+	e.write("go.mod", "module github.com/mvelosop/vloop\n\ngo 1.22\n")
+	e.build.Commit = "unknown"
+	e.build.Module = "v0.8.0"
+	e.want("self-hosting", resPass)
+	e.build.Module = "v0.8.1-0.20260101000000-abcdef123456"
+	e.want("self-hosting", resWarning)
+}

@@ -22,6 +22,7 @@ const (
 type Build struct {
 	Version string
 	Commit  string
+	Module  string // the build's module version, when it carries one
 }
 
 // Globals holds the persistent flags every command inherits.

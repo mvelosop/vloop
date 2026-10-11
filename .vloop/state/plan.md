@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/11 done** · iteration 7
+**Status:** running · **4/11 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:38:13Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:47:11Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [ ] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
 - [x] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
 - [x] **T7** — Record the session in flight in the run lock and show the live run in vloop status
-- [ ] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did
+- [ ] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did · 1 attempt(s)
 - [ ] **T9** — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
 - [ ] **T10** — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
 - [ ] **T11** — Close: commit the worked example as a test and pass the real-data check against v0.8.0
@@ -190,7 +190,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Name the commit from the build's VCS revision and the version from the module, when no stamp did
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 A binary from go install …@v0.8.0 prints commit unknown, and doctor warns about it, because only the stamped build carries a commit. This task reads Go's build info: the VCS revision when a checkout build recorded one, and the module version for an installed binary, printed in place of an unknown commit and accepted by doctor's self-hosting check when it is a release.
 
@@ -201,6 +201,8 @@ A binary from go install …@v0.8.0 prints commit unknown, and doctor warns abou
 - doctor's self-hosting check passes a binary whose module version is a release (vX.Y.Z, with no pre-release or pseudo-version suffix), as it passes a stamped one; an unknown commit with no release module version still warns.
 - Reading the build info is behind a seam the committed tests inject (a module version, a revision, a modified flag) — no test publishes or installs anything. TestVersionJSON, TestVersionText (internal/cli/root_test.go), TestDoctorSelfHostingUnstamped (internal/cli/doctor_test.go) and the version line of TestWorkedExampleEnglishSession (cmd/vloop/e2e_test.go) change only as the new behaviour requires.
 - No refactor from B15's list is folded in.
+
+**From the last attempt:** the new version output (module JSON key after commit, module text line when commit is unknown) ships with no committed test
 
 <details><summary>verify command</summary>
 
