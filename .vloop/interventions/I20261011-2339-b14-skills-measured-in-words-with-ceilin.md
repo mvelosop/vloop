@@ -19,7 +19,7 @@ B14: skills measured in words, with ceilings; a metrics instructions line
 
 **Done.** L10 and L11 in B14
 
-**Context.** Design act for B14, 2026-10-11, interactive, after the operator raised rule bloat from the shell-loop era; plan skill 3,551 words at v0.7.0, 3,751 at v0.9.0
+**Context.** Design act for B14, 2026-10-11, interactive, after the operator raised rule bloat from the shell-loop era; plan skill 3,550 words at v0.7.0, 3,751 at v0.9.0
 
 **Options.**
 1. Word count per skill, a budget test, and the metrics instructions line in B14
