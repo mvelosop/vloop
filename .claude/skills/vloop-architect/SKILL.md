@@ -40,11 +40,24 @@ From `vloop brief new <slug>`, which writes
 and `depends-on:` the previous brief's name. Pin decisions, leave mechanics
 open.
 
-**Start with an executive summary**, right after the header bullets: one or two
-sentences on the problem, then one line per item (requirement or defect), each
-saying what is wrong today and what changes, and a closing line on what does
-not change. Succinct: the operator reads it first, and decides from it. (Set by
-the operator on 2026-10-11, starting with B13.)
+**Start with an executive summary**, right after the header bullets, short
+enough to grasp the brief's goal in a minute: one or two sentences on the
+problem, a bold **The goal:** line saying in plain words what changes for the
+user, then one bullet per item (requirement or defect) —
+`**<id> — <what it achieves>.**` and one or two sentences on why it matters —
+and a closing line on what does not change. Outcomes, not mechanisms; the
+summary restates the contract and never adds to it.
+
+Details come when the operator asks for them, in the conversation, not in the
+brief. Explain an item as a short block: one sentence on what it does;
+**Today:** what is wrong, with the evidence (the run, the number, the message
+the user sees); **After:** what changes, as bullets quoting the exact messages
+or output the contract pins; and, only where they apply, one line each of
+**Safety:**, **Unchanged:**, **Side effect:**, **Limit:**, **Not included:**.
+
+(Set by the operator on 2026-10-11: B13's one-line form, then B14's per-item
+blocks, which were too long to grasp the goal quickly; the short form stays in
+the brief and the blocks are given on request.)
 
 Every brief so far also carried:
 
