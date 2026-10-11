@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T11",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A committed end-to-end test in cmd/vloop runs the brief's worked example line for line with a fresh build and the stub claude the suite already uses, in temporary repositories addressed with git -C: the ignored and named .git/config keys, the config set refusal, the halt and resume of acceptance with both run folders in the plan commit and both counted by the metrics, wall_ms against duration_ms, the denied Bash command and the dashed mask, the per-session line and the two cost warnings, status during a work session, the version lines (the module version injected through the test seam), and n/a in the metrics.", "met": true, "evidence": "cmd/vloop/b12_e2e_test.go subtests: guard keys (ignored/named/configured keys, config set core.* exit 2), halt in acceptance resumes (both run folders in the plan commit, plan_usd and gate_review_usd), record and masks (wall_ms vs duration_ms, denial command/mask, per-session line, n/a), cost warnings, status during a work session, version (cli.Build{Module})."},
+    {"criterion": "The test threads the values it computes (paths, ids, costs, counts) rather than hardcoding them, sleeps no longer than 3 seconds and depends on no wall-clock precision finer than a second.", "met": true, "evidence": "Values are read back from session records and metrics (b12Records, b12Num); longest stub sleep is 3 s (STUB_SLEEP=3), the resume waits 1.1 s; status regex accepts 0m00-0m09."},
+    {"criterion": "On this repository, vloop metrics --json for every consumed brief equals v0.8.0's except the wall time, and vloop defect list, intervention list and brief list read every record as before; the task's notes list each changed wall time for the run record.", "met": true, "evidence": ".vloop/state/runs/.../gates/T11.log shows gate T11: ok with the four changed wall times listed; the same four are in proposal notes."},
+    {"criterion": "No record, config or state of this repository is changed by the task's work or its test (S-4), and no refactor from B15's list is folded in.", "met": true, "evidence": "git status shows only cmd/vloop/b12_e2e_test.go, a small additive STUB_SLEEP/STUB_DENIALS change to run_harness_test.go (defaults preserve behaviour), and driver-owned run-folder artifacts; the test works in temporary repos."}
+  ],
+  "findings": [],
+  "notes": "The metrics reference says no record has wall_ms, yet four briefs' wall times changed (plan time now counted); the gate accepts exactly that and the changes are listed for the run record."
+}

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/11 done** · iteration 15
+**Status:** running · **11/11 done** · iteration 16
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T09:13:09Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T09:23:54Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did · 1 attempt(s)
 - [x] **T9** — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
 - [x] **T10** — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
-- [ ] **T11** — Close: commit the worked example as a test and pass the real-data check against v0.8.0
+- [x] **T11** — Close: commit the worked example as a test and pass the real-data check against v0.8.0
 
 ## Tasks
 
@@ -256,7 +256,7 @@ sh .vloop/state/gates/T10/gate.sh
 
 ### T11 — Close: commit the worked example as a test and pass the real-data check against v0.8.0
 
-`pending` · depends on: T10
+`done` · depends on: T10
 
 The brief's blind spot is that every instrument was tested only here, by fixtures that never had an editor, a long plan session or a halt during acceptance. This task leaves the brief's worked example behind as a committed end-to-end test, line for line, and checks the real repository: every consumed brief's metrics equal v0.8.0's except the wall time this brief changes, and the record listings read as before.
 
