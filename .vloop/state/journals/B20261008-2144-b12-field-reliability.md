@@ -62,3 +62,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** cli.Resolve completes the Build from Go's build info: stamped commit, else the VCS revision (-dirty when modified), else unknown, plus the module version. version prints/emits module for an unknown commit; doctor's self-hosting passes a release module version.
 - **Files:** internal/cli/buildinfo.go, internal/cli/root.go, internal/cli/version.go, internal/cli/doctor.go, cmd/vloop/main.go, internal/cli/root_test.go, internal/cli/doctor_test.go, cmd/vloop/e2e_test.go
 - **Notes for next iteration:** Seam is the readBuildInfo var in internal/cli/buildinfo.go (TestResolveBuild injects it). The e2e test's go build now passes -buildvcs=false so its unstamped binary stays commit unknown without a module (otherwise it picks up the checkout's revision, which is the new behaviour). TestVersionJSON/TestVersionText/TestDoctorSelfHostingUnstamped needed no change. docs/guide/concepts.md still says go install carries no commit; left for the docs task. internal/cli task-gate tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.
+
+## T8 — Name the commit from the build's VCS revision and the version from the module, when no stamp did
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added TestVersionModule covering vloop version text and --json with a module and unknown commit, with a module and a known commit, and with no module; the build-info implementation from the earlier attempt is unchanged.
+- **Files:** internal/cli/root_test.go
+- **Notes for next iteration:** The earlier attempt's implementation (internal/cli/buildinfo.go, version.go, doctor.go) was rejected only for lacking a version-output test; the new test is added alongside, existing tests untouched. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.

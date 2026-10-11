@@ -119,3 +119,48 @@ func TestResolveBuild(t *testing.T) {
 		}
 	}
 }
+
+func TestVersionModule(t *testing.T) {
+	tail := ", plugin 0.8.0, " + runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH + ")\n"
+	cases := []struct {
+		name string
+		b    Build
+		text string
+		keys []string
+	}{
+		{"module, unknown commit", Build{Version: "1.2.3", Commit: "unknown", Module: "v0.8.0"},
+			"vloop 1.2.3 (module v0.8.0" + tail, []string{"version", "commit", "module", "plugin", "go", "os", "arch"}},
+		{"module, known commit", Build{Version: "1.2.3", Commit: "abc", Module: "v0.8.0"},
+			"vloop 1.2.3 (commit abc" + tail, []string{"version", "commit", "module", "plugin", "go", "os", "arch"}},
+		{"no module", Build{Version: "1.2.3", Commit: "unknown"},
+			"vloop 1.2.3 (commit unknown" + tail, []string{"version", "commit", "plugin", "go", "os", "arch"}},
+	}
+	for _, c := range cases {
+		var o, e bytes.Buffer
+		if code := Execute(c.b, []string{"version"}, &o, &e); code != 0 || o.String() != c.text {
+			t.Errorf("%s: text code=%d got %q, want %q", c.name, code, o.String(), c.text)
+		}
+		o.Reset()
+		if code := Execute(c.b, []string{"version", "--json"}, &o, &e); code != 0 {
+			t.Fatalf("%s: exit %d", c.name, code)
+		}
+		var m map[string]string
+		if err := json.Unmarshal(o.Bytes(), &m); err != nil {
+			t.Fatal(err)
+		}
+		if len(m) != len(c.keys) {
+			t.Errorf("%s: keys = %v", c.name, m)
+		}
+		last := -1
+		for _, k := range c.keys {
+			i := strings.Index(o.String(), `"`+k+`"`)
+			if i <= last {
+				t.Errorf("%s: key %s missing or out of order in %s", c.name, k, o.String())
+			}
+			last = i
+		}
+		if m["module"] != c.b.Module {
+			t.Errorf("%s: module = %q, want %q", c.name, m["module"], c.b.Module)
+		}
+	}
+}

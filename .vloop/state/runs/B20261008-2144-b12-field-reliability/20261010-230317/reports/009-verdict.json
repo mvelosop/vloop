@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The commit is the stamped one; else the build's VCS revision when Go recorded one, with -dirty appended when the tree was modified; else unknown.", "met": true, "evidence": "internal/cli/buildinfo.go Resolve; TestResolveBuild cases stamped/revision/dirty/nothing assert commit values"},
+    {"criterion": "When the build carries a module version (anything but (devel) or empty), vloop version --json has \"module\" right after \"commit\", absent when there is none; and when the commit is unknown the text line is `vloop <version> (module <module version>, plugin <plugin>, <go> <os>/<arch>)`. Otherwise the text line is as today.", "met": true, "evidence": "internal/cli/version.go Module field after Commit with omitempty, plus the module text line; TestVersionModule in internal/cli/root_test.go asserts key order, absence without module, the module text line with unknown commit and the unchanged line with a known commit"},
+    {"criterion": "doctor's self-hosting check passes a binary whose module version is a release (vX.Y.Z, with no pre-release or pseudo-version suffix), as it passes a stamped one; an unknown commit with no release module version still warns.", "met": true, "evidence": "internal/cli/doctor.go new case; TestDoctorSelfHostingInstalledRelease asserts pass for v0.8.0 and warning for a pseudo-version; isRelease asserted in TestResolveBuild"},
+    {"criterion": "Reading the build info is behind a seam the committed tests inject (a module version, a revision, a modified flag) — no test publishes or installs anything. TestVersionJSON, TestVersionText (internal/cli/root_test.go), TestDoctorSelfHostingUnstamped (internal/cli/doctor_test.go) and the version line of TestWorkedExampleEnglishSession (cmd/vloop/e2e_test.go) change only as the new behaviour requires.", "met": true, "evidence": "readBuildInfo seam in buildinfo.go injected by TestResolveBuild; existing tests untouched, e2e build only adds -buildvcs=false to keep the unknown commit"},
+    {"criterion": "No refactor from B15's list is folded in.", "met": true, "evidence": "diff touches only build info, version, doctor, main and their tests"}
+  ],
+  "findings": [],
+  "notes": "The implementation was already committed in the earlier rejected attempt; this attempt only added TestVersionModule, which closes the previous finding. The checks log shows go test ./... passing."
+}

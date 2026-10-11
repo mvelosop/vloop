@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "Added TestVersionModule covering vloop version text and --json with a module and unknown commit, with a module and a known commit, and with no module; the build-info implementation from the earlier attempt is unchanged.",
+  "files": ["internal/cli/root_test.go"],
+  "verified": "vloop task gate T8 exited 0 and printed ok; go test ./internal/cli -run 'Version|Resolve|Doctor' passed.",
+  "notes": "The earlier attempt's implementation (internal/cli/buildinfo.go, version.go, doctor.go) was rejected only for lacking a version-output test; the new test is added alongside, existing tests untouched. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset."
+}
