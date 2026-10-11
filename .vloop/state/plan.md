@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/7 done** · iteration 2
+**Status:** running · **3/7 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T20:55:16Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:03:06Z
 
 ## Progress
 
 - [x] **T1** — Make doctor's plugin check warn when no vloop plugin is listed
 - [x] **T2** — Add doctor's `gate edits` check of the operator's permission to edit gate folders
-- [ ] **T3** — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
+- [x] **T3** — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
 - [ ] **T4** — Explain the name, PATH, and asking rather than typing in the README
 - [ ] **T5** — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
 - [ ] **T6** — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
@@ -69,7 +69,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 A user who runs vloop init is told to start a session with --plugin-dir and nothing more, and the CLAUDE.md section tells Claude to follow /vloop:operate without saying what to do when it is absent (brief D3). This task replaces init's closing lines with the install commands and the advice to ask rather than type, and extends the section's interactive paragraph with what Claude says when the plugin is not loaded.
 

@@ -105,6 +105,9 @@ func TestSectionNamesSessionKindsAndOperatePlaybook(t *testing.T) {
 			t.Errorf("section lacks %q:\n%s", want, s)
 		}
 	}
+	if !strings.Contains(s, "In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules. If /vloop:operate is not available, the vloop plugin is not loaded: say so, give the user the two ways to load it (claude plugin install vloop@vloop after claude plugin marketplace add mvelosop/vloop, or claude --plugin-dir \"$(vloop plugin path)\"), and meanwhile work from vloop --help.\n") {
+		t.Errorf("section lacks D3's interactive paragraph:\n%s", s)
+	}
 	if strings.Contains(s, "vloop-operator") {
 		t.Errorf("section names vloop-operator, a skill the plugin does not ship")
 	}

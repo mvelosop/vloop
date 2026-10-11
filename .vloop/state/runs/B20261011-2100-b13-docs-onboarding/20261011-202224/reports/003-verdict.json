@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "After a successful (non-dry-run) vloop init, its output ends with exactly the seven lines of brief D3, starting `next:`", "met": true, "evidence": "internal/cli/init.go prints the seven lines exactly as brief D3; TestInitWritesEverything and TestWorkedExampleB5Session assert them"},
+    {"criterion": "The CLAUDE.md section's interactive paragraph is exactly D3's text, one line, starting `In an interactive session you are the operator's hands:` and ending `and meanwhile work from vloop --help.`; every other line of the section is unchanged and vloop upgrade rewrites the section as today", "met": true, "evidence": "internal/install/section.go diff changes only that one line, matching D3 verbatim; nothing else in the section touched"},
+    {"criterion": "TestInitWritesEverything (internal/cli/init_test.go) and TestWorkedExampleB5Session (cmd/vloop/b5_e2e_test.go) assert the new closing lines; internal/install/install_test.go changes only if it pins the paragraph; a committed test asserts the new paragraph", "met": true, "evidence": "both tests updated with the new lines (16-line count in the e2e); install_test.go:108 asserts the full paragraph with trailing newline"},
+    {"criterion": "docs/guide/commands.md is regenerated if any help text changed, and its staleness test passes", "met": true, "evidence": "no help text changed in the diff, so no regeneration is needed; go check passed (exit 0)"},
+    {"criterion": "This repository's own CLAUDE.md is not rewritten by this task (no vloop upgrade run here)", "met": true, "evidence": "git status shows CLAUDE.md unmodified"},
+    {"criterion": "No earlier test is weakened: only the tests the brief lists change, and only as it states", "met": true, "evidence": "listed tests changed as stated; one unlisted test, TestInitDoesNotPointAtAMarketplace in internal/cli/b11_verify_test.go, was inverted to TestInitPointsAtBothWaysToLoadThePlugin, which D3 makes unavoidable (it asserted no 'marketplace'), and the replacement asserts the three commands"}
+  ],
+  "findings": [],
+  "notes": "The brief's must-change list omits internal/cli/b11_verify_test.go's TestInitDoesNotPointAtAMarketplace, which D3 necessarily contradicts: a gap in the brief's list, not a goalpost move."
+}
