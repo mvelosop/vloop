@@ -41,10 +41,38 @@ and `depends-on:` the previous brief's name. Pin decisions, leave mechanics
 open.
 
 **Start with an executive summary**, right after the header bullets: one or two
-sentences on the problem, then one line per item (requirement or defect), each
-saying what is wrong today and what changes, and a closing line on what does
-not change. Succinct: the operator reads it first, and decides from it. (Set by
-the operator on 2026-10-11, starting with B13.)
+sentences on the problem, then a short block per item (requirement or defect),
+and a closing line on what does not change. The operator reads it first and
+decides from it, so it is succinct but not one line per item: each block
+has enough to judge the item without reading the contract. Each block, as a
+`###` heading `<id> — <title>` followed by:
+
+- **one sentence** saying what the item does, in plain words;
+- **Today:** what is wrong, with the concrete evidence (the run, the number,
+  the message the user sees);
+- **After:** what changes, as bullets, quoting the exact messages, commands or
+  output lines the contract pins;
+- only where they apply, one line each: **Safety:**, **Unchanged:**, **Side
+  effect:**, **Limit:**, **Not included:**.
+
+For example:
+
+```
+### R3 — sessions timed by the driver
+
+R3 makes the driver time each session itself instead of trusting the CLI's figure.
+
+- **Today:** `duration_ms` is copied from the CLI; in visum-monorepo it said
+  20 seconds for a plan session that ran 39 minutes.
+- **After:**
+  - Each session record gains `ended` and `wall_ms`, the driver's own measurement.
+  - Metrics use `wall_ms` when a record has it and `duration_ms` otherwise.
+- **Side effect:** every past brief's wall time changes; the real-data check lists each.
+```
+
+The executive summary restates the contract; it never adds to it. (Set by the
+operator on 2026-10-11 with B13's one-line form; the per-item blocks, from the
+B12 explanations the operator found most useful, from B14 on.)
 
 Every brief so far also carried:
 
