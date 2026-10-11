@@ -74,11 +74,13 @@ GR=$(records '*-gate-review.json')
 (cd "$R" && "$B" schema validate session/v1 "$P") >"$t/out" 2>&1 || fail "the plan record does not validate as session/v1: $(cat "$t/out")"
 (cd "$R" && "$B" schema validate session/v2 $GR) >"$t/out" 2>&1 || fail "the gate review record does not validate as session/v2: $(cat "$t/out")"
 for s in v1 v2; do
-  jq 'del(.ended, .wall_ms)' "$P" >"$t/old.json" || fail jq
+  # Each schema against a record of its own version: the plan's for v1, the gate review's for v2.
+  if [ "$s" = v1 ]; then SRC=$P; else SRC=$GR; fi
+  jq 'del(.ended, .wall_ms)' "$SRC" >"$t/old.json" || fail jq
   (cd "$R" && "$B" schema validate "session/$s" "$t/old.json") >"$t/out" 2>&1 || fail "a record without ended and wall_ms no longer validates as session/$s: $(cat "$t/out")"
-  jq '.wall_ms = "long"' "$P" >"$t/bad.json" || fail jq
+  jq '.wall_ms = "long"' "$SRC" >"$t/bad.json" || fail jq
   (cd "$R" && "$B" schema validate "session/$s" "$t/bad.json") >"$t/out" 2>&1 && fail "session/$s accepts a wall_ms that is not a number: it does not declare wall_ms"
-  jq '.ended = 5' "$P" >"$t/bad.json" || fail jq
+  jq '.ended = 5' "$SRC" >"$t/bad.json" || fail jq
   (cd "$R" && "$B" schema validate "session/$s" "$t/bad.json") >"$t/out" 2>&1 && fail "session/$s accepts an ended that is not a string: it does not declare ended"
 done
 echo "gate T3: ok"

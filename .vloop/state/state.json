@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 9,
   "created": "2026-10-10T23:21:09Z",
-  "updated": "2026-10-11T00:51:50Z",
+  "updated": "2026-10-11T08:27:20Z",
   "shell": "sh",
   "checks": [
     {
@@ -111,7 +111,7 @@
       "title": "Record ended and wall_ms, the driver's own measurement, on every session record",
       "goal": "A session's duration_ms is copied from the claude CLI's JSON, which recorded 20 seconds for a plan session that ran 39 minutes. This task makes the driver time every session itself, from the process start to its exit, and record it as wall_ms with an ended timestamp, beside the CLI's duration_ms. The metrics read it in the next task.",
       "kind": "fix",
-      "fixtures": "7405ee982e07b06640f34bbcfd60db51c19aa2634a2a156949ddc6329b4f22c1",
+      "fixtures": "f28a7a0c8b5675591ce5c009417e90c8e92075b18e5a088671c3470c609de88f",
       "references": [
         {
           "path": "docs/domain/execution/session.md",
@@ -137,9 +137,18 @@
         "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "blocked",
+      "status": "pending",
       "attempts": 0,
-      "notes": "gate disputed: The v2 iteration of the optional-fields loop validates the plan's session/v1 record against session/v2, which can never pass because the schema pins its schema const. — for s in v1 v2: jq 'del(.ended, .wall_ms)' \"$P\" then schema validate session/$s; for v2 the output is '/schema: value must be session/v2' since $P has schema session/v1. $GR (session/v2) should be used for v2."
+      "notes": "gate disputed: The v2 iteration of the optional-fields loop validates the plan's session/v1 record against session/v2, which can never pass because the schema pins its schema const. — for s in v1 v2: jq 'del(.ended, .wall_ms)' \"$P\" then schema validate session/$s; for v2 the output is '/schema: value must be session/v2' since $P has schema session/v1. $GR (session/v2) should be used for v2.",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T3/gate.sh",
+          "replaced_at": "2026-10-11T08:27:20Z",
+          "reason": "gate validated the session/v1 plan record against session/v2, whose schema const rejects it; each schema now checks a record of its own version (D20261011-0844)",
+          "by": "operator",
+          "fixtures": "7405ee982e07b06640f34bbcfd60db51c19aa2634a2a156949ddc6329b4f22c1"
+        }
+      ]
     },
     {
       "id": "T4",
