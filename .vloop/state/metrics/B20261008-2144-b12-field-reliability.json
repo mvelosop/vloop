@@ -2,12 +2,12 @@
   "schema": "metrics/v2",
   "brief": "B20261008-2144-b12-field-reliability.loop-brief",
   "run_id": "B20261008-2144-b12-field-reliability",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 11,
-    "done": 7,
-    "blocked": 1,
+    "done": 11,
+    "blocked": 0,
     "first_pass": 6,
     "estimate": {
       "min": 9,
@@ -16,31 +16,31 @@
   },
   "size": {
     "delivered": {
-      "code": 600,
-      "test": 681,
-      "docs": 11,
+      "code": 616,
+      "test": 1067,
+      "docs": 75,
       "other": 2,
       "deleted": {
-        "code": 87,
-        "test": 10,
-        "docs": 0,
+        "code": 88,
+        "test": 13,
+        "docs": 12,
         "other": 1
       }
     },
     "churn": {
-      "code": 605,
-      "test": 681,
-      "docs": 1,
+      "code": 621,
+      "test": 1067,
+      "docs": 65,
       "other": 0,
       "deleted": {
-        "code": 92,
-        "test": 10,
-        "docs": 0,
+        "code": 93,
+        "test": 13,
+        "docs": 12,
         "other": 0
       }
     },
-    "test_code_ratio": 1.135,
-    "rework": 1.0083333333333333
+    "test_code_ratio": 1.7321428571428572,
+    "rework": 1.0081168831168832
   },
   "time": {
     "agent_ms": 3675992,
@@ -50,11 +50,11 @@
     "gates_ms": 101904,
     "checks_ms": 2600035,
     "gate_review_ms": 348590,
-    "wall_ms": 33533000
+    "wall_ms": 35592000
   },
   "rate": {
-    "code_per_min": 9.793274849346789,
-    "code_test_per_min": 20.908641803355394
+    "code_per_min": 10.054428845329369,
+    "code_test_per_min": 27.470135952417742
   },
   "cost": {
     "total_usd": 16.730921399999996,
@@ -62,7 +62,7 @@
     "work_usd": 6.1720676,
     "review_usd": 2.1050077999999997,
     "gate_review_usd": 1.6403496,
-    "per_1000_code_lines_usd": 27.884868999999995
+    "per_1000_code_lines_usd": 27.16058668831168
   },
   "tokens": {
     "input": 974,
@@ -93,19 +93,19 @@
   },
   "defects": {
     "in_loop": 7,
-    "operator": 0,
+    "operator": 2,
     "escaped": 0,
-    "total": 7,
+    "total": 9,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 2,
+    "total": 5,
     "by_agreement": {
-      "recommended": 2,
+      "recommended": 3,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 2
     }
   },
   "records": {
@@ -116,7 +116,7 @@
   },
   "permission_denials": 9,
   "iterations": 16,
-  "iterations_per_closed": 2.2857142857142856,
+  "iterations_per_closed": 1.4545454545454546,
   "by_task": [
     {
       "id": "T1",
@@ -308,12 +308,12 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 16,
+        "test": 35,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
+          "code": 1,
           "test": 0,
           "docs": 0,
           "other": 0
@@ -333,12 +333,12 @@
       "churn": {
         "code": 0,
         "test": 0,
-        "docs": 0,
+        "docs": 64,
         "other": 0,
         "deleted": {
           "code": 0,
           "test": 0,
-          "docs": 0,
+          "docs": 12,
           "other": 0
         }
       },
@@ -355,12 +355,12 @@
       "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
+        "test": 351,
         "docs": 0,
         "other": 0,
         "deleted": {
           "code": 0,
-          "test": 0,
+          "test": 3,
           "docs": 0,
           "other": 0
         }
