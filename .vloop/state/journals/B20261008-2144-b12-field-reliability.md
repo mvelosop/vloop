@@ -69,3 +69,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added TestVersionModule covering vloop version text and --json with a module and unknown commit, with a module and a known commit, and with no module; the build-info implementation from the earlier attempt is unchanged.
 - **Files:** internal/cli/root_test.go
 - **Notes for next iteration:** The earlier attempt's implementation (internal/cli/buildinfo.go, version.go, doctor.go) was rejected only for lacking a version-output test; the new test is added alongside, existing tests untouched. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.
+
+## Run ended — blocked
+
+- **Run:** `B20261008-2144-b12-field-reliability` · 9 iteration(s) this run
+- **Plan:** 5/11 done, 1 blocked
