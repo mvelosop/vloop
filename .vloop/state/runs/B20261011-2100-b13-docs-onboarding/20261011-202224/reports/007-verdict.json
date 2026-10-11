@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A committed end-to-end test (cmd/vloop) runs the brief's worked example line for line: init's seven lines, the CLAUDE.md sentence, the two warnings with `doctor: 0 problem(s), 2 warning(s)` and exit 0, the passing plugin, the three passing settings files, the warning rule, the unreadable file, no claude, and --json's `gate edits`", "met": true, "evidence": "cmd/vloop/b13_e2e_test.go TestWorkedExampleB13 asserts each step: seven init lines, CLAUDE.md sentence, both warnings + count + exit 0, ✓ plugin, project/local/home rules, unrelated-rule warning, unreadable file, no claude '-' lines, --json 'gate edits'. The test passes when run."},
+    {"criterion": "The test builds its repositories in temporary directories with a temporary HOME, addresses them with git -C, never touches the real HOME, and threads the binary's version rather than hardcoding it", "met": true, "evidence": "b5New uses t.TempDir() for repo, home and stub; the binary is built per version via b5Binary(t, version) and the same constant feeds the stub plugin list and the run; the no-claude run uses cleanEnv(r.home). The version is one constant passed through, not a literal repeated in expectations."},
+    {"criterion": "In this repository, with no vloop plugin listed, the branch's doctor prints `✓ gate edits` and the plugin warning; every other check's result equals the base build's", "met": true, "evidence": "Checked by the real-data section of .vloop/state/gates/T7/gate.sh, which the driver ran and passed before review; the diff changes no production code that could alter it."},
+    {"criterion": "Every relative link in README.md, docs/guide/*.md and docs/domain/domain-model.md resolves to an existing file and heading", "met": true, "evidence": "The gate's links.go step covers these files and passed (driver-run gate); no doc files appear in the diff for this task."},
+    {"criterion": "No production code changes in this task beyond what the test needs to find; any defect found here is fixed in the smallest change and stated in the report", "met": true, "evidence": "git status shows only cmd/vloop/b13_e2e_test.go plus run logs; the proposal reports no defects."},
+    {"criterion": "No earlier test is weakened: only the tests the brief lists change, and only as it states", "met": true, "evidence": "git status shows no modified existing test files; the only new file is b13_e2e_test.go."}
+  ],
+  "findings": [],
+  "notes": "The test only runs on non-Windows hosts and skips if git is missing from /usr/bin:/bin; acceptable. Real-data and link criteria are judged from the driver-run gate, not re-run here."
+}

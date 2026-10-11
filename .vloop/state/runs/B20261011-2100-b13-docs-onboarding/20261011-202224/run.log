@@ -55,3 +55,10 @@ committing the plan
    review T6 · 0m12s · $0.07 · run $4.08 / $40.00
    review: PASS
    T6 done
+── iteration 7 (7 this run) · T7 · 6/7 done ──
+   Close: commit the worked example as a test and pass the real-data check
+   work T7 · 1m19s · $0.26 · run $4.34 / $40.00
+   check go
+   review T7 · 0m21s · $0.12 · run $4.46 / $40.00
+   review: PASS
+   T7 done

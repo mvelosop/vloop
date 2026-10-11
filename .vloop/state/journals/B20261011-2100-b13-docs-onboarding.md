@@ -48,3 +48,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** CLAUDE.md's 'Which rules bind you' now says this repository's operator playbook (.claude/skills/vloop-operator/SKILL.md) is the one to follow where the vloop section names /vloop:operate; the glossary's driver row links to ../guide/concepts.md#the-driver.
 - **Files:** CLAUDE.md, docs/domain/domain-model.md
 - **Notes for next iteration:** The link sits in the definition cell because the gate requires the row to start with '| **driver** |'.
+
+## T7 — Close: commit the worked example as a test and pass the real-data check
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added cmd/vloop/b13_e2e_test.go (TestWorkedExampleB13): the brief's worked example end to end over a fresh build in temporary repositories with a stub claude and temporary HOME. The real-data check and link check pass via the gate; no production code changed.
+- **Files:** cmd/vloop/b13_e2e_test.go
+- **Notes for next iteration:** Reuses b5Repo helpers; the no-claude case runs the binary directly with PATH=/usr/bin:/bin (needs git) and expects exit 1, since a missing claude is a doctor problem, only the two '-' lines are asserted. No defects found; no existing tests touched.

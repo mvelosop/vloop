@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/7 done** · iteration 6
+**Status:** running · **7/7 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:21:12Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:26:07Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Explain the name, PATH, and asking rather than typing in the README
 - [x] **T5** — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
 - [x] **T6** — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
-- [ ] **T7** — Close: commit the worked example as a test and pass the real-data check
+- [x] **T7** — Close: commit the worked example as a test and pass the real-data check
 
 ## Tasks
 
@@ -161,7 +161,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Close: commit the worked example as a test and pass the real-data check
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6
+`done` · depends on: T1, T2, T3, T4, T5, T6
 
 The brief's worked example and real-data check are the run's acceptance as a whole (brief: Worked example). This task commits the worked example as an end-to-end test over a fresh build, in temporary repositories with a stub claude and a temporary HOME, and confirms that in this repository doctor now passes gate edits and warns about the plugin, every other check unchanged, with every new link resolving.
 

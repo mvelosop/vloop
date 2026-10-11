@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Added cmd/vloop/b13_e2e_test.go (TestWorkedExampleB13): the brief's worked example end to end over a fresh build in temporary repositories with a stub claude and temporary HOME. The real-data check and link check pass via the gate; no production code changed.",
+  "files": ["cmd/vloop/b13_e2e_test.go"],
+  "verified": "vloop task gate T7 exited 0 and printed 'gate T7: ok'; go test ./cmd/vloop -run TestWorkedExampleB13 ok; gofmt and go vet (host and windows) clean.",
+  "notes": "Reuses b5Repo helpers; the no-claude case runs the binary directly with PATH=/usr/bin:/bin (needs git) and expects exit 1, since a missing claude is a doctor problem, only the two '-' lines are asserted. No defects found; no existing tests touched."
+}
