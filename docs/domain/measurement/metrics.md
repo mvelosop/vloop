@@ -27,6 +27,12 @@ at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *
 
 - A line counts when it is **added and non-blank** (M-2); deletions are
   reported apart; binary files are not counted.
+- Session time comes from a record's `wall_ms` when it has one and from
+  `duration_ms` otherwise; the brief's wall runs from the first plan session's
+  `started` (the plan commit's time when there is none) to the last run commit.
+- A brief that delivered no line classified as code or test shows `n/a` in the
+  cross-brief table's code and test columns, and the summary adds a line giving
+  how many delivered lines match no stack in `metrics.stacks`; JSON is unchanged.
 - **Delivered**: the diff from the plan commit's parent to the brief's last run
   commit. **Churn**: every task commit, whatever its outcome, summed.
   **Rework** = churned code / delivered code.

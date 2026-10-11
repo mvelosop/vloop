@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **9/11 done** · iteration 14
+**Status:** running · **10/11 done** · iteration 15
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T09:07:29Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T09:13:09Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Record the session in flight in the run lock and show the live run in vloop status
 - [x] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did · 1 attempt(s)
 - [x] **T9** — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
-- [ ] **T10** — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
+- [x] **T10** — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
 - [ ] **T11** — Close: commit the worked example as a test and pass the real-data check against v0.8.0
 
 ## Tasks
@@ -232,7 +232,7 @@ sh .vloop/state/gates/T9/gate.sh
 
 ### T10 — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9
+`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8, T9
 
 The domain is the contract the next briefs bind, and the guides are what an operator reads when a run halts or a number looks wrong; both still describe a byte-hashed guard, acceptance that cannot resume, CLI-reported time and a silent run. This task updates every document the brief's "The domain, updated" section names, so each states what T1–T9 built, and regenerates the command reference.
 

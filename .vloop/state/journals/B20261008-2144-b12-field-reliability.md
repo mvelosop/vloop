@@ -114,3 +114,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The cross-brief and workspace tables print n/a in code and test for a brief with no delivered code or test lines, and the summary adds a line under the delivered line with the unclassified count. JSON is unchanged.
 - **Files:** internal/metrics/print.go, internal/metrics/print_test.go
 - **Notes for next iteration:** Condition is delivered code == 0 and test == 0 (unclassified in internal/metrics/print.go); the extra line prints only when delivered other > 0 and uses thousands separators like the other counts. No existing test changed; added TestPrintNotMeasuredWhereNothingClassified. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.
+
+## T10 — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The domain documents (S-2, plan, run, session, metrics) and the guides (concepts, metrics) now state the key-wise guard, the stamp on load and resuming acceptance, ended/wall_ms and a denial's command, wall_ms-based time and n/a for unmeasured size, and the per-session line and status's running line.
+- **Files:** docs/domain/domain-model.md, docs/domain/execution/plan.md, docs/domain/execution/run.md, docs/domain/execution/session.md, docs/domain/measurement/metrics.md, docs/guide/concepts.md, docs/guide/metrics.md
+- **Notes for next iteration:** docs/guide/configuration.md already documented run.git-config-ignore and VLOOP_RUN_GIT_CONFIG_IGNORE (T1), and docs/guide/commands.md regenerated identical, so neither changed. Also corrected docs/guide/concepts.md's stale claim that go install carries no commit (T8 build info). Wording of the per-session line and status's running line was taken from internal/driver/cost.go and internal/cli/status.go.
