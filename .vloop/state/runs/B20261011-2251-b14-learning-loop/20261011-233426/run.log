@@ -24,3 +24,8 @@ checking the gate of T13 on the base
    check go
    review T2 · 0m28s · $0.12 · run $0.57 / $40.00
    review: FAIL
+── iteration 3 (3 this run) · T2 · 1/13 done ──
+   Hand .vloop/repo-guidelines.md to every session vloop run starts
+   work T2 · 0m26s · $0.09 · run $0.66 / $40.00
+   work session reported blocked
+   T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.

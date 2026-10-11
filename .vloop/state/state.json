@@ -5,9 +5,9 @@
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-11T23:46:43Z",
+  "updated": "2026-10-11T23:47:18Z",
   "shell": "sh",
   "checks": [
     {
@@ -81,8 +81,8 @@
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
       "status": "pending",
-      "attempts": 1,
-      "notes": "Flag spelling was not confirmed against `claude --help` (command denied in the work session); the task proceeded as done instead of halting as the criterion requires"
+      "attempts": 2,
+      "notes": "The implementation from the previous attempt is in place (WithGuidelines in internal/driver/session.go, called from Runner.Run; tests in internal/driver/session_test.go) and the gate passes, but the flag spelling could not be confirmed against `claude --help`: running claude is denied in this session. Per acceptance 3 the task halts instead of guessing. — T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else."
     },
     {
       "id": "T3",

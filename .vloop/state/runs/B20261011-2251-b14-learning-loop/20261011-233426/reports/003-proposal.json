@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "blocked",
+  "summary": "The implementation from the previous attempt is in place (WithGuidelines in internal/driver/session.go, called from Runner.Run; tests in internal/driver/session_test.go) and the gate passes, but the flag spelling could not be confirmed against `claude --help`: running claude is denied in this session. Per acceptance 3 the task halts instead of guessing.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok.",
+  "notes": "Needs the operator to run `claude --help | grep append-system-prompt` once and confirm `--append-system-prompt-file` exists; if so, mark T2 passable (no code change needed). If the spelling differs, change the flag constant in internal/driver/session.go and the gate. Do not re-attempt the code, it is done; the only missing piece is the confirmation, which a work session cannot obtain here."
+}
