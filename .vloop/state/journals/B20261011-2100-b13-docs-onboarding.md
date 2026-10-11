@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The concepts guide now has '## The driver' (with a who-does-what table), PATH per shell, plugin loading, gate-folder lifecycle, the doctor 'gate edits' and plugin warning, and '## Retiring the shell loop'; both guides say vloop reads .loop/state/ in any repository that has it.
 - **Files:** docs/guide/concepts.md, docs/guide/metrics.md
 - **Notes for next iteration:** Anchors added: #the-driver, #retiring-the-shell-loop; #setting-up-a-repository now carries the PATH text. No plugin skill was edited; their uses of 'the driver' (applies verdicts, runs gates, keeps logs) agree with the definition.
+
+## T6 — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
+
+- **Outcome:** done (review: PASS)
+- **Summary:** CLAUDE.md's 'Which rules bind you' now says this repository's operator playbook (.claude/skills/vloop-operator/SKILL.md) is the one to follow where the vloop section names /vloop:operate; the glossary's driver row links to ../guide/concepts.md#the-driver.
+- **Files:** CLAUDE.md, docs/domain/domain-model.md
+- **Notes for next iteration:** The link sits in the definition cell because the gate requires the row to start with '| **driver** |'.

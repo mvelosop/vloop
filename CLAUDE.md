@@ -19,6 +19,8 @@ invariants, contexts — is `docs/domain/README-domain.md`. The briefs live in
   verifying and closing one follows `.claude/skills/vloop-operator/SKILL.md`. You may commit
   on work branches; merging, pushing and anything outward-facing wait for the
   operator's go-ahead. Rules 1, 2 and 8 below bind you too.
+  Where the vloop section below names `/vloop:operate`, this repository's own
+  playbook, `.claude/skills/vloop-operator/SKILL.md`, is the one to follow here.
 
 ## Toolchain
 

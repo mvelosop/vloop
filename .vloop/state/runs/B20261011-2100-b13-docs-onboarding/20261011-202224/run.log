@@ -48,3 +48,10 @@ committing the plan
    review T5 · 0m21s · $0.11 · run $3.93 / $40.00
    review: PASS
    T5 done
+── iteration 6 (6 this run) · T6 · 5/7 done ──
+   Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
+   work T6 · 0m15s · $0.08 · run $4.01 / $40.00
+   check go
+   review T6 · 0m12s · $0.07 · run $4.08 / $40.00
+   review: PASS
+   T6 done

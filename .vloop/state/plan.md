@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/7 done** · iteration 5
+**Status:** running · **6/7 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:17:22Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:21:12Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
 - [x] **T4** — Explain the name, PATH, and asking rather than typing in the README
 - [x] **T5** — Define the driver, PATH, plugin loading, gate-folder lifecycle and retiring the shell loop in the guide
-- [ ] **T6** — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
+- [x] **T6** — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
 - [ ] **T7** — Close: commit the worked example as a test and pass the real-data check
 
 ## Tasks
@@ -141,7 +141,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Say in CLAUDE.md that this repository's operator playbook wins here, and link the glossary's driver
 
-`pending` · depends on: T5
+`done` · depends on: T5
 
 This repository has two operator playbooks: vloop's section names /vloop:operate, and the repository's own section names .claude/skills/vloop-operator/SKILL.md (brief D7, finding 4). This task says, in the repository's own part of CLAUDE.md, which one to follow here, and links the domain glossary's 'driver' to the guide's new definition.
 
