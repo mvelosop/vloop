@@ -2,7 +2,7 @@
   "schema": "metrics/v2",
   "brief": "B20261011-2100-b13-docs-onboarding.loop-brief",
   "run_id": "B20261011-2100-b13-docs-onboarding",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 7,
@@ -50,7 +50,7 @@
     "gates_ms": 10184,
     "checks_ms": 1322288,
     "gate_review_ms": 79155,
-    "wall_ms": null
+    "wall_ms": 3823000
   },
   "rate": {
     "code_per_min": 2.309257883789182,
@@ -93,19 +93,19 @@
   },
   "defects": {
     "in_loop": 0,
-    "operator": 0,
+    "operator": 1,
     "escaped": 0,
-    "total": 0,
-    "removal_efficiency": null
+    "total": 1,
+    "removal_efficiency": 1
   },
   "interventions": {
-    "total": 1,
+    "total": 3,
     "by_agreement": {
       "recommended": 1,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 2
     }
   },
   "records": {
