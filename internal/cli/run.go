@@ -110,7 +110,7 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 			pl := &driver.Planner{Root: root, Version: b.Version, Brief: briefPath,
 				PlanOnly: planOnly, Replan: replan,
 				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn,
-				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute}
+				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute, CostCeiling: budget.CostCeiling}
 			res, err := pl.Plan()
 			if err != nil {
 				var h *driver.Halt

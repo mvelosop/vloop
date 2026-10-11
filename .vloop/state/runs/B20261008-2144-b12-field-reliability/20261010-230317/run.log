@@ -52,3 +52,9 @@ committing the plan
    Record ended and wall_ms, the driver's own measurement, on every session record
    GATE DISPUTE T3 — blocked for the operator; no review, no attempt charged
    T3 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 6 (6 this run) · T6 · 2/11 done ──
+   Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
+   check go
+   review: PASS
+   T6 done

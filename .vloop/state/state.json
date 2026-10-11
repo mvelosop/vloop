@@ -5,9 +5,9 @@
   "base": "615dd19c754de2f82c977c0434d796dcd214955f",
   "branch": "B20261008-2144-b12-field-reliability",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-10-10T23:21:09Z",
-  "updated": "2026-10-11T00:17:56Z",
+  "updated": "2026-10-11T00:28:19Z",
   "shell": "sh",
   "checks": [
     {
@@ -234,7 +234,7 @@
         "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

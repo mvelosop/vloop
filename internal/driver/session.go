@@ -66,7 +66,8 @@ type Result struct {
 	Turns    int
 	IsError  bool
 	Denials  int
-	TimedOut bool // the session was killed for running past the timeout
+	TimedOut bool          // the session was killed for running past the timeout
+	Wall     time.Duration // how long the session ran, by the driver's clock
 }
 
 // Prompt is the slash command a session of the phase starts with.
@@ -321,7 +322,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	started := r.now().Round(0).UTC()
 	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
 	ended := r.now().Round(0).UTC()
-	res := Result{TimedOut: timedOut}
+	res := Result{TimedOut: timedOut, Wall: max(ended.Sub(started), 0)}
 	if runErr != nil {
 		ee, ok := runErr.(*exec.ExitError)
 		if !ok {

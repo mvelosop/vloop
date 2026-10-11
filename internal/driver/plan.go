@@ -58,6 +58,7 @@ type Planner struct {
 	AwakeWarn string // why the keep-awake hold could not be taken; logged once to run.log
 
 	SessionTimeout time.Duration // the plan session is killed after this; none when zero
+	CostCeiling    float64       // the run's cost ceiling, for the cost line and warnings
 
 	Claude string           // test seams, as Runner's
 	Now    func() time.Time // the driver's clock
@@ -212,6 +213,16 @@ func (t term) say(format string, a ...any) {
 	t.r.Logf("%s", line)
 	if t.p.Out != nil && !t.p.Quiet {
 		fmt.Fprintln(t.p.Out, line)
+	}
+}
+
+// sessionDone prints the line of a plan or gate review session that just
+// finished, and the warnings for the thresholds the run's spend crossed.
+func (t term) sessionDone(s Spec, res Result) {
+	spent := spendIn(t.r.RunDir)
+	t.say("%s", sessionLine(s, res.Wall, res.Cost, spent, t.p.CostCeiling))
+	for _, w := range costWarnings(spent-res.Cost, spent, t.p.CostCeiling) {
+		t.warn("%s", w)
 	}
 }
 
@@ -459,6 +470,7 @@ func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effor
 	if err != nil {
 		return halt(ExitPreflight, "planning session failed: %v", err)
 	}
+	t.sessionDone(Spec{Phase: PhasePlan}, res)
 	if what := gguard.changed(); what != "" {
 		return halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
 	}

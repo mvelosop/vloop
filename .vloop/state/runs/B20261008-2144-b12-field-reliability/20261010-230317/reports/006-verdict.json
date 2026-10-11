@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "After each session ends — plan (a revision round's included), gate review, work and review — the driver prints one line on stdout and in run.log: `   <phase>[ <task>] · <m>m<ss>s · $<cost> · run $<spent> / $<ceiling>`, phase one of plan, gate review, work, review; <spent> the same figure the cost ceiling is checked against, after this session; money with two decimals. Example: `   work T3 · 6m12s · $1.84 · run $9.40 / $40.00`.", "met": true, "evidence": "internal/driver/cost.go sessionLine; wired at plan.go planSession, gatereview.go gateReviewRound, iterate.go work and review via say (stdout + run.log). Spend is it.spent / spendIn(RunDir), the same source as the ceiling check at iterate.go:235. Wall comes from Result.Wall set in session.go."},
+    {"criterion": "The first time <spent> reaches 50%, and then 80%, of the ceiling, the driver warns once each, on stderr and in run.log: `   cost: $<spent> spent, <50|80>% of the $<ceiling> ceiling`; never twice in a run.", "met": true, "evidence": "cost.go costWarnings fires only when before < threshold <= after, so each threshold fires once; emitted through warn (stderr + Logf) in both Iterator.sessionDone and term.sessionDone. cost_test.go TestCostWarningsOnceEach."},
+    {"criterion": "run.log stays buffered and written only before each commit, as today; no heartbeat or check runs inside a session, and the ceiling is still checked only between iterations.", "met": true, "evidence": "Lines go through Logf like the existing say/warn; no timers or goroutines added; the ceiling check at iterate.go:235 is unchanged."},
+    {"criterion": "Committed tests cover the line for each phase and both warnings. The run-output tests that slice the log (cmd/vloop/run_gates_test.go, run_iterate_test.go, run_halt_test.go, run_safety_test.go) change only where the new line lands between the lines they match; no assertion is weakened.", "met": true, "evidence": "internal/driver/cost_test.go covers the line for all four phases and both warnings, including a session crossing both and a zero ceiling. git diff HEAD touches nothing under cmd/, so no existing assertion changed."},
+    {"criterion": "No refactor from B15's list is folded in.", "met": true, "evidence": "The only structural change is spend() delegating to a new spendIn so the planner can reuse it; that is needed for the feature. No other refactor in the diff."}
+  ],
+  "findings": [],
+  "notes": "The committed tests exercise the formatting and threshold functions only; the wiring into the plan, gate review, work and review paths is covered by the T6 gate, which dies with the run. No committed run-level test asserts the line appears on stdout or in run.log, or that the warnings reach stderr. Minor: no line is printed for a session whose Run returned an error. That is arguably fine, since no session record exists."
+}

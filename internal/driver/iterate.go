@@ -412,8 +412,20 @@ func (it *Iterator) gitRefsMoved(before []string, task, phase string) error {
 }
 
 // spend is what the records in the run folder say its sessions cost.
-func (it *Iterator) spend() float64 {
-	files, _ := filepath.Glob(filepath.Join(it.RunDir, "sessions", "*.json"))
+func (it *Iterator) spend() float64 { return spendIn(it.RunDir) }
+
+// sessionDone prints the line of a session that has just been added to
+// it.spent, and the warnings for the thresholds it crossed.
+func (it *Iterator) sessionDone(s Spec, res Result) {
+	it.say("%s", sessionLine(s, res.Wall, res.Cost, it.spent, it.Budgets.CostCeiling))
+	for _, w := range costWarnings(it.spent-res.Cost, it.spent, it.Budgets.CostCeiling) {
+		it.warn("%s", w)
+	}
+}
+
+// spendIn is what the sessions recorded in a run folder cost.
+func spendIn(runDir string) float64 {
+	files, _ := filepath.Glob(filepath.Join(runDir, "sessions", "*.json"))
 	total := 0.0
 	for _, f := range files {
 		data, err := os.ReadFile(f)
@@ -459,6 +471,9 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
 	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 	it.spent += wres.Cost
+	if err == nil {
+		it.sessionDone(Spec{Phase: PhaseWork, Arg: id}, wres)
+	}
 	if err != nil {
 		return iterResult{}, err
 	}
@@ -607,6 +622,9 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
 		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 		it.spent += rres.Cost
+		if err == nil {
+			it.sessionDone(Spec{Phase: PhaseReview, Arg: id}, rres)
+		}
 		if err != nil {
 			return iterResult{}, err
 		}

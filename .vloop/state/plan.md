@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/11 done** · iteration 5
+**Status:** running · **3/11 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:17:56Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:28:19Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [ ] **T3** — Record ended and wall_ms, the driver's own measurement, on every session record · **blocked**
 - [ ] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
 - [ ] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
-- [ ] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
+- [x] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
 - [ ] **T7** — Record the session in flight in the run lock and show the live run in vloop status
 - [ ] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did
 - [ ] **T9** — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
@@ -146,7 +146,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Nothing during a run says what it has spent or how long a session took; the operator in another repository saw no cost until the run ended, and run.cost-ceiling is a stop, not feedback. This task prints one line per session — plan, gate review, work and review, revision rounds included — with its time, its cost and the run's spend against the ceiling, and warns once at 50% and once at 80% of the ceiling.
 
