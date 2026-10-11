@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/11 done** · iteration 11
+**Status:** running · **7/11 done** · iteration 12
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T08:42:43Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T08:52:44Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Stamp the plan on load and resume acceptance after a halt instead of planning again · 1 attempt(s)
 - [x] **T3** — Record ended and wall_ms, the driver's own measurement, on every session record
 - [ ] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session · **blocked**
-- [ ] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
+- [x] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
 - [x] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
 - [x] **T7** — Record the session in flight in the run lock and show the live run in vloop status
 - [x] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did · 1 attempt(s)
@@ -124,7 +124,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 A permission denial keeps only tool_name and a file_path (B8 F12), so five Bash denials in another repository could not be analysed; and masking misses Claude Code's dashed project-folder form, -Users-<name>-…, so committed records kept a user name. This task keeps a denied Bash call's command through the same masking and redaction as every record, cut to 200 characters, and masks the dashed form everywhere masking applies. File contents and other tools' inputs stay out.
 

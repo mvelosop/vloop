@@ -350,10 +350,10 @@ func TestSessionDenialsKeepToolAndPath(t *testing.T) {
 		t.Fatalf("%+v %v", res, err)
 	}
 	raw, _ := os.ReadFile(res.Path)
-	if strings.Contains(string(raw), "TOPSECRET") || strings.Contains(string(raw), "CMD-SECRET") {
-		t.Errorf("record keeps content or command: %s", raw)
+	if strings.Contains(string(raw), "TOPSECRET") {
+		t.Errorf("record keeps content: %s", raw)
 	}
-	want := []any{map[string]any{"tool_name": "Write", "file_path": "notes/a.txt"}, map[string]any{"tool_name": "Bash"}}
+	want := []any{map[string]any{"tool_name": "Write", "file_path": "notes/a.txt"}, map[string]any{"tool_name": "Bash", "command": "echo CMD-SECRET"}}
 	if got := readJSON(t, res.Path)["permission_denials"]; !reflect.DeepEqual(got, want) {
 		t.Errorf("denials %v, want %v", got, want)
 	}
@@ -405,5 +405,39 @@ func TestSessionLeavesNoLockWhereNoneIsHeld(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(r.Root, filepath.FromSlash(lockFile))); !os.IsNotExist(err) {
 		t.Errorf("a session created a lock it did not hold: %v", err)
+	}
+}
+
+func TestCutCommandCountsCharactersAndMasksFirst(t *testing.T) {
+	r := &Runner{Env: []string{"API_TOKEN=s3cret-value-123456"}, Home: "/Users/miguel"}
+	long := strings.Repeat("é", 250)
+	got := r.cutCommand(long)
+	if want := strings.Repeat("é", 200) + "…"; got != want {
+		t.Errorf("multibyte cut: %d runes", len([]rune(got)))
+	}
+	if got := r.cutCommand(strings.Repeat("a", 200)); got != strings.Repeat("a", 200) {
+		t.Errorf("200 characters were cut")
+	}
+	// The secret sits across the cut position in the raw text; masked first, it is gone.
+	cmd := strings.Repeat("a", 170) + " s3cret-value-123456 tail"
+	if got := r.cutCommand(cmd); strings.Contains(got, "s3cret") || !strings.Contains(got, "<redacted:API_TOKEN>") {
+		t.Errorf("not redacted before the cut: %q", got)
+	}
+	if got := r.cutCommand("ls /Users/miguel/x"); got != "ls ~/x" {
+		t.Errorf("home not masked: %q", got)
+	}
+}
+
+func TestMaskDashedUserForm(t *testing.T) {
+	r := &Runner{Env: []string{}, Home: "/Users/miguel"}
+	for in, want := range map[string]string{
+		"-Users-miguel-repo":    "-Users-USER-repo",
+		"x/-home-miguel-a/y":    "x/-home-USER-a/y",
+		"miguel-says-hi":        "miguel-says-hi",
+		"-Users-miguelito-repo": "-Users-miguelito-repo",
+	} {
+		if got := r.Mask(in); got != want {
+			t.Errorf("Mask(%q) = %q, want %q", in, got, want)
+		}
 	}
 }

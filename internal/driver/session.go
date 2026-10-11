@@ -217,8 +217,30 @@ func (r *Runner) Mask(s string) string {
 		}
 		re := regexp.MustCompile(flags + `(` + pathSep + `(?:` + strings.Join(dirs, "|") + `)` + pathSep + `)` + regexp.QuoteMeta(user) + pathEnd)
 		s = re.ReplaceAllString(s, "${1}USER${2}")
+		// Claude Code's project folders spell a path with dashes.
+		dashed := regexp.MustCompile(`(-(?:Users|home)-)` + regexp.QuoteMeta(user) + `-`)
+		s = dashed.ReplaceAllString(s, "${1}USER-")
 	}
 	return s
+}
+
+// maxCommand is how many characters of a denied Bash command a record keeps.
+const maxCommand = 200
+
+// cutCommand masks a command, then keeps its first maxCommand characters, with
+// … appended when it was cut. The masking comes first so the cut never splits
+// a secret or a path into something the masks no longer recognize.
+func (r *Runner) cutCommand(c string) string {
+	c = r.Mask(c)
+	if n := 0; len(c) > maxCommand {
+		for i := range c {
+			if n == maxCommand {
+				return c[:i] + "…"
+			}
+			n++
+		}
+	}
+	return c
 }
 
 // maskValue masks every string, and every object key, of a decoded JSON value.
@@ -407,6 +429,7 @@ func (r *Runner) record(s Spec, task string, started, ended time.Time, raw map[s
 		Input struct {
 			Path     string `json:"file_path"`
 			NotePath string `json:"notebook_path"`
+			Command  string `json:"command"`
 		} `json:"tool_input"`
 	}
 	get("permission_denials", &denials)
@@ -417,6 +440,9 @@ func (r *Runner) record(s Spec, task string, started, ended time.Time, raw map[s
 			if d.Input.Path == "" {
 				kept["file_path"] = d.Input.NotePath
 			}
+		}
+		if d.Tool == "Bash" && d.Input.Command != "" {
+			kept["command"] = r.cutCommand(d.Input.Command)
 		}
 		b, _ := json.Marshal(kept)
 		o.Denials = append(o.Denials, b)

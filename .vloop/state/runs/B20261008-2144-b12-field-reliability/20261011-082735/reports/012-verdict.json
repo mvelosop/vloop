@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A denied Bash call's permission_denials entry is {tool_name, command}: the command through the same masking (home, user name) and secret redaction as every record, then cut to its first 200 characters — counted in characters, not bytes — with … appended when cut.", "met": true, "evidence": "internal/driver/session.go cutCommand calls r.Mask first, then cuts at the 200th character by ranging over runes and appends …; record() sets kept[\"command\"] for Bash. TestCutCommandCountsCharactersAndMasksFirst covers 250 multibyte chars, exactly 200, and a secret straddling the cut."},
+    {"criterion": "Every other tool's entry is unchanged: tool_name, and file_path when the input had a file_path or notebook_path. Violation the review must rule against: a record that keeps any tool input but a Bash command and a file_path (a description, file contents, a URL, a prompt).", "met": true, "evidence": "The struct decodes only file_path, notebook_path and command; the command is kept only when Tool == \"Bash\". TestSessionDenialsKeepToolAndPath still asserts that Write content (TOPSECRET) is absent and the Write entry is just tool_name and file_path."},
+    {"criterion": "Masking replaces the user name in the dashed form: -Users-<user>- and -home-<user>- become -Users-USER- and -home-USER-, everywhere masking applies (records, run.log, stderr captures); a user name that is only free text is still left alone.", "met": true, "evidence": "The dashed regex sits in Runner.Mask, the single masking path, and requires the -Users-/-home- prefix and a trailing dash. TestMaskDashedUserForm covers both forms plus free text (miguel-says-hi) and a longer name (-Users-miguelito-repo) left alone."},
+    {"criterion": "TestSessionDenialsKeepToolAndPath (internal/driver/session_test.go) is updated for command; committed tests cover truncation by characters (a multibyte command), masking and redaction before the cut, and the dashed form. No other assertion is weakened.", "met": true, "evidence": "The diff changes only the CMD-SECRET absence check and the Bash want entry in that test; the TOPSECRET check stays. New tests TestCutCommandCountsCharactersAndMasksFirst and TestMaskDashedUserForm cover the rest."},
+    {"criterion": "No past record under .vloop/ is rewritten, and no refactor from B15's list is folded in.", "met": true, "evidence": "The only changed files outside the current run's state directory are internal/driver/session.go and session_test.go; the .vloop changes are this run's own driver output (checks log, gate log, session record). No refactor in the diff."}
+  ],
+  "findings": [],
+  "notes": "None."
+}

@@ -88,3 +88,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Metrics take session time from wall_ms (duration_ms otherwise) in every phase figure and per-task time, and the wall starts at the first plan session's started; the gate's review_ms clause cannot pass for a correct implementation.
 - **Files:** internal/runs/runs.go, internal/metrics/time.go, internal/metrics/metrics.go, internal/metrics/time_test.go
 - **Notes for next iteration:** Session.WallMS (*int64) and Session.TimeMS() in internal/runs; Aggregate and the per-task rows use TimeMS; wall starts at the earliest plan session Started across folders, else the plan commit. No existing test needed changing, so no changed numbers to list; added TestTimeFromWallMSWhereRecorded and TestTimeWallStartsAtFirstPlanSession. The gate's review clause sums records with glob *-review.json, which also matches NNN-gate-review.json (phase gate-review), so its want folds gate review time into review_ms while the metric correctly keeps time.gate_review_ms apart (the plan, work and wall clauses pass). The gate needs glob [0-9]*-review.json or a filter on .phase.
+
+## T5 — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
+
+- **Outcome:** done (review: PASS)
+- **Summary:** A denied Bash call's permission_denials entry now keeps command, masked and redacted then cut to 200 characters with … appended; other tools are unchanged. Mask also replaces the dashed -Users-<user>- and -home-<user>- forms with USER.
+- **Files:** internal/driver/session.go, internal/driver/session_test.go
+- **Notes for next iteration:** Runner.cutCommand masks first (Mask), then cuts by runes, so a secret is never split by the cut. The dashed form is handled in Runner.Mask, so it applies to records, run.log and stderr captures alike. TestSessionDenialsKeepToolAndPath now expects the Bash command; added TestCutCommandCountsCharactersAndMasksFirst and TestMaskDashedUserForm. No past record under .vloop/ was rewritten.

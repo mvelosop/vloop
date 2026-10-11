@@ -7,3 +7,9 @@
    Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
    GATE DISPUTE T4 — blocked for the operator; no review, no attempt charged
    T4 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 12 (3 this run) · T5 · 6/11 done ──
+   Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
+   check go
+   review: PASS
+   T5 done
