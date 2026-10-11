@@ -7,7 +7,7 @@
   "status": "halted",
   "iteration": 4,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-11T23:47:49Z",
+  "updated": "2026-10-11T23:48:39Z",
   "shell": "sh",
   "checks": [
     {
@@ -80,9 +80,9 @@
         "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state"
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "blocked",
-      "attempts": 3,
-      "notes": "The implementation is in place and its gate passes (WithGuidelines in internal/driver/session.go, tests in internal/driver/session_test.go); acceptance 3, confirming the flag against `claude --help`, cannot be met because running claude is denied here. — T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else."
+      "status": "pending",
+      "attempts": 0,
+      "notes": "Operator confirmation of acceptance 3 (2026-10-12), since sessions may not run claude: with Claude Code 2.1.296, 'claude -p hi --append-system-prompt-file ./nonexistent-guidelines.md' exits with 'Error: Append system prompt file not found: <path>', while a misspelled '--append-system-prompt-filez' gives 'error: unknown option'. The flag exists (hidden; claude --help mentions it only as --append-system-prompt[-file] in --system-prompt-snapshot's text). It must not be passed for a missing file, which WithGuidelines already ensures. The spelling is confirmed; the implementation in place needs no change."
     },
     {
       "id": "T3",
