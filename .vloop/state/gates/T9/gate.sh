@@ -6,6 +6,9 @@
 # writes synthetic skills (frontmatter, mixed whitespace) exactly at and a random
 # amount over each ceiling, and counts as wc -w does. It also counts the real
 # skills itself and fails when one is over its ceiling.
+# Operator ruling (2026-10-12): the gate review's pins-unnamed finding on
+# internal/budget.Check is accepted as the plan's seam: the task's acceptance
+# names it, and L10's deliverable is a test, which no gate may run (brief gap).
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
 CEIL='plan 4100
