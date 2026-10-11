@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 12,
   "created": "2026-10-10T23:21:09Z",
-  "updated": "2026-10-11T08:52:45Z",
+  "updated": "2026-10-11T08:53:32Z",
   "shell": "sh",
   "checks": [
     {
@@ -155,7 +155,7 @@
       "title": "Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session",
       "goal": "vloop metrics showed a 39-minute plan as 0.3 minutes and a 71-minute run as 30.7, because it sums the CLI's duration_ms and starts the wall at the plan commit, which leaves planning out. With wall_ms on the records (T3), this task makes every session time come from wall_ms where a record has it, and the wall run from the first plan session's started to the last run commit.",
       "kind": "fix",
-      "fixtures": "12555305d0a68cb0ac0f710c406775529f528847a799394b0d4e314bc50fa526",
+      "fixtures": "e5aa4539086c8c91ba3fc50bee6bb9e9149dc03d3d8f4b33b61fd36d28b566b9",
       "references": [
         {
           "path": "docs/domain/measurement/metrics.md",
@@ -177,9 +177,18 @@
         "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "blocked",
+      "status": "pending",
       "attempts": 0,
-      "notes": "gate disputed: The review_ms clause sums wall_ms over *-review.json, which also matches the gate-review session records, so it expects review_ms to include gate review time that the metrics (and the acceptance) report separately as gate_review_ms. — Session files are named NNN-<phase>.json and the gate-review phase is gate-review, so glob *-review.json matches NNN-gate-review.json; output: 'metrics time.review_ms is 15, want 27'."
+      "notes": "gate disputed: The review_ms clause sums wall_ms over *-review.json, which also matches the gate-review session records, so it expects review_ms to include gate review time that the metrics (and the acceptance) report separately as gate_review_ms. — Session files are named NNN-<phase>.json and the gate-review phase is gate-review, so glob *-review.json matches NNN-gate-review.json; output: 'metrics time.review_ms is 15, want 27'.",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T4/gate.sh",
+          "replaced_at": "2026-10-11T08:53:32Z",
+          "reason": "gate summed review_ms over *-review.json, which also matches NNN-gate-review.json, folding gate review time into review_ms; it now sums by the record's phase field",
+          "by": "operator",
+          "fixtures": "12555305d0a68cb0ac0f710c406775529f528847a799394b0d4e314bc50fa526"
+        }
+      ]
     },
     {
       "id": "T5",

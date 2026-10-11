@@ -60,11 +60,12 @@ for f in $(records '*.json'); do
   jq -e '(.wall_ms | type) == "number"' "$f" >/dev/null || fail "$(basename "$f") has no wall_ms — the session record has to carry it first"
 done
 (cd "$R" && "$B" metrics "$N" --json) >"$t/m.json" 2>"$t/err" || fail "metrics $N --json: $(cat "$t/err")"
-# phase <glob>: the records' wall_ms, summed.
-phase() { jq -s 'map(.wall_ms) | add // 0' $(records "$1") /dev/null; }
+# phase <phase>: the wall_ms of the records of that phase, summed. By the record's
+# phase, not its file name: *-review.json also matches NNN-gate-review.json.
+phase() { jq -s --arg p "$1" 'map(select(.phase == $p) | .wall_ms) | add // 0' $(records '*.json') /dev/null; }
 for p in plan:plan_ms work:work_ms review:review_ms gate-review:gate_review_ms; do
-  glob="*-${p%%:*}.json" key=${p#*:}
-  want=$(phase "$glob")
+  key=${p#*:}
+  want=$(phase "${p%%:*}")
   [ "$(jq ".time.$key" "$t/m.json")" = "$want" ] || fail "metrics time.$key is $(jq ".time.$key" "$t/m.json"), want $want — the records' wall_ms, not their duration_ms"
 done
 w=$(jq '.time.agent_ms' "$t/m.json"); [ "$w" = "$(( $(jq .time.work_ms "$t/m.json") + $(jq .time.review_ms "$t/m.json") ))" ] || fail "agent_ms is not work + review"
