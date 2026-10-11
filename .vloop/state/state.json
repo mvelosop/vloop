@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md",
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
-  "status": "halted",
-  "iteration": 4,
+  "status": "running",
+  "iteration": 5,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-11T23:48:39Z",
+  "updated": "2026-10-11T23:52:50Z",
   "shell": "sh",
   "checks": [
     {
@@ -80,9 +80,9 @@
         "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state"
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
-      "notes": "Operator confirmation of acceptance 3 (2026-10-12), since sessions may not run claude: with Claude Code 2.1.296, 'claude -p hi --append-system-prompt-file ./nonexistent-guidelines.md' exits with 'Error: Append system prompt file not found: <path>', while a misspelled '--append-system-prompt-filez' gives 'error: unknown option'. The flag exists (hidden; claude --help mentions it only as --append-system-prompt[-file] in --system-prompt-snapshot's text). It must not be passed for a missing file, which WithGuidelines already ensures. The spelling is confirmed; the implementation in place needs no change."
+      "notes": ""
     },
     {
       "id": "T3",

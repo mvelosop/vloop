@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Runner.Run passes every session's arguments through WithGuidelines, which appends `--append-system-prompt-file .vloop/repo-guidelines.md` as one pair when that file exists at the repo root and is non-empty; otherwise arguments are unchanged.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed ok.",
+  "notes": "No code change this attempt: the implementation from earlier attempts stands. The flag spelling is confirmed by the operator's note on the task (claude 2.1.296 errors 'Append system prompt file not found' for the flag, 'unknown option' for a misspelling). Args and TestSessionArgs are untouched."
+}
