@@ -2,7 +2,7 @@
 name: B20261011-2100-b13-docs-onboarding.loop-brief
 description: Make vloop learnable without reading its code — doctor warns when /vloop:operate is out of reach and when the operator may not edit gate folders, init and CLAUDE.md say how to get the skill, and the docs explain the name, asking instead of typing, PATH, the driver, gate-folder lifecycle and retiring the shell loop
 kind: brief
-status: draft
+status: ready
 created: 2026-10-11
 seeds: The T1 triage's P2; the learning loop follows as B14
 depends-on: [B20261008-2144-b12-field-reliability.loop-brief]
