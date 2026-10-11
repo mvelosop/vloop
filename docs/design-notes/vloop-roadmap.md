@@ -29,7 +29,8 @@ feature B1 builds — so from B2 on, `vloop brief list` shows this order.
 | B8 | `docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md` — **consumed** | **The v1.0 review, security pass**, run by vloop itself from the released v0.7.0: the driver, not the fence, is the boundary — per-phase fences; the driver's git ignores repository hooks and config; refs, `.git/config` and hooks checked around sessions and gates; the driver's inputs kept in memory and restored; review sessions cannot change the work; gate files by token; gate and session timeouts with process groups; masking by path; secrets redacted; safe `.vloop/tmp/`, lock and run id; export without local paths; only a ready, checked brief from a clean tree; the self-hosting guard. Carried in: the `typescript`/`javascript` presets (D20261002-1425), keep-awake on macOS, Linux and Windows, the README completeness test moved to the guides. Findings: `docs/design-notes/vloop-v1-review.md` | B7 |
 
 v1.0 was tagged `v1.0.0` (`fc0b67a`) on 2026-10-03. The next release is planned
-in `docs/design-notes/vloop-v2.0-roadmap.md`.
+in `docs/design-notes/vloop-v2.0-roadmap.md` (released as v0.8.0), and the series
+after it in `docs/design-notes/vloop-roadmap-b12-b17.md`.
 
 After B8: v1.0 is `vloop run` building its own next patch release (design
 session, section 6). **`.loop/` is kept, not deleted**: its state, journals and

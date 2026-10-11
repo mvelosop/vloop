@@ -126,6 +126,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | next | ceremony | partly | no-options | [I20261004-1337-v2-0-0-beta-1-released-as-a-pre-release](I20261004-1337-v2-0-0-beta-1-released-as-a-pre-release.md) |
 | next | ceremony | partly | recommended | [I20261005-0906-v2-0-0-beta-2-released-so-b11-runs-on-a](I20261005-0906-v2-0-0-beta-2-released-so-b11-runs-on-a.md) |
 | next | ceremony | partly | recommended | [I20261006-1503-the-v1-0-0-and-v2-0-0-tags-deleted-befor](I20261006-1503-the-v1-0-0-and-v2-0-0-tags-deleted-befor.md) |
+| next | ceremony | partly | no-options | [I20261006-1748-vloop-made-public-and-verified-from-outs](I20261006-1748-vloop-made-public-and-verified-from-outs.md) |
 | next | decision | no | recommended | [I20261006-1237-renumbered-to-0-8-0-before-going-public](I20261006-1237-renumbered-to-0-8-0-before-going-public.md) |
 | next | direction | no | no-options | [I20260929-2130-the-metrics-and-defects-design-before-b2](I20260929-2130-the-metrics-and-defects-design-before-b2.md) |
 | next | direction | no | no-options | [I20260930-0955-a-project-level-driver-over-project-stat](I20260930-0955-a-project-level-driver-over-project-stat.md) |
