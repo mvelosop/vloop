@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Every session record (plan, gate review, work, review) gains ended (RFC 3339, UTC, the same format as started) and wall_ms, the driver's own measurement from the session process's start to its exit, including any time the machine slept; duration_ms stays as the CLI reported it.", "met": true, "evidence": "internal/driver/session.go:326-328 takes started and ended from the driver clock (Round(0).UTC(), wall not monotonic) around state.RunGroup; record() (session.go:465-467) writes ended and wall_ms = ended-started; duration_ms still comes from the CLI JSON. All phases go through Runner.Run."},
+    {"criterion": "schemas/session.v1.json and schemas/session.v2.json declare ended (a string) and wall_ms (an integer) as optional properties; records written before validate unchanged; no schema version changes and no record's schema value changes.", "met": true, "evidence": "schemas/session.v1.json:30,32 and session.v2.json:30,32 add ended (string, date-time) and wall_ms (integer); +2 lines each, not in required, schema consts untouched; the test record still has schema session/v1."},
+    {"criterion": "Violation the review must rule against: a schema version bump for the session record, or wall_ms derived from the CLI's duration_ms rather than measured by the driver.", "met": true, "evidence": "No version bump in the schemas diff; wall_ms is computed from r.now() before and after the process, never from duration_ms."},
+    {"criterion": "Committed tests cover the new fields: TestSessionFieldMapping (internal/driver/session_test.go) is updated for them, and TestRun15TelemetryContract (cmd/vloop/run_safety_test.go) only if it lists the record's keys. No other assertion is weakened.", "met": true, "evidence": "session_test.go:139 adds ended and wall_ms to TestSessionFieldMapping's expected map; the run_safety_test.go key list (duration_ms etc.) is a does-not-lose check and was not required to change; the session_test.go diff only adds assertions and tests. Go check log passes."},
+    {"criterion": "No refactor from B15's list is folded in.", "met": true, "evidence": "The session.go change is limited to the started/ended capture and two record fields; no unrelated restructuring seen."}
+  ],
+  "findings": [],
+  "notes": "The implementation was already committed from the earlier blocked attempt; this iteration changed only state.json. TestSessionFieldMapping uses a fixed fake clock, so it only asserts wall_ms == 0; a test with an advancing clock would pin the measurement better, but the criteria do not demand it."
+}

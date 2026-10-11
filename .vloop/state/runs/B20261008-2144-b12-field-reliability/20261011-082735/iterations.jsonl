@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":195302,"exit":0,"name":"go"}],"ended":"2026-10-11T08:35:28Z","gate":{"duration_ms":6378,"exit":0},"iteration":10,"outcome":"done","run_id":"B20261008-2144-b12-field-reliability","schema":"iteration/v2","started":"2026-10-11T08:27:35Z","task":"T3"}

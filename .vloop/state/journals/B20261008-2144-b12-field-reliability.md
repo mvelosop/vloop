@@ -74,3 +74,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261008-2144-b12-field-reliability` · 9 iteration(s) this run
 - **Plan:** 5/11 done, 1 blocked
+
+## T3 — Record ended and wall_ms, the driver's own measurement, on every session record
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Session records carry ended and wall_ms, measured by the driver around the session process; duration_ms stays as the CLI reported it. Both session schemas declare them as optional with no version change.
+- **Files:** internal/driver/session.go, internal/driver/session_test.go, schemas/session.v1.json, schemas/session.v2.json
+- **Notes for next iteration:** The implementation was already in the tree from the earlier blocked attempt; this session verified it against the corrected gate and changed nothing. wall_ms is ended minus started from the driver clock (r.now) around the process.
