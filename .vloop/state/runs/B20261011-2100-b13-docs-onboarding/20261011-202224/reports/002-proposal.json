@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "doctor now has a `gate edits` check right after `plugin` that reads the user, project and local Claude settings and warns, printing the rule to add, unless an allow entry lets a session edit .vloop/state/gates/; it only reads.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go", "cmd/vloop/b5_e2e_test.go"],
+  "verified": "vloop task gate T2 equivalent sh .vloop/state/gates/T2/gate.sh exited 0 and printed gate T2: ok; go test ./internal/cli -run TestDoctor and the B5/B11 worked-example tests pass.",
+  "notes": "Home comes from the package var userHomeDir (defaults to os.UserHomeDir) in internal/cli/doctor.go; tests override it. Files are read in order user, project, local: the first unreadable file before a pass gives the `cannot read` warning, an earlier pass wins over a later unreadable file. Besides the tests the brief lists, TestWorkedExampleB5PlantedFailures/plugin_version_warning (cmd/vloop/b5_e2e_test.go) changed from 1 to 2 warnings, as the new line adds one there too."
+}

@@ -13,6 +13,27 @@ with no memory; the sessions share only files in the repository. A task that
 fails its gate or its review is tried again, and a run that cannot go on halts
 and says why (see [Exit codes](#exit-codes)).
 
+## The driver
+
+The **driver** is `vloop run` itself: the deterministic half of the loop. It
+plans nothing and judges nothing. It starts every session, runs every gate and
+check, owns every status change and makes every commit. It is also the boundary
+the permission fence only advises on: a session that moves a ref, a key of
+`.git/config` or the git hooks halts the run with exit 9 (see [Exit
+codes](#exit-codes)), and the driver restores what a session changed among its
+inputs.
+
+| Who | Does | Never does |
+| --- | --- | --- |
+| The driver (`vloop run`) | starts every session; runs every gate and check; sets every task and plan status; makes the one commit per iteration; halts and exits | plan, judge or review |
+| The plan session | splits the brief into tasks and writes each task's gate: its `verify` command and its gate folder | commit, set a status |
+| The gate-review session | judges every gate of a fresh plan and answers `PASS` or `FAIL` | commit, set a status |
+| The work session | does one task and proposes an outcome | commit, set a status, change its gate |
+| The review session | judges the work independently and answers `PASS` or `FAIL` | commit, set a status |
+| The operator (you) | writes the brief; starts `vloop run`; decides at halts; amends gates; verifies and closes the brief | |
+
+Sessions propose; the driver disposes.
+
 ## Skills
 
 The plugin ships five skills. The first four are the sessions of the loop;
@@ -91,7 +112,11 @@ work session may not change it; only the operator does, with `vloop task verify
 **Gate fixtures.** What a gate needs besides its command (an oracle, a script,
 expected outputs) lives in the task's gate folder, `.vloop/state/gates/<id>/`.
 The plan session writes it, the plan stamps it, and the work session cannot
-change it: the driver restores it from the stamp. `vloop task verify <id>
+change it: the driver restores it from the stamp. `state.json`, `plan.md` and
+`.vloop/state/gates/` belong to the current plan, and there is one plan per
+repository. `vloop brief close` keeps them; they are replaced when the next
+brief is planned, or when a new plan is rejected as unfit. Earlier plans' gate
+folders live in git history. `vloop task verify <id>
 [<command>]` replaces a gate's command, its fixtures or both, and records the
 old ones, the reason and who replaced them.
 
@@ -263,10 +288,33 @@ rewrites the stamp. It refuses a repository set up by a newer vloop, and a
 breaking jump (a new major version, or a new minor while 0.x) or a pre-release
 needs `--yes`.
 
+`go install` writes the binary to `$GOBIN`, or `$(go env GOPATH)/bin`
+(`~/go/bin` by default), and never touches `PATH`; if `vloop` is not found, add
+that directory:
+
+```
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+Put the line in the file your shell reads: zsh `~/.zprofile` (or `~/.zshrc`);
+bash `~/.bash_profile` on macOS and `~/.profile` on most Linux. In PowerShell the
+place is the user `Path` variable. The Go MSI installer usually adds
+`%USERPROFILE%\go\bin` already; otherwise set it once, which new terminals,
+`cmd` and apps inherit:
+
+```
+[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$(go env GOPATH)\bin", 'User')
+```
+
+This is preferred over `$PROFILE`, which reaches PowerShell only.
+
 `vloop doctor` checks the setup without writing anything: git, the install stamp,
 the config, the `[[check]]` entries (`checks`), `claude`, workspace trust, the
-gate shell, the plan, the branch, the plugin, the scoped `stacks` (printed only
-when `metrics.stacks` has scoped entries) and `self-hosting`. It exits 1 on a problem.
+gate shell, the plan, the branch, the plugin (a warning when no vloop plugin
+is installed), `gate edits` (a warning, with the rule to add, unless the
+operator's settings let a session edit `.vloop/state/gates/`), the scoped
+`stacks` (printed only when `metrics.stacks` has scoped entries) and
+`self-hosting`. It exits 1 on a problem.
 
 The plugin ships inside the binary: `vloop plugin path` extracts it to
 `.vloop/tmp/plugin/<version>/`, and refuses outside a repository where `vloop
@@ -281,6 +329,10 @@ claude --plugin-dir "$(vloop plugin path)"
 `vloop version --check-plugin
 <dir>` compares an installed plugin with the binary.
 
+`vloop run`'s sessions load the plugin it hands them and not the plugins enabled
+in your settings (measured 2026-10-11). For interactive sessions, either install
+the plugin or pass `--plugin-dir`, not both.
+
 ## The .vloop/ layout
 
 vloop keeps its files under `.vloop/` in the repository root:
@@ -293,8 +345,27 @@ vloop keeps its files under `.vloop/` in the repository root:
 - `.vloop/state/metrics/<run id>.json`: the metrics snapshot `brief close` freezes.
 - `.vloop/defects/`: one Markdown file per recorded defect.
 
-Legacy: the shell loop that built vloop's first briefs, in this repository only.
-Its state lives in `.loop/`; vloop only reads it.
+Legacy: the shell loop that built vloop's first briefs. Its state lives in
+`.loop/state/`; vloop reads it, in any repository that has it, and never writes
+there. See [Retiring the shell loop](#retiring-the-shell-loop).
+
+## Retiring the shell loop
+
+For a repository that had the shell loop installed (`.loop/install.sh`) and now
+runs vloop, remove:
+
+- `.claude/skills/loop-plan`, `.claude/skills/loop-work` and
+  `.claude/skills/loop-review`;
+- the `<!-- loop:begin -->…<!-- loop:end -->` block in `CLAUDE.md`, first moving
+  any rule it holds that vloop's section lacks into the repository's own part of
+  `CLAUDE.md`: the shell loop's rule 1, that durable state never goes to
+  `~/.claude`;
+- `.claude/loop-knowledge.md`;
+- `.loop/tmp/`.
+
+Keep `.loop/state/`, with a one-line `.loop/RETIRED.md` saying the shell loop is
+retired, because vloop reads its `state.json` and `runs/` for metrics and
+defects. The rest of `.loop/` stays in git history.
 
 ## The flow
 

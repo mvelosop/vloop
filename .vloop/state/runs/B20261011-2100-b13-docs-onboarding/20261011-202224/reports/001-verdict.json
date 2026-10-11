@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "When `claude plugin list --json` lists no entry whose id starts with `vloop@`, doctor prints exactly: ! plugin /vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir \"$(vloop plugin path)\" for one session", "met": true, "evidence": "internal/cli/doctor.go:381 returns that exact message as resWarning for the found==\"\" && !disabled branch; TestDoctorPluginMessages asserts it for [] and for an other-marketplace-only list"},
+    {"criterion": "In --json the plugin check is then result \"warning\" with that message (without the mark and the name)", "met": true, "evidence": "doctorPlugin returns (name, resWarning, message); the tests read c.Message and the result from the check struct, which is what --json serialises"},
+    {"criterion": "Every other outcome is byte-identical to before: an enabled vloop@<any> at the binary's version passes with no message; a disabled one, another version and an unreadable list warn with today's messages; no claude on PATH is `-`", "met": true, "evidence": "the diff touches only the final return in the found==\"\" && !disabled branch of doctorPlugin; the other branches and the resNA path are unchanged; TestDoctorPlugin still passes for vloop@elsewhere and the disabled/other-version cases"},
+    {"criterion": "No exit code changes: the new outcome is a warning, never a problem; doctor writes no file", "met": true, "evidence": "the new result is resWarning, and nothing in the diff writes a file or changes exit-code handling"},
+    {"criterion": "TestDoctorPlugin, TestDoctorPluginMessages and TestDoctorWorkedExampleText (internal/cli/doctor_test.go) change only to expect the plugin warning for [], and committed tests cover the [] case and an other-marketplace-only list; TestWorkedExampleB11 and TestWorkedExampleB5Session change only where their doctor output now carries this warning", "met": true, "evidence": "doctor_test.go diff changes the [] expectation to resWarning and adds the other@x-only case in both tests; TestDoctorWorkedExampleText is untouched because its env lists a matching vloop@vloop plugin; b20261005_e2e_test.go changes only the B11 doctor assertion; B5 session is untouched since its stub reports a matching plugin"},
+    {"criterion": "No earlier test is weakened: only the tests the brief lists change, and only as it states", "met": true, "evidence": "git diff HEAD touches only doctor.go, doctor_test.go and b20261005_e2e_test.go; the changes are expectation updates for the new warning, and the message assertion is now stricter than before (a result is asserted for every case); the go check log is green"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

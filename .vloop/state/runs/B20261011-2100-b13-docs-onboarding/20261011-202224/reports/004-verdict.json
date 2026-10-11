@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The first paragraph says vloop is short for verification loop, with the words `verification loop`, and that the gate and the independent review are what the loop is about", "met": true, "evidence": "README.md lines 3-6 of the diff: 'short for **verification loop**' and 'What the loop is about is the gate and the independent review'"},
+    {"criterion": "Install keeps `go install github.com/mvelosop/vloop/cmd/vloop@latest` and, right after it, says go install puts the binary in `$(go env GOPATH)/bin` (`~/go/bin` by default), often not on PATH, with the line `export PATH=\"$PATH:$(go env GOPATH)/bin\"` and a link to the guide's per-shell instructions in docs/guide/concepts.md", "met": true, "evidence": "README.md Install section: the go install block is kept, followed by the GOPATH/bin paragraph naming ~/go/bin, the export line, and a link to docs/guide/concepts.md#setting-up-a-repository, a heading that exists in the guide (the per-shell text itself is T5's)"},
+    {"criterion": "A section `## You ask; the skill drives` comes before `## Everyday commands`: with the plugin loaded the user asks Claude Code in plain words (\"run this brief\", \"what did that cost?\", \"record this as a defect\") and /vloop:operate runs vloop; \"Everyday commands\" is reframed as what you can ask for and what the skill runs", "met": true, "evidence": "README.md diff adds the section before '## Everyday commands' with the three example phrases and `/vloop:operate`; Everyday commands gains 'What you can ask for, and the command the skill runs for it:'"},
+    {"criterion": "\"The loop in one paragraph\" links \"driver\" to docs/guide/concepts.md#the-driver (the heading the guide gains in T5)", "met": true, "evidence": "README.md: '[the driver](docs/guide/concepts.md#the-driver) runs the gates on the base'"},
+    {"criterion": "Every command or flag the README names exists (the README tests pass); the skill is written `/vloop:operate`; no command is invented", "met": true, "evidence": "checks.json: go check exit 0; the diff adds no new vloop command, only `/vloop:operate` and the export line"},
+    {"criterion": "No plugin skill (plugin/skills/) is edited", "met": true, "evidence": "git status --short shows only README.md and run state files modified"}
+  ],
+  "findings": [],
+  "notes": "The README links to docs/guide/concepts.md#the-driver and the per-shell PATH instructions, which T5 writes; until T5 lands the #the-driver anchor does not resolve and the guide section has no PATH text. Some README lines now exceed the wrapped width; cosmetic only."
+}

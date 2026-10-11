@@ -45,6 +45,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 <!-- index:begin -->
 | Phase | Kind | Automatable | Agreement | Id |
 | --- | --- | --- | --- | --- |
+| setup | decision | partly | no-options | [I20261011-2233-b13-ran-from-the-unmerged-design-branch](I20261011-2233-b13-ran-from-the-unmerged-design-branch.md) |
 | setup | repair | yes | no-options | [I20260928-2215-the-loop-s-install-proof-failed-in-every](I20260928-2215-the-loop-s-install-proof-failed-in-every.md) |
 | design | carry-forward | yes | no-options | [I20260929-2150-b1-s-open-items-carried-into-b2](I20260929-2150-b1-s-open-items-carried-into-b2.md) |
 | design | context-supply | partly | no-options | [I20260929-1222-the-design-conversation-was-reachable-on](I20260929-1222-the-design-conversation-was-reachable-on.md) |
@@ -61,6 +62,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | no | no-options | [I20261004-1435-b10-s-forks-settled-options-as-body-sect](I20261004-1435-b10-s-forks-settled-options-as-body-sect.md) |
 | design | decision | no | adjusted | [I20261005-0935-b11-s-forks-settled-user-facing-quality](I20261005-0935-b11-s-forks-settled-user-facing-quality.md) |
 | design | decision | partly | recommended | [I20261008-2146-b12-s-forks-settled-a-key-aware-git-conf](I20261008-2146-b12-s-forks-settled-a-key-aware-git-conf.md) |
+| design | decision | partly | recommended | [I20261011-2104-b13-s-forks-settled-doctor-warns-on-a-mi](I20261011-2104-b13-s-forks-settled-doctor-warns-on-a-mi.md) |
 | design | direction | no | no-options | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | no-options | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | no-options | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
@@ -116,6 +118,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261002-2118-the-url-shortener-benchmark-the-cost-dro](I20261002-2118-the-url-shortener-benchmark-the-cost-dro.md) |
 | verify | verification-finding | partly | recommended | [I20261005-0757-b10-verified-the-worked-example-held-by](I20261005-0757-b10-verified-the-worked-example-held-by.md) |
 | verify | verification-finding | partly | recommended | [I20261006-1028-b11-verified-the-worked-example-held-by](I20261006-1028-b11-verified-the-worked-example-held-by.md) |
+| verify | verification-finding | partly | no-options | [I20261011-2233-verification-t3-changed-testinitdoesnotp](I20261011-2233-verification-t3-changed-testinitdoesnotp.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

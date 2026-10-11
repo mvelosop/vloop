@@ -38,11 +38,13 @@ func TestShortsFollowListAndShow(t *testing.T) {
 	}
 }
 
-func TestInitDoesNotPointAtAMarketplace(t *testing.T) {
+func TestInitPointsAtBothWaysToLoadThePlugin(t *testing.T) {
 	d := initRepo(t, map[string]string{"go.mod": "module a\n"})
 	out, _, _ := runPluginCLI(t, initBuild, d, "init")
-	if strings.Contains(out, "marketplace") || !strings.Contains(out, `claude --plugin-dir "$(vloop plugin path)"`) {
-		t.Errorf("init's next steps:\n%s", out)
+	for _, want := range []string{"claude plugin marketplace add mvelosop/vloop", "claude plugin install vloop@vloop", `claude --plugin-dir "$(vloop plugin path)"`} {
+		if !strings.Contains(out, want) {
+			t.Errorf("init's next steps lack %q:\n%s", want, out)
+		}
 	}
 }
 

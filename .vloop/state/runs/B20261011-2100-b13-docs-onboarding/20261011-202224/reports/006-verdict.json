@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "\"Which rules bind you\" in CLAUDE.md says that where vloop's section names /vloop:operate, this repository's playbook (.claude/skills/vloop-operator/SKILL.md) is the one to follow here", "met": true, "evidence": "CLAUDE.md diff adds two lines inside the interactive-session bullet of 'Which rules bind you' naming /vloop:operate and .claude/skills/vloop-operator/SKILL.md"},
+    {"criterion": "Nothing else in CLAUDE.md changes: not the vloop section between its markers, not the loop block, not the other sections", "met": true, "evidence": "git diff HEAD CLAUDE.md is a single 2-line addition hunk at line 19-20, outside the vloop markers"},
+    {"criterion": "The glossary row for \"driver\" in docs/domain/domain-model.md links to ../guide/concepts.md#the-driver; no domain rule (P-, S-, R-, B-) changes", "met": true, "evidence": "domain-model.md diff changes only the driver row; docs/guide/concepts.md:16 has '## The driver'"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

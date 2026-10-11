@@ -198,7 +198,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		t.Fatalf("init stderr: %q", init.err)
 	}
 	lines := b5Lines(init.out)
-	if len(lines) != 12 {
+	if len(lines) != 16 {
 		t.Fatalf("init printed %d lines: %q", len(lines), init.out)
 	}
 	brief := regexp.MustCompile(`^wrote docs/briefs/B\d{8}-\d{4}-primeros-pasos\.loop-brief\.md$`)
@@ -210,7 +210,11 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		"each check is a starting point — edit it in .vloop/config.toml",
 		"wrote .vloop/config.toml", "wrote .vloop/install.json", lines[6],
 		"updated .gitignore", "wrote CLAUDE.md", "next:", "vloop doctor",
-		`claude --plugin-dir "$(vloop plugin path)" for an interactive session with the plugin`}
+		"get /vloop:operate for your Claude Code sessions, once:",
+		"claude plugin marketplace add mvelosop/vloop",
+		"claude plugin install vloop@vloop",
+		`or, for one session: claude --plugin-dir "$(vloop plugin path)"`,
+		`then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop`}
 	if strings.Join(lines, "\n") != strings.Join(want, "\n") {
 		t.Fatalf("init printed %q, want %q", lines, want)
 	}
@@ -219,7 +223,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 	b5Expect(t, r.run("0.1.0", "init"), 1, nil, "vloop: already initialized by vloop 0.1.0 — run vloop upgrade\n")
 
 	b5Expect(t, r.run("0.1.0", "doctor"), 0, []string{"✓ git", "✓ install", "✓ config", "✓ claude", "✓ trust", "✓ gate shell",
-		"- plan", "- branch", "✓ plugin", "- self-hosting", "doctor: 0 problem(s), 0 warning(s)"}, "")
+		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "- self-hosting", "doctor: 0 problem(s), 1 warning(s)"}, "")
 
 	b5Expect(t, r.run("0.1.1", "upgrade"), 0, []string{"updated CLAUDE.md", "updated .vloop/install.json"}, "")
 	b5Expect(t, r.run("0.2.0", "upgrade"), 1, []string{"would update CLAUDE.md"},
@@ -326,7 +330,7 @@ func TestWorkedExampleB5PlantedFailures(t *testing.T) {
 		doc := r.run("0.2.0", "doctor")
 		b5Code(t, doc, 0)
 		b5Has(t, doc, "! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — update the one that is behind")
-		b5Has(t, doc, "doctor: 0 problem(s), 1 warning(s)")
+		b5Has(t, doc, "doctor: 0 problem(s), 2 warning(s)")
 	})
 
 	t.Run("no user.email", func(t *testing.T) {

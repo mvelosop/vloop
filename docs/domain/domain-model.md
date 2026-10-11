@@ -100,7 +100,7 @@ classDiagram
 | **verdict** | the review session's independent `PASS` or `FAIL`, with findings |
 | **finding** | one problem a verdict names, with a kind |
 | **journal** | the append-only per-brief log of iterations, one entry each |
-| **driver** | the program that owns status, runs gates and commits (`.loop/run.sh`; `vloop run`) |
+| **driver** | the program that owns status, runs gates and commits (`.loop/run.sh`; `vloop run`); see [the driver](../guide/concepts.md#the-driver) |
 | **fence** | the permission settings loop sessions run under |
 | **work branch** | the branch a run happens on, named for the run id |
 | **close** | recording findings, freezing metrics, writing the run record, marking the brief consumed |

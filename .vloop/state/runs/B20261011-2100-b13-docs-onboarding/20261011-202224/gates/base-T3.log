@@ -1,0 +1,8 @@
+GATE FAIL: vloop init's closing lines are not D3's; got:
+wrote .vloop/install.json
+wrote docs/briefs/B20261011-2132-getting-started.loop-brief.md
+wrote .gitignore
+wrote CLAUDE.md
+next:
+  vloop doctor
+  claude --plugin-dir "$(vloop plugin path)"   for an interactive session with the plugin

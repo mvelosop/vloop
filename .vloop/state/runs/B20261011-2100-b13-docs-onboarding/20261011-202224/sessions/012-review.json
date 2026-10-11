@@ -1,0 +1,26 @@
+{
+  "cost_usd": 0.11272200000000002,
+  "duration_ms": 19771,
+  "effort": null,
+  "ended": "2026-10-11T21:17:22Z",
+  "is_error": false,
+  "iteration": 5,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 19210,
+      "cache_read_input_tokens": 90960,
+      "cost_usd": 0.11272200000000002,
+      "input_tokens": 8,
+      "output_tokens": 2677
+    }
+  },
+  "permission_denials": [],
+  "phase": "review",
+  "run_id": "B20261011-2100-b13-docs-onboarding",
+  "schema": "session/v1",
+  "started": "2026-10-11T21:17:01Z",
+  "task": "T5",
+  "turns": 4,
+  "wall_ms": 20739
+}

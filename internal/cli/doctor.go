@@ -211,8 +211,10 @@ func runDoctor(b Build, root string) []doctorCheck {
 
 	if !hasClaude {
 		add("plugin", resNA, "")
+		add("gate edits", resNA, "")
 	} else {
 		add(doctorPlugin(b))
+		add(doctorGateEdits(root))
 	}
 
 	if cerr == nil {
@@ -378,9 +380,71 @@ func doctorPlugin(b Build) (string, string, string) {
 		if disabled {
 			return "plugin", resWarning, "installed but disabled — claude plugin enable vloop@vloop"
 		}
-		return "plugin", resPass, `the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir "$(vloop plugin path)"`
+		return "plugin", resWarning, `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`
 	}
 	return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — update the one that is behind", found, b.Version)
+}
+
+// userHomeDir is the seam through which doctor finds the user's home, so tests
+// can set it on every OS.
+var userHomeDir = os.UserHomeDir
+
+// gateEditsWarning names the rule that lets an interactive session edit gate
+// folders, which a gate repair needs.
+const gateEditsWarning = `no allow rule lets an interactive session edit .vloop/state/gates/ — add "Edit(./.vloop/state/gates/**)" to permissions.allow in .claude/settings.json`
+
+// gateEditsAllows reports whether one permissions.allow entry lets a session
+// edit .vloop/state/gates/: exactly Edit, or Edit(<p>) with p one of the
+// listed patterns once one leading "./" is removed.
+func gateEditsAllows(entry string) bool {
+	if entry == "Edit" {
+		return true
+	}
+	if !strings.HasPrefix(entry, "Edit(") || !strings.HasSuffix(entry, ")") {
+		return false
+	}
+	p := strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(entry, "Edit("), ")"), "./")
+	switch p {
+	case "**", ".vloop/**", ".vloop/state/**", ".vloop/state/gates/**":
+		return true
+	}
+	return false
+}
+
+// doctorGateEdits reads permissions.allow of the user, project and local
+// Claude Code settings, in that order, and never writes any of them.
+func doctorGateEdits(root string) (string, string, string) {
+	type file struct{ path, shown string }
+	var files []file
+	if home, err := userHomeDir(); err == nil {
+		files = append(files, file{filepath.Join(home, ".claude", "settings.json"), "~/.claude/settings.json"})
+	}
+	files = append(files,
+		file{filepath.Join(root, ".claude", "settings.json"), ".claude/settings.json"},
+		file{filepath.Join(root, ".claude", "settings.local.json"), ".claude/settings.local.json"})
+	for _, f := range files {
+		raw, err := os.ReadFile(f.path)
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		var doc struct {
+			Permissions struct {
+				Allow []any `json:"allow"`
+			} `json:"permissions"`
+		}
+		if err == nil {
+			err = json.Unmarshal(raw, &doc)
+		}
+		if err != nil {
+			return "gate edits", resWarning, "cannot read " + f.shown + ": " + err.Error()
+		}
+		for _, e := range doc.Permissions.Allow {
+			if s, ok := e.(string); ok && gateEditsAllows(s) {
+				return "gate edits", resPass, ""
+			}
+		}
+	}
+	return "gate edits", resWarning, gateEditsWarning
 }
 
 var goModule = regexp.MustCompile(`(?m)^module\s+github\.com/mvelosop/vloop\s*$`)

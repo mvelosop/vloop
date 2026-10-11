@@ -228,7 +228,11 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 	if !o.dryRun {
 		fmt.Fprintln(out, "next:")
 		fmt.Fprintln(out, "  vloop doctor")
-		fmt.Fprintln(out, `  claude --plugin-dir "$(vloop plugin path)"   for an interactive session with the plugin`)
+		fmt.Fprintln(out, "  get /vloop:operate for your Claude Code sessions, once:")
+		fmt.Fprintln(out, "    claude plugin marketplace add mvelosop/vloop")
+		fmt.Fprintln(out, "    claude plugin install vloop@vloop")
+		fmt.Fprintln(out, `  or, for one session: claude --plugin-dir "$(vloop plugin path)"`)
+		fmt.Fprintln(out, `  then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop`)
 	}
 	return nil
 }

@@ -196,7 +196,7 @@ func TestWorkedExampleB11(t *testing.T) {
 			t.Fatal(err)
 		}
 		r := s.run([]string{"PATH=" + bin + string(os.PathListSeparator) + os.Getenv("PATH")}, "doctor")
-		if !strings.Contains(r.out+r.err, "✓ plugin the plugin is supplied by vloop run (--plugin-dir); ") {
+		if !strings.Contains(r.out+r.err, "! plugin /vloop:operate is not available in your interactive sessions") {
 			t.Errorf("doctor with no marketplace plugin: %s%s", r.out, r.err)
 		}
 	}
