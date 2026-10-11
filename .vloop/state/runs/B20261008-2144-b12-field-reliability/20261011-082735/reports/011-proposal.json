@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "blocked",
+  "summary": "Metrics take session time from wall_ms (duration_ms otherwise) in every phase figure and per-task time, and the wall starts at the first plan session's started; the gate's review_ms clause cannot pass for a correct implementation.",
+  "files": ["internal/runs/runs.go", "internal/metrics/time.go", "internal/metrics/metrics.go", "internal/metrics/time_test.go"],
+  "verified": "vloop task gate T4 exited 1: metrics time.review_ms is 15, want 27; go test ./internal/metrics ./internal/runs ./internal/cli ./cmd/vloop pass.",
+  "notes": "Session.WallMS (*int64) and Session.TimeMS() in internal/runs; Aggregate and the per-task rows use TimeMS; wall starts at the earliest plan session Started across folders, else the plan commit. No existing test needed changing, so no changed numbers to list; added TestTimeFromWallMSWhereRecorded and TestTimeWallStartsAtFirstPlanSession. The gate's review clause sums records with glob *-review.json, which also matches NNN-gate-review.json (phase gate-review), so its want folds gate review time into review_ms while the metric correctly keeps time.gate_review_ms apart (the plan, work and wall clauses pass). The gate needs glob [0-9]*-review.json or a filter on .phase.",
+  "gate_dispute": {
+    "reason": "The review_ms clause sums wall_ms over *-review.json, which also matches the gate-review session records, so it expects review_ms to include gate review time that the metrics (and the acceptance) report separately as gate_review_ms.",
+    "evidence": "Session files are named NNN-<phase>.json and the gate-review phase is gate-review, so glob *-review.json matches NNN-gate-review.json; output: 'metrics time.review_ms is 15, want 27'."
+  }
+}

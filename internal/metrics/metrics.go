@@ -307,7 +307,7 @@ func byTask(m *runs.Model, plan *runs.PlanDoc, size Size) []ReportTask {
 				continue
 			}
 			rt := row(s.Task)
-			rt.AgentMS += s.DurationMS
+			rt.AgentMS += s.TimeMS()
 			rt.CostUSD += s.CostUSD
 			if models[s.Task] == nil {
 				models[s.Task] = map[string]bool{}

@@ -81,3 +81,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Session records carry ended and wall_ms, measured by the driver around the session process; duration_ms stays as the CLI reported it. Both session schemas declare them as optional with no version change.
 - **Files:** internal/driver/session.go, internal/driver/session_test.go, schemas/session.v1.json, schemas/session.v2.json
 - **Notes for next iteration:** The implementation was already in the tree from the earlier blocked attempt; this session verified it against the corrected gate and changed nothing. wall_ms is ended minus started from the driver clock (r.now) around the process.
+
+## T4 — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
+
+- **Outcome:** blocked (review: skipped)
+- **Summary:** Metrics take session time from wall_ms (duration_ms otherwise) in every phase figure and per-task time, and the wall starts at the first plan session's started; the gate's review_ms clause cannot pass for a correct implementation.
+- **Files:** internal/runs/runs.go, internal/metrics/time.go, internal/metrics/metrics.go, internal/metrics/time_test.go
+- **Notes for next iteration:** Session.WallMS (*int64) and Session.TimeMS() in internal/runs; Aggregate and the per-task rows use TimeMS; wall starts at the earliest plan session Started across folders, else the plan commit. No existing test needed changing, so no changed numbers to list; added TestTimeFromWallMSWhereRecorded and TestTimeWallStartsAtFirstPlanSession. The gate's review clause sums records with glob *-review.json, which also matches NNN-gate-review.json (phase gate-review), so its want folds gate review time into review_ms while the metric correctly keeps time.gate_review_ms apart (the plan, work and wall clauses pass). The gate needs glob [0-9]*-review.json or a filter on .phase.

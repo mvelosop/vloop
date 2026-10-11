@@ -3,3 +3,7 @@
    check go
    review: PASS
    T3 done
+── iteration 11 (2 this run) · T4 · 6/11 done ──
+   Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
+   GATE DISPUTE T4 — blocked for the operator; no review, no attempt charged
+   T4 blocked — the operator resolves the disputed gate with vloop task verify

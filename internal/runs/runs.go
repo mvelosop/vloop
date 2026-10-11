@@ -58,10 +58,20 @@ type Session struct {
 	Effort     string
 	Started    time.Time
 	DurationMS int64
+	WallMS     *int64 // the driver's own measurement; nil on records that predate it
 	CostUSD    float64
 	Denials    int
 	Models     map[string]Tokens
 	IsError    bool
+}
+
+// TimeMS is the session's time: wall_ms where the record has it, the CLI's
+// duration_ms otherwise.
+func (s Session) TimeMS() int64 {
+	if s.WallMS != nil {
+		return *s.WallMS
+	}
+	return s.DurationMS
 }
 
 // Iteration is one line of iterations.jsonl.
@@ -398,6 +408,7 @@ type rawSession struct {
 	Effort     *string `json:"effort"`
 	Started    string  `json:"started"`
 	DurationMS int64   `json:"duration_ms"`
+	WallMS     *int64  `json:"wall_ms"`
 	TotalCost  float64 `json:"total_cost_usd"`
 	CostUSD    float64 `json:"cost_usd"`
 	IsError    bool    `json:"is_error"`
@@ -425,7 +436,7 @@ func readSession(p string) (Session, error) {
 	}
 	s := Session{
 		Phase: r.Phase, Iteration: r.Iteration, Task: r.Task, Model: r.Model,
-		Started: parseTime(r.Started), DurationMS: r.DurationMS, IsError: r.IsError,
+		Started: parseTime(r.Started), DurationMS: r.DurationMS, WallMS: r.WallMS, IsError: r.IsError,
 		CostUSD: r.CostUSD, Denials: len(r.Denials), Models: map[string]Tokens{},
 	}
 	if r.Effort != nil {

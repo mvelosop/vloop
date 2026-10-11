@@ -310,3 +310,42 @@ func TestTasksDoneRevertedAndRedoneIsNotFirstPass(t *testing.T) {
 		t.Errorf("first-pass = %d, want 1", got.FirstPass)
 	}
 }
+
+func TestTimeFromWallMSWhereRecorded(t *testing.T) {
+	w := func(v int64) *int64 { return &v }
+	m := &runs.Model{Folders: []runs.Folder{{
+		Sessions: []runs.Session{
+			{Phase: "plan", DurationMS: 20, WallMS: w(3000)},
+			{Phase: "gate-review", DurationMS: 30, WallMS: w(4000)},
+			{Phase: "work", Iteration: 1, Task: "T1", DurationMS: 300000, WallMS: w(500)},
+			{Phase: "review", Iteration: 1, Task: "T1", DurationMS: 700},
+		},
+	}}}
+	u := Aggregate(m, Counts{})
+	if u.Time.PlanMS != 3000 || u.Time.GateReviewMS != 4000 || u.Time.WorkMS != 500 || u.Time.ReviewMS != 700 || u.Time.AgentMS != 1200 {
+		t.Errorf("time = %+v, want plan 3000, gate review 4000, work 500 (wall_ms), review 700 (duration_ms), agent 1200", u.Time)
+	}
+}
+
+func TestTimeWallStartsAtFirstPlanSession(t *testing.T) {
+	t0 := time.Date(2026, 1, 1, 9, 0, 0, 0, time.UTC)
+	m := &runs.Model{
+		Folders: []runs.Folder{{Sessions: []runs.Session{
+			{Phase: "plan", Started: t0.Add(-39 * time.Minute)},
+			{Phase: "plan", Started: t0.Add(-10 * time.Minute)},
+		}}},
+		Owned: &runs.Owned{
+			Plan: runs.Commit{Time: t0},
+			Run:  &runs.Commit{Time: t0.Add(30 * time.Minute)},
+		},
+	}
+	u := Aggregate(m, Counts{})
+	if u.Time.WallMS == nil || *u.Time.WallMS != 69*60000 {
+		t.Errorf("wall = %v, want 69 minutes from the first plan session", u.Time.WallMS)
+	}
+	m.Folders = nil
+	u = Aggregate(m, Counts{})
+	if u.Time.WallMS == nil || *u.Time.WallMS != 30*60000 {
+		t.Errorf("wall = %v, want 30 minutes from the plan commit", u.Time.WallMS)
+	}
+}

@@ -5,9 +5,9 @@
   "base": "615dd19c754de2f82c977c0434d796dcd214955f",
   "branch": "B20261008-2144-b12-field-reliability",
   "status": "running",
-  "iteration": 10,
+  "iteration": 11,
   "created": "2026-10-10T23:21:09Z",
-  "updated": "2026-10-11T08:35:28Z",
+  "updated": "2026-10-11T08:42:43Z",
   "shell": "sh",
   "checks": [
     {
@@ -177,9 +177,9 @@
         "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 0,
-      "notes": ""
+      "notes": "gate disputed: The review_ms clause sums wall_ms over *-review.json, which also matches the gate-review session records, so it expects review_ms to include gate review time that the metrics (and the acceptance) report separately as gate_review_ms. — Session files are named NNN-<phase>.json and the gate-review phase is gate-review, so glob *-review.json matches NNN-gate-review.json; output: 'metrics time.review_ms is 15, want 27'."
     },
     {
       "id": "T5",
