@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/skills/plan, gate-review, work and review each gain one short paragraph: the repository's guidelines may be appended to the session's instructions; the planner applies them to tasks and gates and cites them in references where a task needs one; the gate review reports a gate that contradicts one under the kind it fits; the work session follows them; the review rules on a deviation as it would on the brief's constraints; a guideline never overrides the brief or a domain invariant", "met": true, "evidence": "diff adds a paragraph to each of plan (new section, 'Apply them to tasks and gates, and cite one in a task's references'), gate-review ('reported under the kind it fits'), work ('Follow them'), review ('Rule on a deviation ... as you would on one from the brief's constraints'); each ends with the never-overrides sentence"},
+    {"criterion": "In plugin/skills/gate-review/SKILL.md, `unpassable` also names a gate that needs a session to write under .vloop/ outside .vloop/tmp/ (S-4), the plan session's own gate folders aside", "met": true, "evidence": "gate-review/SKILL.md unpassable bullet now ends '... or needs a session to write under `.vloop/` outside `.vloop/tmp/` (S-4; the plan session's own gate folders aside)'"},
+    {"criterion": "Check 1 of the gate-review skill says the gate is run, and read, in the plan's shell with this host's tools: sh unless the config names another (P-5), and on macOS BSD grep, sed, awk and date; a pattern those tools reject is `unpassable`", "met": true, "evidence": "check 1 gains the sentence naming `sh` unless config names another (P-5), BSD grep/sed/awk/date on macOS, and 'A pattern those tools reject is `unpassable`'"},
+    {"criterion": "No other finding kind or check changes; the operate skill is not touched by this task. Violation: any skill changed beyond the paragraphs L1 and L5 name", "met": true, "evidence": "git status shows only plan, gate-review, work, review SKILL.md changed; the gate-review diff touches only the intro paragraph, check 1 and the unpassable bullet"},
+    {"criterion": "Every skill stays within the ceilings T9 will enforce (whole SKILL.md, wc -w): plan 4,100, gate-review 1,550, work 1,800, review 1,650, operate 1,750", "met": true, "evidence": "wc -w: plan 3792, gate-review 1311, work 1624, review 1480; operate untouched"},
+    {"criterion": "The skill structure tests in internal/cli/skills_test.go still pass unchanged", "met": true, "evidence": "go check log shows internal/cli ok; skills_test.go not in the diff"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

@@ -38,6 +38,10 @@ Read, in this order:
 
 ## 2. Do the task — only the task
 
+The repository's guidelines may be appended to
+your instructions. Follow them. A guideline never overrides the brief or a
+domain invariant.
+
 **Scope discipline is the rule that matters most here** (S-3). Do not start the
 next task, even if it is trivial and you have the context loaded. A fresh
 session will handle it. Do not add features the brief lists as out of scope,

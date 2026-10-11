@@ -156,6 +156,13 @@ thing the task actually produces (an import, a file's contents, a `--help` exit
 code) rather than on an empty suite. Do **not** solve this by adding a hook that
 remaps the exit code; that puts a workaround for the loop inside the product.
 
+## The repository's guidelines
+
+The repository's guidelines may be appended to
+your instructions. Apply them to tasks and gates, and cite one in a task's
+`references` where that task needs it. A guideline never overrides the brief or
+a domain invariant.
+
 ## Naming
 
 **Where the brief names something, use its name.** Modules, functions, files,
