@@ -278,9 +278,10 @@ func TestDoctorPlugin(t *testing.T) {
 	e := newDoctorEnv(t)
 	e.want("plugin", resPass)
 	for plugins, want := range map[string]string{
-		`[]`: resPass,
+		`[]`: resWarning,
 		`[{"id":"vloop@vloop","version":"0.1.0","enabled":false}]`:                                                      resWarning,
 		`[{"id":"vloop@vloop","version":"0.0.9","enabled":true}]`:                                                       resWarning,
+		`[{"id":"other@x","version":"0.1.0","enabled":true}]`:                                                           resWarning,
 		`[{"id":"other@x","version":"0.1.0","enabled":true},{"id":"vloop@elsewhere","version":"0.1.0","enabled":true}]`: resPass,
 	} {
 		e.plugins = plugins
@@ -294,13 +295,14 @@ func TestDoctorPlugin(t *testing.T) {
 func TestDoctorPluginMessages(t *testing.T) {
 	e := newDoctorEnv(t)
 	for plugins, want := range map[string]string{
-		`[]`: `the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir "$(vloop plugin path)"`,
+		`[]`: `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`,
+		`[{"id":"other@x","version":"0.1.0","enabled":true}]`:      `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`,
 		`[{"id":"vloop@vloop","version":"0.1.0","enabled":false}]`: "installed but disabled — claude plugin enable vloop@vloop",
 		`[{"id":"vloop@vloop","version":"0.0.9","enabled":true}]`:  "the vloop plugin is 0.0.9 but this binary is 0.1.0 — update the one that is behind",
 	} {
 		e.plugins = plugins
 		e.claude(true)
-		if c := e.want("plugin", map[bool]string{true: resPass, false: resWarning}[strings.HasPrefix(want, "the plugin is")]); c.Message != want {
+		if c := e.want("plugin", resWarning); c.Message != want {
 			t.Errorf("%s: message %q, want %q", plugins, c.Message, want)
 		}
 	}

@@ -378,7 +378,7 @@ func doctorPlugin(b Build) (string, string, string) {
 		if disabled {
 			return "plugin", resWarning, "installed but disabled — claude plugin enable vloop@vloop"
 		}
-		return "plugin", resPass, `the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir "$(vloop plugin path)"`
+		return "plugin", resWarning, `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`
 	}
 	return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — update the one that is behind", found, b.Version)
 }

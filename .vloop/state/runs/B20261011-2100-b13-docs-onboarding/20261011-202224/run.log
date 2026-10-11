@@ -13,3 +13,10 @@ planned: B20261011-2100-b13-docs-onboarding — 7 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 1m19s · $0.37 · run $2.33 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/7 done ──
+   Make doctor's plugin check warn when no vloop plugin is listed
+   work T1 · 7m59s · $0.18 · run $2.51 / $40.00
+   check go
+   review T1 · 0m21s · $0.11 · run $2.61 / $40.00
+   review: PASS
+   T1 done

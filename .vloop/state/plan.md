@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/7 done** · iteration 0
+**Status:** running · **1/7 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T20:34:09Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T20:45:35Z
 
 ## Progress
 
-- [ ] **T1** — Make doctor's plugin check warn when no vloop plugin is listed
+- [x] **T1** — Make doctor's plugin check warn when no vloop plugin is listed
 - [ ] **T2** — Add doctor's `gate edits` check of the operator's permission to edit gate folders
 - [ ] **T3** — Make init's closing lines and the CLAUDE.md section say how to get /vloop:operate
 - [ ] **T4** — Explain the name, PATH, and asking rather than typing in the README
@@ -20,7 +20,7 @@
 
 ### T1 — Make doctor's plugin check warn when no vloop plugin is listed
 
-`pending` · depends on: none
+`done` · depends on: none
 
 vloop doctor passes today when no vloop plugin is installed, so a user never learns that /vloop:operate is missing from their interactive sessions (brief D1). This task turns exactly that outcome into a warning that names both ways to load the plugin, and leaves every other outcome of the plugin check alone.
 

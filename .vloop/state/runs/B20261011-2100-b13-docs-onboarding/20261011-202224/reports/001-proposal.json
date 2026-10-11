@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "doctorPlugin now returns a warning with the D1 message when no vloop@<any> entry is listed (empty list or other-marketplace-only); all other outcomes are unchanged.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go", "cmd/vloop/b20261005_e2e_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go test ./internal/cli -run TestDoctor and go test ./cmd/vloop pass; gofmt -l prints nothing.",
+  "notes": "cmd/vloop/b20261005_e2e_test.go asserted the old pass message for [] (doctor with a fake claude listing none); changed only that expectation to the new warning, as it would otherwise fail. TestDoctorPlugin/TestDoctorPluginMessages gained an other@x-only case. The task_gate_test failures seen in a full go test run from inside a loop session (plan changed during this session) come from running within a live session, not from this change; TestDoctor* and cmd/vloop pass."
+}

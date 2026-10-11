@@ -6,3 +6,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md`
 - **Tasks:** 7
+
+## T1 — Make doctor's plugin check warn when no vloop plugin is listed
+
+- **Outcome:** done (review: PASS)
+- **Summary:** doctorPlugin now returns a warning with the D1 message when no vloop@<any> entry is listed (empty list or other-marketplace-only); all other outcomes are unchanged.
+- **Files:** internal/cli/doctor.go, internal/cli/doctor_test.go, cmd/vloop/b20261005_e2e_test.go
+- **Notes for next iteration:** cmd/vloop/b20261005_e2e_test.go asserted the old pass message for [] (doctor with a fake claude listing none); changed only that expectation to the new warning, as it would otherwise fail. TestDoctorPlugin/TestDoctorPluginMessages gained an other@x-only case. The task_gate_test failures seen in a full go test run from inside a loop session (plan changed during this session) come from running within a live session, not from this change; TestDoctor* and cmd/vloop pass.
