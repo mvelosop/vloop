@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/7 done** · iteration 7
+**Status:** complete · **7/7 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:26:07Z
+**Brief:** `docs/briefs/B20261011-2100-b13-docs-onboarding.loop-brief.md` · **Updated:** 2026-10-11T21:29:18Z
 
 ## Progress
 

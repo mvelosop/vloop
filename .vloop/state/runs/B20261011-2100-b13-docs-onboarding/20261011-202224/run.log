@@ -62,3 +62,9 @@ committing the plan
    review T7 · 0m21s · $0.12 · run $4.46 / $40.00
    review: PASS
    T7 done
+   check go
+
+═══ complete ═══
+run:    B20261011-2100-b13-docs-onboarding/20261011-202224  (7 iteration(s) this run)
+plan:   7/7 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261011-2100-b13-docs-onboarding.md

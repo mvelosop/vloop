@@ -55,3 +55,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added cmd/vloop/b13_e2e_test.go (TestWorkedExampleB13): the brief's worked example end to end over a fresh build in temporary repositories with a stub claude and temporary HOME. The real-data check and link check pass via the gate; no production code changed.
 - **Files:** cmd/vloop/b13_e2e_test.go
 - **Notes for next iteration:** Reuses b5Repo helpers; the no-claude case runs the binary directly with PATH=/usr/bin:/bin (needs git) and expects exit 1, since a missing claude is a doctor problem, only the two '-' lines are asserted. No defects found; no existing tests touched.
+
+## Run ended — complete
+
+- **Run:** `B20261011-2100-b13-docs-onboarding` · 7 iteration(s) this run
+- **Plan:** 7/7 done, 0 blocked
