@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/13 done** · iteration 3
+**Status:** running · **1/13 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-11T23:47:18Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-11T23:47:49Z
 
 ## Progress
 
 - [x] **T1** — Make vloop init write an empty .vloop/repo-guidelines.md
-- [ ] **T2** — Hand .vloop/repo-guidelines.md to every session vloop run starts · 2 attempt(s)
+- [ ] **T2** — Hand .vloop/repo-guidelines.md to every session vloop run starts · **blocked**
 - [ ] **T3** — Add the guidelines paragraph to the four session skills and teach the gate review the two rules it missed
 - [ ] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
 - [ ] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
@@ -50,7 +50,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Hand .vloop/repo-guidelines.md to every session vloop run starts
 
-`pending` · 2 attempt(s) · depends on: T1
+`blocked` · **blocked** · depends on: T1
 
 A rule written in a skill is not a check: the gate review missed twice with its rule written down. L1 makes the driver hand the repository's lessons to every session — plan, gate review, work and review — as the file's content, through `claude --append-system-prompt-file`, so no session has to choose to read it. With no file, or an empty one, nothing changes, byte for byte.
 
@@ -64,7 +64,7 @@ A rule written in a skill is not a check: the gate review missed twice with its 
 - TestSessionArgs (internal/driver/session_test.go) changes only if the function it calls gains a parameter, and the arguments it pins with no guidelines file do not change; committed tests cover the flag with a non-empty file and its absence with no file and an empty file. Violation: the behaviour shipped with no committed test the checks run
 - No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state
 
-**From the last attempt:** The implementation from the previous attempt is in place (WithGuidelines in internal/driver/session.go, called from Runner.Run; tests in internal/driver/session_test.go) and the gate passes, but the flag spelling could not be confirmed against `claude --help`: running claude is denied in this session. Per acceptance 3 the task halts instead of guessing. — T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+**From the last attempt:** The implementation is in place and its gate passes (WithGuidelines in internal/driver/session.go, tests in internal/driver/session_test.go); acceptance 3, confirming the flag against `claude --help`, cannot be met because running claude is denied here. — T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
 
 <details><summary>verify command</summary>
 

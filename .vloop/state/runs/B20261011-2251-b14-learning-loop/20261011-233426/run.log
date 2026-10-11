@@ -29,3 +29,10 @@ checking the gate of T13 on the base
    work T2 · 0m26s · $0.09 · run $0.66 / $40.00
    work session reported blocked
    T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+   no recorded progress (1/2)
+── iteration 4 (4 this run) · T2 · 1/13 done ──
+   Hand .vloop/repo-guidelines.md to every session vloop run starts
+   work T2 · 0m22s · $0.08 · run $0.74 / $40.00
+   work session reported blocked
+   T2 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+   T2 hit the attempt ceiling — blocked
