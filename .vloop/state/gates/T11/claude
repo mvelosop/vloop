@@ -1,11 +1,14 @@
 #!/bin/sh
 # Stub claude for the gate: logs argv, answers doctor's probes, and plays the
-# plan, work, review and gate-review sessions from files beside it.
-dir=$(dirname "$0")
+# plan, gate-review, work and review sessions. script.sh beside it, when
+# present, is sourced first: it may set STUB_COST, STUB_DUR, STUB_SLEEP,
+# STUB_DENIALS (a JSON array) and STUB_EXIT, and define stub_after, which runs
+# after the session's own writes and before the result is printed.
+dir=$(cd "$(dirname "$0")" && pwd -P)
 echo "$*" >> "$dir/argv.log"
 case "$1" in
   --version) echo "2.0.0 (Claude Code)"; exit 0;;
-  plugin) echo '[{"id":"vloop@vloop","version":"2.0.0-beta.2","enabled":true}]'; exit 0;;
+  plugin) echo '[]'; exit 0;;
 esac
 prompt=""; MODEL=""
 while [ $# -gt 0 ]; do
@@ -23,7 +26,9 @@ case "$cmd" in
   /vloop:gate-review) PHASE=gate-review; TASK="";;
   *) echo "stub claude: unrecognised prompt: $prompt" >&2; exit 64;;
 esac
-STUB_EXIT=0
+STUB_EXIT=0 STUB_COST=0.1 STUB_DUR=1000 STUB_SLEEP=0 STUB_DENIALS='[]'
+if [ -f "$dir/script.sh" ]; then . "$dir/script.sh"; fi
+[ "$STUB_SLEEP" != 0 ] && sleep "$STUB_SLEEP"
 mkdir -p .vloop/tmp
 case "$PHASE" in
   plan) mkdir -p .vloop/state; cp "$dir/plan.json" .vloop/state/state.json;;
@@ -32,6 +37,7 @@ case "$PHASE" in
     printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$TASK" "$TASK" > .vloop/tmp/proposal.json;;
   review) printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"none"}\n' "$TASK" > .vloop/tmp/verdict.json;;
 esac
-if [ -f "$dir/script.sh" ]; then . "$dir/script.sh"; fi
-printf '{"type":"result","subtype":"success","is_error":false,"duration_ms":1000,"num_turns":3,"total_cost_usd":0.1,"session_id":"stub","permission_denials":[],"modelUsage":{"%s":{"costUSD":0.1}}}\n' "$MODEL"
+if type stub_after >/dev/null 2>&1; then stub_after; fi
+jq -cn --arg m "$MODEL" --argjson c "$STUB_COST" --argjson d "$STUB_DUR" --argjson den "$STUB_DENIALS" \
+  '{type:"result",subtype:"success",is_error:false,duration_ms:$d,num_turns:3,total_cost_usd:$c,session_id:"stub",permission_denials:$den,modelUsage:{($m):{costUSD:$c}}}'
 exit "$STUB_EXIT"

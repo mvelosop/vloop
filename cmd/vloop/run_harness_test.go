@@ -28,6 +28,8 @@ const runBriefName = "B20260101-0900-demo.loop-brief"
 //	MODEL  the --model it was given    ATTEMPT  1-based count of this PHASE+ARG so far
 //	STUB_COST, STUB_EXIT, STUB_DURATION, STUB_TURNS, STUB_ERROR  the result JSON and exit code
 //	STUB_SILENT=1  print no result JSON
+//	STUB_SLEEP  seconds the session sleeps after its script, before it answers (default 0)
+//	STUB_DENIALS  the result's permission_denials, a JSON array (default [])
 //
 // The script runs in the stub's working directory (the repository) and may do
 // anything a shell can: write the plan, files, .vloop/tmp/proposal.json or
@@ -59,15 +61,16 @@ esac
 n=$(cat "$dir/count.$PHASE.$(echo "$ARG" | tr '/ ' '__')" 2>/dev/null || echo 0)
 ATTEMPT=$((n + 1))
 echo "$ATTEMPT" > "$dir/count.$PHASE.$(echo "$ARG" | tr '/ ' '__')"
-STUB_COST=0.10; STUB_EXIT=0; STUB_DURATION=1000; STUB_TURNS=3; STUB_ERROR=false; STUB_SILENT=0
+STUB_COST=0.10; STUB_EXIT=0; STUB_DURATION=1000; STUB_TURNS=3; STUB_ERROR=false; STUB_SILENT=0; STUB_SLEEP=0; STUB_DENIALS='[]'
 if [ "$PHASE" = gate-review ]; then
   mkdir -p .vloop/tmp
   echo '{"schema":"gate-verdict/v1","verdict":"PASS","tasks":[],"notes":"none"}' > .vloop/tmp/gate-verdict.json
 fi
 if [ -f "$dir/script.sh" ]; then . "$dir/script.sh"; fi
+[ "$STUB_SLEEP" != 0 ] && sleep "$STUB_SLEEP"
 if [ "$STUB_SILENT" != 1 ]; then
-  printf '{"type":"result","subtype":"success","is_error":%s,"duration_ms":%s,"num_turns":%s,"total_cost_usd":%s,"session_id":"stub","permission_denials":[],"modelUsage":{"%s":{"costUSD":%s}}}\n' \
-    "$STUB_ERROR" "$STUB_DURATION" "$STUB_TURNS" "$STUB_COST" "$MODEL" "$STUB_COST"
+  printf '{"type":"result","subtype":"success","is_error":%s,"duration_ms":%s,"num_turns":%s,"total_cost_usd":%s,"session_id":"stub","permission_denials":%s,"modelUsage":{"%s":{"costUSD":%s}}}\n' \
+    "$STUB_ERROR" "$STUB_DURATION" "$STUB_TURNS" "$STUB_COST" "$STUB_DENIALS" "$MODEL" "$STUB_COST"
 fi
 exit "$STUB_EXIT"
 `

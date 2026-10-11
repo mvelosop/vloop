@@ -62,6 +62,19 @@ func efficiency(d ReportDefects) string {
 	return "n/a"
 }
 
+// unclassified is true when a brief delivered no line classified as code or
+// test, so a zero in those columns would read as delivered nothing.
+func unclassified(l JSONLines) bool { return l.Code == 0 && l.Test == 0 }
+
+// codeTestCols is the delivered code and test columns, n/a where nothing was
+// classified as either.
+func codeTestCols(l JSONLines) (string, string) {
+	if unclassified(l) {
+		return "n/a", "n/a"
+	}
+	return thousands(l.Code), thousands(l.Test)
+}
+
 func PrintSummary(out io.Writer, r *Report) {
 	merged := "not merged"
 	if r.Merged != nil {
@@ -79,6 +92,9 @@ func PrintSummary(out io.Writer, r *Report) {
 			thousands(l.Code), thousands(l.Test), thousands(l.Docs), tail)
 	}
 	line(" size      ", "delivered", r.Size.Delivered, "test:code "+optFloat(r.Size.TestCodeRatio, "%.2f"))
+	if n := r.Size.Delivered.Other; n > 0 && unclassified(r.Size.Delivered) {
+		fmt.Fprintf(out, "           %s delivered lines match no stack in metrics.stacks\n", thousands(n))
+	}
 	line("           ", "churn", r.Size.Churn, "rework "+optFloat(r.Size.Rework, "%.2f"))
 	t := r.Time
 	// The gate review (v2) is shown only for a brief that had one, so a v1
@@ -153,8 +169,9 @@ func printBriefTable(out io.Writer, repos []string, rs []*Report) {
 		if r.Cost.Per1000Code != nil {
 			per1k = fmt.Sprintf("%.2f", *r.Cost.Per1000Code)
 		}
+		code, test := codeTestCols(r.Size.Delivered)
 		fmt.Fprintf(w, "%s%s\t%d\t%d/%d\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", lead, r.RunID, r.Tasks.Planned,
-			r.Tasks.FirstPass, r.Tasks.Planned, thousands(r.Size.Delivered.Code), thousands(r.Size.Delivered.Test),
+			r.Tasks.FirstPass, r.Tasks.Planned, code, test,
 			optFloat(r.Size.TestCodeRatio, "%.2f"), minutes(r.Time.AgentMS), per1k,
 			r.Defects.InLoop, r.Defects.Operator, r.Defects.Escaped, efficiency(r.Defects))
 	}

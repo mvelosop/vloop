@@ -161,6 +161,25 @@ the tool, the shell loop's rule 1 on `~/.claude`). This is the "lessons store"
 of `I20260929-2325`, and it is the triage's answer to "repo-specific guidelines
 that could automate interventions".
 
+Seeds from schema changes, the shape that recurs (`D20261004-1142` ×2,
+`D20261004-2304`, B12's `D20261011-0844`):
+- adding or removing a schema changes `vloop schema list`, the count in
+  `embed_test.go` and `TestWorkedExampleB6RealData`: the brief's must-change
+  list names them, and gates run the built binary;
+- each schema's `schema` const pins its version: a gate that checks a schema
+  feeds it a record of that version (plan, work and review records are
+  session/v1, a gate review's session/v2).
+
+The same shape for config keys (B12's `D20261011-1455`):
+- adding or removing a config key changes `config list`, pinned by
+  `TestConfigListDefaults`, `TestConfigListJSONOrderAndNull`
+  (`internal/cli/config_test.go`), `TestDefaultsEveryRow`
+  (`internal/config/config_test.go`) and `TestWorkedExampleEnglishSession`
+  (`cmd/vloop/e2e_test.go`): the brief's must-change list names all four.
+
+A guideline helps the planner write the gate; catching a wrong one is P4's
+(B12 T3's gate becomes a gate-review eval case).
+
 ### P4 — Turn every gate-review miss into an eval case
 
 The gate review missed twice with its rule already written. **Proposal**: the

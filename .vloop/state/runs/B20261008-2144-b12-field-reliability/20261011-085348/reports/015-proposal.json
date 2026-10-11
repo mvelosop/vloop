@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T10",
+  "outcome": "done",
+  "summary": "The domain documents (S-2, plan, run, session, metrics) and the guides (concepts, metrics) now state the key-wise guard, the stamp on load and resuming acceptance, ended/wall_ms and a denial's command, wall_ms-based time and n/a for unmeasured size, and the per-session line and status's running line.",
+  "files": ["docs/domain/domain-model.md", "docs/domain/execution/plan.md", "docs/domain/execution/run.md", "docs/domain/execution/session.md", "docs/domain/measurement/metrics.md", "docs/guide/concepts.md", "docs/guide/metrics.md"],
+  "verified": "vloop task gate T10 exited 0 and printed gate T10: ok.",
+  "notes": "docs/guide/configuration.md already documented run.git-config-ignore and VLOOP_RUN_GIT_CONFIG_IGNORE (T1), and docs/guide/commands.md regenerated identical, so neither changed. Also corrected docs/guide/concepts.md's stale claim that go install carries no commit (T8 build info). Wording of the per-session line and status's running line was taken from internal/driver/cost.go and internal/cli/status.go."
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Fixed the review's findings in the .git/config guard: a valueless key is now distinct from an empty value, and values of a repeated key are compared in file order.",
+  "files": ["internal/driver/gitguard.go", "internal/driver/gitguard_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed ok; go test ./internal/driver ./internal/gitcfg passed.",
+  "notes": "Earlier attempt's work (internal/gitcfg, config key, run.go check, docs) is already in the tree and unchanged. configEntries keeps strings.Cut's found flag and records a NUL-prefixed sentinel for a valueless key (git config -z lists it without newline); values are no longer sorted. New tests: TestGitGuardValuelessKeyIsNotAnEmptyValue, TestGitGuardRepeatedKeyOrderMatters. When running go test inside a vloop session, unset VLOOP_PLAN_SHA256 or TestTaskGate* fail."
+}

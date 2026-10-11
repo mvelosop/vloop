@@ -1,0 +1,2 @@
+GATE FAIL: the table's code and test for a brief with no code or test lines are '0' and '0', want n/a: brief                tasks  first-pass  code  test  t:c  agent  $/1k  in-loop  operator  escaped  efficiency
+B20260101-0900-demo  1      1/1         0     0     n/a  0.0    n/a   0        0         0        n/a

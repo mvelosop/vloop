@@ -19,6 +19,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 
 	"github.com/mvelosop/vloop/internal/classify"
+	"github.com/mvelosop/vloop/internal/gitcfg"
 )
 
 // Sources of a resolved value.
@@ -39,6 +40,7 @@ type Key struct {
 	List    bool    // a list of strings, stored as a TOML array and given as comma-joined text
 	Stacks  bool    // with List: entries are <stack> or <stack>@<path>, see classify.ParseStack
 	Glob    bool    // with List: entries are any non-empty glob pattern rather than lower-case names
+	GitKeys bool    // with List and Glob: patterns over git config keys; one that would hide core, filter or include keys is refused
 	Int     bool    // a whole number, stored as a TOML integer
 	Num     bool    // a number, stored as a TOML float; a TOML integer is read too
 	Min     float64 // with Int or Num: the smallest valid value
@@ -80,6 +82,7 @@ var Keys = []Key{
 	{Name: "run.convergence-min", Default: "6", Int: true},
 	{Name: "run.gate-timeout", Default: "15", Int: true, Min: 1},
 	{Name: "run.gate-scratch", List: true, Glob: true},
+	{Name: "run.git-config-ignore", List: true, Glob: true, GitKeys: true},
 	{Name: "run.session-timeout", Default: "60", Int: true, Min: 1},
 	{Name: "run.keep-awake", Default: "on", Valid: []string{"on", "off"}},
 }
@@ -133,6 +136,14 @@ func (e *InvalidValueError) Error() string {
 type SourceError struct {
 	Source string // variable name or config file path
 	Err    error
+}
+
+// ProtectedPatternError is a run.git-config-ignore pattern that would ignore
+// keys of Section, which the .git/config guard must see.
+type ProtectedPatternError struct{ Key, Pattern, Section string }
+
+func (e *ProtectedPatternError) Error() string {
+	return fmt.Sprintf("%s: %s would ignore %s.* — the guard must see it", e.Key, e.Pattern, e.Section)
 }
 
 func (e *SourceError) Error() string { return e.Source + ": " + e.Err.Error() }
@@ -204,6 +215,11 @@ func (k Key) Validate(value string) error {
 			if k.Valid != nil && !slices.Contains(k.Valid, a) {
 				return &InvalidValueError{k.Name, value, k.Valid}
 			}
+			if k.GitKeys {
+				if sec, ok := gitcfg.Protected(a); ok {
+					return &UsageError{&ProtectedPatternError{k.Name, a, sec}}
+				}
+			}
 		}
 		return nil
 	}
@@ -272,6 +288,16 @@ func fileValue(m map[string]any, name string) (any, bool) {
 	return cur, true
 }
 
+// sourceErr names the source of a bad value; a protected pattern already names
+// itself and is a problem, not a usage error, once it comes from a source.
+func sourceErr(source string, err error) error {
+	var pe *ProtectedPatternError
+	if errors.As(err, &pe) {
+		return pe
+	}
+	return &SourceError{source, err}
+}
+
 func resolveList(k Key, file map[string]any) (Value, error) {
 	v := Value{Key: k.Name, Source: SourceDefault, List: []string{}}
 	set := func(text, source string) { v = Value{k.Name, text, true, source, strings.Split(text, ",")} }
@@ -291,14 +317,14 @@ func resolveList(k Key, file map[string]any) (Value, error) {
 		if len(names) > 0 {
 			text := strings.Join(names, ",")
 			if err := k.Validate(text); err != nil {
-				return v, &SourceError{FilePath, err}
+				return v, sourceErr(FilePath, err)
 			}
 			set(text, SourceFile)
 		}
 	}
 	if ev := os.Getenv(EnvVar(k.Name)); ev != "" {
 		if err := k.Validate(ev); err != nil {
-			return v, &SourceError{EnvVar(k.Name), err}
+			return v, sourceErr(EnvVar(k.Name), err)
 		}
 		set(ev, SourceEnv)
 	}

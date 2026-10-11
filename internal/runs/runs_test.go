@@ -335,3 +335,32 @@ func TestFoldersAreOrderedByTheirRecordsNotTheirNames(t *testing.T) {
 		t.Errorf("folders %v, want %s", got, want)
 	}
 }
+
+// A vloop run folder belongs to its brief by the directory it sits in, so the
+// folder a resumed acceptance opens — whose log says "resuming acceptance of
+// <run id>" and has no plan session — is owned and its sessions are counted.
+func TestVloopResumedAcceptanceFolderIsOwned(t *testing.T) {
+	root := t.TempDir()
+	halted := ".vloop/state/runs/B1-x/20260101-100000/"
+	resumed := ".vloop/state/runs/B1-x/20260101-110000/"
+	put(t, root, halted+"run.log", "planning from docs/briefs/B1-x.loop-brief.md using sonnet\n")
+	put(t, root, halted+"sessions/001-plan.json", `{"total_cost_usd":1.25,"phase":"plan","iteration":0}`)
+	put(t, root, resumed+"run.log", "resuming acceptance of B1-x: round 1\n")
+	put(t, root, resumed+"sessions/001-gate-review.json", `{"total_cost_usd":0.5,"phase":"gate-review","iteration":0}`)
+	m, err := Load(root, briefPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(m.Folders) != 2 {
+		t.Fatalf("folders = %d, want the halted and the resumed folder", len(m.Folders))
+	}
+	var cost float64
+	for _, f := range m.Folders {
+		for _, s := range f.Sessions {
+			cost += s.CostUSD
+		}
+	}
+	if cost != 1.75 {
+		t.Errorf("cost across both folders = %v, want 1.75", cost)
+	}
+}

@@ -28,8 +28,9 @@ A brief decomposed into tasks, in `state.json` (`state/v2`; `vloop run` never re
 
 ```mermaid
 stateDiagram-v2
-  [*] --> planning : plan session
-  planning --> running : plan valid
+  [*] --> planning : plan session, stamped on load
+  planning --> planning : halted in acceptance (exit 9), resume acceptance
+  planning --> running : plan valid, gate review passed
   running --> complete : every task done (exit 0)
   running --> blocked : a task blocked (exit 2)
   running --> stalled : no progress twice (exit 3)
@@ -45,6 +46,11 @@ max iterations (4) and cost ceiling (6) are resumable as they are; not
 converging (5), session error (7), repeat blocked (8) and refs moved (9) want
 the operator first.
 
+`planning` is the status of a plan that has not passed acceptance. The driver
+stamps the plan on load — `run_id`, `brief` and `branch` are written with
+`planning` as soon as the plan session's plan is loaded, before any gate runs —
+so a halt during acceptance leaves a plan that names its run and is resumable.
+
 ## Acceptance
 
 The plan session writes the plan and the gate folders `.vloop/state/gates/<id>/`
@@ -54,6 +60,14 @@ back to the planner), then the **gate review**. Acceptance problems and review
 findings share two rounds; a plan the gate review failed twice is saved blocked
 and the run ends with exit 2. Every check must pass on the base before
 planning, and there must be at least one.
+
+The plan stays `planning` until acceptance passes. If the run halts during
+acceptance (a gate or the review changed `.git/config` or a ref, exit 9),
+`vloop run` on the same brief resumes acceptance of that run id: no second plan
+session runs, the base gates of the current round run again — a halted gate's
+evidence is not trusted — and the gate review follows. The run folder of the
+halted acceptance is kept, and the plan commit includes it. Work starts only
+once the gate review has passed: no path from `planning` to `running` skips it.
 
 ## Rules
 

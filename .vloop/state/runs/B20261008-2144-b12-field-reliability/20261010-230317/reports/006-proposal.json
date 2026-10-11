@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Every plan, gate review, work and review session now prints '   <phase>[ <task>] · <m>m<ss>s · $<cost> · run $<spent> / $<ceiling>' on stdout and in run.log, and the 50% and 80% cost warnings go once each to stderr and run.log.",
+  "files": ["internal/driver/cost.go", "internal/driver/cost_test.go", "internal/driver/session.go", "internal/driver/iterate.go", "internal/driver/plan.go", "internal/driver/gatereview.go", "internal/cli/run.go"],
+  "verified": "vloop task gate T6 equivalent (sh .vloop/state/gates/T6/gate.sh) printed 'gate T6: ok'; go test ./... passed.",
+  "notes": "Session time is Result.Wall (the driver's ended-started, same measurement as wall_ms). Spend is the sum of cost_usd in the current run folder (spendIn), as the ceiling check uses; warnings are stateless: a threshold is warned in the session whose spend crossed it (before < threshold <= after), so a resume never repeats one. Planner got a CostCeiling field set from the resolved budget in internal/cli/run.go. No existing run-output test needed changing."
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "A denied Bash call's permission_denials entry now keeps command, masked and redacted then cut to 200 characters with … appended; other tools are unchanged. Mask also replaces the dashed -Users-<user>- and -home-<user>- forms with USER.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go"],
+  "verified": "vloop task gate T5 exited 0 and printed ok; go test ./..., go vet, gofmt -l, go mod tidy -diff and GOOS=linux/windows builds are clean.",
+  "notes": "Runner.cutCommand masks first (Mask), then cuts by runes, so a secret is never split by the cut. The dashed form is handled in Runner.Mask, so it applies to records, run.log and stderr captures alike. TestSessionDenialsKeepToolAndPath now expects the Bash command; added TestCutCommandCountsCharactersAndMasksFirst and TestMaskDashedUserForm. No past record under .vloop/ was rewritten."
+}

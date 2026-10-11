@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "When a brief's delivered lines include none classified as code or test, the cross-brief table (vloop metrics with no brief, and the workspace table) prints n/a in its code and test columns; a brief with code or test lines prints its numbers as today.", "met": true, "evidence": "internal/metrics/print.go codeTestCols used in printBriefTable, which both PrintBriefTable and the workspace table call; print_test.go asserts n/a n/a and 40 10"},
+    {"criterion": "In that case the summary's delivered line is unchanged and is followed by `           <n> delivered lines match no stack in metrics.stacks`, <n> the delivered other lines, printed only when <n> is above zero.", "met": true, "evidence": "print.go:95-97 prints after the delivered line, guarded by n > 0; test checks the exact text, the with-code case and the zero case"},
+    {"criterion": "vloop metrics --json is unchanged: code and test stay 0 and no key is added.", "met": true, "evidence": "diff touches only print.go and print_test.go; no JSON struct or marshaling changed"},
+    {"criterion": "Committed tests cover the n/a columns, the extra summary line, and a brief with code that is unchanged. TestMetricsCommandCrossBrief and TestMetricsCommandSummary (internal/cli/metrics_test.go) change only if their fixtures have no code or test lines.", "met": true, "evidence": "TestPrintNotMeasuredWhereNothingClassified in print_test.go covers all three; internal/cli/metrics_test.go not in the diff"},
+    {"criterion": "No refactor from B15's list is folded in.", "met": true, "evidence": "diff is 56 lines, only the helper functions and the feature; no unrelated changes"}
+  ],
+  "findings": [],
+  "notes": "The workspace table is not tested separately, but it shares printBriefTable."
+}

@@ -1,13 +1,13 @@
 {
   "schema": "state/v2",
-  "run_id": "B20261005-0933-quality-pass",
-  "brief": "docs/briefs/B20261005-0933-quality-pass.loop-brief.md",
-  "base": "7651dd808d68e1161f9ad81d1a68db0284ac4a7d",
-  "branch": "B20261005-0933-quality-pass",
+  "run_id": "B20261008-2144-b12-field-reliability",
+  "brief": "docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md",
+  "base": "615dd19c754de2f82c977c0434d796dcd214955f",
+  "branch": "B20261008-2144-b12-field-reliability",
   "status": "complete",
-  "iteration": 25,
-  "created": "2026-10-05T10:50:41Z",
-  "updated": "2026-10-06T08:53:47Z",
+  "iteration": 16,
+  "created": "2026-10-10T23:21:09Z",
+  "updated": "2026-10-11T09:27:04Z",
   "shell": "sh",
   "checks": [
     {
@@ -26,154 +26,199 @@
   "tasks": [
     {
       "id": "T1",
-      "title": "Make the cmd/vloop suite run its tests in parallel and the real-data test immune to a changing working tree",
-      "goal": "The repository's go check takes about nine minutes after every iteration, almost all of it cmd/vloop's end-to-end tests run one at a time; this task goes first so every later iteration's check is cheaper. Every cmd/vloop test that builds its own temporary repository and changes no process-wide state (environment, working directory) calls t.Parallel(); one that must stay serial says why in a comment. TestWorkedExampleB6RealData clones the repository's HEAD and must stop failing when someone edits the working tree while it runs. The speed target (at most half the base time on the same machine) is measured once by the operator at verification, never by a gate.",
-      "kind": "test",
-      "fixtures": "9732b42b741ad0c7a83c89b940af983f09e0193232724cdbf3f897aae1cdd300",
+      "title": "Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed",
+      "goal": "The driver hashes .git/config's bytes around every session, gate and check, so VS Code's branch.<name>.vscode-merge-base — written when the work branch is created — halts a run with exit 9 and blames whoever was running. This task makes the guard compare the file's keys and values, leave out keys matching an ignore pattern (one built in, more from the new config key run.git-config-ignore), refuse patterns that would blind it to keys that run code, and name the changed keys in the halt. It goes first so no later task's run can trip on an editor key.",
+      "kind": "fix",
+      "fixtures": "3e0ccd19ca96ec8163dc11d8d71efb4a6f9dd4f1f8f96cf5f2f9d1c005a43cd1",
       "references": [
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Tests: no t.Parallel(), and the real-data test failing when the repository is edited during the run — the two findings this task closes"
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, first bullet: the guard keeps guarding hooks, fsmonitor, filters and core.* while ignoring editor keys — the evidence and intent this task implements"
+        },
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "S-2 (a session or gate that changes .git/config halts, exit 9) and R-3 (exit codes): the invariant this task narrows to keys, without weakening it for any key outside the ignore patterns"
+        },
+        {
+          "path": "docs/guide/configuration.md",
+          "why": "every config key and its environment name is listed here, and a test requires it: run.git-config-ignore and VLOOP_RUN_GIT_CONFIG_IGNORE join it, in the same form as the other list keys"
         }
       ],
       "depends_on": [],
       "acceptance": [
-        "Every top-level test in cmd/vloop that builds its own temporary repository and sets no environment variable or working directory of the test process calls t.Parallel() — including TestRun01HappyPath, TestRun09DependencyOrder, TestWorkedExampleB3Commands, TestRunGateReviewPasses and TestRunChecksScopedToWhatChanged.",
-        "A cmd/vloop test left serial carries a comment saying why (what process-wide state it touches); no test made parallel calls os.Setenv, t.Setenv, os.Chdir or t.Chdir, or mutates a package-level variable another test reads.",
-        "TestWorkedExampleB6RealData still clones the repository's HEAD (not its working tree) and still runs vloop run in the clone; it passes while files in the repository's working tree are edited or added during its run, and it still fails if the run writes into the real repository's tracked files or refs.",
-        "Parallel tests do not share a temporary directory, stub, home or port; each test's harness state is its own.",
-        "No production code changes in this task, and no test's assertions are loosened to make it parallel.",
-        "`go test ./cmd/vloop/` passes with -count=1, and `go test -race ./cmd/vloop/ -run 'TestRun0'` reports no race."
+        "Wherever the guard runs today (around every session, gate and check, including the base gates at acceptance and the gate review), .git/config is compared by its own entries — keys and values, include directives as entries, never the files they include — not by its bytes; the git hooks guard is unchanged.",
+        "An entry whose key matches an ignore pattern is left out of both sides. The built-in pattern is branch.*.vscode-merge-base and is always applied. A pattern matches the key as git config --list prints it (section and variable lowercased, subsection as written), and * matches any run of characters, dots included.",
+        "run.git-config-ignore is a list config key (environment VLOOP_RUN_GIT_CONFIG_IGNORE, comma-separated) whose patterns are added to the built-in one; it never removes the built-in pattern. vloop config get and config list show it.",
+        "A pattern is protected when its text before the first * (all of it, if it has none) and one of core., filter., include., includeif. is a prefix of the other. vloop config set run.git-config-ignore with a protected pattern (alone or in a list) exits 2, writes nothing, and prints exactly `vloop: run.git-config-ignore: <pattern> would ignore <section>.* — the guard must see it`, <pattern> the offending pattern itself (core.* for the list gitlens.*,core.*), <section> the first of core, filter, include, includeif, in that order, it collides with: *, c*, core.* and filter.lfs.* are refused; gitlens.* and branch.*.vscode-merge-base are not.",
+        "vloop run with a protected pattern in VLOOP_RUN_GIT_CONFIG_IGNORE or in the config file refuses with exit 1 and the same line, before any session runs.",
+        "Any other entry added, removed or changed halts with exit 9 and exactly `vloop: <who> changed .git/config (<key>[, <key>…][ and <n> more]) — nothing was committed; restore it, then re-run`: at most three keys, sorted, then how many more; <who> is what it is today (work, review, plan, the gate review, the gate of T5, the check go, …). An ignored key never appears among the named keys and never halts on its own.",
+        "Violations the review must rule against: a key outside the ignore patterns that changes without halting; an ignored key that halts; a built-in pattern list in the binary that a repository cannot extend; a guard that only checks known-dangerous keys.",
+        "The pattern matching and the protected-pattern rule are pure functions with committed unit tests that run on every OS, and a committed end-to-end test in cmd/vloop shows a run continuing past an ignored key and halting with the named key otherwise.",
+        "Only these existing tests change, and only as the brief states: TestRunGitConfigPlanted (cmd/vloop/run_git_test.go) and the hooks/config subtests of TestWorkedExampleB8 (cmd/vloop/b8_e2e_test.go) expect the key named; TestWorkedExampleEnglishSession (cmd/vloop/e2e_test.go) expects the new key in config list. No other assertion is weakened.",
+        "docs/guide/configuration.md lists run.git-config-ignore with its environment name, its built-in pattern and the protected sections; docs/guide/commands.md is regenerated if any help text changed.",
+        "No refactor from B15's list (one git wrapper, the env filters, planSHA, driver.counts, the budget keys, the id generators, long functions) is folded in."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "done",
-      "attempts": 0,
+      "attempts": 1,
       "notes": ""
     },
     {
       "id": "T2",
-      "title": "Add one frontmatter reader and rewriter and move defects and interventions onto it",
-      "goal": "Frontmatter is parsed five ways today, with different trimming and quoting and no BOM handling, so `defect set` and `intervention set` on a CRLF or BOM record fail or corrupt it. This task adds the one package that reads and rewrites the frontmatter of Markdown records — a leading BOM ignored on read and preserved on write, CRLF read and written back as CRLF, no mixed endings, and a rewrite that touches only the lines it changes — and moves defect and intervention reading and setting onto it. T3 moves briefs, run records and brief close onto the same package.",
+      "title": "Stamp the plan on load and resume acceptance after a halt instead of planning again",
+      "goal": "Acceptance — the base gates and the gate review — runs on an unstamped plan, so an exit 9 there leaves a plan the re-run cannot resume: it plans again, paying for the plan twice, and the operator's clean-up loses the halted run folder with its cost. A halt in the gate review leaves a stamped running plan whose re-run starts work with no gate review. This task stamps the plan as soon as it loads, keeps it planning until acceptance passes, and makes vloop run resume acceptance (no plan session) whenever the plan has not passed its gate review.",
       "kind": "fix",
-      "fixtures": "6bd0c6594b5425c76ea0dc92289796a04ef2965e30a72118dd8d7e02eb80046c",
+      "fixtures": "2925c89abc12d2a60b391d120667f0db4becca075ab2a9b7fb07ca415ad3119e",
       "references": [
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Code health: frontmatter parsed five ways (brief, runs/release.go, defect, intervention, cli/close.go) with no BOM handling — the duplication this package replaces"
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, second bullet: an exit 9 during plan acceptance keeps the plan and its run folder and the re-run resumes acceptance — the costs lost and the intent"
+        },
+        {
+          "path": "docs/domain/execution/plan.md",
+          "why": "the plan's lifecycle (planning → running) and its acceptance (two rounds of base gates then gate review), which this task changes: stamped on load, planning until acceptance passes, resumable"
+        },
+        {
+          "path": "docs/domain/execution/run.md",
+          "why": "the run folder's ownership rule (a brief owns every folder whose log says it planned from the brief or resumed its run id) — the resumed folder must be owned so the metrics count it — and the exit table"
+        },
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "P-2 (only the driver sets status), R-3 (exit codes) and R-4 (the clean-tree preflight), which the resume must respect"
         }
       ],
       "depends_on": [
         "T1"
       ],
       "acceptance": [
-        "One package (under internal/) owns reading and rewriting Markdown frontmatter; internal/defect and internal/intervention read and rewrite their records only through it — no frontmatter splitting, line-ending or BOM handling of their own remains in either.",
-        "A record with a leading UTF-8 BOM reads like the same record without it, and a rewrite keeps the BOM.",
-        "A record with CRLF endings reads like its LF twin, and a rewrite writes every line CRLF; a rewrite never leaves a file with mixed endings.",
-        "A set changes only the lines of the fields it sets; every other byte of the file, body included, is unchanged.",
-        "`vloop defect set` and `vloop intervention set` on CRLF and BOM + CRLF records exit 0 and change the field; `defect list`, `intervention list` and `intervention show` read such records.",
-        "Values are parsed exactly as today for LF records without a BOM: quoting, trimming and the fields read are unchanged, so every existing record in .vloop/defects and .vloop/interventions reads as before.",
-        "The package has its own table-driven tests (LF, CRLF, BOM, BOM + CRLF, mixed input, quoted values, a missing or unterminated frontmatter), and defect and intervention tests cover set on a CRLF and a BOM record; the checks run them.",
-        "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
+        "As soon as the plan session's plan loads and passes its checks, the driver stamps run_id, brief and branch and saves it; the status stays planning until acceptance passes and becomes running then.",
+        "A halt (any exit) or a killed driver during acceptance leaves the plan, its gate folders and the run folder in place.",
+        "vloop run <brief>, or bare vloop run, on the plan's branch with a plan whose status is planning, or whose gate review verdict is not PASS, resumes acceptance: no plan session runs; the round it was in continues with the base gates (all of them re-run, even ones that passed before the halt) and then the gate review; the rounds already spent count toward the two. It prints `resuming acceptance of <run id>: round <n>`.",
+        "Work never starts on a plan whose gate review has not passed. A plan the gate review failed twice (status blocked) behaves as today; a plan rejected by its checks (exit 1) is still removed, as today.",
+        "The clean-tree preflight tolerates the plan, its gate folders and the brief's earlier run folders when it resumes acceptance, as it does when it resumes work.",
+        "The halted run folder is kept: the plan commit includes it as well as the resumed run's folder, and vloop metrics counts its sessions — the resumed folder's log says it resumed the run id, so the ownership rule owns it.",
+        "Violations the review must rule against: any path where acceptance resumes by planning again; any path where work starts without a passed gate review.",
+        "Committed end-to-end tests in cmd/vloop cover a halt in the base gates and a halt in the gate review, each resumed with no second plan session and the gate review run before any work. TestRunGateReviewFailsTwiceThenResumes and TestRunResumeAllowsStateEdits change only if their resume paths change wording.",
+        "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
       "status": "done",
-      "attempts": 0,
+      "attempts": 1,
       "notes": ""
     },
     {
       "id": "T3",
-      "title": "Move briefs, run records and brief close onto the frontmatter package; close rewrites only the first status line",
-      "goal": "Briefs are read by internal/brief and by runs (FrontmatterStatus, release.go), and brief close rewrites a brief by hand: a BOM or CRLF brief fails `brief check` with \"missing frontmatter\", and `brief close` rewrites every `**Status:** ready to plan` line it finds (even one quoted mid-line) and appends its run record in LF, leaving mixed endings. This task moves every brief and run-record reader and the close rewrite onto T2's package, so close rewrites only the first `**Status:**` line it means to, as its comment says, and reads the clock once.",
+      "title": "Record ended and wall_ms, the driver's own measurement, on every session record",
+      "goal": "A session's duration_ms is copied from the claude CLI's JSON, which recorded 20 seconds for a plan session that ran 39 minutes. This task makes the driver time every session itself, from the process start to its exit, and record it as wall_ms with an ended timestamp, beside the CLI's duration_ms. The metrics read it in the next task.",
       "kind": "fix",
-      "fixtures": "b682345d10f98782ecc15c4d0c10397b693c91669ef3c4e8ed7e535dd3b07661",
+      "fixtures": "f28a7a0c8b5675591ce5c009417e90c8e92075b18e5a088671c3470c609de88f",
       "references": [
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Cross-platform: brief close rewrites every status line, leaves mixed endings in a CRLF brief, and calls time.Now() twice"
+          "path": "docs/domain/execution/session.md",
+          "why": "the session record's fields (session/v1, session/v2 for a gate review), which grow by ended and wall_ms without a schema version change"
+        },
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "C-3: records may grow only by optional fields — records written before stay valid and no schema version changes"
+        },
+        {
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, third bullet (finding 9): session time is the driver's own wall clock"
         }
       ],
       "depends_on": [
-        "T2"
+        "T1"
       ],
       "acceptance": [
-        "internal/brief, internal/runs (the brief status and release reads) and the brief close command read and rewrite frontmatter only through T2's package; none keeps its own frontmatter parser.",
-        "`vloop brief check` and `vloop brief list` read a ready brief saved with a BOM and CRLF endings exactly as its LF twin (same name, status, problems).",
-        "`vloop brief close` rewrites only the first line that starts with `**Status:** ready to plan` (what precedes `**Status:**` on that line is kept); a later such line and a `**Status:**` quoted mid-line are left as they were.",
-        "On a BOM + CRLF brief, brief close keeps the BOM and writes every line CRLF, including the run record it appends: the closed file equals the close of its LF twin with CRLF endings and the BOM.",
-        "brief close reads the clock once: the date in the status line, the run record and any defect it records come from one time value.",
-        "Tests cover brief check and list on a BOM + CRLF brief and brief close on a CRLF brief with two status lines and a quoted one; the checks run them.",
-        "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
+        "Every session record (plan, gate review, work, review) gains ended (RFC 3339, UTC, the same format as started) and wall_ms, the driver's own measurement from the session process's start to its exit, including any time the machine slept; duration_ms stays as the CLI reported it.",
+        "schemas/session.v1.json and schemas/session.v2.json declare ended (a string) and wall_ms (an integer) as optional properties; records written before validate unchanged; no schema version changes and no record's schema value changes.",
+        "Violation the review must rule against: a schema version bump for the session record, or wall_ms derived from the CLI's duration_ms rather than measured by the driver.",
+        "Committed tests cover the new fields: TestSessionFieldMapping (internal/driver/session_test.go) is updated for them, and TestRun15TelemetryContract (cmd/vloop/run_safety_test.go) only if it lists the record's keys. No other assertion is weakened.",
+        "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
       "status": "done",
       "attempts": 0,
-      "notes": ""
+      "notes": "",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T3/gate.sh",
+          "replaced_at": "2026-10-11T08:27:20Z",
+          "reason": "gate validated the session/v1 plan record against session/v2, whose schema const rejects it; each schema now checks a record of its own version (D20261011-0844)",
+          "by": "operator",
+          "fixtures": "7405ee982e07b06640f34bbcfd60db51c19aa2634a2a156949ddc6329b4f22c1"
+        }
+      ]
     },
     {
       "id": "T4",
-      "title": "Make exit 2 opt-in, for usage only; every other failure exits 1",
-      "goal": "Any error a command returns that is not wrapped as a problem exits 2 today, so about 84 failures that are not usage exit 2 and a script cannot tell a typo from a failure. This task inverts the default: exit 2 only for an unknown command or flag, a wrong argument count, and an invalid value for a flag or a settable field (config set, task set, defect set, intervention set, --by and the like); every other failure exits 1. \"Invalid value\" means a value checked against its vocabulary or format; a missing file, brief, task or record is not usage. The guide's account of the change is T15's.",
+      "title": "Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session",
+      "goal": "vloop metrics showed a 39-minute plan as 0.3 minutes and a 71-minute run as 30.7, because it sums the CLI's duration_ms and starts the wall at the plan commit, which leaves planning out. With wall_ms on the records (T3), this task makes every session time come from wall_ms where a record has it, and the wall run from the first plan session's started to the last run commit.",
       "kind": "fix",
-      "fixtures": "6a57c232400d820213efef9653278c4528eabbb4c8e2ca969a5c6651f010e325",
+      "fixtures": "e5aa4539086c8c91ba3fc50bee6bb9e9149dc03d3d8f4b33b61fd36d28b566b9",
       "references": [
         {
-          "path": "docs/domain/platform/platform-context.md",
-          "why": "\"CLI conventions\": exit 0 ok, 1 problems or failure, 2 usage — the contract this task makes true; one stderr line starting `vloop: `"
+          "path": "docs/domain/measurement/metrics.md",
+          "why": "the time measures (agent, plan, gates, checks, gate review, wall) whose sources this task changes: session time from wall_ms, wall from the first plan session"
         },
         {
           "path": "docs/domain/domain-model.md",
-          "why": "R-3: vloop run's own exit codes (2 is also blocked for run) — unchanged by this task"
-        },
-        {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Errors and exit codes: any error that is not a Problem exits 2; make exit 2 opt-in"
+          "why": "M-1: metrics are recomputed from raw sources on every call — the change applies to every brief that has wall_ms records, and to none that does not"
         }
       ],
       "depends_on": [
         "T3"
       ],
       "acceptance": [
-        "The default for an error returned from a command is exit 1; exit 2 is produced only by an explicit usage error (a type or wrapper the CLI package defines) and by cobra's own unknown-command, unknown-flag, flag-parse and argument-count errors.",
-        "`vloop run docs/briefs/nope.md` exits 1 with its message unchanged (`vloop: brief not found: docs/briefs/nope.md`); vloop run's own endings (R-3, including 2 for blocked) are unchanged.",
-        "`vloop brief check missing.md` exits 1 with exactly `vloop: no such file: missing.md`.",
-        "`vloop intervention set <id> decided <n>` and `recommended <n>` with a number outside the record's options exit 2, as does any other invalid value for a settable field; unknown commands and flags and wrong argument counts stay 2.",
-        "No non-usage failure path still exits 2: the review checks the diff for errors returned without the usage marker that are not usage, and for usage errors (invalid values, argument counts) that now exit 1.",
-        "Tests pin the exit code of every row of the brief's Q2 table and of representative usage errors (unknown flag, argument count, invalid flag value, invalid field value); the checks run them.",
-        "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.",
-        "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
+        "vloop metrics takes each session's time from wall_ms when its record has it and from duration_ms otherwise, in every per-phase figure (plan, work, review, gate review), in agent time and in the per-task times.",
+        "A brief's wall time runs from its first plan session's started to its last run commit; where no plan session record exists, it runs from the plan commit, as today.",
+        "For a brief whose records have no wall_ms, every number except the wall time is what v0.8.0 computes.",
+        "Committed tests cover both sources of session time and both starts of the wall. The metrics tests whose wall time or table changes — TestMetricsCommandSummary, TestMetricsCommandCrossBrief (internal/cli/metrics_test.go), TestTimeCostWorkedExample (internal/metrics/time_test.go) and the worked-example summaries of B3, B4 and B6 (cmd/vloop/b3_e2e_test.go, b4_e2e_test.go, b6_e2e_test.go) — change only where the wall time changes, and each changed number is listed in the task's notes.",
+        "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
       "status": "done",
       "attempts": 0,
-      "notes": ""
+      "notes": "",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T4/gate.sh",
+          "replaced_at": "2026-10-11T08:53:32Z",
+          "reason": "gate summed review_ms over *-review.json, which also matches NNN-gate-review.json, folding gate review time into review_ms; it now sums by the record's phase field",
+          "by": "operator",
+          "fixtures": "12555305d0a68cb0ac0f710c406775529f528847a799394b0d4e314bc50fa526"
+        }
+      ]
     },
     {
       "id": "T5",
-      "title": "Say what to do next: no plan, no task, no brief, a -C that names no directory, git outside a repository",
-      "goal": "Several refusals name a symptom but not the next step, or leak raw git text: `no plan: <path>`, `no task T99`, `no runs for nope` for a brief that does not exist, \"no plan\" for `-C /nonexistent`, and `git log … exit status 128` outside a repository. This task makes each one line on stderr, exit 1, in the exact words the brief quotes, naming the command to run next. The plan-file and remaining messages are T6's and T7's.",
+      "title": "Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form",
+      "goal": "A permission denial keeps only tool_name and a file_path (B8 F12), so five Bash denials in another repository could not be analysed; and masking misses Claude Code's dashed project-folder form, -Users-<name>-…, so committed records kept a user name. This task keeps a denied Bash call's command through the same masking and redaction as every record, cut to 200 characters, and masks the dashed form everywhere masking applies. File contents and other tools' inputs stay out.",
       "kind": "fix",
-      "fixtures": "ae2a62993f0c7b9fd09f7ebbbab6bc75bcaba5aae24d4fd7045ff55652ae9836",
+      "fixtures": "827ec58ddebe818fa3bbcc8767c18d52fe8c0be31a66cd5f71231e45466abb3d",
       "references": [
         {
-          "path": "docs/domain/platform/platform-context.md",
-          "why": "\"CLI conventions\": a refusal is one stderr line starting `vloop: ` — the shape every message here keeps"
+          "path": "docs/domain/execution/session.md",
+          "why": "the record's permission_denials — what a denial keeps (tool_name and a file_path) — which grows by a Bash command and nothing else"
         },
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Errors and exit codes: the not-actionable or misleading messages, and raw git messages reaching the user"
+          "path": "docs/domain/domain-model.md",
+          "why": "C-3 (records grow only by optional fields) and S-4 (sessions write nothing under .vloop/ but .vloop/tmp/ — rewriting the two past records that keep a user name is the operator's, not this task's)"
+        },
+        {
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, fourth bullet (findings 10 and 3): the command masked and truncated, and the dashed -Users-<name>- mask"
         }
       ],
       "depends_on": [
-        "T4"
+        "T3"
       ],
       "acceptance": [
-        "With no plan, every command that needs one (task show, task list, status, and the others) prints exactly `vloop: no plan — vloop run <brief> makes one` and exits 1.",
-        "An unknown task id prints exactly `vloop: no task T<n> — vloop task list shows the plan's tasks` and exits 1, for every task subcommand that takes an id.",
-        "`vloop metrics <name>` for a brief that does not exist prints exactly `vloop: no brief <name> — vloop brief list shows the briefs` (exit 1); a brief that exists with no runs keeps `vloop: no runs for <name>` (exit 1).",
-        "`-C <dir>` naming no directory makes every command print exactly `vloop: -C <dir>: no such directory` and exit 1, before anything else runs; nothing is created at <dir>.",
-        "A command that needs git, run outside a git repository, prints `vloop: <dir> is not a git repository` (exit 1) — no raw `git … exit status 128` or `fatal:` text reaches the user; `vloop metrics` in such a directory no longer exits 0.",
-        "Tests pin each message and exit code above; the checks run them.",
-        "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now."
+        "A denied Bash call's permission_denials entry is {tool_name, command}: the command through the same masking (home, user name) and secret redaction as every record, then cut to its first 200 characters — counted in characters, not bytes — with … appended when cut.",
+        "Every other tool's entry is unchanged: tool_name, and file_path when the input had a file_path or notebook_path. Violation the review must rule against: a record that keeps any tool input but a Bash command and a file_path (a description, file contents, a URL, a prompt).",
+        "Masking replaces the user name in the dashed form: -Users-<user>- and -home-<user>- become -Users-USER- and -home-USER-, everywhere masking applies (records, run.log, stderr captures); a user name that is only free text is still left alone.",
+        "TestSessionDenialsKeepToolAndPath (internal/driver/session_test.go) is updated for command; committed tests cover truncation by characters (a multibyte command), masking and redaction before the cut, and the dashed form. No other assertion is weakened.",
+        "No past record under .vloop/ is rewritten, and no refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
       "status": "done",
@@ -182,31 +227,29 @@
     },
     {
       "id": "T6",
-      "title": "Report a plan that is not valid JSON, or not a valid plan, with its location and the next step",
-      "goal": "A plan with a JSON syntax error reaches the user as Go's `invalid character 'b' looking for beginning of object key string`, task validate prints `✗ schema: : not valid JSON` with an empty field, and a plan that fails its schema makes `status` print an empty line and exit 0. This task names the file, the line and the column of a syntax error, sends a schema-invalid plan to `vloop task validate`, and makes status and status --json exit 1 on either, with the error under --json.",
-      "kind": "fix",
-      "fixtures": "0622f50e0c8b272c09cd27e88a28614d1d59ef2c8585da2866767667f8e96a4b",
+      "title": "Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%",
+      "goal": "Nothing during a run says what it has spent or how long a session took; the operator in another repository saw no cost until the run ended, and run.cost-ceiling is a stop, not feedback. This task prints one line per session — plan, gate review, work and review, revision rounds included — with its time, its cost and the run's spend against the ceiling, and warns once at 50% and once at 80% of the ceiling.",
+      "kind": "feature",
+      "fixtures": "80f1af718a6c17fcf67e4505d9fadf9bb35444c21bfdebea84e3e6cf4036499d",
       "references": [
         {
-          "path": "docs/domain/platform/platform-context.md",
-          "why": "\"CLI conventions\": --json puts exactly one JSON document on stdout; a refusal is one `vloop: ` line on stderr"
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, fifth bullet (field note 4): the running cost and elapsed time per session in the log, warnings at 50% and 80% of the ceiling"
         },
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Errors and exit codes: raw Go JSON messages, `✗ schema: : not valid JSON`, a schema-invalid plan making status exit 0"
+          "path": "docs/domain/execution/run.md",
+          "why": "budgets and endings: the cost ceiling the spend is measured against, and why run.log is buffered until each commit (it stays buffered; stdout is the live surface)"
         }
       ],
       "depends_on": [
-        "T4"
+        "T2"
       ],
       "acceptance": [
-        "A plan that is not valid JSON makes `vloop status` print exactly `vloop: .vloop/state/state.json is not valid JSON (line <l>, column <c>)` and exit 1, where <l> and <c> are the 1-based line and column of the character the JSON decoder rejected (`{bad` is line 1, column 2).",
-        "A plan that is valid JSON but fails the state schema makes `vloop status` print exactly `vloop: .vloop/state/state.json is not a valid plan — vloop task validate lists the problems` and exit 1.",
-        "`vloop status --json` exits 1 on either, with one JSON object `{\"error\": \"<the message without the vloop: prefix>\"}` on stdout.",
-        "`vloop task validate` and `vloop schema validate <schema> <file>` on a file that is not JSON print `<path>: not valid JSON (line <l>, column <c>)` with no empty field, and exit 1.",
-        "A valid plan's status, status --json and task validate output are unchanged.",
-        "Tests pin these messages for a syntax error on the first line and on a later line, and for a schema-invalid plan; the checks run them.",
-        "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now."
+        "After each session ends — plan (a revision round's included), gate review, work and review — the driver prints one line on stdout and in run.log: `   <phase>[ <task>] · <m>m<ss>s · $<cost> · run $<spent> / $<ceiling>`, phase one of plan, gate review, work, review; <spent> the same figure the cost ceiling is checked against, after this session; money with two decimals. Example: `   work T3 · 6m12s · $1.84 · run $9.40 / $40.00`.",
+        "The first time <spent> reaches 50%, and then 80%, of the ceiling, the driver warns once each, on stderr and in run.log: `   cost: $<spent> spent, <50|80>% of the $<ceiling> ceiling`; never twice in a run.",
+        "run.log stays buffered and written only before each commit, as today; no heartbeat or check runs inside a session, and the ceiling is still checked only between iterations.",
+        "Committed tests cover the line for each phase and both warnings. The run-output tests that slice the log (cmd/vloop/run_gates_test.go, run_iterate_test.go, run_halt_test.go, run_safety_test.go) change only where the new line lands between the lines they match; no assertion is weakened.",
+        "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
       "status": "done",
@@ -215,31 +258,29 @@
     },
     {
       "id": "T7",
-      "title": "Fix the remaining messages: drafts-only brief check, plugin path outside a repository, intervention show and migrate paths",
-      "goal": "Four smaller messages mislead: `brief check` on only drafts says `briefs ok` when it checked nothing; `plugin path` outside a repository creates `.vloop/` wherever it is run (breaking C-1's nothing-global rule in spirit); `intervention show` hides the schema and options counts and prints an empty `brief:`; and `intervention migrate --dry-run` prints bare file names. This task makes each say what is true.",
-      "kind": "fix",
-      "fixtures": "7c83bba4bee1162b76b054ecda7b834a55e95f4a253d0e2775391da6a98c7ba7",
+      "title": "Record the session in flight in the run lock and show the live run in vloop status",
+      "goal": "vloop status reads only the plan, so while a run is going it cannot say which session is running, for how long, or what the run has spent — and before the plan exists it fails. This task records the session in flight and the spend in the run lock as sessions start and end, and makes status show a running line (and --json a running object) whenever a live run holds the lock, including while it plans.",
+      "kind": "feature",
+      "fixtures": "fd21b1ff1ead628186dbfcebe3e96e5e3d9b508d34e2fc96409c62ad2a098816",
       "references": [
         {
-          "path": "docs/domain/platform/platform-context.md",
-          "why": "\"CLI conventions\" and C-1: a refusal is one `vloop: ` line; nothing is written outside a repository"
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, fifth bullet: vloop status showing the run (the carried options)"
         },
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Errors and exit codes: plugin path creating .vloop/ in the working directory, brief check on only drafts printing `briefs ok`"
+          "path": "docs/domain/execution/run.md",
+          "why": "the run lock and the exit table: status reads a live run only, never a stale lock"
         }
       ],
       "depends_on": [
-        "T3",
-        "T4"
+        "T6"
       ],
       "acceptance": [
-        "`vloop brief check <paths>` where every path is a draft prints `nothing checked: <n> draft brief(s) skipped` instead of `briefs ok` and exits 0; when at least one brief is checked the summary is as before.",
-        "`vloop plugin path` outside a vloop repository (no `.vloop/` found, whether or not in a git repository) prints exactly `vloop: not in a vloop repository — run vloop init first`, exits 1, and writes nothing anywhere; inside one it extracts and prints `.vloop/tmp/plugin/<version>` as before.",
-        "`vloop intervention show` prints a `schema: <schema>` line and an `options: <n>` line among the record's fields, and omits the `brief:` line when the record has no brief.",
-        "`vloop intervention migrate --dry-run` prints each record it would migrate as a repo-relative path (`.vloop/interventions/<id>.md`), from any working directory in the repository, and writes nothing.",
-        "Tests pin each of these; the checks run them.",
-        "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now."
+        "The run lock (.vloop/tmp/.running) keeps its fields and also records phase (plan, gate review, work or review), task (absent for plan and gate review), session_started (RFC 3339 UTC) and spent, updated as each session starts and ends.",
+        "vloop status, while a live run holds the lock, prints after its first line `running: <phase>[ <task>] for <m>m<ss>s · $<spent> of $<ceiling>`; with no plan yet but a live run planning, it prints the running line and exits 0.",
+        "vloop status --json gains \"running\": {\"phase\", \"task\", \"session_started\", \"spent\", \"ceiling\"}, absent when no live run holds the lock — a lock whose process is gone is not a live run.",
+        "Committed tests cover the lock's new fields, the running line during a session and while planning, and its absence with no live run or a stale lock. The status tests (internal/cli/status_test.go) change only where a live lock is planted; docs/guide/commands.md is regenerated if any help text changed.",
+        "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T7/gate.sh",
       "status": "done",
@@ -248,329 +289,92 @@
     },
     {
       "id": "T8",
-      "title": "Compare trust paths and find the pre-commit hook the way each OS and git do",
-      "goal": "Two checks fail off the happy path: the trust lookup in ~/.claude.json compares paths byte for byte, so a Windows key with backslashes or a key in another letter case on Windows or macOS is not found; and the pre-commit hook check looks in `.git/hooks` with the executable bit, which misses a linked worktree (where `.git` is a file) and every hook on Windows. This task makes both OS-aware pure functions, tested on every OS, used by doctor and run's preflight.",
+      "title": "Name the commit from the build's VCS revision and the version from the module, when no stamp did",
+      "goal": "A binary from go install …@v0.8.0 prints commit unknown, and doctor warns about it, because only the stamped build carries a commit. This task reads Go's build info: the VCS revision when a checkout build recorded one, and the module version for an installed binary, printed in place of an unknown commit and accepted by doctor's self-hosting check when it is a release.",
       "kind": "fix",
-      "fixtures": "654034bbecde00c3e75309eea02f9b7d1c86110033bb7fa16de4a96378d028c0",
+      "fixtures": "74d60e31ef79c3beb83d83f20d5ad4cbc1f9fe86c8a5ec31189602553724bc99",
       "references": [
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Cross-platform: the trust lookup (backslashed, case-sensitive paths) and the pre-commit hook check (executable bit, .git/hooks)"
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, sixth bullet (finding 2): the installed version identifies itself"
         }
       ],
       "depends_on": [
         "T1"
       ],
       "acceptance": [
-        "The trust lookup normalises both the repository path and each key in ~/.claude.json to `/` separators and compares them case-insensitively on Windows and macOS (case-sensitively elsewhere); the symlink-resolved root is still tried.",
-        "The pre-commit hook check finds the hooks directory with `git rev-parse --git-path hooks` (which honours core.hooksPath and linked worktrees); on Windows a hook counts by its presence, elsewhere by its executable bit.",
-        "Both decisions are pure functions taking the OS (or its rule) as a parameter, with table tests covering Windows, macOS and Linux cases that run on every OS; the checks run them.",
-        "`vloop doctor`'s trust line and `vloop run`'s preflight hook warning use these functions; their messages are unchanged.",
-        "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
+        "The commit is the stamped one; else the build's VCS revision when Go recorded one, with -dirty appended when the tree was modified; else unknown.",
+        "When the build carries a module version (anything but (devel) or empty), vloop version --json has \"module\" right after \"commit\", absent when there is none; and when the commit is unknown the text line is `vloop <version> (module <module version>, plugin <plugin>, <go> <os>/<arch>)`. Otherwise the text line is as today.",
+        "doctor's self-hosting check passes a binary whose module version is a release (vX.Y.Z, with no pre-release or pseudo-version suffix), as it passes a stamped one; an unknown commit with no release module version still warns.",
+        "Reading the build info is behind a seam the committed tests inject (a module version, a revision, a modified flag) — no test publishes or installs anything. TestVersionJSON, TestVersionText (internal/cli/root_test.go), TestDoctorSelfHostingUnstamped (internal/cli/doctor_test.go) and the version line of TestWorkedExampleEnglishSession (cmd/vloop/e2e_test.go) change only as the new behaviour requires.",
+        "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T8/gate.sh",
       "status": "done",
-      "attempts": 0,
+      "attempts": 1,
       "notes": ""
     },
     {
       "id": "T9",
-      "title": "Report the driver's swallowed errors, make gendocs refuse a flag-like argument, and fix the CLAUDE.md section",
-      "goal": "The rest of the review's correctness findings: the driver ignores a failed write of a session's report and says \"restored\" even when a restore fails, and replaces the plan without syncing it to disk; `cmd/gendocs --help` wrote a file named `--help`, which is still tracked at the repository root; and the CLAUDE.md section `vloop init` writes lists only plan, work and review sessions and names `vloop-operator`, a skill the plugin does not ship. The gate sees only the last two; the driver's errors are the review's to judge from the diff.",
-      "kind": "fix",
-      "fixtures": "4b851f909fb132e95b44f4af78bd6f03a8ef47b85ed739c53031780d7de24565",
+      "title": "Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack",
+      "goal": "A brief that delivered only lines no stack classifies — 3,487 lines of scripts and docs in another repository — shows code 0 and test 0 in vloop metrics, which reads as delivered nothing. This task prints n/a for those columns in the cross-brief table and adds a line under the summary's delivered line saying how many delivered lines matched no stack. The JSON does not change.",
+      "kind": "feature",
+      "fixtures": "e475ffd5218ee246374cf4ac82869b4bf83789cd51f4d3d718cb119cd7a26104",
       "references": [
         {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Ignored errors that matter (copyReport, a failed restore reported as restored, Sync on the plan) and cmd/gendocs writing to any single argument"
-        }
-      ],
-      "depends_on": [
-        "T1"
-      ],
-      "acceptance": [
-        "A report the driver fails to copy into the run folder (copyReport: MkdirAll or WriteFile failing) is reported as an error in the run log, not silently dropped.",
-        "A restore that fails (restoring a session's changed inputs, or reverting a gate's tree changes) is reported as a failure naming the path — never logged as \"restored\" — and the iteration or run does not proceed as if it had been restored.",
-        "The plan is written to a temporary file, synced to disk (File.Sync, error checked) and only then renamed over the old one.",
-        "`cmd/gendocs` refuses any argument that starts with `-` (usage message on stderr, non-zero exit, nothing written); `go generate ./...` still regenerates docs/guide/commands.md.",
-        "The tracked file named `--help` at the repository root is deleted.",
-        "The CLAUDE.md section `vloop init` and `vloop upgrade` write lists the session kinds plan, gate review, work and review, and names `/vloop:operate` as the operator's playbook (no `vloop-operator`); internal/install's tests that pin the section's text are updated to it.",
-        "Tests cover the gendocs refusal, the section text and the driver's error paths where a test can reach them (for example an unwritable reports directory); the checks run them.",
-        "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
-      ],
-      "verify": "sh .vloop/state/gates/T9/gate.sh",
-      "status": "done",
-      "attempts": 1,
-      "notes": ""
-    },
-    {
-      "id": "T10",
-      "title": "Name new run folders in UTC and order existing ones by their records' timestamps",
-      "goal": "Run folders are named in local time while every record inside is UTC, and folders are ordered by name, so a DST fall-back reorders runs and mis-pairs gate failures with commits. New folders are named in UTC; existing folders keep their names (renaming would break the run records that cite them) and are ordered by their records' timestamps wherever folder order matters. The real-data check (T17) requires every consumed brief's metrics to stay as they are.",
-      "kind": "fix",
-      "fixtures": "2692c9323dba225cf875ab01fcdc7bb75451d559b9d8126f4f0f2640ff28e44f",
-      "references": [
-        {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Metrics correctness: run folders named in local time while records are UTC"
+          "path": "docs/domain/measurement/metrics.md",
+          "why": "the line classification (code, test, docs, other, excluded through layers and stack presets) and delivered versus churn — n/a is where nothing was classified as code or test"
         },
         {
-          "path": "docs/guide/metrics.md",
-          "why": "\"Where the numbers come from\": how run folders and their records feed the metrics this ordering must not change for existing data"
-        }
-      ],
-      "depends_on": [
-        "T1"
-      ],
-      "acceptance": [
-        "vloop run names a new run folder `<YYYYMMDD-HHMMSS>` from the UTC clock whatever the local zone, keeping the `-2`, `-3` suffix rule.",
-        "Run folders are ordered by the earliest timestamp of their records (iteration and session records), falling back to the name only for a folder with no timestamped record; existing folders are not renamed.",
-        "Every consumer that depends on folder order (metrics, the missing-records list, defect derivation, gate-failure/commit pairing, close) sees the timestamp order.",
-        "Tests cover a UTC folder name under a non-UTC zone and two folders whose names sort opposite to their records (a DST fall-back); the checks run them.",
-        "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
-      ],
-      "verify": "sh .vloop/state/gates/T10/gate.sh",
-      "status": "done",
-      "attempts": 0,
-      "notes": ""
-    },
-    {
-      "id": "T11",
-      "title": "Count first-pass and convergence right: a redone task is not first-pass, and convergence counts this run's closes",
-      "goal": "Two numbers are wrong. First-pass counts a task as first-pass when every iteration ended done, so a task reverted to pending by a gate regression and redone still counts. The driver's convergence halt (exit 5) divides this run's iterations by every done task in the plan, including those earlier runs closed, so a resumed run that closes nothing is never caught. This task fixes both; the brief's real-data check expects only these numbers to move.",
-      "kind": "fix",
-      "fixtures": "7c96e9d3b8c7a5eaa50839ef825933b54bf198b40a8227a491f0f3f119f2d76f",
-      "references": [
-        {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Metrics correctness: the convergence ratio counting every done task, first-pass ignoring a task reverted by a gate regression and redone"
-        },
-        {
-          "path": "docs/guide/metrics.md",
-          "why": "the definitions of first-pass and iterations per closed task this task must keep consistent with (update the guide's wording only if a definition changes)"
-        },
-        {
-          "path": "docs/domain/domain-model.md",
-          "why": "R-3: exit 5, not converging, is one of vloop run's endings — its meaning is unchanged, only its count is fixed"
-        }
-      ],
-      "depends_on": [
-        "T10"
-      ],
-      "acceptance": [
-        "A task with more than one iteration that ended `done` (it was done, reverted by a gate regression, and redone) is not first-pass in `vloop metrics` (text, --json, --by task) or in the close snapshot.",
-        "The convergence check divides this run's iterations by the number of tasks this run closed (done during this run), not by every done task in the plan; with run.convergence-min reached and nothing closed this run, the run halts not converging, exit 5.",
-        "A clean run's first-pass and a single run's convergence behave as before.",
-        "Tests cover a regressed-and-redone task's first-pass and a resumed run that closes nothing; the existing tests that pin metrics affected by this are updated and the proposal's notes list each changed number.",
-        "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now.",
-        "No refactor from B12's list is folded in (one git wrapper, the env-filter copies, planSHA, driver.counts, the budget keys, the id generators, splitting long functions): a diff that does one of these fails review."
-      ],
-      "verify": "sh .vloop/state/gates/T11/gate.sh",
-      "status": "done",
-      "attempts": 1,
-      "notes": ""
-    },
-    {
-      "id": "T12",
-      "title": "Make doctor's plugin check tell the truth about the --plugin-dir plugin, a disabled plugin and a failing claude",
-      "goal": "vloop run supplies the plugin itself with --plugin-dir, and no marketplace exists while the repository is private, yet doctor warns \"no enabled vloop plugin — run claude plugin install vloop@vloop\" on every machine, cannot tell installed-but-disabled from absent, and swallows the error when `claude plugin list` fails. This task makes the check pass with the --plugin-dir hint, name the enable command for a disabled plugin, and warn with the error when the listing fails.",
-      "kind": "fix",
-      "fixtures": "f82f46f45a1d5feaa86df9c9da99151c2e6bfb42179e158504f8d2db4b3fd734",
-      "references": [
-        {
-          "path": "docs/guide/concepts.md",
-          "why": "\"Setting up a repository\": doctor's checks and the plugin's install story, which T15 rewrites to match this check"
+          "path": "docs/design-notes/vloop-t1-triage.md",
+          "why": "P1, last bullet (field note 9): metrics say not measured instead of 0"
         }
       ],
       "depends_on": [
         "T4"
       ],
       "acceptance": [
-        "With no vloop marketplace plugin installed, doctor's plugin check passes with exactly `the plugin is supplied by vloop run (--plugin-dir); for an interactive session: claude --plugin-dir \"$(vloop plugin path)\"`.",
-        "A vloop plugin that is installed but disabled is a warning: `installed but disabled — claude plugin enable vloop@vloop`.",
-        "When `claude plugin list --json` fails or prints something that is not its JSON, the check is a warning that names the error (the command's stderr or exit status, or the parse error) instead of a fixed text.",
-        "An enabled vloop plugin of the binary's version passes, and one of another version keeps its version-mismatch warning.",
-        "Tests cover the four cases with a fake claude; the checks run them.",
-        "No earlier test is deleted or loosened to pass; an earlier test changes only where this task's contract changes what it pins, and the proposal's notes list each such test with the expectation it had and has now."
+        "When a brief's delivered lines include none classified as code or test, the cross-brief table (vloop metrics with no brief, and the workspace table) prints n/a in its code and test columns; a brief with code or test lines prints its numbers as today.",
+        "In that case the summary's delivered line is unchanged and is followed by `           <n> delivered lines match no stack in metrics.stacks`, <n> the delivered other lines, printed only when <n> is above zero.",
+        "vloop metrics --json is unchanged: code and test stay 0 and no key is added.",
+        "Committed tests cover the n/a columns, the extra summary line, and a brief with code that is unchanged. TestMetricsCommandCrossBrief and TestMetricsCommandSummary (internal/cli/metrics_test.go) change only if their fixtures have no code or test lines.",
+        "No refactor from B15's list is folded in."
       ],
-      "verify": "sh .vloop/state/gates/T12/gate.sh",
-      "status": "done",
-      "attempts": 0,
-      "notes": "",
-      "gate_history": [
-        {
-          "verify": "sh .vloop/state/gates/T12/gate.sh",
-          "replaced_at": "2026-10-06T08:07:20Z",
-          "reason": "the plugin() helper's grep required a space after 'plugin', so it could not match a check that passes with no message ('✓ plugin'); now 'plugin' followed by a space or the end of the line, still only the plugin row (the work session's gate_dispute)",
-          "by": "operator",
-          "fixtures": "3b2f89f659c9fb3285dfa6dc0a7fc01fc94431be4f347811eff06fbbcf4c3e52"
-        }
-      ]
-    },
-    {
-      "id": "T13",
-      "title": "Rewrite the help: current Shorts, consistent verbs, Long help, and the regenerated command reference",
-      "goal": "The help still describes earlier briefs (`run` \"…and commit the plan\", `brief` \"Check loop briefs\", `task` \"Inspect the plan's tasks\"), mixes Print, Show and List for the same kind of command, and has no Long text: the root help does not say what a brief is or where to start, and `run --help` does not say how the brief is chosen or how to resume. This task fixes the Shorts and verbs, adds Long help where the brief lists it, and regenerates docs/guide/commands.md. It runs after the message and exit-code tasks so the help describes what they built.",
-      "kind": "docs",
-      "fixtures": "09ebf04fee437288bc1e61d3746ddabeda5ef6f03c6b6b02c2c1c59c4aa0e636",
-      "references": [
-        {
-          "path": "docs/guide/commands.md",
-          "why": "the generated reference: regenerate it with go generate ./... after changing any Short, Long or flag; its staleness test fails otherwise"
-        },
-        {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Help: stale Shorts, no Long help, inconsistent verbs and field lists"
-        },
-        {
-          "path": "docs/guide/concepts.md",
-          "why": "the exit codes and the loop as the run Long must describe and point to (docs/guide/concepts.md#exit-codes)"
-        }
-      ],
-      "depends_on": [
-        "T5",
-        "T6",
-        "T7",
-        "T12"
-      ],
-      "acceptance": [
-        "Shorts: `run` is \"Plan a brief and work it, task by task, on a work branch\"; `brief` is \"Write, check, list and close loop briefs\"; `task` is \"Show, amend, gate and reset the plan's tasks\".",
-        "Every `list` subcommand's Short begins \"List \", every `show` subcommand's Short begins \"Show \", other Shorts that print one thing or a report use \"Show\" consistently, and every `set` Short names its settable fields as a sentence.",
-        "The root's Long says what a brief is, gives the loop in three sentences and says where to start (`vloop init`, `vloop brief new`).",
-        "`run`'s Long says how the brief is chosen, what a run does, how to resume, and gives the exit codes with where they are documented (docs/guide/concepts.md).",
-        "`brief`, `task`, `metrics`, `defect` and `intervention` have Long help saying what the group is for and its common flow.",
-        "docs/guide/commands.md is regenerated from the tree and committed; the tests that pin Shorts or help text are updated to the new text.",
-        "No command, flag or behaviour is added or removed; only help text changes."
-      ],
-      "verify": "sh .vloop/state/gates/T13/gate.sh",
+      "verify": "sh .vloop/state/gates/T9/gate.sh",
       "status": "done",
       "attempts": 0,
       "notes": ""
     },
     {
-      "id": "T14",
-      "title": "Fix the two evals whose graders misjudge: plan-checks-its-gates' fixture grader and operate-proposes-options' judges",
-      "goal": "Evals are the skills' gates, and two of them score sound sessions low. plan-checks-its-gates' fixture grader reads the trace, which ends before the planner writes its gate-folder fixtures, so a sound plan scores 0.67 (defect D20261004-1309). operate-proposes-options' two judge graders failed 3-0 on an answer that proposes two real options with a reasoned recommendation, because they judge everything the answer raises (defect D20261005-0757). This task makes the first judge the files themselves and the second judge only the options offered for the disputed gate. Running the evals is the operator's, at verification.",
-      "kind": "test",
-      "fixtures": "02a78f62c69ac3fe0e87d9da305c335122d661d28ea66ce8909cce0afddb86d0",
-      "references": [],
-      "depends_on": [
-        "T1"
-      ],
-      "acceptance": [
-        "plan-checks-its-gates' fixture grader judges the gate folder's files themselves (a grader whose focus or target reads files, fed by whatever the case needs to put the planner's greet.toml fixtures where it reads), not the trace or the final message.",
-        "With that grader, a gate expecting `hello! world` from a fixture whose `punctuation` key sits after the `[style]` header fails it, and a negative fixture with the key inside `[style]` expecting `hello, world` does not.",
-        "operate-proposes-options' judge graders judge only the options offered for the disputed gate (count, realism, one recommendation with its reason); other problems or observations the answer raises do not lower their score, and their wording says so.",
-        "Both cases stay well-formed (case.yaml, prompt, scaffold, every grader with a known type, a weight and a description) and both scaffolds still build their repositories in an empty directory.",
-        "The proposal's notes say the cases need an operator eval run and give the command; scores and spend go in the run record (the operator's, not this session's)."
-      ],
-      "verify": "sh .vloop/state/gates/T14/gate.sh",
-      "status": "done",
-      "attempts": 1,
-      "notes": ""
-    },
-    {
-      "id": "T15",
-      "title": "Bring the guides and the domain's CLI conventions up to v2",
-      "goal": "The guides still describe v1 in places: the exit-code table says 1 is only a refusal before anything ran, configuration.md omits that `-` becomes `_` in environment names, metrics.md's synopsis lacks --workspace, --interventions and metrics export, the doctor check list misses checks and self-hosting, the skills list says four, and shell-loop references read as if every repository had one. There is also no account of what changed in 2.0, including T4's exit-code change. This task fixes the guides and updates the domain's CLI conventions to the qualified one-line rule.",
+      "id": "T10",
+      "title": "Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility",
+      "goal": "The domain is the contract the next briefs bind, and the guides are what an operator reads when a run halts or a number looks wrong; both still describe a byte-hashed guard, acceptance that cannot resume, CLI-reported time and a silent run. This task updates every document the brief's \"The domain, updated\" section names, so each states what T1–T9 built, and regenerates the command reference.",
       "kind": "docs",
-      "fixtures": "7233ab60e8b4222bb504de3e2a166d1c442a714ae20df394d5124176fda68558",
+      "fixtures": "a16fa4c9e75ec13205236792e040ba49e9326093f8c572004b05b923a73c1552",
       "references": [
         {
-          "path": "docs/guide/concepts.md",
-          "why": "the exit-code table, gates section, doctor check list, skills list and the new \"What changed in 2.0\" section this task edits"
+          "path": "docs/domain/domain-model.md",
+          "why": "S-2's .git/config part becomes: a key of .git/config changes, other than those run.git-config-ignore and the built-in editor keys ignore"
+        },
+        {
+          "path": "docs/domain/execution/plan.md",
+          "why": "the plan is stamped on load; acceptance resumes after a halt; work needs a passed gate review"
+        },
+        {
+          "path": "docs/domain/execution/run.md",
+          "why": "the exit table (exit 9 during acceptance: resumable once restored) and the kept run folder"
+        },
+        {
+          "path": "docs/domain/execution/session.md",
+          "why": "the record's ended and wall_ms, and a denial's command"
+        },
+        {
+          "path": "docs/domain/measurement/metrics.md",
+          "why": "session time from wall_ms; the wall from the first plan session; n/a for unmeasured size"
         },
         {
           "path": "docs/guide/configuration.md",
-          "why": "the environment-name rule (`.` and `-` become `_`) and every key's environment name"
-        },
-        {
-          "path": "docs/guide/metrics.md",
-          "why": "the synopsis that gains --workspace, --interventions and metrics export, and its shell-loop notes"
-        },
-        {
-          "path": "docs/domain/platform/platform-context.md",
-          "why": "\"CLI conventions\": the one paragraph of the domain that changes (exit 2 usage only; the one-line rule qualified for doctor and the preflight)"
-        },
-        {
-          "path": "docs/domain/domain-model.md",
-          "why": "R-3 and C-1 to C-4: what the guides document about exit codes, configuration and language — the guides must agree with them, and the domain model itself does not change"
-        },
-        {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → Guides: each stale statement this task corrects"
-        }
-      ],
-      "depends_on": [
-        "T4",
-        "T12",
-        "T13"
-      ],
-      "acceptance": [
-        "concepts.md's exit-code table states 1 as \"problems or failure, including a failed plan session or a mid-run error\" and 2 as \"usage\" (and, for vloop run, still \"blocked\", R-3); the general sentence above it says 2 is usage only.",
-        "concepts.md has a \"What changed in 2.0\" section covering the gate model (state/v2, gate folders, the gate review, [[check]]), intervention/v2 and `vloop intervention migrate`, metrics/v2, and Q2's exit-code change with its table.",
-        "concepts.md's doctor paragraph lists the checks in the order `vloop doctor` prints them, including `checks` and `self-hosting`; its Skills section says the plugin ships five skills and names all five, /vloop:gate-review included.",
-        "concepts.md's plugin install text no longer tells a reader to add a marketplace that does not exist; it gives the --plugin-dir way, matching T12's doctor message.",
-        "configuration.md says a key's environment name is `VLOOP_` and the key upper-cased with `.` and `-` turned into `_`.",
-        "metrics.md's synopsis shows --workspace, --interventions and `vloop metrics export`, and its messages match T5's.",
-        "Every shell-loop reference in the guides is kept and marked \"legacy: the shell loop that built vloop's first briefs, in this repository only\" (the full phrase at least once, \"legacy\" on each mention).",
-        "docs/domain/platform/platform-context.md's CLI conventions read: exit `0` ok, `1` problems or failure, `2` usage only; a refusal is one stderr line starting `vloop: `, after any checks `doctor` or a preflight prints. Nothing else in the domain changes.",
-        "The guide tests (internal/cli guide and README completeness tests) pass, updated only where the text they pin changed."
-      ],
-      "verify": "sh .vloop/state/gates/T15/gate.sh",
-      "status": "done",
-      "attempts": 1,
-      "notes": ""
-    },
-    {
-      "id": "T16",
-      "title": "Rewrite the README as a newcomer's page, last",
-      "goal": "A newcomer who reads the README today cannot install vloop or make a first run: it says running tasks is \"next\", names a marketplace that does not exist, and is mostly reference tables the generated guides now hold. This task rewrites it in the v1 review's outline updated for v2, after everything else, so it describes what this run built. No command table — docs/guide/commands.md is that.",
-      "kind": "docs",
-      "fixtures": "bf5832a78fda57e962a705ed4d116a23adc50de3b97a64b81ce09c92b50d0c05",
-      "references": [
-        {
-          "path": "README.md",
-          "why": "the page this task rewrites; its test's 200-line cap stays"
-        },
-        {
-          "path": "docs/design-notes/vloop-v1-review.md",
-          "why": "\"B9 — quality\" → README: what is stale and the proposed outline"
-        },
-        {
-          "path": "docs/guide/commands.md",
-          "why": "the command reference the README points to instead of a command table"
-        },
-        {
-          "path": "docs/guide/concepts.md",
-          "why": "the exit codes and the loop the README summarises and points to"
-        }
-      ],
-      "depends_on": [
-        "T15"
-      ],
-      "acceptance": [
-        "README.md is at most 200 lines, in this order: what vloop is; prerequisites (Go as in go.mod, git, the claude CLI, workspace trust); install (`go install github.com/mvelosop/vloop/cmd/vloop@v<tag>` at a release tag; the plugin through --plugin-dir while the repository is private); a quickstart (vloop init, a [[check]], vloop doctor, vloop brief new, brief check, vloop run, vloop brief close); the loop in one paragraph (plan, gate folders, the gate review, work, gates, checks, review, one commit); the everyday commands in a short list pointing at docs/guide/commands.md; exit codes in brief, pointing at the concepts guide; the guides; \"What changed in 2.0\".",
-        "There is no command table, and no marketplace install step.",
-        "Any claim that errors are one line starting `vloop: ` carries the qualification (after the checks doctor or a preflight prints).",
-        "The README test keeps its 200-line cap; completeness checks that the README no longer carries (config keys, commands) live in the guides' tests instead, not deleted.",
-        "Every relative link in README.md resolves."
-      ],
-      "verify": "sh .vloop/state/gates/T16/gate.sh",
-      "status": "done",
-      "attempts": 0,
-      "notes": ""
-    },
-    {
-      "id": "T17",
-      "title": "Close: the worked example as a committed test, and the real-data check against v2.0.0-beta.2",
-      "goal": "The brief ends with a worked example and a real-data check; this task proves both on the finished tree. The worked example becomes a committed end-to-end test in cmd/vloop (as each earlier brief's did), line for line, in temporary directories. The real-data check reads this repository with the new binary and with v2.0.0-beta.2: every consumed brief's metrics --json must be equal except first-pass and convergence where a task regressed and was redone, and the lists must read every record as before. The suite's speed is measured by the operator, not here.",
-      "kind": "test",
-      "fixtures": "c690760528d3c00daeb0b48b56cabb7042072111af03dffb00b7abee468a142f",
-      "references": [
-        {
-          "path": "docs/guide/metrics.md",
-          "why": "the metrics/v2 fields the real-data comparison reads, and which of them T10 and T11 may change"
+          "why": "the run.git-config-ignore key, its environment name, the built-in pattern and the protected sections"
         }
       ],
       "depends_on": [
@@ -582,23 +386,48 @@
         "T6",
         "T7",
         "T8",
-        "T9",
-        "T10",
-        "T11",
-        "T12",
-        "T13",
-        "T14",
-        "T15",
-        "T16"
+        "T9"
       ],
       "acceptance": [
-        "A committed cmd/vloop test (TestWorkedExampleB11 or similar, parallel like its neighbours) runs every line of the brief's worked example against the built binary in temporary directories and asserts its output and exit code; the checks run it.",
-        "Run on this repository, `vloop metrics --json` for every consumed brief (B1–B10) equals v2.0.0-beta.2's except first_pass and iterations_per_closed; the proposal's notes list each changed number with its brief and task (for the operator's run record).",
-        "`vloop defect list`, `vloop intervention list` and `vloop brief list` print exactly what v2.0.0-beta.2 prints on this repository.",
-        "If the comparison finds a difference beyond those two fields, the task fixes its cause in the code (not the test or the data) or halts with an account of it.",
-        "No production behaviour changes in this task beyond fixes the comparison forces, each named in the proposal's notes."
+        "docs/domain/domain-model.md's S-2 reads that a key of .git/config changes, other than those run.git-config-ignore and the built-in editor keys ignore.",
+        "docs/domain/execution/plan.md says the plan is stamped on load, stays planning until acceptance passes, that acceptance resumes after a halt with no second plan session, and that work needs a passed gate review; its lifecycle diagram agrees.",
+        "docs/domain/execution/run.md's exit table says exit 9 during acceptance is resumable once restored (by resuming acceptance), and the run folder of a halted acceptance is kept and committed with the plan.",
+        "docs/domain/execution/session.md lists ended and wall_ms on the record and a denied Bash call's command (masked, redacted, 200 characters).",
+        "docs/domain/measurement/metrics.md and docs/guide/metrics.md say session time comes from wall_ms when recorded, the wall runs from the first plan session's started, and the table shows n/a with the summary's line when no delivered line is code or test.",
+        "docs/guide/configuration.md documents run.git-config-ignore; docs/guide/concepts.md covers exit 9 and resuming acceptance, the per-session line and the cost warnings, and status's running line; docs/guide/commands.md is regenerated.",
+        "Every statement agrees with the behaviour T1–T9 shipped, read side by side with the code; nothing describes behaviour the brief puts out of scope (streaming sessions, a heartbeat, a live run.log)."
       ],
-      "verify": "sh .vloop/state/gates/T17/gate.sh",
+      "verify": "sh .vloop/state/gates/T10/gate.sh",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T11",
+      "title": "Close: commit the worked example as a test and pass the real-data check against v0.8.0",
+      "goal": "The brief's blind spot is that every instrument was tested only here, by fixtures that never had an editor, a long plan session or a halt during acceptance. This task leaves the brief's worked example behind as a committed end-to-end test, line for line, and checks the real repository: every consumed brief's metrics equal v0.8.0's except the wall time this brief changes, and the record listings read as before.",
+      "kind": "test",
+      "fixtures": "39c4168eba33de80113a3b8408eda7368d8c4c348181a35c4d0a9eada8fc3fff",
+      "references": [
+        {
+          "path": "docs/domain/measurement/metrics.md",
+          "why": "the real-data check: on records written before this run only the wall time may change — plan time where a record has wall_ms, and there are none"
+        },
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "S-4: the test builds its repositories in temporary directories and writes nothing under this repository's .vloop/; M-1 and C-3 for what the real-data check may and may not change"
+        }
+      ],
+      "depends_on": [
+        "T10"
+      ],
+      "acceptance": [
+        "A committed end-to-end test in cmd/vloop runs the brief's worked example line for line with a fresh build and the stub claude the suite already uses, in temporary repositories addressed with git -C: the ignored and named .git/config keys, the config set refusal, the halt and resume of acceptance with both run folders in the plan commit and both counted by the metrics, wall_ms against duration_ms, the denied Bash command and the dashed mask, the per-session line and the two cost warnings, status during a work session, the version lines (the module version injected through the test seam), and n/a in the metrics.",
+        "The test threads the values it computes (paths, ids, costs, counts) rather than hardcoding them, sleeps no longer than 3 seconds and depends on no wall-clock precision finer than a second.",
+        "On this repository, vloop metrics --json for every consumed brief equals v0.8.0's except the wall time, and vloop defect list, intervention list and brief list read every record as before; the task's notes list each changed wall time for the run record.",
+        "No record, config or state of this repository is changed by the task's work or its test (S-4), and no refactor from B15's list is folded in."
+      ],
+      "verify": "sh .vloop/state/gates/T11/gate.sh",
       "status": "done",
       "attempts": 0,
       "notes": ""

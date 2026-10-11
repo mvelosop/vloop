@@ -244,6 +244,8 @@ func runDoctor(b Build, root string) []doctorCheck {
 	switch {
 	case !isRepo || !ownModule(root):
 		add("self-hosting", resNA, "")
+	case (b.Commit == "" || b.Commit == "unknown") && isRelease(b.Module):
+		add("self-hosting", resPass, "")
 	case b.Commit == "" || b.Commit == "unknown":
 		add("self-hosting", resWarning, "this binary carries no commit — build releases with the stamped build in docs/guide/concepts.md")
 	case head != "" && strings.HasPrefix(head, b.Commit):

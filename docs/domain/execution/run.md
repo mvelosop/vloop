@@ -24,10 +24,15 @@ reports/gate-review-<round>.json  the gate review's verdict
 run.log                     the driver's own log (the shell loop's is loop.log)
 ```
 
+The run folder of a run that halted during acceptance (exit 9) is kept, not
+deleted: the plan commit that follows the resumed acceptance includes it, with
+the folder of the run that resumed, so the brief owns both and its metrics count
+both plan sessions.
+
 The driver buffers `run.log` and writes it only just before each commit, and
 the metrics snapshot into the next commit, so no tracked file is dirty while a
 session or a gate runs. Before each commit it checks that HEAD is where it was
-(a session or gate that moved refs, `.git/config` or the git hooks halts the run, exit 9). A gate that disputes itself
+(a session or gate that moved refs, a key of `.git/config` outside `run.git-config-ignore` and the built-in editor keys, or the git hooks halts the run, exit 9). A gate that disputes itself
 (`gate_dispute` in a proposal) blocks its task at once and charges no attempt.
 
 Before planning, the preflight requires a `ready` brief that passes the check,
@@ -59,7 +64,8 @@ After a done iteration whose gates all passed, the driver runs the checks whose
 paths match what the iteration changed (untracked files included), stops at the
 first failure and never re-runs one. When the last task is done every check runs
 once more in a **final pass**: a check that fails there ends the run blocked,
-exit 2. A resume with every task done repeats the final pass. v1 records stay
+exit 2. A resume with every task done repeats the final pass. A resume of a plan still
+`planning` resumes acceptance (see [plan](plan.md#acceptance)). v1 records stay
 readable.
 
 The shell loop writes `gate_fail` and `review_fail` for the middle two; vloop
@@ -103,7 +109,7 @@ with one exit code (R-3):
 | 6 | cost ceiling | yes, with a higher ceiling |
 | 7 | session error | no |
 | 8 | repeat blocked, nothing changed | no |
-| 9 | refs or repository configuration moved; nothing committed | no — restore the refs first |
+| 9 | refs or repository configuration moved; nothing committed | no — restore the refs first; during acceptance, resumable once restored, by resuming acceptance (no second plan session) |
 
 ## Gaps
 

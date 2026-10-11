@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Metrics take each session's time from wall_ms when the record has it and from duration_ms otherwise, in every per-phase figure, agent time and per-task times; a brief's wall starts at its first plan session's started, else the plan commit.",
+  "files": ["internal/runs/runs.go", "internal/metrics/time.go", "internal/metrics/metrics.go", "internal/metrics/time_test.go"],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: ok; go test ./internal/metrics ./internal/runs ok.",
+  "notes": "Implementation was already in the tree from the earlier blocked attempt (Session.WallMS *int64 and Session.TimeMS() in internal/runs); this session verified it against the corrected gate and changed nothing. No existing test needed changing, so there are no changed numbers to list; tests added: TestTimeFromWallMSWhereRecorded and TestTimeWallStartsAtFirstPlanSession. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset."
+}

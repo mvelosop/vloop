@@ -47,6 +47,7 @@ func (p *Planner) gateReviewRound(t term, round int) ([]string, error) {
 	if err != nil {
 		return nil, halt(ExitPreflight, "gate review session failed: %v", err)
 	}
+	t.sessionDone(Spec{Phase: PhaseGateReview}, res)
 	if what := gguard.changed(); what != "" {
 		return nil, halt(ExitRefsMoved, "the gate review changed %s — nothing was committed; restore it, then re-run", what)
 	}

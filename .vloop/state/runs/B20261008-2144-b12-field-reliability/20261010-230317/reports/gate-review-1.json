@@ -1,0 +1,68 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "FAIL",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "refuse() in .vloop/state/gates/T1/gate.sh expects the whole list 'gitlens.*,core.*' as <pattern> in the config set refusal line, but the brief names the offending pattern (core.*), as the gate's own env case does; no correct implementation passes both",
+          "kind": "unpassable"
+        }
+      ]
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T5",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T6",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T7",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T8",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T9",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T10",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T11",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "All 11 gates fail on the base at behavioural assertions (base logs read). T2-T11 matchers checked against the brief's literal outputs and the existing metrics summary format. T1: the list case must expect `vloop: run.git-config-ignore: core.* would ignore core.* — the guard must see it`."
+}
+

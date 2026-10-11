@@ -120,7 +120,10 @@ Each of `delivered` and `churn` holds `code`, `test`, `docs` and `other`, and a
 ## Time
 
 - **agent** (`time.agent_ms`) = `work_ms` + `review_ms`: the durations of the work
-  and review sessions. **plan** (`plan_ms`) is reported apart.
+  and review sessions. **plan** (`plan_ms`) is reported apart. A session's
+  duration is its record's `wall_ms`, the driver's own measurement around the
+  process, when recorded, and the CLI-reported `duration_ms` otherwise (older
+  records).
 - **gates** (`gates_ms`): the sum of the gate durations in the iteration records;
   `null` (`n/a`) when none was recorded, as always for the legacy shell loop.
 - **checks** (`checks_ms`): the sum of the check durations in the iteration
@@ -128,7 +131,8 @@ Each of `delivered` and `churn` holds `code`, `test`, `docs` and `other`, and a
   was recorded. The final pass writes no iteration record, so it is not counted.
 - **gate review** (`gate_review_ms`): the duration of the gate-review sessions,
   the gate-review phase before any work. It is not part of `agent_ms`.
-- **wall** (`wall_ms`): the plan commit's committer time to the last run
+- **wall** (`wall_ms`): from the first plan session's `started` (the plan
+  commit's committer time when no plan session record exists) to the last run
   commit's. `null` without a run commit.
 - **lead_time** (`lead_time.plan_to_merge_ms`): the plan commit to the merge
   commit; `null` when not merged.
@@ -235,6 +239,12 @@ row over all of them.
 
 The bracketed `gate review` parts appear only for a brief whose plan had a
 gate review (vloop 2 and later).
+
+When a brief delivered no line classified as code or test, the cross-brief
+table shows `n/a` in `code` and `test` rather than 0, and the summary adds a
+line under `delivered` saying how many delivered lines match no stack in
+`metrics.stacks`, so a misconfigured stack is not read as a brief that
+delivered nothing. The JSON keeps the zeros and the `other` count.
 
 The cross-brief table has one row per brief in name order: `brief`, `tasks`,
 `first-pass`, `code`, `test`, `t:c`, `agent` (minutes), `$/1k`, `in-loop`,

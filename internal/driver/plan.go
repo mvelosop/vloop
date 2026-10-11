@@ -58,6 +58,7 @@ type Planner struct {
 	AwakeWarn string // why the keep-awake hold could not be taken; logged once to run.log
 
 	SessionTimeout time.Duration // the plan session is killed after this; none when zero
+	CostCeiling    float64       // the run's cost ceiling, for the cost line and warnings
 
 	Claude string           // test seams, as Runner's
 	Now    func() time.Time // the driver's clock
@@ -215,6 +216,16 @@ func (t term) say(format string, a ...any) {
 	}
 }
 
+// sessionDone prints the line of a plan or gate review session that just
+// finished, and the warnings for the thresholds the run's spend crossed.
+func (t term) sessionDone(s Spec, res Result) {
+	spent := spendIn(t.r.RunDir)
+	t.say("%s", sessionLine(s, res.Wall, res.Cost, spent, t.p.CostCeiling))
+	for _, w := range costWarnings(spent-res.Cost, spent, t.p.CostCeiling) {
+		t.warn("%s", w)
+	}
+}
+
 // show prints a line on stdout without logging it.
 func (t term) show(format string, a ...any) {
 	if t.p.Out != nil && !t.p.Quiet {
@@ -296,7 +307,8 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return nil, err
 	}
 
-	if resuming {
+	accepting := resuming && needsAcceptance(existing)
+	if resuming && !accepting {
 		if p.PlanOnly {
 			t := p.bareTerm()
 			t.show("--plan-only, but %s is already planned — nothing to do", existing.RunID)
@@ -312,25 +324,46 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return &PlanResult{Plan: existing}, nil
 	}
 
-	runID := brief.RunID(briefPath)
-	if err := p.workBranchFree(runID); err != nil {
-		return nil, err
+	var (
+		runID, runDir string
+		r             *Runner
+		logFile       *os.File
+		startRound    = 1
+	)
+	if accepting {
+		// A halt during acceptance left the plan stamped and planning: acceptance
+		// goes on from the round it was in, in a run folder of its own, and the
+		// plan session does not run again.
+		runID, briefPath = existing.RunID, existing.Brief
+		if err := CheckFixtures(root, existing); err != nil {
+			return nil, err
+		}
+		if c, err := p.workBranch(runID); err != nil {
+			return nil, err
+		} else if c != "" {
+			cur = c
+		}
+		if runDir, err = newRunDir(root, runID, p.now()); err != nil {
+			return nil, err
+		}
+		startRound = min(max(plannedSessions(root, runID), 1), planRounds)
+	} else {
+		runID = brief.RunID(briefPath)
+		if err := p.workBranchFree(runID); err != nil {
+			return nil, err
+		}
+		if runDir, err = newRunDir(root, runID, p.now()); err != nil {
+			return nil, err
+		}
 	}
-	runDir, err := newRunDir(root, runID, p.now())
-	if err != nil {
-		return nil, err
-	}
-	logFile, err := os.OpenFile(filepath.Join(runDir, "run.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
-	if err != nil {
+	if logFile, err = os.OpenFile(filepath.Join(runDir, "run.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644); err != nil {
 		return nil, err
 	}
 	defer logFile.Close()
-	r := &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
+	r = &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
 		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
 	t := term{p, r}
 
-	// Every check passes on the base before the branch is made or anything is
-	// planned: one that fails would be blamed on the first task.
 	shell, err := config.Get(root, "shell")
 	if err != nil {
 		return nil, halt(ExitPreflight, "%v", err)
@@ -340,31 +373,35 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return nil, halt(ExitPreflight, "%v", err)
 	}
 	gateMin, _ := strconv.Atoi(gt.Value)
-	if err := t.baseChecks(planChecks(checkDefs), shell.Value, time.Duration(gateMin)*time.Minute); err != nil {
-		return nil, err
-	}
+	if !accepting {
+		// Every check passes on the base before the branch is made or anything is
+		// planned: one that fails would be blamed on the first task.
+		if err := t.baseChecks(planChecks(checkDefs), shell.Value, time.Duration(gateMin)*time.Minute); err != nil {
+			return nil, err
+		}
 
-	if c, err := p.workBranch(runID); err != nil {
-		return nil, err
-	} else if c != "" {
-		cur = c
-	}
+		if c, err := p.workBranch(runID); err != nil {
+			return nil, err
+		} else if c != "" {
+			cur = c
+		}
 
-	if hasPlan { // another brief's plan: reset it
-		for _, f := range []string{state.FilePath, planMarkdown} {
-			if err := os.Remove(filepath.Join(root, filepath.FromSlash(f))); err != nil && !errors.Is(err, os.ErrNotExist) {
+		if hasPlan { // another brief's plan: reset it
+			for _, f := range []string{state.FilePath, planMarkdown} {
+				if err := os.Remove(filepath.Join(root, filepath.FromSlash(f))); err != nil && !errors.Is(err, os.ErrNotExist) {
+					return nil, err
+				}
+			}
+			if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir))); err != nil {
 				return nil, err
 			}
-		}
-		if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir))); err != nil {
-			return nil, err
 		}
 	}
 
 	if p.PlanOnly && p.AwakeWarn != "" {
 		r.Logf("%s", AwakeWarning(p.AwakeWarn))
 	}
-	if hasPlan {
+	if hasPlan && !accepting {
 		t.say("the plan %s was for %s — you asked for %s: resetting and planning fresh", existing.RunID, existing.Brief, briefPath)
 	}
 
@@ -372,13 +409,17 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	if err != nil {
 		return nil, halt(ExitPreflight, "%v", err)
 	}
-	t.say("planning from %s using %s", briefPath, model)
 	session := func() error { return p.planSession(t, r, runDir, briefPath, model, effort) }
-	if err := session(); err != nil {
-		return nil, err
+	if accepting {
+		t.say("resuming acceptance of %s: round %d", runID, startRound)
+	} else {
+		t.say("planning from %s using %s", briefPath, model)
+		if err := session(); err != nil {
+			return nil, err
+		}
 	}
 
-	plan, blocked, err := p.acceptPlan(t, runID, briefPath, cur, time.Duration(gateMin)*time.Minute, session)
+	plan, blocked, err := p.acceptPlan(t, runID, briefPath, cur, time.Duration(gateMin)*time.Minute, startRound, session)
 	if err != nil {
 		return nil, err
 	}
@@ -429,6 +470,7 @@ func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effor
 	if err != nil {
 		return halt(ExitPreflight, "planning session failed: %v", err)
 	}
+	t.sessionDone(Spec{Phase: PhasePlan}, res)
 	if what := gguard.changed(); what != "" {
 		return halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
 	}
@@ -531,18 +573,40 @@ func newRunDir(root, runID string, now time.Time) (string, error) {
 
 var taskPointer = regexp.MustCompile(`^schema: /tasks/(\d+)`)
 
+// needsAcceptance reports whether a plan's acceptance has not finished: it is
+// still planning, or no gate review has passed it and no work has begun on it.
+// A plan the gate review failed twice is blocked and resumes as the iterator
+// resumes it.
+func needsAcceptance(p *state.Plan) bool {
+	return p.Status == "planning" || (p.Status != "blocked" && p.GateReview.Verdict != "PASS" && p.Iteration == 0)
+}
+
+// plannedSessions counts the plan sessions the run id's folders recorded: the
+// acceptance rounds already spent.
+func plannedSessions(root, runID string) int {
+	m, _ := filepath.Glob(filepath.Join(root, filepath.FromSlash(runsDir), runID, "*", "sessions", "*-plan.json"))
+	return len(m)
+}
+
 // acceptPlan checks the plan the session wrote and, when it is fit, stamps it
-// and saves it as running. A plan that is not fit is removed — the session's
-// output is not a plan — and the problems are listed. A round is the base run
+// — planning while acceptance goes on, running once the gate review has passed
+// it — and saves it. A halt in between leaves it stamped and planning, for
+// the re-run to resume from round startRound. A plan that is not fit is
+// removed — the session's output is not a plan — and the problems are listed. A round is the base run
 // of the gates and then the gate review; a plan that fails either goes back to
 // the plan session once. The plan the gate review failed twice is saved
 // blocked and returned with the halt that ends the run, for the caller to
 // commit first.
-func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeout time.Duration, revise func() error) (*state.Plan, *Halt, error) {
+func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeout time.Duration, startRound int, revise func() error) (*state.Plan, *Halt, error) {
 	root := p.Root
-	for round := 1; ; round++ {
+	for round := startRound; ; round++ {
 		plan, err := p.loadPlan(t)
 		if err != nil {
+			return nil, nil, err
+		}
+		// Stamped before any gate runs, so a halt in acceptance keeps a plan the
+		// re-run can resume.
+		if plan, err = p.stampPlan(plan, runID, briefPath, branch, "planning"); err != nil {
 			return nil, nil, err
 		}
 		problems, err := p.baseGates(t, plan, gateTimeout)
@@ -551,10 +615,8 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeou
 		}
 		reviewed := false
 		if len(problems) == 0 {
-			// The review runs vloop task gate, so the plan is stamped and saved first.
-			if plan, err = p.stampPlan(t, plan, runID, briefPath, branch); err != nil {
-				return nil, nil, err
-			}
+			// The review runs vloop task gate, on the plan stamped and saved above.
+			t.say("planned: %s — %d tasks", runID, len(plan.Tasks))
 			if problems, err = p.gateReviewRound(t, round); err != nil {
 				return nil, nil, err
 			}
@@ -562,6 +624,8 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeou
 			plan.GateReview = state.GateReview{Rounds: round, Verdict: "PASS"}
 			if len(problems) > 0 {
 				plan.GateReview.Verdict = "FAIL"
+			} else {
+				plan.Status = "running"
 			}
 			if err := state.Save(root, plan); err != nil {
 				return nil, nil, err
@@ -670,15 +734,15 @@ func (p *Planner) loadPlan(t term) (*state.Plan, error) {
 	return &plan, nil
 }
 
-// stampPlan stamps an accepted plan with what the driver holds and saves it as
-// running.
-func (p *Planner) stampPlan(t term, plan *state.Plan, runID, briefPath, branch string) (*state.Plan, error) {
+// stampPlan stamps a plan with what the driver holds and saves it with the
+// status given.
+func (p *Planner) stampPlan(plan *state.Plan, runID, briefPath, branch, status string) (*state.Plan, error) {
 	root := p.Root
 
 	// The driver stamps what it already holds, rather than trusting the session
 	// to record it: which run, brief and branch the plan belongs to.
 	plan.RunID, plan.Brief, plan.Branch = runID, briefPath, branch
-	plan.Status = "running"
+	plan.Status = status
 	// The plan's checks are the config's, whatever the session wrote.
 	if defs, err := config.Checks(root); err == nil {
 		plan.Checks = planChecks(defs)
@@ -697,7 +761,6 @@ func (p *Planner) stampPlan(t term, plan *state.Plan, runID, briefPath, branch s
 	if err := state.Save(root, plan); err != nil {
 		return nil, err
 	}
-	t.say("planned: %s — %d tasks", runID, len(plan.Tasks))
 	return plan, nil
 }
 

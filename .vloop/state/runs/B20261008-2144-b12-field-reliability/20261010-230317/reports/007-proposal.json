@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "The run lock now records phase, task, session_started and spent as each session starts and ends, and vloop status prints a running line (and --json a running object) for a live run, including while it plans with no plan yet.",
+  "files": ["internal/driver/safety.go", "internal/driver/session.go", "internal/driver/session_test.go", "internal/cli/status.go", "internal/cli/status_test.go"],
+  "verified": "vloop task gate T7 exited 0 and printed gate T7: ok; go vet, gofmt, go mod tidy -diff, linux and windows builds clean; internal/cli and internal/driver tests pass.",
+  "notes": "Runner.Run updates the lock through updateLock (rename of a temp file) only when this process holds it, so tests without a lock create none; after a session phase, task and session_started are cleared and spent is re-summed from the run folder, so status between sessions prints 'running: between sessions'. The ceiling is not in the lock: status reads it from config (run.cost-ceiling), so a --cost-ceiling flag override is not reflected. Phase value for a gate review is gate-review in the lock and JSON, printed 'gate review'. internal/cli task-gate tests fail if VLOOP_PLAN_SHA256 is set in the environment (as inside a work session); run them with it unset. docs/guide/commands.md unchanged: no help text changed."
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Session records carry ended and wall_ms, measured by the driver around the session process; duration_ms stays as the CLI reported it. Both session schemas declare them as optional with no version change.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go", "schemas/session.v1.json", "schemas/session.v2.json"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok; go test ./internal/driver ok.",
+  "notes": "The implementation was already in the tree from the earlier blocked attempt; this session verified it against the corrected gate and changed nothing. wall_ms is ended minus started from the driver clock (r.now) around the process."
+}

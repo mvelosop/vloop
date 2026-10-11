@@ -1,0 +1,19 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []},
+    {"task": "T7", "verdict": "PASS", "findings": []},
+    {"task": "T8", "verdict": "PASS", "findings": []},
+    {"task": "T9", "verdict": "PASS", "findings": []},
+    {"task": "T10", "verdict": "PASS", "findings": []},
+    {"task": "T11", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Each gate was run on the base with vloop task gate: all eleven fail at the behavioural assertion the task adds, none on a typo, missing tool or malformed fixture. Fixtures are read back (vscode key, alias keys, include path, plan stamp, run folders, lock fields). Matchers were exercised against the formats in the repo: the delivered line, the doctor self-hosting JSON, the plan commit subject, the stderr capture name and the redaction text. T10 pins the phrase 'resumes acceptance' in the docs; its failure message names the pattern, so the work session can adapt in one pass, and it is not a finding. T8 serves the module from a local file proxy, so nothing is published."
+}
+

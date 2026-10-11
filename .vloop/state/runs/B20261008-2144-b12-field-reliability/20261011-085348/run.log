@@ -1,0 +1,26 @@
+── iteration 13 (1 this run) · T4 · 7/11 done ──
+   Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
+   check go
+   review: PASS
+   T4 done
+── iteration 14 (2 this run) · T9 · 8/11 done ──
+   Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
+   check go
+   review: PASS
+   T9 done
+── iteration 15 (3 this run) · T10 · 9/11 done ──
+   Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
+   check go
+   review: PASS
+   T10 done
+── iteration 16 (4 this run) · T11 · 10/11 done ──
+   Close: commit the worked example as a test and pass the real-data check against v0.8.0
+   check go
+   review: PASS
+   T11 done
+   check go
+
+═══ complete ═══
+run:    B20261008-2144-b12-field-reliability/20261011-085348  (4 iteration(s) this run)
+plan:   11/11 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261008-2144-b12-field-reliability.md

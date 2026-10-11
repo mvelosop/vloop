@@ -60,6 +60,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | no | no-options | [I20261003-2053-b9-s-forks-settled-gates-may-be-the-plan](I20261003-2053-b9-s-forks-settled-gates-may-be-the-plan.md) |
 | design | decision | no | no-options | [I20261004-1435-b10-s-forks-settled-options-as-body-sect](I20261004-1435-b10-s-forks-settled-options-as-body-sect.md) |
 | design | decision | no | adjusted | [I20261005-0935-b11-s-forks-settled-user-facing-quality](I20261005-0935-b11-s-forks-settled-user-facing-quality.md) |
+| design | decision | partly | recommended | [I20261008-2146-b12-s-forks-settled-a-key-aware-git-conf](I20261008-2146-b12-s-forks-settled-a-key-aware-git-conf.md) |
 | design | direction | no | no-options | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | no-options | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | no-options | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
@@ -76,6 +77,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | verification-finding | yes | no-options | [I20261001-0730-b6-draft-cited-a-folder](I20261001-0730-b6-draft-cited-a-folder.md) |
 | design | verification-finding | partly | no-options | [I20261001-1018-roadmap-contradiction-first-real-run](I20261001-1018-roadmap-contradiction-first-real-run.md) |
 | run | ceremony | yes | no-options | [I20260929-1917-the-plan-commit-landed-on-main](I20260929-1917-the-plan-commit-landed-on-main.md) |
+| run | ceremony | partly | recommended | [I20261011-0003-b12-s-work-branch-started-from-design-t1](I20261011-0003-b12-s-work-branch-started-from-design-t1.md) |
 | run | context-supply | partly | no-options | [I20260929-1900-go-not-installed-and-the-loop-s-fence-ha](I20260929-1900-go-not-installed-and-the-loop-s-fence-ha.md) |
 | run | halt | yes | no-options | [I20260929-1941-the-driver-refused-to-resume-on-the-new](I20260929-1941-the-driver-refused-to-resume-on-the-new.md) |
 | run | halt | partly | no-options | [I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt](I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt.md) |
@@ -83,13 +85,16 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | halt | partly | no-options | [I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table](I20260930-2159-t8-gate-wrote-toml-into-the-wrong-table.md) |
 | run | repair | no | recommended | [I20261005-1204-t](I20261005-1204-t.md) |
 | run | repair | no | no-options | [I20261005-1205-no-brief](I20261005-1205-no-brief.md) |
+| halt | context-supply | no | no-options | [I20261011-1027-operator-allowed-the-assistant-to-edit-g](I20261011-1027-operator-allowed-the-assistant-to-edit-g.md) |
 | halt | halt | yes | no-options | [I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new](I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new.md) |
+| halt | halt | partly | recommended | [I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate](I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate.md) |
 | halt | repair | partly | no-options | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
 | halt | repair | yes | no-options | [I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th](I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th.md) |
 | halt | repair | partly | recommended | [I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio](I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio.md) |
 | halt | repair | partly | other-option | [I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac](I20261005-1125-b11-s-first-run-halted-with-exit-9-at-ac.md) |
 | halt | repair | partly | recommended | [I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l](I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l.md) |
 | halt | repair | partly | recommended | [I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr](I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr.md) |
+| halt | repair | partly | no-options | [I20261011-1027-b12-halted-blocked-on-t4-s-disputed-gate](I20261011-1027-b12-halted-blocked-on-t4-s-disputed-gate.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | halt | partly | no-options | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |

@@ -136,7 +136,7 @@ func TestSessionFieldMapping(t *testing.T) {
 	want := map[string]any{
 		"schema": "session/v1", "run_id": "B1-x", "iteration": 3.0, "phase": "work", "task": "T2",
 		"model": "sonnet", "effort": "high", "started": "2026-01-02T03:04:05Z",
-		"duration_ms": 1234.0, "cost_usd": 0.5, "turns": 7.0, "is_error": false,
+		"ended": "2026-01-02T03:04:05Z", "wall_ms": 0.0, "duration_ms": 1234.0, "cost_usd": 0.5, "turns": 7.0, "is_error": false,
 		"permission_denials": []any{map[string]any{"tool_name": "Bash"}},
 		"models_used": map[string]any{
 			"claude-a": map[string]any{"input_tokens": 1.0, "output_tokens": 2.0, "cache_read_input_tokens": 3.0, "cache_creation_input_tokens": 4.0, "cost_usd": 0.25},
@@ -350,11 +350,94 @@ func TestSessionDenialsKeepToolAndPath(t *testing.T) {
 		t.Fatalf("%+v %v", res, err)
 	}
 	raw, _ := os.ReadFile(res.Path)
-	if strings.Contains(string(raw), "TOPSECRET") || strings.Contains(string(raw), "CMD-SECRET") {
-		t.Errorf("record keeps content or command: %s", raw)
+	if strings.Contains(string(raw), "TOPSECRET") {
+		t.Errorf("record keeps content: %s", raw)
 	}
-	want := []any{map[string]any{"tool_name": "Write", "file_path": "notes/a.txt"}, map[string]any{"tool_name": "Bash"}}
+	want := []any{map[string]any{"tool_name": "Write", "file_path": "notes/a.txt"}, map[string]any{"tool_name": "Bash", "command": "echo CMD-SECRET"}}
 	if got := readJSON(t, res.Path)["permission_denials"]; !reflect.DeepEqual(got, want) {
 		t.Errorf("denials %v, want %v", got, want)
+	}
+}
+
+func TestSessionRecordsItselfInTheRunLock(t *testing.T) {
+	r, _, _ := fixture(t, claudeOut)
+	lock := filepath.Join(r.Root, filepath.FromSlash(lockFile))
+	seen := filepath.Join(r.Root, "lock-during")
+	script := "#!/bin/sh\ncat '" + lock + "' > '" + seen + "'\ncat <<'EOF'\n" + claudeOut + "EOF\n"
+	if err := os.WriteFile(r.Claude, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	release, err := AcquireLock(r.Root, "b", "B1-x", r.Now(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer release()
+	if _, err := r.Run(Spec{Phase: PhaseWork, Iteration: 1, Arg: "T2", Model: "sonnet"}); err != nil {
+		t.Fatal(err)
+	}
+	during := readJSON(t, seen)
+	if during["phase"] != "work" || during["task"] != "T2" || during["session_started"] != "2026-01-02T03:04:05Z" || during["spent"] != 0.0 {
+		t.Errorf("lock during the session: %v", during)
+	}
+	if during["branch"] != "b" || during["run"] != "B1-x" || during["started"] == nil || during["pid"] == nil {
+		t.Errorf("the lock lost its fields: %v", during)
+	}
+	after := readJSON(t, lock)
+	if after["phase"] != nil || after["task"] != nil || after["session_started"] != nil || after["spent"] != 0.5 {
+		t.Errorf("lock after the session: %v", after)
+	}
+	if after["branch"] != "b" || after["run"] != "B1-x" {
+		t.Errorf("the lock lost its fields: %v", after)
+	}
+	// A plan session has no task.
+	if _, err := r.Run(Spec{Phase: PhasePlan, Iteration: 0, Arg: "docs/briefs/x.md", Model: "opus"}); err != nil {
+		t.Fatal(err)
+	}
+	if during = readJSON(t, seen); during["phase"] != "plan" || during["task"] != nil || during["spent"] != 0.5 {
+		t.Errorf("lock during the plan session: %v", during)
+	}
+}
+
+func TestSessionLeavesNoLockWhereNoneIsHeld(t *testing.T) {
+	r, _, _ := fixture(t, claudeOut)
+	if _, err := r.Run(Spec{Phase: PhaseWork, Iteration: 1, Arg: "T2", Model: "sonnet"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(r.Root, filepath.FromSlash(lockFile))); !os.IsNotExist(err) {
+		t.Errorf("a session created a lock it did not hold: %v", err)
+	}
+}
+
+func TestCutCommandCountsCharactersAndMasksFirst(t *testing.T) {
+	r := &Runner{Env: []string{"API_TOKEN=s3cret-value-123456"}, Home: "/Users/miguel"}
+	long := strings.Repeat("é", 250)
+	got := r.cutCommand(long)
+	if want := strings.Repeat("é", 200) + "…"; got != want {
+		t.Errorf("multibyte cut: %d runes", len([]rune(got)))
+	}
+	if got := r.cutCommand(strings.Repeat("a", 200)); got != strings.Repeat("a", 200) {
+		t.Errorf("200 characters were cut")
+	}
+	// The secret sits across the cut position in the raw text; masked first, it is gone.
+	cmd := strings.Repeat("a", 170) + " s3cret-value-123456 tail"
+	if got := r.cutCommand(cmd); strings.Contains(got, "s3cret") || !strings.Contains(got, "<redacted:API_TOKEN>") {
+		t.Errorf("not redacted before the cut: %q", got)
+	}
+	if got := r.cutCommand("ls /Users/miguel/x"); got != "ls ~/x" {
+		t.Errorf("home not masked: %q", got)
+	}
+}
+
+func TestMaskDashedUserForm(t *testing.T) {
+	r := &Runner{Env: []string{}, Home: "/Users/miguel"}
+	for in, want := range map[string]string{
+		"-Users-miguel-repo":    "-Users-USER-repo",
+		"x/-home-miguel-a/y":    "x/-home-USER-a/y",
+		"miguel-says-hi":        "miguel-says-hi",
+		"-Users-miguelito-repo": "-Users-miguelito-repo",
+	} {
+		if got := r.Mask(in); got != want {
+			t.Errorf("Mask(%q) = %q, want %q", in, got, want)
+		}
 	}
 }

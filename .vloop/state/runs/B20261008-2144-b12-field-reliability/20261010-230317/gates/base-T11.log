@@ -1,0 +1,2 @@
+GATE FAIL: the worked example's run exited 9, want 0 — work changed .git/config — nothing was committed; restore it, then re-run
+vloop: work changed .git/config — nothing was committed; restore it, then re-run

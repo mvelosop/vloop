@@ -198,7 +198,7 @@ marked.
 
 - **S-1** A session is a fresh process; sessions share nothing but files.
 - **S-2** Sessions never commit, never set status and never move git refs. The
-  fence denies the commands. The fence is advisory; the driver is the boundary. It halts (exit 9) if a ref, `.git/config` or the git hooks change during a session or a gate, and restores what a session changed among the driver's inputs.
+  fence denies the commands. The fence is advisory; the driver is the boundary. It halts (exit 9) if a ref, a key of `.git/config` or the git hooks change during a session or a gate — a key of `.git/config` changes, other than those `run.git-config-ignore` and the built-in editor keys ignore — and restores what a session changed among the driver's inputs.
 - **S-4** A session writes nothing under `.git/` and nothing under `.vloop/` but `.vloop/tmp/` — the plan session also writes the plan and its gate folders.
 - **S-3** A work session does exactly one task. A review session judges it
   independently, from the diff and the acceptance, not from the proposal's

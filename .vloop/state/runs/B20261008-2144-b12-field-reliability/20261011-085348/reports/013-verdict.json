@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "vloop metrics takes each session's time from wall_ms when its record has it and from duration_ms otherwise, in every per-phase figure (plan, work, review, gate review), in agent time and in the per-task times.", "met": true, "evidence": "internal/runs/runs.go Session.TimeMS() returns wall_ms else duration_ms; internal/metrics/time.go uses it for plan, work, review and gate-review, agent_ms is work+review; internal/metrics/metrics.go byTask uses s.TimeMS(); TestTimeFromWallMSWhereRecorded covers both sources"},
+    {"criterion": "A brief's wall time runs from its first plan session's started to its last run commit; where no plan session record exists, it runs from the plan commit, as today.", "met": true, "evidence": "internal/metrics/time.go: planStart is the earliest plan session Started; wall = o.Run.Time - planStart, falling back to o.Plan.Time; TestTimeWallStartsAtFirstPlanSession asserts 69 min and 30 min cases"},
+    {"criterion": "For a brief whose records have no wall_ms, every number except the wall time is what v0.8.0 computes.", "met": true, "evidence": "TimeMS falls back to DurationMS and nothing else in Aggregate changed; the existing worked-example tests were not edited and pass"},
+    {"criterion": "Committed tests cover both sources of session time and both starts of the wall. The metrics tests whose wall time or table changes — TestMetricsCommandSummary, TestMetricsCommandCrossBrief (internal/cli/metrics_test.go), TestTimeCostWorkedExample (internal/metrics/time_test.go) and the worked-example summaries of B3, B4 and B6 (cmd/vloop/b3_e2e_test.go, b4_e2e_test.go, b6_e2e_test.go) — change only where the wall time changes, and each changed number is listed in the task's notes.", "met": true, "evidence": "new tests in internal/metrics/time_test.go:314 and following; diff touches only time_test.go additions and runs_test.go, none of the listed tests changed, and the go check passes; the proposal states no numbers changed"},
+    {"criterion": "No refactor from B15's list is folded in.", "met": true, "evidence": "diff is limited to WallMS/TimeMS plumbing and the wall start in internal/runs and internal/metrics"}
+  ],
+  "findings": [],
+  "notes": "The implementation was already in the tree from the earlier blocked attempt, so git diff HEAD shows only state changes; the review judged the code against base 615dd19. The work session's remark that internal/cli tests fail when VLOOP_PLAN_SHA256 is set is not part of this task."
+}

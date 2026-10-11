@@ -16,5 +16,5 @@ var (
 )
 
 func main() {
-	os.Exit(cli.Execute(cli.Build{Version: version, Commit: commit}, os.Args[1:], os.Stdout, os.Stderr))
+	os.Exit(cli.Execute(cli.Resolve(version, commit), os.Args[1:], os.Stdout, os.Stderr))
 }

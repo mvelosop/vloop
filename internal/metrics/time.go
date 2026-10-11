@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mvelosop/vloop/internal/runs"
 )
@@ -20,7 +21,7 @@ const (
 
 // Time is where a brief's time went, in milliseconds. Agent time is work plus
 // review; plan is reported apart. Gate and wall are nil when unknown: the shell
-// loop never recorded gate durations, and wall needs a run commit.
+// loop never recorded gate durations, and wall needs a run commit and runs from the first plan session's start.
 type Time struct {
 	AgentMS      int64  `json:"agent_ms"`
 	WorkMS       int64  `json:"work_ms"`
@@ -127,6 +128,7 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	var checks int64
 	checksKnown := false
 	iterations := 0
+	var planStart time.Time
 
 	for _, f := range m.Folders {
 		for _, it := range f.Iterations {
@@ -143,16 +145,19 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 		for _, s := range f.Sessions {
 			switch s.Phase {
 			case PhasePlan:
-				u.Time.PlanMS += s.DurationMS
+				if !s.Started.IsZero() && (planStart.IsZero() || s.Started.Before(planStart)) {
+					planStart = s.Started
+				}
+				u.Time.PlanMS += s.TimeMS()
 				u.Cost.Plan += s.CostUSD
 			case PhaseWork:
-				u.Time.WorkMS += s.DurationMS
+				u.Time.WorkMS += s.TimeMS()
 				u.Cost.Work += s.CostUSD
 			case PhaseReview:
-				u.Time.ReviewMS += s.DurationMS
+				u.Time.ReviewMS += s.TimeMS()
 				u.Cost.Review += s.CostUSD
 			case PhaseGateReview:
-				u.Time.GateReviewMS += s.DurationMS
+				u.Time.GateReviewMS += s.TimeMS()
 				u.Cost.GateReview += s.CostUSD
 			default:
 				continue
@@ -197,7 +202,11 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 		u.Time.ChecksMS = &checks
 	}
 	if o := m.Owned; o != nil && o.Run != nil {
-		w := o.Run.Time.Sub(o.Plan.Time).Milliseconds()
+		start := o.Plan.Time
+		if !planStart.IsZero() {
+			start = planStart
+		}
+		w := o.Run.Time.Sub(start).Milliseconds()
 		u.Time.WallMS = &w
 	}
 

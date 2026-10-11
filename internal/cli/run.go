@@ -70,6 +70,9 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 			if err != nil {
 				return configErr(g, cmd.OutOrStdout(), err)
 			}
+			if _, err := config.Get(root, "run.git-config-ignore"); err != nil {
+				return configErr(g, cmd.OutOrStdout(), err)
+			}
 
 			briefPath := ""
 			if len(args) == 1 {
@@ -107,7 +110,7 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 			pl := &driver.Planner{Root: root, Version: b.Version, Brief: briefPath,
 				PlanOnly: planOnly, Replan: replan,
 				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn,
-				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute}
+				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute, CostCeiling: budget.CostCeiling}
 			res, err := pl.Plan()
 			if err != nil {
 				var h *driver.Halt

@@ -73,7 +73,12 @@ but `.vloop/tmp/` (S-4).
 
 `run_id`, `iteration`, `phase`, `task` (none for `plan`), the configured
 `model` and `effort`, `models_used` (per model: tokens and cost), `started`,
-`duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A gate-review session's record is `session/v2` (iteration 0, no task). A missing
+`ended`, `wall_ms`, `duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A gate-review session's record is `session/v2` (iteration 0, no task). `ended` and `wall_ms` are the driver's own
+measurement around the session process (the wall time, including any time the
+machine slept); `duration_ms` stays what the CLI reported, and both are optional
+so older records stay readable, with no version change. A denied Bash call in
+`permission_denials` keeps its `command`, masked, redacted and cut to 200
+characters; other tools keep only the tool name and a `file_path`. A missing
 record is reported by the metrics, never silently skipped.
 
 ## Skills, as built

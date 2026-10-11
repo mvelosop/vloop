@@ -1,0 +1,28 @@
+{
+  "cost_usd": 0.182165,
+  "duration_ms": 33350,
+  "effort": null,
+  "is_error": false,
+  "iteration": 1,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 27836,
+      "cache_read_input_tokens": 131605,
+      "cost_usd": 0.182165,
+      "input_tokens": 10,
+      "output_tokens": 4448
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review",
+  "run_id": "B20261008-2144-b12-field-reliability",
+  "schema": "session/v1",
+  "started": "2026-10-10T23:44:58Z",
+  "task": "T1",
+  "turns": 7
+}

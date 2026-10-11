@@ -1,0 +1,6 @@
+changed wall times (for the run record):
+docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md: wall_ms 48581000 -> 50119000
+docs/briefs/B20261003-2049-gate-model.loop-brief.md: wall_ms 16803000 -> 19299000
+docs/briefs/B20261004-1434-interventions-options.loop-brief.md: wall_ms 11667000 -> 13140000
+docs/briefs/B20261005-0933-quality-pass.loop-brief.md: wall_ms 78351000 -> 80885000
+gate T11: ok

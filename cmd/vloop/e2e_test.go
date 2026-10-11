@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 	if runtime.GOOS == "windows" {
 		binPath += ".exe"
 	}
-	if out, err := exec.Command("go", "build", "-o", binPath, ".").CombinedOutput(); err != nil {
+	if out, err := exec.Command("go", "build", "-buildvcs=false", "-o", binPath, ".").CombinedOutput(); err != nil {
 		os.RemoveAll(dir)
 		panic("build failed: " + err.Error() + "\n" + string(out))
 	}
@@ -136,7 +136,7 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 			"shell="+defaultShell()+" (default)\nareas= (default)\n"+
 			"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n"+
 			"run.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\n"+
-			"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.gate-scratch= (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n", "")
+			"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.gate-scratch= (default)\nrun.git-config-ignore= (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n", "")
 	expect(t, s.run(nil, "config", "set", "language", "es"), 0, "", "")
 	expect(t, s.run(nil, "config", "set", "effort.review", "high"), 0, "", "")
 	expect(t, s.run([]string{"VLOOP_MODEL_WORK=opus"}, "config", "get", "model.work", "--json"), 0,

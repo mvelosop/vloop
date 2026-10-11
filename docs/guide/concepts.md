@@ -109,6 +109,12 @@ sends its findings back to the plan session; after two rounds a plan still
 failing is saved blocked and the run ends with exit 2. Amend the gates, then
 `vloop run` again to resume.
 
+The plan is stamped on load and stays `planning` until acceptance passes. If a
+gate or the review halts the run during acceptance (exit 9), restore what moved
+and run `vloop run <brief>` again: it prints `resuming acceptance of <run id>:
+round <n>`, runs no second plan session, re-runs the base gates of the round and
+goes on to the gate review. Work never starts without a passed gate review.
+
 **Checks.** A `[[check]]` in `.vloop/config.toml` is a command that proves a
 part of the repository still works, scoped by path globs. The driver runs every
 check on the base before planning (and refuses to plan with none, or with one
@@ -172,7 +178,15 @@ adds its own, one per way a run can end:
 | `6` | cost ceiling: `run.cost-ceiling` is reached | yes, with a higher ceiling |
 | `7` | session error: a session failed to run | no |
 | `8` | repeat blocked: a task blocked twice with nothing changed | no |
-| `9` | refs or repository configuration moved: a session or a gate changed a ref, `.git/config` or the git hooks; nothing was committed | no — restore the refs first |
+| `9` | refs or repository configuration moved: a session or a gate changed a ref, a key of `.git/config` (other than those `run.git-config-ignore` and the built-in editor keys ignore) or the git hooks; nothing was committed. The message names the key | no — restore the refs first; during acceptance, once restored, `vloop run` resumes acceptance, and the halted run's folder is kept and committed with the plan |
+
+While it runs, `vloop run` prints one line per finished session: its phase and
+task, how long it took, what it cost and the run's spend against the ceiling,
+for example `work T3 · 4m12s · $0.81 · run $3.10 / $40.00`. It warns once when
+the spend crosses 50% and again at 80% of `run.cost-ceiling`. From another
+terminal, `vloop status` shows the live run as `running: work T3 for 2m05s ·
+$3.10 of $40.00` (or `running: gate review · …`, or `running: between
+sessions`); the line reads the run lock and appears only while a run holds it.
 
 Resuming is running `vloop run` again on the work branch. Errors go to stderr as
 one line starting with `vloop: `, after any checks `vloop doctor` or a preflight
@@ -204,8 +218,11 @@ add --blame <file>:<line>` attribute a later bug to the brief that wrote the lin
 
 ### The stamped release build
 
-`go install` stamps no commit, so `vloop doctor` warns in this repository that
-the binary carries no commit. Build releases with the stamped build:
+Without a stamp, a binary names its commit from the VCS revision Go recorded
+(`-dirty` when the tree was modified) and its version from the module, so
+`go install` of a checkout carries a commit; one built with `-buildvcs=false`
+carries none, and `vloop doctor` warns in this repository that the binary
+carries no commit. Build releases with the stamped build:
 
 ```
 go build -ldflags "-X main.version=<v> -X main.commit=<sha>" -o vloop ./cmd/vloop

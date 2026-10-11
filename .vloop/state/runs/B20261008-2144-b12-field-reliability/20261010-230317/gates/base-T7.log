@@ -1,0 +1,2 @@
+GATE FAIL: status while a live run plans exited 1, want 0: vloop: no plan — vloop run <brief> makes one
+.vloop/state/gates/T7/gate.sh: line 8: 28669 Terminated: 15          ( cd "$R" && env PATH="$S:$PATH" "$B" run "$BRIEF" ) > "$t/run.out" 2> "$t/run.err"

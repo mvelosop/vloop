@@ -26,6 +26,13 @@ type lockRecord struct {
 	Branch  string `json:"branch"`
 	Started string `json:"started"`
 	Run     string `json:"run"`
+
+	// The session in flight and the run's spend, kept current by the holder
+	// as each session starts and ends. Phase is empty between sessions.
+	Phase          string  `json:"phase,omitempty"`
+	Task           string  `json:"task,omitempty"`
+	SessionStarted string  `json:"session_started,omitempty"`
+	Spent          float64 `json:"spent"`
 }
 
 func (l lockRecord) pid() int {
@@ -99,6 +106,56 @@ func AcquireLock(root, branch, runID string, now time.Time, warn func(format str
 		}
 		_ = os.Remove(path)
 	}, nil
+}
+
+// updateLock rewrites the run lock of the working tree at root through edit,
+// when this process holds it. It never creates a lock: without one, or with
+// another process's, it does nothing. The new record replaces the old by
+// rename, so a reader sees one complete record or the other.
+func updateLock(root string, edit func(*lockRecord)) {
+	path := filepath.Join(root, filepath.FromSlash(lockFile))
+	rec, _, regular := readLock(path)
+	if !regular || rec.pid() != os.Getpid() {
+		return
+	}
+	edit(&rec)
+	data, err := json.Marshal(rec)
+	if err != nil {
+		return
+	}
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".running-*")
+	if err != nil {
+		return
+	}
+	_, werr := tmp.Write(append(data, '\n'))
+	if cerr := tmp.Close(); werr == nil {
+		werr = cerr
+	}
+	if werr != nil || os.Rename(tmp.Name(), path) != nil {
+		_ = os.Remove(tmp.Name())
+	}
+}
+
+// Running is the session in flight of a live run, as its lock records it.
+type Running struct {
+	Phase          string  `json:"phase"`
+	Task           string  `json:"task,omitempty"`
+	SessionStarted string  `json:"session_started"`
+	Spent          float64 `json:"spent"`
+}
+
+// ReadRunning reads the run lock of the working tree at root. It reports false
+// when there is none, or when the process holding it is gone: a stale lock is
+// not a live run.
+func ReadRunning(root string) (Running, bool) {
+	rec, _, regular := readLock(filepath.Join(root, filepath.FromSlash(lockFile)))
+	if !regular {
+		return Running{}, false
+	}
+	if pid := rec.pid(); pid <= 0 || !processAlive(pid) {
+		return Running{}, false
+	}
+	return Running{Phase: rec.Phase, Task: rec.Task, SessionStarted: rec.SessionStarted, Spent: rec.Spent}, true
 }
 
 // readLock reads the lock at path without following a symlink. regular is false

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The plan is stamped (planning) as soon as it loads and becomes running only when the gate review passes; vloop run resumes acceptance with no plan session whenever a plan has not passed its gate review. A runs test now pins that the resumed acceptance folder is owned and its sessions counted.",
+  "files": ["internal/driver/plan.go", "cmd/vloop/run_git_test.go", "internal/runs/runs_test.go"],
+  "verified": "vloop task gate T2 logic (sh .vloop/state/gates/T2/gate.sh) exited 0 and printed gate T2: ok; go test ./internal/runs ./cmd/vloop passed.",
+  "notes": "Earlier attempt's plan.go work is unchanged in the tree. The review's finding that the resumed folder is not owned came from reading logOwns, which only serves shell-loop loop.log folders; vloop folders are owned by sitting under .vloop/state/runs/<run id>/, so no code change was needed, only the new test TestVloopResumedAcceptanceFolderIsOwned. Domain docs for the lifecycle and resume are T10's."
+}

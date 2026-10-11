@@ -1,8 +1,9 @@
 #!/bin/sh
-# Gate T7 — the remaining messages of brief Q3: brief check on drafts only says
-# nothing was checked; plugin path outside a vloop repository refuses and writes
-# nothing; intervention show prints the schema and options lines and omits an
-# empty brief; intervention migrate --dry-run prints repo-relative paths.
+# Gate T7 — vloop status shows the live run (brief R5, the lock and status):
+# while a stub plan session runs, with no plan yet, status prints the running
+# line and exits 0; during the work session of T1 it prints the plan's line,
+# then the running line, --json carries running, and the lock records the
+# session; with no live run (finished, or a lock whose process is gone) neither.
 set -u
 fail() { echo "GATE FAIL: $*" >&2; exit 1; }
 for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
@@ -10,72 +11,97 @@ unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT
 export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
 export GIT_AUTHOR_NAME=gate GIT_AUTHOR_EMAIL=gate@example.invalid GIT_COMMITTER_NAME=gate GIT_COMMITTER_EMAIL=gate@example.invalid
 G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+top=$(pwd -P)
 t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
 trap 'rm -rf "$t"' EXIT
 go build -o "$t/vloop" ./cmd/vloop || fail "go build ./cmd/vloop"
 GOOS=linux go build -o "$t/vloop-linux" ./cmd/vloop || fail "GOOS=linux go build ./cmd/vloop"
 GOOS=windows go build -o "$t/vloop.exe" ./cmd/vloop || fail "GOOS=windows go build ./cmd/vloop"
 B="$t/vloop"
-mkdir -p "$t/home" "$t/bin" && printf '#!/bin/sh\nexit 1\n' >"$t/bin/claude" && chmod +x "$t/bin/claude" || fail "fake home"
-export HOME="$t/home" PATH="$t/bin:$PATH"
-newrepo() {
-  R="$t/$1"
-  mkdir -p "$R" && git -C "$R" init -q -b main && git -C "$R" commit -q --allow-empty -m "gate base" || fail "git init $1"
+# Go keeps its caches under HOME unless told; keep the real ones across the change.
+GOMODCACHE=$(go env GOMODCACHE) GOCACHE=$(go env GOCACHE) GOPATH=$(go env GOPATH) || fail "go env"
+export GOMODCACHE GOCACHE GOPATH GOPROXY=off
+mkdir -p "$t/Users/gateuser" || fail mkdir
+export HOME="$t/Users/gateuser"
+N=B20260101-0900-demo
+BRIEF=docs/briefs/$N.loop-brief.md
+trust() { printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$R" >"$HOME/.claude.json"; }
+# runrepo <name> [<plan>]: a vloop repository on main with a ready brief and a
+# check (after $CONFIG, when set), committed; its own stub claude playing
+# <plan> (plan.json by default) from $t/<name>.stub.
+runrepo() {
+  R="$t/$1" S="$t/$1.stub"
+  mkdir -p "$R" "$S" && git -C "$R" init -q -b main || fail "git init $1"
+  cp "$G/claude" "$S/claude" && chmod +x "$S/claude" && cp "$G/${2:-plan.json}" "$S/plan.json" || fail "stub for $1"
+  git -C "$R" config user.name gate && git -C "$R" config user.email gate@example.invalid || fail "identity"
+  trust
   (cd "$R" && "$B" init </dev/null) >"$t/init.out" 2>&1 || fail "vloop init in $1: $(cat "$t/init.out")"
+  printf '%s[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' "${CONFIG:-}" >"$R/.vloop/config.toml" || fail config
+  mkdir -p "$R/docs/briefs" && echo x >"$R/docs/x.md" && cp "$G/brief.md" "$R/$BRIEF" || fail brief
+  git -C "$R" add -A && git -C "$R" commit -q -m harness || fail "commit $1"
 }
-run() { (cd "$R" && "$B" "$@") >"$t/out" 2>"$t/err"; }
+# vrun <out> [VAR=value...]: vloop run <brief> in $R with its stub on PATH;
+# stdout in $t/<out>, stderr in $t/<out>.err; returns vloop's exit code.
+vrun() {
+  o=$1; shift
+  trust
+  (cd "$R" && env PATH="$S:$PATH" "$@" "$B" run "$BRIEF") >"$t/$o" 2>"$t/$o.err"
+}
+# records <glob>: the session records of the brief's run folders matching <glob>, one path per line.
+records() { ls "$R"/.vloop/state/runs/"$N"/*/sessions/$1 2>/dev/null; }
 
-# --- brief check on drafts only ---
-newrepo drafts
-run brief new second-draft || fail "brief new: $(cat "$t/err")"
-n=$(cd "$R/docs/briefs" && ls *.loop-brief.md | wc -l | tr -d ' ')
-[ "$n" = 2 ] || fail "expected two draft briefs, found $n"
-(cd "$R" && "$B" brief check docs/briefs/*.loop-brief.md) >"$t/out" 2>"$t/err"; got=$?
-[ "$got" = 0 ] || fail "brief check on drafts only exited $got, want 0: $(cat "$t/out" "$t/err")"
-cat "$t/out" "$t/err" | grep -qx 'nothing checked: 2 draft brief(s) skipped' \
-  || fail "brief check on drafts only does not print 'nothing checked: 2 draft brief(s) skipped': $(cat "$t/out" "$t/err")"
-grep -q 'briefs ok' "$t/out" "$t/err" && fail "brief check on drafts only still says 'briefs ok'"
+runrepo s
+cat >"$S/script.sh" <<'EOF'
+case "$PHASE" in
+  plan) : >"$dir/in-plan"; STUB_SLEEP=3;;
+  work) : >"$dir/in-work"; STUB_SLEEP=3;;
+esac
+EOF
+trust
+(cd "$R" && env PATH="$S:$PATH" "$B" run "$BRIEF") >"$t/run.out" 2>"$t/run.err" &
+pid=$!
+# waitfor <file>: poll for the stub's marker, up to 30 s.
+waitfor() {
+  n=0
+  while [ ! -f "$1" ]; do
+    n=$((n + 1)); [ "$n" -gt 300 ] && { kill "$pid" 2>/dev/null; fail "the stubbed run never reached $(basename "$1"): $(tail -5 "$t/run.err")"; }
+    sleep 0.1
+  done
+}
+st() { (cd "$R" && "$B" status "$@") >"$t/st.out" 2>"$t/st.err"; }
 
-# --- plugin path outside a vloop repository ---
-REFUSE="vloop: not in a vloop repository — run vloop init first"
-mkdir -p "$t/plain" "$t/gitonly" && git -C "$t/gitonly" init -q -b main || fail "dirs"
-for d in "$t/plain" "$t/gitonly"; do
-  (cd "$d" && "$B" plugin path) >"$t/out" 2>"$t/err"; got=$?
-  [ "$got" = 1 ] || fail "plugin path in $(basename "$d") exited $got, want 1 — stdout: $(cat "$t/out")"
-  [ "$(cat "$t/err")" = "$REFUSE" ] || fail "plugin path in $(basename "$d") printed '$(cat "$t/err")', want '$REFUSE'"
-  [ -e "$d/.vloop" ] && fail "plugin path outside a vloop repository wrote $(basename "$d")/.vloop"
-done
-[ -e "$t/home/.vloop" ] && fail "plugin path wrote under the home directory"
-newrepo plug
-run plugin path || fail "plugin path in a vloop repository failed: $(cat "$t/err")"
-grep -q '^\.vloop/tmp/plugin/' "$t/out" || fail "plugin path in a vloop repository does not print .vloop/tmp/plugin/<version>: $(cat "$t/out")"
+# --- planning, no plan yet: the running line, exit 0 ---
+waitfor "$S/in-plan"
+sleep 1
+[ -e "$R/.vloop/state/state.json" ] && fail "the fixture wrote the plan before the status check"
+st; got=$?
+[ "$got" = 0 ] || { kill "$pid"; fail "status while a live run plans exited $got, want 0: $(cat "$t/st.err")"; }
+grep -Eq '^running: plan for 0m0[0-3]s · \$0\.00 of \$40\.00$' "$t/st.out" || { kill "$pid"; fail "status while planning printed: $(cat "$t/st.out")"; }
 
-# --- intervention show ---
-newrepo show
-BRIEF=$(cd "$R/docs/briefs" && ls *.loop-brief.md | head -1) || fail "no brief"
-BRIEF=${BRIEF%.md}
-run intervention add "no brief, no options" --phase run --kind repair --automatable no --by operator || fail "add: $(cat "$t/err")"
-I1=$(basename "$(cat "$t/out")" .md)
-run intervention add "a brief and two options" --brief "$BRIEF" --phase halt --kind repair --automatable partly --by both \
-  --option "replace the gate" --option "reset the task" --recommended 1 --why "the gate is wrong" --decided-option 2 \
-  || fail "add: $(cat "$t/err")"
-I2=$(basename "$(cat "$t/out")" .md)
-run intervention show "$I1" || fail "show $I1: $(cat "$t/err")"
-grep -q '^schema: *intervention/v2 *$' "$t/out" || fail "intervention show does not print a 'schema: intervention/v2' line: $(cat "$t/out")"
-grep -q '^options: *0 *$' "$t/out" || fail "intervention show does not print an 'options: 0' line"
-grep -q '^brief:' "$t/out" && fail "intervention show prints an empty brief line for a record with no brief"
-run intervention show "$I2" || fail "show $I2: $(cat "$t/err")"
-grep -q "^brief: *$BRIEF *\$" "$t/out" || fail "intervention show does not print the record's brief: $(cat "$t/out")"
-grep -q '^options: *2 *$' "$t/out" || fail "intervention show does not print an 'options: 2' line for a record with two options"
-grep -q '^schema: *intervention/v2 *$' "$t/out" || fail "intervention show does not print the schema line for $I2"
+# --- working T1: the plan's line, then the running line; the lock records the session ---
+waitfor "$S/in-work"
+sleep 1
+spent=$(jq -s 'map(.cost_usd) | add // 0' $(records '*.json') /dev/null)
+st; got=$?
+[ "$got" = 0 ] || { kill "$pid"; fail "status during a work session exited $got: $(cat "$t/st.err")"; }
+want=$(printf 'running: work T1 for 0m0[0-3]s · \\$%.2f of \\$40\\.00' "$spent" | sed 's/\./\\./')
+sed -n 2p "$t/st.out" | grep -Eq "^$want\$" || { kill "$pid"; fail "status during the work session of T1 printed (want 'running: work T1 for 0m0<s>s · \$$(printf '%.2f' "$spent") of \$40.00' second): $(cat "$t/st.out")"; }
+head -1 "$t/st.out" | grep -q "^$N — " || { kill "$pid"; fail "status's first line is not the plan's: $(head -1 "$t/st.out")"; }
+st --json; got=$?
+jq -e --argjson s "$spent" '.running.phase == "work" and .running.task == "T1" and ((.running.spent - $s) | fabs) < 0.001 and .running.ceiling == 40
+  and (.running.session_started | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"))' "$t/st.out" >/dev/null \
+  || { kill "$pid"; fail "status --json during the work session of T1: $(cat "$t/st.out")"; }
+jq -e --argjson s "$spent" '.phase == "work" and .task == "T1" and (.session_started | type) == "string" and ((.spent - $s) | fabs) < 0.001' "$R/.vloop/tmp/.running" >/dev/null \
+  || { kill "$pid"; fail "the run lock does not record the session in flight: $(cat "$R/.vloop/tmp/.running")"; }
 
-# --- intervention migrate --dry-run ---
-V1=I20260101-0900-a-v1-record
-mkdir -p "$R/.vloop/interventions" && cp "$G/$V1.md" "$R/.vloop/interventions/$V1.md" || fail "v1 fixture"
-for sub in . docs; do
-  (cd "$R/$sub" && "$B" intervention migrate --dry-run) >"$t/out" 2>"$t/err" || fail "migrate --dry-run in $sub: $(cat "$t/err")"
-  grep -Fq ".vloop/interventions/$V1.md" "$t/out" || fail "migrate --dry-run (from $sub) does not print the repo-relative path .vloop/interventions/$V1.md: $(cat "$t/out")"
-  grep -Fq "$t" "$t/out" && fail "migrate --dry-run prints an absolute path"
-done
-grep -q '^schema:' "$R/.vloop/interventions/$V1.md" && fail "migrate --dry-run wrote the record"
+wait "$pid"; got=$?
+[ "$got" = 0 ] || fail "the stubbed run exited $got, want 0 — $(tail -5 "$t/run.err")"
+
+# --- no live run: no running line, no running key ---
+st; grep -q '^running:' "$t/st.out" && fail "status prints a running line with no live run"
+st --json; jq -e 'has("running") | not' "$t/st.out" >/dev/null || fail "status --json has running with no live run"
+sh -c 'exit 0' & dead=$!; wait "$dead"
+jq -n --argjson p "$dead" '{pid: $p, branch: "x", started: "2026-01-01T00:00:00Z", run: "x", phase: "work", task: "T1", session_started: "2026-01-01T00:00:00Z", spent: 1}' >"$R/.vloop/tmp/.running"
+st --json; jq -e 'has("running") | not' "$t/st.out" >/dev/null || fail "status --json shows a run whose process is gone"
+rm -f "$R/.vloop/tmp/.running"
 echo "gate T7: ok"

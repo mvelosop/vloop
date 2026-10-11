@@ -66,7 +66,8 @@ type Result struct {
 	Turns    int
 	IsError  bool
 	Denials  int
-	TimedOut bool // the session was killed for running past the timeout
+	TimedOut bool          // the session was killed for running past the timeout
+	Wall     time.Duration // how long the session ran, by the driver's clock
 }
 
 // Prompt is the slash command a session of the phase starts with.
@@ -216,8 +217,30 @@ func (r *Runner) Mask(s string) string {
 		}
 		re := regexp.MustCompile(flags + `(` + pathSep + `(?:` + strings.Join(dirs, "|") + `)` + pathSep + `)` + regexp.QuoteMeta(user) + pathEnd)
 		s = re.ReplaceAllString(s, "${1}USER${2}")
+		// Claude Code's project folders spell a path with dashes.
+		dashed := regexp.MustCompile(`(-(?:Users|home)-)` + regexp.QuoteMeta(user) + `-`)
+		s = dashed.ReplaceAllString(s, "${1}USER-")
 	}
 	return s
+}
+
+// maxCommand is how many characters of a denied Bash command a record keeps.
+const maxCommand = 200
+
+// cutCommand masks a command, then keeps its first maxCommand characters, with
+// … appended when it was cut. The masking comes first so the cut never splits
+// a secret or a path into something the masks no longer recognize.
+func (r *Runner) cutCommand(c string) string {
+	c = r.Mask(c)
+	if n := 0; len(c) > maxCommand {
+		for i := range c {
+			if n == maxCommand {
+				return c[:i] + "…"
+			}
+			n++
+		}
+	}
+	return c
 }
 
 // maskValue masks every string, and every object key, of a decoded JSON value.
@@ -317,9 +340,20 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 
-	started := r.now().UTC()
+	// Wall clock, not monotonic: the measurement includes any time the machine slept.
+	started := r.now().Round(0).UTC()
+	spent := spendIn(r.RunDir)
+	updateLock(r.Root, func(l *lockRecord) {
+		l.Phase, l.Task, l.SessionStarted, l.Spent = s.Phase, task, started.Format(time.RFC3339), spent
+	})
 	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
-	res := Result{TimedOut: timedOut}
+	ended := r.now().Round(0).UTC()
+	// However it ended, the session is over: record the spend, clear the session.
+	defer func() {
+		spent := spendIn(r.RunDir)
+		updateLock(r.Root, func(l *lockRecord) { l.Phase, l.Task, l.SessionStarted, l.Spent = "", "", "", spent })
+	}()
+	res := Result{TimedOut: timedOut, Wall: max(ended.Sub(started), 0)}
 	if runErr != nil {
 		ee, ok := runErr.(*exec.ExitError)
 		if !ok {
@@ -343,7 +377,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		r.Logf("SESSION RECORD MISSING %s %s (iteration %d)", s.Phase, orDash(task), s.Iteration)
 		return res, nil
 	}
-	rec, out := r.record(s, task, started, raw)
+	rec, out := r.record(s, task, started, ended, raw)
 	data, err := r.maskRecord(rec)
 	if err != nil {
 		return res, err
@@ -381,7 +415,7 @@ type output struct {
 
 // record maps claude's JSON onto session/v1 (session/v2 for a gate review). Fields claude did not print are
 // zero values of the same type; none is made up beyond that.
-func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]json.RawMessage) (map[string]any, output) {
+func (r *Runner) record(s Spec, task string, started, ended time.Time, raw map[string]json.RawMessage) (map[string]any, output) {
 	var o output
 	get := func(k string, v any) { _ = json.Unmarshal(raw[k], v) }
 	var dur float64
@@ -395,6 +429,7 @@ func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]j
 		Input struct {
 			Path     string `json:"file_path"`
 			NotePath string `json:"notebook_path"`
+			Command  string `json:"command"`
 		} `json:"tool_input"`
 	}
 	get("permission_denials", &denials)
@@ -405,6 +440,9 @@ func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]j
 			if d.Input.Path == "" {
 				kept["file_path"] = d.Input.NotePath
 			}
+		}
+		if d.Tool == "Bash" && d.Input.Command != "" {
+			kept["command"] = r.cutCommand(d.Input.Command)
 		}
 		b, _ := json.Marshal(kept)
 		o.Denials = append(o.Denials, b)
@@ -450,7 +488,9 @@ func (r *Runner) record(s Spec, task string, started time.Time, raw map[string]j
 		"effort":             effort,
 		"models_used":        used,
 		"started":            started.Format(time.RFC3339),
+		"ended":              ended.Format(time.RFC3339),
 		"duration_ms":        int64(dur),
+		"wall_ms":            max(ended.Sub(started).Milliseconds(), 0),
 		"cost_usd":           o.Cost,
 		"turns":              o.Turns,
 		"is_error":           o.IsError,

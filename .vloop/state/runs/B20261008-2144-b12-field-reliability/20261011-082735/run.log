@@ -1,0 +1,21 @@
+── iteration 10 (1 this run) · T3 · 5/11 done ──
+   Record ended and wall_ms, the driver's own measurement, on every session record
+   check go
+   review: PASS
+   T3 done
+── iteration 11 (2 this run) · T4 · 6/11 done ──
+   Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
+   GATE DISPUTE T4 — blocked for the operator; no review, no attempt charged
+   T4 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+── iteration 12 (3 this run) · T5 · 6/11 done ──
+   Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
+   check go
+   review: PASS
+   T5 done
+3 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261008-2144-b12-field-reliability/20261011-082735  (3 iteration(s) this run)
+plan:   7/11 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

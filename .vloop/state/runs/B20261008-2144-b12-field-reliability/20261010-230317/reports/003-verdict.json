@@ -1,0 +1,21 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "As soon as the plan session's plan loads and passes its checks, the driver stamps run_id, brief and branch and saves it; the status stays planning until acceptance passes and becomes running then.", "met": true, "evidence": "internal/driver/plan.go acceptPlan: stampPlan(..., \"planning\") right after loadPlan, before baseGates; Status = \"running\" only when the gate review passes"},
+    {"criterion": "A halt (any exit) or a killed driver during acceptance leaves the plan, its gate folders and the run folder in place.", "met": true, "evidence": "only rejected-plan paths remove the plan; the halt tests in cmd/vloop/run_git_test.go assert status planning after exit 9"},
+    {"criterion": "vloop run <brief>, or bare vloop run, on the plan's branch with a plan whose status is planning, or whose gate review verdict is not PASS, resumes acceptance: no plan session runs; the round it was in continues with the base gates (all of them re-run, even ones that passed before the halt) and then the gate review; the rounds already spent count toward the two. It prints `resuming acceptance of <run id>: round <n>`.", "met": true, "evidence": "needsAcceptance + accepting branch in Plan(), startRound from plannedSessions, say(\"resuming acceptance of %s: round %d\"); tests assert one plan session and the message"},
+    {"criterion": "Work never starts on a plan whose gate review has not passed. A plan the gate review failed twice (status blocked) behaves as today; a plan rejected by its checks (exit 1) is still removed, as today.", "met": true, "evidence": "needsAcceptance excludes blocked; reject paths unchanged; tests check gate-review order before work"},
+    {"criterion": "The clean-tree preflight tolerates the plan, its gate folders and the brief's earlier run folders when it resumes acceptance, as it does when it resumes work.", "met": true, "evidence": "requireCleanTree is called with resuming=true, which tolerates .vloop/state/"},
+    {"criterion": "The halted run folder is kept: the plan commit includes it as well as the resumed run's folder, and vloop metrics counts its sessions — the resumed folder's log says it resumed the run id, so the ownership rule owns it.", "met": false, "evidence": "internal/runs/runs.go:290 logOwns matches the text \"resuming <run id>\" followed by space/end; the new log line is \"resuming acceptance of <run id>: round n\", which does not match (and the resumed folder has no \"planning from\" line), so the resumed folder's sessions are not owned; no test checks metrics"},
+    {"criterion": "Violations the review must rule against: any path where acceptance resumes by planning again; any path where work starts without a passed gate review.", "met": true, "evidence": "no path found in the diff where accepting calls session() or work proceeds without PASS"},
+    {"criterion": "Committed end-to-end tests in cmd/vloop cover a halt in the base gates and a halt in the gate review, each resumed with no second plan session and the gate review run before any work. TestRunGateReviewFailsTwiceThenResumes and TestRunResumeAllowsStateEdits change only if their resume paths change wording.", "met": true, "evidence": "TestRunBaseGateHaltResumesAcceptance and TestRunGateReviewHaltResumesAcceptance in cmd/vloop/run_git_test.go; existing tests untouched"},
+    {"criterion": "No refactor from B15's list is folded in.", "met": true, "evidence": "diff limited to plan.go acceptance paths and new tests"}
+  ],
+  "findings": [
+    {"summary": "the resumed acceptance folder's log line does not match the ownership rule (\"resuming <run id>\"), so vloop metrics will not own or count its sessions (gate review)", "kind": "bug"},
+    {"summary": "no test asserts that the metrics ownership covers the resumed folder", "kind": "gate-gap"}
+  ],
+  "notes": "Fix: make the log line contain \"resuming <run id>\" (e.g. \"resuming <run id>: acceptance, round n\" is not the required printed text, so log an additional line, or have logOwns also accept \"resuming acceptance of <run id>\"), and add a test over runs ownership."
+}

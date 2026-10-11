@@ -3,7 +3,8 @@
   "permissions": {
     "allow": [
       "Bash(go:*)",
-      "Bash(gofmt:*)"
+      "Bash(gofmt:*)",
+      "Edit(./.vloop/state/gates/**)"
     ]
   }
 }
