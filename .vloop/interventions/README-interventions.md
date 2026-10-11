@@ -61,6 +61,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | no | no-options | [I20261004-1435-b10-s-forks-settled-options-as-body-sect](I20261004-1435-b10-s-forks-settled-options-as-body-sect.md) |
 | design | decision | no | adjusted | [I20261005-0935-b11-s-forks-settled-user-facing-quality](I20261005-0935-b11-s-forks-settled-user-facing-quality.md) |
 | design | decision | partly | recommended | [I20261008-2146-b12-s-forks-settled-a-key-aware-git-conf](I20261008-2146-b12-s-forks-settled-a-key-aware-git-conf.md) |
+| design | decision | partly | recommended | [I20261011-2104-b13-s-forks-settled-doctor-warns-on-a-mi](I20261011-2104-b13-s-forks-settled-doctor-warns-on-a-mi.md) |
 | design | direction | no | no-options | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | no-options | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | no-options | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
