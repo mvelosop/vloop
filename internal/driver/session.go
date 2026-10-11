@@ -320,8 +320,17 @@ func (r *Runner) Run(s Spec) (Result, error) {
 
 	// Wall clock, not monotonic: the measurement includes any time the machine slept.
 	started := r.now().Round(0).UTC()
+	spent := spendIn(r.RunDir)
+	updateLock(r.Root, func(l *lockRecord) {
+		l.Phase, l.Task, l.SessionStarted, l.Spent = s.Phase, task, started.Format(time.RFC3339), spent
+	})
 	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
 	ended := r.now().Round(0).UTC()
+	// However it ended, the session is over: record the spend, clear the session.
+	defer func() {
+		spent := spendIn(r.RunDir)
+		updateLock(r.Root, func(l *lockRecord) { l.Phase, l.Task, l.SessionStarted, l.Spent = "", "", "", spent })
+	}()
 	res := Result{TimedOut: timedOut, Wall: max(ended.Sub(started), 0)}
 	if runErr != nil {
 		ee, ok := runErr.(*exec.ExitError)

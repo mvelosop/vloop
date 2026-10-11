@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The run lock (.vloop/tmp/.running) keeps its fields and also records phase (plan, gate review, work or review), task (absent for plan and gate review), session_started (RFC 3339 UTC) and spent, updated as each session starts and ends.", "met": true, "evidence": "internal/driver/safety.go lockRecord gains phase/task/session_started/spent (omitempty); internal/driver/session.go updates the lock at session start and in a defer at end; TestSessionRecordsItselfInTheRunLock reads the lock during and after the session and checks the old fields survive."},
+    {"criterion": "vloop status, while a live run holds the lock, prints after its first line `running: <phase>[ <task>] for <m>m<ss>s · $<spent> of $<ceiling>`; with no plan yet but a live run planning, it prints the running line and exits 0.", "met": true, "evidence": "internal/cli/status.go runningLine prints the line after the header; the ErrNoPlan branch prints only the running line and returns nil; TestStatusRunningLine and TestStatusRunningWhilePlanning match the format by regexp."},
+    {"criterion": "vloop status --json gains \"running\": {\"phase\", \"task\", \"session_started\", \"spent\", \"ceiling\"}, absent when no live run holds the lock — a lock whose process is gone is not a live run.", "met": true, "evidence": "runningJSON is omitempty on the status object; driver.ReadRunning returns false unless processAlive(pid); TestStatusNoRunningWithoutLiveRun covers no lock and a dead pid."},
+    {"criterion": "Committed tests cover the lock's new fields, the running line during a session and while planning, and its absence with no live run or a stale lock. The status tests (internal/cli/status_test.go) change only where a live lock is planted; docs/guide/commands.md is regenerated if any help text changed.", "met": true, "evidence": "The diff to status_test.go and session_test.go is additions only; no pre-existing test is edited. The help text is unchanged and docs/ is untouched."},
+    {"criterion": "No refactor from B15's list is folded in.", "met": true, "evidence": "The diff has only the lock, Run and status changes plus the small encodeJSON helper used by the new code."}
+  ],
+  "findings": [],
+  "notes": "Spec gap: the ceiling is read from config in status, so a --cost-ceiling flag override on the run is not reflected in the running line. Between sessions the phase is empty and the line prints 'running: between sessions', which the brief does not specify."
+}

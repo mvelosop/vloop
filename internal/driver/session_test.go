@@ -358,3 +358,52 @@ func TestSessionDenialsKeepToolAndPath(t *testing.T) {
 		t.Errorf("denials %v, want %v", got, want)
 	}
 }
+
+func TestSessionRecordsItselfInTheRunLock(t *testing.T) {
+	r, _, _ := fixture(t, claudeOut)
+	lock := filepath.Join(r.Root, filepath.FromSlash(lockFile))
+	seen := filepath.Join(r.Root, "lock-during")
+	script := "#!/bin/sh\ncat '" + lock + "' > '" + seen + "'\ncat <<'EOF'\n" + claudeOut + "EOF\n"
+	if err := os.WriteFile(r.Claude, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	release, err := AcquireLock(r.Root, "b", "B1-x", r.Now(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer release()
+	if _, err := r.Run(Spec{Phase: PhaseWork, Iteration: 1, Arg: "T2", Model: "sonnet"}); err != nil {
+		t.Fatal(err)
+	}
+	during := readJSON(t, seen)
+	if during["phase"] != "work" || during["task"] != "T2" || during["session_started"] != "2026-01-02T03:04:05Z" || during["spent"] != 0.0 {
+		t.Errorf("lock during the session: %v", during)
+	}
+	if during["branch"] != "b" || during["run"] != "B1-x" || during["started"] == nil || during["pid"] == nil {
+		t.Errorf("the lock lost its fields: %v", during)
+	}
+	after := readJSON(t, lock)
+	if after["phase"] != nil || after["task"] != nil || after["session_started"] != nil || after["spent"] != 0.5 {
+		t.Errorf("lock after the session: %v", after)
+	}
+	if after["branch"] != "b" || after["run"] != "B1-x" {
+		t.Errorf("the lock lost its fields: %v", after)
+	}
+	// A plan session has no task.
+	if _, err := r.Run(Spec{Phase: PhasePlan, Iteration: 0, Arg: "docs/briefs/x.md", Model: "opus"}); err != nil {
+		t.Fatal(err)
+	}
+	if during = readJSON(t, seen); during["phase"] != "plan" || during["task"] != nil || during["spent"] != 0.5 {
+		t.Errorf("lock during the plan session: %v", during)
+	}
+}
+
+func TestSessionLeavesNoLockWhereNoneIsHeld(t *testing.T) {
+	r, _, _ := fixture(t, claudeOut)
+	if _, err := r.Run(Spec{Phase: PhaseWork, Iteration: 1, Arg: "T2", Model: "sonnet"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(r.Root, filepath.FromSlash(lockFile))); !os.IsNotExist(err) {
+		t.Errorf("a session created a lock it did not hold: %v", err)
+	}
+}

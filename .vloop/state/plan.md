@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/11 done** · iteration 6
+**Status:** running · **4/11 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:28:19Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:38:13Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [ ] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
 - [ ] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
 - [x] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
-- [ ] **T7** — Record the session in flight in the run lock and show the live run in vloop status
+- [x] **T7** — Record the session in flight in the run lock and show the live run in vloop status
 - [ ] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did
 - [ ] **T9** — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
 - [ ] **T10** — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
@@ -168,7 +168,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Record the session in flight in the run lock and show the live run in vloop status
 
-`pending` · depends on: T6
+`done` · depends on: T6
 
 vloop status reads only the plan, so while a run is going it cannot say which session is running, for how long, or what the run has spent — and before the plan exists it fails. This task records the session in flight and the spend in the run lock as sessions start and end, and makes status show a running line (and --json a running object) whenever a live run holds the lock, including while it plans.
 

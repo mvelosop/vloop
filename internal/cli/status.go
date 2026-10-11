@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/driver"
 	"github.com/mvelosop/vloop/internal/schema"
 	"github.com/mvelosop/vloop/internal/state"
 )
@@ -94,6 +96,56 @@ func writeTaskLines(out io.Writer, lines []taskLine) {
 	}
 }
 
+func encodeJSON(out io.Writer, v any) error {
+	enc := json.NewEncoder(out)
+	enc.SetEscapeHTML(false)
+	return enc.Encode(v)
+}
+
+type runningJSON struct {
+	Phase          string  `json:"phase"`
+	Task           *string `json:"task,omitempty"`
+	SessionStarted string  `json:"session_started"`
+	Spent          float64 `json:"spent"`
+	Ceiling        float64 `json:"ceiling"`
+}
+
+// costCeiling is the run's ceiling as the config states it; 0 when unreadable.
+func costCeiling(root string) float64 {
+	b, _ := driver.ResolveBudgets(root, nil)
+	return b.CostCeiling
+}
+
+func newRunningJSON(root string, r driver.Running) *runningJSON {
+	j := &runningJSON{Phase: r.Phase, SessionStarted: r.SessionStarted, Spent: r.Spent, Ceiling: costCeiling(root)}
+	if r.Task != "" {
+		t := r.Task
+		j.Task = &t
+	}
+	return j
+}
+
+// runningLine is the line status prints for a live run: the session in
+// flight and for how long, and the spend against the ceiling.
+func runningLine(root string, r driver.Running) string {
+	who := r.Phase
+	switch {
+	case who == "":
+		who = "between sessions"
+	case who == driver.PhaseGateReview:
+		who = "gate review"
+	}
+	if r.Task != "" {
+		who += " " + r.Task
+	}
+	line := "running: " + who
+	if t, err := time.Parse(time.RFC3339, r.SessionStarted); err == nil {
+		secs := max(int(time.Since(t).Round(time.Second)/time.Second), 0)
+		line += fmt.Sprintf(" for %dm%02ds", secs/60, secs%60)
+	}
+	return fmt.Sprintf("%s · $%.2f of $%.2f", line, r.Spent, costCeiling(root))
+}
+
 func newStatus(g *Globals) *cobra.Command {
 	var markdown bool
 	cmd := &cobra.Command{
@@ -105,6 +157,22 @@ func newStatus(g *Globals) *cobra.Command {
 			if markdown && g.JSON {
 				return Usage(errors.New("--json and --markdown are mutually exclusive"))
 			}
+			var running *driver.Running
+			if root, err := g.root(); err == nil {
+				if r, ok := driver.ReadRunning(root); ok {
+					running = &r
+					// A run still planning has no plan yet; that is not a failure.
+					if _, lerr := state.Load(root); errors.Is(lerr, state.ErrNoPlan) && !markdown {
+						if g.JSON {
+							return encodeJSON(out, struct {
+								Running *runningJSON `json:"running"`
+							}{newRunningJSON(root, r)})
+						}
+						fmt.Fprintln(out, runningLine(root, r))
+						return nil
+					}
+				}
+			}
 			p, err := loadPlan(g, out)
 			if err != nil {
 				return err
@@ -115,20 +183,28 @@ func newStatus(g *Globals) *cobra.Command {
 				_, err = io.WriteString(out, p.Markdown())
 				return err
 			case g.JSON:
-				enc := json.NewEncoder(out)
-				enc.SetEscapeHTML(false)
-				return enc.Encode(struct {
-					RunID     string     `json:"run_id"`
-					Status    string     `json:"status"`
-					Iteration int        `json:"iteration"`
-					Done      int        `json:"done"`
-					Total     int        `json:"total"`
-					Blocked   int        `json:"blocked"`
-					Tasks     []taskLine `json:"tasks"`
-				}{p.RunID, p.Status, p.Iteration, done, len(p.Tasks), blocked, taskLines(p)})
+				var rj *runningJSON
+				if running != nil {
+					root, _ := g.root()
+					rj = newRunningJSON(root, *running)
+				}
+				return encodeJSON(out, struct {
+					RunID     string       `json:"run_id"`
+					Status    string       `json:"status"`
+					Iteration int          `json:"iteration"`
+					Done      int          `json:"done"`
+					Total     int          `json:"total"`
+					Blocked   int          `json:"blocked"`
+					Tasks     []taskLine   `json:"tasks"`
+					Running   *runningJSON `json:"running,omitempty"`
+				}{p.RunID, p.Status, p.Iteration, done, len(p.Tasks), blocked, taskLines(p), rj})
 			}
 			fmt.Fprintf(out, "%s — %s · %d/%d done · %d blocked · iteration %d\n",
 				p.RunID, p.Status, done, len(p.Tasks), blocked, p.Iteration)
+			if running != nil {
+				root, _ := g.root()
+				fmt.Fprintln(out, runningLine(root, *running))
+			}
 			writeTaskLines(out, taskLines(p))
 			return nil
 		},
