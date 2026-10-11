@@ -170,6 +170,13 @@ Seeds from schema changes, the shape that recurs (`D20261004-1142` ×2,
   feeds it a record of that version (plan, work and review records are
   session/v1, a gate review's session/v2).
 
+The same shape for config keys (B12's `D20261011-1455`):
+- adding or removing a config key changes `config list`, pinned by
+  `TestConfigListDefaults`, `TestConfigListJSONOrderAndNull`
+  (`internal/cli/config_test.go`), `TestDefaultsEveryRow`
+  (`internal/config/config_test.go`) and `TestWorkedExampleEnglishSession`
+  (`cmd/vloop/e2e_test.go`): the brief's must-change list names all four.
+
 A guideline helps the planner write the gate; catching a wrong one is P4's
 (B12 T3's gate becomes a gate-review eval case).
 
