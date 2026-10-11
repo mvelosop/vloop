@@ -95,3 +95,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** A denied Bash call's permission_denials entry now keeps command, masked and redacted then cut to 200 characters with … appended; other tools are unchanged. Mask also replaces the dashed -Users-<user>- and -home-<user>- forms with USER.
 - **Files:** internal/driver/session.go, internal/driver/session_test.go
 - **Notes for next iteration:** Runner.cutCommand masks first (Mask), then cuts by runes, so a secret is never split by the cut. The dashed form is handled in Runner.Mask, so it applies to records, run.log and stderr captures alike. TestSessionDenialsKeepToolAndPath now expects the Bash command; added TestCutCommandCountsCharactersAndMasksFirst and TestMaskDashedUserForm. No past record under .vloop/ was rewritten.
+
+## Run ended — blocked
+
+- **Run:** `B20261008-2144-b12-field-reliability` · 3 iteration(s) this run
+- **Plan:** 7/11 done, 1 blocked

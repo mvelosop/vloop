@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/11 done** · iteration 12
+**Status:** blocked · **7/11 done** · iteration 12
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T08:52:44Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T08:52:45Z
 
 ## Progress
 
