@@ -5,9 +5,9 @@
   "base": "615dd19c754de2f82c977c0434d796dcd214955f",
   "branch": "B20261008-2144-b12-field-reliability",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-10T23:21:09Z",
-  "updated": "2026-10-11T00:03:30Z",
+  "updated": "2026-10-11T00:13:54Z",
   "shell": "sh",
   "checks": [
     {
@@ -102,9 +102,9 @@
         "No refactor from B15's list is folded in."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "the resumed acceptance folder's log line does not match the ownership rule (\"resuming <run id>\"), so vloop metrics will not own or count its sessions (gate review); no test asserts that the metrics ownership covers the resumed folder"
+      "notes": ""
     },
     {
       "id": "T3",

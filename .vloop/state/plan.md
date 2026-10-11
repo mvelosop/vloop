@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/11 done** · iteration 3
+**Status:** running · **2/11 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:03:30Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T00:13:54Z
 
 ## Progress
 
 - [x] **T1** — Make the .git/config guard compare parsed keys, ignore editor bookkeeping, and name what changed · 1 attempt(s)
-- [ ] **T2** — Stamp the plan on load and resume acceptance after a halt instead of planning again · 1 attempt(s)
+- [x] **T2** — Stamp the plan on load and resume acceptance after a halt instead of planning again · 1 attempt(s)
 - [ ] **T3** — Record ended and wall_ms, the driver's own measurement, on every session record
 - [ ] **T4** — Take session time from wall_ms in the metrics, and start a brief's wall at its first plan session
 - [ ] **T5** — Keep a denied Bash call's command, masked, redacted and cut to 200 characters, and mask the dashed user form
@@ -52,7 +52,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Stamp the plan on load and resume acceptance after a halt instead of planning again
 
-`pending` · 1 attempt(s) · depends on: T1
+`done` · 1 attempt(s) · depends on: T1
 
 Acceptance — the base gates and the gate review — runs on an unstamped plan, so an exit 9 there leaves a plan the re-run cannot resume: it plans again, paying for the plan twice, and the operator's clean-up loses the halted run folder with its cost. A halt in the gate review leaves a stamped running plan whose re-run starts work with no gate review. This task stamps the plan as soon as it loads, keeps it planning until acceptance passes, and makes vloop run resume acceptance (no plan session) whenever the plan has not passed its gate review.
 
@@ -67,8 +67,6 @@ Acceptance — the base gates and the gate review — runs on an unstamped plan,
 - Violations the review must rule against: any path where acceptance resumes by planning again; any path where work starts without a passed gate review.
 - Committed end-to-end tests in cmd/vloop cover a halt in the base gates and a halt in the gate review, each resumed with no second plan session and the gate review run before any work. TestRunGateReviewFailsTwiceThenResumes and TestRunResumeAllowsStateEdits change only if their resume paths change wording.
 - No refactor from B15's list is folded in.
-
-**From the last attempt:** the resumed acceptance folder's log line does not match the ownership rule ("resuming <run id>"), so vloop metrics will not own or count its sessions (gate review); no test asserts that the metrics ownership covers the resumed folder
 
 <details><summary>verify command</summary>
 
