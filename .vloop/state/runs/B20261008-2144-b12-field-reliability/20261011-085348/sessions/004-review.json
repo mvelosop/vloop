@@ -1,0 +1,24 @@
+{
+  "cost_usd": 0.0891914,
+  "duration_ms": 12087,
+  "effort": null,
+  "is_error": false,
+  "iteration": 14,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 14655,
+      "cache_read_input_tokens": 85077,
+      "cost_usd": 0.0891914,
+      "input_tokens": 8,
+      "output_tokens": 1354
+    }
+  },
+  "permission_denials": [],
+  "phase": "review",
+  "run_id": "B20261008-2144-b12-field-reliability",
+  "schema": "session/v1",
+  "started": "2026-10-11T09:07:16Z",
+  "task": "T9",
+  "turns": 4
+}

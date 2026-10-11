@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "The cross-brief and workspace tables print n/a in code and test for a brief with no delivered code or test lines, and the summary adds a line under the delivered line with the unclassified count. JSON is unchanged.",
+  "files": ["internal/metrics/print.go", "internal/metrics/print_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed gate T9: ok.",
+  "notes": "Condition is delivered code == 0 and test == 0 (unclassified in internal/metrics/print.go); the extra line prints only when delivered other > 0 and uses thousands separators like the other counts. No existing test changed; added TestPrintNotMeasuredWhereNothingClassified. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset."
+}

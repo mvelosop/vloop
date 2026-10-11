@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":188573,"exit":0,"name":"go"}],"ended":"2026-10-11T09:01:53Z","gate":{"duration_ms":6548,"exit":0},"iteration":13,"outcome":"done","run_id":"B20261008-2144-b12-field-reliability","schema":"iteration/v2","started":"2026-10-11T08:53:48Z","task":"T4"}
+{"attempt":1,"checks":[{"duration_ms":182372,"exit":0,"name":"go"}],"ended":"2026-10-11T09:07:29Z","gate":{"duration_ms":5899,"exit":0},"iteration":14,"outcome":"done","run_id":"B20261008-2144-b12-field-reliability","schema":"iteration/v2","started":"2026-10-11T09:01:53Z","task":"T9"}

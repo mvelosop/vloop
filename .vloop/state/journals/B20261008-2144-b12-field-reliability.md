@@ -107,3 +107,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Metrics take each session's time from wall_ms when the record has it and from duration_ms otherwise, in every per-phase figure, agent time and per-task times; a brief's wall starts at its first plan session's started, else the plan commit.
 - **Files:** internal/runs/runs.go, internal/metrics/time.go, internal/metrics/metrics.go, internal/metrics/time_test.go
 - **Notes for next iteration:** Implementation was already in the tree from the earlier blocked attempt (Session.WallMS *int64 and Session.TimeMS() in internal/runs); this session verified it against the corrected gate and changed nothing. No existing test needed changing, so there are no changed numbers to list; tests added: TestTimeFromWallMSWhereRecorded and TestTimeWallStartsAtFirstPlanSession. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.
+
+## T9 — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The cross-brief and workspace tables print n/a in code and test for a brief with no delivered code or test lines, and the summary adds a line under the delivered line with the unclassified count. JSON is unchanged.
+- **Files:** internal/metrics/print.go, internal/metrics/print_test.go
+- **Notes for next iteration:** Condition is delivered code == 0 and test == 0 (unclassified in internal/metrics/print.go); the extra line prints only when delivered other > 0 and uses thousands separators like the other counts. No existing test changed; added TestPrintNotMeasuredWhereNothingClassified. internal/cli tests fail if VLOOP_PLAN_SHA256 is set; run them with it unset.

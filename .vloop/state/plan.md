@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/11 done** · iteration 13
+**Status:** running · **9/11 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T09:01:53Z
+**Brief:** `docs/briefs/B20261008-2144-b12-field-reliability.loop-brief.md` · **Updated:** 2026-10-11T09:07:29Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Print a line per session with its time and cost against the ceiling, and warn at 50% and 80%
 - [x] **T7** — Record the session in flight in the run lock and show the live run in vloop status
 - [x] **T8** — Name the commit from the build's VCS revision and the version from the module, when no stamp did · 1 attempt(s)
-- [ ] **T9** — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
+- [x] **T9** — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
 - [ ] **T10** — Bring the domain and the guides up to the brief: the guard, the resume, the record, the metrics, the visibility
 - [ ] **T11** — Close: commit the worked example as a test and pass the real-data check against v0.8.0
 
@@ -210,7 +210,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Show n/a for code and test when a brief delivered no classified lines, and say how many matched no stack
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 A brief that delivered only lines no stack classifies — 3,487 lines of scripts and docs in another repository — shows code 0 and test 0 in vloop metrics, which reads as delivered nothing. This task prints n/a for those columns in the cross-brief table and adds a line under the summary's delivered line saying how many delivered lines matched no stack. The JSON does not change.
 
