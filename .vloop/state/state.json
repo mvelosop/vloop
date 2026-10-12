@@ -5,9 +5,9 @@
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
   "status": "running",
-  "iteration": 13,
+  "iteration": 14,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-12T00:54:17Z",
+  "updated": "2026-10-12T01:04:12Z",
   "shell": "sh",
   "checks": [
     {
@@ -434,8 +434,8 @@
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "a defect with a rule but no rule-outcome is shown as untriaged yet still gets a recurs suffix, and counts toward others' recurs; the criterion says an untriaged defect never recurs"
     },
     {
       "id": "T12",

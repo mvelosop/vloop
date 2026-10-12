@@ -209,6 +209,11 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 		fmt.Fprintf(out, "%s %s\n", verb, f)
 	}
 	fmt.Fprintf(out, "committed %s %s\n", sha[:7], subject)
+	every, err := defect.List(root, "")
+	if err != nil {
+		return Problem(err)
+	}
+	printDefectReport(out, runID, recorded, every)
 	fmt.Fprintf(out, "squash-merge with the trailer: %s\n", trailer)
 	return nil
 }
@@ -241,6 +246,8 @@ func closeDryRun(out io.Writer, root, briefPath, subject string, findings []stri
 	}
 	metrics.PrintSummary(out, report)
 	taken := map[string]bool{}
+	var pending []defect.Defect
+	var would []string
 	for _, f := range findings {
 		base := "D" + now.Format("20060102-1504") + "-" + defect.Slug(strings.Join(strings.Fields(f), " "))
 		id := base
@@ -252,10 +259,79 @@ func closeDryRun(out io.Writer, root, briefPath, subject string, findings []stri
 			id = base + "-" + strconv.Itoa(n)
 		}
 		taken[id] = true
+		would = append(would, id)
+		pending = append(pending, defect.Defect{ID: id, Kind: "bug", FoundBy: "operator"})
+	}
+	// The report sits before the would-lines: a dry run has no trailer line to
+	// precede, and its tail stays what it was.
+	brief, err := defect.List(root, defect.BriefName(briefPath))
+	if err != nil {
+		return Problem(err)
+	}
+	every, err := defect.List(root, "")
+	if err != nil {
+		return Problem(err)
+	}
+	printDefectReport(out, report.RunID, append(brief, pending...), append(every, pending...))
+	for _, id := range would {
 		fmt.Fprintf(out, "would record %s/%s.md\n", defect.Dir, id)
 	}
 	fmt.Fprintf(out, "would write %s/%s.json\n", closing.SnapshotDir, report.RunID)
 	fmt.Fprintf(out, "would update %s\n", briefPath)
 	fmt.Fprintf(out, "would commit %s\n", subject)
 	return nil
+}
+
+// printDefectReport prints the brief's defects with their rule, outcome or
+// untriaged, and the recurrences of each rule across every brief (L12). Close
+// reports; it never refuses for an untriaged defect.
+func printDefectReport(out io.Writer, runID string, brief, every []defect.Defect) {
+	if len(brief) == 0 {
+		fmt.Fprintf(out, "defects of %s: none\n", runID)
+		return
+	}
+	fmt.Fprintf(out, "defects of %s\n", runID)
+	untriaged := 0
+	for _, d := range brief {
+		rule, outcome := "—", "untriaged"
+		if d.Rule != "" {
+			rule = d.Rule
+		}
+		if d.RuleOutcome != "" {
+			outcome = d.RuleOutcome
+		}
+		if d.RuleOutcome == "" {
+			untriaged++
+		}
+		line := fmt.Sprintf("  %s  %s  %s  %s  %s", d.ID, d.Kind, d.FoundBy, rule, outcome)
+		if d.Rule != "" {
+			var ids []string
+			n := 0
+			for _, o := range every {
+				if o.ID == d.ID || o.Rule != d.Rule {
+					continue
+				}
+				n++
+				if len(ids) < 3 {
+					ids = append(ids, shortDefectID(o.ID))
+				}
+			}
+			if n > 0 {
+				line += fmt.Sprintf("  recurs ×%d (%s)", n, strings.Join(ids, ", "))
+			}
+		}
+		fmt.Fprintln(out, line)
+	}
+	if untriaged > 0 {
+		fmt.Fprintf(out, "%d untriaged: vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none\n", untriaged)
+	}
+}
+
+// shortDefectID is D<stamp> of a defect ID: D<date>-<time>.
+func shortDefectID(id string) string {
+	p := strings.SplitN(id, "-", 3)
+	if len(p) < 2 {
+		return id
+	}
+	return p[0] + "-" + p[1]
 }

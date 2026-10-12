@@ -85,6 +85,12 @@ field:
 - `fixed-by`: the loop brief that fixed it, empty until then.
 - `case`: the failing test written first, empty until then.
 - `created`: an RFC 3339 date-time.
+- `rule` (optional): the rule that caught the defect, or should have, as
+  `<where>: <which>`; `<where>` is `guideline`, `brief-check`, `gate`,
+  `gate-review`, `review` or `skill`.
+- `rule-outcome` (optional): `fired` (the rule caught it), `missed` (it existed
+  and did not), `absent` (none existed; one should) or `none` (none is
+  warranted; the body says why).
 
 ## Commands
 
@@ -100,7 +106,9 @@ brief, or a `--task` not in its plan, is exit 1; an invalid value is exit 2.
 sorted by id.
 
 `vloop defect set <id> <field> <value>` changes `status`, `fixed-by`, `case`,
-`severity`, `origin`, `kind` or `task`, validated as `add` validates.
+`severity`, `origin`, `kind`, `task`, `rule` or `rule-outcome`, validated as
+`add` validates; a `rule` whose `<where>` is not listed, or any other
+`rule-outcome`, is exit 2 and leaves the file untouched.
 
 ### Attribution with `--blame`
 

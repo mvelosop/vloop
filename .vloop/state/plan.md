@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/13 done** · iteration 13
+**Status:** running · **10/13 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:54:17Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T01:04:12Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
 - [x] **T9** — Put the plugin skills on word budgets enforced by a test
 - [x] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
-- [ ] **T11** — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
+- [ ] **T11** — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill · 1 attempt(s)
 - [ ] **T12** — Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
 - [ ] **T13** — Close: commit the worked example as an end-to-end test and pass the real-data checks
 
@@ -259,7 +259,7 @@ sh .vloop/state/gates/T10/gate.sh
 
 ### T11 — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
 
-`pending` · depends on: T9
+`pending` · 1 attempt(s) · depends on: T9
 
 Close is where defects are recorded, so L12 asks there, every brief, which rule caught each defect or should have. Two optional defect fields record it; close prints a report of the brief's defects with their rule, outcome or untriaged, and recurrences across briefs; the operate skill's close step proposes the triage. Close reports, never refuses: whether a defect deserves a rule is the operator's call.
 
@@ -273,6 +273,8 @@ Close is where defects are recorded, so L12 asks there, every brief, which rule 
 - plugin/skills/operate/SKILL.md's close step gains the triage: for each untriaged defect propose its rule and rule-outcome as options and record the operator's choice; for absent, draft the guideline line with its provenance, or the check; for a gate-review rule that missed, propose an eval case and the defect's case:. The skill stays within its 1,750-word ceiling and changes nowhere else
 - TestCloseCommitsFindingsSnapshotAndBrief (internal/cli/close_test.go) and B4's worked-example test (cmd/vloop/b4_e2e_test.go) change only by the report's lines before the trailer; committed tests cover the two fields, both refusals, the report with rule, untriaged and recurs, no defects and --dry-run. Violation: the behaviour shipped with no committed test the checks run
 - No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state
+
+**From the last attempt:** a defect with a rule but no rule-outcome is shown as untriaged yet still gets a recurs suffix, and counts toward others' recurs; the criterion says an untriaged defect never recurs
 
 <details><summary>verify command</summary>
 

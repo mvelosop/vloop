@@ -172,15 +172,23 @@ func TestCloseCommitsFindingsSnapshotAndBrief(t *testing.T) {
 	n := len(lines)
 	sha7 := gitOutput(t, dir, "rev-parse", "--short=7", "HEAD")
 	sha7 = strings.TrimSpace(sha7)
+	// Then the defect report (header, two rows, the untriaged hint), then the
+	// trailer line, which stays last.
 	for i, w := range []string{
 		"wrote .vloop/state/metrics/" + closeBrief + ".json",
 		"updated docs/briefs/" + closeName + ".md",
 		"committed " + sha7 + " [vloop] close " + closeBrief,
-		"squash-merge with the trailer: Vloop-Brief: " + closeName,
+		"defects of " + closeBrief,
 	} {
-		if lines[n-4+i] != w {
-			t.Errorf("line %d = %q, want %q", n-4+i, lines[n-4+i], w)
+		if lines[n-8+i] != w {
+			t.Errorf("line %d = %q, want %q", n-8+i, lines[n-8+i], w)
 		}
+	}
+	if w := "2 untriaged: vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none"; lines[n-2] != w {
+		t.Errorf("line %d = %q, want %q", n-2, lines[n-2], w)
+	}
+	if w := "squash-merge with the trailer: Vloop-Brief: " + closeName; lines[n-1] != w {
+		t.Errorf("last line = %q, want %q", lines[n-1], w)
 	}
 	if !strings.HasPrefix(collapse(out), closeBrief+" consumed · not merged\n") {
 		t.Errorf("summary: %q", out)
@@ -308,5 +316,86 @@ func TestCloseCRLFBriefRewritesFirstStatusLineOnly(t *testing.T) {
 	}
 	if want := "\xef\xbb\xbf" + strings.ReplaceAll(string(lf), "\n", "\r\n"); string(cr) != want {
 		t.Errorf("CRLF close differs from the LF close:\n%q\nwant\n%q", cr, want)
+	}
+}
+
+// triaged writes a recorded defect of brief with the given rule and outcome.
+func triaged(t *testing.T, dir, id, brief, rule, outcome string) {
+	t.Helper()
+	text := "---\nid: " + id + "\nbrief: " + brief + "\norigin: brief\nfound-by: review\nkind: spec-gap\nseverity: low\nstatus: open\nfixed-by: \"\"\ncase: \"\"\n"
+	if rule != "" {
+		text += "rule: \"" + rule + "\"\n"
+	}
+	if outcome != "" {
+		text += "rule-outcome: " + outcome + "\n"
+	}
+	write(t, dir, ".vloop/defects/"+id+".md", text+"created: 2026-01-01T09:00:00Z\n---\nd\n")
+}
+
+func TestCloseDefectReport(t *testing.T) {
+	const rule = "brief-check: must-change list"
+	dir := closeRepo(t, true, "")
+	// Four recurrences of the rule in another brief: only three are named.
+	for i := 1; i <= 4; i++ {
+		id := "D2025010" + string(rune('0'+i)) + "-0900-old"
+		triaged(t, dir, id, "B20250101-0900-old.loop-brief", rule, "missed")
+	}
+	triaged(t, dir, "D20260102-1000-mine", closeName, rule, "missed")
+	triaged(t, dir, "D20260102-1100-open", closeName, "", "")
+	triaged(t, dir, "D20260102-1200-none", closeName, "", "none")
+	gitIn(t, dir, "2026-01-02T00:00:00Z", "add", "-A")
+	gitIn(t, dir, "2026-01-02T00:00:00Z", "commit", "-q", "-m", "triage")
+
+	want := []string{
+		"defects of " + closeBrief,
+		"  D20260102-1000-mine  spec-gap  review  " + rule + "  missed  recurs ×4 (D20250101-0900, D20250102-0900, D20250103-0900)",
+		"  D20260102-1100-open  spec-gap  review  —  untriaged",
+		"  D20260102-1200-none  spec-gap  review  —  none",
+		"1 untriaged: vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none",
+	}
+	check := func(out string) {
+		t.Helper()
+		for _, w := range want {
+			if !strings.Contains(out+"\n", w+"\n") {
+				t.Errorf("no line %q in:\n%s", w, out)
+			}
+		}
+	}
+	before := headOf(t, dir)
+	code, out, errs := runCLI(t, dir, "brief", "close", closeName, "--no-findings", "--dry-run")
+	if code != 0 || errs != "" {
+		t.Fatalf("dry-run exit %d: %s", code, errs)
+	}
+	check(out)
+	if s := gitOutput(t, dir, "status", "--porcelain", "--untracked-files=all"); s != "" || headOf(t, dir) != before {
+		t.Errorf("dry-run wrote: %q", s)
+	}
+	code, out, errs = runCLI(t, dir, "brief", "close", closeName, "--no-findings")
+	if code != 0 || errs != "" {
+		t.Fatalf("close exit %d: %s", code, errs)
+	}
+	check(out)
+	lines := strings.Split(strings.TrimRight(out, "\n"), "\n")
+	if l := lines[len(lines)-1]; !strings.HasPrefix(l, "squash-merge with the trailer: ") {
+		t.Errorf("last line %q", l)
+	}
+}
+
+func TestCloseDefectReportNone(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	code, out, errs := runCLI(t, dir, "brief", "close", closeName, "--no-findings", "--dry-run")
+	if code != 0 || errs != "" {
+		t.Fatalf("exit %d: %s", code, errs)
+	}
+	if !strings.Contains(out, "\ndefects of "+closeBrief+": none\n") {
+		t.Errorf("no 'none' report in:\n%s", out)
+	}
+}
+
+func TestCloseDryRunReportsFindingsUntriaged(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	_, out, _ := runCLI(t, dir, "brief", "close", closeName, "--finding", "one", "--dry-run")
+	if !strings.Contains(out, "-one  bug  operator  —  untriaged\n1 untriaged: vloop defect set") {
+		t.Errorf("dry-run report:\n%s", out)
 	}
 }
