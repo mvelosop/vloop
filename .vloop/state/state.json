@@ -5,9 +5,9 @@
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
   "status": "running",
-  "iteration": 15,
+  "iteration": 16,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-12T01:10:51Z",
+  "updated": "2026-10-12T01:21:01Z",
   "shell": "sh",
   "checks": [
     {
@@ -476,7 +476,7 @@
         "No statement contradicts the behaviour T1–T11 shipped; no plugin skill is edited"
       ],
       "verify": "sh .vloop/state/gates/T12/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

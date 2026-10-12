@@ -37,8 +37,29 @@ before release / all.
 - **Recorded** by the operator, one file each: `.vloop/defects/<id>.md`
   (`defect/v1`), with `brief`, optional `task`, `origin`, `found-by`, `kind`
   (`bug`, `spec-gap`, `gate`, `gate-gap`, `regression`), `severity` (`low` to
-  `critical`), `status`, `fixed-by` (the brief that fixed it), `case` (the
-  failing test written first), `created`, then the description.
+  `critical`), `status`, `fixed-by` (the brief that fixed it, or `guideline`
+  when a rule of `.vloop/repo-guidelines.md` now prevents it), `case` (the
+  failing test written first), `created`, then the description. Two more are
+  optional, and records without them stay valid; see below.
+
+## The rule that caught it
+
+`rule` is the rule that caught the defect, or should have, as
+`<where>: <which>`; `<where>` is one of `guideline`, `brief-check`, `gate`,
+`gate-review`, `review`, `skill` (`guideline: D20261011-1455`,
+`brief-check: must-change list`). `rule-outcome` says what became of it:
+
+| `rule-outcome` | Meaning |
+| --- | --- |
+| `fired` | the rule caught it |
+| `missed` | the rule existed and did not catch it |
+| `absent` | no rule existed; one should |
+| `none` | no rule is warranted; the reason is in the body |
+
+`defect set` refuses any other outcome, and a `<where>` outside the list, with
+exit 2. `brief close` prints the brief's defects with both fields, `untriaged`
+where there is no outcome, and `recurs` where other defects share the `rule`;
+it never refuses for an untriaged one.
 
 ## Lifecycle of a recorded defect
 

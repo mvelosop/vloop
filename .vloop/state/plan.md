@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **11/13 done** · iteration 15
+**Status:** running · **12/13 done** · iteration 16
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T01:10:51Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T01:21:01Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T9** — Put the plugin skills on word budgets enforced by a test
 - [x] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
 - [x] **T11** — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill · 1 attempt(s)
-- [ ] **T12** — Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
+- [x] **T12** — Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
 - [ ] **T13** — Close: commit the worked example as an end-to-end test and pass the real-data checks
 
 ## Tasks
@@ -284,7 +284,7 @@ sh .vloop/state/gates/T11/gate.sh
 
 ### T12 — Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
 
-`pending` · depends on: T5, T8, T10, T11
+`done` · depends on: T5, T8, T10, T11
 
 Everything this brief adds must be findable: L8 gives the guide a `## Repository guidelines` section and lists the file in the .vloop/ layout, adds the two warnings to the brief domain doc, and carries L9–L12 into the domain docs they extend. A lesson there replaces a constraint repeated brief after brief, which is the point of the whole brief.
 

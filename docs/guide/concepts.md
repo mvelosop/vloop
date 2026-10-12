@@ -226,6 +226,43 @@ that the loop produced or let through, counted by where it entered and who caugh
 it. Some are derived from the run and some are recorded by hand with `vloop
 defect add`. See [defects.md](defects.md).
 
+## Repository guidelines
+
+`.vloop/repo-guidelines.md` holds this repository's lessons: short rules a
+brief would otherwise repeat as a constraint, brief after brief. `vloop init`
+writes it empty. When it exists and is not empty, `vloop run` hands it to every
+session it starts (plan, gate review, work and review) as appended system
+instructions; with no file, or an empty one, the sessions start as before. A
+guideline never overrides the brief or a domain invariant.
+
+A rule is a line starting with `- ` at the left margin, in any section. Two
+sections are also read by `vloop brief check`, and their headings are the same
+in every language:
+
+- `## Pinning tests`: ``- when `<phrase>`: `<name>`, `<name>` `` names the tests
+  a change to that phrase must also change.
+- `## External formats`: ``- `<phrase>`: `<path>` `` names the document a
+  format comes from.
+
+Each gives one warning, never a problem, and never changes the exit code:
+
+- `must-change list:` the Behaviour contract mentions `<phrase>`
+  (case-insensitively) but Constraints do not name every test of the rule.
+- `external format:` the Behaviour contract mentions `<phrase>` but the Binding
+  references do not cite its `<path>`.
+
+Every rule cites the defect or intervention that taught it (`D20261011-1455`,
+`I20261011-0900`), in its line. `vloop doctor` warns, under `guidelines`, when
+the file has more than 20 rules, and when a rule cites none. Retire or merge
+rules before adding more; the budget is not configurable.
+
+A lesson there replaces a constraint repeated brief after brief, which is the
+point of the file. When a defect is one a guideline now prevents, record it:
+`vloop defect set <id> fixed-by guideline`. `vloop brief close` prints each
+defect's `rule` and `rule-outcome` (see [defects.md](defects.md)), and
+`vloop metrics` shows how many words each session kind starts with (see
+[metrics.md](metrics.md)).
+
 ## Closing and release
 
 When a run is finished and you have verified it, `vloop brief close <brief>` on
@@ -344,6 +381,7 @@ vloop keeps its files under `.vloop/` in the repository root:
 - `.vloop/state/runs/<run id>/`: a run's folders, sessions and iteration records.
 - `.vloop/state/metrics/<run id>.json`: the metrics snapshot `brief close` freezes.
 - `.vloop/defects/`: one Markdown file per recorded defect.
+- `.vloop/repo-guidelines.md`: this repository's lessons, handed to every session `vloop run` starts; see [Repository guidelines](#repository-guidelines).
 
 Legacy: the shell loop that built vloop's first briefs. Its state lives in
 `.loop/state/`; vloop reads it, in any repository that has it, and never writes

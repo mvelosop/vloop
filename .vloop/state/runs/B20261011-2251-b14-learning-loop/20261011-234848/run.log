@@ -74,3 +74,10 @@
    review T11 · 0m23s · $0.13 · run $4.54 / $40.00
    review: PASS
    T11 done
+── iteration 16 (12 this run) · T12 · 11/13 done ──
+   Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
+   work T12 · 5m52s · $0.20 · run $4.74 / $40.00
+   check go
+   review T12 · 0m22s · $0.11 · run $4.86 / $40.00
+   review: PASS
+   T12 done
