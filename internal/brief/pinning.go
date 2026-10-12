@@ -22,24 +22,34 @@ type pinRule struct {
 // pinningRules reads the rules under "## Pinning tests"; other lines and
 // malformed ones are ignored. A missing file or section yields none.
 func pinningRules(root string) []pinRule {
+	var rules []pinRule
+	for _, l := range guidelinesSection(root, pinningHeading) {
+		if r, ok := parsePinRule(l); ok {
+			rules = append(rules, r)
+		}
+	}
+	return rules
+}
+
+// guidelinesSection is the lines under the given heading of the guidelines
+// file, up to the next heading; a missing file or section yields none.
+func guidelinesSection(root, heading string) []string {
 	data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(GuidelinesFile)))
 	if err != nil {
 		return nil
 	}
-	var rules []pinRule
+	var out []string
 	in := false
 	for _, l := range strings.Split(string(data), "\n") {
 		l = strings.TrimRight(l, "\r ")
 		switch {
 		case strings.HasPrefix(l, "#"):
-			in = l == pinningHeading
+			in = l == heading
 		case in:
-			if r, ok := parsePinRule(l); ok {
-				rules = append(rules, r)
-			}
+			out = append(out, l)
 		}
 	}
-	return rules
+	return out
 }
 
 func parsePinRule(l string) (pinRule, bool) {

@@ -19,3 +19,10 @@
    review T4 · 0m24s · $0.13 · run $0.78 / $40.00
    review: PASS
    T4 done
+── iteration 8 (4 this run) · T5 · 4/13 done ──
+   Make vloop brief check warn when a contract names an external format without citing its source
+   work T5 · 5m54s · $0.20 · run $0.98 / $40.00
+   check go
+   review T5 · 0m21s · $0.11 · run $1.09 / $40.00
+   review: PASS
+   T5 done

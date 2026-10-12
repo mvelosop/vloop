@@ -190,6 +190,7 @@ func Check(root string, b *Brief, set *HeadingSet) *Result {
 		add(Pass, "no references a memoryless offline session cannot follow")
 	}
 	res.Lines = append(res.Lines, pinningLines(root, body, set)...)
+	res.Lines = append(res.Lines, externalFormatLines(root, body, set)...)
 	return res
 }
 

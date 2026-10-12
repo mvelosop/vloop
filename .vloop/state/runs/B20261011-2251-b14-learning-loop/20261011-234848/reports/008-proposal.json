@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "vloop brief check reads `## External formats` in .vloop/repo-guidelines.md and warns once per rule whose phrase the Behaviour contract mentions and whose path Binding references do not cite; never a problem.",
+  "files": ["internal/brief/extformat.go", "internal/brief/extformat_test.go", "internal/brief/pinning.go", "internal/brief/check.go"],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: ok; go test ./internal/brief, go vet, gofmt clean.",
+  "notes": "Extracted guidelinesSection(root, heading) in pinning.go, shared by both rule readers; pinningRules behaviour unchanged. Rule form: - `phrase`: `path` then end or ' (' trailer. In this session go test ./... shows TestTaskGate* failures ('plan was changed during this session') caused by running inside a driver session, unrelated to this change."
+}

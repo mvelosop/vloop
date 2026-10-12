@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/13 done** · iteration 7
+**Status:** running · **5/13 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:02:35Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:12:12Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Hand .vloop/repo-guidelines.md to every session vloop run starts
 - [x] **T3** — Add the guidelines paragraph to the four session skills and teach the gate review the two rules it missed
 - [x] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
-- [ ] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
+- [x] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
 - [ ] **T6** — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
 - [ ] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
 - [ ] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
@@ -122,7 +122,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Make vloop brief check warn when a contract names an external format without citing its source
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 A brief that uses an external format, such as an eval case, without citing its definition invites a session to write the format from memory, which a recorded defect did. L4 lets a repository list, under `## External formats` in .vloop/repo-guidelines.md, which phrase needs which source, and makes brief check warn when the Behaviour contract mentions the phrase and Binding references do not cite the path.
 
