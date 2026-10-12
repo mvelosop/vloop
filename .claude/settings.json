@@ -6,5 +6,8 @@
       "Bash(gofmt:*)",
       "Edit(./.vloop/state/gates/**)"
     ]
+  },
+  "enabledPlugins": {
+    "vloop@vloop": true
   }
 }
