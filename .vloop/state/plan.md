@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/13 done** · iteration 6
+**Status:** running · **4/13 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-11T23:57:59Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:02:35Z
 
 ## Progress
 
 - [x] **T1** — Make vloop init write an empty .vloop/repo-guidelines.md
 - [x] **T2** — Hand .vloop/repo-guidelines.md to every session vloop run starts
 - [x] **T3** — Add the guidelines paragraph to the four session skills and teach the gate review the two rules it missed
-- [ ] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
+- [x] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
 - [ ] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
 - [ ] **T6** — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
 - [ ] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
@@ -97,7 +97,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 The same spec gap — a must-change list missing the tests that pin a list or a count — was recorded four times. L3 lets a repository list, under `## Pinning tests` in .vloop/repo-guidelines.md, which tests pin what, and makes brief check warn before the run when a brief's Behaviour contract mentions the phrase and its Constraints do not name every test. The warning is a warning: it never changes the exit code.
 

@@ -12,3 +12,10 @@
    review T3 · 0m16s · $0.09 · run $0.43 / $40.00
    review: PASS
    T3 done
+── iteration 7 (3 this run) · T4 · 3/13 done ──
+   Make vloop brief check warn when a brief changes what a listed test pins without naming the test
+   work T4 · 0m52s · $0.22 · run $0.65 / $40.00
+   check go
+   review T4 · 0m24s · $0.13 · run $0.78 / $40.00
+   review: PASS
+   T4 done
