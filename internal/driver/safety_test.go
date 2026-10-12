@@ -205,3 +205,41 @@ func TestInputGuardRestoreReportsFailure(t *testing.T) {
 		t.Errorf("failed = %v, want one entry naming .vloop/config.toml", failed)
 	}
 }
+
+// The guidelines file is a driver input: a session's edit of it, or a file it
+// creates there, is put back as it was before the session.
+func TestInputGuardRestoresGuidelines(t *testing.T) {
+	root := t.TempDir()
+	gl := filepath.Join(root, filepath.FromSlash(GuidelinesFile))
+	if err := os.MkdirAll(filepath.Dir(gl), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(gl, []byte("- a rule (D20260101-0000)\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	g := snapshotInputs(root, filepath.Join(root, ".vloop", "runs", "r"))
+	if err := os.WriteFile(gl, []byte("- a rule the session wrote\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	changed, failed := g.restore("")
+	if len(failed) != 0 || len(changed) != 1 || changed[0] != GuidelinesFile {
+		t.Fatalf("restore = %v, %v; want [%s], []", changed, failed, GuidelinesFile)
+	}
+	if got, _ := os.ReadFile(gl); string(got) != "- a rule (D20260101-0000)\n" {
+		t.Fatalf("guidelines after restore = %q", got)
+	}
+
+	if err := os.Remove(gl); err != nil {
+		t.Fatal(err)
+	}
+	g = snapshotInputs(root, filepath.Join(root, ".vloop", "runs", "r"))
+	if err := os.WriteFile(gl, []byte("- planted\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if changed, _ := g.restore(""); len(changed) != 1 || changed[0] != GuidelinesFile {
+		t.Fatalf("restore of a created file = %v", changed)
+	}
+	if _, err := os.Stat(gl); !os.IsNotExist(err) {
+		t.Fatalf("a guidelines file the session created was kept: %v", err)
+	}
+}

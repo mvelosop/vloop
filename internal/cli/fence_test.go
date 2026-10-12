@@ -107,6 +107,7 @@ func TestPhaseFenceWrites(t *testing.T) {
 		{".vloop/config.toml", false, false, false},
 		{".vloop/defects/D1.md", false, false, false},
 		{".vloop/interventions/I1.md", false, false, false},
+		{".vloop/repo-guidelines.md", false, false, false},
 		{".vloop/state/runs/r/sessions/001-plan.json", false, false, false},
 		{".git/config", false, false, false},
 		{".git/hooks/pre-commit", false, false, false},

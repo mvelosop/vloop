@@ -82,6 +82,8 @@
       "Write(.vloop/defects/**)",
       "Edit(.vloop/interventions/**)",
       "Write(.vloop/interventions/**)",
+      "Edit(.vloop/repo-guidelines.md)",
+      "Write(.vloop/repo-guidelines.md)",
       "Edit(.vloop/install.json)",
       "Write(.vloop/install.json)",
       "Read(~/.claude/**)",
