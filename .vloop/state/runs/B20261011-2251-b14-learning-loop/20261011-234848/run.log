@@ -81,3 +81,10 @@
    review T12 · 0m22s · $0.11 · run $4.86 / $40.00
    review: PASS
    T12 done
+── iteration 17 (13 this run) · T13 · 12/13 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data checks
+   work T13 · 3m00s · $0.66 · run $5.52 / $40.00
+   check go
+   review T13 · 0m32s · $0.17 · run $5.70 / $40.00
+   review: PASS
+   T13 done

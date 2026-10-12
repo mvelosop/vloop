@@ -5,9 +5,9 @@
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
   "status": "running",
-  "iteration": 16,
+  "iteration": 17,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-12T01:21:01Z",
+  "updated": "2026-10-12T01:28:43Z",
   "shell": "sh",
   "checks": [
     {
@@ -511,7 +511,7 @@
         "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state"
       ],
       "verify": "sh .vloop/state/gates/T13/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

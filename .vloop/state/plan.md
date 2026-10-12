@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **12/13 done** · iteration 16
+**Status:** running · **13/13 done** · iteration 17
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T01:21:01Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T01:28:43Z
 
 ## Progress
 
@@ -20,7 +20,7 @@
 - [x] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
 - [x] **T11** — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill · 1 attempt(s)
 - [x] **T12** — Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
-- [ ] **T13** — Close: commit the worked example as an end-to-end test and pass the real-data checks
+- [x] **T13** — Close: commit the worked example as an end-to-end test and pass the real-data checks
 
 ## Tasks
 
@@ -307,7 +307,7 @@ sh .vloop/state/gates/T12/gate.sh
 
 ### T13 — Close: commit the worked example as an end-to-end test and pass the real-data checks
 
-`pending` · depends on: T6, T7, T12
+`done` · depends on: T6, T7, T12
 
 The brief's worked example and real-data checks are the acceptance of the whole brief. This task commits them as a test the checks run, line for line, and confirms against this repository's own history: with the seed, brief check warns on four consumed briefs naming the tests their recorded defects say they omitted, and vloop metrics gives every consumed brief an instructions line whose figures git confirms.
 
