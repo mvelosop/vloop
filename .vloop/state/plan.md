@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/13 done** · iteration 9
+**Status:** running · **7/13 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:19:20Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:25:06Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
 - [x] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
 - [x] **T6** — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
-- [ ] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
+- [x] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
 - [ ] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
 - [ ] **T9** — Put the plugin skills on word budgets enforced by a test
 - [ ] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
@@ -169,7 +169,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
 
-`pending` · depends on: T6
+`done` · depends on: T6
 
 Three recorded eval defects scored correct answers below 1, so these cases could not measure anything. L7 makes plan-checks-its-gates judge the planner's gate-folder fixtures from the files it wrote rather than a trace cut off before those writes, and gives operate-proposes-options a realistic halted run and graders that score what the operate skill's step names.
 

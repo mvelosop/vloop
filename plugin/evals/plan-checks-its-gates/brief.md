@@ -25,6 +25,13 @@ with the punctuation read from `greet.toml`.
 1. Both behaviours hold.
 2. A committed shell test, `tests/greet.sh`, exercises both.
 
+## Plan shape
+
+One task, `T1`, delivers the whole brief. Its judge is one script in its gate
+folder, `.vloop/state/gates/T1/gate.sh`, which builds each `greet.toml` it needs
+in a temporary directory and holds every expected output; `verify` runs that
+script.
+
 ## Out of scope
 
 - Any option or flag.

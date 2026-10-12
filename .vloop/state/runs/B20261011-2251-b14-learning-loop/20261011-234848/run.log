@@ -33,3 +33,10 @@
    review T6 · 0m35s · $0.18 · run $1.92 / $40.00
    review: PASS
    T6 done
+── iteration 10 (6 this run) · T7 · 6/13 done ──
+   Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
+   work T7 · 1m54s · $0.29 · run $2.21 / $40.00
+   check go
+   review T7 · 0m26s · $0.16 · run $2.37 / $40.00
+   review: PASS
+   T7 done

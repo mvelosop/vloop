@@ -5,9 +5,9 @@
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
   "status": "running",
-  "iteration": 9,
+  "iteration": 10,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-12T00:19:20Z",
+  "updated": "2026-10-12T00:25:06Z",
   "shell": "sh",
   "checks": [
     {
@@ -293,7 +293,7 @@
         "Only these two cases change, in the format of docs/guide/evals.md; their README rows stay accurate; the skill checks accept them. Violation: any eval case changed beyond L6 and L7; a case format, grader type or field not in docs/guide/evals.md"
       ],
       "verify": "sh .vloop/state/gates/T7/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
