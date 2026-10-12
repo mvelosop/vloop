@@ -47,6 +47,9 @@ the only thing that stops it.
 | `plan-valid-state` | `/vloop:plan` | a plan for a small brief validates and every task has a `kind` |
 | `plan-checks-its-gates` | `/vloop:plan` | the planner's judges are assertions in the `verify` or files in the gate folder, never the test a task writes, no `verify` runs a repository suite, and a gate's TOML fixture sets its key at the top level |
 | `gate-review-planted-gates` | `/vloop:gate-review` | five planted gates (a path typo, a judge the task writes, a grep of source text, one that passes on the base, one sound): the four defects are found with the right finding kind and the sound gate passes |
+| `gate-review-real-misses` | `/vloop:gate-review` | six gates that fooled the gate review in past runs (a GNU-only `grep -P`, a TOML key appended after a table, a session required to write under `.vloop/`, a pattern with a trailing space, a `session/v1` record validated against `session/v2`, a `*-review.json` glob that also matches `*-gate-review.json`) and one sound gate: each defect is found as `unpassable` and the sound gate passes |
 | `work-disputes-impossible-gate` | `/vloop:work` | a gate no correct implementation passes is reported as a `gate_dispute`, not edited |
 | `operate-proposes-options` | `/vloop:operate` | a run halted on a gate dispute: the skill proposes one to three real options, recommends one and says why, amends no gate before the operator answers, and pads no straw option |
 | `language-es` | `/vloop:plan` | with `language = "es"`, titles and acceptance are Spanish and keys stay English |
+
+`gate-review-real-misses` is for macOS hosts: its first gate's `grep -P` is a defect only where `grep` is BSD grep, which rejects the option. Its scaffold exits non-zero on a host whose `grep` accepts `-P`, and on any host where a planted gate does not fail for its recorded reason. The scaffold needs `vloop` on `PATH`.

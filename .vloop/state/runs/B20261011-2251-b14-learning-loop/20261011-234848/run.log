@@ -26,3 +26,10 @@
    review T5 · 0m21s · $0.11 · run $1.09 / $40.00
    review: PASS
    T5 done
+── iteration 9 (5 this run) · T6 · 5/13 done ──
+   Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
+   work T6 · 2m59s · $0.65 · run $1.74 / $40.00
+   check go
+   review T6 · 0m35s · $0.18 · run $1.92 / $40.00
+   review: PASS
+   T6 done

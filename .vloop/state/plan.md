@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/13 done** · iteration 8
+**Status:** running · **6/13 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:12:12Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:19:20Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Add the guidelines paragraph to the four session skills and teach the gate review the two rules it missed
 - [x] **T4** — Make vloop brief check warn when a brief changes what a listed test pins without naming the test
 - [x] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
-- [ ] **T6** — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
+- [x] **T6** — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
 - [ ] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
 - [ ] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
 - [ ] **T9** — Put the plugin skills on word budgets enforced by a test
@@ -145,7 +145,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 The gate review passed six defective gates in past runs, gates whose rule was already written. L6 turns them into one eval case, built like gate-review-planted-gates, so the gate review can be measured against them from now on. The case is behaviour data for the operator's eval runs: no gate runs claude, so its scaffold must prove on the host that each planted gate fails on the base for its recorded reason.
 

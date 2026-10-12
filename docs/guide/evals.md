@@ -130,7 +130,7 @@ claude plugin eval plugin \
   `TestEvalGrantsCoverFence` holds the cases to the fence and the list above to
   the cases.
 - `--max-cost-usd` is a hard ceiling, checked before each run. The full suite
-  is 14 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
+  is 16 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
 - `--keep-temp` keeps each run's sandbox and `trace.jsonl`, the only way to see
   what a session ran and which commands were denied; read them before
   re-running a case that scores low.
@@ -145,7 +145,7 @@ run's grader verdicts; the HTML report shows the same per case and arm.
 | --- | --- | --- |
 | `/vloop:review` | `01`–`07b` | nine planted defects in work that passes its gate; the review returns `FAIL` and names each |
 | `/vloop:plan` | `plan-valid-state`, `plan-checks-its-gates`, `language-es` | a valid plan, judges in the `verify` or the gate folder and no repository suite in a `verify`, prose in the configured language |
-| `/vloop:gate-review` | `gate-review-planted-gates` | five planted gates; the typo, the task-written judge, the source grep and the gate that passes on the base are found with the right finding kind, and the sound gate passes |
+| `/vloop:gate-review` | `gate-review-planted-gates`, `gate-review-real-misses` | five planted gates, then six gates that fooled the gate review in past runs (macOS hosts) and one sound gate; the typo, the task-written judge, the source grep, the gate that passes on the base and the six real misses are found with the right finding kind, and the sound gates pass |
 | `/vloop:work` | `work-disputes-impossible-gate` | a gate no correct implementation passes is disputed, not edited |
 
 `/vloop:operate` has no suite: it is the operator's, interactive.
