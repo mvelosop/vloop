@@ -304,7 +304,7 @@ func printDefectReport(out io.Writer, runID string, brief, every []defect.Defect
 			untriaged++
 		}
 		line := fmt.Sprintf("  %s  %s  %s  %s  %s", d.ID, d.Kind, d.FoundBy, rule, outcome)
-		if d.Rule != "" {
+		if d.Rule != "" && d.RuleOutcome != "" {
 			var ids []string
 			n := 0
 			for _, o := range every {

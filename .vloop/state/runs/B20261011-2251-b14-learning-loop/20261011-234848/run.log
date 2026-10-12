@@ -67,3 +67,10 @@
    check go
    review T11 · 0m26s · $0.14 · run $4.22 / $40.00
    review: FAIL
+── iteration 15 (11 this run) · T11 · 10/13 done ──
+   Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
+   work T11 · 2m17s · $0.19 · run $4.41 / $40.00
+   check go
+   review T11 · 0m23s · $0.13 · run $4.54 / $40.00
+   review: PASS
+   T11 done

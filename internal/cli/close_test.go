@@ -343,15 +343,18 @@ func TestCloseDefectReport(t *testing.T) {
 	triaged(t, dir, "D20260102-1000-mine", closeName, rule, "missed")
 	triaged(t, dir, "D20260102-1100-open", closeName, "", "")
 	triaged(t, dir, "D20260102-1200-none", closeName, "", "none")
+	// A rule without an outcome is untriaged and never recurs.
+	triaged(t, dir, "D20260102-1300-ruled", closeName, rule, "")
 	gitIn(t, dir, "2026-01-02T00:00:00Z", "add", "-A")
 	gitIn(t, dir, "2026-01-02T00:00:00Z", "commit", "-q", "-m", "triage")
 
 	want := []string{
 		"defects of " + closeBrief,
-		"  D20260102-1000-mine  spec-gap  review  " + rule + "  missed  recurs ×4 (D20250101-0900, D20250102-0900, D20250103-0900)",
+		"  D20260102-1000-mine  spec-gap  review  " + rule + "  missed  recurs ×5 (D20250101-0900, D20250102-0900, D20250103-0900)",
 		"  D20260102-1100-open  spec-gap  review  —  untriaged",
 		"  D20260102-1200-none  spec-gap  review  —  none",
-		"1 untriaged: vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none",
+		"  D20260102-1300-ruled  spec-gap  review  " + rule + "  untriaged",
+		"2 untriaged: vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none",
 	}
 	check := func(out string) {
 		t.Helper()

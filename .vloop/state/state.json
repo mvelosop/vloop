@@ -5,9 +5,9 @@
   "base": "dc2642803289b6626124451e2567f80f3795bfc7",
   "branch": "B20261011-2251-b14-learning-loop",
   "status": "running",
-  "iteration": 14,
+  "iteration": 15,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-12T01:04:12Z",
+  "updated": "2026-10-12T01:10:51Z",
   "shell": "sh",
   "checks": [
     {
@@ -433,9 +433,9 @@
         "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state"
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "a defect with a rule but no rule-outcome is shown as untriaged yet still gets a recurs suffix, and counts toward others' recurs; the criterion says an untriaged defect never recurs"
+      "notes": ""
     },
     {
       "id": "T12",
