@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/13 done** · iteration 10
+**Status:** running · **8/13 done** · iteration 11
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:25:06Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:35:23Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Make vloop brief check warn when a contract names an external format without citing its source
 - [x] **T6** — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
 - [x] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
-- [ ] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
+- [x] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
 - [ ] **T9** — Put the plugin skills on word budgets enforced by a test
 - [ ] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
 - [ ] **T11** — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
@@ -190,7 +190,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Add doctor's guidelines check: provenance on every rule, and a budget of 20
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 A rule that cites no defect or intervention cannot be judged when it is time to prune, and too many rules has hurt before (L9). This task defines a rule and its provenance and adds a doctor check, printed right after `gate edits`, that counts the rules and warns past 20 or on a rule with no ID. Both are warnings: the operator decides what to retire, and no exit code changes.
 

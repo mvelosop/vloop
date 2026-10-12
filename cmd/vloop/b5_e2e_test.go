@@ -223,7 +223,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 	b5Expect(t, r.run("0.1.0", "init"), 1, nil, "vloop: already initialized by vloop 0.1.0 — run vloop upgrade\n")
 
 	b5Expect(t, r.run("0.1.0", "doctor"), 0, []string{"✓ git", "✓ install", "✓ config", "✓ claude", "✓ trust", "✓ gate shell",
-		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "- self-hosting", "doctor: 0 problem(s), 1 warning(s)"}, "")
+		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "✓ guidelines 0 rule(s)", "- self-hosting", "doctor: 0 problem(s), 1 warning(s)"}, "")
 
 	b5Expect(t, r.run("0.1.1", "upgrade"), 0, []string{"updated CLAUDE.md", "updated .vloop/install.json"}, "")
 	b5Expect(t, r.run("0.2.0", "upgrade"), 1, []string{"would update CLAUDE.md"},

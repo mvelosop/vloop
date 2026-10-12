@@ -40,3 +40,10 @@
    review T7 · 0m26s · $0.16 · run $2.37 / $40.00
    review: PASS
    T7 done
+── iteration 11 (7 this run) · T8 · 7/13 done ──
+   Add doctor's guidelines check: provenance on every rule, and a budget of 20
+   work T8 · 6m21s · $0.27 · run $2.64 / $40.00
+   check go
+   review T8 · 0m29s · $0.14 · run $2.78 / $40.00
+   review: PASS
+   T8 done

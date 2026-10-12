@@ -216,6 +216,7 @@ func runDoctor(b Build, root string) []doctorCheck {
 		add(doctorPlugin(b))
 		add(doctorGateEdits(root))
 	}
+	add(doctorGuidelines(root))
 
 	if cerr == nil {
 		var missing []string
@@ -445,6 +446,84 @@ func doctorGateEdits(root string) (string, string, string) {
 		}
 	}
 	return "gate edits", resWarning, gateEditsWarning
+}
+
+// guidelinesBudget is the most rules .vloop/repo-guidelines.md should hold.
+const guidelinesBudget = 20
+
+var guidelineID = regexp.MustCompile(`\b[DI][0-9]{8}-[0-9]{4}`)
+
+// guidelineRules returns the 1-based line numbers of the rules in a guidelines
+// file — lines starting `- ` outside HTML comments — and those among them
+// that cite no defect or intervention ID.
+func guidelineRules(text string) (rules, noID []int) {
+	inComment := false
+	for i, l := range strings.Split(text, "\n") {
+		l = strings.TrimRight(l, "\r")
+		isRule := !inComment && strings.HasPrefix(l, "- ")
+		// Drop comment spans from the rest of the line, tracking an open one.
+		var kept strings.Builder
+		rest := l
+		for rest != "" {
+			if inComment {
+				_, after, found := strings.Cut(rest, "-->")
+				if !found {
+					rest = ""
+					break
+				}
+				inComment = false
+				rest = after
+				continue
+			}
+			before, after, found := strings.Cut(rest, "<!--")
+			kept.WriteString(before)
+			if !found {
+				break
+			}
+			inComment = true
+			rest = after
+		}
+		if !isRule {
+			continue
+		}
+		rules = append(rules, i+1)
+		if !guidelineID.MatchString(kept.String()) {
+			noID = append(noID, i+1)
+		}
+	}
+	return rules, noID
+}
+
+// doctorGuidelines counts the rules of the guidelines file and warns past the
+// budget or on a rule with no provenance; it never writes the file.
+func doctorGuidelines(root string) (string, string, string) {
+	raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(".vloop/repo-guidelines.md")))
+	if errors.Is(err, os.ErrNotExist) {
+		return "guidelines", resNA, ""
+	}
+	if err != nil {
+		return "guidelines", resWarning, "cannot read .vloop/repo-guidelines.md: " + err.Error()
+	}
+	rules, noID := guidelineRules(string(raw))
+	var msgs []string
+	if len(rules) > guidelinesBudget {
+		msgs = append(msgs, fmt.Sprintf("%d rules, over the budget of %d — retire or merge some before adding more", len(rules), guidelinesBudget))
+	}
+	if len(noID) > 0 {
+		lines := make([]string, len(noID))
+		for i, n := range noID {
+			lines[i] = fmt.Sprintf("line %d", n)
+		}
+		prefix := ""
+		if len(msgs) > 0 {
+			prefix = "guidelines "
+		}
+		msgs = append(msgs, fmt.Sprintf("%s%d rule(s) cite no defect or intervention: %s", prefix, len(noID), strings.Join(lines, ", ")))
+	}
+	if len(msgs) > 0 {
+		return "guidelines", resWarning, strings.Join(msgs, "; ")
+	}
+	return "guidelines", resPass, fmt.Sprintf("%d rule(s)", len(rules))
 }
 
 var goModule = regexp.MustCompile(`(?m)^module\s+github\.com/mvelosop/vloop\s*$`)
