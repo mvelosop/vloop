@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/13 done** · iteration 11
+**Status:** running · **9/13 done** · iteration 12
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:35:23Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:39:43Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
 - [x] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
 - [x] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
-- [ ] **T9** — Put the plugin skills on word budgets enforced by a test
+- [x] **T9** — Put the plugin skills on word budgets enforced by a test
 - [ ] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
 - [ ] **T11** — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
 - [ ] **T12** — Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
@@ -213,7 +213,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Put the plugin skills on word budgets enforced by a test
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 Skills grow by drift; L10 makes growth a recorded decision by a failing test. The test counts each plugin skill's whitespace-separated words, frontmatter included, against a ceiling that lives beside it with a comment saying when and why it was set. No gate may run the repository's tests, so the gate judges the counting through one function this plan pins, `Check(pluginDir string) []string` in package `internal/budget`, which it calls from its own oracle on synthetic skills; the committed test is the review's to rule on, and calls the same function on this repository's plugin/.
 

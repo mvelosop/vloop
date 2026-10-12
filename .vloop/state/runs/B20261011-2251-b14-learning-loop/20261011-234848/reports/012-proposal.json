@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "internal/budget exports Check(pluginDir) []string, per-skill ceilings with a dated comment, and a committed test that runs Check on plugin/ and fails with each message.",
+  "files": ["internal/budget/budget.go", "internal/budget/budget_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed gate T9: ok.",
+  "notes": "Word counting is budget.CountWords / budget.FileWords (strings.Fields, as wc -w) and budget.Sep formats thousands; T10 should reuse these, not copy. Ceilings is a map beside one comment, in budget.go; Skills fixes report order. Unreadable skill files are reported as messages too."
+}
