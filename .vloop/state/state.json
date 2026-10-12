@@ -7,7 +7,7 @@
   "status": "complete",
   "iteration": 17,
   "created": "2026-10-11T23:17:28Z",
-  "updated": "2026-10-12T01:31:51Z",
+  "updated": "2026-10-12T20:28:00Z",
   "shell": "sh",
   "checks": [
     {
@@ -330,7 +330,7 @@
       "title": "Put the plugin skills on word budgets enforced by a test",
       "goal": "Skills grow by drift; L10 makes growth a recorded decision by a failing test. The test counts each plugin skill's whitespace-separated words, frontmatter included, against a ceiling that lives beside it with a comment saying when and why it was set. No gate may run the repository's tests, so the gate judges the counting through one function this plan pins, `Check(pluginDir string) []string` in package `internal/budget`, which it calls from its own oracle on synthetic skills; the committed test is the review's to rule on, and calls the same function on this repository's plugin/.",
       "kind": "test",
-      "fixtures": "8bd9eb43794e8bcb706519eaa5b8bba397b25e97cb63d31eed1be02302b704ca",
+      "fixtures": "5e18e68ac9feb7e19cfbb4047dd1b8476aefd5e021e2acebbd2d37947c0b90d3",
       "references": [
         {
           "path": "docs/design-notes/vloop-t1-triage.md",
@@ -358,6 +358,13 @@
           "reason": "Gate review round 2 found pins-unnamed on internal/budget.Check; the seam is named in T9's acceptance, so a work session cannot build it elsewhere, and the round-1 alternative (running the committed test) is task-reach. Root cause: the brief's L10 makes the deliverable a test while forbidding gates that run tests. Gate kept, ruling recorded in it.",
           "by": "operator",
           "fixtures": "ff4fd6b6981653ff82025dfdfa5c3eff7a0d29d5e1262e6eb90d94210e999afc"
+        },
+        {
+          "verify": "sh .vloop/state/gates/T9/gate.sh",
+          "replaced_at": "2026-10-12T20:28:00Z",
+          "reason": "The gate judged L10 through internal/budget.Check, an implementation detail; it now judges the contract: each skill's wc -w within the pinned ceiling, and the ceilings beside a test with one comment each (operator ruling 2026-10-12)",
+          "by": "operator",
+          "fixtures": "8bd9eb43794e8bcb706519eaa5b8bba397b25e97cb63d31eed1be02302b704ca"
         }
       ]
     },
