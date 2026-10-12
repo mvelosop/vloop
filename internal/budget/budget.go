@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -64,4 +65,47 @@ func Sep(n int) string {
 		s = s[:i] + "," + s[i:]
 	}
 	return s
+}
+
+var guidelineID = regexp.MustCompile(`\b[DI][0-9]{8}-[0-9]{4}`)
+
+// GuidelineRules returns the 1-based line numbers of the rules in a guidelines
+// file — lines starting `- ` outside HTML comments — and those among them
+// that cite no defect or intervention ID.
+func GuidelineRules(text string) (rules, noID []int) {
+	inComment := false
+	for i, l := range strings.Split(text, "\n") {
+		l = strings.TrimRight(l, "\r")
+		isRule := !inComment && strings.HasPrefix(l, "- ")
+		// Drop comment spans from the rest of the line, tracking an open one.
+		var kept strings.Builder
+		rest := l
+		for rest != "" {
+			if inComment {
+				_, after, found := strings.Cut(rest, "-->")
+				if !found {
+					rest = ""
+					break
+				}
+				inComment = false
+				rest = after
+				continue
+			}
+			before, after, found := strings.Cut(rest, "<!--")
+			kept.WriteString(before)
+			if !found {
+				break
+			}
+			inComment = true
+			rest = after
+		}
+		if !isRule {
+			continue
+		}
+		rules = append(rules, i+1)
+		if !guidelineID.MatchString(kept.String()) {
+			noID = append(noID, i+1)
+		}
+	}
+	return rules, noID
 }

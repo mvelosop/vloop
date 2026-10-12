@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **9/13 done** · iteration 12
+**Status:** running · **10/13 done** · iteration 13
 
-**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:39:43Z
+**Brief:** `docs/briefs/B20261011-2251-b14-learning-loop.loop-brief.md` · **Updated:** 2026-10-12T00:54:17Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
 - [x] **T8** — Add doctor's guidelines check: provenance on every rule, and a budget of 20
 - [x] **T9** — Put the plugin skills on word budgets enforced by a test
-- [ ] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
+- [x] **T10** — Add the instructions line to vloop metrics: the words each session kind starts with
 - [ ] **T11** — Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
 - [ ] **T12** — Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
 - [ ] **T13** — Close: commit the worked example as an end-to-end test and pass the real-data checks
@@ -235,7 +235,7 @@ sh .vloop/state/gates/T9/gate.sh
 
 ### T10 — Add the instructions line to vloop metrics: the words each session kind starts with
 
-`pending` · depends on: T8, T9
+`done` · depends on: T8, T9
 
 Each session reads its skill, the guidelines and CLAUDE.md before doing anything; L11 makes that load visible per brief, back to B1, so its trend shows. It is computed from git at the commit a brief's delivered lines are measured to (M-2), never recorded during a run, and adds one line to the brief summary and one optional object to the metrics/v2 JSON, frozen by brief close.
 

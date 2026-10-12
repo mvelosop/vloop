@@ -54,3 +54,10 @@
    review T9 · 0m15s · $0.09 · run $3.01 / $40.00
    review: PASS
    T9 done
+── iteration 13 (9 this run) · T10 · 9/13 done ──
+   Add the instructions line to vloop metrics: the words each session kind starts with
+   work T10 · 9m51s · $0.41 · run $3.42 / $40.00
+   check go
+   review T10 · 0m40s · $0.16 · run $3.59 / $40.00
+   review: PASS
+   T10 done
