@@ -16,3 +16,9 @@
    check go
    review T14 · 0m15s · $0.10 · run $0.79 / $40.00
    review: FAIL
+── iteration 25 (4 this run) · T14 · 13/14 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data check
+   work T14 · 0m48s · $0.13 · run $0.92 / $40.00
+   check go
+   review T14 · 0m15s · $0.08 · run $1.00 / $40.00
+   review: FAIL

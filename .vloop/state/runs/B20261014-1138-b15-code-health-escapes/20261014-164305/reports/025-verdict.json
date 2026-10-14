@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T14",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "A new end-to-end test in cmd/vloop, in the style of the earlier b<n>_e2e_test.go files, runs the brief's worked example with a fresh build in temporary repositories and a temporary HOME addressed with git -C: the git-config-ignore lines, defect add on an unmerged and a merged brief (with the same-second stamp), the metrics defects line, the intervention add refusals and origin, the defect set rule refusal, the close with a refused and an accepted finding and its run record line, and the per-task test:code and $/kloc values.", "met": true, "evidence": "cmd/vloop/b20261014_e2e_test.go exists (committed in a44e6b1) and the go check passes; not re-audited line by line, the working tree diff adds nothing to it"},
+    {"criterion": "Real-data check on this repository, in the task notes: `vloop metrics` for each consumed brief, the defects lines before and after (only operator and escaped move); every other summary line unchanged but the cost line's ending; `vloop defect list` and `vloop intervention list`/`show` list every existing record.", "met": false, "evidence": "proposal.json says the before/after comparison against a base build was NOT done (base build denied); only after-values are listed, so 'before and after' and 'unchanged but the cost ending' cannot be ruled on"},
+    {"criterion": "No historical record is edited, renamed or migrated, and nothing is written under .vloop/ but .vloop/tmp/.", "met": true, "evidence": "git diff HEAD shows only run-artifact logs under .vloop/state/runs (driver-owned); no historical records changed"},
+    {"criterion": "Fixes needed to make the worked example hold are made here, each with its committed test, and named in the notes.", "met": true, "evidence": "proposal says no fixes were needed; no source changes in the diff"}
+  ],
+  "findings": [
+    {"summary": "the real-data before/after metrics comparison per consumed brief was not done and is not recorded, so acceptance criterion 2 is unmet", "kind": "bug"}
+  ],
+  "notes": "This attempt's working-tree diff has no code changes; the test file came from the previous rejected attempt. The work session should build the base commit binary into a temp dir (git worktree/ go build -o under .vloop/tmp) or otherwise obtain the 'before' metrics, and record the per-brief comparison in the task notes."
+}

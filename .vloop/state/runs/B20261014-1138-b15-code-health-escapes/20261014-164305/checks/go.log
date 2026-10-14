@@ -1,6 +1,6 @@
 ok  	github.com/mvelosop/vloop	(cached)
 ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	190.852s
+ok  	github.com/mvelosop/vloop/cmd/vloop	189.506s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
