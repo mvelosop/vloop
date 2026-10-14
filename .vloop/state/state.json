@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md",
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
-  "status": "blocked",
-  "iteration": 21,
+  "status": "running",
+  "iteration": 22,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T16:43:04Z",
+  "updated": "2026-10-14T16:47:33Z",
   "shell": "sh",
   "checks": [
     {
@@ -443,8 +443,8 @@
       ],
       "verify": "sh .vloop/state/gates/T13/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": "gate disputed: The gate's section() helper passes regexes with \\* through awk -v, where the escape is consumed; under BSD awk the pattern matches nothing, so the M-4 section is always empty regardless of content. — printf -- '- **M-4** x\\n' | awk -v s='^- \\*\\*M-4\\*\\*' '$0 ~ s' prints nothing, while s='^- \\\\*\\\\*M-4\\\\*\\\\*' matches; the gate fails with 'docs/domain/domain-model.md has no M-4' although the line exists. With the escapes doubled in a temp copy the gate prints 'gate T13: ok'.",
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-164305/checks/022-go.fail.log",
       "gate_history": [
         {
           "verify": "sh .vloop/state/gates/T13/gate.sh",

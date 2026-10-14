@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **12/14 done** · iteration 21
+**Status:** running · **12/14 done** · iteration 22
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:42:06Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:47:33Z
 
 ## Progress
 
@@ -20,7 +20,7 @@
 - [x] **T10** — Count a recorded defect as escaped when it was created after its brief merged
 - [x] **T11** — Record operator findings as verification-finding interventions with an origin · 1 attempt(s)
 - [x] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
-- [ ] **T13** — Describe the new model in the docs, the domain and both operate playbooks · **blocked**
+- [ ] **T13** — Describe the new model in the docs, the domain and both operate playbooks · 1 attempt(s)
 - [ ] **T14** — Close: commit the worked example as an end-to-end test and pass the real-data check
 
 ## Tasks
@@ -297,7 +297,7 @@ sh .vloop/state/gates/T12/gate.sh
 
 ### T13 — Describe the new model in the docs, the domain and both operate playbooks
 
-`blocked` · **blocked** · depends on: T12
+`pending` · 1 attempt(s) · depends on: T12
 
 The code now records findings before merge as interventions, counts escapes by time, stamps IDs with seconds and has no triage; the docs, the domain model and the two operate playbooks still describe the old model. They are brought in line, and docs/guide/commands.md is regenerated. The operate skill must stay within its word ceiling.
 
@@ -311,7 +311,7 @@ The code now records findings before merge as interventions, counts escapes by t
 - .claude/skills/vloop-operator/SKILL.md, section 5 (Closing and merging): its "Record defects" item says to record findings before merge as verification-finding interventions with --origin, and defects only for escapes.
 - docs/guide/commands.md is regenerated and equals what cmd/gendocs makes now.
 
-**From the last attempt:** gate disputed: The gate's section() helper passes regexes with \* through awk -v, where the escape is consumed; under BSD awk the pattern matches nothing, so the M-4 section is always empty regardless of content. — printf -- '- **M-4** x\n' | awk -v s='^- \*\*M-4\*\*' '$0 ~ s' prints nothing, while s='^- \\*\\*M-4\\*\\*' matches; the gate fails with 'docs/domain/domain-model.md has no M-4' although the line exists. With the escapes doubled in a temp copy the gate prints 'gate T13: ok'.
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-164305/checks/022-go.fail.log
 
 <details><summary>verify command</summary>
 

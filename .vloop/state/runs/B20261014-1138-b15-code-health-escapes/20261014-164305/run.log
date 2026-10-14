@@ -1,0 +1,5 @@
+── iteration 22 (1 this run) · T13 · 12/14 done ──
+   Describe the new model in the docs, the domain and both operate playbooks
+   work T13 · 0m12s · $0.09 · run $0.09 / $40.00
+   check go
+   CHECK FAIL T13 — check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-164305/checks/022-go.fail.log; review skipped
