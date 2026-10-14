@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/metrics"
 )
@@ -268,7 +268,7 @@ func strPtr(s string) *string {
 // user info, query or fragment; a local path or file:// remote is not exported
 // at all (M-7). It reads local git config only.
 func repoIdentity(root string) exportRepo {
-	out, err := exec.Command("git", "-C", root, "config", "--get", "remote.origin.url").Output()
+	out, err := gitrun.At(root, "config", "--get", "remote.origin.url").Output()
 	url, ok := publicRemote(strings.TrimSpace(string(out)))
 	if err != nil || !ok {
 		return exportRepo{Name: filepath.Base(root), Stacks: []string{}}

@@ -5,3 +5,10 @@
    review T1 · 0m15s · $0.08 · run $0.17 / $40.00
    review: PASS
    T1 done
+── iteration 5 (2 this run) · T2 · 1/14 done ──
+   Run every git command through one package
+   work T2 · 5m16s · $0.29 · run $0.46 / $40.00
+   check go
+   review T2 · 0m17s · $0.11 · run $0.58 / $40.00
+   review: PASS
+   T2 done

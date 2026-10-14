@@ -6,12 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -115,7 +115,7 @@ func resolve(root string, v Intervention, kind, ref string) string {
 }
 
 func gitOut(root string, args ...string) (string, bool) {
-	cmd := exec.Command("git", append([]string{"-C", root}, args...)...)
+	cmd := gitrun.At(root, args...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	if cmd.Run() != nil {

@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/14 done** · iteration 4
+**Status:** running · **2/14 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:32:59Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:42:08Z
 
 ## Progress
 
 - [x] **T1** — Make cmd/vloop's TestMain fail cleanly when the binary does not build
-- [ ] **T2** — Run every git command through one package
+- [x] **T2** — Run every git command through one package
 - [ ] **T3** — Filter the environment for gates, checks and sessions with one function
 - [ ] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
 - [ ] **T5** — Split the five long functions to at most 100 lines each
@@ -48,7 +48,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Run every git command through one package
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Fourteen call sites run git with their own exec.Command, each with its own trimming and error text, so a change to how vloop runs git has to be made many times. One package becomes the only place that runs git; every caller goes through it and keeps exactly the output and errors it has today. The driver's hardening is security-relevant: it must apply exactly where it does today, no more and no less.
 

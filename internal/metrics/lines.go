@@ -3,13 +3,11 @@
 package metrics
 
 import (
-	"bytes"
-	"fmt"
-	"os/exec"
 	"strconv"
 	"strings"
 
 	"github.com/mvelosop/vloop/internal/classify"
+	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -54,13 +52,7 @@ func (l Lines) Plus(o Lines) Lines {
 }
 
 func gitOut(root string, args ...string) ([]byte, error) {
-	cmd := exec.Command("git", append([]string{"-C", root}, args...)...)
-	var out, errb bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &out, &errb
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("git %s: %w: %s", strings.Join(args, " "), err, strings.TrimSpace(errb.String()))
-	}
-	return out.Bytes(), nil
+	return gitrun.Capture(root, args...)
 }
 
 // DiffLines counts the lines of the diff from one tree-ish to another. Blank

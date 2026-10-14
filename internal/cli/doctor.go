@@ -16,6 +16,7 @@ import (
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/driver"
+	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/install"
 	"github.com/mvelosop/vloop/internal/state"
 )
@@ -285,7 +286,7 @@ func doctorGit(root string, add func(name, result, msg string)) (bool, string) {
 func gitIgnored(root, rel string) bool { return driver.GitIgnored(root, rel) }
 
 func gitOut(root string, args ...string) (string, error) {
-	out, err := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
+	out, err := gitrun.At(root, args...).Output()
 	return strings.TrimSpace(string(out)), err
 }
 

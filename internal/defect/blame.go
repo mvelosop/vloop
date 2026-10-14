@@ -1,11 +1,10 @@
 package defect
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
 	"strings"
 
+	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -37,13 +36,8 @@ func (a Attribution) String() string {
 }
 
 func gitOut(root string, args ...string) (string, error) {
-	cmd := exec.Command("git", append([]string{"-C", root}, args...)...)
-	var out, errb bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &out, &errb
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("git %s: %w: %s", strings.Join(args, " "), err, strings.TrimSpace(errb.String()))
-	}
-	return out.String(), nil
+	out, err := gitrun.Capture(root, args...)
+	return string(out), err
 }
 
 // Blame attributes file:line, as it is on the default branch (not HEAD), to a

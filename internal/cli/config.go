@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/gitrun"
 )
 
 // root resolves the repo root from -C or the working directory.
@@ -34,7 +34,7 @@ func (g *Globals) gitRoot() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := exec.Command("git", "-C", root, "rev-parse", "--git-dir").Run(); err != nil {
+	if err := gitrun.At(root, "rev-parse", "--git-dir").Run(); err != nil {
 		return "", Problem(fmt.Errorf("%s is not a git repository", root))
 	}
 	return root, nil

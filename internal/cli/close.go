@@ -18,6 +18,7 @@ import (
 	"github.com/mvelosop/vloop/internal/closing"
 	"github.com/mvelosop/vloop/internal/defect"
 	fmpkg "github.com/mvelosop/vloop/internal/frontmatter"
+	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/metrics"
 	"github.com/mvelosop/vloop/internal/runs"
 )
@@ -61,7 +62,7 @@ type closeOpts struct {
 }
 
 func runGit(root string, args ...string) (string, error) {
-	out, err := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
+	out, err := gitrun.At(root, args...).Output()
 	if err != nil {
 		var ee *exec.ExitError
 		if errors.As(err, &ee) && len(ee.Stderr) > 0 {

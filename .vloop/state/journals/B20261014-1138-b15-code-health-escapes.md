@@ -39,3 +39,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** TestMain in cmd/vloop prints the go build output or the MkdirTemp error to stderr, removes its temp dir and exits 1; it never panics.
 - **Files:** cmd/vloop/e2e_test.go
 - **Notes for next iteration:** No change needed this attempt: the code was already committed by an earlier attempt. gofmt -l . is clean now.
+
+## T2 — Run every git command through one package
+
+- **Outcome:** done (review: PASS)
+- **Summary:** New internal/gitrun package is the only place that calls exec.Command with "git" (Plain, At, Hardened, Capture); all former call sites in cli, defect, driver, intervention, metrics and runs build their commands through it with their trimming and error text unchanged.
+- **Files:** internal/gitrun/gitrun.go, internal/gitrun/gitrun_test.go, internal/driver/gitguard.go, internal/cli/close.go, internal/cli/config.go, internal/cli/doctor.go, internal/cli/export.go, internal/defect/blame.go, internal/intervention/show.go, internal/metrics/instructions.go, internal/metrics/lines.go, internal/runs/commits.go, internal/runs/release.go
+- **Notes for next iteration:** Hardening lives only in gitrun.Hardened (driver's gitCmd wraps it); gitPath uses gitrun.At and configEntries gitrun.Plain, both unhardened as before. Running go test ./internal/cli inside a session fails TestTaskGate* because the inherited VLOOP_PLAN_SHA256 env var is set; unset it for a local run.
