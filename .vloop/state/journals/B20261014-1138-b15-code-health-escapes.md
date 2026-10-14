@@ -163,3 +163,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Docs, domain model and both operate playbooks describe the new model; commands.md already equals gendocs output. The gate cannot pass on this machine because its section() helper does not work with the system awk.
 - **Files:** docs/domain/domain-model.md, docs/domain/measurement/defect.md, docs/domain/measurement/metrics.md, docs/guide/metrics.md, docs/guide/defects.md, plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md
 - **Notes for next iteration:** operate skill is 1602 words (ceiling 1750). The gate's section() passes '^- \*\*M-4\*\*' through awk -v, which processes escapes; macOS awk (20200816) turns it into a regex that matches nothing, so M-4 and M-6 sections are always empty. Needs '\\*' in the gate (or a non-awk extraction).
+
+## Run ended — blocked
+
+- **Run:** `B20261014-1138-b15-code-health-escapes` · 5 iteration(s) this run
+- **Plan:** 12/14 done, 1 blocked
