@@ -17,29 +17,29 @@
   "size": {
     "delivered": {
       "code": 582,
-      "test": 1178,
-      "docs": 252,
-      "other": 206,
+      "test": 1527,
+      "docs": 109,
+      "other": 0,
       "deleted": {
         "code": 24,
-        "test": 11,
-        "docs": 31,
-        "other": 13
+        "test": 43,
+        "docs": 12,
+        "other": 0
       }
     },
     "churn": {
       "code": 631,
-      "test": 1180,
-      "docs": 252,
-      "other": 206,
+      "test": 1529,
+      "docs": 109,
+      "other": 0,
       "deleted": {
         "code": 73,
-        "test": 13,
-        "docs": 31,
-        "other": 13
+        "test": 45,
+        "docs": 12,
+        "other": 0
       }
     },
-    "test_code_ratio": 2.0240549828178693,
+    "test_code_ratio": 2.6237113402061856,
     "rework": 1.0841924398625429
   },
   "time": {
@@ -54,7 +54,7 @@
   },
   "rate": {
     "code_per_min": 9.928792474589455,
-    "code_test_per_min": 30.025214356146808
+    "code_test_per_min": 35.979077884723644
   },
   "cost": {
     "total_usd": 15.806994000000003,
@@ -247,9 +247,9 @@
       "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
-        "docs": 116,
-        "other": 151,
+        "test": 265,
+        "docs": 2,
+        "other": 0,
         "deleted": {
           "code": 0,
           "test": 0,
@@ -270,14 +270,14 @@
       "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
-        "docs": 29,
-        "other": 55,
+        "test": 84,
+        "docs": 0,
+        "other": 0,
         "deleted": {
           "code": 0,
-          "test": 0,
-          "docs": 19,
-          "other": 13
+          "test": 32,
+          "docs": 0,
+          "other": 0
         }
       },
       "agent_ms": 140059,
