@@ -4,6 +4,9 @@ run.gate-timeout = 30
 
 [metrics]
   code = ["internal/brief/templates/**", "schemas/**"]
+  # The plugin's eval cases are the skills' tests: graders, prompts, briefs and
+  # scaffolds alike (the go preset would count their .md as docs, the rest as other).
+  test = ["plugin/evals/**", "tools/eval-preflight/**"]
   stacks = ["go"]
 
 # The repository's tests and health checks — CLAUDE.md's toolchain — run by the
