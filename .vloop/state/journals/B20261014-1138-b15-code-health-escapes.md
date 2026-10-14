@@ -215,3 +215,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The worked example is committed as cmd/vloop/b20261014_e2e_test.go; the operator's real-data check is in the task notes. No fixes were needed.
 - **Files:** cmd/vloop/b20261014_e2e_test.go
 - **Notes for next iteration:** Work already existed on disk from the operator's hand-done T14 (commit ae656d8); this session only re-ran the gate. Real-data figures are in the task's notes field.
+
+## Run ended — complete
+
+- **Run:** `B20261014-1138-b15-code-health-escapes` · 1 iteration(s) this run
+- **Plan:** 14/14 done, 0 blocked
