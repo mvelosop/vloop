@@ -91,7 +91,8 @@ before closing anything.
 The patterns only show in the data, so record each thing when it happens, not at
 the end.
 
-A **defect** is something wrong that the loop did or failed to catch:
+A **defect** is an escape: something found after the brief merged. Before the
+merge, a finding is an intervention (`--kind verification-finding --origin <…>`).
 
 ```
 vloop defect add "<summary>" --brief <name> --task <id> \
@@ -151,27 +152,18 @@ intervention migrate` brings older records to the current version.
 ## 5. Closing and merging
 
 1. Fix what the operator agrees to fix, on the work branch, test first.
-2. Close: `vloop brief close <brief> --finding "<what you found>"` (repeatable),
+2. Close: `vloop brief close <brief> --finding "<brief|plan|work|env>: <what you found>"`
+   (repeatable; the origin is whose defect it is),
    or `--no-findings` when you found nothing — state it, do not skip it.
    `--dry-run` first shows what would be recorded. It records the findings as
-   defects, snapshots the metrics, writes the run record, marks the brief
+   verification-finding interventions, snapshots the metrics, writes the run record, marks the brief
    consumed and commits, and prints the trailer for the merge. A plan that did
    not complete is closed with `--abandon "<reason>"`.
-3. Triage, before the close commits: `--dry-run` prints `defects of <run id>`,
-   one line per defect, the untriaged ones last. For each, propose its `rule`
-   (`<where>: <which>`; where is guideline, brief-check, gate, gate-review,
-   review or skill) and `rule-outcome` (fired, missed, absent, none) as
-   options with a recommendation, then record the operator's choice with
-   `vloop defect set`, and commit. For `absent`, draft the guideline line with
-   its provenance, or the check. For a `gate-review` rule that `missed`,
-   propose an eval case and the defect's `case:`. Close reports untriaged
-   defects and never refuses for one; whether a defect deserves a rule is the
-   operator's call.
-4. With the operator's go-ahead only: squash-merge the work branch into the
+3. With the operator's go-ahead only: squash-merge the work branch into the
    default branch with a message ending in the printed trailer, `Vloop-Brief:
    <brief name>`. **Keep the work branch**: its per-iteration commits are the
    evidence of the run.
-5. Check that nothing on the local default branch is missing from the remote one
+4. Check that nothing on the local default branch is missing from the remote one
    before moving it to match.
 
 ## Lessons, where they bite

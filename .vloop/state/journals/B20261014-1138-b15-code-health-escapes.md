@@ -156,3 +156,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** defect set refuses rule and rule-outcome like any unknown field (exit 2, record untouched), and brief close and --dry-run print no defect report or untriaged hint; records carrying the fields stay valid and listed, the schema keeps both properties.
 - **Files:** internal/defect/defect.go, internal/cli/close.go, internal/defect/defect_test.go, internal/cli/close_test.go, cmd/vloop/b14_e2e_test.go, docs/guide/commands.md
 - **Notes for next iteration:** Defect.Rule/RuleOutcome stay as read-only struct fields so list shows old records. commands.md regenerated with go generate ./cmd/vloop. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated.
+
+## T13 — Describe the new model in the docs, the domain and both operate playbooks
+
+- **Outcome:** blocked (review: skipped)
+- **Summary:** Docs, domain model and both operate playbooks describe the new model; commands.md already equals gendocs output. The gate cannot pass on this machine because its section() helper does not work with the system awk.
+- **Files:** docs/domain/domain-model.md, docs/domain/measurement/defect.md, docs/domain/measurement/metrics.md, docs/guide/metrics.md, docs/guide/defects.md, plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md
+- **Notes for next iteration:** operate skill is 1602 words (ceiling 1750). The gate's section() passes '^- \*\*M-4\*\*' through awk -v, which processes escapes; macOS awk (20200816) turns it into a regex that matches nothing, so M-4 and M-6 sections are always empty. Needs '\\*' in the gate (or a non-awk extraction).
