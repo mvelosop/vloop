@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":195080,"exit":1,"name":"go"}],"ended":"2026-10-14T14:21:07Z","gate":{"duration_ms":1641,"exit":0},"iteration":1,"outcome":"check_failed","run_id":"B20261014-1138-b15-code-health-escapes","schema":"iteration/v2","started":"2026-10-14T14:17:36Z","task":"T1"}

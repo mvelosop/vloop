@@ -1,0 +1,1 @@
+{"schema":"proposal/v1","task":"T1","outcome":"done","summary":"TestMain in cmd/vloop now prints temp-dir and go build failures to stderr and exits 1 instead of panicking.","files":["cmd/vloop/e2e_test.go"],"verified":"vloop task gate T1 exited 0.","notes":"none"}

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,7 +18,8 @@ var binPath string
 func TestMain(m *testing.M) {
 	dir, err := os.MkdirTemp("", "vloop-e2e-")
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "create temp dir: %v\n", err)
+		os.Exit(1)
 	}
 	binPath = filepath.Join(dir, "vloop")
 	if runtime.GOOS == "windows" {
@@ -25,7 +27,8 @@ func TestMain(m *testing.M) {
 	}
 	if out, err := exec.Command("go", "build", "-buildvcs=false", "-o", binPath, ".").CombinedOutput(); err != nil {
 		os.RemoveAll(dir)
-		panic("build failed: " + err.Error() + "\n" + string(out))
+		fmt.Fprintf(os.Stderr, "build failed: %v\n%s", err, out)
+		os.Exit(1)
 	}
 	code := m.Run()
 	os.RemoveAll(dir)

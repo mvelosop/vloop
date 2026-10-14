@@ -20,3 +20,8 @@ planned: B20261014-1138-b15-code-health-escapes — 14 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 4m32s · $0.93 · run $7.77 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/14 done ──
+   Make cmd/vloop's TestMain fail cleanly when the binary does not build
+   work T1 · 0m14s · $0.07 · run $7.84 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/001-go.fail.log; review skipped
