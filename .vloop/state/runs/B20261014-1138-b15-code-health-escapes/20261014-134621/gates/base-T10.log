@@ -1,0 +1,1 @@
+GATE FAIL: two operator defects recorded after the merge: the defects line is 'defects in-loop 0 · operator 2 · escaped 0 · removal efficiency 100%', want 'defects in-loop 0 · operator 0 · escaped 2 · removal efficiency 0%'

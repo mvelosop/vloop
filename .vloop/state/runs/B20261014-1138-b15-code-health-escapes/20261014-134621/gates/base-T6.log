@@ -1,0 +1,1 @@
+GATE FAIL: vloop config set run.git-config-ignore 'Core.*': exit 0, want 2: 

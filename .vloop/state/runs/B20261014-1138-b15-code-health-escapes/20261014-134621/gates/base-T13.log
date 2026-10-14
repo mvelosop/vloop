@@ -1,0 +1,1 @@
+GATE FAIL: docs/domain/domain-model.md: the Identifiers table's recorded defect is not D<YYYYMMDD-HHMMSS>-<slug>

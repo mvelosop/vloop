@@ -1,7 +1,7 @@
-# Shared harness: a fresh build (host, linux, windows), a temporary HOME, and a
-# stub claude that answers doctor's two probes and plays every session of
-# `vloop run`, logging each session's arguments, one line per session, to
-# $t/stub/argv.log. Nothing touches the real HOME or this repository.
+# Shared harness for B15's gates: a fresh build (host, linux, windows), a
+# temporary HOME, and a stub claude that answers doctor's probes and plays
+# every session of `vloop run`. Nothing touches the real HOME or this
+# repository; every repository the gate makes lives under $t.
 set -u
 fail() { echo "GATE FAIL: $*" >&2; exit 1; }
 for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
@@ -14,16 +14,33 @@ trap 'rm -rf "$t"' EXIT
 GOMODCACHE=$(go env GOMODCACHE) GOCACHE=$(go env GOCACHE) GOPATH=$(go env GOPATH) || fail "go env"
 export GOMODCACHE GOCACHE GOPATH GOPROXY=off
 go build -buildvcs=false -o "$t/vloop" ./cmd/vloop || fail "go build ./cmd/vloop"
-GOOS=linux go build -o "$t/vloop-linux" ./cmd/vloop || fail "GOOS=linux go build ./cmd/vloop"
-GOOS=windows go build -o "$t/vloop.exe" ./cmd/vloop || fail "GOOS=windows go build ./cmd/vloop"
+GOOS=linux go build ./... || fail "GOOS=linux go build ./..."
+GOOS=windows go build ./... || fail "GOOS=windows go build ./..."
 B="$t/vloop"
-V=$("$B" version --json | "$JQ" -r .version) && [ -n "$V" ] && [ "$V" != null ] || fail "vloop version --json gave no version"
 SYS=/usr/bin:/bin
-mkdir -p "$t/stub" "$t/fakehome/gateuser" || fail mkdir
-export HOME="$t/fakehome/gateuser"
-printf '{"projects":{}}\n' >"$HOME/.claude.json" || fail trust
-printf '[{"id":"vloop@vloop","version":"%s","enabled":true}]\n' "$V" >"$t/stub/plugins.json" || fail plugins
-cat >"$t/stub/claude" <<'STUB'
+# The plan's base, for "as today" comparisons.
+BASE=4ece10df6362e2939d4dad3da319e430e3b044bd
+# basebin: $t/vloop-base, built from the plan's base.
+basebin() {
+  mkdir -p "$t/base" && git -C "$top" archive "$BASE" | tar -x -C "$t/base" || fail "git archive $BASE"
+  (cd "$t/base" && go build -buildvcs=false -o "$t/vloop-base" ./cmd/vloop) || fail "build of the base"
+}
+# astcheck <mode> <root>: the gate's source checker, built outside any module.
+astcheck() {
+  if [ ! -x "$t/astcheck" ]; then
+    mkdir -p "$t/ast" && cp "$G/astcheck.go.txt" "$t/ast/astcheck.go" || fail "copy astcheck"
+    (cd "$t/ast" && GO111MODULE=on GOFLAGS= go build -o "$t/astcheck" astcheck.go) || fail "build astcheck"
+  fi
+  "$t/astcheck" "$@"
+}
+# stubs: the stub claude in $t/stub, and an empty argv log.
+stubs() {
+  V=$("$B" version --json | "$JQ" -r .version) && [ -n "$V" ] && [ "$V" != null ] || fail "vloop version --json gave no version"
+  mkdir -p "$t/stub" "$t/fakehome/gateuser" || fail mkdir
+  export HOME="$t/fakehome/gateuser"
+  [ -f "$HOME/.claude.json" ] || printf '{"projects":{}}\n' >"$HOME/.claude.json" || fail trust
+  printf '[{"id":"vloop@vloop","version":"%s","enabled":true}]\n' "$V" >"$t/stub/plugins.json" || fail plugins
+  cat >"$t/stub/claude" <<'STUB'
 #!/bin/sh
 dir=$(dirname "$0")
 case "$1" in
@@ -46,31 +63,42 @@ mkdir -p .vloop/tmp
 case "$PHASE" in
 plan) mkdir -p .vloop/state && cp "$dir/plan.json" .vloop/state/state.json ;;
 gate-review) echo '{"schema":"gate-verdict/v1","verdict":"PASS","tasks":[],"notes":"none"}' >.vloop/tmp/gate-verdict.json ;;
-work) : >"$TASK.out"
+work)
+  # fail-<task>: this attempt leaves the gate failing, once.
+  if [ -f "$dir/fail-$TASK" ]; then rm -f "$dir/fail-$TASK"; else : >"$TASK.out"; fi
+  if [ -f "$dir/work-$TASK.sh" ]; then . "$dir/work-$TASK.sh"; fi
   printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$TASK" "$TASK" >.vloop/tmp/proposal.json ;;
 review) printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"none"}\n' "$TASK" >.vloop/tmp/verdict.json ;;
 esac
-printf '{"type":"result","subtype":"success","is_error":false,"duration_ms":1000,"num_turns":3,"total_cost_usd":0.1,"session_id":"stub","permission_denials":[],"modelUsage":{"%s":{"costUSD":0.1}}}\n' "$MODEL"
+# cost: what each session costs, 0.1 unless the file says otherwise.
+c=0.1; [ -f "$dir/cost" ] && c=$(cat "$dir/cost")
+printf '{"type":"result","subtype":"success","is_error":false,"duration_ms":1000,"num_turns":3,"total_cost_usd":%s,"session_id":"stub","permission_denials":[],"modelUsage":{"%s":{"costUSD":%s}}}\n' "$c" "$MODEL" "$c"
 STUB
-chmod +x "$t/stub/claude" || fail chmod
+  chmod +x "$t/stub/claude" || fail chmod
+  : >"$t/stub/argv.log"
+}
 RUN=B20260101-0900-demo
 BRIEF=docs/briefs/$RUN.loop-brief.md
-# A one-task state/v2 plan, as the stub's plan session writes it.
-"$JQ" -n --arg brief "$BRIEF" '{schema: "state/v2", run_id: "", brief: "", base: "", branch: "",
-  status: "planning", iteration: 0, created: "2026-01-01T09:00:00Z", updated: "2026-01-01T09:00:00Z",
-  shell: "sh", checks: [], gate_scratch: [], gate_review: {rounds: 0, verdict: ""},
-  tasks: [{id: "T1", title: "Task T1", goal: "Do T1.", kind: "feature", fixtures: "", references: [],
-    depends_on: [], acceptance: ["T1.out exists"], verify: "test -f T1.out", status: "pending",
-    attempts: 0, notes: ""}]}' >"$t/stub/plan.json" || fail "plan.json"
-
+# mkplan <task id>...: the state/v2 plan the stub's plan session writes; task
+# <id> passes when <id>.out exists, and depends on the one before it.
+mkplan() {
+  printf '%s\n' "$@" | "$JQ" -R . | "$JQ" -s '[ to_entries[] | {id: .value, title: ("Task " + .value),
+    goal: ("Do " + .value + "."), kind: "feature", fixtures: "", references: [],
+    depends_on: (if .key == 0 then [] else ["T" + (.key | tostring)] end),
+    acceptance: [(.value + ".out exists")], verify: ("test -f " + .value + ".out"),
+    status: "pending", attempts: 0, notes: ""} ]' >"$t/tasks.json" || fail tasks.json
+  "$JQ" -n --slurpfile ts "$t/tasks.json" '{schema: "state/v2", run_id: "", brief: "", base: "", branch: "",
+    status: "planning", iteration: 0, created: "2026-01-01T09:00:00Z", updated: "2026-01-01T09:00:00Z",
+    shell: "sh", checks: [], gate_scratch: [], gate_review: {rounds: 0, verdict: ""}, tasks: $ts[0]}' >"$t/stub/plan.json" || fail plan.json
+}
 # inr <args...>: run in $R with the stub first on PATH.
 inr() { (cd "$R" && env PATH="$t/stub:$SYS" "$@"); }
 # newrepo <name>: a git repository on main where vloop init ran, with one
-# [[check]], trusted in $HOME/.claude.json; $R is its path, $t/<name>.init the
-# output of init.
+# [[check]], trusted in $HOME/.claude.json; $R is its path.
 newrepo() {
+  [ -x "$t/stub/claude" ] || stubs
   R="$t/$1"
-  mkdir -p "$R/docs" && git -C "$R" init -q -b main || fail "git init $1"
+  mkdir -p "$R/docs/briefs" && git -C "$R" init -q -b main || fail "git init $1"
   git -C "$R" config user.name gate && git -C "$R" config user.email gate@example.invalid || fail identity
   printf 'x\n' >"$R/docs/x.md"
   inr "$B" init </dev/null >"$t/$1.init" 2>&1 || fail "vloop init in $1: $(cat "$t/$1.init")"
@@ -79,19 +107,21 @@ newrepo() {
     mv "$t/trust.json" "$HOME/.claude.json" || fail trust
 }
 commit() { git -C "$R" add -A && git -C "$R" commit -q -m "$1" || fail "commit $1"; }
-# brief: a ready loop brief that passes vloop brief check.
-brief() {
+# briefdoc <run id> <status>: a loop brief that passes vloop brief check.
+briefdoc() {
   cat <<BRIEF
 ---
-name: $RUN.loop-brief
+name: $1.loop-brief
 description: Build a demo
 kind: brief
-status: ready
+status: $2
 created: 2026-01-01
 seeds: A run that builds a demo
 depends-on: []
 ---
 # Brief
+
+**Status:** ready to plan
 
 ## What it is
 
@@ -130,9 +160,31 @@ ok
 2 to 3 tasks.
 BRIEF
 }
-# runrepo <name>: newrepo with the ready brief, all committed on main.
-runrepo() { newrepo "$1"; mkdir -p "$R/docs/briefs" && brief >"$R/$BRIEF" || fail brief; commit harness; }
+# putbrief <run id> <status>: write the brief into $R (not committed).
+putbrief() { briefdoc "$1" "$2" >"$R/docs/briefs/$1.loop-brief.md" || fail "brief $1"; }
+# runrepo <name> <task id>...: newrepo with the ready brief $RUN and a plan of
+# those tasks, all committed on main.
+runrepo() { n=$1; shift; newrepo "$n"; mkplan "$@"; putbrief "$RUN" ready; commit harness; }
 # vrun <out>: vloop run on the brief in $R; output in $t/<out>, exit in $got.
 vrun() { : >"$t/stub/argv.log"; inr "$B" run "$BRIEF" </dev/null >"$t/$1" 2>&1; got=$?; }
-# sessions: the logged session lines, one per session.
-sessions() { cat "$t/stub/argv.log"; }
+# mergemain: merge the current work branch into main with --no-ff, leaving
+# main checked out; $MERGED is the merge commit's committer time, in seconds.
+mergemain() {
+  wb=$(git -C "$R" symbolic-ref --short HEAD) || fail "no branch checked out"
+  [ "$wb" != main ] || fail "the run left main checked out, not a work branch"
+  git -C "$R" checkout -q main && git -C "$R" merge -q --no-ff -m "merge $wb" "$wb" || fail "merge $wb"
+  MERGED=$(git -C "$R" log -1 --format=%ct main) || fail "merge time"
+}
+# words <file>: the file's lines with runs of blanks squeezed and the ends trimmed.
+squeeze() { sed -e 's/[[:space:]][[:space:]]*/ /g' -e 's/^ //' -e 's/ $//' "$1"; }
+# stamp <epoch>: the local YYYYMMDD-HHMMSS of that second (BSD date).
+stamp() { date -r "$1" +%Y%m%d-%H%M%S; }
+# utc <epoch>: that second as created/recorded write it.
+utc() { date -u -r "$1" +%Y-%m-%dT%H:%M:%SZ; }
+# defectdoc <id> <brief name> <found-by> <created> [<extra frontmatter line>]:
+# a defect/v1 record, origin work, as an operator's hand would write it.
+defectdoc() {
+  printf -- '---\nid: %s\nbrief: %s\norigin: work\nfound-by: %s\nkind: bug\nseverity: low\nstatus: open\nfixed-by: ""\ncase: ""\ncreated: %s\n%s---\nfixture defect %s\n' \
+    "$1" "$2" "$3" "$4" "${5:+$5
+}" "$1"
+}

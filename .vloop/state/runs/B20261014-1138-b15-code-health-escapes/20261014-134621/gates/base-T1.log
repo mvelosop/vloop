@@ -1,0 +1,11 @@
+GATE FAIL: TestMain panicked on a build failure:
+panic: build failed: exit status 1
+	# github.com/mvelosop/vloop/cmd/vloop
+	/private/var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/gate.O8iHx4/break.go:3:9: undefined: gateOnlyInTest
+	
+
+goroutine 1 [running]:
+github.com/mvelosop/vloop/cmd/vloop.TestMain(0x29541c569220)
+	~/source/personal/vloop/cmd/vloop/e2e_test.go:28 +0x1bc
+main.main()
+	_testmain.go:306 +0x88

@@ -1,0 +1,6 @@
+GATE FAIL: a long function is over 100 lines:
+internal/cli/close.go:75 runBriefClose is 145 lines, over 100
+internal/cli/doctor.go:90 runDoctor is 172 lines, over 100
+internal/cli/init.go:53 runInit is 192 lines, over 100
+internal/driver/iterate.go:451 iterate is 296 lines, over 100
+internal/driver/plan.go:248 Plan is 215 lines, over 100

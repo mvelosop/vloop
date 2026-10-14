@@ -1,0 +1,1 @@
+GATE FAIL: by_task T1 (code+ 200, test+ 300, cost 0.2): want test_code_ratio 1.5 and per_1000_code_lines_usd 0.2*1000/200: {"id":"T1","area":null,"kind":"feature","attempts":1,"churn":{"code":200,"test":300,"docs":0,"other":0,"deleted":{"code":0,"test":0,"docs":0,"other":0}},"agent_ms":36,"cost_usd":0.2,"models":["sonnet"]}

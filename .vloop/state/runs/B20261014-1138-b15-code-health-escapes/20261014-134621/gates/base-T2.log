@@ -1,0 +1,8 @@
+GATE FAIL: git is run from more than one package:
+6 packages run git; one may
+internal/cli runs git: internal/cli/close.go:64, internal/cli/config.go:37, internal/cli/doctor.go:288, internal/cli/export.go:271
+internal/defect runs git: internal/defect/blame.go:40
+internal/driver runs git: internal/driver/gitguard.go:33, internal/driver/gitguard.go:104, internal/driver/gitguard.go:146
+internal/intervention runs git: internal/intervention/show.go:118
+internal/metrics runs git: internal/metrics/instructions.go:24, internal/metrics/lines.go:57
+internal/runs runs git: internal/runs/commits.go:62, internal/runs/release.go:29

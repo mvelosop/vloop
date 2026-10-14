@@ -1,0 +1,1 @@
+GATE FAIL: vloop intervention add --brief B20260101-0800-merged.loop-brief --kind verification-finding: exit 0, want 2: 

@@ -1,0 +1,337 @@
+// astcheck judges the shape of vloop's Go source for B15's code-health gates.
+// It reads every non-test .go file under <root>/internal and <root>/cmd and
+// prints one line per offence; it exits 1 when there is any, 2 on misuse.
+//
+//	astcheck gitcalls <root>    more than one package calls exec.Command(Context) with "git"
+//	astcheck envfilter <root>   more than one function filters an environment by "<NAME>="
+//	astcheck plansha <root>     more than one function picks run, last task or plan commit
+//	astcheck counts <root>      the driver still has its own counts, or never calls Counts()
+//	astcheck budgetkeys <root>  a run.* budget key is named more than twice
+//	astcheck funclen <root>     iterate, Plan, runInit, runDoctor or runBriefClose is over 100 lines
+package main
+
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"sort"
+	"strconv"
+	"strings"
+)
+
+type file struct {
+	path string // relative to root, with /
+	f    *ast.File
+}
+
+var fset = token.NewFileSet()
+
+func load(root string) []file {
+	var out []file
+	for _, top := range []string{"internal", "cmd"} {
+		dir := filepath.Join(root, top)
+		err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() {
+				if p != dir && (strings.HasPrefix(d.Name(), ".") || d.Name() == "testdata") {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
+				return nil
+			}
+			f, err := parser.ParseFile(fset, p, nil, 0)
+			if err != nil {
+				return err
+			}
+			rel, _ := filepath.Rel(root, p)
+			out = append(out, file{filepath.ToSlash(rel), f})
+			return nil
+		})
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "astcheck:", err)
+			os.Exit(2)
+		}
+	}
+	return out
+}
+
+func str(e ast.Expr) (string, bool) {
+	if b, ok := e.(*ast.BasicLit); ok && b.Kind == token.STRING {
+		s, err := strconv.Unquote(b.Value)
+		return s, err == nil
+	}
+	return "", false
+}
+
+// callTo reports whether c calls pkg.name.
+func callTo(c *ast.CallExpr, pkg string, names ...string) bool {
+	sel, ok := c.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+	x, ok := sel.X.(*ast.Ident)
+	if !ok || x.Name != pkg {
+		return false
+	}
+	for _, n := range names {
+		if sel.Sel.Name == n {
+			return true
+		}
+	}
+	return false
+}
+
+func pos(n ast.Node) string {
+	p := fset.Position(n.Pos())
+	return p.Filename + ":" + strconv.Itoa(p.Line)
+}
+
+// funcs calls fn for every top-level function declaration with a body.
+func funcs(files []file, fn func(file, *ast.FuncDecl)) {
+	for _, f := range files {
+		for _, d := range f.f.Decls {
+			if fd, ok := d.(*ast.FuncDecl); ok && fd.Body != nil {
+				fn(f, fd)
+			}
+		}
+	}
+}
+
+func gitcalls(files []file) []string {
+	byDir := map[string][]string{}
+	for _, f := range files {
+		// names bound to the literal "git", by const, var or :=
+		gitNames := map[string]bool{}
+		ast.Inspect(f.f, func(n ast.Node) bool {
+			switch v := n.(type) {
+			case *ast.ValueSpec:
+				for i, val := range v.Values {
+					if s, ok := str(val); ok && s == "git" && i < len(v.Names) {
+						gitNames[v.Names[i].Name] = true
+					}
+				}
+			case *ast.AssignStmt:
+				for i, val := range v.Rhs {
+					if s, ok := str(val); ok && s == "git" && i < len(v.Lhs) {
+						if id, ok := v.Lhs[i].(*ast.Ident); ok {
+							gitNames[id.Name] = true
+						}
+					}
+				}
+			}
+			return true
+		})
+		ast.Inspect(f.f, func(n ast.Node) bool {
+			c, ok := n.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			i := -1
+			switch {
+			case callTo(c, "exec", "Command"):
+				i = 0
+			case callTo(c, "exec", "CommandContext"):
+				i = 1
+			}
+			if i < 0 || len(c.Args) <= i {
+				return true
+			}
+			arg := c.Args[i]
+			s, lit := str(arg)
+			id, isID := arg.(*ast.Ident)
+			if (lit && s == "git") || (isID && gitNames[id.Name]) {
+				dir := filepath.ToSlash(filepath.Dir(f.path))
+				byDir[dir] = append(byDir[dir], pos(c))
+			}
+			return true
+		})
+	}
+	if len(byDir) <= 1 {
+		return nil
+	}
+	var out []string
+	for dir, calls := range byDir {
+		out = append(out, fmt.Sprintf("%s runs git: %s", dir, strings.Join(calls, ", ")))
+	}
+	sort.Strings(out)
+	return append([]string{fmt.Sprintf("%d packages run git; one may", len(byDir))}, out...)
+}
+
+// envPrefix reports whether e is "<literal>=" or <expr>+"=".
+func envPrefix(e ast.Expr) bool {
+	if s, ok := str(e); ok {
+		return strings.HasSuffix(s, "=") && len(s) > 1
+	}
+	if b, ok := e.(*ast.BinaryExpr); ok && b.Op == token.ADD {
+		if s, ok := str(b.Y); ok && s == "=" {
+			return true
+		}
+	}
+	return false
+}
+
+func envfilter(files []file) []string {
+	var hits []string
+	funcs(files, func(f file, fd *ast.FuncDecl) {
+		found := false
+		ast.Inspect(fd.Body, func(n ast.Node) bool {
+			if c, ok := n.(*ast.CallExpr); ok && callTo(c, "strings", "HasPrefix") && len(c.Args) == 2 && envPrefix(c.Args[1]) {
+				found = true
+			}
+			return !found
+		})
+		if found {
+			hits = append(hits, fmt.Sprintf("%s %s filters an environment by name", pos(fd), fd.Name.Name))
+		}
+	})
+	if len(hits) <= 1 {
+		return nil
+	}
+	return append([]string{fmt.Sprintf("%d functions filter an environment by variable name; one may", len(hits))}, hits...)
+}
+
+// selChain reports whether e is <x>.<a>.<b>.
+func selChain(e ast.Node, a, b string) bool {
+	s, ok := e.(*ast.SelectorExpr)
+	if !ok || s.Sel.Name != b {
+		return false
+	}
+	in, ok := s.X.(*ast.SelectorExpr)
+	return ok && in.Sel.Name == a
+}
+
+func plansha(files []file) []string {
+	var hits []string
+	funcs(files, func(f file, fd *ast.FuncDecl) {
+		plan, run := false, false
+		ast.Inspect(fd.Body, func(n ast.Node) bool {
+			plan = plan || selChain(n, "Plan", "SHA")
+			run = run || selChain(n, "Run", "SHA")
+			return true
+		})
+		if plan && run {
+			hits = append(hits, fmt.Sprintf("%s %s picks the run, last task or plan commit itself", pos(fd), fd.Name.Name))
+		}
+	})
+	if len(hits) <= 1 {
+		return nil
+	}
+	return append([]string{fmt.Sprintf("%d functions pick the plan at the last commit; one may", len(hits))}, hits...)
+}
+
+func counts(files []file) []string {
+	var out []string
+	calls := 0
+	funcs(files, func(f file, fd *ast.FuncDecl) {
+		if !strings.HasPrefix(f.path, "internal/driver/") {
+			return
+		}
+		if fd.Recv == nil && fd.Name.Name == "counts" {
+			out = append(out, pos(fd)+" the driver still has its own counts")
+		}
+		ast.Inspect(fd.Body, func(n ast.Node) bool {
+			if c, ok := n.(*ast.CallExpr); ok {
+				if s, ok := c.Fun.(*ast.SelectorExpr); ok && s.Sel.Name == "Counts" {
+					calls++
+				}
+			}
+			return true
+		})
+	})
+	if calls == 0 {
+		out = append(out, "internal/driver never calls the plan's Counts()")
+	}
+	return out
+}
+
+var budgetKeys = []string{"run.max-iterations", "run.cost-ceiling", "run.max-attempts", "run.stall-limit",
+	"run.convergence-max", "run.convergence-min", "run.gate-timeout", "run.session-timeout", "run.keep-awake"}
+
+func budgetkeys(files []file) []string {
+	where := map[string][]string{}
+	for _, f := range files {
+		ast.Inspect(f.f, func(n ast.Node) bool {
+			if s, ok := str(func() ast.Expr { e, _ := n.(ast.Expr); return e }()); ok {
+				for _, k := range budgetKeys {
+					if s == k {
+						where[k] = append(where[k], pos(n))
+					}
+				}
+			}
+			return true
+		})
+	}
+	var out []string
+	for _, k := range budgetKeys {
+		if len(where[k]) > 2 {
+			out = append(out, fmt.Sprintf("%s is named %d times: %s", k, len(where[k]), strings.Join(where[k], ", ")))
+		}
+	}
+	return out
+}
+
+func funclen(files []file) []string {
+	want := []struct{ recv, name string }{{"Iterator", "iterate"}, {"Planner", "Plan"}, {"", "runInit"}, {"", "runDoctor"}, {"", "runBriefClose"}}
+	found := map[string]int{}
+	var out []string
+	funcs(files, func(f file, fd *ast.FuncDecl) {
+		recv := ""
+		if fd.Recv != nil && len(fd.Recv.List) == 1 {
+			t := fd.Recv.List[0].Type
+			if s, ok := t.(*ast.StarExpr); ok {
+				t = s.X
+			}
+			if id, ok := t.(*ast.Ident); ok {
+				recv = id.Name
+			}
+		}
+		for _, w := range want {
+			if fd.Name.Name != w.name || recv != w.recv {
+				continue
+			}
+			found[w.name]++
+			n := fset.Position(fd.End()).Line - fset.Position(fd.Type.Func).Line + 1
+			if n > 100 {
+				out = append(out, fmt.Sprintf("%s %s is %d lines, over 100", pos(fd), w.name, n))
+			}
+		}
+	})
+	for _, w := range want {
+		if found[w.name] != 1 {
+			out = append(out, fmt.Sprintf("%s: found %d declarations, want 1", w.name, found[w.name]))
+		}
+	}
+	return out
+}
+
+func main() {
+	checks := map[string]func([]file) []string{"gitcalls": gitcalls, "envfilter": envfilter, "plansha": plansha,
+		"counts": counts, "budgetkeys": budgetkeys, "funclen": funclen}
+	if len(os.Args) != 3 || checks[os.Args[1]] == nil {
+		fmt.Fprintln(os.Stderr, "usage: astcheck gitcalls|envfilter|plansha|counts|budgetkeys|funclen <root>")
+		os.Exit(2)
+	}
+	root := os.Args[2]
+	files := load(root)
+	if len(files) == 0 {
+		fmt.Fprintln(os.Stderr, "astcheck: no Go files under", root)
+		os.Exit(2)
+	}
+	for i := range files {
+		files[i].path = strings.TrimPrefix(files[i].path, "./")
+	}
+	if out := checks[os.Args[1]](files); len(out) > 0 {
+		for _, l := range out {
+			fmt.Println(strings.ReplaceAll(l, root+string(filepath.Separator), ""))
+		}
+		os.Exit(1)
+	}
+}
