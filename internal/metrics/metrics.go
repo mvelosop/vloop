@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
@@ -196,15 +197,17 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 		size = *s
 		r.Instructions = MeasureInstructions(root, o.PlanSHA())
 	}
+	var released time.Time // the release commit's committer time; zero when not merged
 	// A release error only means there is no default branch: not merged.
 	if sha, err := runs.Release(root, m.BriefPath); err == nil && sha != "" {
 		r.Merged = &sha
-		if m.Owned != nil {
-			out, err := gitOut(root, "show", "-s", "--format=%ct", sha)
-			if err != nil {
-				return nil, err
-			}
-			if secs, err := strconv.ParseInt(strings.TrimSpace(string(out)), 10, 64); err == nil {
+		out, err := gitOut(root, "show", "-s", "--format=%ct", sha)
+		if err != nil {
+			return nil, err
+		}
+		if secs, err := strconv.ParseInt(strings.TrimSpace(string(out)), 10, 64); err == nil {
+			released = time.Unix(secs, 0)
+			if m.Owned != nil {
 				ms := secs*1000 - m.Owned.Plan.Time.UnixMilli()
 				r.LeadTime.PlanToMergeMS = &ms
 			}
@@ -239,6 +242,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	}
 	x.AddRecorded(recorded)
 	dc := x.Counts()
+	dc.Reclassify(recorded, released)
 	r.Defects = ReportDefects{InLoop: dc.InLoop, Operator: dc.Operator, Escaped: dc.Escaped, Total: dc.All()}
 	r.Defects.RemovalEfficiency = fratio(float64(dc.InLoop+dc.Operator), float64(dc.All()))
 

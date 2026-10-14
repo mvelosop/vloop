@@ -153,3 +153,28 @@ func TestDerivedCheckFailed(t *testing.T) {
 		t.Errorf("id = %v", ids)
 	}
 }
+
+func TestReclassifyByReleaseTime(t *testing.T) {
+	rel := at(10, 0)
+	mk := func(by string, d time.Duration) defect.Defect {
+		return defect.Defect{FoundBy: by, Created: rel.Add(d).Format("2006-01-02T15:04:05Z")}
+	}
+	rec := []defect.Defect{
+		mk("operator", -time.Hour), mk("operator", 0), mk("operator", time.Second),
+		mk("review", time.Minute), mk("gate", -time.Minute), mk("user", -time.Minute),
+	}
+	var x Matrix
+	for _, d := range rec {
+		x.Add("work", d.FoundBy)
+	}
+	c := x.Counts()
+	c.Reclassify(rec, rel)
+	if c.InLoop != 1 || c.Operator != 2 || c.Escaped != 3 {
+		t.Errorf("counts = %+v, want in-loop 1, operator 2, escaped 3", c)
+	}
+	u := x.Counts()
+	u.Reclassify(rec, time.Time{})
+	if u != x.Counts() {
+		t.Errorf("unmerged brief reclassified: %+v", u)
+	}
+}

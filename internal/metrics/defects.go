@@ -149,6 +149,31 @@ type DefectCounts struct {
 	Escaped  int // found by user
 }
 
+// Reclassify moves a recorded defect created after its brief's release to
+// escaped, whoever found it (M-5); one created at or before the release, or of
+// an unmerged brief (zero released), keeps its found-by group. The matrix, by
+// catcher, is not touched.
+func (c *DefectCounts) Reclassify(recorded []defect.Defect, released time.Time) {
+	if released.IsZero() {
+		return
+	}
+	for _, d := range recorded {
+		at, err := time.Parse(time.RFC3339, d.Created)
+		if err != nil || !at.After(released) {
+			continue
+		}
+		switch d.FoundBy {
+		case "gate", "review":
+			c.InLoop--
+		case "operator":
+			c.Operator--
+		default:
+			continue
+		}
+		c.Escaped++
+	}
+}
+
 // Counts groups the matrix by catcher.
 func (x Matrix) Counts() DefectCounts {
 	var c DefectCounts
