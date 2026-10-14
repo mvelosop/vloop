@@ -22,3 +22,9 @@
    check go
    review T14 · 0m15s · $0.08 · run $1.00 / $40.00
    review: FAIL
+── iteration 26 (5 this run) · T14 · 13/14 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data check
+   work T14 · 0m36s · $0.11 · run $1.11 / $40.00
+   work session reported blocked
+   T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+   T14 hit the attempt ceiling — blocked

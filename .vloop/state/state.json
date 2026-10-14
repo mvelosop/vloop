@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 25,
+  "iteration": 26,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T17:05:30Z",
+  "updated": "2026-10-14T17:07:22Z",
   "shell": "sh",
   "checks": [
     {
@@ -481,9 +481,9 @@
         "Fixes needed to make the worked example hold are made here, each with its committed test, and named in the notes."
       ],
       "verify": "sh .vloop/state/gates/T14/gate.sh",
-      "status": "pending",
-      "attempts": 2,
-      "notes": "the real-data before/after metrics comparison per consumed brief was not done and is not recorded, so acceptance criterion 2 is unmet"
+      "status": "blocked",
+      "attempts": 3,
+      "notes": "The worked example is committed as cmd/vloop/b20261014_e2e_test.go and the gate passes; the before/after real-data metrics comparison (acceptance 2) could not be done because building a base-commit binary is denied in this session. — T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else."
     }
   ]
 }
