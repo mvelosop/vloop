@@ -2,7 +2,7 @@
 name: B20261014-1138-b15-code-health-escapes.loop-brief
 description: Pay down the v1 review's code-health findings with no behaviour change, and narrow recorded defects to escapes — operator findings become interventions saying whose defect it is, escaped is counted by time against the merge, the defect triage retires — plus unique second-stamped record IDs, a case-correct git-config-ignore, and test:code and $/kloc per task
 kind: brief
-status: draft
+status: ready
 created: 2026-10-14
 seeds: The roadmap's B15 row as rewritten after B14's close; the verification phase follows as B16
 depends-on: [B20261011-2251-b14-learning-loop.loop-brief]
