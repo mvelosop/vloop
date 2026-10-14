@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T13",
+  "outcome": "done",
+  "summary": "Docs, domain model and both operate playbooks describe the new model; defects.md again names the retired rule-outcome values so TestGuideDefectsCoversSchema passes.",
+  "files": ["docs/guide/defects.md", "docs/domain/domain-model.md", "docs/domain/measurement/defect.md", "docs/domain/measurement/metrics.md", "docs/guide/metrics.md", "plugin/skills/operate/SKILL.md", ".claude/skills/vloop-operator/SKILL.md", "docs/guide/commands.md"],
+  "verified": "vloop task gate T13 exited 0 (gate T13: ok); go test ./internal/cli -run TestGuide passed.",
+  "notes": "The previous check_failed was TestGuideDefectsCoversSchema: defect/v1 schema still enumerates fired/missed, so defects.md must keep naming them; the retired-field line now lists them. Operate skill is 1602 words."
+}

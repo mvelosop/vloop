@@ -92,7 +92,8 @@ field:
 - `case`: the failing test written first, empty until then.
 - `created`: an RFC 3339 date-time.
 - `rule` and `rule-outcome` (optional): retired in B15; old records keep them
-  and stay valid, and `defect set` no longer accepts them.
+  (the outcome was `fired`, `missed`, `absent` or `none`) and stay valid, and
+  `defect set` no longer accepts them.
 
 ## Commands
 

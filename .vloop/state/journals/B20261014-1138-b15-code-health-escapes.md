@@ -175,3 +175,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Docs, domain model and both operate playbooks describe the new model (escaped by time, interventions for pre-merge findings, second-stamped IDs, triage retired); commands.md equals gendocs output.
 - **Files:** docs/domain/domain-model.md, docs/domain/measurement/defect.md, docs/domain/measurement/metrics.md, docs/guide/metrics.md, docs/guide/defects.md, plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md, docs/guide/commands.md
 - **Notes for next iteration:** Edits were made in an earlier attempt and are in the tree; this attempt only re-ran the amended gate, which now passes. Operate skill is 1602 words (ceiling 1750).
+
+## T13 — Describe the new model in the docs, the domain and both operate playbooks
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Docs, domain model and both operate playbooks describe the new model; defects.md again names the retired rule-outcome values so TestGuideDefectsCoversSchema passes.
+- **Files:** docs/guide/defects.md, docs/domain/domain-model.md, docs/domain/measurement/defect.md, docs/domain/measurement/metrics.md, docs/guide/metrics.md, plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md, docs/guide/commands.md
+- **Notes for next iteration:** The previous check_failed was TestGuideDefectsCoversSchema: defect/v1 schema still enumerates fired/missed, so defects.md must keep naming them; the retired-field line now lists them. Operate skill is 1602 words.

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **12/14 done** · iteration 22
+**Status:** running · **13/14 done** · iteration 23
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:47:33Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:52:41Z
 
 ## Progress
 
@@ -20,7 +20,7 @@
 - [x] **T10** — Count a recorded defect as escaped when it was created after its brief merged
 - [x] **T11** — Record operator findings as verification-finding interventions with an origin · 1 attempt(s)
 - [x] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
-- [ ] **T13** — Describe the new model in the docs, the domain and both operate playbooks · 1 attempt(s)
+- [x] **T13** — Describe the new model in the docs, the domain and both operate playbooks · 1 attempt(s)
 - [ ] **T14** — Close: commit the worked example as an end-to-end test and pass the real-data check
 
 ## Tasks
@@ -297,7 +297,7 @@ sh .vloop/state/gates/T12/gate.sh
 
 ### T13 — Describe the new model in the docs, the domain and both operate playbooks
 
-`pending` · 1 attempt(s) · depends on: T12
+`done` · 1 attempt(s) · depends on: T12
 
 The code now records findings before merge as interventions, counts escapes by time, stamps IDs with seconds and has no triage; the docs, the domain model and the two operate playbooks still describe the old model. They are brought in line, and docs/guide/commands.md is regenerated. The operate skill must stay within its word ceiling.
 
@@ -310,8 +310,6 @@ The code now records findings before merge as interventions, counts escapes by t
 - plugin/skills/operate/SKILL.md: the close step's --finding takes its origin (`--finding "<brief|plan|work|env>: …"`); the triage step is removed (no rule-outcome, untriaged or `defects of` left); it stays within 1,750 words and is not changed beyond D1.
 - .claude/skills/vloop-operator/SKILL.md, section 5 (Closing and merging): its "Record defects" item says to record findings before merge as verification-finding interventions with --origin, and defects only for escapes.
 - docs/guide/commands.md is regenerated and equals what cmd/gendocs makes now.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-164305/checks/022-go.fail.log
 
 <details><summary>verify command</summary>
 

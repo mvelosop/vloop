@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 22,
+  "iteration": 23,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T16:47:33Z",
+  "updated": "2026-10-14T16:52:41Z",
   "shell": "sh",
   "checks": [
     {
@@ -442,9 +442,9 @@
         "docs/guide/commands.md is regenerated and equals what cmd/gendocs makes now."
       ],
       "verify": "sh .vloop/state/gates/T13/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-164305/checks/022-go.fail.log",
+      "notes": "",
       "gate_history": [
         {
           "verify": "sh .vloop/state/gates/T13/gate.sh",
