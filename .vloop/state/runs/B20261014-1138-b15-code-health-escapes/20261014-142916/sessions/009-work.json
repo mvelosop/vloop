@@ -1,0 +1,26 @@
+{
+  "cost_usd": 0.7598720000000001,
+  "duration_ms": 426084,
+  "effort": null,
+  "ended": "2026-10-14T15:01:19Z",
+  "is_error": false,
+  "iteration": 8,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 74446,
+      "cache_read_input_tokens": 1884400,
+      "cost_usd": 0.7598720000000001,
+      "input_tokens": 64,
+      "output_tokens": 27352
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261014-1138-b15-code-health-escapes",
+  "schema": "session/v1",
+  "started": "2026-10-14T14:54:12Z",
+  "task": "T5",
+  "turns": 33,
+  "wall_ms": 427108
+}

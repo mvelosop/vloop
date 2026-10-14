@@ -60,3 +60,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** runs.Owned.PlanSHA is the one place that picks the run, last task or plan commit; the driver's counts is gone in favour of Plan.Counts(); config.BudgetKeys names the nine run.* budget keys once and ResolveBudgets, the run flags and both gate-timeout reads use it.
 - **Files:** internal/runs/commits.go, internal/runs/plansha_test.go, internal/config/config.go, internal/config/budgetkeys_test.go, internal/metrics/metrics.go, internal/metrics/defects.go, internal/defect/defect.go, internal/cli/defect.go, internal/cli/run.go, internal/cli/task_gate.go, internal/driver/budgets.go, internal/driver/iterate.go, internal/driver/plan.go, internal/driver/iterate_test.go
 - **Notes for next iteration:** internal/driver/iterate_test.go TestNextReady called the removed counts(); its one call now uses p.Counts() with pending as len(Tasks)-done-blocked, same assertions. Running go test ./internal/cli needs VLOOP_PLAN_SHA256 unset.
+
+## T5 — Split the five long functions to at most 100 lines each
+
+- **Outcome:** done (review: PASS)
+- **Summary:** iterate, Plan, runInit, runDoctor and runBriefClose are each at most 100 lines, split into named helpers (workSession, runGates, reviewSession, preflight, openRun, commitPlan, configStep, applySteps, doctor* checks, closeRefusals, commitClose, printClosed and others) with no behaviour change.
+- **Files:** internal/driver/iterate.go, internal/driver/plan.go, internal/cli/init.go, internal/cli/doctor.go, internal/cli/close.go
+- **Notes for next iteration:** iterate is exactly 100 lines and Plan 98; runBriefClose is 91, runInit 87, runDoctor 46. Later tasks that add to iterate or Plan need to extract a helper rather than grow them. Running go test ./internal/cli needs VLOOP_PLAN_SHA256 unset.

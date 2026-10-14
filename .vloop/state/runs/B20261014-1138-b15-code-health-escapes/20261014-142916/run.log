@@ -26,3 +26,10 @@
    review T4 · 0m19s · $0.12 · run $1.13 / $40.00
    review: PASS
    T4 done
+── iteration 8 (5 this run) · T5 · 4/14 done ──
+   Split the five long functions to at most 100 lines each
+   work T5 · 7m07s · $0.76 · run $1.89 / $40.00
+   check go
+   review T5 · 0m18s · $0.16 · run $2.05 / $40.00
+   review: PASS
+   T5 done

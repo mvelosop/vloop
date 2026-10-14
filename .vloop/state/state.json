@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T14:54:12Z",
+  "updated": "2026-10-14T15:05:02Z",
   "shell": "sh",
   "checks": [
     {
@@ -152,7 +152,7 @@
         "No command's output, exit code, files written or session arguments change, and no earlier test changes (H1-H7: the unchanged tests are the behaviour check)."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

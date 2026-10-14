@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/14 done** · iteration 7
+**Status:** running · **5/14 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:54:12Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:05:02Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Run every git command through one package
 - [x] **T3** — Filter the environment for gates, checks and sessions with one function
 - [x] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
-- [ ] **T5** — Split the five long functions to at most 100 lines each
+- [x] **T5** — Split the five long functions to at most 100 lines each
 - [ ] **T6** — Compare run.git-config-ignore patterns as git reports keys
 - [ ] **T7** — Give new defects and interventions second-stamped IDs that never collide
 - [ ] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
@@ -115,7 +115,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Split the five long functions to at most 100 lines each
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 iterate, Plan, runInit, runDoctor and runBriefClose are 145 to 296 lines and every later brief touches them. Each is split into named steps so that none exceeds 100 lines, after H1-H5 have already shrunk some of them. Later tasks in this run change runBriefClose and must keep it within the bound, which this task's gate keeps checking.
 

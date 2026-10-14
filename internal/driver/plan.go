@@ -247,114 +247,26 @@ func (t term) warn(format string, a ...any) {
 // session has been made.
 func (p *Planner) Plan() (*PlanResult, error) {
 	root := p.Root
-	existing, err := state.Load(root)
-	if err != nil && !errors.Is(err, state.ErrNoPlan) {
-		return nil, halt(ExitPreflight, "%v", err)
-	}
-	hasPlan := err == nil
-	cur := CurrentBranch(root)
-
-	briefPath := p.Brief
-	if briefPath == "" && !hasPlan {
-		entries, err := brief.Load(root)
-		if err != nil {
-			return nil, halt(ExitPreflight, "%v", err)
-		}
-		if briefPath = brief.Newest(entries); briefPath == "" {
-			return nil, halt(ExitPreflight, "no ready brief in %s/ — name one, or set status: ready on a checked brief", briefsDir)
-		}
-	}
-
-	// Naming a brief the plan does not hold means a fresh plan; naming the one
-	// it holds is resuming it, whatever branch it was stamped on.
-	resuming := hasPlan && (briefPath == "" || existing.Brief == briefPath)
-	if briefPath != "" && !p.Replan && !resuming {
-		journal := journalsDir + "/" + brief.RunID(briefPath) + ".md"
-		if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(journal))); err == nil {
-			return nil, halt(ExitPreflight, "refusing to plan: %s already exists — planning would re-derive work this brief already produced; re-plan deliberately with --replan", journal)
-		}
-	}
-	if hasPlan && briefPath == "" && existing.Branch != "" && existing.Branch != cur {
-		return nil, halt(ExitPreflight, "the plan %s was made on branch %s and you are on %s — name its brief to resume it, or another brief to plan afresh", existing.RunID, existing.Branch, cur)
-	}
-
-	if !resuming {
-		lang, err := config.Get(root, "language")
-		if err != nil {
-			return nil, halt(ExitPreflight, "%v", err)
-		}
-		if err := brief.Plannable(root, briefPath, brief.SetFor(lang.Value), p.Replan); err != nil {
-			return nil, halt(ExitPreflight, "%v", err)
-		}
-	}
-	scratch, err := config.Get(root, "run.gate-scratch")
+	pre, err := p.preflight()
 	if err != nil {
-		return nil, halt(ExitPreflight, "%v", err)
-	}
-	for _, d := range scratch.List {
-		if !GitIgnored(root, d) {
-			return nil, halt(ExitPreflight, "gate scratch %s is not ignored by git — add it to .gitignore", d)
-		}
-	}
-	checkDefs, err := config.Checks(root)
-	if err != nil {
-		return nil, halt(ExitPreflight, "%v", err)
-	}
-	if len(checkDefs) == 0 {
-		return nil, halt(ExitPreflight, "no check configured — add a [[check]] to .vloop/config.toml")
-	}
-	if err := requireCleanTree(root, resuming, brief.RunID(briefPath)); err != nil {
 		return nil, err
 	}
+	existing, hasPlan, briefPath, resuming, cur, checkDefs := pre.existing, pre.hasPlan, pre.briefPath, pre.resuming, pre.cur, pre.checkDefs
 
 	accepting := resuming && needsAcceptance(existing)
 	if resuming && !accepting {
-		if p.PlanOnly {
-			t := p.bareTerm()
-			t.show("--plan-only, but %s is already planned — nothing to do", existing.RunID)
-			t.show("read:   %s", planMarkdown)
-			return &PlanResult{Plan: existing}, nil
-		}
-		if err := CheckFixtures(root, existing); err != nil {
-			return nil, err
-		}
-		if _, err := p.workBranch(existing.RunID); err != nil {
-			return nil, err
-		}
-		return &PlanResult{Plan: existing}, nil
+		return p.alreadyPlanned(existing)
 	}
 
 	var (
 		runID, runDir string
 		r             *Runner
 		logFile       *os.File
-		startRound    = 1
+		startRound    int
 	)
-	if accepting {
-		// A halt during acceptance left the plan stamped and planning: acceptance
-		// goes on from the round it was in, in a run folder of its own, and the
-		// plan session does not run again.
-		runID, briefPath = existing.RunID, existing.Brief
-		if err := CheckFixtures(root, existing); err != nil {
-			return nil, err
-		}
-		if c, err := p.workBranch(runID); err != nil {
-			return nil, err
-		} else if c != "" {
-			cur = c
-		}
-		if runDir, err = newRunDir(root, runID, p.now()); err != nil {
-			return nil, err
-		}
-		startRound = min(max(plannedSessions(root, runID), 1), planRounds)
-	} else {
-		runID = brief.RunID(briefPath)
-		if err := p.workBranchFree(runID); err != nil {
-			return nil, err
-		}
-		if runDir, err = newRunDir(root, runID, p.now()); err != nil {
-			return nil, err
-		}
+	runID, runDir, briefPath, cur, startRound, err = p.openRun(existing, accepting, briefPath, cur)
+	if err != nil {
+		return nil, err
 	}
 	if logFile, err = os.OpenFile(filepath.Join(runDir, "run.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644); err != nil {
 		return nil, err
@@ -387,12 +299,7 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		}
 
 		if hasPlan { // another brief's plan: reset it
-			for _, f := range []string{state.FilePath, planMarkdown} {
-				if err := os.Remove(filepath.Join(root, filepath.FromSlash(f))); err != nil && !errors.Is(err, os.ErrNotExist) {
-					return nil, err
-				}
-			}
-			if err := os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir))); err != nil {
+			if err := resetPlan(root); err != nil {
 				return nil, err
 			}
 		}
@@ -424,6 +331,163 @@ func (p *Planner) Plan() (*PlanResult, error) {
 		return nil, err
 	}
 
+	rendered, err := p.commitPlan(t, logFile, plan, runID)
+	if err != nil {
+		return nil, err
+	}
+	if blocked != nil { // the plan is kept, blocked, for the operator's amendment
+		return nil, blocked
+	}
+	if p.PlanOnly { // after the commit, so on the terminal only: the log is committed
+		t.planOnlyReport(runID, plan)
+	}
+	return &PlanResult{Plan: rendered, Planned: true, RunDir: runDir}, nil
+}
+
+// alreadyPlanned is the result of a resume whose plan is accepted: its
+// fixtures are checked and its work branch entered, and nothing is planned.
+func (p *Planner) alreadyPlanned(existing *state.Plan) (*PlanResult, error) {
+	if p.PlanOnly {
+		t := p.bareTerm()
+		t.show("--plan-only, but %s is already planned — nothing to do", existing.RunID)
+		t.show("read:   %s", planMarkdown)
+		return &PlanResult{Plan: existing}, nil
+	}
+	if err := CheckFixtures(p.Root, existing); err != nil {
+		return nil, err
+	}
+	if _, err := p.workBranch(existing.RunID); err != nil {
+		return nil, err
+	}
+	return &PlanResult{Plan: existing}, nil
+}
+
+// openRun settles the run id, makes its run folder and returns the brief, the
+// branch and the acceptance round to start from. A halt during acceptance left
+// the plan stamped and planning: acceptance goes on from the round it was in,
+// in a run folder of its own, and the plan session does not run again.
+func (p *Planner) openRun(existing *state.Plan, accepting bool, briefPath, cur string) (runID, runDir, briefOut, branch string, startRound int, err error) {
+	root := p.Root
+	startRound = 1
+	if !accepting {
+		runID = brief.RunID(briefPath)
+		if err = p.workBranchFree(runID); err != nil {
+			return
+		}
+		runDir, err = newRunDir(root, runID, p.now())
+		return runID, runDir, briefPath, cur, startRound, err
+	}
+	runID, briefPath = existing.RunID, existing.Brief
+	if err = CheckFixtures(root, existing); err != nil {
+		return
+	}
+	c, err := p.workBranch(runID)
+	if err != nil {
+		return
+	}
+	if c != "" {
+		cur = c
+	}
+	if runDir, err = newRunDir(root, runID, p.now()); err != nil {
+		return
+	}
+	startRound = min(max(plannedSessions(root, runID), 1), planRounds)
+	return runID, runDir, briefPath, cur, startRound, nil
+}
+
+// planPreflight is what the plan phase settles before it changes anything: the
+// plan on disk, the brief to plan or resume, and the checks configured.
+type planPreflight struct {
+	existing  *state.Plan
+	hasPlan   bool
+	briefPath string
+	resuming  bool
+	cur       string
+	checkDefs []config.CheckDef
+}
+
+// preflight makes every refusal that needs no session: which brief, whether it
+// may be planned, that the gate scratch is ignored, checks exist and the tree
+// is clean.
+func (p *Planner) preflight() (planPreflight, error) {
+	root := p.Root
+	existing, err := state.Load(root)
+	if err != nil && !errors.Is(err, state.ErrNoPlan) {
+		return planPreflight{}, halt(ExitPreflight, "%v", err)
+	}
+	hasPlan := err == nil
+	cur := CurrentBranch(root)
+
+	briefPath := p.Brief
+	if briefPath == "" && !hasPlan {
+		entries, err := brief.Load(root)
+		if err != nil {
+			return planPreflight{}, halt(ExitPreflight, "%v", err)
+		}
+		if briefPath = brief.Newest(entries); briefPath == "" {
+			return planPreflight{}, halt(ExitPreflight, "no ready brief in %s/ — name one, or set status: ready on a checked brief", briefsDir)
+		}
+	}
+
+	// Naming a brief the plan does not hold means a fresh plan; naming the one
+	// it holds is resuming it, whatever branch it was stamped on.
+	resuming := hasPlan && (briefPath == "" || existing.Brief == briefPath)
+	if briefPath != "" && !p.Replan && !resuming {
+		journal := journalsDir + "/" + brief.RunID(briefPath) + ".md"
+		if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(journal))); err == nil {
+			return planPreflight{}, halt(ExitPreflight, "refusing to plan: %s already exists — planning would re-derive work this brief already produced; re-plan deliberately with --replan", journal)
+		}
+	}
+	if hasPlan && briefPath == "" && existing.Branch != "" && existing.Branch != cur {
+		return planPreflight{}, halt(ExitPreflight, "the plan %s was made on branch %s and you are on %s — name its brief to resume it, or another brief to plan afresh", existing.RunID, existing.Branch, cur)
+	}
+
+	if !resuming {
+		lang, err := config.Get(root, "language")
+		if err != nil {
+			return planPreflight{}, halt(ExitPreflight, "%v", err)
+		}
+		if err := brief.Plannable(root, briefPath, brief.SetFor(lang.Value), p.Replan); err != nil {
+			return planPreflight{}, halt(ExitPreflight, "%v", err)
+		}
+	}
+	scratch, err := config.Get(root, "run.gate-scratch")
+	if err != nil {
+		return planPreflight{}, halt(ExitPreflight, "%v", err)
+	}
+	for _, d := range scratch.List {
+		if !GitIgnored(root, d) {
+			return planPreflight{}, halt(ExitPreflight, "gate scratch %s is not ignored by git — add it to .gitignore", d)
+		}
+	}
+	checkDefs, err := config.Checks(root)
+	if err != nil {
+		return planPreflight{}, halt(ExitPreflight, "%v", err)
+	}
+	if len(checkDefs) == 0 {
+		return planPreflight{}, halt(ExitPreflight, "no check configured — add a [[check]] to .vloop/config.toml")
+	}
+	if err := requireCleanTree(root, resuming, brief.RunID(briefPath)); err != nil {
+		return planPreflight{}, err
+	}
+
+	return planPreflight{existing: existing, hasPlan: hasPlan, briefPath: briefPath, resuming: resuming, cur: cur, checkDefs: checkDefs}, nil
+}
+
+// resetPlan removes another brief's plan, its rendering and its gate fixtures.
+func resetPlan(root string) error {
+	for _, f := range []string{state.FilePath, planMarkdown} {
+		if err := os.Remove(filepath.Join(root, filepath.FromSlash(f))); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+	}
+	return os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir)))
+}
+
+// commitPlan writes the plan's journal and rendering and commits the plan,
+// returning the plan as loaded back.
+func (p *Planner) commitPlan(t term, logFile *os.File, plan *state.Plan, runID string) (*state.Plan, error) {
+	root := p.Root
 	if err := writeJournal(root, plan); err != nil {
 		return nil, err
 	}
@@ -446,19 +510,18 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	if _, err := git(root, "commit", "-q", "-m", "[vloop] plan "+runID); err != nil {
 		return nil, halt(ExitPreflight, "cannot commit the plan: %v", err)
 	}
-	if blocked != nil { // the plan is kept, blocked, for the operator's amendment
-		return nil, blocked
-	}
-	if p.PlanOnly { // after the commit, so on the terminal only: the log is committed
-		t.show("")
-		t.show("═══ plan only ═══")
-		t.show("plan:   %s — %d task(s)", runID, len(plan.Tasks))
-		t.show("first:  %s", firstReady(plan))
-		t.show("read:   %s   (verify commands are in %s)", planMarkdown, state.FilePath)
-		t.show("adjust: vloop task set | note | drop")
-		t.show("run it: vloop run")
-	}
-	return &PlanResult{Plan: rendered, Planned: true, RunDir: runDir}, nil
+	return rendered, nil
+}
+
+// planOnlyReport prints what --plan-only leaves for the operator.
+func (t term) planOnlyReport(runID string, plan *state.Plan) {
+	t.show("")
+	t.show("═══ plan only ═══")
+	t.show("plan:   %s — %d task(s)", runID, len(plan.Tasks))
+	t.show("first:  %s", firstReady(plan))
+	t.show("read:   %s   (verify commands are in %s)", planMarkdown, state.FilePath)
+	t.show("adjust: vloop task set | note | drop")
+	t.show("run it: vloop run")
 }
 
 // planSession runs one plan session and refuses what it moved or how it ended.

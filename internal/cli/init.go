@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -66,28 +67,9 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 		return Problem(err)
 	}
 
-	lang := "en"
-	if o.languageSet {
-		lang = o.language
-		if err := config.Check(root, "language", lang); err != nil {
-			return err
-		}
-	}
-	if o.stacksSet {
-		if err := config.Check(root, "metrics.stacks", o.stacks); err != nil {
-			return err
-		}
-	}
-	_, cfgErr := os.Lstat(filepath.Join(root, filepath.FromSlash(config.FilePath)))
-	haveConfig := cfgErr == nil
-	if haveConfig {
-		v, err := config.Get(root, "language")
-		if err != nil {
-			return configErr(g, out, err)
-		}
-		if !o.languageSet {
-			lang = v.Value
-		}
+	lang, haveConfig, err := initLanguage(g, out, root, o)
+	if err != nil {
+		return err
 	}
 
 	detected, err := detect.Stacks(root)
@@ -107,47 +89,7 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 	starter := detect.StarterChecks(strings.Split(chosen, ","))
 	var steps []initStep
 	// 1. config
-	if haveConfig {
-		if cur, err := config.Checks(root); err == nil && len(cur) == 0 {
-			for _, c := range starter {
-				fmt.Fprintln(out, "suggest check: "+detect.FormatCheck(c))
-			}
-		}
-		steps = append(steps, initStep{path: config.FilePath, verb: "kept"})
-		if cur, err := config.Get(root, "metrics.stacks"); err == nil {
-			var missing []string
-			for _, d := range detected {
-				found := false
-				for _, c := range cur.List {
-					found = found || c == d
-				}
-				if !found {
-					missing = append(missing, d)
-				}
-			}
-			if len(missing) > 0 {
-				fmt.Fprintln(out, "suggest metrics.stacks: "+strings.Join(missing, ","))
-			}
-		}
-	} else {
-		steps = append(steps, initStep{path: config.FilePath, verb: "wrote", write: func() error {
-			if err := config.Set(root, "language", lang); err != nil {
-				return err
-			}
-			if chosen != "" {
-				if err := config.Set(root, "metrics.stacks", chosen); err != nil {
-					return err
-				}
-			}
-			return config.AddChecks(root, starter)
-		}})
-		for _, c := range starter {
-			fmt.Fprintln(out, "check "+detect.FormatCheck(c))
-		}
-		if len(starter) > 0 {
-			fmt.Fprintln(out, "each check is a starting point — edit it in "+config.FilePath)
-		}
-	}
+	steps = append(steps, configStep(out, root, haveConfig, detected, chosen, lang, starter))
 	// 2. stamp
 	stamp := install.Stamp{
 		Version: b.Version, Commit: b.Commit,
@@ -161,51 +103,24 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 		steps = append(steps, initStep{path: guidelinesPath, verb: "wrote", content: []byte(guidelinesTemplate(lang))})
 	}
 	// 3. starter brief
-	hasBrief := false
-	if ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(brief.Dir))); err == nil {
-		for _, e := range ents {
-			hasBrief = hasBrief || strings.HasSuffix(e.Name(), brief.Suffix)
-		}
+	briefStep, err := starterBriefStep(root, lang, now)
+	if err != nil {
+		return Problem(err)
 	}
-	if hasBrief {
-		steps = append(steps, initStep{path: brief.Dir + "/", verb: "kept"})
-	} else {
-		slug := "getting-started"
-		if lang == "es" {
-			slug = "primeros-pasos"
-		}
-		text, err := brief.Render(lang, slug, now)
-		if err != nil {
-			return Problem(err)
-		}
-		steps = append(steps, initStep{path: brief.NewPath(slug, now), verb: "wrote", content: []byte(text)})
-	}
+	steps = append(steps, briefStep)
 	// 4. .gitignore
 	old, exists, err := readRepoFile(root, ".gitignore")
 	if err != nil {
 		return Problem(err)
 	}
-	if merged, changed := install.MergeGitignore(old); !changed {
-		steps = append(steps, initStep{path: ".gitignore", verb: "kept"})
-	} else if exists {
-		steps = append(steps, initStep{path: ".gitignore", verb: "updated", content: merged})
-	} else {
-		steps = append(steps, initStep{path: ".gitignore", verb: "wrote", content: merged})
-	}
+	steps = append(steps, mergedStep(".gitignore", old, exists, func() ([]byte, bool) { return install.MergeGitignore(old) }))
 	// 5. CLAUDE.md
 	old, exists, err = readRepoFile(root, "CLAUDE.md")
 	if err != nil {
 		return Problem(err)
 	}
-	merged := install.MergeClaudeMD(old, exists, b.Version)
-	switch {
-	case exists && string(merged) == string(old):
-		steps = append(steps, initStep{path: "CLAUDE.md", verb: "kept"})
-	case exists:
-		steps = append(steps, initStep{path: "CLAUDE.md", verb: "updated", content: merged})
-	default:
-		steps = append(steps, initStep{path: "CLAUDE.md", verb: "wrote", content: merged})
-	}
+	claude := install.MergeClaudeMD(old, exists, b.Version)
+	steps = append(steps, mergedStep("CLAUDE.md", old, exists, func() ([]byte, bool) { return claude, string(claude) != string(old) }))
 
 	// Every target is checked for a symlink before anything is written.
 	for _, s := range steps {
@@ -215,30 +130,11 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 			}
 		}
 	}
-	for _, s := range steps {
-		if !o.dryRun && s.verb != "kept" {
-			if s.write != nil {
-				if err := s.write(); err != nil {
-					return Problem(err)
-				}
-			} else if err := writeRepoFile(root, s.path, s.content); err != nil {
-				return Problem(err)
-			}
-		}
-		verb := s.verb
-		if o.dryRun {
-			verb = map[string]string{"wrote": "would write", "updated": "would update", "kept": "would keep"}[verb]
-		}
-		fmt.Fprintf(out, "%s %s\n", verb, s.path)
+	if err := applySteps(out, root, steps, o.dryRun); err != nil {
+		return err
 	}
 	if !o.dryRun {
-		fmt.Fprintln(out, "next:")
-		fmt.Fprintln(out, "  vloop doctor")
-		fmt.Fprintln(out, "  get /vloop:operate for your Claude Code sessions, once:")
-		fmt.Fprintln(out, "    claude plugin marketplace add mvelosop/vloop")
-		fmt.Fprintln(out, "    claude plugin install vloop@vloop")
-		fmt.Fprintln(out, `  or, for one session: claude --plugin-dir "$(vloop plugin path)"`)
-		fmt.Fprintln(out, `  then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop`)
+		printInitNext(out)
 	}
 	return nil
 }
@@ -325,4 +221,148 @@ External formats: when a contract mentions the phrase, Binding references must c
 
 <!-- - ` + "`<phrase>`" + `: ` + "`<path>`" + ` -->
 `
+}
+
+// initLanguage validates the language and stacks flags and returns the language
+// to write in: the flag, else the existing config's, else English.
+func initLanguage(g *Globals, out io.Writer, root string, o initOpts) (lang string, haveConfig bool, err error) {
+	lang = "en"
+	if o.languageSet {
+		lang = o.language
+		if err := config.Check(root, "language", lang); err != nil {
+			return "", false, err
+		}
+	}
+	if o.stacksSet {
+		if err := config.Check(root, "metrics.stacks", o.stacks); err != nil {
+			return "", false, err
+		}
+	}
+	_, cfgErr := os.Lstat(filepath.Join(root, filepath.FromSlash(config.FilePath)))
+	haveConfig = cfgErr == nil
+	if haveConfig {
+		v, err := config.Get(root, "language")
+		if err != nil {
+			return "", false, configErr(g, out, err)
+		}
+		if !o.languageSet {
+			lang = v.Value
+		}
+	}
+	return lang, haveConfig, nil
+}
+
+// configStep reports on, or builds the write of, .vloop/config.toml, printing
+// the suggestions and starter checks that go with it.
+func configStep(out io.Writer, root string, haveConfig bool, detected []string, chosen, lang string, starter []config.CheckDef) initStep {
+	if !haveConfig {
+		for _, c := range starter {
+			fmt.Fprintln(out, "check "+detect.FormatCheck(c))
+		}
+		if len(starter) > 0 {
+			fmt.Fprintln(out, "each check is a starting point — edit it in "+config.FilePath)
+		}
+		return initStep{path: config.FilePath, verb: "wrote", write: func() error {
+			if err := config.Set(root, "language", lang); err != nil {
+				return err
+			}
+			if chosen != "" {
+				if err := config.Set(root, "metrics.stacks", chosen); err != nil {
+					return err
+				}
+			}
+			return config.AddChecks(root, starter)
+		}}
+	}
+	if cur, err := config.Checks(root); err == nil && len(cur) == 0 {
+		for _, c := range starter {
+			fmt.Fprintln(out, "suggest check: "+detect.FormatCheck(c))
+		}
+	}
+	if cur, err := config.Get(root, "metrics.stacks"); err == nil {
+		var missing []string
+		for _, d := range detected {
+			found := false
+			for _, c := range cur.List {
+				found = found || c == d
+			}
+			if !found {
+				missing = append(missing, d)
+			}
+		}
+		if len(missing) > 0 {
+			fmt.Fprintln(out, "suggest metrics.stacks: "+strings.Join(missing, ","))
+		}
+	}
+	return initStep{path: config.FilePath, verb: "kept"}
+}
+
+// starterBriefStep keeps the briefs folder when it holds a brief, else writes
+// the getting-started brief in the language.
+func starterBriefStep(root, lang string, now time.Time) (initStep, error) {
+	hasBrief := false
+	if ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(brief.Dir))); err == nil {
+		for _, e := range ents {
+			hasBrief = hasBrief || strings.HasSuffix(e.Name(), brief.Suffix)
+		}
+	}
+	if hasBrief {
+		return initStep{path: brief.Dir + "/", verb: "kept"}, nil
+	}
+	slug := "getting-started"
+	if lang == "es" {
+		slug = "primeros-pasos"
+	}
+	text, err := brief.Render(lang, slug, now)
+	if err != nil {
+		return initStep{}, err
+	}
+	return initStep{path: brief.NewPath(slug, now), verb: "wrote", content: []byte(text)}, nil
+}
+
+// mergedStep is the step for a file vloop merges its own part into: merge says
+// what the merged content is and whether it differs from the file.
+func mergedStep(path string, old []byte, exists bool, merge func() ([]byte, bool)) initStep {
+	merged, changed := merge()
+	switch {
+	case !changed:
+		return initStep{path: path, verb: "kept"}
+	case exists:
+		return initStep{path: path, verb: "updated", content: merged}
+	default:
+		return initStep{path: path, verb: "wrote", content: merged}
+	}
+}
+
+// applySteps writes every step that is not kept, or with dryRun only says what
+// it would do.
+func applySteps(out io.Writer, root string, steps []initStep, dryRun bool) error {
+	for _, s := range steps {
+		if !dryRun && s.verb != "kept" {
+			if s.write != nil {
+				if err := s.write(); err != nil {
+					return Problem(err)
+				}
+			} else if err := writeRepoFile(root, s.path, s.content); err != nil {
+				return Problem(err)
+			}
+		}
+		verb := s.verb
+		if dryRun {
+			verb = map[string]string{"wrote": "would write", "updated": "would update", "kept": "would keep"}[verb]
+		}
+		fmt.Fprintf(out, "%s %s\n", verb, s.path)
+	}
+	return nil
+}
+
+// printInitNext says what to do after a real init.
+func printInitNext(out io.Writer) {
+	fmt.Fprintln(out, "next:")
+	fmt.Fprintln(out, "  vloop doctor")
+	fmt.Fprintln(out, "  get /vloop:operate for your Claude Code sessions, once:")
+	fmt.Fprintln(out, "    claude plugin marketplace add mvelosop/vloop")
+	fmt.Fprintln(out, "    claude plugin install vloop@vloop")
+	fmt.Fprintln(out, `  or, for one session: claude --plugin-dir "$(vloop plugin path)"`)
+	fmt.Fprintln(out, `  then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop`)
 }
