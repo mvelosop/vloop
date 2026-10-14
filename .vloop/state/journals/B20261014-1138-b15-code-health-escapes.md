@@ -142,3 +142,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** intervention add takes --origin (required for verification-finding, refused otherwise) and the record, show/list JSON, set and schema carry origin; brief close --finding "<origin>: <summary>" records verification-finding interventions, counted as operator-caught alongside non-escaped operator defects, listed after the defects in the run record and in --dry-run.
 - **Files:** internal/intervention/intervention.go, internal/intervention/intervention_test.go, internal/cli/intervention.go, internal/cli/close.go, internal/cli/close_test.go, internal/cli/close_flags_test.go, internal/closing/closing.go, internal/metrics/defects.go, internal/metrics/defects_test.go, internal/metrics/metrics.go, schemas/intervention.v2.json, docs/guide/commands.md, cmd/vloop/b4_e2e_test.go, cmd/vloop/b14_e2e_test.go
 - **Notes for next iteration:** Counting lives in metrics.DefectCounts.AddFindings (IsFinding: kind verification-finding with an origin), applied in metrics.Build after Reclassify. close's defect report is unchanged (T12 retires it), so a close with findings prints 'defects of <run>: none' when the brief has no defects. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated.
+
+## T11 — Record operator findings as verification-finding interventions with an origin
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Implementation was already in place; this attempt adds the two missing committed tests the review asked for: intervention add's two --origin refusals (and the origin line after by:), and the operator count taking operator defects and verification-finding interventions together without overlap.
+- **Files:** internal/cli/intervention_test.go, internal/metrics/defects_test.go
+- **Notes for next iteration:** Review rejected attempt 1 only for those two untested behaviours; TestInterventionAddOriginRefusals (internal/cli) and TestOperatorCountTwoSourcesWithoutOverlap (internal/metrics) cover them. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated.

@@ -64,6 +64,34 @@ func TestInterventionAddRefusals(t *testing.T) {
 	}
 }
 
+func TestInterventionAddOriginRefusals(t *testing.T) {
+	dir := t.TempDir()
+	base := []string{"intervention", "add", "x", "--phase", "verify", "--automatable", "no", "--by", "operator"}
+	for _, c := range []struct {
+		args []string
+		want string
+	}{
+		{[]string{"--kind", "verification-finding"}, "vloop: --kind verification-finding needs --origin brief, plan, work or env\n"},
+		{[]string{"--kind", "repair", "--origin", "work"}, "vloop: --origin is only for --kind verification-finding\n"},
+	} {
+		code, _, e := runDefect(t, dir, append(append([]string{}, base...), c.args...)...)
+		if code != 2 || e != c.want {
+			t.Errorf("%v: %d %q", c.args, code, e)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".vloop", "interventions")); err == nil {
+		t.Fatal("a refused add wrote files")
+	}
+	code, out, _ := runDefect(t, dir, append(append([]string{}, base...), "--kind", "verification-finding", "--origin", "plan")...)
+	if code != 0 {
+		t.Fatalf("add with origin: %d", code)
+	}
+	b, _ := os.ReadFile(filepath.Join(dir, strings.TrimSpace(out)))
+	if !strings.Contains(string(b), "by: operator\norigin: plan\n") {
+		t.Fatalf("record: %s", b)
+	}
+}
+
 func TestExistingInterventionsValidate(t *testing.T) {
 	var o, e strings.Builder
 	if code := Execute(Build{}, []string{"-C", "../..", "--json", "intervention", "list"}, &o, &e); code != 0 {

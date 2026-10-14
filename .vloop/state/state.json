@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 18,
+  "iteration": 19,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T16:20:15Z",
+  "updated": "2026-10-14T16:26:00Z",
   "shell": "sh",
   "checks": [
     {
@@ -365,9 +365,9 @@
         "The earlier tests that change are only internal/cli/close_test.go, internal/cli/close_flags_test.go, cmd/vloop/b4_e2e_test.go and cmd/vloop/b14_e2e_test.go (findings taking an origin, recorded as interventions), internal/metrics/defects_test.go (the interventions in the operator count) and the commands.md staleness test (regenerate docs/guide/commands.md); committed tests cover --origin's two refusals, the record's origin line, close's refusal and recording, the operator count's two sources without overlap and the run record line."
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "the two `intervention add --origin` refusals (missing origin with verification-finding; origin with another kind) have no committed test; no test counts operator defects and verification-finding interventions together to show the two sources do not overlap"
+      "notes": ""
     },
     {
       "id": "T12",

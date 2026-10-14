@@ -192,3 +192,28 @@ func TestAddFindingsCountsOnlyFindingsWithOrigin(t *testing.T) {
 		t.Fatalf("operator %d, all %d, want 2 and 2", c.Operator, c.All())
 	}
 }
+
+// The operator count has two sources, each record counted once: operator
+// defects that did not escape and verification-finding interventions with an origin.
+func TestOperatorCountTwoSourcesWithoutOverlap(t *testing.T) {
+	rel := at(10, 0)
+	mk := func(by string, d time.Duration) defect.Defect {
+		return defect.Defect{FoundBy: by, Created: rel.Add(d).Format("2006-01-02T15:04:05Z")}
+	}
+	rec := []defect.Defect{mk("operator", -time.Hour), mk("operator", time.Minute), mk("gate", -time.Minute)}
+	var x Matrix
+	for _, d := range rec {
+		x.Add("work", d.FoundBy)
+	}
+	c := x.Counts()
+	c.Reclassify(rec, rel)
+	c.AddFindings([]intervention.Intervention{
+		{Kind: "verification-finding", Origin: "brief"},
+		{Kind: "verification-finding", Origin: "env"},
+		{Kind: "verification-finding"},
+		{Kind: "repair", Origin: "plan"},
+	})
+	if c.InLoop != 1 || c.Operator != 3 || c.Escaped != 1 || c.All() != 5 {
+		t.Fatalf("counts = %+v, want in-loop 1, operator 3 (1 defect + 2 findings), escaped 1", c)
+	}
+}
