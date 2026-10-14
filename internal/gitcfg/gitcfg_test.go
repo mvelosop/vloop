@@ -22,7 +22,8 @@ func TestMatch(t *testing.T) {
 		{"a*b*c", "axxcyyb", false},
 		{"a*b", "ab", true},
 		{"a*a", "a", false},
-		{"Branch.*", "branch.x", false},
+		{"Branch.*", "branch.x", true},
+		{"Branch.X.*", "branch.x.y", false},
 	} {
 		if got := Match(c.pattern, c.key); got != c.want {
 			t.Errorf("Match(%q, %q) = %v, want %v", c.pattern, c.key, got, c.want)
@@ -65,5 +66,23 @@ func TestIgnored(t *testing.T) {
 	}
 	if Ignored(nil, "x.y") {
 		t.Error("no patterns ignored a key")
+	}
+}
+
+func TestNormalizeMixedCase(t *testing.T) {
+	if _, ok := Protected("Core.*"); !ok {
+		t.Error("Core.* not protected")
+	}
+	if _, ok := Protected("IncludeIf.*"); !ok {
+		t.Error("IncludeIf.* not protected")
+	}
+	if !Match("Branch.Main.Foo-Bar", "branch.Main.foo-bar") {
+		t.Error("mixed-case pattern does not match its own subsection")
+	}
+	if Match("Branch.Main.Foo-Bar", "branch.main.foo-bar") {
+		t.Error("subsection case must be kept")
+	}
+	if !Match("branch.*.vscode-merge-base", "branch.x.vscode-merge-base") || Match("core.x", "core.y") {
+		t.Error("lower-case patterns changed")
 	}
 }

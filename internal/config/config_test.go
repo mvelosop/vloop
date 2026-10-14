@@ -570,3 +570,15 @@ func TestGitConfigIgnoreProtectedFromSourceIsAProblem(t *testing.T) {
 		t.Errorf("Get = %v, want a bare protected pattern error", err)
 	}
 }
+
+func TestGitConfigIgnoreMixedCaseProtectedRefused(t *testing.T) {
+	root := scratch(t)
+	err := Set(root, "run.git-config-ignore", "Core.*")
+	want := "run.git-config-ignore: Core.* would ignore core.* — the guard must see it"
+	if err == nil || err.Error() != want {
+		t.Errorf("got %v, want %q", err, want)
+	}
+	if err := Set(root, "run.git-config-ignore", "Branch.Main.Foo-Bar"); err != nil {
+		t.Errorf("mixed-case subsection pattern refused: %v", err)
+	}
+}

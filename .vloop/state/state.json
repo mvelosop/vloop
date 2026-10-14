@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 8,
+  "iteration": 9,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T15:05:02Z",
+  "updated": "2026-10-14T15:09:35Z",
   "shell": "sh",
   "checks": [
     {
@@ -184,7 +184,7 @@
         "No record under .vloop/ is edited; the defect's status is the operator's to set."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

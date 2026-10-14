@@ -33,3 +33,10 @@
    review T5 · 0m18s · $0.16 · run $2.05 / $40.00
    review: PASS
    T5 done
+── iteration 9 (6 this run) · T6 · 5/14 done ──
+   Compare run.git-config-ignore patterns as git reports keys
+   work T6 · 0m47s · $0.15 · run $2.20 / $40.00
+   check go
+   review T6 · 0m18s · $0.09 · run $2.29 / $40.00
+   review: PASS
+   T6 done

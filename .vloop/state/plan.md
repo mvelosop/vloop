@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/14 done** · iteration 8
+**Status:** running · **6/14 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:05:02Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:09:35Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Filter the environment for gates, checks and sessions with one function
 - [x] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
 - [x] **T5** — Split the five long functions to at most 100 lines each
-- [ ] **T6** — Compare run.git-config-ignore patterns as git reports keys
+- [x] **T6** — Compare run.git-config-ignore patterns as git reports keys
 - [ ] **T7** — Give new defects and interventions second-stamped IDs that never collide
 - [ ] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
 - [ ] **T9** — Refuse vloop defect add for a brief that is not merged
@@ -136,7 +136,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Compare run.git-config-ignore patterns as git reports keys
 
-`pending` · depends on: T5
+`done` · depends on: T5
 
 git reports a config key's section and variable in lower case and keeps a subsection's case, but vloop compares patterns literally, so a pattern like Core.* is accepted and silently matches nothing (D20261011-1458). Patterns are compared the way git spells keys, and the protected-section refusal sees the lower-cased form, so Core.* is refused like core.*.
 

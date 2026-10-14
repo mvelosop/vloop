@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A run.git-config-ignore pattern is compared with keys after lower-casing its text before the first \".\" and after the last \".\", keeping a subsection between them as given (a pattern with no \".\" is lower-cased whole); lower-case patterns behave exactly as today.", "met": true, "evidence": "internal/gitcfg/gitcfg.go Normalize lower-cases before first and after last dot, keeps the middle; Match calls it; TestNormalizeMixedCase and TestMatch cover it"},
+    {"criterion": "The protected-section refusal applies to that lower-cased form: `vloop config set run.git-config-ignore 'Core.*'` exits 2 with exactly `vloop: run.git-config-ignore: Core.* would ignore core.* — the guard must see it`, naming the pattern as given; `core.*` gives the message it gives today.", "met": true, "evidence": "gitcfg.Protected cuts Normalize(pattern); config.go:235 uses it with the original pattern in the message; TestGitConfigIgnoreMixedCaseProtectedRefused asserts the exact text"},
+    {"criterion": "`Branch.Main.Foo-Bar` is accepted, and during `vloop run` a session setting branch.Main.foo-bar does not halt the run, while one setting branch.main.foo-bar halts it with exit 9 as today.", "met": true, "evidence": "config test accepts the pattern; gitcfg test asserts it matches branch.Main.foo-bar and not branch.main.foo-bar; the guard goes through Ignored/Match; gate T6 passed"},
+    {"criterion": "The same comparison applies wherever the patterns come from (config set, the file, VLOOP_RUN_GIT_CONFIG_IGNORE) and to the run's start-up refusal of a bad source; the built-in pattern and the guard's halt message are unchanged.", "met": true, "evidence": "normalization sits in Match and Protected, the only two entry points used by config.go and driver/gitguard.go; the guard message and built-in pattern are untouched in the diff"},
+    {"criterion": "Committed unit tests (internal/gitcfg, and the config refusal) cover a mixed-case protected pattern refused, a mixed-case subsection pattern matching only its own subsection's case, and lower-case patterns unchanged.", "met": true, "evidence": "TestNormalizeMixedCase in internal/gitcfg/gitcfg_test.go and TestGitConfigIgnoreMixedCaseProtectedRefused in internal/config/config_test.go"},
+    {"criterion": "No record under .vloop/ is edited; the defect's status is the operator's to set.", "met": true, "evidence": "git status shows only internal/ source and test files modified, plus run-state logs written by the driver; .vloop/defects untouched"}
+  ],
+  "findings": [],
+  "notes": "TestMatch's pre-existing case {\"Branch.*\", \"branch.x\", false} was flipped to true; this is required by the new spec, not a goalpost move."
+}

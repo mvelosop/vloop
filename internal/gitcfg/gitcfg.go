@@ -13,9 +13,23 @@ const BuiltinIgnore = "branch.*.vscode-merge-base"
 // configuration, in the order a refusal names them.
 var protectedSections = []string{"core", "filter", "include", "includeif"}
 
-// Match reports whether pattern matches key as git config --list prints it. A
-// * matches any run of characters, dots included; everything else is literal.
+// Normalize spells pattern the way git config --list spells keys: the text
+// before the first "." and after the last "." lower-cased, a subsection between
+// them kept as given. A pattern with no "." is lower-cased whole.
+func Normalize(pattern string) string {
+	first := strings.Index(pattern, ".")
+	if first < 0 {
+		return strings.ToLower(pattern)
+	}
+	last := strings.LastIndex(pattern, ".")
+	return strings.ToLower(pattern[:first]) + pattern[first:last] + strings.ToLower(pattern[last:])
+}
+
+// Match reports whether pattern, normalized by Normalize, matches key as git
+// config --list prints it. A * matches any run of characters, dots included;
+// everything else is literal.
 func Match(pattern, key string) bool {
+	pattern = Normalize(pattern)
 	parts := strings.Split(pattern, "*")
 	if len(parts) == 1 {
 		return pattern == key
@@ -39,7 +53,7 @@ func Match(pattern, key string) bool {
 // include or includeif — the text before its first * and "<section>." being
 // one a prefix of the other — and names the first such section.
 func Protected(pattern string) (section string, ok bool) {
-	head, _, _ := strings.Cut(pattern, "*")
+	head, _, _ := strings.Cut(Normalize(pattern), "*")
 	for _, s := range protectedSections {
 		p := s + "."
 		if strings.HasPrefix(head, p) || strings.HasPrefix(p, head) {

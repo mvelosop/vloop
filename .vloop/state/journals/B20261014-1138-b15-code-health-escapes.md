@@ -67,3 +67,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** iterate, Plan, runInit, runDoctor and runBriefClose are each at most 100 lines, split into named helpers (workSession, runGates, reviewSession, preflight, openRun, commitPlan, configStep, applySteps, doctor* checks, closeRefusals, commitClose, printClosed and others) with no behaviour change.
 - **Files:** internal/driver/iterate.go, internal/driver/plan.go, internal/cli/init.go, internal/cli/doctor.go, internal/cli/close.go
 - **Notes for next iteration:** iterate is exactly 100 lines and Plan 98; runBriefClose is 91, runInit 87, runDoctor 46. Later tasks that add to iterate or Plan need to extract a helper rather than grow them. Running go test ./internal/cli needs VLOOP_PLAN_SHA256 unset.
+
+## T6 — Compare run.git-config-ignore patterns as git reports keys
+
+- **Outcome:** done (review: PASS)
+- **Summary:** gitcfg.Normalize lower-cases a pattern's text before the first and after the last dot, keeping a subsection; Match and Protected apply it, so Core.* is refused like core.* and Branch.Main.Foo-Bar matches only branch.Main.foo-bar.
+- **Files:** internal/gitcfg/gitcfg.go, internal/gitcfg/gitcfg_test.go, internal/config/config_test.go
+- **Notes for next iteration:** Existing TestMatch case {Branch.*, branch.x, false} asserted the defect itself (literal comparison); flipped to true and added {Branch.X.*, branch.x.y, false}, as the acceptance requires. All callers (config validation, guard, startup refusal) go through Match/Protected, so normalization lives only in gitcfg.
