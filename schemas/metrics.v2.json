@@ -185,7 +185,9 @@
           "churn": { "$ref": "#/$defs/lines" },
           "agent_ms": { "type": "integer", "minimum": 0 },
           "cost_usd": { "type": "number", "minimum": 0 },
-          "models": { "type": "array", "items": { "type": "string" } }
+          "models": { "type": "array", "items": { "type": "string" } },
+          "test_code_ratio": { "type": ["number", "null"], "minimum": 0, "description": "the task's test+ over its code+; null when code+ is 0" },
+          "per_1000_code_lines_usd": { "type": ["number", "null"], "minimum": 0, "description": "the task's cost per 1,000 of its code+ lines; null when code+ is 0" }
         }
       }
     }

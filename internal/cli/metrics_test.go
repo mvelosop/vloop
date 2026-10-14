@@ -108,7 +108,7 @@ func TestMetricsCommandSummary(t *testing.T) {
 		"churn code 17 · test 6 · docs 3 · rework 1.13",
 		"time agent 2.7 min (work 2.2 · review 0.5) · plan 2.0 min · gates n/a · wall 10.0 min",
 		"rate 5.6 code lines/min · 7.9 incl. tests",
-		"cost $2.10 · plan 1.00 · work 0.90 · review 0.20 · $140.00 per 1,000 code lines",
+		"cost $2.10 · plan 1.00 · work 0.90 · review 0.20 · $140.00/kloc",
 		"models plan claude-opus-5-5 · work claude-sonnet-5-5 · review claude-sonnet-5-5",
 		"defects in-loop 1 · operator 0 · escaped 0 · removal efficiency 100%",
 		"interventions 0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0",
@@ -142,9 +142,9 @@ func TestMetricsCommandSummary(t *testing.T) {
 func TestMetricsCommandByTask(t *testing.T) {
 	dir, _ := metricsRepo(t)
 	code, out, errs := runCLI(t, dir, "metrics", metricsBrief+".loop-brief", "--by", "task")
-	want := "id area kind att code+ test+ docs+ other+ agent cost model\n" +
-		"T1 - - 1 10 6 3 0 1m20s $0.50 claude-sonnet-5-5\n" +
-		"T2 - - 2 7 0 0 0 1m20s $0.60 claude-sonnet-5-5"
+	want := "id area kind att code+ test+ docs+ other+ test:code $/kloc agent cost model\n" +
+		"T1 - - 1 10 6 3 0 0.60 50.00 1m20s $0.50 claude-sonnet-5-5\n" +
+		"T2 - - 2 7 0 0 0 0.00 85.71 1m20s $0.60 claude-sonnet-5-5"
 	if code != 0 || collapse(out) != want {
 		t.Fatalf("%d\n%s\n%s", code, out, errs)
 	}
@@ -157,7 +157,7 @@ func TestMetricsCommandCrossBrief(t *testing.T) {
 	dir, _ := metricsRepo(t)
 	write(t, dir, "docs/briefs/B20260103-0900-c.loop-brief.md", "---\nname: B20260103-0900-c.loop-brief\nstatus: ready\n---\n")
 	code, out, errs := runCLI(t, dir, "metrics")
-	want := "brief tasks first-pass code test t:c agent $/1k in-loop operator escaped efficiency\n" +
+	want := "brief tasks first-pass code test test:code agent $/kloc in-loop operator escaped efficiency\n" +
 		metricsBrief + " 2 1/2 15 6 0.40 2.7 140.00 1 0 0 100%"
 	if code != 0 || collapse(out) != want {
 		t.Fatalf("%d\n%s\n%s", code, out, errs)

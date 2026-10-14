@@ -167,7 +167,7 @@ func b3Summary(sha string) []string {
 		"churn code 17 · test 6 · docs 3 · rework 1.13",
 		"time agent 2.7 min (work 2.2 · review 0.5) · plan 2.0 min · gates n/a · wall 10.0 min",
 		"rate 5.6 code lines/min · 7.9 incl. tests",
-		"cost $2.10 · plan 1.00 · work 0.90 · review 0.20 · $140.00 per 1,000 code lines",
+		"cost $2.10 · plan 1.00 · work 0.90 · review 0.20 · $140.00/kloc",
 		"models plan claude-opus-5-5 · work claude-sonnet-5-5 · review claude-sonnet-5-5",
 		"defects in-loop 1 · operator 0 · escaped 0 · removal efficiency 100%",
 		"interventions 0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0",
@@ -183,9 +183,9 @@ func TestWorkedExampleB3Commands(t *testing.T) {
 	b3Expect(t, s.run(nil, "metrics", brief), 0, strings.Join(b3Summary(sha), "\n"))
 
 	b3Expect(t, s.run(nil, "metrics", brief, "--by", "task"), 0,
-		"id area kind att code+ test+ docs+ other+ agent cost model\n"+
-			"T1 - - 1 10 6 3 0 1m20s $0.50 claude-sonnet-5-5\n"+
-			"T2 - - 2 7 0 0 0 1m20s $0.60 claude-sonnet-5-5")
+		"id area kind att code+ test+ docs+ other+ test:code $/kloc agent cost model\n"+
+			"T1 - - 1 10 6 3 0 0.60 50.00 1m20s $0.50 claude-sonnet-5-5\n"+
+			"T2 - - 2 7 0 0 0 0.00 85.71 1m20s $0.60 claude-sonnet-5-5")
 
 	b3Expect(t, s.run(nil, "metrics", "classify", "main.go", "main_test.go", "README.md", "go.sum", ".loop/x", "notes.txt"), 0,
 		"main.go code (go: **/*.go)\n"+

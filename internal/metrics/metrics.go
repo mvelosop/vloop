@@ -106,6 +106,9 @@ type ReportTask struct {
 	AgentMS  int64     `json:"agent_ms"`
 	CostUSD  float64   `json:"cost_usd"`
 	Models   []string  `json:"models"`
+	// TestCodeRatio and Per1000CodeUSD are nil where the task's code lines are 0.
+	TestCodeRatio  *float64 `json:"test_code_ratio"`
+	Per1000CodeUSD *float64 `json:"per_1000_code_lines_usd"`
 }
 
 // Report is the metrics/v2 document for one brief.
@@ -315,6 +318,11 @@ func byTask(m *runs.Model, plan *runs.PlanDoc, size Size) []ReportTask {
 	for _, id := range order {
 		rt := rows[id]
 		rt.Models = splitList(joinSet(models[id]))
+		rt.TestCodeRatio = ratio(rt.Churn.Test, rt.Churn.Code)
+		if rt.Churn.Code > 0 {
+			c := rt.CostUSD * 1000 / float64(rt.Churn.Code)
+			rt.Per1000CodeUSD = &c
+		}
 		out = append(out, *rt)
 	}
 	return out

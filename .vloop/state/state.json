@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 12,
+  "iteration": 13,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T15:28:28Z",
+  "updated": "2026-10-14T15:36:51Z",
   "shell": "sh",
   "checks": [
     {
@@ -240,8 +240,8 @@
       ],
       "verify": "sh .vloop/state/gates/T8/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "No committed test covers the JSON test_code_ratio/per_1000_code_lines_usd fields or the null case where code+ is 0, nor byTask producing nil for a zero-code task"
     },
     {
       "id": "T9",

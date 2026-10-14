@@ -64,3 +64,19 @@ func TestPrintNotMeasuredWhereNothingClassified(t *testing.T) {
 		t.Errorf("the line is printed with zero unclassified lines:\n%s", b.String())
 	}
 }
+
+func TestPrintByTaskRatioColumns(t *testing.T) {
+	ratio, per1k := 1.5, 2.5
+	r := &Report{ByTask: []ReportTask{
+		{ID: "T1", Churn: JSONLines{Code: 200, Test: 300}, CostUSD: 0.5, TestCodeRatio: &ratio, Per1000CodeUSD: &per1k},
+		{ID: "T2"},
+	}}
+	var b strings.Builder
+	PrintByTask(&b, r)
+	got := strings.Join(strings.Fields(b.String()), " ")
+	want := "id area kind att code+ test+ docs+ other+ test:code $/kloc agent cost model " +
+		"T1 - - 0 200 300 0 0 1.50 2.50 0m00s $0.50 - T2 - - 0 0 0 0 0 - - 0m00s $0.00 -"
+	if got != want {
+		t.Errorf("got %q\nwant %q", got, want)
+	}
+}

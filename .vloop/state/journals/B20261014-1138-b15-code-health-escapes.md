@@ -95,3 +95,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Second-stamped D/I IDs come from one generator (defect.StampedID); close --dry-run predicts with it; both ID forms are accepted. This attempt fixes the remaining check failure: the B4 worked-example test was flaky across a second boundary.
 - **Files:** cmd/vloop/b4_e2e_test.go
 - **Notes for next iteration:** The dry run's predicted stamp and the real close can fall in different seconds (the close is slower), so TestWorkedExampleB4Close now takes the recorded stamp from the close output and only requires it to be >= the prediction. Earlier fixes: two cmd/vloop regexes moved from four-digit to six-digit stamps.
+
+## T8 — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
+
+- **Outcome:** rejected (review: FAIL)
+- **Summary:** The per-task table gains test:code and $/kloc columns, by_task JSON gains test_code_ratio and per_1000_code_lines_usd (null where code+ is 0, optional in metrics/v2), the summary cost line ends $<c>/kloc, and the all-briefs headers are test:code and $/kloc.
+- **Files:** internal/metrics/metrics.go, internal/metrics/print.go, internal/metrics/print_test.go, schemas/metrics.v2.json, internal/cli/metrics_test.go, cmd/vloop/b3_e2e_test.go
+- **Notes for next iteration:** Docs still say 'per 1,000 code lines' (docs/guide/metrics.md:235 etc.); that is T13's. lines_test.go and run_iterate_test.go needed no change.
