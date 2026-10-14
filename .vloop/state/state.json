@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T14:42:08Z",
+  "updated": "2026-10-14T14:46:24Z",
   "shell": "sh",
   "checks": [
     {
@@ -98,7 +98,7 @@
         "The function has a committed unit test: the named variables are gone, every other entry is kept in order, and a variable whose name merely starts with a dropped name is kept."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

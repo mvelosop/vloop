@@ -840,13 +840,7 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	if base == nil {
 		base = os.Environ()
 	}
-	var env []string
-	for _, kv := range base {
-		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") {
-			continue
-		}
-		env = append(env, kv)
-	}
+	env := dropEnv(base, "VLOOP_ACTIVE_TASK", "VLOOP_GATE_TASK")
 	env = append(env, "VLOOP_ACTIVE_TASK="+active, "VLOOP_GATE_TASK="+id)
 	cmd, err := state.GateCommand(it.Root, it.plan.Shell, t.Verify, env)
 	if err != nil {

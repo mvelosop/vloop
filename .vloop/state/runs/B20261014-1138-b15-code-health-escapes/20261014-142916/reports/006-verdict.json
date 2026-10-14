@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "One function removes a given list of variable names from an environment ([]string of NAME=value), matching NAME= exactly so that a longer name sharing the prefix is kept; the gate run (runGate), the base gates (baseGates), the checks (runCheck) and the session launch (Session.Run) call it, and no other function filters an environment by matching \"<NAME>=\" prefixes.", "met": true, "evidence": "dropEnv in internal/driver/safety.go matches n+\"=\"; called from iterate.go runGate, acceptance.go baseGates, checks.go runCheck, session.go Run; grep finds no other HasPrefix(kv) filter"},
+    {"criterion": "Each caller keeps its base environment and the set it drops today: the gate run its injected base else os.Environ, the base gates and the checks os.Environ, all three dropping VLOOP_ACTIVE_TASK and VLOOP_GATE_TASK; the session launch also drops VLOOP_PLAN_SHA256 (PlanHashEnv).", "met": true, "evidence": "diff: runGate uses base (injected else os.Environ); baseGates and runCheck use os.Environ; session.go adds PlanHashEnv to the names"},
+    {"criterion": "The difference that the base gates and the checks start from the process environment while the gate run honours an injected one is kept as is and reported in the task notes, not fixed.", "met": true, "evidence": "base selection unchanged in diff; proposal.json notes report the difference"},
+    {"criterion": "No command's output, exit code, files written or session arguments change, and no earlier test changes (H1-H7: the unchanged tests are the behaviour check).", "met": true, "evidence": "diff is a pure extraction; only a new test file added, no existing tests modified; go check log passes"},
+    {"criterion": "The function has a committed unit test: the named variables are gone, every other entry is kept in order, and a variable whose name merely starts with a dropped name is kept.", "met": true, "evidence": "internal/driver/envfilter_test.go TestDropEnv asserts exact order-preserving result including VLOOP_GATE_TASK_X kept"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

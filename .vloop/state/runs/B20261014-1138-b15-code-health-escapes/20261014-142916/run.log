@@ -12,3 +12,10 @@
    review T2 · 0m17s · $0.11 · run $0.58 / $40.00
    review: PASS
    T2 done
+── iteration 6 (3 this run) · T3 · 2/14 done ──
+   Filter the environment for gates, checks and sessions with one function
+   work T3 · 0m33s · $0.12 · run $0.69 / $40.00
+   check go
+   review T3 · 0m15s · $0.08 · run $0.78 / $40.00
+   review: PASS
+   T3 done

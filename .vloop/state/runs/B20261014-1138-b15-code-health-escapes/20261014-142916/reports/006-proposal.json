@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "dropEnv in internal/driver/safety.go is now the only environment filter; runGate, the base gates, runCheck and Session.Run call it with their own name sets.",
+  "files": ["internal/driver/safety.go", "internal/driver/iterate.go", "internal/driver/acceptance.go", "internal/driver/checks.go", "internal/driver/session.go", "internal/driver/envfilter_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; go test ./internal/driver passes.",
+  "notes": "Kept as is: the gate run honours an injected it.Env (else os.Environ) while the base gates and the checks always start from os.Environ. The session launch also drops PlanHashEnv."
+}

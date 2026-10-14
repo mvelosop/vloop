@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/14 done** · iteration 5
+**Status:** running · **3/14 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:42:08Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:46:24Z
 
 ## Progress
 
 - [x] **T1** — Make cmd/vloop's TestMain fail cleanly when the binary does not build
 - [x] **T2** — Run every git command through one package
-- [ ] **T3** — Filter the environment for gates, checks and sessions with one function
+- [x] **T3** — Filter the environment for gates, checks and sessions with one function
 - [ ] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
 - [ ] **T5** — Split the five long functions to at most 100 lines each
 - [ ] **T6** — Compare run.git-config-ignore patterns as git reports keys
@@ -70,7 +70,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Filter the environment for gates, checks and sessions with one function
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Four copies of the same loop drop vloop's own variables from an environment before a gate, a base gate, a check or a session starts. One function that removes a given list of variable names replaces them, so the set of dropped variables is stated at each call and implemented once.
 
