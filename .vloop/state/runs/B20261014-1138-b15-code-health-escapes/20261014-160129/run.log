@@ -1,0 +1,7 @@
+── iteration 17 (1 this run) · T10 · 9/14 done ──
+   Count a recorded defect as escaped when it was created after its brief merged
+   work T10 · 1m04s · $0.15 · run $0.15 / $40.00
+   check go
+   review T10 · 0m33s · $0.13 · run $0.28 / $40.00
+   review: PASS
+   T10 done

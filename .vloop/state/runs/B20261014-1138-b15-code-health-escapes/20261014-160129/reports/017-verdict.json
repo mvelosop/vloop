@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T10",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A recorded defect is escaped when its created time is after the committer time of its brief's release commit (M-5), whatever its found-by; a record created in the same second is not escaped. Otherwise it counts by found-by as today: gate and review in-loop, operator operator, user escaped. A brief that is not merged has no release, so its records count by found-by.", "met": true, "evidence": "internal/metrics/defects.go:156 Reclassify uses !at.After(released) (same second stays), zero released returns early; released is the %ct committer time of runs.Release (metrics.go:200-212)"},
+    {"criterion": "The rule applies to every record, old and new, everywhere the counts are computed (vloop metrics' summary and JSON, the all-briefs table, close's summary and snapshot); no record is edited or migrated.", "met": true, "evidence": "Reclassify is applied once in metrics.Build (metrics.go:245), which cli/metrics.go, cli/close.go and driver/snapshot.go all call; records are only read"},
+    {"criterion": "Removal efficiency stays (in-loop + operator) / all; `defect list --matrix` is unchanged (origin by catcher).", "met": true, "evidence": "RemovalEfficiency untouched in defects.go; Reclassify works on DefectCounts only, the Matrix is not modified"},
+    {"criterion": "The release commit's time is read through the one git runner (T2).", "met": true, "evidence": "metrics.go:204 calls gitOut, which delegates to gitrun.Capture (lines.go:54-56)"},
+    {"criterion": "Real-data check, on this repository: the task notes give, for each consumed brief, the `vloop metrics` defects line before and after; only operator and escaped move, only for briefs with recorded defects created after their merge, and the total escaped across them rises from 3.", "met": true, "evidence": "proposal notes list per-brief before/after in-loop/operator/escaped, total escaped 3 -> 33; gate-found records created after merge also move to escaped, which is consistent with the rule and with the operator's amended gate (gate_history)"},
+    {"criterion": "internal/metrics/defects_test.go changes only by the time rule; committed tests cover a defect before, at the same second as, and after the release, by each catcher, and an unmerged brief.", "met": true, "evidence": "git diff 4ece10d HEAD on defects_test.go is a pure addition of TestReclassifyByReleaseTime: operator before/at/after, review after, gate and user before, and zero release time for an unmerged brief"}
+  ],
+  "findings": [],
+  "notes": "git diff HEAD is empty for code: the work was already committed in 59debf7 before the gate dispute; this iteration only re-ran the amended gate. The test does not cover a gate- or review-found record after the release by user catcher or a user record after release beyond the unmerged case, which is minor. The task notes still carry the stale gate-dispute text."
+}

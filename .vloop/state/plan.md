@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **9/14 done** · iteration 16
+**Status:** running · **10/14 done** · iteration 17
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:59:32Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:07:07Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Give new defects and interventions second-stamped IDs that never collide · 2 attempt(s)
 - [x] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere · 1 attempt(s)
 - [x] **T9** — Refuse vloop defect add for a brief that is not merged
-- [ ] **T10** — Count a recorded defect as escaped when it was created after its brief merged · **blocked**
+- [x] **T10** — Count a recorded defect as escaped when it was created after its brief merged
 - [ ] **T11** — Record operator findings as verification-finding interventions with an origin
 - [ ] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
 - [ ] **T13** — Describe the new model in the docs, the domain and both operate playbooks
@@ -226,7 +226,7 @@ sh .vloop/state/gates/T9/gate.sh
 
 ### T10 — Count a recorded defect as escaped when it was created after its brief merged
 
-`blocked` · **blocked** · depends on: T9
+`done` · depends on: T9
 
 found-by alone decided whether a defect escaped, so an operator who found a defect a week after the merge was counted as catching it: 28 escapes were counted as caught and removal efficiency overstated the loop. A recorded defect is escaped when created after its brief's release commit, whoever found it; the history is recomputed, not edited (M-1).
 
@@ -238,8 +238,6 @@ found-by alone decided whether a defect escaped, so an operator who found a defe
 - The release commit's time is read through the one git runner (T2).
 - Real-data check, on this repository: the task notes give, for each consumed brief, the `vloop metrics` defects line before and after; only operator and escaped move, only for briefs with recorded defects created after their merge, and the total escaped across them rises from 3.
 - internal/metrics/defects_test.go changes only by the time rule; committed tests cover a defect before, at the same second as, and after the release, by each catcher, and an unmerged brief.
-
-**From the last attempt:** gate disputed: The real-data clause requires in-loop to be unchanged for every consumed brief, contradicting the rule it checks: a gate- or review-found record created after the merge is escaped whatever its found-by. — The clause `elif $o.defects.in_loop != $n.defects.in_loop then ... in-loop changed` fails for B20261003-2049-gate-model and B20260929-2148-vloop-state-tasks-status, which hold gate-found defects created after their merge; the same gate's fixture D20250101-0004-after-review (review, MERGED+60) must count as escaped.
 
 <details><summary>verify command</summary>
 

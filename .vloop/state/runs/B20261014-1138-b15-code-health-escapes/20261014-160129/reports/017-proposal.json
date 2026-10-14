@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T10",
+  "outcome": "done",
+  "summary": "A recorded defect created after its brief's release commit (committer time, via the git runner) is counted escaped whatever its found-by; same-second and unmerged briefs count by found-by. DefectCounts.Reclassify is applied in metrics.Build, so summary, JSON, all-briefs table, close and snapshot follow; the matrix and records are untouched.",
+  "files": ["internal/metrics/defects.go", "internal/metrics/metrics.go", "internal/metrics/defects_test.go"],
+  "verified": "vloop task gate T10 exited 0 and printed gate T10: ok.",
+  "notes": "Real data, in-loop/operator/escaped before -> after (total escaped 3 -> 33): skeleton-config-briefs 0/3/2 -> 0/0/5; state-tasks-status 1/3/1 -> 0/0/5; metrics-defects 0/2/0 -> 0/1/1; close-export-workspace 0/1/0 -> 0/0/1; init-upgrade-doctor 2/1/0 -> 2/0/1; run-driver 0/13/0 -> 0/1/12; skills 0/5/0 -> 0/4/1; v1-security 6/2/0 -> 6/0/2; gate-model 7/11/0 -> 6/8/4; interventions-options 10/6/0 -> 10/5/1; others unchanged. Gate-found records created after a merge also move to escaped (gate was amended for that). Reclassify lives in internal/metrics/defects.go; zero release time means unmerged."
+}
