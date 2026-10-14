@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "vloop defect add now refuses, before writing anything, a brief (from --brief or --blame) that is not merged, with the intervention-add hint on stderr and exit 1; with no default branch it returns M-5's lookup error.",
+  "files": ["internal/cli/defect.go", "internal/cli/defect_test.go", "internal/cli/matrix_test.go", "internal/cli/export_test.go", "internal/cli/intervention_test.go", "cmd/vloop/b20261005_e2e_test.go", "cmd/vloop/b14_e2e_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed gate T9: ok; go test of internal/cli defect/export/matrix/metrics/intervention tests and cmd/vloop B3, B8, B11, B14 tests pass.",
+  "notes": "The check is requireMerged in internal/cli/defect.go, using runs.Release (same lookup as metrics). The blame attribution line is now printed only after the merged check. Test fixtures merge the brief via mergeBrief (internal/cli/matrix_test.go) and b15MergeBrief (cmd/vloop/b20261005_e2e_test.go), which commit to main with a scratch index. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated."
+}

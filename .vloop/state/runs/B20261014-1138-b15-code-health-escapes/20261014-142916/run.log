@@ -70,3 +70,10 @@
    review T8 · 0m17s · $0.11 · run $3.66 / $40.00
    review: PASS
    T8 done
+── iteration 15 (12 this run) · T9 · 8/14 done ──
+   Refuse vloop defect add for a brief that is not merged
+   work T9 · 12m18s · $0.43 · run $4.09 / $40.00
+   check go
+   review T9 · 0m17s · $0.11 · run $4.21 / $40.00
+   review: PASS
+   T9 done

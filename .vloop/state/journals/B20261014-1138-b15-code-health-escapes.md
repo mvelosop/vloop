@@ -109,3 +109,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Per-task test:code and $/kloc columns, by_task JSON fields (null where code+ is 0), $/kloc summary ending and all-briefs headers were already in place; this attempt adds the missing committed test of byTask's nil ratios and the JSON null/value fields.
 - **Files:** internal/metrics/print_test.go
 - **Notes for next iteration:** Review rejected attempt 1 only for lacking a test of the JSON fields and the null case; TestByTaskRatiosAndJSONNull in internal/metrics/print_test.go calls byTask directly and marshals ReportTask. Docs still say 'per 1,000 code lines' (T13's).
+
+## T9 — Refuse vloop defect add for a brief that is not merged
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop defect add now refuses, before writing anything, a brief (from --brief or --blame) that is not merged, with the intervention-add hint on stderr and exit 1; with no default branch it returns M-5's lookup error.
+- **Files:** internal/cli/defect.go, internal/cli/defect_test.go, internal/cli/matrix_test.go, internal/cli/export_test.go, internal/cli/intervention_test.go, cmd/vloop/b20261005_e2e_test.go, cmd/vloop/b14_e2e_test.go
+- **Notes for next iteration:** The check is requireMerged in internal/cli/defect.go, using runs.Release (same lookup as metrics). The blame attribution line is now printed only after the merged check. Test fixtures merge the brief via mergeBrief (internal/cli/matrix_test.go) and b15MergeBrief (cmd/vloop/b20261005_e2e_test.go), which commit to main with a scratch index. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated.

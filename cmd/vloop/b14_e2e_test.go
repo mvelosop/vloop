@@ -415,6 +415,7 @@ func TestWorkedExampleB14DefectReport(t *testing.T) {
 		t.Fatalf("close --dry-run wrote: %s", s)
 	}
 
+	b15MergeBrief(r.t, r.dir, runBrief)
 	add := r.vloop("defect", "add", "the must-change list missed a test", "--brief", runBriefName,
 		"--found-by", "review", "--kind", "spec-gap", "--origin", "brief")
 	wantExit(t, add, 0)

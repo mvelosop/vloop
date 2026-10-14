@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/14 done** · iteration 14
+**Status:** running · **9/14 done** · iteration 15
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:41:22Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:57:40Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Compare run.git-config-ignore patterns as git reports keys
 - [x] **T7** — Give new defects and interventions second-stamped IDs that never collide · 2 attempt(s)
 - [x] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere · 1 attempt(s)
-- [ ] **T9** — Refuse vloop defect add for a brief that is not merged
+- [x] **T9** — Refuse vloop defect add for a brief that is not merged
 - [ ] **T10** — Count a recorded defect as escaped when it was created after its brief merged
 - [ ] **T11** — Record operator findings as verification-finding interventions with an origin
 - [ ] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
@@ -204,7 +204,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Refuse vloop defect add for a brief that is not merged
 
-`pending` · depends on: T8
+`done` · depends on: T8
 
 A recorded defect now means an escape: a problem that got past the brief's merge. What the operator finds before merge is an intervention instead, so `defect add` refuses a brief that is not merged (M-5) and says how to record the intervention. This is enforced where the record is made, because a convention in the docs is how 28 escapes went uncounted.
 

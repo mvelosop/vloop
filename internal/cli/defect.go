@@ -78,6 +78,7 @@ func newDefectAdd(g *Globals) *cobra.Command {
 					return err
 				}
 			}
+			var attribution fmt.Stringer
 			if in.Brief != "" {
 				in.Brief = defect.BriefName(in.Brief)
 				if err := defect.CheckBrief(root, in.Brief); err != nil {
@@ -94,7 +95,13 @@ func newDefectAdd(g *Globals) *cobra.Command {
 					return Problem(err)
 				}
 				in.Brief = a.Brief
-				fmt.Fprintln(cmd.ErrOrStderr(), a)
+				attribution = a
+			}
+			if err := requireMerged(root, in.Brief); err != nil {
+				return Problem(err)
+			}
+			if attribution != nil {
+				fmt.Fprintln(cmd.ErrOrStderr(), attribution)
 			}
 			if in.Task != "" {
 				if err := defect.CheckTask(root, in.Brief, in.Task); err != nil {
@@ -119,6 +126,19 @@ func newDefectAdd(g *Globals) *cobra.Command {
 	f.StringVar(&in.Case, "case", "", "the failing test written first")
 	f.StringVar(&blame, "blame", "", "attribute to the brief that wrote `file:line` when --brief is absent")
 	return cmd
+}
+
+// requireMerged refuses a brief that is not merged (M-5): a defect is an
+// escape, and what is found before merge is an intervention.
+func requireMerged(root, brief string) error {
+	sha, err := runs.Release(root, defect.BriefsDir+"/"+brief+".md")
+	if err != nil {
+		return err
+	}
+	if sha == "" {
+		return fmt.Errorf("%s is not merged: record what you found before merge as an intervention — vloop intervention add \"<summary>\" --brief %s --kind verification-finding --origin <brief|plan|work|env> --phase verify --automatable partly --by operator", brief, brief)
+	}
+	return nil
 }
 
 func newDefectList(g *Globals) *cobra.Command {

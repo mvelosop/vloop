@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 14,
+  "iteration": 15,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T15:41:22Z",
+  "updated": "2026-10-14T15:57:40Z",
   "shell": "sh",
   "checks": [
     {
@@ -274,7 +274,7 @@
         "The tests that run defect add against a brief that is not merged — cmd/vloop/b14_e2e_test.go, cmd/vloop/b20261005_e2e_test.go, cmd/vloop/b3_e2e_test.go, internal/cli/defect_test.go, internal/cli/export_test.go, internal/cli/intervention_test.go, internal/cli/matrix_test.go, internal/cli/metrics_test.go — change only by merging the brief in their fixture first, or by asserting the refusal; committed tests cover the refusal by --brief and by --blame, the no-default-branch refusal and a merged brief accepted."
       ],
       "verify": "sh .vloop/state/gates/T9/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

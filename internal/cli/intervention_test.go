@@ -233,6 +233,7 @@ func TestInterventionShowLinks(t *testing.T) {
 
 	os.MkdirAll(filepath.Join(dir, "docs/briefs"), 0o755)
 	os.WriteFile(filepath.Join(dir, "docs/briefs/B20260101-0900-a.loop-brief.md"), []byte("---\nname: B20260101-0900-a.loop-brief\nstatus: ready\n---\n"), 0o644)
+	mergeBrief(t, dir, "B20260101-0900-a.loop-brief")
 	_, out, _ := runDefect(t, dir, "defect", "add", "the defect", "--found-by", "user", "--brief", "B20260101-0900-a.loop-brief")
 	did := strings.TrimSuffix(filepath.Base(strings.TrimSpace(out)), ".md")
 	_, out, _ = runDefect(t, dir, "intervention", "add", "the other one", "--phase", "run", "--kind", "repair", "--automatable", "no", "--by", "operator")

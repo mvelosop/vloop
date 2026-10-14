@@ -40,6 +40,7 @@ func TestExportRecordOrderAndFields(t *testing.T) {
 			`{"iteration":3,"task":"T1","outcome":"done"}`+"\n")
 	write(t, dir, folder+"reports/002-verdict.json",
 		`{"task":"T1","verdict":"FAIL","findings":[{"summary":"a spec gap","kind":"spec-gap"},{"summary":"an off by one","kind":"bug"}]}`)
+	mergeBrief(t, dir, closeName)
 	if code, _, errs := runCLI(t, dir, "defect", "add", "README omits the flag", "--found-by", "operator", "--brief", closeName); code != 0 {
 		t.Fatal(errs)
 	}

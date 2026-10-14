@@ -75,6 +75,7 @@ func TestMatrixCommand(t *testing.T) {
 	}
 	// A recorded defect is counted alongside the derived ones.
 	dir := matrixRepo(t, "planner")
+	mergeBrief(t, dir, "B20260102-0900-b.loop-brief")
 	if code, _, e := runDefect(t, dir, "defect", "add", "late", "--found-by", "user", "--brief", "B20260102-0900-b.loop-brief"); code != 0 {
 		t.Fatal(e)
 	}
@@ -87,4 +88,42 @@ func TestMatrixCommand(t *testing.T) {
 	if code, out, _ := runDefect(t, empty, "defect", "list", "--matrix"); code != 0 || !strings.Contains(out, "env       0       0         0     0\n") {
 		t.Fatalf("empty: %d %q", code, out)
 	}
+}
+
+// mergeBrief makes the brief released (M-5): a commit on main where its
+// frontmatter says status: consumed. It creates the repository when dir has
+// none and leaves the working tree and the current branch alone.
+func mergeBrief(t *testing.T, dir, name string) {
+	t.Helper()
+	const date = "2026-01-03T09:00:00Z"
+	p := "docs/briefs/" + name + ".md"
+	text := "---\nname: " + name + "\nstatus: consumed\n---\n"
+	commit := []string{"-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false"}
+	if _, err := os.Stat(filepath.Join(dir, ".git")); err != nil {
+		gitIn(t, dir, date, "init", "-q", "-b", "main")
+	}
+	head, _ := exec.Command("git", "-C", dir, "symbolic-ref", "--short", "HEAD").Output()
+	if err := exec.Command("git", "-C", dir, "rev-parse", "--verify", "-q", "main").Run(); err != nil || strings.TrimSpace(string(head)) == "main" {
+		write(t, dir, p, text)
+		gitIn(t, dir, date, "add", p)
+		gitIn(t, dir, date, append(commit, "commit", "-q", "-m", "merge "+name)...)
+		return
+	}
+	// Build the commit on main with a scratch index, so nothing is checked out.
+	env := append(os.Environ(), "GIT_INDEX_FILE="+filepath.Join(t.TempDir(), "index"),
+		"GIT_AUTHOR_DATE="+date, "GIT_COMMITTER_DATE="+date, "GIT_CONFIG_GLOBAL=/dev/null", "GIT_CONFIG_NOSYSTEM=1",
+		"GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@example.com", "GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@example.com")
+	g := func(stdin string, args ...string) string {
+		c := exec.Command("git", append([]string{"-C", dir}, args...)...)
+		c.Env, c.Stdin = env, strings.NewReader(stdin)
+		out, err := c.Output()
+		if err != nil {
+			t.Fatalf("git %v: %v", args, err)
+		}
+		return strings.TrimSpace(string(out))
+	}
+	blob := g(text, "hash-object", "-w", "--stdin")
+	g("", "read-tree", "main")
+	g("", "update-index", "--add", "--cacheinfo", "100644,"+blob+","+p)
+	g("", "update-ref", "refs/heads/main", g("", "commit-tree", g("", "write-tree"), "-p", "main", "-m", "merge "+name))
 }
