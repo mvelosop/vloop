@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T14:21:07Z",
+  "updated": "2026-10-14T14:24:36Z",
   "shell": "sh",
   "checks": [
     {
@@ -45,8 +45,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/001-go.fail.log"
+      "attempts": 2,
+      "notes": "check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/002-go.fail.log"
     },
     {
       "id": "T2",

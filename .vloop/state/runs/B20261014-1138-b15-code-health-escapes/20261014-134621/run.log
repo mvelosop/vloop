@@ -25,3 +25,8 @@ committing the plan
    work T1 · 0m14s · $0.07 · run $7.84 / $40.00
    check go
    CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/001-go.fail.log; review skipped
+── iteration 2 (2 this run) · T1 · 0/14 done ──
+   Make cmd/vloop's TestMain fail cleanly when the binary does not build
+   work T1 · 0m14s · $0.08 · run $7.92 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/002-go.fail.log; review skipped
