@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 21,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T16:42:06Z",
+  "updated": "2026-10-14T16:43:04Z",
   "shell": "sh",
   "checks": [
     {
@@ -406,7 +406,7 @@
       "title": "Describe the new model in the docs, the domain and both operate playbooks",
       "goal": "The code now records findings before merge as interventions, counts escapes by time, stamps IDs with seconds and has no triage; the docs, the domain model and the two operate playbooks still describe the old model. They are brought in line, and docs/guide/commands.md is regenerated. The operate skill must stay within its word ceiling.",
       "kind": "docs",
-      "fixtures": "0e2f853716ba3397423ca9a40f712dc7be41fe3c3d18c5b2fc9ee566ebbdd1a6",
+      "fixtures": "49ebc48df0857e850a71c67a6499012edca5cad862b0ba77462c5108aeca2792",
       "references": [
         {
           "path": "docs/domain/domain-model.md",
@@ -442,9 +442,18 @@
         "docs/guide/commands.md is regenerated and equals what cmd/gendocs makes now."
       ],
       "verify": "sh .vloop/state/gates/T13/gate.sh",
-      "status": "blocked",
+      "status": "pending",
       "attempts": 0,
-      "notes": "gate disputed: The gate's section() helper passes regexes with \\* through awk -v, where the escape is consumed; under BSD awk the pattern matches nothing, so the M-4 section is always empty regardless of content. — printf -- '- **M-4** x\\n' | awk -v s='^- \\*\\*M-4\\*\\*' '$0 ~ s' prints nothing, while s='^- \\\\*\\\\*M-4\\\\*\\\\*' matches; the gate fails with 'docs/domain/domain-model.md has no M-4' although the line exists. With the escapes doubled in a temp copy the gate prints 'gate T13: ok'."
+      "notes": "gate disputed: The gate's section() helper passes regexes with \\* through awk -v, where the escape is consumed; under BSD awk the pattern matches nothing, so the M-4 section is always empty regardless of content. — printf -- '- **M-4** x\\n' | awk -v s='^- \\*\\*M-4\\*\\*' '$0 ~ s' prints nothing, while s='^- \\\\*\\\\*M-4\\\\*\\\\*' matches; the gate fails with 'docs/domain/domain-model.md has no M-4' although the line exists. With the escapes doubled in a temp copy the gate prints 'gate T13: ok'.",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T13/gate.sh",
+          "replaced_at": "2026-10-14T16:43:04Z",
+          "reason": "BSD awk consumes the \\* escapes passed through awk -v, so section() matched nothing and M-4 always read empty. Patterns now use bracket expressions ([*][*], [.]); the checks are unchanged. Gate passes on the work in the tree; on the base's domain model it still fails (M-4 does not cite M-5).",
+          "by": "operator",
+          "fixtures": "0e2f853716ba3397423ca9a40f712dc7be41fe3c3d18c5b2fc9ee566ebbdd1a6"
+        }
+      ]
     },
     {
       "id": "T14",
