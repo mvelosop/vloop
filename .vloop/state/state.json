@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 26,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T17:07:23Z",
+  "updated": "2026-10-14T17:09:08Z",
   "shell": "sh",
   "checks": [
     {
@@ -481,9 +481,9 @@
         "Fixes needed to make the worked example hold are made here, each with its committed test, and named in the notes."
       ],
       "verify": "sh .vloop/state/gates/T14/gate.sh",
-      "status": "blocked",
-      "attempts": 3,
-      "notes": "The worked example is committed as cmd/vloop/b20261014_e2e_test.go and the gate passes; the before/after real-data metrics comparison (acceptance 2) could not be done because building a base-commit binary is denied in this session. — T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else."
+      "status": "pending",
+      "attempts": 0,
+      "notes": "Real-data check, done by the operator (the session may not build the base): vloop metrics --json, base 4ece10d against this branch, consumed briefs, defects in-loop/operator/escaped before -> after: skeleton 0/3/2->0/0/5; state-tasks-status 1/3/1->0/0/5; metrics-defects 0/2/0->0/1/1; close-export 0/1/0->0/0/1; init-upgrade 2/1/0->2/0/1; run-driver 0/13/0->0/1/12; skills 0/5/0->0/4/1; v1-security 6/2/0->6/0/2; gate-model 7/11/0->6/8/4; interventions-options 10/6/0->10/5/1; quality-pass, b12, b13, b14 unchanged. Total escaped 3 -> 33 (28 operator, 2 gate, plus the 3 user), matching the operator's independent survey. Every other JSON figure is identical (per-task test_code_ratio and per_1000_code_lines_usd aside), and every text summary line is identical but the defects line and the cost line's ending. The worked example test is cmd/vloop/b20261014_e2e_test.go; no fixes were needed."
     }
   ]
 }
