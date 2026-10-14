@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **13/14 done** · iteration 26
+**Status:** running · **14/14 done** · iteration 27
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T17:07:23Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T17:14:27Z
 
 ## Progress
 
@@ -21,7 +21,7 @@
 - [x] **T11** — Record operator findings as verification-finding interventions with an origin · 1 attempt(s)
 - [x] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
 - [x] **T13** — Describe the new model in the docs, the domain and both operate playbooks · 1 attempt(s)
-- [ ] **T14** — Close: commit the worked example as an end-to-end test and pass the real-data check · **blocked**
+- [x] **T14** — Close: commit the worked example as an end-to-end test and pass the real-data check
 
 ## Tasks
 
@@ -321,7 +321,7 @@ sh .vloop/state/gates/T13/gate.sh
 
 ### T14 — Close: commit the worked example as an end-to-end test and pass the real-data check
 
-`blocked` · **blocked** · depends on: T13
+`done` · depends on: T13
 
 The last task proves the brief as written: the worked example line for line, against a fresh build in temporary repositories, committed as an end-to-end test the checks keep running, and the real-data check on this repository. Anything the worked example exposes is fixed here.
 
@@ -331,8 +331,6 @@ The last task proves the brief as written: the worked example line for line, aga
 - Real-data check on this repository, in the task notes: `vloop metrics` for each consumed brief, the defects lines before and after (only operator and escaped move); every other summary line unchanged but the cost line's ending; `vloop defect list` and `vloop intervention list`/`show` list every existing record.
 - No historical record is edited, renamed or migrated, and nothing is written under .vloop/ but .vloop/tmp/.
 - Fixes needed to make the worked example hold are made here, each with its committed test, and named in the notes.
-
-**From the last attempt:** The worked example is committed as cmd/vloop/b20261014_e2e_test.go and the gate passes; the before/after real-data metrics comparison (acceptance 2) could not be done because building a base-commit binary is denied in this session. — T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
 
 <details><summary>verify command</summary>
 
