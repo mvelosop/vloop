@@ -19,11 +19,26 @@ import (
 	"github.com/mvelosop/vloop/internal/defect"
 	fmpkg "github.com/mvelosop/vloop/internal/frontmatter"
 	"github.com/mvelosop/vloop/internal/gitrun"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/metrics"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
 const closeFindingsMsg = `say what you found before merge: --finding "<summary>" (repeatable) or --no-findings`
+
+// findingRefusal is what a finding without an origin prefix is refused with.
+const findingRefusal = `a finding starts with whose defect it is: --finding "<brief|plan|work|env>: <summary>"`
+
+// splitFinding splits "<origin>: <summary>" into its origin and summary; ok is
+// false when it does not start with one of the origins in lower case.
+func splitFinding(f string) (origin, summary string, ok bool) {
+	for _, o := range intervention.Origins {
+		if rest, found := strings.CutPrefix(strings.TrimSpace(f), o+": "); found && strings.TrimSpace(rest) != "" {
+			return o, strings.TrimSpace(rest), true
+		}
+	}
+	return "", "", false
+}
 
 func newBriefClose(g *Globals) *cobra.Command {
 	var findings []string
@@ -41,6 +56,9 @@ func newBriefClose(g *Globals) *cobra.Command {
 				if strings.TrimSpace(f) == "" {
 					return Usage(errors.New("a finding must not be empty"))
 				}
+				if _, _, ok := splitFinding(f); !ok {
+					return Usage(errors.New(findingRefusal))
+				}
 			}
 			if cmd.Flags().Changed("abandon") && strings.TrimSpace(abandon) == "" {
 				return Usage(errors.New("an abandon needs a reason: --abandon \"<reason>\""))
@@ -48,7 +66,7 @@ func newBriefClose(g *Globals) *cobra.Command {
 			return runBriefClose(g, cmd, args[0], findings, closeOpts{abandon: cmd.Flags().Changed("abandon"), reason: strings.TrimSpace(abandon), dry: dry})
 		},
 	}
-	cmd.Flags().StringArrayVar(&findings, "finding", nil, "a defect you found in the run, recorded as an operator defect (repeatable)")
+	cmd.Flags().StringArrayVar(&findings, "finding", nil, "\"<brief|plan|work|env>: <summary>\": a defect you found in the run and whose it is, recorded as a verification-finding intervention (repeatable)")
 	cmd.Flags().BoolVar(&none, "no-findings", false, "state that you found nothing")
 	cmd.Flags().StringVar(&abandon, "abandon", "", "close a brief whose plan did not complete, as abandoned, with the reason")
 	cmd.Flags().BoolVar(&dry, "dry-run", false, "print what a close would record, write and commit, and write nothing")
@@ -122,7 +140,7 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 		return err
 	}
 	if len(findings) > 0 {
-		// The report above predates the defect files; rebuild so it counts them.
+		// The report above predates the intervention files; rebuild so it counts them.
 		if report, err = metrics.Build(root, briefPath, c); err != nil {
 			return Problem(err)
 		}
@@ -140,7 +158,11 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 	if err != nil {
 		return Problem(err)
 	}
-	rec := closing.Record{Name: name, Date: now, Report: report, Derived: derived, Recorded: recorded}
+	ivs, err := intervention.List(root, name)
+	if err != nil {
+		return Problem(err)
+	}
+	rec := closing.Record{Name: name, Date: now, Report: report, Derived: derived, Recorded: recorded, Findings: ivs}
 	if err := writeClosedBrief(full, briefPath, doc, status, statusText, rec); err != nil {
 		return err
 	}
@@ -177,12 +199,14 @@ func encodeClosed(out io.Writer, name, status, sha string, files []string, trail
 	}{name, status, sha, files, trailer, report})
 }
 
-// recordFindings writes one defect file per finding the operator named and
-// returns their paths.
+// recordFindings writes one verification-finding intervention per finding the
+// operator named and returns their paths.
 func recordFindings(root, name string, findings []string, now time.Time) ([]string, error) {
 	var files []string
 	for _, f := range findings {
-		p, err := defect.Add(root, defect.NewInput{Summary: f, FoundBy: "operator", Brief: name, Origin: "work", Kind: "bug", Severity: "medium"}, now)
+		origin, summary, _ := splitFinding(f)
+		p, err := intervention.Add(root, intervention.NewInput{Summary: summary, Brief: name, Phase: "verify", Kind: "verification-finding",
+			Automatable: "partly", By: "operator", Origin: origin}, now)
 		if err != nil {
 			return nil, Problem(err)
 		}
@@ -294,7 +318,7 @@ func rewriteStatusLine(body, statusText string) string {
 }
 
 // closeDryRun prints what the close would do, counting the pending findings as
-// operator defects in the summary, and touches nothing.
+// operator-caught defects in the summary, and touches nothing.
 func closeDryRun(out io.Writer, root, briefPath, subject string, findings []string, report *metrics.Report, now time.Time) error {
 	d := &report.Defects
 	d.Operator += len(findings)
@@ -305,12 +329,10 @@ func closeDryRun(out io.Writer, root, briefPath, subject string, findings []stri
 	}
 	metrics.PrintSummary(out, report)
 	taken := map[string]bool{}
-	var pending []defect.Defect
 	var would []string
 	for _, f := range findings {
-		id := defect.StampedID(filepath.Join(root, filepath.FromSlash(defect.Dir)), "D", defect.Slug(strings.Join(strings.Fields(f), " ")), now, taken)
-		would = append(would, id)
-		pending = append(pending, defect.Defect{ID: id, Kind: "bug", FoundBy: "operator"})
+		_, summary, _ := splitFinding(f)
+		would = append(would, defect.StampedID(filepath.Join(root, filepath.FromSlash(intervention.Dir)), "I", defect.Slug(strings.Join(strings.Fields(summary), " ")), now, taken))
 	}
 	// The report sits before the would-lines: a dry run has no trailer line to
 	// precede, and its tail stays what it was.
@@ -322,9 +344,9 @@ func closeDryRun(out io.Writer, root, briefPath, subject string, findings []stri
 	if err != nil {
 		return Problem(err)
 	}
-	printDefectReport(out, report.RunID, append(brief, pending...), append(every, pending...))
+	printDefectReport(out, report.RunID, brief, every)
 	for _, id := range would {
-		fmt.Fprintf(out, "would record %s/%s.md\n", defect.Dir, id)
+		fmt.Fprintf(out, "would record %s/%s.md\n", intervention.Dir, id)
 	}
 	fmt.Fprintf(out, "would write %s/%s.json\n", closing.SnapshotDir, report.RunID)
 	fmt.Fprintf(out, "would update %s\n", briefPath)

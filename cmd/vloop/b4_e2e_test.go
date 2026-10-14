@@ -58,16 +58,16 @@ func TestWorkedExampleB4Close(t *testing.T) {
 	b4Err(t, s.run(nil, "brief", "close", b4Name), 2,
 		"vloop: say what you found before merge: --finding \"<summary>\" (repeatable) or --no-findings\n")
 
-	r := s.run(nil, "brief", "close", b4Name, "--finding", "README omits the flag", "--dry-run")
+	r := s.run(nil, "brief", "close", b4Name, "--finding", "work: README omits the flag", "--dry-run")
 	c := b3Collapse(r.out)
-	stamp := regexp.MustCompile(`would record \.vloop/defects/(D\d{8}-\d{6}-readme-omits-the-flag)\.md`).FindStringSubmatch(c)
+	stamp := regexp.MustCompile(`would record \.vloop/interventions/(I\d{8}-\d{6}-readme-omits-the-flag)\.md`).FindStringSubmatch(c)
 	if r.code != 0 || r.err != "" || stamp == nil {
 		t.Fatalf("dry run: %+v", r)
 	}
 	defect := stamp[1]
 	for _, w := range []string{
 		b3Brief + " consumed · not merged",
-		"would record .vloop/defects/" + defect + ".md",
+		"would record .vloop/interventions/" + defect + ".md",
 		"would write .vloop/state/metrics/" + b3Brief + ".json",
 		"would update " + b4File,
 		"would commit [vloop] close " + b3Brief,
@@ -80,14 +80,14 @@ func TestWorkedExampleB4Close(t *testing.T) {
 		t.Fatalf("dry run changed the repository: %q", p)
 	}
 
-	r = s.run(nil, "brief", "close", b4Name, "--finding", "README omits the flag")
+	r = s.run(nil, "brief", "close", b4Name, "--finding", "work: README omits the flag")
 	if r.code != 0 || r.err != "" {
 		t.Fatalf("close: %+v", r)
 	}
 	c = b3Collapse(r.out)
 	// The prediction and the close are different seconds apart on a slow
 	// machine: the recorded stamp is the dry run's or a later one.
-	rec := regexp.MustCompile(`recorded \.vloop/defects/(D\d{8}-\d{6}-readme-omits-the-flag)\.md`).FindStringSubmatch(c)
+	rec := regexp.MustCompile(`recorded \.vloop/interventions/(I\d{8}-\d{6}-readme-omits-the-flag)\.md`).FindStringSubmatch(c)
 	if rec == nil || rec[1] < defect {
 		t.Fatalf("close recorded %v, dry run predicted %s:\n%s", rec, defect, c)
 	}
@@ -97,8 +97,8 @@ func TestWorkedExampleB4Close(t *testing.T) {
 		b3Brief + " consumed · not merged",
 		"tasks 2 planned (brief said 2–3) · 2 done · 0 blocked · first-pass 1/2",
 		"defects in-loop 1 · operator 1 · escaped 0 · removal efficiency 100%",
-		"interventions 0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0",
-		"recorded .vloop/defects/" + defect + ".md",
+		"interventions 1 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 1",
+		"recorded .vloop/interventions/" + defect + ".md",
 		"wrote .vloop/state/metrics/" + b3Brief + ".json",
 		"updated " + b4File,
 	} {
@@ -121,7 +121,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 		t.Fatalf("message %q lacks the trailer after a blank line", body)
 	}
 	if got := strings.Join(b4Names(t, s, "show", "--name-only", "--format=", "HEAD"), "\n"); got !=
-		".vloop/defects/"+defect+".md\n.vloop/state/metrics/"+b3Brief+".json\n"+b4File {
+		".vloop/interventions/"+defect+".md\n.vloop/state/metrics/"+b3Brief+".json\n"+b4File {
 		t.Fatalf("commit files:\n%s", got)
 	}
 	if p := b4Porcelain(t, s); p != "" {
@@ -145,7 +145,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 		!strings.Contains(text, " as run "+b3Brief+". **Do not re-plan from this brief.**") ||
 		!strings.Contains(text, "<!-- vloop:run-record:begin -->\n## Run record\n") ||
 		!strings.Contains(text, "Recompute with: vloop metrics "+b4Name) ||
-		!strings.Contains(text, "- "+defect+" — bug, work, found by operator: README omits the flag") {
+		!strings.Contains(text, "- "+defect+" — verification-finding, work, found by operator: README omits the flag") {
 		t.Fatalf("brief after close:\n%s", text)
 	}
 
@@ -175,7 +175,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 			t.Fatalf("line %d schema = %v", i, m["schema"])
 		}
 	}
-	want := []string{"brief " + b3Brief, "task T1", "task T2", "defect " + b3Brief + "/i2-gate", "defect " + defect}
+	want := []string{"brief " + b3Brief, "task T1", "task T2", "defect " + b3Brief + "/i2-gate", "intervention " + defect}
 	if strings.Join(got, "|") != strings.Join(want, "|") {
 		t.Fatalf("export records %v, want %v", got, want)
 	}

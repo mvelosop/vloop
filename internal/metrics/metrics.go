@@ -243,13 +243,14 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	x.AddRecorded(recorded)
 	dc := x.Counts()
 	dc.Reclassify(recorded, released)
-	r.Defects = ReportDefects{InLoop: dc.InLoop, Operator: dc.Operator, Escaped: dc.Escaped, Total: dc.All()}
-	r.Defects.RemovalEfficiency = fratio(float64(dc.InLoop+dc.Operator), float64(dc.All()))
-
 	ivs, err := intervention.List(root, r.Brief)
 	if err != nil {
 		return nil, err
 	}
+	dc.AddFindings(ivs)
+	r.Defects = ReportDefects{InLoop: dc.InLoop, Operator: dc.Operator, Escaped: dc.Escaped, Total: dc.All()}
+	r.Defects.RemovalEfficiency = fratio(float64(dc.InLoop+dc.Operator), float64(dc.All()))
+
 	for _, v := range ivs {
 		r.Interventions.Total++
 		a := &r.Interventions.ByAgreement

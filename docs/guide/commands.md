@@ -39,7 +39,7 @@ vloop brief close <brief> [flags]
 
 - `--abandon string`: close a brief whose plan did not complete, as abandoned, with the reason
 - `--dry-run`: print what a close would record, write and commit, and write nothing
-- `--finding stringArray`: a defect you found in the run, recorded as an operator defect (repeatable)
+- `--finding stringArray`: "<brief|plan|work|env>: <summary>": a defect you found in the run and whose it is, recorded as a verification-finding intervention (repeatable)
 - `--no-findings`: state that you found nothing
 
 ## vloop brief list
@@ -192,6 +192,7 @@ vloop intervention add "<summary>" [flags]
 - `--done string`: what was done
 - `--kind string`: kind: direction, decision, context-supply, halt, verification-finding, repair, carry-forward, ceremony
 - `--option stringArray`: an option put to the operator (repeatable, at most three)
+- `--origin string`: whose defect a verification-finding is: brief, plan, work, env
 - `--phase string`: lifecycle phase: setup, design, run, halt, verify, close, next
 - `--recommended int`: the recommended option, 1 to the number of options (default 0)
 - `--trigger string`: what made it necessary
@@ -219,7 +220,7 @@ vloop intervention migrate [flags]
 
 ## vloop intervention set
 
-Set one field of an intervention: brief, phase, kind, automatable, by, occurred, recommended, decided, adjusted
+Set one field of an intervention: brief, phase, kind, automatable, by, origin, occurred, recommended, decided, adjusted
 
 ```
 vloop intervention set <id> <field> <value>

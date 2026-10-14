@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/14 done** · iteration 17
+**Status:** running · **10/14 done** · iteration 18
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:07:07Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:20:15Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere · 1 attempt(s)
 - [x] **T9** — Refuse vloop defect add for a brief that is not merged
 - [x] **T10** — Count a recorded defect as escaped when it was created after its brief merged
-- [ ] **T11** — Record operator findings as verification-finding interventions with an origin
+- [ ] **T11** — Record operator findings as verification-finding interventions with an origin · 1 attempt(s)
 - [ ] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
 - [ ] **T13** — Describe the new model in the docs, the domain and both operate playbooks
 - [ ] **T14** — Close: commit the worked example as an end-to-end test and pass the real-data check
@@ -249,7 +249,7 @@ sh .vloop/state/gates/T10/gate.sh
 
 ### T11 — Record operator findings as verification-finding interventions with an origin
 
-`pending` · depends on: T10
+`pending` · 1 attempt(s) · depends on: T10
 
 What the operator finds before merge is no longer a defect but an intervention that says whose defect it is (brief, plan, work or env). `intervention add` gains --origin for verification findings, `brief close --finding "<origin>: <summary>"` records those interventions, and the metrics count them as caught by the operator, alongside the operator defects that did not escape, without counting anything twice.
 
@@ -263,6 +263,8 @@ What the operator finds before merge is no longer a defect but an intervention t
 - The run record lists those interventions after the defects, one line each: `- <id> — verification-finding, <origin>, found by operator: <summary>`; `--dry-run` counts them in its summary and lists them as `would record .vloop/interventions/<id>.md`, with the IDs the real close would give.
 - runBriefClose stays within 100 lines (T5's gate keeps checking); git runs only through the runner.
 - The earlier tests that change are only internal/cli/close_test.go, internal/cli/close_flags_test.go, cmd/vloop/b4_e2e_test.go and cmd/vloop/b14_e2e_test.go (findings taking an origin, recorded as interventions), internal/metrics/defects_test.go (the interventions in the operator count) and the commands.md staleness test (regenerate docs/guide/commands.md); committed tests cover --origin's two refusals, the record's origin line, close's refusal and recording, the operator count's two sources without overlap and the run record line.
+
+**From the last attempt:** the two `intervention add --origin` refusals (missing origin with verification-finding; origin with another kind) have no committed test; no test counts operator defects and verification-finding interventions together to show the two sources do not overlap
 
 <details><summary>verify command</summary>
 

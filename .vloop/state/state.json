@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 17,
+  "iteration": 18,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T16:07:07Z",
+  "updated": "2026-10-14T16:20:15Z",
   "shell": "sh",
   "checks": [
     {
@@ -366,8 +366,8 @@
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "the two `intervention add --origin` refusals (missing origin with verification-finding; origin with another kind) have no committed test; no test counts operator defects and verification-finding interventions together to show the two sources do not overlap"
     },
     {
       "id": "T12",

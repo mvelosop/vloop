@@ -12,6 +12,7 @@
     "kind": { "enum": ["direction", "decision", "context-supply", "halt", "verification-finding", "repair", "carry-forward", "ceremony"] },
     "automatable": { "enum": ["yes", "partly", "no"] },
     "by": { "enum": ["operator", "assistant", "both"] },
+    "origin": { "enum": ["brief", "plan", "work", "env"] },
     "occurred": { "type": "string", "format": "date" },
     "recorded": { "type": "string", "format": "date-time" },
     "backfilled": { "type": "boolean" },

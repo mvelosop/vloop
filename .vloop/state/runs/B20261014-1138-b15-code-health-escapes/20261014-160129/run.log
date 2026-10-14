@@ -5,3 +5,9 @@
    review T10 · 0m33s · $0.13 · run $0.28 / $40.00
    review: PASS
    T10 done
+── iteration 18 (2 this run) · T11 · 10/14 done ──
+   Record operator findings as verification-finding interventions with an origin
+   work T11 · 8m27s · $0.63 · run $0.91 / $40.00
+   check go
+   review T11 · 0m34s · $0.18 · run $1.09 / $40.00
+   review: FAIL

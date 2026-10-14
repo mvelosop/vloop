@@ -239,3 +239,22 @@ func TestSetOnCRLFAndBOMRecords(t *testing.T) {
 		}
 	}
 }
+
+func TestAddWritesOriginAfterBy(t *testing.T) {
+	root := t.TempDir()
+	p, err := Add(root, NewInput{Summary: "a finding", Phase: "verify", Kind: "verification-finding", Automatable: "partly", By: "operator", Origin: "plan"}, time.Now())
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(p)))
+	if !strings.Contains(string(b), "\nby: operator\norigin: plan\nschema: intervention/v2\n") {
+		t.Fatalf("origin not right after by:\n%s", b)
+	}
+	if err := Set(root, strings.TrimSuffix(filepath.Base(p), ".md"), "origin", "work"); err != nil {
+		t.Fatal(err)
+	}
+	vs, _ := List(root, "")
+	if len(vs) != 1 || vs[0].Origin != "work" {
+		t.Fatalf("origin after set: %+v", vs)
+	}
+}

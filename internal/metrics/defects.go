@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -171,6 +172,23 @@ func (c *DefectCounts) Reclassify(recorded []defect.Defect, released time.Time) 
 			continue
 		}
 		c.Escaped++
+	}
+}
+
+// IsFinding is whether an intervention is an operator's verification finding
+// that says whose defect it is; only those count as operator-caught defects.
+func IsFinding(v intervention.Intervention) bool {
+	return v.Kind == "verification-finding" && v.Origin != ""
+}
+
+// AddFindings counts the verification findings of a brief's interventions as
+// caught by the operator. They are separate records from the defects, so
+// nothing is counted twice.
+func (c *DefectCounts) AddFindings(ivs []intervention.Intervention) {
+	for _, v := range ivs {
+		if IsFinding(v) {
+			c.Operator++
+		}
 	}
 }
 

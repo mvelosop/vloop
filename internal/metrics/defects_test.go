@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -176,5 +177,18 @@ func TestReclassifyByReleaseTime(t *testing.T) {
 	u.Reclassify(rec, time.Time{})
 	if u != x.Counts() {
 		t.Errorf("unmerged brief reclassified: %+v", u)
+	}
+}
+
+func TestAddFindingsCountsOnlyFindingsWithOrigin(t *testing.T) {
+	var c DefectCounts
+	c.Operator = 1 // an operator defect that did not escape
+	c.AddFindings([]intervention.Intervention{
+		{Kind: "verification-finding", Origin: "plan"},
+		{Kind: "verification-finding"},
+		{Kind: "repair", Origin: "work"},
+	})
+	if c.Operator != 2 || c.All() != 2 {
+		t.Fatalf("operator %d, all %d, want 2 and 2", c.Operator, c.All())
 	}
 }

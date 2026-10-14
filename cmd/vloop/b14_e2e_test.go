@@ -450,7 +450,7 @@ func TestWorkedExampleB14DefectReport(t *testing.T) {
 	}
 	r.b14Commit("triage")
 
-	res := r.vloop("brief", "close", runBrief, "--finding", "a", "--finding", "b")
+	res := r.vloop("brief", "close", runBrief, "--finding", "work: a", "--finding", "plan: b")
 	wantExit(t, res, 0)
 	lines := strings.Split(strings.TrimSuffix(res.out, "\n"), "\n")
 	if last := lines[len(lines)-1]; !strings.HasPrefix(last, "squash-merge with the trailer: ") {
@@ -469,17 +469,8 @@ func TestWorkedExampleB14DefectReport(t *testing.T) {
 	for i := head + 1; i < len(lines) && strings.HasPrefix(lines[i], " "); i++ {
 		rows = append(rows, lines[i])
 	}
-	hintAt := -1
-	for i := head + 1 + len(rows); i < len(lines)-1; i++ {
-		if strings.TrimSpace(lines[i]) == "2 untriaged: "+hint {
-			hintAt = i
-		}
-	}
-	if len(rows) != 3 {
-		t.Fatalf("the report has %d rows, want one per defect of the brief (3):\n%s", len(rows), res.out)
-	}
-	if hintAt < 0 {
-		t.Fatalf("no '2 untriaged: %s' line before the squash-merge line:\n%s", hint, res.out)
+	if len(rows) != 1 {
+		t.Fatalf("the report has %d rows, want one per defect of the brief (1):\n%s", len(rows), res.out)
 	}
 	cols := regexp.MustCompile(` {2,}`)
 	short := strings.Join(strings.SplitN(id1, "-", 3)[:2], "-")
@@ -495,9 +486,7 @@ func TestWorkedExampleB14DefectReport(t *testing.T) {
 			}
 			continue
 		}
-		if strings.Join(f[1:], "|") != "bug|operator|—|untriaged" {
-			t.Fatalf("a finding's row is %q, want bug, operator, —, untriaged", f)
-		}
+		t.Fatalf("a row for %q, want only %s", f, id1)
 	}
 	if !seen {
 		t.Fatalf("no row for %s in %q", id1, rows)

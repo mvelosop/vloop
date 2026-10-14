@@ -82,7 +82,7 @@ func TestCloseRefusals(t *testing.T) {
 		want  string
 	}{
 		{"neither flag", func(t *testing.T) string { return closeRepo(t, true, "") }, nil, 2, msg},
-		{"both flags", func(t *testing.T) string { return closeRepo(t, true, "") }, []string{"--finding", "x", "--no-findings"}, 2, msg},
+		{"both flags", func(t *testing.T) string { return closeRepo(t, true, "") }, []string{"--finding", "work: x", "--no-findings"}, 2, msg},
 		{"no runs", func(t *testing.T) string {
 			d := closeRepo(t, true, "")
 			write(t, d, "docs/briefs/B20260102-0900-c.loop-brief.md", "---\nname: B20260102-0900-c.loop-brief\nstatus: ready\n---\n")
@@ -155,7 +155,7 @@ func TestCloseRefusals(t *testing.T) {
 func TestCloseCommitsFindingsSnapshotAndBrief(t *testing.T) {
 	dir := closeRepo(t, true, "")
 	before := headOf(t, dir)
-	code, out, errs := runCLI(t, dir, "brief", "close", closeName, "--finding", "README omits the flag", "--finding", "second one")
+	code, out, errs := runCLI(t, dir, "brief", "close", closeName, "--finding", "work: README omits the flag", "--finding", "plan: second one")
 	if code != 0 || errs != "" {
 		t.Fatalf("exit %d: %s", code, errs)
 	}
@@ -172,20 +172,17 @@ func TestCloseCommitsFindingsSnapshotAndBrief(t *testing.T) {
 	n := len(lines)
 	sha7 := gitOutput(t, dir, "rev-parse", "--short=7", "HEAD")
 	sha7 = strings.TrimSpace(sha7)
-	// Then the defect report (header, two rows, the untriaged hint), then the
-	// trailer line, which stays last.
+	// Then the defect report (the brief has no defects), then the trailer
+	// line, which stays last.
 	for i, w := range []string{
 		"wrote .vloop/state/metrics/" + closeBrief + ".json",
 		"updated docs/briefs/" + closeName + ".md",
 		"committed " + sha7 + " [vloop] close " + closeBrief,
-		"defects of " + closeBrief,
+		"defects of " + closeBrief + ": none",
 	} {
-		if lines[n-8+i] != w {
-			t.Errorf("line %d = %q, want %q", n-8+i, lines[n-8+i], w)
+		if lines[n-5+i] != w {
+			t.Errorf("line %d = %q, want %q", n-5+i, lines[n-5+i], w)
 		}
-	}
-	if w := "2 untriaged: vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none"; lines[n-2] != w {
-		t.Errorf("line %d = %q, want %q", n-2, lines[n-2], w)
 	}
 	if w := "squash-merge with the trailer: Vloop-Brief: " + closeName; lines[n-1] != w {
 		t.Errorf("last line = %q, want %q", lines[n-1], w)
@@ -227,7 +224,7 @@ func TestCloseCommitsFindingsSnapshotAndBrief(t *testing.T) {
 		"- **Status:** consumed — closed ",
 		" as run " + closeBrief + ". **Do not re-plan from this brief.**\n",
 		"## Run record\n",
-		"- " + strings.TrimSuffix(filepath.Base(rec[0]), ".md") + " — bug, work, found by operator: README omits the flag\n",
+		"- " + strings.TrimSuffix(filepath.Base(rec[0]), ".md") + " — verification-finding, work, found by operator: README omits the flag\n",
 	} {
 		if !strings.Contains(string(brief), w) {
 			t.Errorf("brief lacks %q:\n%s", w, brief)
@@ -395,10 +392,27 @@ func TestCloseDefectReportNone(t *testing.T) {
 	}
 }
 
-func TestCloseDryRunReportsFindingsUntriaged(t *testing.T) {
+func TestCloseDryRunListsFindingsAsInterventions(t *testing.T) {
 	dir := closeRepo(t, true, "")
-	_, out, _ := runCLI(t, dir, "brief", "close", closeName, "--finding", "one", "--dry-run")
-	if !strings.Contains(out, "-one  bug  operator  —  untriaged\n1 untriaged: vloop defect set") {
+	_, out, _ := runCLI(t, dir, "brief", "close", closeName, "--finding", "brief: one", "--dry-run")
+	if !strings.Contains(out, "would record .vloop/interventions/I") || !strings.Contains(out, "-one.md\n") {
 		t.Errorf("dry-run report:\n%s", out)
+	}
+	if strings.Contains(out, ".vloop/defects/") {
+		t.Errorf("dry run names a defect file:\n%s", out)
+	}
+}
+
+func TestCloseRefusesFindingWithoutOrigin(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	for _, f := range []string{"one", "Work: one", "work:one", "spec gap: one"} {
+		code, _, errs := runCLI(t, dir, "brief", "close", closeName, "--finding", f)
+		want := "vloop: a finding starts with whose defect it is: --finding \"<brief|plan|work|env>: <summary>\"\n"
+		if code != 2 || errs != want {
+			t.Errorf("%q: exit %d, stderr %q", f, code, errs)
+		}
+	}
+	if s := gitOutput(t, dir, "status", "--porcelain", "--untracked-files=all"); s != "" {
+		t.Errorf("a refused close wrote: %s", s)
 	}
 }

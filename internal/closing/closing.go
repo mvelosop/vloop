@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/metrics"
 )
 
@@ -67,6 +68,8 @@ type Record struct {
 	Report   *metrics.Report
 	Derived  []metrics.Derived
 	Recorded []defect.Defect
+	// Findings are the brief's verification-finding interventions.
+	Findings []intervention.Intervention
 }
 
 // Render is the run record, without the markers.
@@ -92,6 +95,13 @@ func Render(r Record) string {
 	sort.SliceStable(rec, func(i, j int) bool { return rec[i].ID < rec[j].ID })
 	for _, d := range rec {
 		line(&b, d.ID, d.Kind, d.Origin, d.FoundBy, d.Summary)
+	}
+	fs := append([]intervention.Intervention(nil), r.Findings...)
+	sort.SliceStable(fs, func(i, j int) bool { return fs[i].ID < fs[j].ID })
+	for _, v := range fs {
+		if metrics.IsFinding(v) {
+			line(&b, v.ID, v.Kind, v.Origin, v.By, v.Summary)
+		}
 	}
 	return b.String()
 }
