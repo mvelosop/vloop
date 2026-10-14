@@ -27,3 +27,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** TestMain in cmd/vloop prints the go build output to stderr, removes its temp dir and exits 1 on a build failure (and on a MkdirTemp failure); it never panics. The code was already in place from an earlier attempt; no further change was needed.
 - **Files:** cmd/vloop/e2e_test.go
 - **Notes for next iteration:** The earlier 'check go failed' was not a test failure: go tests all passed, but `gofmt -l .` lists the untracked, git-ignored operator scratch file .vloop/tmp/b15/fix/e2e_test.go (import order). It is not part of the tree and not mine to delete; if the go check fails again on gofmt, the operator should remove or format that file.
+
+## Run ended — blocked
+
+- **Run:** `B20261014-1138-b15-code-health-escapes` · 3 iteration(s) this run
+- **Plan:** 0/14 done, 1 blocked

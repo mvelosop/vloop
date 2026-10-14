@@ -7,7 +7,7 @@
   "tasks": {
     "planned": 14,
     "done": 0,
-    "blocked": 0,
+    "blocked": 1,
     "first_pass": 0,
     "estimate": {
       "min": 12,
@@ -43,33 +43,33 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 28004,
-    "work_ms": 28004,
+    "agent_ms": 52332,
+    "work_ms": 52332,
     "review_ms": 0,
     "plan_ms": 1375367,
-    "gates_ms": 3279,
-    "checks_ms": 387420,
+    "gates_ms": 4915,
+    "checks_ms": 576406,
     "gate_review_ms": 271733,
     "wall_ms": null
   },
   "rate": {
     "code_per_min": 0,
-    "code_test_per_min": 10.712755320668476
+    "code_test_per_min": 5.732630130703967
   },
   "cost": {
-    "total_usd": 7.917947400000001,
+    "total_usd": 8.029328900000001,
     "plan_usd": 6.8408468000000004,
-    "work_usd": 0.1460675,
+    "work_usd": 0.25744900000000004,
     "review_usd": 0,
     "gate_review_usd": 0.9310331000000002,
     "per_1000_code_lines_usd": null
   },
   "tokens": {
-    "input": 270,
-    "output": 151059,
-    "cache_read": 15305820,
-    "cache_creation": 363953,
-    "cache_hit_ratio": 0.9767567325756541
+    "input": 284,
+    "output": 152899,
+    "cache_read": 15483835,
+    "cache_creation": 382741,
+    "cache_hit_ratio": 0.9758600630496519
   },
   "models": {
     "plan": [
@@ -90,10 +90,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 2,
+    "in_loop": 3,
     "operator": 0,
     "escaped": 0,
-    "total": 2,
+    "total": 3,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -113,14 +113,14 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 5,
-  "iterations": 2,
+  "iterations": 3,
   "iterations_per_closed": null,
   "by_task": [
     {
       "id": "T1",
       "area": null,
       "kind": "test",
-      "attempts": 2,
+      "attempts": 3,
       "churn": {
         "code": 0,
         "test": 5,
@@ -133,8 +133,8 @@
           "other": 0
         }
       },
-      "agent_ms": 28004,
-      "cost_usd": 0.1460675,
+      "agent_ms": 52332,
+      "cost_usd": 0.25744900000000004,
       "models": [
         "claude-sonnet-5-5"
       ]
