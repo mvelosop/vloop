@@ -4,8 +4,9 @@
 # found-by; otherwise it counts by found-by (gate, review in-loop; operator
 # operator; user escaped). The same second is not escaped. defect list
 # --matrix is unchanged, and no record changes. Real data: on this repository
-# every consumed brief's metrics are the base's but for operator and escaped,
-# which only trade (in-loop unchanged), and the total escaped rises.
+# every consumed brief's metrics are the base's but for the defects split,
+# whose total is unchanged; records only move to escaped (in-loop and operator
+# never rise, escaped never falls), and the total escaped rises.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
 N=$RUN.loop-brief
@@ -60,9 +61,10 @@ basebin
   ($b[0] | map({key: .brief, value: .}) | from_entries) as $now |
   [ $base[] | . as $o | $now[$o.brief] as $n |
     if $n == null then "\($o.brief): missing"
-    elif ($o | strip) != ($n | strip) then "\($o.brief): a figure other than operator and escaped changed"
-    elif $o.defects.in_loop != $n.defects.in_loop then "\($o.brief): in-loop changed"
-    elif ($o.defects.operator + $o.defects.escaped) != ($n.defects.operator + $n.defects.escaped) then "\($o.brief): operator + escaped changed"
+    elif ($o | strip) != ($n | strip) then "\($o.brief): a figure other than the defects split changed"
+    elif ($o.defects.in_loop + $o.defects.operator + $o.defects.escaped) != ($n.defects.in_loop + $n.defects.operator + $n.defects.escaped) then "\($o.brief): the defects total changed"
+    elif $n.defects.in_loop > $o.defects.in_loop then "\($o.brief): in-loop rose"
+    elif $n.defects.operator > $o.defects.operator then "\($o.brief): operator rose"
     elif $n.defects.escaped < $o.defects.escaped then "\($o.brief): escaped fell"
     else empty end ] +
   (if ([$base[].defects.escaped] | add) < ([$base[] | $now[.brief].defects.escaped] | add) then []

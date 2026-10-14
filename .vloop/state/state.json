@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 16,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T15:59:32Z",
+  "updated": "2026-10-14T16:00:56Z",
   "shell": "sh",
   "checks": [
     {
@@ -283,7 +283,7 @@
       "title": "Count a recorded defect as escaped when it was created after its brief merged",
       "goal": "found-by alone decided whether a defect escaped, so an operator who found a defect a week after the merge was counted as catching it: 28 escapes were counted as caught and removal efficiency overstated the loop. A recorded defect is escaped when created after its brief's release commit, whoever found it; the history is recomputed, not edited (M-1).",
       "kind": "feature",
-      "fixtures": "811a49c3d9f8cbb295ddb90a76d50f05e932eb5e4643c6200f74cbc17b26c152",
+      "fixtures": "f58c60324a9d5f9b33af1f45c475dbbc7e03f4ca11612b93ddd91282691cfe10",
       "references": [
         {
           "path": "docs/domain/domain-model.md",
@@ -314,9 +314,18 @@
         "internal/metrics/defects_test.go changes only by the time rule; committed tests cover a defect before, at the same second as, and after the release, by each catcher, and an unmerged brief."
       ],
       "verify": "sh .vloop/state/gates/T10/gate.sh",
-      "status": "blocked",
+      "status": "pending",
       "attempts": 0,
-      "notes": "gate disputed: The real-data clause requires in-loop to be unchanged for every consumed brief, contradicting the rule it checks: a gate- or review-found record created after the merge is escaped whatever its found-by. — The clause `elif $o.defects.in_loop != $n.defects.in_loop then ... in-loop changed` fails for B20261003-2049-gate-model and B20260929-2148-vloop-state-tasks-status, which hold gate-found defects created after their merge; the same gate's fixture D20250101-0004-after-review (review, MERGED+60) must count as escaped."
+      "notes": "gate disputed: The real-data clause requires in-loop to be unchanged for every consumed brief, contradicting the rule it checks: a gate- or review-found record created after the merge is escaped whatever its found-by. — The clause `elif $o.defects.in_loop != $n.defects.in_loop then ... in-loop changed` fails for B20261003-2049-gate-model and B20260929-2148-vloop-state-tasks-status, which hold gate-found defects created after their merge; the same gate's fixture D20250101-0004-after-review (review, MERGED+60) must count as escaped.",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T10/gate.sh",
+          "replaced_at": "2026-10-14T16:00:56Z",
+          "reason": "The real-data clause required in-loop unchanged, contradicting E2's own rule (escaped whatever the found-by): gate-found records created after the merge exist in gate-model and vloop-state-tasks-status. Now: the defects total per brief is unchanged, in-loop and operator never rise, escaped never falls, the total escaped rises. A brief defect (the brief's real-data sentence), not the work's.",
+          "by": "operator",
+          "fixtures": "811a49c3d9f8cbb295ddb90a76d50f05e932eb5e4643c6200f74cbc17b26c152"
+        }
+      ]
     },
     {
       "id": "T11",
