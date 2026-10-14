@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T14:24:36Z",
+  "updated": "2026-10-14T14:28:12Z",
   "shell": "sh",
   "checks": [
     {
@@ -44,9 +44,9 @@
         "Only TestMain (and any small helper it needs) in cmd/vloop changes; no product code changes. This task ships no product behaviour, so it adds no test of its own; the gate plants the build break through a Go overlay and is the check."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
-      "attempts": 2,
-      "notes": "check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/002-go.fail.log"
+      "status": "blocked",
+      "attempts": 3,
+      "notes": "check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/003-go.fail.log"
     },
     {
       "id": "T2",

@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/14 done** · iteration 2
+**Status:** running · **0/14 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:24:36Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:28:12Z
 
 ## Progress
 
-- [ ] **T1** — Make cmd/vloop's TestMain fail cleanly when the binary does not build · 2 attempt(s)
+- [ ] **T1** — Make cmd/vloop's TestMain fail cleanly when the binary does not build · **blocked**
 - [ ] **T2** — Run every git command through one package
 - [ ] **T3** — Filter the environment for gates, checks and sessions with one function
 - [ ] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
@@ -27,7 +27,7 @@
 
 ### T1 — Make cmd/vloop's TestMain fail cleanly when the binary does not build
 
-`pending` · 2 attempt(s) · depends on: none
+`blocked` · **blocked** · depends on: none
 
 TestMain in cmd/vloop builds the vloop binary the end-to-end tests run; when that build fails it panics today, burying the compiler's message under a goroutine trace. This task comes first so that any build break later in this run reads as the compiler wrote it. It changes no product behaviour.
 
@@ -38,7 +38,7 @@ TestMain in cmd/vloop builds the vloop binary the end-to-end tests run; when tha
 - When the build succeeds, the tests run exactly as before and the temporary directory is removed after m.Run; no Test function changes.
 - Only TestMain (and any small helper it needs) in cmd/vloop changes; no product code changes. This task ships no product behaviour, so it adds no test of its own; the gate plants the build break through a Go overlay and is the check.
 
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/002-go.fail.log
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-134621/checks/003-go.fail.log
 
 <details><summary>verify command</summary>
 
