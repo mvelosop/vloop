@@ -28,3 +28,11 @@
    work session reported blocked
    T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
    T14 hit the attempt ceiling — blocked
+   no recorded progress (1/2)
+
+═══ blocked ═══
+run:    B20261014-1138-b15-code-health-escapes/20261014-164305  (5 iteration(s) this run)
+plan:   13/14 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status
+
+T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.

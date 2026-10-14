@@ -203,3 +203,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The worked example is committed as cmd/vloop/b20261014_e2e_test.go and the gate passes; the before/after real-data metrics comparison (acceptance 2) could not be done because building a base-commit binary is denied in this session.
 - **Files:** cmd/vloop/b20261014_e2e_test.go
 - **Notes for next iteration:** Needs the operator: build the base binary (git archive of the merge-base with main, go build ./cmd/vloop in .vloop/tmp) and diff `vloop metrics` per consumed brief against this build; only the defects line (operator, escaped) and the cost line ending should move. Current-build defects lines and cost endings per brief are in the previous T14 journal entry. No fixes were needed; nothing under .vloop/ was written but .vloop/tmp/.
+
+## Run ended — blocked
+
+- **Run:** `B20261014-1138-b15-code-health-escapes` · 5 iteration(s) this run
+- **Plan:** 13/14 done, 1 blocked
