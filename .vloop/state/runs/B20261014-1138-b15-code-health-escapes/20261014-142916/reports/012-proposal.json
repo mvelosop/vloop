@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Second-stamped D/I IDs come from one generator (defect.StampedID); close --dry-run predicts with it; both ID forms are accepted. This attempt fixes the remaining check failure: the B4 worked-example test was flaky across a second boundary.",
+  "files": ["cmd/vloop/b4_e2e_test.go"],
+  "verified": "vloop task gate T7 exited 0 and printed gate T7: ok; go test ./cmd/vloop -run TestWorkedExample passed.",
+  "notes": "The dry run's predicted stamp and the real close can fall in different seconds (the close is slower), so TestWorkedExampleB4Close now takes the recorded stamp from the close output and only requires it to be >= the prediction. Earlier fixes: two cmd/vloop regexes moved from four-digit to six-digit stamps."
+}

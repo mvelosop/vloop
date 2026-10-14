@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A new recorded defect is D<YYYYMMDD-HHMMSS>-<slug> and a new intervention I<YYYYMMDD-HHMMSS>-<slug>, in local time as today.", "met": true, "evidence": "internal/defect/defect.go StampFormat 20060102-150405; defect_test.go and intervention_test.go assert the six-digit stamps"},
+    {"criterion": "When any record of the kind already uses the stamp, whatever its slug, the stamp moves on one second until it is free; the -2, -3 suffixes are no longer made; creating the file stays atomic (exclusive create, moving on when the file exists).", "met": true, "evidence": "StampedID globs prefix+stamp+\"-*.md\" and advances by a second; Add keeps O_EXCL and advances on ErrExist; TestAddCollisionAcrossSlugsMovesTheStamp"},
+    {"criterion": "One generator makes both kinds of ID; `vloop brief close --dry-run` predicts the IDs of its pending findings with it, the IDs taken by earlier findings of the same dry run included, replacing the copy of the ID code in closeDryRun.", "met": true, "evidence": "defect.StampedID is used by defect.Add, intervention.Add and internal/cli/close.go:311 with the taken map"},
+    {"criterion": "Every command that reads or names an ID accepts both forms, old and new: intervention show's ID patterns (its links), doctor's guidelines provenance check, defect set and intervention set.", "met": true, "evidence": "show.go defectRe/intervRe and budget.go guidelineID accept an optional two extra digits; defect set and intervention set have no stamp-length pattern left (grep)"},
+    {"criterion": "No existing record is renamed or edited.", "met": true, "evidence": "the diff touches no .vloop/defects or .vloop/interventions file"},
+    {"criterion": "internal/defect/defect_test.go and internal/intervention/intervention_test.go change only for the second-stamped IDs and their allocation; committed tests cover a collision across different slugs, the one-second move, and both ID forms resolved by intervention show and accepted by the provenance check.", "met": true, "evidence": "defect_test.go and intervention_test.go changes are limited to stamps and collisions; new links_test.go and budget/guideline_id_test.go cover both forms"}
+  ],
+  "findings": [],
+  "notes": "cmd/vloop/b3_e2e_test.go and b4_e2e_test.go changed for six-digit stamps; the b4 close test now tolerates a later second than the dry run, which is a reasonable adjustment, not a loosened assertion."
+}

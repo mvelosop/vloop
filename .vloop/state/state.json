@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 11,
+  "iteration": 12,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T15:21:23Z",
+  "updated": "2026-10-14T15:28:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -212,9 +212,9 @@
         "internal/defect/defect_test.go and internal/intervention/intervention_test.go change only for the second-stamped IDs and their allocation; committed tests cover a collision across different slugs, the one-second move, and both ID forms resolved by intervention show and accepted by the provenance check."
       ],
       "verify": "sh .vloop/state/gates/T7/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 2,
-      "notes": "check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-142916/checks/011-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T8",

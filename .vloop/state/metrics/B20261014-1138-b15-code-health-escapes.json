@@ -43,33 +43,33 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 1356042,
-    "work_ms": 1253255,
+    "agent_ms": 1527943,
+    "work_ms": 1425156,
     "review_ms": 102787,
     "plan_ms": 1375367,
-    "gates_ms": 18553,
-    "checks_ms": 1964592,
+    "gates_ms": 20156,
+    "checks_ms": 2152801,
     "gate_review_ms": 271733,
     "wall_ms": 2316000
   },
   "rate": {
     "code_per_min": 0,
-    "code_test_per_min": 0.22123208573185787
+    "code_test_per_min": 0.1963424028252363
   },
   "cost": {
-    "total_usd": 10.572367600000002,
+    "total_usd": 10.7300882,
     "plan_usd": 6.8408468000000004,
-    "work_usd": 2.1577321000000005,
+    "work_usd": 2.3154527000000007,
     "review_usd": 0.6427556,
     "gate_review_usd": 0.9310331000000002,
     "per_1000_code_lines_usd": null
   },
   "tokens": {
-    "input": 550,
-    "output": 221259,
-    "cache_read": 20300462,
-    "cache_creation": 727052,
-    "cache_hit_ratio": 0.9653985264644429
+    "input": 578,
+    "output": 224218,
+    "cache_read": 20679808,
+    "cache_creation": 749587,
+    "cache_hit_ratio": 0.9649945895872104
   },
   "models": {
     "plan": [
@@ -92,10 +92,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 4,
+    "in_loop": 5,
     "operator": 0,
     "escaped": 0,
-    "total": 4,
+    "total": 5,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -115,7 +115,7 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 5,
-  "iterations": 10,
+  "iterations": 11,
   "iterations_per_closed": null,
   "by_task": [
     {
@@ -260,7 +260,7 @@
       "id": "T7",
       "area": null,
       "kind": "feature",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
         "code": 0,
         "test": 0,
@@ -273,8 +273,8 @@
           "other": 0
         }
       },
-      "agent_ms": 120990,
-      "cost_usd": 0.25503710000000007,
+      "agent_ms": 292891,
+      "cost_usd": 0.41275770000000006,
       "models": [
         "claude-sonnet-5-5"
       ]

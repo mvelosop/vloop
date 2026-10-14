@@ -85,6 +85,13 @@ func TestWorkedExampleB4Close(t *testing.T) {
 		t.Fatalf("close: %+v", r)
 	}
 	c = b3Collapse(r.out)
+	// The prediction and the close are different seconds apart on a slow
+	// machine: the recorded stamp is the dry run's or a later one.
+	rec := regexp.MustCompile(`recorded \.vloop/defects/(D\d{8}-\d{6}-readme-omits-the-flag)\.md`).FindStringSubmatch(c)
+	if rec == nil || rec[1] < defect {
+		t.Fatalf("close recorded %v, dry run predicted %s:\n%s", rec, defect, c)
+	}
+	defect = rec[1]
 	lines := strings.Split(c, "\n")
 	for _, w := range []string{
 		b3Brief + " consumed · not merged",

@@ -88,3 +88,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Second-stamped D/I IDs from one generator (defect.StampedID) were already in place; this attempt fixes the check failure: two cmd/vloop worked-example tests asserted the old four-digit minute stamp.
 - **Files:** cmd/vloop/b3_e2e_test.go, cmd/vloop/b4_e2e_test.go
 - **Notes for next iteration:** The previous attempt's check_failed was only those two regexes (D\d{8}-\d{4} -> \d{6}); other e2e regexes match brief IDs and stay four-digit.
+
+## T7 — Give new defects and interventions second-stamped IDs that never collide
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Second-stamped D/I IDs come from one generator (defect.StampedID); close --dry-run predicts with it; both ID forms are accepted. This attempt fixes the remaining check failure: the B4 worked-example test was flaky across a second boundary.
+- **Files:** cmd/vloop/b4_e2e_test.go
+- **Notes for next iteration:** The dry run's predicted stamp and the real close can fall in different seconds (the close is slower), so TestWorkedExampleB4Close now takes the recorded stamp from the close output and only requires it to be >= the prediction. Earlier fixes: two cmd/vloop regexes moved from four-digit to six-digit stamps.
