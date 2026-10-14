@@ -196,7 +196,7 @@ func TestWorkedExampleB3Commands(t *testing.T) {
 			"notes.txt other (none)")
 
 	r := s.run(nil, "defect", "add", "util drops a line", "--found-by", "user", "--blame", "util.go:1")
-	if r.code != 0 || !regexp.MustCompile(`^\.vloop/defects/D\d{8}-\d{4}-util-drops-a-line\.md\n$`).MatchString(r.out) {
+	if r.code != 0 || !regexp.MustCompile(`^\.vloop/defects/D\d{8}-\d{6}-util-drops-a-line\.md\n$`).MatchString(r.out) {
 		t.Fatalf("defect add: %+v", r)
 	}
 	if want := "attributed to " + brief + " (trailer on " + sha + ")\n"; r.err != want {

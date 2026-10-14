@@ -81,3 +81,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** New defects and interventions get D/I<YYYYMMDD-HHMMSS>-<slug> IDs from one generator, defect.StampedID, that moves the stamp on a second until no record of the kind uses it; close --dry-run predicts with it. Show links and the guidelines provenance check accept both ID forms.
 - **Files:** internal/defect/defect.go, internal/defect/defect_test.go, internal/intervention/intervention.go, internal/intervention/intervention_test.go, internal/intervention/show.go, internal/intervention/links_test.go, internal/cli/close.go, internal/budget/budget.go, internal/budget/guideline_id_test.go
 - **Notes for next iteration:** internal/cli TestTaskGate* tests fail inside a live session (plan changed during session guard); unrelated to this task. defect set / intervention set needed no change: they look up by file name.
+
+## T7 — Give new defects and interventions second-stamped IDs that never collide
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** Second-stamped D/I IDs from one generator (defect.StampedID) were already in place; this attempt fixes the check failure: two cmd/vloop worked-example tests asserted the old four-digit minute stamp.
+- **Files:** cmd/vloop/b3_e2e_test.go, cmd/vloop/b4_e2e_test.go
+- **Notes for next iteration:** The previous attempt's check_failed was only those two regexes (D\d{8}-\d{4} -> \d{6}); other e2e regexes match brief IDs and stay four-digit.

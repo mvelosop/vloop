@@ -60,7 +60,7 @@ func TestWorkedExampleB4Close(t *testing.T) {
 
 	r := s.run(nil, "brief", "close", b4Name, "--finding", "README omits the flag", "--dry-run")
 	c := b3Collapse(r.out)
-	stamp := regexp.MustCompile(`would record \.vloop/defects/(D\d{8}-\d{4}-readme-omits-the-flag)\.md`).FindStringSubmatch(c)
+	stamp := regexp.MustCompile(`would record \.vloop/defects/(D\d{8}-\d{6}-readme-omits-the-flag)\.md`).FindStringSubmatch(c)
 	if r.code != 0 || r.err != "" || stamp == nil {
 		t.Fatalf("dry run: %+v", r)
 	}

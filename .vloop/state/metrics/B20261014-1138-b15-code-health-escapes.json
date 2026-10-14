@@ -43,33 +43,33 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 1235052,
-    "work_ms": 1132265,
+    "agent_ms": 1356042,
+    "work_ms": 1253255,
     "review_ms": 102787,
     "plan_ms": 1375367,
-    "gates_ms": 16947,
-    "checks_ms": 1768311,
+    "gates_ms": 18553,
+    "checks_ms": 1964592,
     "gate_review_ms": 271733,
     "wall_ms": 2316000
   },
   "rate": {
     "code_per_min": 0,
-    "code_test_per_min": 0.24290475218857183
+    "code_test_per_min": 0.22123208573185787
   },
   "cost": {
-    "total_usd": 10.3173305,
+    "total_usd": 10.572367600000002,
     "plan_usd": 6.8408468000000004,
-    "work_usd": 1.9026950000000002,
+    "work_usd": 2.1577321000000005,
     "review_usd": 0.6427556,
     "gate_review_usd": 0.9310331000000002,
     "per_1000_code_lines_usd": null
   },
   "tokens": {
-    "input": 516,
-    "output": 213830,
-    "cache_read": 19737111,
-    "cache_creation": 695966,
-    "cache_hit_ratio": 0.9659148540347261
+    "input": 550,
+    "output": 221259,
+    "cache_read": 20300462,
+    "cache_creation": 727052,
+    "cache_hit_ratio": 0.9653985264644429
   },
   "models": {
     "plan": [
@@ -92,10 +92,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 3,
+    "in_loop": 4,
     "operator": 0,
     "escaped": 0,
-    "total": 3,
+    "total": 4,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -115,7 +115,7 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 5,
-  "iterations": 9,
+  "iterations": 10,
   "iterations_per_closed": null,
   "by_task": [
     {
@@ -260,7 +260,7 @@
       "id": "T7",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -273,9 +273,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 120990,
+      "cost_usd": 0.25503710000000007,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T8",
