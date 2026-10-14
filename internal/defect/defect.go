@@ -31,15 +31,10 @@ var (
 	Kinds      = []string{"bug", "spec-gap", "gate", "gate-gap", "regression"}
 	Severities = []string{"low", "medium", "high", "critical"}
 	Statuses   = []string{"open", "fixed", "wontfix"}
-	// RuleWheres are the places a rule can live: the `<where>` of a rule.
-	RuleWheres = []string{"guideline", "brief-check", "gate", "gate-review", "review", "skill"}
-	// RuleOutcomes say what the rule did: caught it, missed it, did not exist,
-	// or none is warranted.
-	RuleOutcomes = []string{"fired", "missed", "absent", "none"}
 )
 
 // SetFields are the fields `defect set` may change.
-var SetFields = []string{"status", "fixed-by", "case", "severity", "origin", "kind", "task", "rule", "rule-outcome"}
+var SetFields = []string{"status", "fixed-by", "case", "severity", "origin", "kind", "task"}
 
 // Defect is the defect/v1 frontmatter as JSON, plus the description.
 type Defect struct {
@@ -57,8 +52,8 @@ type Defect struct {
 	Created  string `json:"created"`
 	Summary  string `json:"summary"`
 
-	// Rule and RuleOutcome are the triage (L12): the rule that caught the
-	// defect, or should have, as "<where>: <which>", and what it did.
+	// Rule and RuleOutcome are retired as settable fields: records that carry
+	// them stay valid and are shown as they are.
 	Rule        string `json:"rule,omitempty"`
 	RuleOutcome string `json:"rule-outcome,omitempty"`
 }
@@ -82,14 +77,6 @@ func Validate(field, value string) error {
 		valid = Severities
 	case "status":
 		valid = Statuses
-	case "rule-outcome":
-		valid = RuleOutcomes
-	case "rule":
-		where, which, ok := strings.Cut(value, ": ")
-		if !ok || strings.TrimSpace(which) == "" || !slices.Contains(RuleWheres, where) {
-			return &config.InvalidValueError{Key: field, Value: value, Valid: []string{"<where>: <which>, <where> one of " + strings.Join(RuleWheres, ", ")}}
-		}
-		return nil
 	default:
 		return nil
 	}
@@ -335,7 +322,7 @@ func Set(root, id, field, value string) error {
 	line := field + ": " + frontmatter.Quote(value)
 	if field == "task" && value == "" {
 		line = ""
-	} else if field != "fixed-by" && field != "case" && field != "rule" {
+	} else if field != "fixed-by" && field != "case" {
 		line = field + ": " + value
 	}
 	doc, err := frontmatter.Parse(string(b))
@@ -344,15 +331,6 @@ func Set(root, id, field, value string) error {
 	}
 	switch {
 	case doc.Replace(field, line):
-	case line != "" && (field == "rule" || field == "rule-outcome"):
-		// absent triage fields follow case, rule before rule-outcome
-		i := doc.Find("rule")
-		if i < 0 || field == "rule" {
-			i = doc.Find("case")
-		}
-		if i >= 0 {
-			doc.Insert(i+1, line)
-		}
 	case line != "": // task was absent: it follows brief
 		if i := doc.Find("brief"); i >= 0 {
 			doc.Insert(i+1, line)

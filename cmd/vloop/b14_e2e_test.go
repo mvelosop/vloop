@@ -388,29 +388,19 @@ func TestWorkedExampleB14Instructions(t *testing.T) {
 
 func TestWorkedExampleB14DefectReport(t *testing.T) {
 	t.Parallel()
-	const (
-		rule = "brief-check: must-change list"
-		hint = "vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none"
-	)
 	r := newRunRepo(t)
-	r.write("docs/briefs/B20250101-0900-old.loop-brief.md",
-		"---\nname: B20250101-0900-old.loop-brief\ndescription: An old brief\nkind: brief\nstatus: draft\n---\n# Old\n")
-	var olds []string
-	for i := 1; i <= 3; i++ {
-		id := fmt.Sprintf("D2025010%d-0900-old-%d", i, i)
-		olds = append(olds, id)
-		r.write(".vloop/defects/"+id+".md", fmt.Sprintf("---\nid: %s\nbrief: B20250101-0900-old.loop-brief\norigin: brief\n"+
-			"found-by: operator\nkind: spec-gap\nseverity: low\nstatus: open\nfixed-by: \"\"\ncase: \"\"\n"+
-			"created: 2025-01-0%dT09:00:00Z\n---\nold defect %d\n", id, i, i))
-	}
-	r.b14Commit("old defects")
 	r.scripted(planJSON(t, planTask("T1", nil)), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
 
-	// A brief with no defects: none, and a dry run writes nothing.
+	noReport := func(out string) {
+		t.Helper()
+		if strings.Contains(out, "defects of ") || strings.Contains(out, "untriaged") {
+			t.Fatalf("close prints the retired defect report:\n%s", out)
+		}
+	}
 	dry := r.vloop("brief", "close", runBrief, "--dry-run", "--no-findings")
 	wantExit(t, dry, 0)
-	b14HasLine(t, b14Trim(dry.out), "defects of "+runID+": none")
+	noReport(dry.out)
 	if s := r.git("status", "--porcelain"); s != "" {
 		t.Fatalf("close --dry-run wrote: %s", s)
 	}
@@ -421,78 +411,27 @@ func TestWorkedExampleB14DefectReport(t *testing.T) {
 	wantExit(t, add, 0)
 	file := strings.TrimSpace(strings.SplitN(add.out, "\n", 2)[0])
 	id1 := strings.TrimSuffix(filepath.Base(file), ".md")
-	record := func() string { return r.read(".vloop/defects/" + id1 + ".md") }
-	set := func(code int, args ...string) {
-		t.Helper()
-		before := record()
-		res := r.vloop(append([]string{"defect", "set"}, args...)...)
-		if res.code != code {
-			t.Fatalf("defect set %v: exit %d, want %d: %+v", args, res.code, code, res)
+	before := r.read(".vloop/defects/" + id1 + ".md")
+	for _, f := range []string{"rule", "rule-outcome"} {
+		res := r.vloop("defect", "set", id1, f, "missed")
+		if res.code != 2 {
+			t.Fatalf("defect set %s: exit %d, want 2: %+v", f, res.code, res)
 		}
-		if code != 0 && record() != before {
-			t.Fatalf("a refused defect set %v changed the record", args)
+		if r.read(".vloop/defects/"+id1+".md") != before {
+			t.Fatalf("a refused defect set %s changed the record", f)
 		}
 	}
-	set(0, id1, "rule", rule)
-	set(0, id1, "rule-outcome", "missed")
-	set(2, id1, "rule-outcome", "forgot")
-	set(2, id1, "rule", "linter: x")
-	for _, w := range []string{"guideline: D20261011-1455", "brief-check: x", "gate: x", "gate-review: unpassable", "review: x", "skill: x"} {
-		set(0, id1, "rule", w)
+	if h := r.vloop("defect", "set", "--help"); strings.Contains(h.out+h.err, "rule-outcome") {
+		t.Fatalf("defect set --help still lists rule-outcome: %+v", h)
 	}
-	for _, o := range []string{"fired", "missed", "absent", "none"} {
-		set(0, id1, "rule-outcome", o)
-	}
-	set(0, id1, "rule", rule)
-	set(0, id1, "rule-outcome", "missed")
-	for _, id := range olds {
-		set(0, id, "rule", rule)
-	}
-	r.b14Commit("triage")
+	r.b14Commit("defect")
 
 	res := r.vloop("brief", "close", runBrief, "--finding", "work: a", "--finding", "plan: b")
 	wantExit(t, res, 0)
+	noReport(res.out)
 	lines := strings.Split(strings.TrimSuffix(res.out, "\n"), "\n")
 	if last := lines[len(lines)-1]; !strings.HasPrefix(last, "squash-merge with the trailer: ") {
 		t.Fatalf("the last line is %q", last)
-	}
-	head := -1
-	for i, l := range lines {
-		if l == "defects of "+runID {
-			head = i
-		}
-	}
-	if head < 0 {
-		t.Fatalf("close prints no 'defects of %s':\n%s", runID, res.out)
-	}
-	var rows []string
-	for i := head + 1; i < len(lines) && strings.HasPrefix(lines[i], " "); i++ {
-		rows = append(rows, lines[i])
-	}
-	if len(rows) != 1 {
-		t.Fatalf("the report has %d rows, want one per defect of the brief (1):\n%s", len(rows), res.out)
-	}
-	cols := regexp.MustCompile(` {2,}`)
-	short := strings.Join(strings.SplitN(id1, "-", 3)[:2], "-")
-	seen := false
-	for _, row := range rows {
-		f := cols.Split(strings.TrimSpace(row), -1)
-		if f[0] == id1 || f[0] == short {
-			seen = true
-			want := []string{"spec-gap", "review", rule, "missed",
-				"recurs ×3 (D20250101-0900, D20250102-0900, D20250103-0900)"}
-			if strings.Join(f[1:], "|") != strings.Join(want, "|") {
-				t.Fatalf("the row for %s is %q, want kind, found-by, rule, outcome, recurs: %q", id1, f, want)
-			}
-			continue
-		}
-		t.Fatalf("a row for %q, want only %s", f, id1)
-	}
-	if !seen {
-		t.Fatalf("no row for %s in %q", id1, rows)
-	}
-	if h := r.vloop("defect", "set", "--help"); !strings.Contains(h.out+h.err, "rule-outcome") {
-		t.Fatalf("defect set --help does not list rule-outcome: %+v", h)
 	}
 }
 

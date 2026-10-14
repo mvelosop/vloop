@@ -18,3 +18,10 @@
    review T11 · 0m18s · $0.11 · run $1.37 / $40.00
    review: PASS
    T11 done
+── iteration 20 (4 this run) · T12 · 11/14 done ──
+   Retire the defect triage: rule, rule-outcome and close's defect report
+   work T12 · 9m05s · $0.31 · run $1.69 / $40.00
+   check go
+   review T12 · 0m19s · $0.12 · run $1.81 / $40.00
+   review: PASS
+   T12 done

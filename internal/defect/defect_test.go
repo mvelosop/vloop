@@ -244,38 +244,20 @@ func TestSetOnCRLFAndBOMRecords(t *testing.T) {
 	}
 }
 
-func TestSetRuleAndOutcome(t *testing.T) {
+func TestSetRefusesRetiredRuleFields(t *testing.T) {
 	dir := t.TempDir()
 	p, _ := Add(dir, NewInput{Summary: "x", FoundBy: "user", Brief: "B1.loop-brief"}, at)
 	id := strings.TrimSuffix(filepath.Base(p), ".md")
-	for _, kv := range [][2]string{{"rule", "brief-check: must-change list"}, {"rule-outcome", "missed"}} {
-		if err := Set(dir, id, kv[0], kv[1]); err != nil {
-			t.Fatal(err)
-		}
-	}
-	ds, _ := List(dir, "")
-	if len(ds) != 1 || ds[0].Rule != "brief-check: must-change list" || ds[0].RuleOutcome != "missed" || ds[0].Created == "" {
-		t.Fatalf("%+v", ds)
-	}
 	before, _ := os.ReadFile(filepath.Join(dir, p))
-	for _, kv := range [][2]string{{"rule-outcome", "forgot"}, {"rule", "linter: x"}, {"rule", "gate"}, {"rule", "gate: "}, {"rule-outcome", ""}} {
-		var inv *config.InvalidValueError
-		if err := Set(dir, id, kv[0], kv[1]); !errors.As(err, &inv) {
-			t.Errorf("%v: %v, want an invalid value", kv, err)
+	for _, f := range []string{"rule", "rule-outcome"} {
+		err := Set(dir, id, f, "gate: x")
+		want := "cannot set \"" + f + "\": want one of status, fixed-by, case, severity, origin, kind, task"
+		if err == nil || err.Error() != want {
+			t.Errorf("%s: %v, want %q", f, err, want)
 		}
 	}
 	after, _ := os.ReadFile(filepath.Join(dir, p))
 	if string(before) != string(after) {
 		t.Fatal("refused set changed the file")
-	}
-	for _, w := range []string{"guideline", "brief-check", "gate", "gate-review", "review", "skill"} {
-		if err := Set(dir, id, "rule", w+": x"); err != nil {
-			t.Errorf("%s: %v", w, err)
-		}
-	}
-	for _, o := range []string{"fired", "missed", "absent", "none"} {
-		if err := Set(dir, id, "rule-outcome", o); err != nil {
-			t.Errorf("%s: %v", o, err)
-		}
 	}
 }

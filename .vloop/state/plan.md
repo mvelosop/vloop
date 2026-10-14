@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **11/14 done** · iteration 19
+**Status:** running · **12/14 done** · iteration 20
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:26:00Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T16:39:52Z
 
 ## Progress
 
@@ -19,7 +19,7 @@
 - [x] **T9** — Refuse vloop defect add for a brief that is not merged
 - [x] **T10** — Count a recorded defect as escaped when it was created after its brief merged
 - [x] **T11** — Record operator findings as verification-finding interventions with an origin · 1 attempt(s)
-- [ ] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
+- [x] **T12** — Retire the defect triage: rule, rule-outcome and close's defect report
 - [ ] **T13** — Describe the new model in the docs, the domain and both operate playbooks
 - [ ] **T14** — Close: commit the worked example as an end-to-end test and pass the real-data check
 
@@ -274,7 +274,7 @@ sh .vloop/state/gates/T11/gate.sh
 
 ### T12 — Retire the defect triage: rule, rule-outcome and close's defect report
 
-`pending` · depends on: T11
+`done` · depends on: T11
 
 B14 added a triage of each defect (the rule that caught it and what it did) and a defect report at close; with defects narrowed to escapes it costs more than it tells. The setters and the report go; records that already carry the fields stay valid and are shown as they are.
 

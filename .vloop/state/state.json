@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 19,
+  "iteration": 20,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T16:26:00Z",
+  "updated": "2026-10-14T16:39:52Z",
   "shell": "sh",
   "checks": [
     {
@@ -397,7 +397,7 @@
         "The earlier tests that change are only internal/cli/close_test.go, internal/cli/close_flags_test.go, cmd/vloop/b4_e2e_test.go, cmd/vloop/b14_e2e_test.go (the defect report going), internal/defect/defect_test.go (the retired setters) and the commands.md staleness test; a committed test asserts that rule and rule-outcome are refused and close prints no report."
       ],
       "verify": "sh .vloop/state/gates/T12/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

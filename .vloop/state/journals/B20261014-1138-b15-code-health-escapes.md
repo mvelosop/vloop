@@ -149,3 +149,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Implementation was already in place; this attempt adds the two missing committed tests the review asked for: intervention add's two --origin refusals (and the origin line after by:), and the operator count taking operator defects and verification-finding interventions together without overlap.
 - **Files:** internal/cli/intervention_test.go, internal/metrics/defects_test.go
 - **Notes for next iteration:** Review rejected attempt 1 only for those two untested behaviours; TestInterventionAddOriginRefusals (internal/cli) and TestOperatorCountTwoSourcesWithoutOverlap (internal/metrics) cover them. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated.
+
+## T12 — Retire the defect triage: rule, rule-outcome and close's defect report
+
+- **Outcome:** done (review: PASS)
+- **Summary:** defect set refuses rule and rule-outcome like any unknown field (exit 2, record untouched), and brief close and --dry-run print no defect report or untriaged hint; records carrying the fields stay valid and listed, the schema keeps both properties.
+- **Files:** internal/defect/defect.go, internal/cli/close.go, internal/defect/defect_test.go, internal/cli/close_test.go, cmd/vloop/b14_e2e_test.go, docs/guide/commands.md
+- **Notes for next iteration:** Defect.Rule/RuleOutcome stay as read-only struct fields so list shows old records. commands.md regenerated with go generate ./cmd/vloop. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated.

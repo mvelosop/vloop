@@ -138,7 +138,7 @@ vloop defect list [flags]
 
 ## vloop defect set
 
-Set one field of a defect: status, fixed-by, case, severity, origin, kind, task, rule, rule-outcome
+Set one field of a defect: status, fixed-by, case, severity, origin, kind, task
 
 ```
 vloop defect set <id> <field> <value>
