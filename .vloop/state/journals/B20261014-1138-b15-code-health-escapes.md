@@ -123,3 +123,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Implemented the time rule: DefectCounts.Reclassify moves a recorded defect created after the release commit's committer time to escaped whatever its found-by, applied in metrics.Build (so summary, JSON, all-briefs table, close and snapshot follow); the matrix is untouched. Added TestReclassifyByReleaseTime. Every gate clause passes except the real-data check, which a correct implementation cannot pass.
 - **Files:** internal/metrics/defects.go, internal/metrics/metrics.go, internal/metrics/defects_test.go
 - **Notes for next iteration:** The gate's real-data jq clause asserts in-loop unchanged, but acceptance 1 and the gate's own fixtures (D...-0004-after-review moves review to escaped) require a gate- or review-found record created after the merge to become escaped. Two real briefs have such records (e.g. D20261004-2304-testworkedexampleb6realdata-as-repaired, found-by gate, created 2026-10-04T22:04Z, after the gate-model merge at 13:18Z; D20260930-0809-t1-gate-used-a-gnu-only-grep..., found-by gate, on the state-tasks-status brief). The real-data clause should instead assert operator + escaped + in-loop total unchanged (in-loop may only fall, escaped only rise).
+
+## Run ended — blocked
+
+- **Run:** `B20261014-1138-b15-code-health-escapes` · 13 iteration(s) this run
+- **Plan:** 9/14 done, 1 blocked
