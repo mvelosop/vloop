@@ -56,7 +56,7 @@ func TestAddWritesFileAndSlug(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := ".vloop/defects/D" + at.Format("20060102-1504") + "-util-drops-a-line-in-main-go.md"
+	want := ".vloop/defects/D" + at.Format("20060102-150405") + "-util-drops-a-line-in-main-go.md"
 	if p != want {
 		t.Fatalf("path %q, want %q", p, want)
 	}
@@ -85,8 +85,17 @@ func TestAddCollisionNeverOverwrites(t *testing.T) {
 	p1, _ := Add(dir, in, at)
 	p2, _ := Add(dir, in, at)
 	p3, _ := Add(dir, in, at)
-	if p2 != strings.TrimSuffix(p1, ".md")+"-2.md" || p3 != strings.TrimSuffix(p1, ".md")+"-3.md" {
+	if p2 != strings.Replace(p1, "-100000-", "-100001-", 1) || p3 != strings.Replace(p1, "-100000-", "-100002-", 1) {
 		t.Fatalf("%s %s %s", p1, p2, p3)
+	}
+}
+
+func TestAddCollisionAcrossSlugsMovesTheStamp(t *testing.T) {
+	dir := t.TempDir()
+	p1, _ := Add(dir, NewInput{Summary: "first", FoundBy: "operator", Brief: "B1.loop-brief"}, at)
+	p2, _ := Add(dir, NewInput{Summary: "second", FoundBy: "operator", Brief: "B1.loop-brief"}, at)
+	if !strings.HasSuffix(p1, "D20260101-100000-first.md") || !strings.HasSuffix(p2, "D20260101-100001-second.md") {
+		t.Fatalf("%s %s", p1, p2)
 	}
 }
 

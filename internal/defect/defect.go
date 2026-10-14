@@ -10,7 +10,6 @@ import (
 	"regexp"
 	"slices"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -178,15 +177,12 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	base := "D" + now.Format("20060102-1504") + "-" + Slug(summary)
-	for n := 1; ; n++ {
-		id := base
-		if n > 1 {
-			id = base + "-" + strconv.Itoa(n)
-		}
+	for {
+		id := StampedID(dir, "D", Slug(summary), now, nil)
 		d.ID = id
 		f, err := os.OpenFile(filepath.Join(dir, id+".md"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
 		if errors.Is(err, os.ErrExist) {
+			now = now.Add(time.Second)
 			continue
 		}
 		if err != nil {
@@ -197,6 +193,30 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 			werr = cerr
 		}
 		return Dir + "/" + id + ".md", werr
+	}
+}
+
+// StampFormat is the local-time stamp of a new D or I ID, to the second.
+const StampFormat = "20060102-150405"
+
+// StampedID makes the ID <prefix><stamp>-<slug> for a new record of the kind
+// whose files are in dir. The stamp is now's, moved on one second at a time
+// until no file in dir and no stamp in taken uses it, whatever the slug; the
+// stamp it settles on is recorded in taken when taken is not nil. Old IDs,
+// whose stamps stop at the minute, share no stamp with a new one.
+func StampedID(dir, prefix, slug string, now time.Time, taken map[string]bool) string {
+	for ; ; now = now.Add(time.Second) {
+		stamp := now.Format(StampFormat)
+		if taken[stamp] {
+			continue
+		}
+		if m, _ := filepath.Glob(filepath.Join(dir, prefix+stamp+"-*.md")); len(m) > 0 {
+			continue
+		}
+		if taken != nil {
+			taken[stamp] = true
+		}
+		return prefix + stamp + "-" + slug
 	}
 }
 

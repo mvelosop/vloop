@@ -51,8 +51,8 @@ var (
 	wordRe   = regexp.MustCompile(`[A-Za-z0-9-]+`)
 	taskRe   = regexp.MustCompile(`^T[0-9]+$`)
 	runIDRe  = regexp.MustCompile(`^B[0-9]{8}-[0-9]{4}-[a-z0-9-]+$`)
-	defectRe = regexp.MustCompile(`^D[0-9]{8}-[0-9]{4}-[a-z0-9-]+$`)
-	intervRe = regexp.MustCompile(`^I[0-9]{8}-[0-9]{4}-[a-z0-9-]+$`)
+	defectRe = regexp.MustCompile(`^D[0-9]{8}-[0-9]{4}(?:[0-9]{2})?-[a-z0-9-]+$`)
+	intervRe = regexp.MustCompile(`^I[0-9]{8}-[0-9]{4}(?:[0-9]{2})?-[a-z0-9-]+$`)
 	shaRe    = regexp.MustCompile(`^[0-9a-f]{7,40}$`)
 )
 

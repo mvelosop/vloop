@@ -1,21 +1,47 @@
 ok  	github.com/mvelosop/vloop	(cached)
-ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	192.210s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	1.105s
+--- FAIL: TestWorkedExampleB4Close (1.12s)
+    b4_e2e_test.go:65: dry run: {out:B20260101-0900-a  consumed · not merged
+         tasks     2 planned (brief said 2–3) · 2 done · 0 blocked · first-pass 1/2
+         size      delivered  code 15 · test 6 · docs 3 · test:code 0.40
+                   churn      code 17 · test 6 · docs 3 · rework 1.13
+         time      agent 2.7 min (work 2.2 · review 0.5) · plan 2.0 min · gates n/a · wall 10.0 min
+         rate      5.6 code lines/min · 7.9 incl. tests
+         cost      $2.10 · plan 1.00 · work 0.90 · review 0.20 · $140.00 per 1,000 code lines
+         models    plan claude-opus-5-5 · work claude-sonnet-5-5 · review claude-sonnet-5-5
+         defects   in-loop 1 · operator 1 · escaped 0 · removal efficiency 100%
+         interventions  0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0
+         instructions  plan n/a · gate review n/a · work n/a · review n/a words · guidelines 0 rules
+        defects of B20260101-0900-a
+          D20261014-161228-readme-omits-the-flag  bug  operator  —  untriaged
+        1 untriaged: vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none
+        would record .vloop/defects/D20261014-161228-readme-omits-the-flag.md
+        would write .vloop/state/metrics/B20260101-0900-a.json
+        would update docs/briefs/B20260101-0900-a.loop-brief.md
+        would commit [vloop] close B20260101-0900-a
+         err: code:0}
+--- FAIL: TestWorkedExampleB3Commands (1.70s)
+    b3_e2e_test.go:200: defect add: {out:.vloop/defects/D20261014-161229-util-drops-a-line.md
+         err:attributed to B20260101-0900-a.loop-brief (trailer on b6565c1)
+         code:0}
+FAIL
+FAIL	github.com/mvelosop/vloop/cmd/vloop	195.662s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
-ok  	github.com/mvelosop/vloop/internal/budget	(cached)
+ok  	github.com/mvelosop/vloop/internal/budget	0.152s
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	59.902s
-ok  	github.com/mvelosop/vloop/internal/closing	(cached)
-ok  	github.com/mvelosop/vloop/internal/config	0.166s
-ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	64.607s
+ok  	github.com/mvelosop/vloop/internal/closing	0.164s
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	2.224s
 ok  	github.com/mvelosop/vloop/internal/detect	(cached)
-ok  	github.com/mvelosop/vloop/internal/driver	6.219s
+ok  	github.com/mvelosop/vloop/internal/driver	6.240s
 ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
-ok  	github.com/mvelosop/vloop/internal/gitcfg	0.132s
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
 ok  	github.com/mvelosop/vloop/internal/install	(cached)
-ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
-ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	0.168s
+ok  	github.com/mvelosop/vloop/internal/metrics	3.377s
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
 ok  	github.com/mvelosop/vloop/internal/schema	(cached)
 ok  	github.com/mvelosop/vloop/internal/state	(cached)
+FAIL

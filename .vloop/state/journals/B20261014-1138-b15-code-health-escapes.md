@@ -74,3 +74,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** gitcfg.Normalize lower-cases a pattern's text before the first and after the last dot, keeping a subsection; Match and Protected apply it, so Core.* is refused like core.* and Branch.Main.Foo-Bar matches only branch.Main.foo-bar.
 - **Files:** internal/gitcfg/gitcfg.go, internal/gitcfg/gitcfg_test.go, internal/config/config_test.go
 - **Notes for next iteration:** Existing TestMatch case {Branch.*, branch.x, false} asserted the defect itself (literal comparison); flipped to true and added {Branch.X.*, branch.x.y, false}, as the acceptance requires. All callers (config validation, guard, startup refusal) go through Match/Protected, so normalization lives only in gitcfg.
+
+## T7 — Give new defects and interventions second-stamped IDs that never collide
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** New defects and interventions get D/I<YYYYMMDD-HHMMSS>-<slug> IDs from one generator, defect.StampedID, that moves the stamp on a second until no record of the kind uses it; close --dry-run predicts with it. Show links and the guidelines provenance check accept both ID forms.
+- **Files:** internal/defect/defect.go, internal/defect/defect_test.go, internal/intervention/intervention.go, internal/intervention/intervention_test.go, internal/intervention/show.go, internal/intervention/links_test.go, internal/cli/close.go, internal/budget/budget.go, internal/budget/guideline_id_test.go
+- **Notes for next iteration:** internal/cli TestTaskGate* tests fail inside a live session (plan changed during session guard); unrelated to this task. defect set / intervention set needed no change: they look up by file name.

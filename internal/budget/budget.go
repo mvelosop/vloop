@@ -66,7 +66,7 @@ func Sep(n int) string {
 	return s
 }
 
-var guidelineID = regexp.MustCompile(`\b[DI][0-9]{8}-[0-9]{4}`)
+var guidelineID = regexp.MustCompile(`\b[DI][0-9]{8}-[0-9]{4}(?:[0-9]{2})?`)
 
 // GuidelineRules returns the 1-based line numbers of the rules in a guidelines
 // file — lines starting `- ` outside HTML comments — and those among them

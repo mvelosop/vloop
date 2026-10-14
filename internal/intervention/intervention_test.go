@@ -24,15 +24,15 @@ func add(t *testing.T, root, summary, phase, kind, brief string, now time.Time) 
 func TestAddWritesRecord(t *testing.T) {
 	root := t.TempDir()
 	p := add(t, root, "The gate failed", "run", "halt", "B1-x.loop-brief", t0)
-	if p != ".vloop/interventions/I20260102-1030-the-gate-failed.md" {
+	if p != ".vloop/interventions/I20260102-103000-the-gate-failed.md" {
 		t.Fatalf("path %q", p)
 	}
 	b, _ := os.ReadFile(filepath.Join(root, p))
-	want := "---\nid: I20260102-1030-the-gate-failed\nbrief: B1-x.loop-brief\nphase: run\nkind: halt\nautomatable: yes\nby: operator\nschema: intervention/v2\noptions: 0\nrecommended: 0\ndecided: \"\"\nagreement: no-options\noccurred: 2026-01-02\nrecorded: 2026-01-02T10:30:00Z\n---\nThe gate failed\n\n**Trigger.** tr\n\n**Done.** dn\n\n**What would automate it.** au\n"
+	want := "---\nid: I20260102-103000-the-gate-failed\nbrief: B1-x.loop-brief\nphase: run\nkind: halt\nautomatable: yes\nby: operator\nschema: intervention/v2\noptions: 0\nrecommended: 0\ndecided: \"\"\nagreement: no-options\noccurred: 2026-01-02\nrecorded: 2026-01-02T10:30:00Z\n---\nThe gate failed\n\n**Trigger.** tr\n\n**Done.** dn\n\n**What would automate it.** au\n"
 	if string(b) != want {
 		t.Fatalf("got\n%s\nwant\n%s", b, want)
 	}
-	if q := add(t, root, "The gate failed", "run", "halt", "", t0); !strings.HasSuffix(q, "-the-gate-failed-2.md") {
+	if q := add(t, root, "The gate failed", "run", "halt", "", t0); q != ".vloop/interventions/I20260102-103001-the-gate-failed.md" {
 		t.Fatalf("collision path %q", q)
 	}
 }

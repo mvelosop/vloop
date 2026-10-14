@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/14 done** · iteration 9
+**Status:** running · **6/14 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:09:35Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:15:07Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
 - [x] **T5** — Split the five long functions to at most 100 lines each
 - [x] **T6** — Compare run.git-config-ignore patterns as git reports keys
-- [ ] **T7** — Give new defects and interventions second-stamped IDs that never collide
+- [ ] **T7** — Give new defects and interventions second-stamped IDs that never collide · 1 attempt(s)
 - [ ] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
 - [ ] **T9** — Refuse vloop defect add for a brief that is not merged
 - [ ] **T10** — Count a recorded defect as escaped when it was created after its brief merged
@@ -159,7 +159,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Give new defects and interventions second-stamped IDs that never collide
 
-`pending` · depends on: T6
+`pending` · 1 attempt(s) · depends on: T6
 
 Ten records share D20261004-1142 today because IDs carry minutes and collisions get -2, -3 suffixes. New recorded defects and interventions get a stamp with seconds that no other record of their kind has, made by one generator that `brief close --dry-run` also predicts with. Every command that reads an ID keeps accepting the old form, because existing IDs are never renamed.
 
@@ -171,6 +171,8 @@ Ten records share D20261004-1142 today because IDs carry minutes and collisions 
 - Every command that reads or names an ID accepts both forms, old and new: intervention show's ID patterns (its links), doctor's guidelines provenance check, defect set and intervention set.
 - No existing record is renamed or edited.
 - internal/defect/defect_test.go and internal/intervention/intervention_test.go change only for the second-stamped IDs and their allocation; committed tests cover a collision across different slugs, the one-second move, and both ID forms resolved by intervention show and accepted by the provenance check.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-142916/checks/010-go.fail.log
 
 <details><summary>verify command</summary>
 

@@ -226,15 +226,12 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	if slug == "defect" && summary == "" {
 		slug = "intervention"
 	}
-	base := "I" + now.Format("20060102-1504") + "-" + slug
-	for n := 1; ; n++ {
-		id := base
-		if n > 1 {
-			id = base + "-" + strconv.Itoa(n)
-		}
+	for {
+		id := defect.StampedID(dir, "I", slug, now, nil)
 		v.ID = id
 		f, err := os.OpenFile(filepath.Join(dir, id+".md"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
 		if errors.Is(err, os.ErrExist) {
+			now = now.Add(time.Second)
 			continue
 		}
 		if err != nil {

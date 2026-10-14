@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -309,16 +308,7 @@ func closeDryRun(out io.Writer, root, briefPath, subject string, findings []stri
 	var pending []defect.Defect
 	var would []string
 	for _, f := range findings {
-		base := "D" + now.Format("20060102-1504") + "-" + defect.Slug(strings.Join(strings.Fields(f), " "))
-		id := base
-		for n := 2; ; n++ {
-			_, err := os.Stat(filepath.Join(root, filepath.FromSlash(defect.Dir), id+".md"))
-			if err != nil && !taken[id] {
-				break
-			}
-			id = base + "-" + strconv.Itoa(n)
-		}
-		taken[id] = true
+		id := defect.StampedID(filepath.Join(root, filepath.FromSlash(defect.Dir)), "D", defect.Slug(strings.Join(strings.Fields(f), " ")), now, taken)
 		would = append(would, id)
 		pending = append(pending, defect.Defect{ID: id, Kind: "bug", FoundBy: "operator"})
 	}
