@@ -19,10 +19,10 @@ import (
 
 // runBudgetFlags maps each budget flag to the config key it overrides.
 var runBudgetFlags = []struct{ flag, key, usage string }{
-	{"max-iterations", "run.max-iterations", "stop after `N` iterations in this run (0 or more)"},
-	{"cost-ceiling", "run.cost-ceiling", "stop once the run's sessions cost `USD` dollars"},
-	{"max-attempts", "run.max-attempts", "block a task after `N` attempts (1 or more)"},
-	{"stall-limit", "run.stall-limit", "stop after `N` iterations in a row that close nothing (1 or more)"},
+	{"max-iterations", config.BudgetKeys.MaxIterations, "stop after `N` iterations in this run (0 or more)"},
+	{"cost-ceiling", config.BudgetKeys.CostCeiling, "stop once the run's sessions cost `USD` dollars"},
+	{"max-attempts", config.BudgetKeys.MaxAttempts, "block a task after `N` attempts (1 or more)"},
+	{"stall-limit", config.BudgetKeys.StallLimit, "stop after `N` iterations in a row that close nothing (1 or more)"},
 }
 
 func newRun(b Build, g *Globals) *cobra.Command {

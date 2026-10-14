@@ -164,19 +164,6 @@ func strp(s string) *string {
 	return &s
 }
 
-// planSHA is the commit whose plan describes the run's end: the last run
-// commit, else the last task commit, else the plan commit.
-func planSHA(o *runs.Owned) string {
-	sha := o.Plan.SHA
-	if n := len(o.Tasks); n > 0 {
-		sha = o.Tasks[n-1].SHA
-	}
-	if o.Run != nil {
-		sha = o.Run.SHA
-	}
-	return sha
-}
-
 // Build assembles the report of one brief from its run folders and commits.
 // It returns nil when the brief has no runs. Nothing is written.
 func Build(root, brief string, c *classify.Classifier) (*Report, error) {
@@ -196,7 +183,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	var plan *runs.PlanDoc
 	var size Size
 	if o := m.Owned; o != nil {
-		if plan, err = runs.PlanAt(root, o.Layout, planSHA(o)); err != nil {
+		if plan, err = runs.PlanAt(root, o.Layout, o.PlanSHA()); err != nil {
 			return nil, err
 		}
 		s, err := Measure(root, o, c)
@@ -204,7 +191,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 			return nil, err
 		}
 		size = *s
-		r.Instructions = MeasureInstructions(root, planSHA(o))
+		r.Instructions = MeasureInstructions(root, o.PlanSHA())
 	}
 	// A release error only means there is no default branch: not merged.
 	if sha, err := runs.Release(root, m.BriefPath); err == nil && sha != "" {

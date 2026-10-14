@@ -368,7 +368,7 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	if err != nil {
 		return nil, halt(ExitPreflight, "%v", err)
 	}
-	gt, err := config.Get(root, "run.gate-timeout")
+	gt, err := config.Get(root, config.BudgetKeys.GateTimeout)
 	if err != nil {
 		return nil, halt(ExitPreflight, "%v", err)
 	}

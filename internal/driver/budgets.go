@@ -48,17 +48,17 @@ func ResolveBudgets(root string, over map[string]string) (Budgets, error) {
 		num(key, &f)
 		*dst = int(f)
 	}
-	integer("run.max-iterations", &b.MaxIterations)
-	num("run.cost-ceiling", &b.CostCeiling)
-	integer("run.max-attempts", &b.MaxAttempts)
-	integer("run.stall-limit", &b.StallLimit)
-	num("run.convergence-max", &b.ConvergenceMax)
-	integer("run.convergence-min", &b.ConvergenceMin)
-	integer("run.gate-timeout", &b.GateTimeout)
-	integer("run.session-timeout", &b.SessionTimeout)
+	integer(config.BudgetKeys.MaxIterations, &b.MaxIterations)
+	num(config.BudgetKeys.CostCeiling, &b.CostCeiling)
+	integer(config.BudgetKeys.MaxAttempts, &b.MaxAttempts)
+	integer(config.BudgetKeys.StallLimit, &b.StallLimit)
+	num(config.BudgetKeys.ConvergenceMax, &b.ConvergenceMax)
+	integer(config.BudgetKeys.ConvergenceMin, &b.ConvergenceMin)
+	integer(config.BudgetKeys.GateTimeout, &b.GateTimeout)
+	integer(config.BudgetKeys.SessionTimeout, &b.SessionTimeout)
 	if err == nil {
 		var s string
-		if s, err = val("run.keep-awake"); err == nil {
+		if s, err = val(config.BudgetKeys.KeepAwake); err == nil {
 			b.KeepAwake = s == "on"
 		}
 	}

@@ -144,13 +144,7 @@ func CheckTask(root, brief, task string) error {
 	if o == nil {
 		return fmt.Errorf("no plan found for %s, so task %s cannot be checked", brief, task)
 	}
-	sha := o.Plan.SHA
-	if o.Run != nil {
-		sha = o.Run.SHA
-	} else if n := len(o.Tasks); n > 0 {
-		sha = o.Tasks[n-1].SHA
-	}
-	plan, err := runs.PlanAt(root, o.Layout, sha)
+	plan, err := runs.PlanAt(root, o.Layout, o.PlanSHA())
 	if err != nil {
 		return err
 	}

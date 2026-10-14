@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T14:46:24Z",
+  "updated": "2026-10-14T14:54:12Z",
   "shell": "sh",
   "checks": [
     {
@@ -126,7 +126,7 @@
         "Each new shared function or table has a committed unit test of its own (the commit choice for each of the three cases; the table naming every key ResolveBudgets resolves)."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

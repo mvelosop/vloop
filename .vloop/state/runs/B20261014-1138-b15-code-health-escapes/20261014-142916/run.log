@@ -19,3 +19,10 @@
    review T3 · 0m15s · $0.08 · run $0.78 / $40.00
    review: PASS
    T3 done
+── iteration 7 (4 this run) · T4 · 3/14 done ──
+   One plan-at-the-last-commit function, one task count, one table of budget keys
+   work T4 · 4m02s · $0.23 · run $1.01 / $40.00
+   check go
+   review T4 · 0m19s · $0.12 · run $1.13 / $40.00
+   review: PASS
+   T4 done

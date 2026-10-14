@@ -57,6 +57,22 @@ func defaultShell() string {
 }
 
 // Keys lists every key, in display order.
+// BudgetKeys names the run.* budget keys; every other place reads them here.
+var BudgetKeys = struct {
+	MaxIterations, CostCeiling, MaxAttempts, StallLimit, ConvergenceMax,
+	ConvergenceMin, GateTimeout, SessionTimeout, KeepAwake string
+}{
+	MaxIterations:  "run.max-iterations",
+	CostCeiling:    "run.cost-ceiling",
+	MaxAttempts:    "run.max-attempts",
+	StallLimit:     "run.stall-limit",
+	ConvergenceMax: "run.convergence-max",
+	ConvergenceMin: "run.convergence-min",
+	GateTimeout:    "run.gate-timeout",
+	SessionTimeout: "run.session-timeout",
+	KeepAwake:      "run.keep-awake",
+}
+
 var Keys = []Key{
 	{Name: "language", Default: "en", Valid: []string{"en", "es"}},
 	{Name: "model.plan", Default: "opus"},
@@ -74,17 +90,17 @@ var Keys = []Key{
 	{Name: "metrics.test", List: true, Glob: true},
 	{Name: "metrics.docs", List: true, Glob: true},
 	{Name: "metrics.excluded", List: true, Glob: true},
-	{Name: "run.max-iterations", Default: "30", Int: true},
-	{Name: "run.cost-ceiling", Default: "40", Num: true, MinOpen: true},
-	{Name: "run.max-attempts", Default: "3", Int: true, Min: 1},
-	{Name: "run.stall-limit", Default: "2", Int: true, Min: 1},
-	{Name: "run.convergence-max", Default: "3.0", Num: true, MinOpen: true},
-	{Name: "run.convergence-min", Default: "6", Int: true},
-	{Name: "run.gate-timeout", Default: "15", Int: true, Min: 1},
+	{Name: BudgetKeys.MaxIterations, Default: "30", Int: true},
+	{Name: BudgetKeys.CostCeiling, Default: "40", Num: true, MinOpen: true},
+	{Name: BudgetKeys.MaxAttempts, Default: "3", Int: true, Min: 1},
+	{Name: BudgetKeys.StallLimit, Default: "2", Int: true, Min: 1},
+	{Name: BudgetKeys.ConvergenceMax, Default: "3.0", Num: true, MinOpen: true},
+	{Name: BudgetKeys.ConvergenceMin, Default: "6", Int: true},
+	{Name: BudgetKeys.GateTimeout, Default: "15", Int: true, Min: 1},
 	{Name: "run.gate-scratch", List: true, Glob: true},
 	{Name: "run.git-config-ignore", List: true, Glob: true, GitKeys: true},
-	{Name: "run.session-timeout", Default: "60", Int: true, Min: 1},
-	{Name: "run.keep-awake", Default: "on", Valid: []string{"on", "off"}},
+	{Name: BudgetKeys.SessionTimeout, Default: "60", Int: true, Min: 1},
+	{Name: BudgetKeys.KeepAwake, Default: "on", Valid: []string{"on", "off"}},
 }
 
 // Value is a resolved key. Set is false for an unset effort. For a list key

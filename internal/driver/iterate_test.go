@@ -29,7 +29,8 @@ func TestNextReady(t *testing.T) {
 	if got := nextReady(p); got != nil {
 		t.Fatalf("nothing is pending, but %v is ready", got.ID)
 	}
-	done, blocked, pending := counts(p)
+	done, blocked := p.Counts()
+	pending := len(p.Tasks) - done - blocked
 	if done != 1 || blocked != 2 || pending != 0 {
 		t.Errorf("counts = %d done, %d blocked, %d pending", done, blocked, pending)
 	}

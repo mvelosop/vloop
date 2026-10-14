@@ -53,3 +53,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** dropEnv in internal/driver/safety.go is now the only environment filter; runGate, the base gates, runCheck and Session.Run call it with their own name sets.
 - **Files:** internal/driver/safety.go, internal/driver/iterate.go, internal/driver/acceptance.go, internal/driver/checks.go, internal/driver/session.go, internal/driver/envfilter_test.go
 - **Notes for next iteration:** Kept as is: the gate run honours an injected it.Env (else os.Environ) while the base gates and the checks always start from os.Environ. The session launch also drops PlanHashEnv.
+
+## T4 — One plan-at-the-last-commit function, one task count, one table of budget keys
+
+- **Outcome:** done (review: PASS)
+- **Summary:** runs.Owned.PlanSHA is the one place that picks the run, last task or plan commit; the driver's counts is gone in favour of Plan.Counts(); config.BudgetKeys names the nine run.* budget keys once and ResolveBudgets, the run flags and both gate-timeout reads use it.
+- **Files:** internal/runs/commits.go, internal/runs/plansha_test.go, internal/config/config.go, internal/config/budgetkeys_test.go, internal/metrics/metrics.go, internal/metrics/defects.go, internal/defect/defect.go, internal/cli/defect.go, internal/cli/run.go, internal/cli/task_gate.go, internal/driver/budgets.go, internal/driver/iterate.go, internal/driver/plan.go, internal/driver/iterate_test.go
+- **Notes for next iteration:** internal/driver/iterate_test.go TestNextReady called the removed counts(); its one call now uses p.Counts() with pending as len(Tasks)-done-blocked, same assertions. Running go test ./internal/cli needs VLOOP_PLAN_SHA256 unset.

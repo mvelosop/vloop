@@ -44,7 +44,7 @@ func newTaskGate(g *Globals) *cobra.Command {
 			if g.JSON {
 				gateOut = cmd.ErrOrStderr()
 			}
-			minutes, err := config.Get(root, "run.gate-timeout")
+			minutes, err := config.Get(root, config.BudgetKeys.GateTimeout)
 			if err != nil {
 				return configErr(g, out, err)
 			}

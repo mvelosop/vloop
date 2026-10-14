@@ -30,6 +30,18 @@ type Owned struct {
 	Tasks  []Commit
 }
 
+// PlanSHA is the commit whose plan describes the run's end: the run commit,
+// else the last task commit, else the plan commit.
+func (o *Owned) PlanSHA() string {
+	if o.Run != nil {
+		return o.Run.SHA
+	}
+	if n := len(o.Tasks); n > 0 {
+		return o.Tasks[n-1].SHA
+	}
+	return o.Plan.SHA
+}
+
 // PlanTask is a task as the plan at a commit records it. The shell loop's
 // plans predate state/v1, so only the fields both share are read.
 type PlanTask struct {

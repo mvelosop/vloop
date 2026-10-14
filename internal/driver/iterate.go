@@ -208,7 +208,8 @@ func (it *Iterator) Run() (Ending, error) {
 	it.blockedAt = map[string]blockedMark{}
 	end := Ending{Status: "halted", Code: ExitMaxIter}
 	for {
-		done, blocked, pending := counts(plan)
+		done, blocked := plan.Counts()
+		pending := len(plan.Tasks) - done - blocked
 		if pending == 0 {
 			if blocked > 0 {
 				end = Ending{Status: "blocked", Code: ExitBlocked}
@@ -267,7 +268,7 @@ func (it *Iterator) Run() (Ending, error) {
 		}
 		// An iteration that closed nothing and charged no attempt made no
 		// recorded progress at all.
-		if nd, _, _ := counts(plan); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected && res.outcome != OutCheckFailed {
+		if nd, _ := plan.Counts(); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected && res.outcome != OutCheckFailed {
 			stalls++
 			it.warn("   no recorded progress (%d/%d)", stalls, it.Budgets.StallLimit)
 			if stalls >= it.Budgets.StallLimit {
@@ -299,20 +300,6 @@ func closedThisRun(p *state.Plan, doneAtStart map[string]bool) int {
 		}
 	}
 	return closed
-}
-
-func counts(p *state.Plan) (done, blocked, pending int) {
-	for _, t := range p.Tasks {
-		switch t.Status {
-		case "done":
-			done++
-		case "blocked":
-			blocked++
-		default:
-			pending++
-		}
-	}
-	return
 }
 
 // nextReady is the first pending task, in plan order, whose dependencies are
@@ -1045,7 +1032,7 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 	if err := it.save(); err != nil {
 		return err
 	}
-	done, blocked, _ := counts(plan)
+	done, blocked := plan.Counts()
 	it.say("")
 	it.say("═══ %s ═══", end.Status)
 	it.say("run:    %s/%s  (%d iteration(s) this run)", plan.RunID, filepath.Base(it.RunDir), runIters)

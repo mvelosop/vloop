@@ -202,7 +202,7 @@ func DeriveBrief(root, brief string) ([]Derived, error) {
 	}
 	var plan *runs.PlanDoc
 	if o := m.Owned; o != nil {
-		if plan, err = runs.PlanAt(root, o.Layout, planSHA(o)); err != nil {
+		if plan, err = runs.PlanAt(root, o.Layout, o.PlanSHA()); err != nil {
 			return nil, err
 		}
 	}
@@ -219,5 +219,5 @@ func PlanOf(root, brief string) (*runs.PlanDoc, error) {
 	if m.Owned == nil {
 		return nil, nil
 	}
-	return runs.PlanAt(root, m.Owned.Layout, planSHA(m.Owned))
+	return runs.PlanAt(root, m.Owned.Layout, m.Owned.PlanSHA())
 }

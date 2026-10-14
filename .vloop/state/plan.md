@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/14 done** · iteration 6
+**Status:** running · **4/14 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:46:24Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T14:54:12Z
 
 ## Progress
 
 - [x] **T1** — Make cmd/vloop's TestMain fail cleanly when the binary does not build
 - [x] **T2** — Run every git command through one package
 - [x] **T3** — Filter the environment for gates, checks and sessions with one function
-- [ ] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
+- [x] **T4** — One plan-at-the-last-commit function, one task count, one table of budget keys
 - [ ] **T5** — Split the five long functions to at most 100 lines each
 - [ ] **T6** — Compare run.git-config-ignore patterns as git reports keys
 - [ ] **T7** — Give new defects and interventions second-stamped IDs that never collide
@@ -92,7 +92,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — One plan-at-the-last-commit function, one task count, one table of budget keys
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 Three small duplications from the v1 review: the rule for which commit a brief's plan is read at, the driver's own copy of the plan's task counts, and the run.* budget keys listed in several places. Each becomes one definition the other places call, so the next change to any of them is made once.
 

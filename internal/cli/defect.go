@@ -195,13 +195,7 @@ func defectMatrix(root, brief string) (metrics.Matrix, error) {
 		}
 		var plan *runs.PlanDoc
 		if o := m.Owned; o != nil {
-			sha := o.Plan.SHA
-			if o.Run != nil {
-				sha = o.Run.SHA
-			} else if n := len(o.Tasks); n > 0 {
-				sha = o.Tasks[n-1].SHA
-			}
-			if plan, err = runs.PlanAt(root, o.Layout, sha); err != nil {
+			if plan, err = runs.PlanAt(root, o.Layout, o.PlanSHA()); err != nil {
 				return x, err
 			}
 		}
