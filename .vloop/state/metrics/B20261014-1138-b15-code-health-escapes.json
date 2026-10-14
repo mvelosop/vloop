@@ -43,33 +43,33 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 1745331,
-    "work_ms": 1618631,
-    "review_ms": 126700,
+    "agent_ms": 2022752,
+    "work_ms": 1874819,
+    "review_ms": 147933,
     "plan_ms": 1375367,
-    "gates_ms": 21794,
-    "checks_ms": 2343333,
+    "gates_ms": 27725,
+    "checks_ms": 2547684,
     "gate_review_ms": 271733,
     "wall_ms": 2316000
   },
   "rate": {
     "code_per_min": 0,
-    "code_test_per_min": 0.17188716638849594
+    "code_test_per_min": 0.14831279365933145
   },
   "cost": {
-    "total_usd": 11.0078592,
+    "total_usd": 11.351292100000002,
     "plan_usd": 6.8408468000000004,
-    "work_usd": 2.460648300000001,
-    "review_usd": 0.775331,
+    "work_usd": 2.691659500000001,
+    "review_usd": 0.8877527000000001,
     "gate_review_usd": 0.9310331000000002,
     "per_1000_code_lines_usd": null
   },
   "tokens": {
-    "input": 612,
-    "output": 229244,
-    "cache_read": 21153798,
-    "cache_creation": 794598,
-    "cache_hit_ratio": 0.9637701166266831
+    "input": 658,
+    "output": 236371,
+    "cache_read": 21858947,
+    "cache_creation": 844987,
+    "cache_hit_ratio": 0.9627544507296145
   },
   "models": {
     "plan": [
@@ -92,10 +92,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 5,
+    "in_loop": 6,
     "operator": 0,
     "escaped": 0,
-    "total": 5,
+    "total": 6,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -115,7 +115,7 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 5,
-  "iterations": 12,
+  "iterations": 13,
   "iterations_per_closed": null,
   "by_task": [
     {
@@ -283,7 +283,7 @@
       "id": "T8",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -296,9 +296,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": []
+      "agent_ms": 277421,
+      "cost_usd": 0.34343290000000004,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
     },
     {
       "id": "T9",

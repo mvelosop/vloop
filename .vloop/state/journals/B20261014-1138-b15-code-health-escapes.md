@@ -102,3 +102,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The per-task table gains test:code and $/kloc columns, by_task JSON gains test_code_ratio and per_1000_code_lines_usd (null where code+ is 0, optional in metrics/v2), the summary cost line ends $<c>/kloc, and the all-briefs headers are test:code and $/kloc.
 - **Files:** internal/metrics/metrics.go, internal/metrics/print.go, internal/metrics/print_test.go, schemas/metrics.v2.json, internal/cli/metrics_test.go, cmd/vloop/b3_e2e_test.go
 - **Notes for next iteration:** Docs still say 'per 1,000 code lines' (docs/guide/metrics.md:235 etc.); that is T13's. lines_test.go and run_iterate_test.go needed no change.
+
+## T8 — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Per-task test:code and $/kloc columns, by_task JSON fields (null where code+ is 0), $/kloc summary ending and all-briefs headers were already in place; this attempt adds the missing committed test of byTask's nil ratios and the JSON null/value fields.
+- **Files:** internal/metrics/print_test.go
+- **Notes for next iteration:** Review rejected attempt 1 only for lacking a test of the JSON fields and the null case; TestByTaskRatiosAndJSONNull in internal/metrics/print_test.go calls byTask directly and marshals ReportTask. Docs still say 'per 1,000 code lines' (T13's).

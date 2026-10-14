@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "Per-task test:code and $/kloc columns, by_task JSON fields (null where code+ is 0), $/kloc summary ending and all-briefs headers were already in place; this attempt adds the missing committed test of byTask's nil ratios and the JSON null/value fields.",
+  "files": ["internal/metrics/print_test.go"],
+  "verified": "vloop task gate T8 exited 0 and printed gate T8: ok; go test ./internal/metrics passes.",
+  "notes": "Review rejected attempt 1 only for lacking a test of the JSON fields and the null case; TestByTaskRatiosAndJSONNull in internal/metrics/print_test.go calls byTask directly and marshals ReportTask. Docs still say 'per 1,000 code lines' (T13's)."
+}

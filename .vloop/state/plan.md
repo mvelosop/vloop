@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/14 done** · iteration 13
+**Status:** running · **8/14 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:36:51Z
+**Brief:** `docs/briefs/B20261014-1138-b15-code-health-escapes.loop-brief.md` · **Updated:** 2026-10-14T15:41:22Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Split the five long functions to at most 100 lines each
 - [x] **T6** — Compare run.git-config-ignore patterns as git reports keys
 - [x] **T7** — Give new defects and interventions second-stamped IDs that never collide · 2 attempt(s)
-- [ ] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere · 1 attempt(s)
+- [x] **T8** — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere · 1 attempt(s)
 - [ ] **T9** — Refuse vloop defect add for a brief that is not merged
 - [ ] **T10** — Count a recorded defect as escaped when it was created after its brief merged
 - [ ] **T11** — Record operator findings as verification-finding interventions with an origin
@@ -182,7 +182,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
 
-`pending` · 1 attempt(s) · depends on: T7
+`done` · 1 attempt(s) · depends on: T7
 
 The per-task table shows each task's lines and cost but not the two ratios the operator reads them for. It gains test:code and $/kloc, the JSON gains the same as optional fields, and the summary and all-briefs table use the same two names so one name means one thing.
 
@@ -193,8 +193,6 @@ The per-task table shows each task's lines and cost but not the two ratios the o
 - The summary's cost line ends ` · $<c>/kloc` instead of ` · $<c> per 1,000 code lines`; its figure still uses delivered code lines.
 - The all-briefs table's headers t:c and $/1k become test:code and $/kloc; the values are unchanged.
 - The earlier tests that change are only internal/metrics/print_test.go, internal/metrics/lines_test.go, internal/cli/metrics_test.go, cmd/vloop/b3_e2e_test.go and cmd/vloop/run_iterate_test.go, and only by the two per-task columns, the cost line's `$<c>/kloc` and the all-briefs headers; committed tests cover both columns, the `-` and null cases and the new summary ending.
-
-**From the last attempt:** No committed test covers the JSON test_code_ratio/per_1000_code_lines_usd fields or the null case where code+ is 0, nor byTask producing nil for a zero-code task
 
 <details><summary>verify command</summary>
 

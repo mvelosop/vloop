@@ -5,9 +5,9 @@
   "base": "4ece10df6362e2939d4dad3da319e430e3b044bd",
   "branch": "B20261014-1138-b15-code-health-escapes",
   "status": "running",
-  "iteration": 13,
+  "iteration": 14,
   "created": "2026-10-14T14:09:57Z",
-  "updated": "2026-10-14T15:36:51Z",
+  "updated": "2026-10-14T15:41:22Z",
   "shell": "sh",
   "checks": [
     {
@@ -239,9 +239,9 @@
         "The earlier tests that change are only internal/metrics/print_test.go, internal/metrics/lines_test.go, internal/cli/metrics_test.go, cmd/vloop/b3_e2e_test.go and cmd/vloop/run_iterate_test.go, and only by the two per-task columns, the cost line's `$<c>/kloc` and the all-briefs headers; committed tests cover both columns, the `-` and null cases and the new summary ending."
       ],
       "verify": "sh .vloop/state/gates/T8/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "No committed test covers the JSON test_code_ratio/per_1000_code_lines_usd fields or the null case where code+ is 0, nor byTask producing nil for a zero-code task"
+      "notes": ""
     },
     {
       "id": "T9",

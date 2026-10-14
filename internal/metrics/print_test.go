@@ -2,8 +2,11 @@ package metrics
 
 import (
 	"bytes"
+	"encoding/json"
 	"strings"
 	"testing"
+
+	"github.com/mvelosop/vloop/internal/runs"
 )
 
 // A brief whose plan had a gate review shows its cost, time and models beside
@@ -78,5 +81,37 @@ func TestPrintByTaskRatioColumns(t *testing.T) {
 		"T1 - - 0 200 300 0 0 1.50 2.50 0m00s $0.50 - T2 - - 0 0 0 0 0 - - 0m00s $0.00 -"
 	if got != want {
 		t.Errorf("got %q\nwant %q", got, want)
+	}
+}
+
+// byTask gives the two ratios for a task with code and nil for one without,
+// and the JSON carries null for the nil ones (never omits them).
+func TestByTaskRatiosAndJSONNull(t *testing.T) {
+	size := Size{ByTask: []TaskChurn{
+		{Task: "T1", Lines: Lines{Added: Counts{Code: 200, Test: 300}}},
+		{Task: "T2", Lines: Lines{Added: Counts{Docs: 5}}},
+	}}
+	rows := byTask(&runs.Model{}, nil, size)
+	if len(rows) != 2 {
+		t.Fatalf("rows: %+v", rows)
+	}
+	if rows[0].TestCodeRatio == nil || *rows[0].TestCodeRatio != 1.5 {
+		t.Errorf("T1 test_code_ratio: %v", rows[0].TestCodeRatio)
+	}
+	if rows[1].TestCodeRatio != nil || rows[1].Per1000CodeUSD != nil {
+		t.Errorf("T2 (code+ 0) ratios: %v %v", rows[1].TestCodeRatio, rows[1].Per1000CodeUSD)
+	}
+	b, err := json.Marshal(rows[1])
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{`"test_code_ratio":null`, `"per_1000_code_lines_usd":null`} {
+		if !strings.Contains(string(b), want) {
+			t.Errorf("JSON lacks %s: %s", want, b)
+		}
+	}
+	b, _ = json.Marshal(rows[0])
+	if !strings.Contains(string(b), `"test_code_ratio":1.5`) || !strings.Contains(string(b), `"per_1000_code_lines_usd":0`) {
+		t.Errorf("T1 JSON: %s", b)
 	}
 }

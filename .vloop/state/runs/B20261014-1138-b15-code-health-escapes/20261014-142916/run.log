@@ -63,3 +63,10 @@
    check go
    review T8 · 0m21s · $0.11 · run $3.32 / $40.00
    review: FAIL
+── iteration 14 (11 this run) · T8 · 7/14 done ──
+   Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
+   work T8 · 0m43s · $0.23 · run $3.55 / $40.00
+   check go
+   review T8 · 0m17s · $0.11 · run $3.66 / $40.00
+   review: PASS
+   T8 done
