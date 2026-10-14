@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "When the build fails, TestMain prints the go build output, the compiler's error included, to standard error, removes its temporary directory and exits 1; it never calls panic (a panic exits 2 with a goroutine trace, which is the violation).", "met": true, "evidence": "cmd/vloop/e2e_test.go:28-32: RemoveAll(dir), Fprintf(os.Stderr, ... out), os.Exit(1); no panic"},
+    {"criterion": "When the temporary directory cannot be created, TestMain prints the error to standard error and exits 1, again without panic.", "met": true, "evidence": "cmd/vloop/e2e_test.go:19-23"},
+    {"criterion": "When the build succeeds, the tests run exactly as before and the temporary directory is removed after m.Run; no Test function changes.", "met": true, "evidence": "cmd/vloop/e2e_test.go:33-35 unchanged; diff against base touches only TestMain and the fmt import"},
+    {"criterion": "Only TestMain (and any small helper it needs) in cmd/vloop changes; no product code changes. This task ships no product behaviour, so it adds no test of its own; the gate plants the build break through a Go overlay and is the check.", "met": true, "evidence": "git diff 4ece10d HEAD -- cmd shows only cmd/vloop/e2e_test.go, 5 insertions and 2 deletions"}
+  ],
+  "findings": [],
+  "notes": "The code change was committed by an earlier attempt, so git diff HEAD shows only state.json; judged against the run base. Checks passed (go exit 0)."
+}

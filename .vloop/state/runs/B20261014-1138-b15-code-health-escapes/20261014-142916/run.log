@@ -1,0 +1,7 @@
+── iteration 4 (1 this run) · T1 · 0/14 done ──
+   Make cmd/vloop's TestMain fail cleanly when the binary does not build
+   work T1 · 0m15s · $0.09 · run $0.09 / $40.00
+   check go
+   review T1 · 0m15s · $0.08 · run $0.17 / $40.00
+   review: PASS
+   T1 done

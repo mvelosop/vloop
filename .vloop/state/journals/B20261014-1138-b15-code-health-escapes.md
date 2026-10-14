@@ -32,3 +32,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261014-1138-b15-code-health-escapes` · 3 iteration(s) this run
 - **Plan:** 0/14 done, 1 blocked
+
+## T1 — Make cmd/vloop's TestMain fail cleanly when the binary does not build
+
+- **Outcome:** done (review: PASS)
+- **Summary:** TestMain in cmd/vloop prints the go build output or the MkdirTemp error to stderr, removes its temp dir and exits 1; it never panics.
+- **Files:** cmd/vloop/e2e_test.go
+- **Notes for next iteration:** No change needed this attempt: the code was already committed by an earlier attempt. gofmt -l . is clean now.
