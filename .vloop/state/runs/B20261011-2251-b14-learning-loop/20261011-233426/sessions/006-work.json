@@ -1,0 +1,31 @@
+{
+  "cost_usd": 0.08102909999999999,
+  "duration_ms": 20499,
+  "effort": null,
+  "ended": "2026-10-11T23:47:40Z",
+  "is_error": false,
+  "iteration": 4,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 13956,
+      "cache_read_input_tokens": 132711,
+      "cost_usd": 0.08102909999999999,
+      "input_tokens": 12,
+      "output_tokens": 1191
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "claude --help 2\u003e\u00261 | grep -i -A1 \"append-system-prompt\"; git status --short; grep -rn \"append-system-prompt\" internal --include=*.go | head",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261011-2251-b14-learning-loop",
+  "schema": "session/v1",
+  "started": "2026-10-11T23:47:18Z",
+  "task": "T2",
+  "turns": 7,
+  "wall_ms": 21745
+}

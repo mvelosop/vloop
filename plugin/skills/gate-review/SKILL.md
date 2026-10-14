@@ -21,6 +21,10 @@ tell. **It cannot tell why.** A gate that fails on a path typo, a missing tool o
 a syntax error fails exactly like one that fails for the missing behaviour, and
 then passes or fails at random once the work lands. You are here for the reason.
 
+The repository's guidelines may be appended to your instructions. A gate that
+contradicts one is reported under the kind it fits. A guideline never overrides
+the brief or a domain invariant.
+
 ## 1. Read the evidence
 
 Read, in this order:
@@ -47,7 +51,10 @@ it past its timeout.
    error, a missing tool or a path typo is broken, not a gate; the expected
    failure is the assertion about the behaviour the task will add (or, when the
    thing it runs does not exist yet, that absence reported plainly). Read the
-   log, not the exit code.
+   log, not the exit code. The gate is run, and read, in the plan's shell with
+   this host's tools: `sh` unless the config names another (P-5), and on macOS
+   BSD `grep`, `sed`, `awk` and `date`. A pattern those tools reject is
+   `unpassable`.
 2. **Every fixture it builds is read back.** When a gate edits a file, appends
    a config key, plants a defect in a copy or builds a repository, check the
    state the edit leaves with commands that already exist — do not assume it. A
@@ -77,8 +84,9 @@ Each problem is one finding with a one-line `summary` and a `kind`:
   gate that runs the repository's suite is this kind too.
 - `unpassable` — no correct implementation could pass it: it contradicts its
   task's acceptance, asserts a clean tree the task must dirty, diffs against a
-  baseline fixed at plan time, or reads a file the task is meant to change as it
-  was before.
+  baseline fixed at plan time, reads a file the task is meant to change as it
+  was before, or needs a session to write under `.vloop/` outside `.vloop/tmp/`
+  (S-4; the plan session's own gate folders aside).
 - `pins-unnamed` — it pins a name (a function, file, flag, output label) the
   brief does not, so a correct implementation that chose another name fails.
 

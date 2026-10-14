@@ -1,23 +1,46 @@
 #!/bin/sh
-# Gate T6 — this repository's CLAUDE.md (brief D7): "Which rules bind you" names
-# /vloop:operate and says this repository's playbook is the one to follow; the
-# rest of CLAUDE.md is byte-for-byte as planned. And the glossary's "driver"
-# row links to the guide's definition, which exists.
-set -u
-fail() { echo "GATE FAIL: $*" >&2; exit 1; }
-export LC_ALL=C
-G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
-t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") || fail mktemp
-trap 'rm -rf "$t"' EXIT
-w=$(awk 'p && /^## / { exit } p { print } $0 == "## Which rules bind you" { p = 1 }' CLAUDE.md)
-[ -n "$w" ] || fail "CLAUDE.md has no '## Which rules bind you' section"
-printf '%s\n' "$w" | grep -Fq '/vloop:operate' || fail "'Which rules bind you' does not name /vloop:operate"
-printf '%s\n' "$w" | grep -Fq '.claude/skills/vloop-operator/SKILL.md' || fail "'Which rules bind you' does not name .claude/skills/vloop-operator/SKILL.md"
-awk '$0 == "## Which rules bind you" { skip = 1; next } skip && /^## / { skip = 0 } !skip { print }' CLAUDE.md >"$t/rest" || fail awk
-cmp -s "$t/rest" "$G/claude-rest.md" || fail "CLAUDE.md changed outside 'Which rules bind you':
-$(diff "$G/claude-rest.md" "$t/rest")"
-row=$(grep '^| \*\*driver\*\* |' docs/domain/domain-model.md)
-[ -n "$row" ] || fail "the glossary has no driver row"
-case "$row" in *'](../guide/concepts.md#the-driver)'*) ;; *) fail "the glossary's driver row does not link ../guide/concepts.md#the-driver: $row" ;; esac
-grep -Fxq '## The driver' docs/guide/concepts.md || fail "docs/guide/concepts.md has no '## The driver' for the glossary to link to"
+# Gate T6 — the eval case gate-review-real-misses (brief L6): its scaffold, run
+# in an empty directory on this host, exits 0 and leaves a state/v2 plan of
+# seven tasks in shell `sh` whose seven gates all fail on the base; its graders
+# hold the verdict to FAIL and name `unpassable`; the evals README and the
+# evals guide list it, the README saying it is for macOS hosts.
+G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
+. "$G/lib.sh"
+C=plugin/evals/gate-review-real-misses
+[ -f "$C/scaffold.sh" ] && [ -f "$C/case.yaml" ] && [ -f "$C/prompt.md" ] && [ -d "$C/graders" ] ||
+  fail "$C does not have scaffold.sh, case.yaml, prompt.md and graders/"
+grep -Fxq 'name: gate-review-real-misses' "$C/case.yaml" || fail "$C/case.yaml does not name the case"
+grep -Fxq '  scaffold_script: scaffold.sh' "$C/case.yaml" || fail "$C/case.yaml has no context.scaffold_script: scaffold.sh"
+[ "$(awk 'n == 2 && NF { print; exit } /^---$/ { n++ }' "$C/prompt.md")" = '/vloop:gate-review' ] ||
+  fail "$C/prompt.md's body is not /vloop:gate-review"
+
+S="$t/scaffold"
+mkdir -p "$S" "$t/bin" && cp "$B" "$t/bin/vloop" || fail "mkdir, and vloop on PATH"
+(cd "$S" && env PATH="$t/bin:$PATH" bash "$top/$C/scaffold.sh") >"$t/scaffold.log" 2>&1 ||
+  fail "scaffold.sh in an empty directory exits non-zero: $(tail -n 20 "$t/scaffold.log")"
+P="$S/.vloop/state/state.json"
+[ -f "$P" ] || fail "the scaffold wrote no .vloop/state/state.json"
+"$B" schema validate state/v2 "$P" >"$t/validate" 2>&1 || fail "the plan is not state/v2: $(cat "$t/validate")"
+[ "$("$JQ" -r .shell "$P")" = sh ] || fail "the plan's shell is not \"sh\""
+[ "$("$JQ" '.tasks | length' "$P")" = 7 ] || fail "the plan has $("$JQ" '.tasks | length' "$P") tasks, not seven"
+i=0
+while [ $i -lt 7 ]; do
+  id=$("$JQ" -r ".tasks[$i].id" "$P")
+  "$JQ" -r ".tasks[$i].verify" "$P" >"$t/verify.$i"
+  (cd "$S" && env PATH="$t/bin:$PATH" sh -c "$(cat "$t/verify.$i")") >"$t/gate.$i" 2>&1 &&
+    fail "$id's gate passes on the scaffold's base: $(cat "$t/verify.$i")"
+  i=$((i + 1))
+done
+
+# Graders: the verdict FAIL, and the defective gates as `unpassable`.
+grep -l '^type: regex' "$C"/graders/*.md 2>/dev/null | xargs grep -l 'path: .vloop/tmp/gate-verdict.json' 2>/dev/null |
+  xargs grep -l 'FAIL' >/dev/null 2>&1 || fail "no regex grader holds .vloop/tmp/gate-verdict.json's verdict to FAIL"
+u=$(grep -l 'unpassable' "$C"/graders/*.md 2>/dev/null | wc -l | tr -d ' ')
+[ "$u" -ge 6 ] || fail "$u grader(s) name unpassable; the six defective gates need one each"
+
+R=plugin/evals/README.md
+grep -q '^| `gate-review-real-misses` |' "$R" || fail "$R has no table row for gate-review-real-misses"
+grep 'macOS' "$R" | grep -Eq 'gate-review-real-misses|BSD' || fail "$R does not say, beside the case, that it is for macOS hosts"
+grep '^| `/vloop:gate-review` |' docs/guide/evals.md | grep -Fq 'gate-review-real-misses' ||
+  fail "docs/guide/evals.md's /vloop:gate-review row does not list gate-review-real-misses"
 echo "gate T6: ok"

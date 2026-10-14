@@ -1,0 +1,39 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "FAIL",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []},
+    {"task": "T7", "verdict": "PASS", "findings": []},
+    {
+      "task": "T8",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "for the both-warnings case it pins '! guidelines 21 rules, over the budget of 20 — …; 2 rule(s) cite no defect or intervention: …', dropping the word 'guidelines' from the second message; the brief (L9) lists that message as '! guidelines <k> rule(s) cite …' and says the two are joined by '; ', so a literal join keeps 'guidelines' and fails",
+          "kind": "pins-unnamed"
+        }
+      ]
+    },
+    {
+      "task": "T9",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "it runs go test over every package outside cmd/ in a copy of the tree, so its judge is the budget test the task itself writes (plus the repository suite), which the brief's Constraints forbid (no gate runs the repository's tests); the task can pass by writing a test that prints the pinned strings. The gate should count the skills' words and check the ceilings itself, or run only a judge it supplies",
+          "kind": "task-reach"
+        }
+      ]
+    },
+    {"task": "T10", "verdict": "PASS", "findings": []},
+    {"task": "T11", "verdict": "PASS", "findings": []},
+    {"task": "T12", "verdict": "PASS", "findings": []},
+    {"task": "T13", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "All 13 gates fail on the base at a behavioural assertion (read from the base logs and re-run with vloop task gate; T9 takes 36 s, the others 1-3 s). Read back: T1's rule-counting awk exercised on a template with single- and multi-line comments; T4, T5 and T13 expectations recomputed from the real briefs and the seed (phrases and missing names match); T10 and T13 end-commit formula matches M-2 (the last run commit) and every consumed brief already exits 0 on the base. T9 is the only gate that runs the repository tests, against the brief's Constraints. T8: the brief's joined-message form is ambiguous; the gate should accept the literal join or the planner should settle it."
+}
+

@@ -1,40 +1,46 @@
 #!/bin/sh
-# Gate T5 — the guide (brief D5, D6): "The driver" right after "The loop"; PATH
-# per shell, and the gate edits check, in "Setting up a repository"; "Retiring
-# the shell loop" naming what goes and what stays; and no "in this repository
-# only" left in the concepts or metrics guide.
-set -u
-fail() { echo "GATE FAIL: $*" >&2; exit 1; }
-export LC_ALL=C
-C=docs/guide/concepts.md M=docs/guide/metrics.md
-[ -f "$C" ] && [ -f "$M" ] || fail "no $C or $M"
-# sect <heading>: the lines under that exact heading, up to the next ## heading.
-sect() { awk -v h="$1" 'p && /^## / { exit } p { print } $0 == h { p = 1 }' "$C"; }
-flat() { tr '\n' ' ' | tr -s ' '; }
-# need <section text> <section name> <string>...: each string is in the section.
-need() {
-  s=$1 n=$2; shift 2
-  for w in "$@"; do
-    printf '%s\n' "$s" | grep -Fq -- "$w" || fail "$C, '$n', does not have: $w"
-  done
-}
-grep -Fxq '## The driver' "$C" || fail "$C has no '## The driver' heading"
-nxt=$(awk 'p && /^## / { print; exit } $0 == "## The loop" { p = 1 }' "$C")
-[ "$nxt" = '## The driver' ] || fail "the heading after '## The loop' is '$nxt', not '## The driver'"
-need "$(sect '## The driver')" 'The driver' 'vloop run'
+# Gate T5 — vloop brief check reads `## External formats` in
+# .vloop/repo-guidelines.md (brief L4): a rule whose phrase the Behaviour
+# contract contains, and whose path Binding references do not cite, is one
+# warning; sections, not the whole brief; no file, nothing; a warning never
+# changes the exit code.
+G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
+. "$G/lib.sh"
+. "$G/briefs.sh"
+W='! external format: the contract mentions "eval case" but Binding references do not cite docs/guide/evals.md (.vloop/repo-guidelines.md)'
 
-su=$(sect '## Setting up a repository')
-[ -n "$su" ] || fail "$C has no '## Setting up a repository' section"
-need "$su" 'Setting up a repository' \
-  'export PATH="$PATH:$(go env GOPATH)/bin"' '~/.zprofile' '~/.zshrc' '~/.bash_profile' '~/.profile' \
-  '%USERPROFILE%\go\bin' '[Environment]::SetEnvironmentVariable' '$PROFILE' 'gate edits'
+newrepo en
+cp "$G/seed.md" "$R/$GF" || fail seed
+mkdir -p "$R/docs/guide" && printf '# Evals guide\n' >"$R/docs/guide/evals.md" || fail evals.md
 
-grep -Fxq '## Retiring the shell loop' "$C" || fail "$C has no '## Retiring the shell loop' heading"
-need "$(sect '## Retiring the shell loop')" 'Retiring the shell loop' \
-  '.claude/skills/loop-plan' 'loop-work' 'loop-review' '<!-- loop:begin -->' '<!-- loop:end -->' \
-  '.claude/loop-knowledge.md' '.loop/tmp/' '.loop/state/' '.loop/RETIRED.md' 'state.json' 'runs/'
+wbrief 'A thing.' 'It adds a new eval case.' ''
+A=$F
+check a "$A"
+[ "$got" = 0 ] || fail "a: a brief with only a warning exits $got, not 0: $(cat "$t/a.raw")"
+has a "$W"
+[ "$(grep -c '^! external format:' "$t/a")" = 1 ] || fail "a: not exactly one external format warning: $(cat "$t/a.raw")"
 
-for f in "$C" "$M"; do
-  flat <"$f" | grep -Fq 'in this repository only' && fail "$f still says the legacy layout is read 'in this repository only'"
-done
+wbrief 'A thing.' 'It adds a new eval case.' '' '- `docs/guide/evals.md` — the eval case format'
+check b "$F"; none b 'external format:'
+
+wbrief 'A thing.' 'It adds a new EVAL Case.' '- Follow `docs/guide/evals.md`.'
+check c "$F"; has c "$W"
+
+wbrief 'It adds a new eval case.' 'Nothing else.' ''
+check d "$F"; none d 'external format:'
+
+# The contract runs through its ### subsections.
+wbrief 'A thing.' '### L6 — a case
+
+A new eval case under plugin/evals/.' ''
+check e "$F"; has e "$W"
+
+# No guidelines file: the output is today's, byte for byte, as the plan's base builds it.
+rm "$R/$GF"
+check nofile "$A"
+none nofile 'external format:'
+basebin
+inr "$t/vloop-base" brief check "$A" </dev/null >"$t/today" 2>&1
+cmp -s "$t/nofile.raw" "$t/today" || fail "with no guidelines file the report is not today's:
+$(diff "$t/today" "$t/nofile.raw")"
 echo "gate T5: ok"

@@ -1,9 +1,9 @@
 {
-  "id": "T1",
+  "id": "T2",
   "title": "Add bin/greet, which greets a name",
   "goal": "The greet command is the whole product. This task adds the script that prints the greeting, so a later task can add the shout option on top of it.",
   "files": ["bin/greet"],
-  "depends_on": [],
+  "depends_on": ["T1"],
   "acceptance": [
     "bin/greet is a new file in the repository",
     "bin/greet world prints exactly hello, world and exits 0",

@@ -16,6 +16,8 @@
     "status": { "enum": ["open", "fixed", "wontfix"] },
     "fixed-by": { "type": "string" },
     "case": { "type": "string" },
-    "created": { "type": "string", "format": "date-time" }
+    "created": { "type": "string", "format": "date-time" },
+    "rule": { "type": "string", "pattern": "^(guideline|brief-check|gate|gate-review|review|skill): .+" },
+    "rule-outcome": { "enum": ["fired", "missed", "absent", "none"] }
   }
 }

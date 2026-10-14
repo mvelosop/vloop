@@ -1,12 +1,14 @@
 ---
 type: llm
 weight: 3
-focus: trace
+focus:
+  source: file
+  path: .vloop/state/gates/T1/gate.sh
 ---
 `greet.toml` already ends in a `[style]` table, and the brief reads
-`punctuation` only at the top level. Find, in the transcript, every `greet.toml`
-the planner's gates use — a file it wrote under `.vloop/state/gates/<task id>/`,
-or one a `verify` command builds — and the output the gate expects with it.
+`punctuation` only at the top level. Read the gate script the planner wrote,
+`.vloop/state/gates/T1/gate.sh`. Find every `greet.toml` it builds or copies,
+and the output the gate expects with each.
 Score 1 if every fixture whose gate expects the configured punctuation
 (`hello! world`) sets `punctuation` at the top level, before any table header.
 A fixture that puts the key inside `[style]` and expects the default

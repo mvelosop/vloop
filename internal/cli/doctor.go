@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/budget"
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/driver"
@@ -216,6 +217,7 @@ func runDoctor(b Build, root string) []doctorCheck {
 		add(doctorPlugin(b))
 		add(doctorGateEdits(root))
 	}
+	add(doctorGuidelines(root))
 
 	if cerr == nil {
 		var missing []string
@@ -445,6 +447,41 @@ func doctorGateEdits(root string) (string, string, string) {
 		}
 	}
 	return "gate edits", resWarning, gateEditsWarning
+}
+
+// guidelinesBudget is the most rules .vloop/repo-guidelines.md should hold.
+const guidelinesBudget = 20
+
+// doctorGuidelines counts the rules of the guidelines file and warns past the
+// budget or on a rule with no provenance; it never writes the file.
+func doctorGuidelines(root string) (string, string, string) {
+	raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(".vloop/repo-guidelines.md")))
+	if errors.Is(err, os.ErrNotExist) {
+		return "guidelines", resNA, ""
+	}
+	if err != nil {
+		return "guidelines", resWarning, "cannot read .vloop/repo-guidelines.md: " + err.Error()
+	}
+	rules, noID := budget.GuidelineRules(string(raw))
+	var msgs []string
+	if len(rules) > guidelinesBudget {
+		msgs = append(msgs, fmt.Sprintf("%d rules, over the budget of %d — retire or merge some before adding more", len(rules), guidelinesBudget))
+	}
+	if len(noID) > 0 {
+		lines := make([]string, len(noID))
+		for i, n := range noID {
+			lines[i] = fmt.Sprintf("line %d", n)
+		}
+		prefix := ""
+		if len(msgs) > 0 {
+			prefix = "guidelines "
+		}
+		msgs = append(msgs, fmt.Sprintf("%s%d rule(s) cite no defect or intervention: %s", prefix, len(noID), strings.Join(lines, ", ")))
+	}
+	if len(msgs) > 0 {
+		return "guidelines", resWarning, strings.Join(msgs, "; ")
+	}
+	return "guidelines", resPass, fmt.Sprintf("%d rule(s)", len(rules))
 }
 
 var goModule = regexp.MustCompile(`(?m)^module\s+github\.com/mvelosop/vloop\s*$`)

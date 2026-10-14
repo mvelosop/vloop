@@ -1,0 +1,26 @@
+{
+  "cost_usd": 0.2223967,
+  "duration_ms": 51342,
+  "effort": null,
+  "ended": "2026-10-11T23:58:52Z",
+  "is_error": false,
+  "iteration": 7,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 32853,
+      "cache_read_input_tokens": 254127,
+      "cost_usd": 0.2223967,
+      "input_tokens": 16,
+      "output_tokens": 6554
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261011-2251-b14-learning-loop",
+  "schema": "session/v1",
+  "started": "2026-10-11T23:57:59Z",
+  "task": "T4",
+  "turns": 9,
+  "wall_ms": 52346
+}

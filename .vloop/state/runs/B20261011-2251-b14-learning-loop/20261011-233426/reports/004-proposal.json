@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "blocked",
+  "summary": "The implementation is in place and its gate passes (WithGuidelines in internal/driver/session.go, tests in internal/driver/session_test.go); acceptance 3, confirming the flag against `claude --help`, cannot be met because running claude is denied here.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed ok; `claude --help` was denied by the permission layer.",
+  "notes": "No code change needed. The operator must run `claude --help | grep append-system-prompt` once; if `--append-system-prompt-file` is listed, accept T2 as is. If the spelling differs, change GuidelinesFile's flag in internal/driver/session.go and the gate. Re-attempting in a work session will hit the same denial."
+}

@@ -1,0 +1,96 @@
+── iteration 5 (1 this run) · T2 · 1/13 done ──
+   Hand .vloop/repo-guidelines.md to every session vloop run starts
+   work T2 · 0m20s · $0.08 · run $0.08 / $40.00
+   check go
+   review T2 · 0m21s · $0.11 · run $0.20 / $40.00
+   review: PASS
+   T2 done
+── iteration 6 (2 this run) · T3 · 2/13 done ──
+   Add the guidelines paragraph to the four session skills and teach the gate review the two rules it missed
+   work T3 · 1m39s · $0.14 · run $0.34 / $40.00
+   check go
+   review T3 · 0m16s · $0.09 · run $0.43 / $40.00
+   review: PASS
+   T3 done
+── iteration 7 (3 this run) · T4 · 3/13 done ──
+   Make vloop brief check warn when a brief changes what a listed test pins without naming the test
+   work T4 · 0m52s · $0.22 · run $0.65 / $40.00
+   check go
+   review T4 · 0m24s · $0.13 · run $0.78 / $40.00
+   review: PASS
+   T4 done
+── iteration 8 (4 this run) · T5 · 4/13 done ──
+   Make vloop brief check warn when a contract names an external format without citing its source
+   work T5 · 5m54s · $0.20 · run $0.98 / $40.00
+   check go
+   review T5 · 0m21s · $0.11 · run $1.09 / $40.00
+   review: PASS
+   T5 done
+── iteration 9 (5 this run) · T6 · 5/13 done ──
+   Add the eval case gate-review-real-misses: six gates that fooled the gate review, and one sound gate
+   work T6 · 2m59s · $0.65 · run $1.74 / $40.00
+   check go
+   review T6 · 0m35s · $0.18 · run $1.92 / $40.00
+   review: PASS
+   T6 done
+── iteration 10 (6 this run) · T7 · 6/13 done ──
+   Repair the three broken eval cases: plan-checks-its-gates' fixture grader and operate-proposes-options' scaffold and graders
+   work T7 · 1m54s · $0.29 · run $2.21 / $40.00
+   check go
+   review T7 · 0m26s · $0.16 · run $2.37 / $40.00
+   review: PASS
+   T7 done
+── iteration 11 (7 this run) · T8 · 7/13 done ──
+   Add doctor's guidelines check: provenance on every rule, and a budget of 20
+   work T8 · 6m21s · $0.27 · run $2.64 / $40.00
+   check go
+   review T8 · 0m29s · $0.14 · run $2.78 / $40.00
+   review: PASS
+   T8 done
+── iteration 12 (8 this run) · T9 · 8/13 done ──
+   Put the plugin skills on word budgets enforced by a test
+   work T9 · 0m32s · $0.14 · run $2.92 / $40.00
+   check go
+   review T9 · 0m15s · $0.09 · run $3.01 / $40.00
+   review: PASS
+   T9 done
+── iteration 13 (9 this run) · T10 · 9/13 done ──
+   Add the instructions line to vloop metrics: the words each session kind starts with
+   work T10 · 9m51s · $0.41 · run $3.42 / $40.00
+   check go
+   review T10 · 0m40s · $0.16 · run $3.59 / $40.00
+   review: PASS
+   T10 done
+── iteration 14 (10 this run) · T11 · 10/13 done ──
+   Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
+   work T11 · 5m29s · $0.50 · run $4.08 / $40.00
+   check go
+   review T11 · 0m26s · $0.14 · run $4.22 / $40.00
+   review: FAIL
+── iteration 15 (11 this run) · T11 · 10/13 done ──
+   Add rule and rule-outcome to defects, the defect report to brief close, and the triage to the operate skill
+   work T11 · 2m17s · $0.19 · run $4.41 / $40.00
+   check go
+   review T11 · 0m23s · $0.13 · run $4.54 / $40.00
+   review: PASS
+   T11 done
+── iteration 16 (12 this run) · T12 · 11/13 done ──
+   Document the repository guidelines, the two warnings, the budget, the instructions line and the defect report
+   work T12 · 5m52s · $0.20 · run $4.74 / $40.00
+   check go
+   review T12 · 0m22s · $0.11 · run $4.86 / $40.00
+   review: PASS
+   T12 done
+── iteration 17 (13 this run) · T13 · 12/13 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data checks
+   work T13 · 3m00s · $0.66 · run $5.52 / $40.00
+   check go
+   review T13 · 0m32s · $0.17 · run $5.70 / $40.00
+   review: PASS
+   T13 done
+   check go
+
+═══ complete ═══
+run:    B20261011-2251-b14-learning-loop/20261011-234848  (13 iteration(s) this run)
+plan:   13/13 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261011-2251-b14-learning-loop.md

@@ -45,6 +45,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 <!-- index:begin -->
 | Phase | Kind | Automatable | Agreement | Id |
 | --- | --- | --- | --- | --- |
+| setup | ceremony | partly | no-options | [I20261012-0235-the-operator-s-uncommitted-plugin-settin](I20261012-0235-the-operator-s-uncommitted-plugin-settin.md) |
 | setup | decision | partly | no-options | [I20261011-2233-b13-ran-from-the-unmerged-design-branch](I20261011-2233-b13-ran-from-the-unmerged-design-branch.md) |
 | setup | repair | yes | no-options | [I20260928-2215-the-loop-s-install-proof-failed-in-every](I20260928-2215-the-loop-s-install-proof-failed-in-every.md) |
 | design | carry-forward | yes | no-options | [I20260929-2150-b1-s-open-items-carried-into-b2](I20260929-2150-b1-s-open-items-carried-into-b2.md) |
@@ -95,6 +96,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | run | repair | no | recommended | [I20261005-1204-t](I20261005-1204-t.md) |
 | run | repair | no | no-options | [I20261005-1205-no-brief](I20261005-1205-no-brief.md) |
 | halt | context-supply | no | no-options | [I20261011-1027-operator-allowed-the-assistant-to-edit-g](I20261011-1027-operator-allowed-the-assistant-to-edit-g.md) |
+| halt | context-supply | partly | no-options | [I20261012-0235-b14-t2-s-hidden-flag-confirmed-by-the-op](I20261012-0235-b14-t2-s-hidden-flag-confirmed-by-the-op.md) |
 | halt | halt | yes | no-options | [I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new](I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new.md) |
 | halt | halt | partly | recommended | [I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate](I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate.md) |
 | halt | repair | partly | no-options | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
@@ -104,6 +106,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | partly | recommended | [I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l](I20261005-2129-b11-blocked-on-t1-the-real-data-test-s-l.md) |
 | halt | repair | partly | recommended | [I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr](I20261006-0907-b11-blocked-on-t12-s-gate-dispute-one-gr.md) |
 | halt | repair | partly | no-options | [I20261011-1027-b12-halted-blocked-on-t4-s-disputed-gate](I20261011-1027-b12-halted-blocked-on-t4-s-disputed-gate.md) |
+| halt | repair | partly | no-options | [I20261012-0235-b14-t9-s-gate-accepted-with-its-named-se](I20261012-0235-b14-t9-s-gate-accepted-with-its-named-se.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | halt | partly | no-options | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |

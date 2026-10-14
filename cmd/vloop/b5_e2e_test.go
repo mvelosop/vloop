@@ -198,17 +198,17 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		t.Fatalf("init stderr: %q", init.err)
 	}
 	lines := b5Lines(init.out)
-	if len(lines) != 16 {
+	if len(lines) != 17 {
 		t.Fatalf("init printed %d lines: %q", len(lines), init.out)
 	}
 	brief := regexp.MustCompile(`^wrote docs/briefs/B\d{8}-\d{4}-primeros-pasos\.loop-brief\.md$`)
-	if !brief.MatchString(lines[6]) {
-		t.Fatalf("starter brief line: %q", lines[6])
+	if !brief.MatchString(lines[7]) {
+		t.Fatalf("starter brief line: %q", lines[7])
 	}
 	want := []string{"detected stacks: go, javascript, react",
 		"check go: go test ./... && go vet ./... (paths: **)", "check javascript: npm test (paths: **)",
 		"each check is a starting point — edit it in .vloop/config.toml",
-		"wrote .vloop/config.toml", "wrote .vloop/install.json", lines[6],
+		"wrote .vloop/config.toml", "wrote .vloop/install.json", "wrote .vloop/repo-guidelines.md", lines[7],
 		"updated .gitignore", "wrote CLAUDE.md", "next:", "vloop doctor",
 		"get /vloop:operate for your Claude Code sessions, once:",
 		"claude plugin marketplace add mvelosop/vloop",
@@ -223,7 +223,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 	b5Expect(t, r.run("0.1.0", "init"), 1, nil, "vloop: already initialized by vloop 0.1.0 — run vloop upgrade\n")
 
 	b5Expect(t, r.run("0.1.0", "doctor"), 0, []string{"✓ git", "✓ install", "✓ config", "✓ claude", "✓ trust", "✓ gate shell",
-		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "- self-hosting", "doctor: 0 problem(s), 1 warning(s)"}, "")
+		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "✓ guidelines 0 rule(s)", "- self-hosting", "doctor: 0 problem(s), 1 warning(s)"}, "")
 
 	b5Expect(t, r.run("0.1.1", "upgrade"), 0, []string{"updated CLAUDE.md", "updated .vloop/install.json"}, "")
 	b5Expect(t, r.run("0.2.0", "upgrade"), 1, []string{"would update CLAUDE.md"},

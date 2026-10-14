@@ -94,6 +94,19 @@ func Args(s Spec, fence, plugin string) []string {
 		"--output-format", "json")
 }
 
+// GuidelinesFile is the repository's lessons, handed to every session.
+const GuidelinesFile = ".vloop/repo-guidelines.md"
+
+// WithGuidelines adds the guidelines file to a session's arguments as one
+// contiguous pair when the repository root has it and it is not empty; the
+// arguments are returned as given otherwise. The root only, never HOME.
+func WithGuidelines(args []string, root string) []string {
+	if fi, err := os.Stat(filepath.Join(root, GuidelinesFile)); err != nil || !fi.Mode().IsRegular() || fi.Size() == 0 {
+		return args
+	}
+	return append(args, "--append-system-prompt-file", GuidelinesFile)
+}
+
 func (r *Runner) now() time.Time {
 	if r.Now != nil {
 		return r.Now()
@@ -326,7 +339,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	if bin == "" {
 		bin = "claude"
 	}
-	cmd := exec.Command(bin, Args(s, fence, plugin)...)
+	cmd := exec.Command(bin, WithGuidelines(Args(s, fence, plugin), r.Root)...)
 	cmd.Dir = r.Root
 	for _, kv := range r.env() {
 		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") || strings.HasPrefix(kv, PlanHashEnv+"=") {

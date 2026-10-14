@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T10",
+  "outcome": "done",
+  "summary": "vloop metrics prints an instructions line after interventions and emits an optional metrics/v2 `instructions` object, computed from git at the brief's end commit; brief close's snapshot carries it.",
+  "files": ["internal/metrics/instructions.go", "internal/metrics/instructions_test.go", "internal/metrics/metrics.go", "internal/metrics/print.go", "internal/budget/budget.go", "internal/cli/doctor.go", "internal/cli/metrics_test.go", "cmd/vloop/b3_e2e_test.go", "schemas/metrics.v2.json"],
+  "verified": "vloop task gate T10 exited 0 and printed gate T10: ok.",
+  "notes": "Guideline rule counting moved from internal/cli/doctor.go to budget.GuidelineRules so metrics and doctor share it. The end commit is planSHA(o) (run commit, else last task, else plan); with no run folder owned the object is omitted. Only the exact-match summary pins in internal/cli/metrics_test.go and cmd/vloop/b3_e2e_test.go gained the line; b4's hasLine checks needed no change. Docs (metrics.md, guide) not touched; that belongs to a later docs task."
+}

@@ -130,6 +130,18 @@
         }
       }
     },
+    "instructions": {
+      "type": "object",
+      "description": "the words each session kind starts with (its skill, .vloop/repo-guidelines.md and CLAUDE.md) at the commit the brief's delivered lines are measured to; null where the kind has no skill; absent in snapshots written before it existed",
+      "required": ["plan", "gate_review", "work", "review", "guidelines_rules"],
+      "properties": {
+        "plan": { "type": ["integer", "null"], "minimum": 0 },
+        "gate_review": { "type": ["integer", "null"], "minimum": 0 },
+        "work": { "type": ["integer", "null"], "minimum": 0 },
+        "review": { "type": ["integer", "null"], "minimum": 0 },
+        "guidelines_rules": { "type": "integer", "minimum": 0 }
+      }
+    },
     "records": {
       "type": "object",
       "required": ["missing"],

@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Under `## External formats`, each line of the form - `<phrase>`: `<path>` is a rule; the path is read before a trailing parenthesis; other lines are ignored", "met": true, "evidence": "internal/brief/extformat.go parseFormatRule accepts only the `phrase`: `path` form, end or ' (' trailer; the test guidelines include a trailing (D...) and two malformed lines"},
+    {"criterion": "When the Behaviour contract contains the phrase (case-insensitive plain substring) and the Binding references section does not contain the path (plain substring), one warning: `external format: the contract mentions \"<phrase>\" but Binding references do not cite <path> (.vloop/repo-guidelines.md)`", "met": true, "evidence": "extformat.go externalFormatLines lowercases the contract, uses strings.Contains on refs, emits the exact message; TestExternalFormatWarnsWhenNotCited asserts the full text"},
+    {"criterion": "The path cited only in another section (Constraints, What it is) does not satisfy the rule: only Binding references counts (B-4)", "met": true, "evidence": "refs is sectionText of set.BindingRefs only; TestExternalFormatPathInAnotherSectionDoesNotCount"},
+    {"criterion": "With no guidelines file the output is exactly today's; the warning never becomes a problem nor changes the exit code", "met": true, "evidence": "guidelinesSection returns nil on a missing file, so no lines are added; lines are typed Warning; TestExternalFormatNoFileSameOutputAndNeverAProblem compares Failed() and Problems() with and without the file"},
+    {"criterion": "Committed tests (internal/brief) cover the warning, the cited path, the phrase outside the contract, case-insensitivity and no file. Violation: the behaviour shipped with no committed test the checks run", "met": true, "evidence": "internal/brief/extformat_test.go has one test per case; the go check passed (checks.json exit 0)"},
+    {"criterion": "No earlier test is weakened: only the tests the brief's Constraints list change, and only as they state", "met": true, "evidence": "git diff HEAD touches only check.go and pinning.go (a behaviour-preserving extraction of guidelinesSection) and adds new files; no existing test file is modified"}
+  ],
+  "findings": [],
+  "notes": "The pinning.go refactor shares guidelinesSection between the two rule readers; behaviour is unchanged and the pinning tests still pass. The proposal's note about TestTaskGate* failures inside a driver session is outside this task, and the driver's go check passed."
+}

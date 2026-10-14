@@ -1,0 +1,428 @@
+{
+  "schema": "metrics/v2",
+  "brief": "B20261011-2251-b14-learning-loop.loop-brief",
+  "run_id": "B20261011-2251-b14-learning-loop",
+  "status": "consumed",
+  "merged": null,
+  "tasks": {
+    "planned": 13,
+    "done": 13,
+    "blocked": 0,
+    "first_pass": 11,
+    "estimate": {
+      "min": 11,
+      "max": 13
+    }
+  },
+  "size": {
+    "delivered": {
+      "code": 582,
+      "test": 1527,
+      "docs": 109,
+      "other": 0,
+      "deleted": {
+        "code": 24,
+        "test": 43,
+        "docs": 12,
+        "other": 0
+      }
+    },
+    "churn": {
+      "code": 631,
+      "test": 1529,
+      "docs": 109,
+      "other": 0,
+      "deleted": {
+        "code": 73,
+        "test": 45,
+        "docs": 12,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 2.6237113402061856,
+    "rework": 1.0841924398625429
+  },
+  "time": {
+    "agent_ms": 3517044,
+    "work_ms": 3138759,
+    "review_ms": 378285,
+    "plan_ms": 1408556,
+    "gates_ms": 75114,
+    "checks_ms": 2857946,
+    "gate_review_ms": 506209,
+    "wall_ms": 9136000
+  },
+  "rate": {
+    "code_per_min": 9.928792474589455,
+    "code_test_per_min": 35.979077884723644
+  },
+  "cost": {
+    "total_usd": 15.806994000000003,
+    "plan_usd": 7.870528600000002,
+    "work_usd": 4.4893452,
+    "review_usd": 1.9452741,
+    "gate_review_usd": 1.5018460999999999,
+    "per_1000_code_lines_usd": 27.159783505154646
+  },
+  "tokens": {
+    "input": 946,
+    "output": 336654,
+    "cache_read": 29452857,
+    "cache_creation": 1389503,
+    "cache_hit_ratio": 0.9549189376780816
+  },
+  "models": {
+    "plan": [
+      "claude-opus-5-5"
+    ],
+    "work": [
+      "claude-sonnet-5-5"
+    ],
+    "review": [
+      "claude-sonnet-5-5"
+    ],
+    "gate-review": [
+      "claude-sonnet-5-5"
+    ]
+  },
+  "effort": {
+    "plan": null,
+    "work": null,
+    "review": null,
+    "gate-review": null
+  },
+  "defects": {
+    "in_loop": 2,
+    "operator": 3,
+    "escaped": 0,
+    "total": 5,
+    "removal_efficiency": 1
+  },
+  "interventions": {
+    "total": 10,
+    "by_agreement": {
+      "recommended": 5,
+      "other-option": 0,
+      "adjusted": 1,
+      "different": 0,
+      "no-options": 4
+    }
+  },
+  "instructions": {
+    "plan": 4467,
+    "gate_review": 1986,
+    "work": 2299,
+    "review": 2155,
+    "guidelines_rules": 0
+  },
+  "records": {
+    "missing": []
+  },
+  "lead_time": {
+    "plan_to_merge_ms": null
+  },
+  "permission_denials": 21,
+  "iterations": 17,
+  "iterations_per_closed": 1.3076923076923077,
+  "by_task": [
+    {
+      "id": "T1",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 33,
+        "test": 49,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 6,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 238850,
+      "cost_usd": 0.30227190000000004,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T2",
+      "area": null,
+      "kind": "feature",
+      "attempts": 4,
+      "churn": {
+        "code": 12,
+        "test": 18,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 1,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 167651,
+      "cost_usd": 0.6318265000000001,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T3",
+      "area": null,
+      "kind": "docs",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 21,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 3,
+          "other": 0
+        }
+      },
+      "agent_ms": 114607,
+      "cost_usd": 0.231246,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T4",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 136,
+        "test": 101,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 19,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 76473,
+      "cost_usd": 0.35187369999999996,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T5",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 79,
+        "test": 91,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 6,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 375300,
+      "cost_usd": 0.3100309,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T6",
+      "area": null,
+      "kind": "test",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 265,
+        "docs": 2,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 2,
+          "other": 0
+        }
+      },
+      "agent_ms": 214268,
+      "cost_usd": 0.8351926000000001,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T7",
+      "area": null,
+      "kind": "fix",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 84,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 32,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 140059,
+      "cost_usd": 0.44899559999999994,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T8",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 75,
+        "test": 41,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 2,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 409957,
+      "cost_usd": 0.40494030000000003,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T9",
+      "area": null,
+      "kind": "test",
+      "attempts": 1,
+      "churn": {
+        "code": 60,
+        "test": 45,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 47356,
+      "cost_usd": 0.2315263,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T10",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 126,
+        "test": 70,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 43,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 631380,
+      "cost_usd": 0.5782768,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T11",
+      "area": null,
+      "kind": "feature",
+      "attempts": 2,
+      "churn": {
+        "code": 110,
+        "test": 127,
+        "docs": 22,
+        "other": 0,
+        "deleted": {
+          "code": 4,
+          "test": 5,
+          "docs": 4,
+          "other": 0
+        }
+      },
+      "agent_ms": 515536,
+      "cost_usd": 0.9504685000000002,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T12",
+      "area": null,
+      "kind": "docs",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 64,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 3,
+          "other": 0
+        }
+      },
+      "agent_ms": 373601,
+      "cost_usd": 0.3190414,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "id": "T13",
+      "area": null,
+      "kind": "test",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 638,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 212006,
+      "cost_usd": 0.8389287999999999,
+      "models": [
+        "claude-sonnet-5-5"
+      ]
+    }
+  ]
+}

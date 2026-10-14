@@ -32,6 +32,10 @@ and logs; you do not run the tests yourself.** Read a log when a criterion
 depends on what the check covers. A check that passes only because it was
 skipped or loosened in this diff is a finding.
 
+The repository's guidelines may be appended to your instructions. Rule on a
+deviation from one as you would on one from the brief's constraints. A guideline
+never overrides the brief or a domain invariant.
+
 ## 1. Read the evidence, not the summary
 
 You judge the work, not the claim (S-3). Read, in this order:

@@ -20,6 +20,7 @@ at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *
 | cost | total and per phase (gate review included), per 1,000 delivered code lines; tokens and cache-hit ratio | cost |
 | models | the models actually used per phase; the configured effort | the work model |
 | defects | in-loop, operator, escaped, removal efficiency; a `check_failed` iteration derives a `work` defect found by the gate, counted apart as check failures | — |
+| instructions | words each session kind starts with (skill + `.vloop/repo-guidelines.md` + `CLAUDE.md`) and the guidelines' rule count; `n/a` for a kind with no skill | — |
 | records | session records that should exist and do not | — |
 | lead time | created → planned → completed → merged | — |
 
@@ -36,6 +37,16 @@ at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *
 - **Delivered**: the diff from the plan commit's parent to the brief's last run
   commit. **Churn**: every task commit, whatever its outcome, summed.
   **Rework** = churned code / delivered code.
+
+## Instructions
+
+The summary's `instructions` line, after `interventions`, gives the words each
+session kind (plan, gate review, work, review) starts with, counted at the
+commit the brief's delivered lines are measured to, and the number of rules in
+the guidelines file. `--json` carries the same as an optional `instructions`
+object (`plan`, `gate_review`, `work`, `review`, `guidelines_rules`; `null` for
+a kind with no skill), absent in snapshots written before it existed. Computed
+from git (M-1); nothing is recorded during a run.
 
 ## Classification
 

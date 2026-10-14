@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "vloop doctor now prints a `guidelines` check right after `gate edits`: counts the rules of .vloop/repo-guidelines.md, warns past 20 rules and on rules citing no D/I ID, joined by `; ` when both.",
+  "files": ["internal/cli/doctor.go", "internal/cli/doctor_test.go", "cmd/vloop/b5_e2e_test.go"],
+  "verified": "vloop task gate T8 exited 0 and printed gate T8: ok; go test of internal/cli doctor tests and TestWorkedExampleB5Session/B11/B13 pass.",
+  "notes": "Check is printed whether or not claude is present (gate edits is n/a then); no file is n/a (`- guidelines`). A rule is a line starting `- ` outside HTML comments; provenance regex is \\b[DI][0-9]{8}-[0-9]{4}. TestDoctorGuidelinesRules covers template, seed, 21, 20, stripped, both, commented, no file. B11 and B13 worked examples needed no change (they pin no full check list; the template adds no warning). The internal/cli TestTaskGate* tests fail only inside a running session (plan changed during this session), unrelated to this task."
+}

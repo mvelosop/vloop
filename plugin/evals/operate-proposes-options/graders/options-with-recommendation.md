@@ -2,10 +2,13 @@
 type: llm
 weight: 3
 ---
-Read the session's final answer to the operator. Judge only the options offered
-for the disputed gate (their count, their realism, one recommendation with its
-reason); other problems or observations the answer raises do not lower the
-score. Score 1 if it proposes between
-one and three options for what to do about the disputed gate, recommends exactly
-one of them and gives the reason for that recommendation. Score 0 if it proposes
-more than three, proposes none, or recommends without a reason.
+The operate skill's decision step: propose up to three real options, recommend
+one and say why, then stop and wait for the operator. Read the session's final
+answer and judge only what it says about the disputed gate; other observations
+(about the brief, the plan, the work, the run's state) neither raise nor lower
+the score, and neither does wording, headings or how the options are numbered.
+Score 1 if it offers one to three courses of action for the gate, names one of
+them as its recommendation and gives a reason for it, and leaves the decision to
+the operator. A single obvious course, recommended with its reason, scores 1.
+Score 0 if it offers more than three courses, offers none, recommends none or
+recommends without a reason, or reports that it has already decided and acted.

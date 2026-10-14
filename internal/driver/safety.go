@@ -267,9 +267,10 @@ const PlanHashEnv = "VLOOP_PLAN_SHA256"
 const GateRefusedFile = tmpDir + "/gate-refused"
 
 // inputGuard holds, in memory, the files a session must leave alone: the
-// config, the operator's defects and interventions, and the run's own session
-// and report records. Detection compares what is on disk after the session
-// with what the driver read before it, whatever commands the session ran.
+// config, the guidelines file, the operator's defects and interventions, and
+// the run's own session and report records. Detection compares what is on
+// disk after the session with what the driver read before it, whatever
+// commands the session ran.
 type inputGuard struct {
 	root  string
 	roots []string          // repo-relative, slash-separated
@@ -278,7 +279,7 @@ type inputGuard struct {
 
 func snapshotInputs(root, runDir string) inputGuard {
 	g := inputGuard{root: root, files: map[string][]byte{}}
-	g.roots = []string{".vloop/config.toml", ".vloop/defects", ".vloop/interventions"}
+	g.roots = []string{".vloop/config.toml", GuidelinesFile, ".vloop/defects", ".vloop/interventions"}
 	if rel, err := filepath.Rel(root, runDir); err == nil {
 		rel = filepath.ToSlash(rel)
 		g.roots = append(g.roots, rel+"/sessions", rel+"/reports")

@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T9",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Package internal/budget exports `func Check(pluginDir string) []string`: for each of the five skills, it counts the whitespace-separated words of `<pluginDir>/skills/<skill>/SKILL.md`, the whole file with its frontmatter, as wc -w counts them, and returns one message per skill over its ceiling, `<skill>: <count> words, over its ceiling of <ceiling>`, with thousands separators (e.g. `plan: 4,213 words, over its ceiling of 4,100`); a skill exactly at its ceiling is not reported", "met": true, "evidence": "internal/budget/budget.go Check uses strings.Fields on the whole file, Sep for separators, reports only n > ceiling; TestCheck covers exactly-at-ceiling and the 4,213 example"},
+    {"criterion": "The ceilings are plan 4,100, gate-review 1,550, work 1,800, review 1,650, operate 1,750, each beside the test with one comment saying when and why it was last set", "met": true, "evidence": "budget.go Ceilings map holds the exact values, one dated comment above it giving when and why; same package as the test"},
+    {"criterion": "A committed Go test, outside cmd/, calls budget.Check on this repository's plugin/ and fails with each message it returns, and passes on the tree as this task leaves it. Violation: the budget shipped with no committed test the checks run, or a test that does not fail when a skill grows past its ceiling", "met": true, "evidence": "budget_test.go TestPluginSkillsWithinBudget calls Check(../../plugin) and t.Error per message; current counts 3792/1311/1624/1480/1583 are under ceilings; go check passed"},
+    {"criterion": "Raising a ceiling is an edit of that comment and number. Violation: a ceiling raised, or a skill trimmed, to make room, beyond what L10 sets", "met": true, "evidence": "ceilings equal L10's values; diff touches no plugin skill files"},
+    {"criterion": "The word counting is one function the metrics task (T10) can share, not a second copy", "met": true, "evidence": "exported CountWords/FileWords in budget.go; no other copy found"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

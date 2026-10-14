@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T11",
+  "outcome": "done",
+  "summary": "Fixed the review finding: brief close's defect report no longer prints a recurs suffix on an untriaged defect (rule set, no rule-outcome); TestCloseDefectReport now covers that case.",
+  "files": ["internal/cli/close.go", "internal/cli/close_test.go"],
+  "verified": "vloop task gate T11 exited 0 and printed gate T11: pass; go test ./internal/cli ./internal/defect fails only in TestTaskGate*, which refuse to run inside a driver session.",
+  "notes": "A defect with a rule but no rule-outcome still counts toward other defects' recurs (the gate requires it: the three old defects carry a rule only); it just never shows a recurs suffix itself. The rest of T11 (defect fields, report, skill, schema, docs) was committed by the previous attempt and is unchanged."
+}

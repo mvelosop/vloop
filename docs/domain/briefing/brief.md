@@ -70,7 +70,12 @@ In the repo's language (B-3), in this order:
 
 Other checks: an absolute home path is a problem; no task count, no exit or
 status codes, more than two pinned internal symbols, unresolvable backticked
-paths and tracker keys or links are warnings.
+paths and tracker keys or links are warnings. So are two the repository's
+`.vloop/repo-guidelines.md` asks for, each read from its named section only
+(B-4): `must-change list` (the contract mentions a phrase of a `## Pinning
+tests` rule and Constraints do not name its tests) and `external format` (the
+contract mentions a phrase of an `## External formats` rule and Binding
+references do not cite its path). Neither is ever a problem.
 
 ## Dependencies
 

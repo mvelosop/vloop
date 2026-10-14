@@ -154,6 +154,12 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 		Initialized: now.UTC().Format("2006-01-02T15:04:05Z"),
 	}
 	steps = append(steps, initStep{path: install.Path, verb: "wrote", write: func() error { return install.Write(root, stamp) }})
+	// 2b. repository guidelines: written once, never touched or reported when present
+	if _, exists, err := readRepoFile(root, guidelinesPath); err != nil {
+		return Problem(err)
+	} else if !exists {
+		steps = append(steps, initStep{path: guidelinesPath, verb: "wrote", content: []byte(guidelinesTemplate(lang))})
+	}
 	// 3. starter brief
 	hasBrief := false
 	if ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(brief.Dir))); err == nil {
@@ -276,4 +282,47 @@ func writeRepoFile(root, rel string, content []byte) error {
 		return err
 	}
 	return os.WriteFile(abs, content, 0o644)
+}
+
+// guidelinesPath is the repository's lessons file; every loop session receives it.
+const guidelinesPath = ".vloop/repo-guidelines.md"
+
+// guidelinesTemplate is the empty guidelines file. The two headings are the
+// same in every language because vloop brief check reads them; the examples
+// sit inside HTML comments so they are not rules.
+func guidelinesTemplate(lang string) string {
+	if lang == "es" {
+		return `# Lecciones de este repositorio
+
+Este archivo guarda las lecciones de este repositorio y todas las sesiones del bucle lo reciben.
+
+## Pinning tests
+
+Las pruebas que fijan un comportamiento: si un contrato menciona la frase, las restricciones deben nombrarlas.
+
+<!-- - when ` + "`<frase>`" + `: ` + "`<prueba>`" + `, ` + "`<prueba>`" + ` -->
+
+## External formats
+
+Los formatos externos: si un contrato menciona la frase, las referencias vinculantes deben citar su fuente.
+
+<!-- - ` + "`<frase>`" + `: ` + "`<ruta>`" + ` -->
+`
+	}
+	return `# Lessons of this repository
+
+This file holds this repository's lessons, and every loop session receives it.
+
+## Pinning tests
+
+Tests that pin a behaviour: when a contract mentions the phrase, Constraints must name them.
+
+<!-- - when ` + "`<phrase>`" + `: ` + "`<name>`" + `, ` + "`<name>`" + ` -->
+
+## External formats
+
+External formats: when a contract mentions the phrase, Binding references must cite its source.
+
+<!-- - ` + "`<phrase>`" + `: ` + "`<path>`" + ` -->
+`
 }

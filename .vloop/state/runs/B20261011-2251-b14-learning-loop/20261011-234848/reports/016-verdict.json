@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T12",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "docs/guide/concepts.md gains `## Repository guidelines`: what the file is; that vloop run hands it to every session; the two sections and their line formats (- when `<phrase>`: `<name>`, … and - `<phrase>`: `<path>`); the two warnings (`must-change list:` and `external format:`); that a rule cites its defect or intervention and vloop doctor warns past a budget of 20 rules or on a rule with none; that a lesson there replaces a constraint repeated brief after brief; and `vloop defect set <id> fixed-by guideline` for a defect a guideline now prevents", "met": true, "evidence": "docs/guide/concepts.md diff adds the section covering every listed item; warnings text matches internal/brief/pinning.go:126 and extformat.go:65, budget/provenance matches internal/cli/doctor.go:455-484"},
+    {"criterion": "The concepts guide's `## The .vloop/ layout` list gains a `.vloop/repo-guidelines.md` entry", "met": true, "evidence": "concepts.md diff adds the .vloop/repo-guidelines.md bullet to the .vloop/ layout list"},
+    {"criterion": "docs/domain/briefing/brief.md lists the two warnings with the others", "met": true, "evidence": "brief.md diff extends the 'Other checks' paragraph with must-change list and external format, never problems"},
+    {"criterion": "docs/domain/measurement/defect.md describes the optional rule and rule-outcome fields (the six <where> values; fired, missed, absent, none) and the close report with untriaged; docs/domain/measurement/metrics.md describes the instructions line and the optional `instructions` object with guidelines_rules", "met": true, "evidence": "defect.md new section lists six where values, four outcomes, untriaged/recurs per internal/cli/close.go:296-326; metrics.md adds the instructions row and an Instructions section naming guidelines_rules"},
+    {"criterion": "docs/guide/commands.md is regenerated if any help text changed; the guide and README tests pass; every link added resolves", "met": true, "evidence": "no Go or help text changed in the diff; the go check passed (exit 0); added links defects.md, metrics.md and #repository-guidelines exist"},
+    {"criterion": "No statement contradicts the behaviour T1–T11 shipped; no plugin skill is edited", "met": true, "evidence": "spot-checked claims against doctor.go, close.go, pinning.go and extformat.go; the diff touches only four docs files"}
+  ],
+  "findings": [],
+  "notes": "Docs-only task; no committed test beyond the existing guide/README tests, which is appropriate."
+}

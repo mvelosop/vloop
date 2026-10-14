@@ -1,0 +1,31 @@
+{
+  "cost_usd": 0.6649173999999999,
+  "duration_ms": 178873,
+  "effort": null,
+  "ended": "2026-10-12T01:24:01Z",
+  "is_error": false,
+  "iteration": 17,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 81822,
+      "cache_read_input_tokens": 1155054,
+      "cost_usd": 0.6649173999999999,
+      "input_tokens": 42,
+      "output_tokens": 22204
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop/cmd/vloop; grep -n \"runBrief \\|runID \\|runBrief=\\|runID=\\|const runBrief\\|runBrief =\\|runID =\" *_test.go | head; grep -n \"func planJSON\\|func planTask\\|func wantExit\\|func w…",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261011-2251-b14-learning-loop",
+  "schema": "session/v1",
+  "started": "2026-10-12T01:21:01Z",
+  "task": "T13",
+  "turns": 23,
+  "wall_ms": 179909
+}

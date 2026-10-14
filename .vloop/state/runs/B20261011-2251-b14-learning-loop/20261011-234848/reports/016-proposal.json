@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T12",
+  "outcome": "done",
+  "summary": "docs/guide/concepts.md gains '## Repository guidelines' and a layout entry; the brief, defect and metrics domain docs describe the two warnings, the rule/rule-outcome fields with the close report, and the instructions line/object.",
+  "files": ["docs/guide/concepts.md", "docs/domain/briefing/brief.md", "docs/domain/measurement/defect.md", "docs/domain/measurement/metrics.md"],
+  "verified": "sh .vloop/state/gates/T12/gate.sh printed 'gate T12: ok'; go test ./internal/cli ./cmd/... passes except TestTaskGate*, which fail only inside a driver session.",
+  "notes": "No help text changed, so docs/guide/commands.md was not regenerated; no plugin skill edited. docs/guide/metrics.md was not touched (not in the acceptance)."
+}

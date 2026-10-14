@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Runner.Run now passes every session's arguments through WithGuidelines, which appends `--append-system-prompt-file .vloop/repo-guidelines.md` when that file exists at the repo root and is non-empty; otherwise the arguments are unchanged.",
+  "files": ["internal/driver/session.go", "internal/driver/session_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go test ./internal/driver and go vet pass, gofmt -l clean.",
+  "notes": "NOT DONE: acceptance 3 asks to confirm the flag spelling against `claude --help`; that command was denied in this session, so the spelling follows the brief and gate and is unconfirmed here. The operator should run `claude --help | grep append-system-prompt` once. Args is untouched (TestSessionArgs unchanged); the flag is added in WithGuidelines, called from Runner.Run. No size cap on the file; session record schema unchanged."
+}

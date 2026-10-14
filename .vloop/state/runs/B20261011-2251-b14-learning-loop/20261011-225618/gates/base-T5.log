@@ -1,0 +1,15 @@
+GATE FAIL: a: no line '! external format: the contract mentions "eval case" but Binding references do not cite docs/guide/evals.md (.vloop/repo-guidelines.md)' in:
+docs/briefs/B20260101-1001-case.loop-brief.md
+  ✓ frontmatter is valid
+  ✓ has a worked example
+  ✓ has a fenced block with concrete values
+  ✓ out of scope: 2 item(s)
+  ✓ has constraints
+  ✓ states an expected task count
+  ✓ pins exit or status codes
+  ✓ no absolute paths
+  ✓ binding references resolve and say why
+  ✓ referenced docs resolve
+  ✓ no references a memoryless offline session cannot follow
+  ok, 0 warning(s)
+briefs ok

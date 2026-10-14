@@ -1,0 +1,51 @@
+GATE FAIL: B20261003-2049-gate-model: no warning 'must-change list: the contract mentions "schemas/" but Constraints do not name TestWorkedExampleB2Commands, TestSchemasAreEmbedded, TestWorkedExampleB6RealData (.vloop/repo-guidelines.md)' in:
+docs/briefs/B20261003-2049-gate-model.loop-brief.md
+✓ frontmatter is valid
+✓ has a worked example
+✓ has a fenced block with concrete values
+✓ out of scope: 6 item(s)
+✓ has constraints
+✓ states an expected task count
+✓ pins exit or status codes
+✓ no absolute paths
+✗ binding reference does not resolve: docs/domain/domain-model.md
+✗ binding reference does not resolve: docs/domain/execution/task.md
+✗ binding reference does not resolve: docs/domain/execution/plan.md
+✗ binding reference does not resolve: docs/domain/execution/session.md
+✗ binding reference does not resolve: docs/domain/execution/run.md
+✗ binding reference does not resolve: docs/domain/measurement/metrics.md
+✗ binding reference does not resolve: schemas/state.v1.json
+✗ binding reference does not resolve: schemas/iteration.v1.json
+✗ binding reference does not resolve: schemas/session.v1.json
+✗ binding reference does not resolve: schemas/verdict.v1.json
+✗ binding reference does not resolve: plugin/skills/plan/SKILL.md
+✗ binding reference does not resolve: plugin/skills/review/SKILL.md
+✗ binding reference does not resolve: plugin/skills/work/SKILL.md
+✗ binding reference does not resolve: docs/guide/concepts.md
+✗ binding reference does not resolve: docs/guide/configuration.md
+✗ binding reference does not resolve: docs/briefs/B20261002-2135-vloop-v1-security.loop-brief.md
+✗ depends-on does not resolve: B20261002-2135-vloop-v1-security.loop-brief
+! path does not resolve: .loop/tests/run-all.sh
+! path does not resolve: .vloop/state/gates/
+! path does not resolve: .vloop/state/state.json
+! path does not resolve: .vloop/tmp/
+! path does not resolve: both.toml
+! path does not resolve: commands.md
+! path does not resolve: configuration.md
+! path does not resolve: docs/design-notes/vloop-v2.0-roadmap.md
+! path does not resolve: docs/domain/domain-model.md
+! path does not resolve: docs/domain/execution/task.md
+! path does not resolve: docs/domain/measurement/metrics.md
+! path does not resolve: docs/guide/concepts.md
+! path does not resolve: docs/guide/configuration.md
+! path does not resolve: metrics.md
+! path does not resolve: plan.md
+! path does not resolve: plugin/evals/plan-checks-its-gates/
+! path does not resolve: run.md
+! path does not resolve: session.md
+! path does not resolve: state.json
+! path does not resolve: styled.toml
+! path does not resolve: top.toml
+✓ no references a memoryless offline session cannot follow
+17 problem(s), 21 warning(s)
+1 brief(s) need work

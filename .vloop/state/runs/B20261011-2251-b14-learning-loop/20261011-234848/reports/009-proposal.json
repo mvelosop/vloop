@@ -1,0 +1,25 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Added the eval case plugin/evals/gate-review-real-misses: a state/v2 plan of seven sh gates (six cited defects reduced to their mechanisms, one sound), regex and llm graders, and a scaffold that proves each gate's defect on the host; listed in the evals README (with the macOS note) and the evals guide.",
+  "files": [
+    "plugin/evals/gate-review-real-misses/brief.md",
+    "plugin/evals/gate-review-real-misses/case.yaml",
+    "plugin/evals/gate-review-real-misses/prompt.md",
+    "plugin/evals/gate-review-real-misses/scaffold.sh",
+    "plugin/evals/gate-review-real-misses/graders/verdict-is-fail.md",
+    "plugin/evals/gate-review-real-misses/graders/verdict-validates.md",
+    "plugin/evals/gate-review-real-misses/graders/finds-gnu-grep.md",
+    "plugin/evals/gate-review-real-misses/graders/finds-toml-key-after-table.md",
+    "plugin/evals/gate-review-real-misses/graders/finds-write-under-vloop.md",
+    "plugin/evals/gate-review-real-misses/graders/finds-trailing-space.md",
+    "plugin/evals/gate-review-real-misses/graders/finds-session-v1-as-v2.md",
+    "plugin/evals/gate-review-real-misses/graders/finds-glob-too-wide.md",
+    "plugin/evals/gate-review-real-misses/graders/sound-gate-passes.md",
+    "plugin/evals/README.md",
+    "docs/guide/evals.md"
+  ],
+  "verified": "vloop task gate T6 exited 0 and printed ok; go test ./internal/cli -run 'Skill|Eval' passed.",
+  "notes": "The scaffold dies unless (1) every gate fails on the base, (2) a reference runlog installed in a copy still fails T1-T6 and passes T7, (3) each defect's mechanism shows: grep -P exits 2 (BSD grep only), the appended TOML key follows the table header, T3's path is under .vloop/ outside tmp, the trailing-space pattern exits 1 on 'ok runlog', session/v1 record rejected by session/v2, glob sum 28 vs brief's 21. It needs vloop on PATH. The guide's case count was stale (14); set to 16 for the 16 cases now present. No other case or shared _*.sh helper changed."
+}

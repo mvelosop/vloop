@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -172,7 +173,7 @@ func (e *doctorEnv) plan(status, shell string) {
 func TestDoctorWorkedExampleText(t *testing.T) {
 	e := newDoctorEnv(t)
 	out, code := e.run("doctor")
-	want := "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n✓ plugin\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n- self-hosting\ndoctor: 0 problem(s), 1 warning(s)\n"
+	want := "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n✓ plugin\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n✓ guidelines 0 rule(s)\n- self-hosting\ndoctor: 0 problem(s), 1 warning(s)\n"
 	if code != 0 || out != want {
 		t.Errorf("exit %d, output:\n%s\nwant:\n%s", code, out, want)
 	}
@@ -537,4 +538,43 @@ func TestDoctorGateEditsFollowsPlugin(t *testing.T) {
 		}
 	}
 	t.Error("no plugin check")
+}
+
+func TestDoctorGuidelinesRules(t *testing.T) {
+	over := func(n int) string {
+		var b strings.Builder
+		for i := 0; i < n; i++ {
+			fmt.Fprintf(&b, "- Rule %d. (D20261012-%04d)\n", i, 100+i)
+		}
+		return b.String()
+	}
+	const over21 = "21 rules, over the budget of 20 — retire or merge some before adding more"
+	cases := []struct {
+		name, text, result, msg string
+	}{
+		{"template", "# G\n\n<!--\n- when `x`: `T` (D20261012-0100)\n-->\n", resPass, "0 rule(s)"},
+		{"seed", "- a (D20261004-2304)\n## Pinning tests\n- when `k`: `T` (D20261004-1142, D20261004-2304)\n- b (I20261004-1142-a-decision)\n", resPass, "3 rule(s)"},
+		{"seed plus 15", over(21), resWarning, over21},
+		{"twenty", over(20), resPass, "20 rule(s)"},
+		{"stripped", "- a\n- b (D20261004-2304)\n- c\n", resWarning, "2 rule(s) cite no defect or intervention: line 1, line 3"},
+		{"both", over(21) + "- x\n", resWarning, "22 rules, over the budget of 20 — retire or merge some before adding more; guidelines 1 rule(s) cite no defect or intervention: line 22"},
+		{"commented rule", "<!-- - a --> \n- b (D20261004-2304)\n<!-- one\n- c\n-->\n", resPass, "1 rule(s)"},
+		{"indented is not a rule", "  - a\n-b\n", resPass, "0 rule(s)"},
+	}
+	for _, c := range cases {
+		root := t.TempDir()
+		if err := os.MkdirAll(filepath.Join(root, ".vloop"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(root, ".vloop", "repo-guidelines.md"), []byte(c.text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		name, result, msg := doctorGuidelines(root)
+		if name != "guidelines" || result != c.result || msg != c.msg {
+			t.Errorf("%s: got %s %s %q, want %s %q", c.name, name, result, msg, c.result, c.msg)
+		}
+	}
+	if _, result, _ := doctorGuidelines(t.TempDir()); result != resNA {
+		t.Errorf("no file: result %s, want %s", result, resNA)
+	}
 }

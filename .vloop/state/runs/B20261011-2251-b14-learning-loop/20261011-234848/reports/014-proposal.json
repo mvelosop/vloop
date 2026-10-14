@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T11",
+  "outcome": "done",
+  "summary": "vloop defect set accepts rule (<where>: <which>) and rule-outcome (fired|missed|absent|none), refusing others with exit 2; brief close prints the defect report (rule, outcome or untriaged, recurs) before the trailer line, in --dry-run too; the operate skill's close step triages.",
+  "files": ["internal/defect/defect.go", "internal/defect/defect_test.go", "internal/cli/close.go", "internal/cli/close_test.go", "schemas/defect.v1.json", "docs/guide/commands.md", "docs/guide/defects.md", "plugin/skills/operate/SKILL.md"],
+  "verified": "vloop task gate T11 exited 0 and printed gate T11: ok.",
+  "notes": "In --dry-run the report is printed after the summary and before the would-lines (there is no trailer line), so TestCloseDryRunWritesNothing needed no change; pending findings appear as untriaged rows. Real close prints it after the committed line. A defect is untriaged when rule-outcome is empty; recurs needs a rule. defect.Set inserts absent rule/rule-outcome after case. docs/guide/defects.md got the two fields because TestGuideDefectsCoversSchema requires every schema property; the full docs task (T12) remains. internal/cli TestTaskGate* fail only inside a driver session, unrelated."
+}

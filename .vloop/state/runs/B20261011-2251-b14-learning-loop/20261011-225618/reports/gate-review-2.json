@@ -1,0 +1,78 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "FAIL",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T5",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T6",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T7",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T8",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T9",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "the gate pins a Go package and function the brief never names: oracle.go imports github.com/mvelosop/vloop/internal/budget and calls budget.Check(pluginDir string) []string, so a correct L10 test placed or named differently fails to build",
+          "kind": "pins-unnamed"
+        }
+      ]
+    },
+    {
+      "task": "T10",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T11",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T12",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T13",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "T9: L10 asks for a test beside its ceilings that fails with the message \"plan: 4,213 words, over its ceiling of 4,100\"; the brief names no package or function, so the gate should judge through what the brief pins (the real skills counted by the gate, and the message) rather than a Go API. The other 12 gates fail on the base at behavioural assertions (T3, T6, T12 on absent text or files; T4, T5, T8, T10, T11 at the missing warning, doctor line, instructions line and defect report); their fixtures and matchers, and the real-data expectations of T4 and T13 against the four consumed briefs, were checked and hold."
+}
+

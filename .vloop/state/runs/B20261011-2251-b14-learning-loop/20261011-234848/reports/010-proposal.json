@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "plan-checks-its-gates' fixture grader now reads .vloop/state/gates/T1/gate.sh (the brief fixes a one-task plan with that judge); operate-proposes-options' scaffold builds a work branch named for the run id with a 3-task plan (T1 done, T2 blocked on a dispute, T3 pending) and its two llm graders score the skill's step, not wording.",
+  "files": ["plugin/evals/plan-checks-its-gates/brief.md", "plugin/evals/plan-checks-its-gates/graders/fixture-at-top-level.md", "plugin/evals/operate-proposes-options/scaffold.sh", "plugin/evals/operate-proposes-options/task.json", "plugin/evals/operate-proposes-options/prompt.md", "plugin/evals/operate-proposes-options/graders/options-with-recommendation.md", "plugin/evals/operate-proposes-options/graders/no-straw-option.md"],
+  "verified": "vloop task gate T7 equivalent: sh .vloop/state/gates/T7/gate.sh printed 'gate T7: ok'; go test ./internal/cli -run 'Skill|Eval' ok.",
+  "notes": "The plan-checks brief now has a 'Plan shape' section pinning one task T1 with its judge at .vloop/state/gates/T1/gate.sh, because a file focus cannot name a folder or glob. The operate disputed task is T2 (task.json id changed from T1). README rows unchanged and still accurate. Evals themselves not run (real model calls)."
+}

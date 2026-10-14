@@ -126,7 +126,10 @@ type Report struct {
 	Defects ReportDefects      `json:"defects"`
 	// Interventions counts the brief's intervention records by agreement.
 	Interventions ReportInterventions `json:"interventions"`
-	Records       struct {
+	// Instructions is the words each session kind starts with, at the commit
+	// the brief's delivered lines are measured to; absent without a run.
+	Instructions *Instructions `json:"instructions,omitempty"`
+	Records      struct {
 		Missing []MissingRecord `json:"missing"`
 	} `json:"records"`
 	LeadTime struct {
@@ -201,6 +204,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 			return nil, err
 		}
 		size = *s
+		r.Instructions = MeasureInstructions(root, planSHA(o))
 	}
 	// A release error only means there is no default branch: not merged.
 	if sha, err := runs.Release(root, m.BriefPath); err == nil && sha != "" {

@@ -123,6 +123,16 @@ func PrintSummary(out io.Writer, r *Report) {
 	ia := r.Interventions.ByAgreement
 	fmt.Fprintf(out, " interventions  %d · recommended %d · other-option %d · adjusted %d · different %d · no-options %d\n",
 		r.Interventions.Total, ia.Recommended, ia.OtherOption, ia.Adjusted, ia.Different, ia.NoOptions)
+	if in := r.Instructions; in != nil {
+		w := func(n *int) string {
+			if n == nil {
+				return "n/a"
+			}
+			return thousands(*n)
+		}
+		fmt.Fprintf(out, " instructions  plan %s · gate review %s · work %s · review %s words · guidelines %d rules\n",
+			w(in.Plan), w(in.GateReview), w(in.Work), w(in.Review), in.GuidelinesRules)
+	}
 	if n := len(r.Records.Missing); n > 0 {
 		var l []string
 		for _, m := range r.Records.Missing {
