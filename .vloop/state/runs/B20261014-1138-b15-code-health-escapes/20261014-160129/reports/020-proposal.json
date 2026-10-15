@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T12",
+  "outcome": "done",
+  "summary": "defect set refuses rule and rule-outcome like any unknown field (exit 2, record untouched), and brief close and --dry-run print no defect report or untriaged hint; records carrying the fields stay valid and listed, the schema keeps both properties.",
+  "files": ["internal/defect/defect.go", "internal/cli/close.go", "internal/defect/defect_test.go", "internal/cli/close_test.go", "cmd/vloop/b14_e2e_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T12 exited 0 and printed gate T12: ok; go test ./cmd/... ./internal/defect ok.",
+  "notes": "Defect.Rule/RuleOutcome stay as read-only struct fields so list shows old records. commands.md regenerated with go generate ./cmd/vloop. internal/cli TestTaskGate* fail inside a live session (plan changed during session guard), unrelated."
+}

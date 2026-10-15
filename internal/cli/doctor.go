@@ -16,6 +16,7 @@ import (
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/driver"
+	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/install"
 	"github.com/mvelosop/vloop/internal/state"
 )
@@ -93,6 +94,49 @@ func runDoctor(b Build, root string) []doctorCheck {
 
 	isRepo, head := doctorGit(root, add)
 
+	doctorInstall(b, root, add)
+
+	vals, cerr := config.List(root)
+	if cerr != nil {
+		add("config", resProblem, cerr.Error())
+	} else {
+		add("config", resPass, "")
+	}
+
+	if cerr == nil {
+		doctorConfig(root, vals, isRepo, add)
+	}
+
+	hasClaude := doctorClaude(add)
+
+	if doctorTrusted(root) {
+		add("trust", resPass, "")
+	} else {
+		add("trust", resWarning, "this folder is not marked trusted in the Claude settings — run claude here once and accept the trust dialog")
+	}
+
+	plan, hasPlan := doctorPlan(root)
+	doctorPlanShell(root, plan, hasPlan, vals, isRepo, add)
+
+	if !hasClaude {
+		add("plugin", resNA, "")
+		add("gate edits", resNA, "")
+	} else {
+		add(doctorPlugin(b))
+		add(doctorGateEdits(root))
+	}
+	add(doctorGuidelines(root))
+
+	if cerr == nil {
+		doctorStacks(root, vals, add)
+	}
+
+	doctorSelfHosting(b, root, isRepo, head, add)
+	return checks
+}
+
+// doctorInstall adds the install check: the stamp against this binary.
+func doctorInstall(b Build, root string, add func(name, result, msg string)) {
 	stamp, serr := install.Read(root)
 	switch {
 	case errors.Is(serr, os.ErrNotExist):
@@ -112,34 +156,31 @@ func runDoctor(b Build, root string) []doctorCheck {
 			add("install", resWarning, fmt.Sprintf("set up by vloop %s, this binary is %s — run vloop upgrade", stamp.Version, b.Version))
 		}
 	}
+}
 
-	vals, cerr := config.List(root)
-	if cerr != nil {
-		add("config", resProblem, cerr.Error())
-	} else {
-		add("config", resPass, "")
+// doctorConfig adds the checks and gate-scratch findings of a readable config.
+func doctorConfig(root string, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
+	if cks, err := config.Checks(root); err == nil && len(cks) == 0 {
+		add("checks", resProblem, "no [[check]] is configured — a run needs at least one; see docs/guide/configuration.md")
 	}
-
-	if cerr == nil {
-		if cks, err := config.Checks(root); err == nil && len(cks) == 0 {
-			add("checks", resProblem, "no [[check]] is configured — a run needs at least one; see docs/guide/configuration.md")
+	for _, v := range vals {
+		if v.Key != "run.gate-scratch" {
+			continue
 		}
-		for _, v := range vals {
-			if v.Key != "run.gate-scratch" {
-				continue
-			}
-			var loose []string
-			for _, d := range v.List {
-				if isRepo && !gitIgnored(root, d) {
-					loose = append(loose, d)
-				}
-			}
-			if len(loose) > 0 {
-				add("gate scratch", resProblem, strings.Join(loose, ", ")+" is not ignored by git — add it to .gitignore")
+		var loose []string
+		for _, d := range v.List {
+			if isRepo && !gitIgnored(root, d) {
+				loose = append(loose, d)
 			}
 		}
+		if len(loose) > 0 {
+			add("gate scratch", resProblem, strings.Join(loose, ", ")+" is not ignored by git — add it to .gitignore")
+		}
 	}
+}
 
+// doctorClaude adds the claude check and reports whether claude runs.
+func doctorClaude(add func(name, result, msg string)) bool {
 	_, lerr := exec.LookPath("claude")
 	hasClaude := lerr == nil
 	switch {
@@ -152,14 +193,11 @@ func runDoctor(b Build, root string) []doctorCheck {
 			add("claude", resPass, "")
 		}
 	}
+	return hasClaude
+}
 
-	if doctorTrusted(root) {
-		add("trust", resPass, "")
-	} else {
-		add("trust", resWarning, "this folder is not marked trusted in the Claude settings — run claude here once and accept the trust dialog")
-	}
-
-	plan, hasPlan := doctorPlan(root)
+// doctorPlanShell adds the gate shell, plan and branch checks.
+func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
 	shell := plan.Shell
 	if !hasPlan {
 		shell = ""
@@ -209,42 +247,38 @@ func runDoctor(b Build, root string) []doctorCheck {
 			add("branch", resPass, "")
 		}
 	}
+}
 
-	if !hasClaude {
-		add("plugin", resNA, "")
-		add("gate edits", resNA, "")
-	} else {
-		add(doctorPlugin(b))
-		add(doctorGateEdits(root))
-	}
-	add(doctorGuidelines(root))
-
-	if cerr == nil {
-		var missing []string
-		scoped := false
-		for _, v := range vals {
-			if v.Key != "metrics.stacks" {
+// doctorStacks adds the stacks check: every scoped stack names a directory.
+func doctorStacks(root string, vals []config.Value, add func(name, result, msg string)) {
+	var missing []string
+	scoped := false
+	for _, v := range vals {
+		if v.Key != "metrics.stacks" {
+			continue
+		}
+		for _, e := range v.List {
+			_, scope, _ := classify.ParseStack(e)
+			if scope == "" {
 				continue
 			}
-			for _, e := range v.List {
-				_, scope, _ := classify.ParseStack(e)
-				if scope == "" {
-					continue
-				}
-				scoped = true
-				if fi, err := os.Stat(filepath.Join(root, filepath.FromSlash(scope))); err != nil || !fi.IsDir() {
-					missing = append(missing, e+": no such directory")
-				}
+			scoped = true
+			if fi, err := os.Stat(filepath.Join(root, filepath.FromSlash(scope))); err != nil || !fi.IsDir() {
+				missing = append(missing, e+": no such directory")
 			}
 		}
-		switch {
-		case len(missing) > 0:
-			add("stacks", resWarning, strings.Join(missing, "; "))
-		case scoped:
-			add("stacks", resPass, "")
-		}
 	}
+	switch {
+	case len(missing) > 0:
+		add("stacks", resWarning, strings.Join(missing, "; "))
+	case scoped:
+		add("stacks", resPass, "")
+	}
+}
 
+// doctorSelfHosting adds the self-hosting check: whether this binary may build
+// vloop itself.
+func doctorSelfHosting(b Build, root string, isRepo bool, head string, add func(name, result, msg string)) {
 	switch {
 	case !isRepo || !ownModule(root):
 		add("self-hosting", resNA, "")
@@ -257,7 +291,6 @@ func runDoctor(b Build, root string) []doctorCheck {
 	default:
 		add("self-hosting", resPass, "")
 	}
-	return checks
 }
 
 // doctorGit adds the git check and reports whether root is a git repository
@@ -285,7 +318,7 @@ func doctorGit(root string, add func(name, result, msg string)) (bool, string) {
 func gitIgnored(root, rel string) bool { return driver.GitIgnored(root, rel) }
 
 func gitOut(root string, args ...string) (string, error) {
-	out, err := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
+	out, err := gitrun.At(root, args...).Output()
 	return strings.TrimSpace(string(out)), err
 }
 
@@ -333,9 +366,12 @@ func doctorTrusted(root string) bool {
 	return false
 }
 
+// doctorPlanInfo is the part of the plan the doctor reads.
+type doctorPlanInfo struct{ Schema, Shell, Status string }
+
 // doctorPlan reads just the plan's shell and status, leniently: validity is
 // the plan check's business.
-func doctorPlan(root string) (p struct{ Schema, Shell, Status string }, ok bool) {
+func doctorPlan(root string) (p doctorPlanInfo, ok bool) {
 	raw, err := os.ReadFile(state.Path(root))
 	if err != nil {
 		return p, false

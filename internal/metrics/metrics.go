@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
@@ -106,6 +107,9 @@ type ReportTask struct {
 	AgentMS  int64     `json:"agent_ms"`
 	CostUSD  float64   `json:"cost_usd"`
 	Models   []string  `json:"models"`
+	// TestCodeRatio and Per1000CodeUSD are nil where the task's code lines are 0.
+	TestCodeRatio  *float64 `json:"test_code_ratio"`
+	Per1000CodeUSD *float64 `json:"per_1000_code_lines_usd"`
 }
 
 // Report is the metrics/v2 document for one brief.
@@ -164,19 +168,6 @@ func strp(s string) *string {
 	return &s
 }
 
-// planSHA is the commit whose plan describes the run's end: the last run
-// commit, else the last task commit, else the plan commit.
-func planSHA(o *runs.Owned) string {
-	sha := o.Plan.SHA
-	if n := len(o.Tasks); n > 0 {
-		sha = o.Tasks[n-1].SHA
-	}
-	if o.Run != nil {
-		sha = o.Run.SHA
-	}
-	return sha
-}
-
 // Build assembles the report of one brief from its run folders and commits.
 // It returns nil when the brief has no runs. Nothing is written.
 func Build(root, brief string, c *classify.Classifier) (*Report, error) {
@@ -196,7 +187,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	var plan *runs.PlanDoc
 	var size Size
 	if o := m.Owned; o != nil {
-		if plan, err = runs.PlanAt(root, o.Layout, planSHA(o)); err != nil {
+		if plan, err = runs.PlanAt(root, o.Layout, o.PlanSHA()); err != nil {
 			return nil, err
 		}
 		s, err := Measure(root, o, c)
@@ -204,17 +195,19 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 			return nil, err
 		}
 		size = *s
-		r.Instructions = MeasureInstructions(root, planSHA(o))
+		r.Instructions = MeasureInstructions(root, o.PlanSHA())
 	}
+	var released time.Time // the release commit's committer time; zero when not merged
 	// A release error only means there is no default branch: not merged.
 	if sha, err := runs.Release(root, m.BriefPath); err == nil && sha != "" {
 		r.Merged = &sha
-		if m.Owned != nil {
-			out, err := gitOut(root, "show", "-s", "--format=%ct", sha)
-			if err != nil {
-				return nil, err
-			}
-			if secs, err := strconv.ParseInt(strings.TrimSpace(string(out)), 10, 64); err == nil {
+		out, err := gitOut(root, "show", "-s", "--format=%ct", sha)
+		if err != nil {
+			return nil, err
+		}
+		if secs, err := strconv.ParseInt(strings.TrimSpace(string(out)), 10, 64); err == nil {
+			released = time.Unix(secs, 0)
+			if m.Owned != nil {
 				ms := secs*1000 - m.Owned.Plan.Time.UnixMilli()
 				r.LeadTime.PlanToMergeMS = &ms
 			}
@@ -249,13 +242,15 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	}
 	x.AddRecorded(recorded)
 	dc := x.Counts()
-	r.Defects = ReportDefects{InLoop: dc.InLoop, Operator: dc.Operator, Escaped: dc.Escaped, Total: dc.All()}
-	r.Defects.RemovalEfficiency = fratio(float64(dc.InLoop+dc.Operator), float64(dc.All()))
-
+	dc.Reclassify(recorded, released)
 	ivs, err := intervention.List(root, r.Brief)
 	if err != nil {
 		return nil, err
 	}
+	dc.AddFindings(ivs)
+	r.Defects = ReportDefects{InLoop: dc.InLoop, Operator: dc.Operator, Escaped: dc.Escaped, Total: dc.All()}
+	r.Defects.RemovalEfficiency = fratio(float64(dc.InLoop+dc.Operator), float64(dc.All()))
+
 	for _, v := range ivs {
 		r.Interventions.Total++
 		a := &r.Interventions.ByAgreement
@@ -328,6 +323,11 @@ func byTask(m *runs.Model, plan *runs.PlanDoc, size Size) []ReportTask {
 	for _, id := range order {
 		rt := rows[id]
 		rt.Models = splitList(joinSet(models[id]))
+		rt.TestCodeRatio = ratio(rt.Churn.Test, rt.Churn.Code)
+		if rt.Churn.Code > 0 {
+			c := rt.CostUSD * 1000 / float64(rt.Churn.Code)
+			rt.Per1000CodeUSD = &c
+		}
 		out = append(out, *rt)
 	}
 	return out

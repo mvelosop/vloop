@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "runs.Owned.PlanSHA is the one place that picks the run, last task or plan commit; the driver's counts is gone in favour of Plan.Counts(); config.BudgetKeys names the nine run.* budget keys once and ResolveBudgets, the run flags and both gate-timeout reads use it.",
+  "files": ["internal/runs/commits.go", "internal/runs/plansha_test.go", "internal/config/config.go", "internal/config/budgetkeys_test.go", "internal/metrics/metrics.go", "internal/metrics/defects.go", "internal/defect/defect.go", "internal/cli/defect.go", "internal/cli/run.go", "internal/cli/task_gate.go", "internal/driver/budgets.go", "internal/driver/iterate.go", "internal/driver/plan.go", "internal/driver/iterate_test.go"],
+  "verified": "vloop gate script sh .vloop/state/gates/T4/gate.sh printed gate T4: ok; go vet, gofmt and go test ./internal/... pass; linux and windows builds ok.",
+  "notes": "internal/driver/iterate_test.go TestNextReady called the removed counts(); its one call now uses p.Counts() with pending as len(Tasks)-done-blocked, same assertions. Running go test ./internal/cli needs VLOOP_PLAN_SHA256 unset."
+}

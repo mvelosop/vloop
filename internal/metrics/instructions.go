@@ -1,9 +1,8 @@
 package metrics
 
 import (
-	"os/exec"
-
 	"github.com/mvelosop/vloop/internal/budget"
+	"github.com/mvelosop/vloop/internal/gitrun"
 )
 
 // Instructions is the words each session kind starts with, counted at the
@@ -21,7 +20,7 @@ const guidelinesPath = ".vloop/repo-guidelines.md"
 
 // showAt returns the file at the commit, and whether it exists there.
 func showAt(root, sha, path string) ([]byte, bool) {
-	out, err := exec.Command("git", "-C", root, "show", sha+":"+path).Output()
+	out, err := gitrun.At(root, "show", sha+":"+path).Output()
 	return out, err == nil
 }
 

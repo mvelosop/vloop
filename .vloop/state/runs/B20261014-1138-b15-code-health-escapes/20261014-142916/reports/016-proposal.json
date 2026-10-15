@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T10",
+  "outcome": "blocked",
+  "summary": "Implemented the time rule: DefectCounts.Reclassify moves a recorded defect created after the release commit's committer time to escaped whatever its found-by, applied in metrics.Build (so summary, JSON, all-briefs table, close and snapshot follow); the matrix is untouched. Added TestReclassifyByReleaseTime. Every gate clause passes except the real-data check, which a correct implementation cannot pass.",
+  "files": ["internal/metrics/defects.go", "internal/metrics/metrics.go", "internal/metrics/defects_test.go"],
+  "verified": "vloop task gate T10 exited 1: real data: B20260929-2148-vloop-state-tasks-status and B20261003-2049-gate-model 'in-loop changed'; go test ./internal/metrics passes.",
+  "notes": "The gate's real-data jq clause asserts in-loop unchanged, but acceptance 1 and the gate's own fixtures (D...-0004-after-review moves review to escaped) require a gate- or review-found record created after the merge to become escaped. Two real briefs have such records (e.g. D20261004-2304-testworkedexampleb6realdata-as-repaired, found-by gate, created 2026-10-04T22:04Z, after the gate-model merge at 13:18Z; D20260930-0809-t1-gate-used-a-gnu-only-grep..., found-by gate, on the state-tasks-status brief). The real-data clause should instead assert operator + escaped + in-loop total unchanged (in-loop may only fall, escaped only rise).",
+  "gate_dispute": {
+    "reason": "The real-data clause requires in-loop to be unchanged for every consumed brief, contradicting the rule it checks: a gate- or review-found record created after the merge is escaped whatever its found-by.",
+    "evidence": "The clause `elif $o.defects.in_loop != $n.defects.in_loop then ... in-loop changed` fails for B20261003-2049-gate-model and B20260929-2148-vloop-state-tasks-status, which hold gate-found defects created after their merge; the same gate's fixture D20250101-0004-after-review (review, MERGED+60) must count as escaped."
+  }
+}

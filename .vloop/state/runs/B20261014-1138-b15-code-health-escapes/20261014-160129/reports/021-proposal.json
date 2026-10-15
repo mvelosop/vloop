@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T13",
+  "outcome": "blocked",
+  "summary": "Docs, domain model and both operate playbooks describe the new model; commands.md already equals gendocs output. The gate cannot pass on this machine because its section() helper does not work with the system awk.",
+  "files": ["docs/domain/domain-model.md", "docs/domain/measurement/defect.md", "docs/domain/measurement/metrics.md", "docs/guide/metrics.md", "docs/guide/defects.md", "plugin/skills/operate/SKILL.md", ".claude/skills/vloop-operator/SKILL.md"],
+  "verified": "vloop task gate T13 exited 1: 'docs/domain/domain-model.md has no M-4'; a temp copy of the gate with the awk regex escapes doubled printed 'gate T13: ok'.",
+  "notes": "operate skill is 1602 words (ceiling 1750). The gate's section() passes '^- \\*\\*M-4\\*\\*' through awk -v, which processes escapes; macOS awk (20200816) turns it into a regex that matches nothing, so M-4 and M-6 sections are always empty. Needs '\\\\*' in the gate (or a non-awk extraction).",
+  "gate_dispute": {
+    "reason": "The gate's section() helper passes regexes with \\* through awk -v, where the escape is consumed; under BSD awk the pattern matches nothing, so the M-4 section is always empty regardless of content.",
+    "evidence": "printf -- '- **M-4** x\\n' | awk -v s='^- \\*\\*M-4\\*\\*' '$0 ~ s' prints nothing, while s='^- \\\\*\\\\*M-4\\\\*\\\\*' matches; the gate fails with 'docs/domain/domain-model.md has no M-4' although the line exists. With the escapes doubled in a temp copy the gate prints 'gate T13: ok'."
+  }
+}

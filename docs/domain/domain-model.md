@@ -120,10 +120,12 @@ classDiagram
 | run folder | start time | `20260930-121245` |
 | task | `T<n>`, unique in the plan | `T3` |
 | session record | `NNN-<phase>` within a run folder | `003-work` |
-| recorded defect | `D<YYYYMMDD-HHMM>-<slug>` | `D20260930-0809-no-gate-ran-go-mod-tidy-diff` |
+| recorded defect | `D<YYYYMMDD-HHMMSS>-<slug>` | `D20260930-080912-no-gate-ran-go-mod-tidy-diff` |
 | derived defect | `<run id>/i<iteration>-gate`, `…-review-<n>` | `B20260101-0900-a/i2-gate` |
-| intervention | `I<YYYYMMDD-HHMM>-<slug>` | `I20260929-2224-t1-blocked-twice-on-a-gnu-only-grep-patt` |
+| intervention | `I<YYYYMMDD-HHMMSS>-<slug>` | `I20260929-222431-t1-blocked-twice-on-a-gnu-only-grep-patt` |
 | JSON document | `schema: <name>/v<n>` | `state/v1` |
+
+Identifiers made before B15 end in minutes (`D<YYYYMMDD-HHMM>-<slug>`); old IDs stay as they are and are still accepted everywhere.
 
 ## On disk
 
@@ -231,12 +233,14 @@ marked.
   scope's directory.
 - **M-4** A defect has one origin (`brief`, `plan`, `work`, `env`) and one
   catcher (`gate`, `review`, `operator`, `user`). Derived defects are computed on
-  every call, never stored. `found-by: user` is after release; every other
-  catcher is before it.
+  every call, never stored. A recorded defect is an escape: it is
+  **escaped** when its `created` time is after the committer time of its
+  brief's release commit (M-5), whatever its `found-by`; otherwise it counts by
+  catcher (`gate`, `review`, `operator` before release, `user` after).
 - **M-5** A brief is released at the first commit on the default branch where it
   is `consumed`. The default branch is `origin/HEAD`'s target, else `main`, else
   `master`.
-- **M-6** Closing is one commit on the work branch — defect files, the snapshot
+- **M-6** Closing is one commit on the work branch — intervention files, the snapshot
   and the brief — with the trailer `Vloop-Brief: <name>`, after the operator has
   stated findings or `--no-findings`.
 - **M-7** An export carries numbers and titles only: no file contents, no

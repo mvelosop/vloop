@@ -31,6 +31,7 @@ func TestDefectAddListSet(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(dir, ".vloop/defects")); err == nil {
 		t.Fatal("refused adds wrote .vloop/defects")
 	}
+	mergeBrief(t, dir, "B1.loop-brief")
 	code, out, _ = runDefect(t, dir, "defect", "add", "It broke", "--found-by", "user", "--brief", "B1.loop-brief")
 	path := strings.TrimSpace(out)
 	if code != 0 || !strings.HasPrefix(path, ".vloop/defects/D") {
@@ -50,5 +51,37 @@ func TestDefectAddListSet(t *testing.T) {
 	code, out, _ = runDefect(t, dir, "defect", "list", "--json")
 	if code != 0 || !strings.Contains(out, `"status":"fixed"`) || !strings.Contains(out, `"schema":"defect/v1"`) {
 		t.Fatalf("%d %q", code, out)
+	}
+}
+
+func TestDefectAddRefusesUnmergedBrief(t *testing.T) {
+	const name = "B20260101-0900-a.loop-brief"
+	want := "vloop: " + name + " is not merged: record what you found before merge as an intervention — vloop intervention add \"<summary>\" --brief " + name + " --kind verification-finding --origin <brief|plan|work|env> --phase verify --automatable partly --by operator\n"
+	dir := t.TempDir()
+	gitIn(t, dir, "2026-01-01T08:00:00Z", "init", "-q", "-b", "trunk")
+	write(t, dir, ".vloop/config.toml", "")
+	write(t, dir, "docs/briefs/"+name+".md", "---\nname: "+name+"\nstatus: ready\n---\n")
+	write(t, dir, "src/u.txt", "line\n")
+	gitIn(t, dir, "2026-01-01T08:00:00Z", "add", "-A")
+	gitIn(t, dir, "2026-01-01T08:00:00Z", "-c", "user.name=t", "-c", "user.email=t@example.com", "commit", "-q", "-m", "u", "-m", "Vloop-Brief: "+name)
+
+	// No main, no master: M-5's lookup error, nothing written.
+	code, out, errs := runDefect(t, dir, "defect", "add", "x", "--found-by", "user", "--brief", name)
+	if code != 1 || out != "" || errs != "vloop: no default branch: origin/HEAD, main and master are all missing\n" {
+		t.Fatalf("no default branch: %d %q %q", code, out, errs)
+	}
+	gitIn(t, dir, "2026-01-01T08:00:00Z", "branch", "-m", "main")
+	for _, args := range [][]string{{"--brief", name}, {"--blame", "src/u.txt:1"}} {
+		code, out, errs := runDefect(t, dir, append([]string{"defect", "add", "x", "--found-by", "user"}, args...)...)
+		if code != 1 || out != "" || !strings.HasSuffix(errs, want) {
+			t.Fatalf("%v: %d %q %q", args, code, out, errs)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(dir, ".vloop/defects")); err == nil {
+		t.Fatal("a refused add wrote .vloop/defects")
+	}
+	mergeBrief(t, dir, name)
+	if code, _, errs := runDefect(t, dir, "defect", "add", "x", "--found-by", "user", "--brief", name); code != 0 {
+		t.Fatalf("merged brief: %d %q", code, errs)
 	}
 }

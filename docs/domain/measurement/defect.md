@@ -24,8 +24,10 @@ found it (M-4). *Part of [measurement](measurement-context.md).* The workflow:
 | `operator` | after the run, before the merge |
 | `user` | after release |
 
-**Before release** is every catcher but `user`. **Removal efficiency** = found
-before release / all.
+**Escaped** is decided by time: a recorded defect whose `created` is after its
+brief's release commit (M-5) is an escape, whatever its `found-by`. Every other
+defect was found before release. **Removal efficiency** = found before release
+/ all.
 
 ## Derived and recorded
 
@@ -34,32 +36,20 @@ before release / all.
   review (`found-by: review`; origin `brief` for a `spec-gap` finding, `plan`
   for a `gate-gap`, else `work`). A gate failure before the operator replaced
   that task's gate is `origin: plan`, `kind: gate`.
-- **Recorded** by the operator, one file each: `.vloop/defects/<id>.md`
+- **Recorded** by the operator, one file each, and only for an escape — a
+  finding before merge is a `verification-finding` intervention with an origin,
+  counted as caught by the operator; `defect add` refuses an unmerged brief: `.vloop/defects/<id>.md`
   (`defect/v1`), with `brief`, optional `task`, `origin`, `found-by`, `kind`
   (`bug`, `spec-gap`, `gate`, `gate-gap`, `regression`), `severity` (`low` to
   `critical`), `status`, `fixed-by` (the brief that fixed it, or `guideline`
   when a rule of `.vloop/repo-guidelines.md` now prevents it), `case` (the
-  failing test written first), `created`, then the description. Two more are
-  optional, and records without them stay valid; see below.
+  failing test written first), `created`, then the description. Two more, `rule` and
+  `rule-outcome`, are retired; see below.
 
-## The rule that caught it
+## Retired fields
 
-`rule` is the rule that caught the defect, or should have, as
-`<where>: <which>`; `<where>` is one of `guideline`, `brief-check`, `gate`,
-`gate-review`, `review`, `skill` (`guideline: D20261011-1455`,
-`brief-check: must-change list`). `rule-outcome` says what became of it:
-
-| `rule-outcome` | Meaning |
-| --- | --- |
-| `fired` | the rule caught it |
-| `missed` | the rule existed and did not catch it |
-| `absent` | no rule existed; one should |
-| `none` | no rule is warranted; the reason is in the body |
-
-`defect set` refuses any other outcome, and a `<where>` outside the list, with
-exit 2. `brief close` prints the brief's defects with both fields, `untriaged`
-where there is no outcome, and `recurs` where other defects share the `rule`;
-it never refuses for an untriaged one.
+`rule` and `rule-outcome` (the triage) were retired in B15: `defect set` refuses
+them, and they stay valid in old records.
 
 ## Lifecycle of a recorded defect
 

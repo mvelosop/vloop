@@ -1,0 +1,38 @@
+── iteration 22 (1 this run) · T13 · 12/14 done ──
+   Describe the new model in the docs, the domain and both operate playbooks
+   work T13 · 0m12s · $0.09 · run $0.09 / $40.00
+   check go
+   CHECK FAIL T13 — check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-164305/checks/022-go.fail.log; review skipped
+── iteration 23 (2 this run) · T13 · 12/14 done ──
+   Describe the new model in the docs, the domain and both operate playbooks
+   work T13 · 0m18s · $0.11 · run $0.20 / $40.00
+   check go
+   review T13 · 0m22s · $0.11 · run $0.31 / $40.00
+   review: PASS
+   T13 done
+── iteration 24 (3 this run) · T14 · 13/14 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data check
+   work T14 · 2m33s · $0.38 · run $0.69 / $40.00
+   check go
+   review T14 · 0m15s · $0.10 · run $0.79 / $40.00
+   review: FAIL
+── iteration 25 (4 this run) · T14 · 13/14 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data check
+   work T14 · 0m48s · $0.13 · run $0.92 / $40.00
+   check go
+   review T14 · 0m15s · $0.08 · run $1.00 / $40.00
+   review: FAIL
+── iteration 26 (5 this run) · T14 · 13/14 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data check
+   work T14 · 0m36s · $0.11 · run $1.11 / $40.00
+   work session reported blocked
+   T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+   T14 hit the attempt ceiling — blocked
+   no recorded progress (1/2)
+
+═══ blocked ═══
+run:    B20261014-1138-b15-code-health-escapes/20261014-164305  (5 iteration(s) this run)
+plan:   13/14 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status
+
+T14 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.

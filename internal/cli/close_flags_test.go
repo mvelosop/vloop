@@ -44,7 +44,7 @@ func TestCloseAbandonStalledRun(t *testing.T) {
 
 func TestCloseAbandonAcceptedOnCompleteRunAndKeepsRefusals(t *testing.T) {
 	dir := closeRepo(t, true, "")
-	if code, _, errs := runCLI(t, dir, "brief", "close", closeName, "--abandon", "x", "--finding", "f"); code != 0 {
+	if code, _, errs := runCLI(t, dir, "brief", "close", closeName, "--abandon", "x", "--finding", "work: f"); code != 0 {
 		t.Fatalf("exit %d: %s", code, errs)
 	}
 
@@ -67,7 +67,7 @@ func TestCloseAbandonAcceptedOnCompleteRunAndKeepsRefusals(t *testing.T) {
 func TestCloseDryRunWritesNothing(t *testing.T) {
 	dir := closeRepo(t, true, "")
 	head := headOf(t, dir)
-	code, out, errs := runCLI(t, dir, "brief", "close", closeName, "--finding", "README omits the flag", "--dry-run")
+	code, out, errs := runCLI(t, dir, "brief", "close", closeName, "--finding", "work: README omits the flag", "--dry-run")
 	if code != 0 || errs != "" {
 		t.Fatalf("exit %d: %s", code, errs)
 	}
@@ -76,7 +76,7 @@ func TestCloseDryRunWritesNothing(t *testing.T) {
 	if !strings.HasPrefix(collapse(out), closeBrief+" consumed · not merged\n") || !strings.Contains(collapse(out), "operator 1") {
 		t.Errorf("summary: %q", out)
 	}
-	if !strings.HasPrefix(lines[n-4], "would record .vloop/defects/D") || !strings.HasSuffix(lines[n-4], "-readme-omits-the-flag.md") {
+	if !strings.HasPrefix(lines[n-4], "would record .vloop/interventions/I") || !strings.HasSuffix(lines[n-4], "-readme-omits-the-flag.md") {
 		t.Errorf("record line: %q", lines[n-4])
 	}
 	for i, w := range []string{
@@ -91,7 +91,7 @@ func TestCloseDryRunWritesNothing(t *testing.T) {
 	if headOf(t, dir) != head || gitOutput(t, dir, "status", "--porcelain", "--untracked-files=all") != "" {
 		t.Error("dry run wrote or committed")
 	}
-	for _, p := range []string{".vloop/defects", ".vloop/state"} {
+	for _, p := range []string{".vloop/defects", ".vloop/interventions", ".vloop/state"} {
 		if _, err := os.Stat(filepath.Join(dir, p)); err == nil {
 			t.Errorf("dry run created %s", p)
 		}

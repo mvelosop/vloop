@@ -14,12 +14,12 @@ at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *
 | Group | Per brief | Per task |
 | --- | --- | --- |
 | tasks | planned, done, blocked, first-pass, the brief's estimate (B-4), iterations per closed task | attempts |
-| size | delivered and churned lines per category, deletions, rework, test:code | churned lines per category |
+| size | delivered and churned lines per category, deletions, rework, test:code | churned lines per category, test:code |
 | time | agent (work + review), plan, gates, checks (`checks_ms`), gate review (`gate_review_ms`), wall | agent |
 | rate | delivered code lines per agent minute, with and without tests | — |
-| cost | total and per phase (gate review included), per 1,000 delivered code lines; tokens and cache-hit ratio | cost |
+| cost | total and per phase (gate review included), `$/kloc` (per 1,000 delivered code lines); tokens and cache-hit ratio | cost, `$/kloc` |
 | models | the models actually used per phase; the configured effort | the work model |
-| defects | in-loop, operator, escaped, removal efficiency; a `check_failed` iteration derives a `work` defect found by the gate, counted apart as check failures | — |
+| defects | in-loop, operator (recorded operator defects before release plus verification-finding interventions with an origin), escaped (by time against release), removal efficiency; a `check_failed` iteration derives a `work` defect found by the gate, counted apart as check failures | — |
 | instructions | words each session kind starts with (skill + `.vloop/repo-guidelines.md` + `CLAUDE.md`) and the guidelines' rule count; `n/a` for a kind with no skill | — |
 | records | session records that should exist and do not | — |
 | lead time | created → planned → completed → merged | — |
@@ -79,5 +79,5 @@ templates and its schemas are product code in `.md` and `.json` files.
   `consumed` (M-5). Metrics show `merged <sha>` or `not merged`.
 - The **snapshot** at `.vloop/state/metrics/<run id>.json` is what `close`
   froze. Live metrics may later differ — a config change reclassifies lines,
-  a defect found after release lowers removal efficiency — and that difference
+  a defect recorded after release lowers removal efficiency — and that difference
   is the point: the snapshot is what the operator saw at close.

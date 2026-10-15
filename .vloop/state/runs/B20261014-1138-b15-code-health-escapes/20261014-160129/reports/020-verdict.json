@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T12",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop defect set` no longer accepts rule or rule-outcome: each is refused as any unknown field is, exit 2, with `vloop: cannot set \"<field>\": want one of status, fixed-by, case, severity, origin, kind, task`, leaving the record byte-identical; defect set's help lists the same fields.", "met": true, "evidence": "internal/defect/defect.go SetFields drops both; defect_test.go TestSetRefusesRetiredRuleFields asserts message and byte-identical file; b14_e2e_test.go asserts exit 2 and help; commands.md updated"},
+    {"criterion": "Records that have rule and rule-outcome stay valid and are shown as they are (defect list and its --json keep both fields); schemas/defect.v1.json keeps both properties.", "met": true, "evidence": "Defect struct keeps Rule/RuleOutcome with json tags; schemas/defect.v1.json untouched and still has both properties; TestCloseNoDefectReport uses records carrying them"},
+    {"criterion": "`vloop brief close` and its --dry-run no longer print `defects of <run id>`, the per-defect report lines or the untriaged hint; `squash-merge with the trailer: Vloop-Brief: <name>` stays close's last line.", "met": true, "evidence": "close.go: printDefectReport and its calls removed; close_test.go and b14_e2e_test.go assert absence and last line"},
+    {"criterion": "doctor's guidelines provenance check is unchanged: a rule still cites a defect or intervention ID.", "met": true, "evidence": "no doctor files in the diff"},
+    {"criterion": "runBriefClose stays within 100 lines (T5's gate keeps checking).", "met": true, "evidence": "close.go diff only removes lines from runBriefClose; go checks pass"},
+    {"criterion": "The earlier tests that change are only internal/cli/close_test.go, internal/cli/close_flags_test.go, cmd/vloop/b4_e2e_test.go, cmd/vloop/b14_e2e_test.go (the defect report going), internal/defect/defect_test.go (the retired setters) and the commands.md staleness test; a committed test asserts that rule and rule-outcome are refused and close prints no report.", "met": true, "evidence": "changed test files are close_test.go, b14_e2e_test.go, defect_test.go only; TestSetRefusesRetiredRuleFields, TestCloseNoDefectReport and TestWorkedExampleB14DefectReport assert refusal and no report"}
+  ],
+  "findings": [],
+  "notes": "docs/guide/defects.md and concepts.md still mention rule-outcome; not in this task's criteria, may be worth a later doc sweep."
+}

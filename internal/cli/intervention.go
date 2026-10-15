@@ -29,6 +29,9 @@ show and update one with vloop intervention set.`,
 	return cmd
 }
 
+// originList is the origins as the refusals print them: brief, plan, work or env.
+var originList = strings.Join(intervention.Origins[:3], ", ") + " or " + intervention.Origins[3]
+
 func newInterventionAdd(g *Globals) *cobra.Command {
 	var in intervention.NewInput
 	cmd := &cobra.Command{
@@ -47,6 +50,16 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 			}
 			for _, v := range []struct{ f, v string }{{"phase", in.Phase}, {"kind", in.Kind}, {"automatable", in.Automatable}, {"by", in.By}} {
 				if err := intervention.Validate(v.f, v.v); err != nil {
+					return err
+				}
+			}
+			switch {
+			case in.Kind == "verification-finding" && in.Origin == "":
+				return Usage(errors.New("--kind verification-finding needs --origin " + originList))
+			case in.Kind != "verification-finding" && in.Origin != "":
+				return Usage(errors.New("--origin is only for --kind verification-finding"))
+			case in.Origin != "":
+				if err := intervention.Validate("origin", in.Origin); err != nil {
 					return err
 				}
 			}
@@ -72,6 +85,7 @@ func newInterventionAdd(g *Globals) *cobra.Command {
 	f.StringVar(&in.Kind, "kind", "", "kind: "+strings.Join(intervention.Kinds, ", "))
 	f.StringVar(&in.Automatable, "automatable", "", "could a driver do it: "+strings.Join(intervention.Automatables, ", "))
 	f.StringVar(&in.By, "by", "", "who did it: "+strings.Join(intervention.Bys, ", "))
+	f.StringVar(&in.Origin, "origin", "", "whose defect a verification-finding is: "+strings.Join(intervention.Origins, ", "))
 	f.StringVar(&in.Brief, "brief", "", "the loop brief it belongs to (none: series-level)")
 	f.StringVar(&in.Trigger, "trigger", "", "what made it necessary")
 	f.StringVar(&in.Done, "done", "", "what was done")

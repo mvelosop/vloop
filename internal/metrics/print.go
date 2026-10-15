@@ -114,7 +114,7 @@ func PrintSummary(out io.Writer, r *Report) {
 	if r.Cost.Per1000Code != nil {
 		per1k = fmt.Sprintf("$%.2f", *r.Cost.Per1000Code)
 	}
-	fmt.Fprintf(out, " cost      $%.2f · plan %.2f · work %.2f · review %.2f%s · %s per 1,000 code lines\n",
+	fmt.Fprintf(out, " cost      $%.2f · plan %.2f · work %.2f · review %.2f%s · %s/kloc\n",
 		r.Cost.Total, r.Cost.Plan, r.Cost.Work, r.Cost.Review, grCost, per1k)
 	fmt.Fprintf(out, " models    plan %s · work %s · review %s%s\n",
 		joinModels(r.Models.Plan), joinModels(r.Models.Work), joinModels(r.Models.Review), grModels)
@@ -144,11 +144,11 @@ func PrintSummary(out io.Writer, r *Report) {
 
 func PrintByTask(out io.Writer, r *Report) {
 	w := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "id\tarea\tkind\tatt\tcode+\ttest+\tdocs+\tother+\tagent\tcost\tmodel")
+	fmt.Fprintln(w, "id\tarea\tkind\tatt\tcode+\ttest+\tdocs+\tother+\ttest:code\t$/kloc\tagent\tcost\tmodel")
 	for _, t := range r.ByTask {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t$%.2f\t%s\n", t.ID, dashPtr(t.Area), dashPtr(t.Kind), t.Attempts,
+		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t$%.2f\t%s\n", t.ID, dashPtr(t.Area), dashPtr(t.Kind), t.Attempts,
 			thousands(t.Churn.Code), thousands(t.Churn.Test), thousands(t.Churn.Docs), thousands(t.Churn.Other),
-			minSec(t.AgentMS), t.CostUSD, joinModels(t.Models))
+			dashFloat(t.TestCodeRatio), dashFloat(t.Per1000CodeUSD), minSec(t.AgentMS), t.CostUSD, joinModels(t.Models))
 	}
 	w.Flush()
 }
@@ -170,7 +170,7 @@ func printBriefTable(out io.Writer, repos []string, rs []*Report) {
 	if repos != nil {
 		head = "repo\t"
 	}
-	fmt.Fprintln(w, head+"brief\ttasks\tfirst-pass\tcode\ttest\tt:c\tagent\t$/1k\tin-loop\toperator\tescaped\tefficiency")
+	fmt.Fprintln(w, head+"brief\ttasks\tfirst-pass\tcode\ttest\ttest:code\tagent\t$/kloc\tin-loop\toperator\tescaped\tefficiency")
 	for i, r := range rs {
 		if repos != nil {
 			lead = repos[i] + "\t"
@@ -193,4 +193,12 @@ func dash(s string) string {
 		return "-"
 	}
 	return s
+}
+
+// dashFloat is f with two decimals, or - where it is nil.
+func dashFloat(f *float64) string {
+	if f == nil {
+		return "-"
+	}
+	return fmt.Sprintf("%.2f", *f)
 }

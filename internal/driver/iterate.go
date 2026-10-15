@@ -208,7 +208,8 @@ func (it *Iterator) Run() (Ending, error) {
 	it.blockedAt = map[string]blockedMark{}
 	end := Ending{Status: "halted", Code: ExitMaxIter}
 	for {
-		done, blocked, pending := counts(plan)
+		done, blocked := plan.Counts()
+		pending := len(plan.Tasks) - done - blocked
 		if pending == 0 {
 			if blocked > 0 {
 				end = Ending{Status: "blocked", Code: ExitBlocked}
@@ -267,7 +268,7 @@ func (it *Iterator) Run() (Ending, error) {
 		}
 		// An iteration that closed nothing and charged no attempt made no
 		// recorded progress at all.
-		if nd, _, _ := counts(plan); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected && res.outcome != OutCheckFailed {
+		if nd, _ := plan.Counts(); nd <= done && res.outcome != OutGateFailed && res.outcome != OutRejected && res.outcome != OutCheckFailed {
 			stalls++
 			it.warn("   no recorded progress (%d/%d)", stalls, it.Budgets.StallLimit)
 			if stalls >= it.Budgets.StallLimit {
@@ -299,20 +300,6 @@ func closedThisRun(p *state.Plan, doneAtStart map[string]bool) int {
 		}
 	}
 	return closed
-}
-
-func counts(p *state.Plan) (done, blocked, pending int) {
-	for _, t := range p.Tasks {
-		switch t.Status {
-		case "done":
-			done++
-		case "blocked":
-			blocked++
-		default:
-			pending++
-		}
-	}
-	return
 }
 
 // nextReady is the first pending task, in plan order, whose dependencies are
@@ -448,6 +435,15 @@ type iterResult struct {
 	repeat  string // set when the task blocked twice with nothing changed
 }
 
+// workReport is what a work session left, as the driver reads it: the
+// proposed outcome and the text that goes in the journal, or the reason the
+// session's work cannot be judged (a dispute or tampering with the plan).
+type workReport struct {
+	outcome, summary, notes string
+	files                   []string
+	dispute, tampered       string
+}
+
 func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterResult, error) {
 	root := it.Root
 	plan := it.plan
@@ -463,6 +459,155 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	}
 
 	// 1. work session
+	w, err := it.workSession(task, iter)
+	if err != nil {
+		return iterResult{}, err
+	}
+	outcome, summary := w.outcome, w.summary
+
+	// 2. gates: every done task, plus this one if it claims done or blocked
+	own, failed, err := it.runGates(iter, id, w.dispute == "" && (outcome == OutDone || outcome == OutBlocked))
+	if err != nil {
+		return iterResult{}, err
+	}
+
+	// 3. checks: only when every gate that ran passed
+	var checkRuns []checkRun
+	failedCheck := ""
+	if w.dispute == "" && w.tampered == "" && outcome == OutDone && len(failed) == 0 {
+		checkRuns, failedCheck, err = it.checksStep(id, iter)
+		if err != nil {
+			return iterResult{}, err
+		}
+	}
+
+	// 4. review
+	verdict := "skipped"
+	var findings []string
+	gatePassed := outcome == OutBlocked && w.dispute == "" && own != nil && own.exit == 0
+	switch {
+	case w.dispute != "":
+		it.warn("   GATE DISPUTE %s — blocked for the operator; no review, no attempt charged", id)
+	case w.tampered != "":
+		outcome = OutGateFailed
+		it.warn("   %s failed on a rewritten gate — the work is reverted whatever the gate said", id)
+	case outcome == OutBlocked:
+		it.say("   work session reported blocked")
+		if gatePassed {
+			it.warn("   %s", gatePassesLine(id))
+			it.gatePasses = append(it.gatePasses, id)
+		}
+	case failed[id]:
+		outcome = OutGateFailed
+		it.warn("   GATE FAIL %s — review skipped, work that fails its own gate is not reviewable", id)
+	case failedCheck != "":
+		outcome = OutCheckFailed
+		it.warn("   CHECK FAIL %s — %s; review skipped", id, failedCheck)
+	default:
+		outcome, verdict, findings, err = it.reviewSession(task, iter, outcome, checkRuns)
+		if err != nil {
+			return iterResult{}, err
+		}
+	}
+
+	// 5. apply: the driver makes every status transition
+	attempt := task.Attempts + 1
+	switch {
+	case w.dispute != "":
+		outcome = OutBlocked
+		task.Status, task.Notes = "blocked", w.dispute
+		it.say("   %s blocked — the operator resolves the disputed gate with vloop task verify", id)
+	default:
+		it.applyOutcome(task, outcome, summary, findings, w.tampered, gatePassed, failedCheck)
+	}
+	repeat := it.repeatBlocked(id, outcome, summary)
+	it.blockAtCeiling(task)
+	plan.Iteration = iter
+	if err := it.save(); err != nil {
+		return iterResult{}, err
+	}
+
+	// 6. record
+	rec := map[string]any{
+		"schema": "iteration/v2", "run_id": plan.RunID, "iteration": iter, "task": id, "attempt": attempt,
+		"outcome": outcome, "gate": gateRecord(own), "checks": checksRecord(checkRuns),
+		"started": started.Format(time.RFC3339), "ended": it.now().UTC().Format(time.RFC3339),
+	}
+	if err := it.record(rec, task, iter, outcome, verdict, w); err != nil {
+		return iterResult{}, err
+	}
+
+	// 7. commit: one per iteration
+	if err := it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome)); err != nil {
+		return iterResult{outcome: outcome, repeat: repeat}, err
+	}
+	it.snapshot()
+	return iterResult{outcome: outcome, repeat: repeat}, nil
+}
+
+// checksStep runs the checks that match what the task changed. It returns the
+// runs and a description of the first failing one, or "".
+func (it *Iterator) checksStep(id string, iter int) ([]checkRun, string, error) {
+	runs, err := it.runChecks(checksFor(it.plan.Checks, changedPaths(it.Root, id)), "", iter)
+	if err != nil {
+		return nil, "", err
+	}
+	failed := ""
+	for _, c := range runs {
+		if c.exit != 0 {
+			failed = fmt.Sprintf("check %s failed — see %s", c.name, c.log)
+		}
+	}
+	return runs, failed, nil
+}
+
+// blockAtCeiling blocks every pending task that has used its attempts, saying
+// so for the task just iterated.
+func (it *Iterator) blockAtCeiling(task *state.Task) {
+	if task.Status != "pending" || task.Attempts < it.Budgets.MaxAttempts {
+		return
+	}
+	for i := range it.plan.Tasks {
+		if t := &it.plan.Tasks[i]; t.Status == "pending" && t.Attempts >= it.Budgets.MaxAttempts {
+			t.Status = "blocked"
+		}
+	}
+	it.warn("   %s hit the attempt ceiling — blocked", task.ID)
+}
+
+// gateRecord is the iteration record's view of the task's own gate run, nil
+// when it did not run.
+func gateRecord(own *gateResult) map[string]any {
+	if own == nil {
+		return nil
+	}
+	g := map[string]any{"exit": own.exit, "duration_ms": own.ms}
+	if own.flaky {
+		g["flaky"] = true
+	}
+	return g
+}
+
+// record writes the iteration's record, copies the session reports, and
+// appends the journal entry and the rendered plan.
+func (it *Iterator) record(rec map[string]any, task *state.Task, iter int, outcome, verdict string, w workReport) error {
+	if err := it.appendIteration(rec); err != nil {
+		return err
+	}
+	it.copyReport("proposal.json", fmt.Sprintf("%03d-proposal.json", iter))
+	it.copyReport("verdict.json", fmt.Sprintf("%03d-verdict.json", iter))
+	if err := it.appendJournal(task, outcome, verdict, w.summary, w.notes, w.files); err != nil {
+		return err
+	}
+	return it.render()
+}
+
+// workSession runs the task's work session, restores what it changed among
+// the driver's inputs and reads its proposal. A session that could not run, or
+// timed out, is errSessionError and charges no attempt.
+func (it *Iterator) workSession(task *state.Task, iter int) (workReport, error) {
+	root := it.Root
+	id := task.ID
 	model, effort := it.resolved.For(task, PhaseWork)
 	before := refsState(root)
 	guard := snapshotState(root)
@@ -475,41 +620,39 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		it.sessionDone(Spec{Phase: PhaseWork, Arg: id}, wres)
 	}
 	if err != nil {
-		return iterResult{}, err
+		return workReport{}, err
 	}
 	if _, err := it.restoreInputs(inputs, PhaseWork, wres.Path); err != nil {
-		return iterResult{}, err
+		return workReport{}, err
 	}
 	if err := it.gitChanged(gguard, PhaseWork); err != nil {
-		return iterResult{}, err
+		return workReport{}, err
 	}
 	if err := it.gitRefsMoved(before, id, PhaseWork); err != nil {
-		return iterResult{}, err
+		return workReport{}, err
 	}
 
-	outcome, summary, notes := OutBlocked, "", "none"
-	var proposalFiles []string
-	var dispute string
+	w := workReport{outcome: OutBlocked, notes: "none"}
 	data, ok := it.readReport("proposal.json", "proposal/v1")
 	if wres.TimedOut {
 		it.warn("   the work session for %s timed out after %s", id, it.sessionTimeout())
-		return iterResult{}, errSessionError
+		return workReport{}, errSessionError
 	}
 	if !ok && (wres.ExitCode != 0 || wres.IsError) {
 		// An infrastructure failure, not the task's: no attempt is charged.
-		return iterResult{}, errSessionError
+		return workReport{}, errSessionError
 	}
 	if !ok {
 		it.warn("work session left no valid proposal")
 		changed := it.sessionTreeChanges()
 		if len(changed) > 0 {
-			summary = fmt.Sprintf("work session left no valid proposal; before dying it changed %s — the driver committed them under this iteration", strings.Join(changed, ", "))
+			w.summary = fmt.Sprintf("work session left no valid proposal; before dying it changed %s — the driver committed them under this iteration", strings.Join(changed, ", "))
 		} else {
-			summary = "work session left no valid proposal; the working tree is unchanged"
+			w.summary = "work session left no valid proposal; the working tree is unchanged"
 		}
-		summary = it.r.Mask(summary)
+		w.summary = it.r.Mask(w.summary)
 		if len(changed) > 0 {
-			it.noProposal = append(it.noProposal, id+" — "+summary)
+			it.noProposal = append(it.noProposal, id+" — "+w.summary)
 		}
 	} else {
 		var p struct {
@@ -523,28 +666,33 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 			} `json:"gate_dispute"`
 		}
 		_ = json.Unmarshal(data, &p)
-		outcome, summary, notes, proposalFiles = p.Outcome, it.r.Mask(p.Summary), it.r.Mask(p.Notes), p.Files
+		w.outcome, w.summary, w.notes, w.files = p.Outcome, it.r.Mask(p.Summary), it.r.Mask(p.Notes), p.Files
 		if p.Dispute != nil {
-			dispute = it.r.Mask(fmt.Sprintf("gate disputed: %s — %s", p.Dispute.Reason, p.Dispute.Evidence))
+			w.dispute = it.r.Mask(fmt.Sprintf("gate disputed: %s — %s", p.Dispute.Reason, p.Dispute.Evidence))
 		}
 	}
 
 	// A session does not touch the plan. Restored from HEAD before any gate
 	// runs, and the work is not reviewable.
-	tampered := ""
 	if touched := guard.restoreTouched(); len(touched) > 0 {
-		tampered = it.r.Mask(tamperNote(PhaseWork))
+		w.tampered = it.r.Mask(tamperNote(PhaseWork))
 		it.warn("   STATE TAMPERING %s — %s was modified; restored, iteration failed", id, strings.Join(touched, ", "))
 	}
+	return w, nil
+}
 
-	// 2. gates: every done task, plus this one if it claims done or blocked
+// runGates runs the gate of every done task, plus the task's own when
+// withOwn, and reverts to pending any other task whose gate now fails. It
+// returns the task's own result (nil when not run) and the ids that failed.
+func (it *Iterator) runGates(iter int, id string, withOwn bool) (*gateResult, map[string]bool, error) {
+	plan := it.plan
 	targets := []string{}
 	for _, t := range plan.Tasks {
 		if t.Status == "done" {
 			targets = append(targets, t.ID)
 		}
 	}
-	if dispute == "" && (outcome == OutDone || outcome == OutBlocked) {
+	if withOwn {
 		targets = append(targets, id)
 	}
 	var own *gateResult
@@ -552,7 +700,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	for _, gid := range targets {
 		g, err := it.runGateRetry(iter, id, gid)
 		if err != nil {
-			return iterResult{}, err
+			return nil, nil, err
 		}
 		if gid == id {
 			own = g
@@ -570,179 +718,93 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		t.Status, t.Attempts = "pending", t.Attempts+1
 		t.Notes = fmt.Sprintf("regressed: verify failed during %s — see %s", id, it.relGate(gid))
 	}
+	return own, failed, nil
+}
 
-	// 3. checks: only when every gate that ran passed
-	var checkRuns []checkRun
-	failedCheck := ""
-	if dispute == "" && tampered == "" && outcome == OutDone && len(failed) == 0 {
-		var err error
-		checkRuns, err = it.runChecks(checksFor(plan.Checks, changedPaths(root, id)), "", iter)
-		if err != nil {
-			return iterResult{}, err
-		}
-		for _, c := range checkRuns {
-			if c.exit != 0 {
-				failedCheck = fmt.Sprintf("check %s failed — see %s", c.name, c.log)
-			}
-		}
-	}
-
-	// 4. review
+// reviewSession runs the review of a task whose gates and checks passed and
+// returns the outcome it leads to, the verdict and the findings.
+func (it *Iterator) reviewSession(task *state.Task, iter int, outcome string, checkRuns []checkRun) (string, string, []string, error) {
+	root := it.Root
+	id := task.ID
 	verdict := "skipped"
 	var findings []string
-	gatePassed := outcome == OutBlocked && dispute == "" && own != nil && own.exit == 0
-	switch {
-	case dispute != "":
-		it.warn("   GATE DISPUTE %s — blocked for the operator; no review, no attempt charged", id)
-	case tampered != "":
-		outcome = OutGateFailed
-		it.warn("   %s failed on a rewritten gate — the work is reverted whatever the gate said", id)
-	case outcome == OutBlocked:
-		it.say("   work session reported blocked")
-		if gatePassed {
-			it.warn("   %s", gatePassesLine(id))
-			it.gatePasses = append(it.gatePasses, id)
-		}
-	case failed[id]:
-		outcome = OutGateFailed
-		it.warn("   GATE FAIL %s — review skipped, work that fails its own gate is not reviewable", id)
-	case failedCheck != "":
-		outcome = OutCheckFailed
-		it.warn("   CHECK FAIL %s — %s; review skipped", id, failedCheck)
-	default:
-		if err := it.writeChecksFile(checkRuns); err != nil {
-			return iterResult{}, err
-		}
-		model, effort := it.resolved.For(task, PhaseReview)
-		before := refsState(root)
-		guard := snapshotState(root)
-		gguard := snapshotGit(root)
-		inputs := snapshotInputs(root, it.RunDir)
-		tree := snapshotTree(root)
-		_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-		rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
-		it.spent += rres.Cost
-		if err == nil {
-			it.sessionDone(Spec{Phase: PhaseReview, Arg: id}, rres)
-		}
-		if err != nil {
-			return iterResult{}, err
-		}
-		inputsChanged, err := it.restoreInputs(inputs, PhaseReview, rres.Path)
-		if err != nil {
-			return iterResult{}, err
-		}
-		if err := it.gitChanged(gguard, PhaseReview); err != nil {
-			return iterResult{}, err
-		}
-		if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
-			return iterResult{}, err
-		}
-		treeChanged, treeFailed := tree.revert()
-		if len(treeFailed) > 0 {
-			return iterResult{}, halt(ExitPreflight, "the review session changed files the driver could not revert: %s", strings.Join(treeFailed, "; "))
-		}
-		for _, p := range treeChanged {
-			it.warn("vloop: the review session changed %s — reverted", p)
-		}
-		reviewTouched := guard.restoreTouched()
-		reviewTampered := len(reviewTouched) > 0
-		if reviewTampered {
-			it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, strings.Join(reviewTouched, ", "))
-		}
-		if rres.TimedOut {
-			it.warn("   the review session for %s timed out after %s", id, it.sessionTimeout())
-			return iterResult{}, errSessionError
-		}
-		if data, ok := it.readReport("verdict.json", "verdict/v1"); !ok {
-			it.warn("   review session left no valid verdict — treating as FAIL")
-			verdict = "FAIL"
-		} else {
-			var v struct {
-				Verdict  string `json:"verdict"`
-				Findings []struct {
-					Summary string `json:"summary"`
-				} `json:"findings"`
-			}
-			_ = json.Unmarshal(data, &v)
-			verdict = v.Verdict
-			for _, f := range v.Findings {
-				findings = append(findings, f.Summary)
-			}
-		}
-		if verdict != "PASS" {
-			outcome = OutRejected
-		}
-		if reviewTampered {
-			outcome, verdict = OutRejected, "FAIL"
-			findings = append(findings, it.r.Mask(tamperNote(PhaseReview)))
-		}
-		if inputsChanged {
-			outcome, verdict = OutRejected, "FAIL"
-			findings = append(findings, "review session changed the driver's inputs — restored by the driver; a review judges the work and changes nothing else")
-		}
-		if len(treeChanged) > 0 {
-			outcome, verdict = OutRejected, "FAIL"
-			findings = append(findings, "the review session changed files")
-		}
-		it.say("   review: %s", verdict)
+	if err := it.writeChecksFile(checkRuns); err != nil {
+		return outcome, verdict, nil, err
 	}
-
-	// 5. apply: the driver makes every status transition
-	attempt := task.Attempts + 1
-	switch {
-	case dispute != "":
-		outcome = OutBlocked
-		task.Status, task.Notes = "blocked", dispute
-		it.say("   %s blocked — the operator resolves the disputed gate with vloop task verify", id)
-	default:
-		it.applyOutcome(task, outcome, summary, findings, tampered, gatePassed, failedCheck)
+	model, effort := it.resolved.For(task, PhaseReview)
+	before := refsState(root)
+	guard := snapshotState(root)
+	gguard := snapshotGit(root)
+	inputs := snapshotInputs(root, it.RunDir)
+	tree := snapshotTree(root)
+	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
+	rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
+	it.spent += rres.Cost
+	if err == nil {
+		it.sessionDone(Spec{Phase: PhaseReview, Arg: id}, rres)
 	}
-	repeat := it.repeatBlocked(id, outcome, summary)
-	if task.Status == "pending" && task.Attempts >= it.Budgets.MaxAttempts {
-		for i := range plan.Tasks {
-			if t := &plan.Tasks[i]; t.Status == "pending" && t.Attempts >= it.Budgets.MaxAttempts {
-				t.Status = "blocked"
-			}
+	if err != nil {
+		return outcome, verdict, nil, err
+	}
+	inputsChanged, err := it.restoreInputs(inputs, PhaseReview, rres.Path)
+	if err != nil {
+		return outcome, verdict, nil, err
+	}
+	if err := it.gitChanged(gguard, PhaseReview); err != nil {
+		return outcome, verdict, nil, err
+	}
+	if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
+		return outcome, verdict, nil, err
+	}
+	treeChanged, treeFailed := tree.revert()
+	if len(treeFailed) > 0 {
+		return outcome, verdict, nil, halt(ExitPreflight, "the review session changed files the driver could not revert: %s", strings.Join(treeFailed, "; "))
+	}
+	for _, p := range treeChanged {
+		it.warn("vloop: the review session changed %s — reverted", p)
+	}
+	reviewTouched := guard.restoreTouched()
+	reviewTampered := len(reviewTouched) > 0
+	if reviewTampered {
+		it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, strings.Join(reviewTouched, ", "))
+	}
+	if rres.TimedOut {
+		it.warn("   the review session for %s timed out after %s", id, it.sessionTimeout())
+		return outcome, verdict, nil, errSessionError
+	}
+	if data, ok := it.readReport("verdict.json", "verdict/v1"); !ok {
+		it.warn("   review session left no valid verdict — treating as FAIL")
+		verdict = "FAIL"
+	} else {
+		var v struct {
+			Verdict  string `json:"verdict"`
+			Findings []struct {
+				Summary string `json:"summary"`
+			} `json:"findings"`
 		}
-		it.warn("   %s hit the attempt ceiling — blocked", id)
-	}
-	plan.Iteration = iter
-	if err := it.save(); err != nil {
-		return iterResult{}, err
-	}
-
-	// 6. record
-	rec := map[string]any{
-		"schema": "iteration/v2", "run_id": plan.RunID, "iteration": iter, "task": id, "attempt": attempt,
-		"outcome": outcome, "gate": nil, "checks": checksRecord(checkRuns),
-		"started": started.Format(time.RFC3339), "ended": it.now().UTC().Format(time.RFC3339),
-	}
-	if own != nil {
-		g := map[string]any{"exit": own.exit, "duration_ms": own.ms}
-		if own.flaky {
-			g["flaky"] = true
+		_ = json.Unmarshal(data, &v)
+		verdict = v.Verdict
+		for _, f := range v.Findings {
+			findings = append(findings, f.Summary)
 		}
-		rec["gate"] = g
 	}
-	if err := it.appendIteration(rec); err != nil {
-		return iterResult{}, err
+	if verdict != "PASS" {
+		outcome = OutRejected
 	}
-	it.copyReport("proposal.json", fmt.Sprintf("%03d-proposal.json", iter))
-	it.copyReport("verdict.json", fmt.Sprintf("%03d-verdict.json", iter))
-	if err := it.appendJournal(task, outcome, verdict, summary, notes, proposalFiles); err != nil {
-		return iterResult{}, err
+	if reviewTampered {
+		outcome, verdict = OutRejected, "FAIL"
+		findings = append(findings, it.r.Mask(tamperNote(PhaseReview)))
 	}
-	if err := it.render(); err != nil {
-		return iterResult{}, err
+	if inputsChanged {
+		outcome, verdict = OutRejected, "FAIL"
+		findings = append(findings, "review session changed the driver's inputs — restored by the driver; a review judges the work and changes nothing else")
 	}
-
-	// 7. commit: one per iteration
-	if err := it.commit(fmt.Sprintf("[vloop] %s: %s", id, outcome)); err != nil {
-		return iterResult{outcome: outcome, repeat: repeat}, err
+	if len(treeChanged) > 0 {
+		outcome, verdict = OutRejected, "FAIL"
+		findings = append(findings, "the review session changed files")
 	}
-	it.snapshot()
-	return iterResult{outcome: outcome, repeat: repeat}, nil
+	it.say("   review: %s", verdict)
+	return outcome, verdict, findings, nil
 }
 
 // repeatBlocked notes where a task ended blocked and says so when it is the
@@ -840,13 +902,7 @@ func (it *Iterator) runGate(iter int, active, id string) (*gateResult, error) {
 	if base == nil {
 		base = os.Environ()
 	}
-	var env []string
-	for _, kv := range base {
-		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") {
-			continue
-		}
-		env = append(env, kv)
-	}
+	env := dropEnv(base, "VLOOP_ACTIVE_TASK", "VLOOP_GATE_TASK")
 	env = append(env, "VLOOP_ACTIVE_TASK="+active, "VLOOP_GATE_TASK="+id)
 	cmd, err := state.GateCommand(it.Root, it.plan.Shell, t.Verify, env)
 	if err != nil {
@@ -1051,7 +1107,7 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 	if err := it.save(); err != nil {
 		return err
 	}
-	done, blocked, _ := counts(plan)
+	done, blocked := plan.Counts()
 	it.say("")
 	it.say("═══ %s ═══", end.Status)
 	it.say("run:    %s/%s  (%d iteration(s) this run)", plan.RunID, filepath.Base(it.RunDir), runIters)

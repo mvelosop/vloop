@@ -38,8 +38,14 @@ recomputed on every call, so a later correction needs no migration:
   defect and charges no attempt;
 - a `blocked` outcome is not a defect by itself.
 
-**Recorded** defects are the ones the loop could not see, one file each, written
-by `vloop defect add`.
+**Recorded** defects are escapes: what the loop let through and was found after
+the brief merged, one file each, written by `vloop defect add` with `--blame`
+to attribute the line to its brief. `defect add` refuses a brief that is not
+merged (exit 1). What you find before the merge is not a defect but an
+intervention: `vloop intervention add "<summary>" --brief <name> --kind
+verification-finding --origin <brief|plan|work|env> --phase verify
+--automatable partly --by operator`, or `vloop brief close --finding
+"<origin>: <summary>"`. The operator count includes both.
 
 ### The gate as a defect
 
@@ -50,8 +56,8 @@ was wrong, not the work. A failure whose time is unknown is never reclassified.
 
 ## The `.vloop/defects/` files
 
-`.vloop/defects/D<YYYYMMDD-HHMM>-<slug>.md` (local time; `-2`, `-3`… on
-collision): YAML frontmatter, then the description.
+`.vloop/defects/D<YYYYMMDD-HHMMSS>-<slug>.md` (local time; the stamp moves on
+one second when taken; older IDs, with minutes only, stay): YAML frontmatter, then the description.
 
 ```
 ---
@@ -85,12 +91,9 @@ field:
 - `fixed-by`: the loop brief that fixed it, empty until then.
 - `case`: the failing test written first, empty until then.
 - `created`: an RFC 3339 date-time.
-- `rule` (optional): the rule that caught the defect, or should have, as
-  `<where>: <which>`; `<where>` is `guideline`, `brief-check`, `gate`,
-  `gate-review`, `review` or `skill`.
-- `rule-outcome` (optional): `fired` (the rule caught it), `missed` (it existed
-  and did not), `absent` (none existed; one should) or `none` (none is
-  warranted; the body says why).
+- `rule` and `rule-outcome` (optional): retired in B15; old records keep them
+  (the outcome was `fired`, `missed`, `absent` or `none`) and stay valid, and
+  `defect set` no longer accepts them.
 
 ## Commands
 
@@ -106,9 +109,8 @@ brief, or a `--task` not in its plan, is exit 1; an invalid value is exit 2.
 sorted by id.
 
 `vloop defect set <id> <field> <value>` changes `status`, `fixed-by`, `case`,
-`severity`, `origin`, `kind`, `task`, `rule` or `rule-outcome`, validated as
-`add` validates; a `rule` whose `<where>` is not listed, or any other
-`rule-outcome`, is exit 2 and leaves the file untouched.
+`severity`, `origin`, `kind` or `task`, validated as `add` validates; any
+other field is exit 2 and leaves the file untouched.
 
 ### Attribution with `--blame`
 
@@ -138,7 +140,8 @@ env       0       0         0     0
 Without `--brief` it covers every brief that has runs, plus all recorded defects.
 
 The counts roll up as **in-loop** (found by `gate` or `review`), **operator** and
-**escaped** (found by `user`). **Removal efficiency** = (in-loop + operator) /
+**escaped** (recorded after its brief's release commit, whatever its
+`found-by`, or found by `user`). **Removal efficiency** = (in-loop + operator) /
 all defects, shown as a whole percentage, or `n/a` with no defects. It is the
 share of defects removed before users saw them. In `vloop metrics --json` these
 are `defects.in_loop`, `operator`, `escaped`, `total` and `removal_efficiency`
@@ -150,7 +153,7 @@ An intervention is what the operator (or the assistant as their hands) did aroun
 a run besides testing it: a decision, a halt handled, a repair. Recording them
 shows what a driver could one day do itself, and, where the assistant proposed
 options, how often the operator took its recommendation. One file each:
-`.vloop/interventions/I<YYYYMMDD-HHMM>-<slug>.md`, YAML frontmatter, then the
+`.vloop/interventions/I<YYYYMMDD-HHMMSS>-<slug>.md`, YAML frontmatter, then the
 summary line and the sections **Trigger.**, **Done.** and **What would automate
 it.**, plus, in a v2 record, **Context.**, **Options.**, **Recommended.**,
 **Suggested.** and **Decided.**

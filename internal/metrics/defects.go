@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/mvelosop/vloop/internal/defect"
+	"github.com/mvelosop/vloop/internal/intervention"
 	"github.com/mvelosop/vloop/internal/runs"
 )
 
@@ -149,6 +150,48 @@ type DefectCounts struct {
 	Escaped  int // found by user
 }
 
+// Reclassify moves a recorded defect created after its brief's release to
+// escaped, whoever found it (M-5); one created at or before the release, or of
+// an unmerged brief (zero released), keeps its found-by group. The matrix, by
+// catcher, is not touched.
+func (c *DefectCounts) Reclassify(recorded []defect.Defect, released time.Time) {
+	if released.IsZero() {
+		return
+	}
+	for _, d := range recorded {
+		at, err := time.Parse(time.RFC3339, d.Created)
+		if err != nil || !at.After(released) {
+			continue
+		}
+		switch d.FoundBy {
+		case "gate", "review":
+			c.InLoop--
+		case "operator":
+			c.Operator--
+		default:
+			continue
+		}
+		c.Escaped++
+	}
+}
+
+// IsFinding is whether an intervention is an operator's verification finding
+// that says whose defect it is; only those count as operator-caught defects.
+func IsFinding(v intervention.Intervention) bool {
+	return v.Kind == "verification-finding" && v.Origin != ""
+}
+
+// AddFindings counts the verification findings of a brief's interventions as
+// caught by the operator. They are separate records from the defects, so
+// nothing is counted twice.
+func (c *DefectCounts) AddFindings(ivs []intervention.Intervention) {
+	for _, v := range ivs {
+		if IsFinding(v) {
+			c.Operator++
+		}
+	}
+}
+
 // Counts groups the matrix by catcher.
 func (x Matrix) Counts() DefectCounts {
 	var c DefectCounts
@@ -202,7 +245,7 @@ func DeriveBrief(root, brief string) ([]Derived, error) {
 	}
 	var plan *runs.PlanDoc
 	if o := m.Owned; o != nil {
-		if plan, err = runs.PlanAt(root, o.Layout, planSHA(o)); err != nil {
+		if plan, err = runs.PlanAt(root, o.Layout, o.PlanSHA()); err != nil {
 			return nil, err
 		}
 	}
@@ -219,5 +262,5 @@ func PlanOf(root, brief string) (*runs.PlanDoc, error) {
 	if m.Owned == nil {
 		return nil, nil
 	}
-	return runs.PlanAt(root, m.Owned.Layout, planSHA(m.Owned))
+	return runs.PlanAt(root, m.Owned.Layout, m.Owned.PlanSHA())
 }

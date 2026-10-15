@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T14",
+  "outcome": "done",
+  "summary": "The worked example is committed as cmd/vloop/b20261014_e2e_test.go; the operator's real-data check is in the task notes. No fixes were needed.",
+  "files": ["cmd/vloop/b20261014_e2e_test.go"],
+  "verified": "vloop task gate T14 exited 0 and printed gate T14: ok.",
+  "notes": "Work already existed on disk from the operator's hand-done T14 (commit ae656d8); this session only re-ran the gate. Real-data figures are in the task's notes field."
+}

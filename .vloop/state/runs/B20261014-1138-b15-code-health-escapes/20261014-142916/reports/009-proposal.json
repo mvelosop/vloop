@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "gitcfg.Normalize lower-cases a pattern's text before the first and after the last dot, keeping a subsection; Match and Protected apply it, so Core.* is refused like core.* and Branch.Main.Foo-Bar matches only branch.Main.foo-bar.",
+  "files": ["internal/gitcfg/gitcfg.go", "internal/gitcfg/gitcfg_test.go", "internal/config/config_test.go"],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: pass; go test ./internal/gitcfg ./internal/config ./internal/driver ok.",
+  "notes": "Existing TestMatch case {Branch.*, branch.x, false} asserted the defect itself (literal comparison); flipped to true and added {Branch.X.*, branch.x.y, false}, as the acceptance requires. All callers (config validation, guard, startup refusal) go through Match/Protected, so normalization lives only in gitcfg."
+}

@@ -51,13 +51,7 @@ type checkResult struct {
 // the gate timeout, and returns its output. A check that moves a ref or changes
 // .git/config or the hooks is a *Halt with exit 9, as a gate is.
 func runCheck(root, shell string, c state.PlanCheck, timeout time.Duration) (*checkResult, error) {
-	var env []string
-	for _, kv := range os.Environ() {
-		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") {
-			continue
-		}
-		env = append(env, kv)
-	}
+	env := dropEnv(os.Environ(), "VLOOP_ACTIVE_TASK", "VLOOP_GATE_TASK")
 	cmd, err := state.GateCommand(root, shell, c.Run, env)
 	if err != nil {
 		return nil, halt(ExitPreflight, "%v", err)

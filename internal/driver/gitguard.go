@@ -13,6 +13,7 @@ import (
 
 	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/gitcfg"
+	"github.com/mvelosop/vloop/internal/gitrun"
 )
 
 // noHooksDir is the empty directory every driver git command points
@@ -23,14 +24,7 @@ const noHooksDir = tmpDir + "/nohooks"
 // unquoted. The hooks directory is recreated empty each time, because it lives
 // where a session can write.
 func gitCmd(root string, args ...string) *exec.Cmd {
-	dir := filepath.Join(root, filepath.FromSlash(noHooksDir))
-	_ = os.RemoveAll(dir)
-	_ = os.MkdirAll(dir, 0o755)
-	full := append([]string{"-C", root,
-		"-c", "core.hooksPath=" + dir,
-		"-c", "core.fsmonitor=false",
-		"-c", "core.quotepath=false"}, args...)
-	return exec.Command("git", full...)
+	return gitrun.Hardened(root, filepath.Join(root, filepath.FromSlash(noHooksDir)), args...)
 }
 
 // gitGuard is the state of .git/config and of the hooks directory git names,
@@ -101,7 +95,7 @@ func configEntries(path string, ignore []string) map[string][]string {
 	if err != nil {
 		return out
 	}
-	list, err := exec.Command("git", "config", "--file", path, "--no-includes", "--list", "-z").Output()
+	list, err := gitrun.Plain("config", "--file", path, "--no-includes", "--list", "-z").Output()
 	if err != nil {
 		sum := sha256.Sum256(raw)
 		out[unparsedKey] = []string{hex.EncodeToString(sum[:])}
@@ -143,7 +137,7 @@ func diffEntries(before, after map[string][]string) []string {
 // gitPath is where git keeps the named file or directory; plain git, since the
 // driver's own overrides would answer for the hooks.
 func gitPath(root, name string) string {
-	out, err := exec.Command("git", "-C", root, "rev-parse", "--git-path", name).Output()
+	out, err := gitrun.At(root, "rev-parse", "--git-path", name).Output()
 	if err != nil {
 		return ""
 	}

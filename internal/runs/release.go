@@ -2,10 +2,10 @@ package runs
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/mvelosop/vloop/internal/frontmatter"
+	"github.com/mvelosop/vloop/internal/gitrun"
 )
 
 // DefaultBranch resolves the branch a release lands on: origin/HEAD's target,
@@ -26,7 +26,7 @@ func DefaultBranch(root string) (string, error) {
 }
 
 func refExists(root, ref string) bool {
-	return exec.Command("git", "-C", root, "rev-parse", "--verify", "--quiet", ref+"^{commit}").Run() == nil
+	return gitrun.At(root, "rev-parse", "--verify", "--quiet", ref+"^{commit}").Run() == nil
 }
 
 // StatusAt reports the `status` in the frontmatter of the file at path as

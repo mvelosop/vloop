@@ -1,0 +1,91 @@
+── iteration 4 (1 this run) · T1 · 0/14 done ──
+   Make cmd/vloop's TestMain fail cleanly when the binary does not build
+   work T1 · 0m15s · $0.09 · run $0.09 / $40.00
+   check go
+   review T1 · 0m15s · $0.08 · run $0.17 / $40.00
+   review: PASS
+   T1 done
+── iteration 5 (2 this run) · T2 · 1/14 done ──
+   Run every git command through one package
+   work T2 · 5m16s · $0.29 · run $0.46 / $40.00
+   check go
+   review T2 · 0m17s · $0.11 · run $0.58 / $40.00
+   review: PASS
+   T2 done
+── iteration 6 (3 this run) · T3 · 2/14 done ──
+   Filter the environment for gates, checks and sessions with one function
+   work T3 · 0m33s · $0.12 · run $0.69 / $40.00
+   check go
+   review T3 · 0m15s · $0.08 · run $0.78 / $40.00
+   review: PASS
+   T3 done
+── iteration 7 (4 this run) · T4 · 3/14 done ──
+   One plan-at-the-last-commit function, one task count, one table of budget keys
+   work T4 · 4m02s · $0.23 · run $1.01 / $40.00
+   check go
+   review T4 · 0m19s · $0.12 · run $1.13 / $40.00
+   review: PASS
+   T4 done
+── iteration 8 (5 this run) · T5 · 4/14 done ──
+   Split the five long functions to at most 100 lines each
+   work T5 · 7m07s · $0.76 · run $1.89 / $40.00
+   check go
+   review T5 · 0m18s · $0.16 · run $2.05 / $40.00
+   review: PASS
+   T5 done
+── iteration 9 (6 this run) · T6 · 5/14 done ──
+   Compare run.git-config-ignore patterns as git reports keys
+   work T6 · 0m47s · $0.15 · run $2.20 / $40.00
+   check go
+   review T6 · 0m18s · $0.09 · run $2.29 / $40.00
+   review: PASS
+   T6 done
+── iteration 10 (7 this run) · T7 · 6/14 done ──
+   Give new defects and interventions second-stamped IDs that never collide
+   work T7 · 2m01s · $0.26 · run $2.54 / $40.00
+   check go
+   CHECK FAIL T7 — check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-142916/checks/010-go.fail.log; review skipped
+── iteration 11 (8 this run) · T7 · 6/14 done ──
+   Give new defects and interventions second-stamped IDs that never collide
+   work T7 · 2m52s · $0.16 · run $2.70 / $40.00
+   check go
+   CHECK FAIL T7 — check go failed — see .vloop/state/runs/B20261014-1138-b15-code-health-escapes/20261014-142916/checks/011-go.fail.log; review skipped
+── iteration 12 (9 this run) · T7 · 6/14 done ──
+   Give new defects and interventions second-stamped IDs that never collide
+   work T7 · 3m13s · $0.15 · run $2.85 / $40.00
+   check go
+   review T7 · 0m24s · $0.13 · run $2.98 / $40.00
+   review: PASS
+   T7 done
+── iteration 13 (10 this run) · T8 · 7/14 done ──
+   Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
+   work T8 · 4m16s · $0.23 · run $3.21 / $40.00
+   check go
+   review T8 · 0m21s · $0.11 · run $3.32 / $40.00
+   review: FAIL
+── iteration 14 (11 this run) · T8 · 7/14 done ──
+   Show test:code and $/kloc per task, and name the cost per 1,000 code lines $/kloc everywhere
+   work T8 · 0m43s · $0.23 · run $3.55 / $40.00
+   check go
+   review T8 · 0m17s · $0.11 · run $3.66 / $40.00
+   review: PASS
+   T8 done
+── iteration 15 (12 this run) · T9 · 8/14 done ──
+   Refuse vloop defect add for a brief that is not merged
+   work T9 · 12m18s · $0.43 · run $4.09 / $40.00
+   check go
+   review T9 · 0m17s · $0.11 · run $4.21 / $40.00
+   review: PASS
+   T9 done
+── iteration 16 (13 this run) · T10 · 9/14 done ──
+   Count a recorded defect as escaped when it was created after its brief merged
+   work T10 · 1m28s · $0.26 · run $4.46 / $40.00
+   GATE DISPUTE T10 — blocked for the operator; no review, no attempt charged
+   T10 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+4 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261014-1138-b15-code-health-escapes/20261014-142916  (13 iteration(s) this run)
+plan:   9/14 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

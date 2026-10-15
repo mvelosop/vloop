@@ -262,6 +262,22 @@ func tamperNote(phase string) string {
 // the driver holds, so that `vloop task gate` runs only that plan.
 const PlanHashEnv = "VLOOP_PLAN_SHA256"
 
+// dropEnv returns env without the variables called by names, matching NAME=
+// exactly so that a longer name sharing the prefix is kept. Order is kept.
+func dropEnv(env []string, names ...string) []string {
+	var out []string
+next:
+	for _, kv := range env {
+		for _, n := range names {
+			if strings.HasPrefix(kv, n+"=") {
+				continue next
+			}
+		}
+		out = append(out, kv)
+	}
+	return out
+}
+
 // GateRefusedFile is where `vloop task gate` notes, for the driver, that it
 // refused a plan other than the one the driver holds.
 const GateRefusedFile = tmpDir + "/gate-refused"

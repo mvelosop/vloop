@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T13",
+  "outcome": "done",
+  "summary": "Docs, domain model and both operate playbooks describe the new model (escaped by time, interventions for pre-merge findings, second-stamped IDs, triage retired); commands.md equals gendocs output.",
+  "files": ["docs/domain/domain-model.md", "docs/domain/measurement/defect.md", "docs/domain/measurement/metrics.md", "docs/guide/metrics.md", "docs/guide/defects.md", "plugin/skills/operate/SKILL.md", ".claude/skills/vloop-operator/SKILL.md", "docs/guide/commands.md"],
+  "verified": "vloop task gate T13 exited 0 and printed gate T13: ok.",
+  "notes": "Edits were made in an earlier attempt and are in the tree; this attempt only re-ran the amended gate, which now passes. Operate skill is 1602 words (ceiling 1750)."
+}

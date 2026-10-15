@@ -10,7 +10,6 @@ import (
 	"regexp"
 	"slices"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -32,15 +31,10 @@ var (
 	Kinds      = []string{"bug", "spec-gap", "gate", "gate-gap", "regression"}
 	Severities = []string{"low", "medium", "high", "critical"}
 	Statuses   = []string{"open", "fixed", "wontfix"}
-	// RuleWheres are the places a rule can live: the `<where>` of a rule.
-	RuleWheres = []string{"guideline", "brief-check", "gate", "gate-review", "review", "skill"}
-	// RuleOutcomes say what the rule did: caught it, missed it, did not exist,
-	// or none is warranted.
-	RuleOutcomes = []string{"fired", "missed", "absent", "none"}
 )
 
 // SetFields are the fields `defect set` may change.
-var SetFields = []string{"status", "fixed-by", "case", "severity", "origin", "kind", "task", "rule", "rule-outcome"}
+var SetFields = []string{"status", "fixed-by", "case", "severity", "origin", "kind", "task"}
 
 // Defect is the defect/v1 frontmatter as JSON, plus the description.
 type Defect struct {
@@ -58,8 +52,8 @@ type Defect struct {
 	Created  string `json:"created"`
 	Summary  string `json:"summary"`
 
-	// Rule and RuleOutcome are the triage (L12): the rule that caught the
-	// defect, or should have, as "<where>: <which>", and what it did.
+	// Rule and RuleOutcome are retired as settable fields: records that carry
+	// them stay valid and are shown as they are.
 	Rule        string `json:"rule,omitempty"`
 	RuleOutcome string `json:"rule-outcome,omitempty"`
 }
@@ -83,14 +77,6 @@ func Validate(field, value string) error {
 		valid = Severities
 	case "status":
 		valid = Statuses
-	case "rule-outcome":
-		valid = RuleOutcomes
-	case "rule":
-		where, which, ok := strings.Cut(value, ": ")
-		if !ok || strings.TrimSpace(which) == "" || !slices.Contains(RuleWheres, where) {
-			return &config.InvalidValueError{Key: field, Value: value, Valid: []string{"<where>: <which>, <where> one of " + strings.Join(RuleWheres, ", ")}}
-		}
-		return nil
 	default:
 		return nil
 	}
@@ -144,13 +130,7 @@ func CheckTask(root, brief, task string) error {
 	if o == nil {
 		return fmt.Errorf("no plan found for %s, so task %s cannot be checked", brief, task)
 	}
-	sha := o.Plan.SHA
-	if o.Run != nil {
-		sha = o.Run.SHA
-	} else if n := len(o.Tasks); n > 0 {
-		sha = o.Tasks[n-1].SHA
-	}
-	plan, err := runs.PlanAt(root, o.Layout, sha)
+	plan, err := runs.PlanAt(root, o.Layout, o.PlanSHA())
 	if err != nil {
 		return err
 	}
@@ -184,15 +164,12 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	base := "D" + now.Format("20060102-1504") + "-" + Slug(summary)
-	for n := 1; ; n++ {
-		id := base
-		if n > 1 {
-			id = base + "-" + strconv.Itoa(n)
-		}
+	for {
+		id := StampedID(dir, "D", Slug(summary), now, nil)
 		d.ID = id
 		f, err := os.OpenFile(filepath.Join(dir, id+".md"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
 		if errors.Is(err, os.ErrExist) {
+			now = now.Add(time.Second)
 			continue
 		}
 		if err != nil {
@@ -203,6 +180,30 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 			werr = cerr
 		}
 		return Dir + "/" + id + ".md", werr
+	}
+}
+
+// StampFormat is the local-time stamp of a new D or I ID, to the second.
+const StampFormat = "20060102-150405"
+
+// StampedID makes the ID <prefix><stamp>-<slug> for a new record of the kind
+// whose files are in dir. The stamp is now's, moved on one second at a time
+// until no file in dir and no stamp in taken uses it, whatever the slug; the
+// stamp it settles on is recorded in taken when taken is not nil. Old IDs,
+// whose stamps stop at the minute, share no stamp with a new one.
+func StampedID(dir, prefix, slug string, now time.Time, taken map[string]bool) string {
+	for ; ; now = now.Add(time.Second) {
+		stamp := now.Format(StampFormat)
+		if taken[stamp] {
+			continue
+		}
+		if m, _ := filepath.Glob(filepath.Join(dir, prefix+stamp+"-*.md")); len(m) > 0 {
+			continue
+		}
+		if taken != nil {
+			taken[stamp] = true
+		}
+		return prefix + stamp + "-" + slug
 	}
 }
 
@@ -321,7 +322,7 @@ func Set(root, id, field, value string) error {
 	line := field + ": " + frontmatter.Quote(value)
 	if field == "task" && value == "" {
 		line = ""
-	} else if field != "fixed-by" && field != "case" && field != "rule" {
+	} else if field != "fixed-by" && field != "case" {
 		line = field + ": " + value
 	}
 	doc, err := frontmatter.Parse(string(b))
@@ -330,15 +331,6 @@ func Set(root, id, field, value string) error {
 	}
 	switch {
 	case doc.Replace(field, line):
-	case line != "" && (field == "rule" || field == "rule-outcome"):
-		// absent triage fields follow case, rule before rule-outcome
-		i := doc.Find("rule")
-		if i < 0 || field == "rule" {
-			i = doc.Find("case")
-		}
-		if i >= 0 {
-			doc.Insert(i+1, line)
-		}
 	case line != "": // task was absent: it follows brief
 		if i := doc.Find("brief"); i >= 0 {
 			doc.Insert(i+1, line)

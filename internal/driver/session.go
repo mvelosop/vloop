@@ -341,12 +341,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	}
 	cmd := exec.Command(bin, WithGuidelines(Args(s, fence, plugin), r.Root)...)
 	cmd.Dir = r.Root
-	for _, kv := range r.env() {
-		if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") || strings.HasPrefix(kv, PlanHashEnv+"=") {
-			continue
-		}
-		cmd.Env = append(cmd.Env, kv)
-	}
+	cmd.Env = dropEnv(r.env(), "VLOOP_ACTIVE_TASK", "VLOOP_GATE_TASK", PlanHashEnv)
 	if s.PlanSHA != "" {
 		cmd.Env = append(cmd.Env, PlanHashEnv+"="+s.PlanSHA)
 	}

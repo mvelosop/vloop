@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Iterator.iterate (internal/driver/iterate.go), Planner.Plan (internal/driver/plan.go), runInit (internal/cli/init.go), runDoctor (internal/cli/doctor.go) and runBriefClose (internal/cli/close.go) each exist once under that name and receiver and are at most 100 lines, counted from the func line to its closing brace.", "met": true, "evidence": "Measured func line to closing brace: iterate 100, Plan 98, runInit 87, runDoctor 46, runBriefClose 91; each name and receiver appears once."},
+    {"criterion": "The split extracts cohesive steps into named helpers; it does not pad, inline-collapse statements onto one line, or move logic into closures declared elsewhere just to pass the count.", "met": true, "evidence": "Helpers are named, documented and cohesive: workSession, runGates, checksStep, reviewSession, record, initLanguage, configStep, applySteps, closeRefusals, writeClosedBrief, commitClose, doctorInstall, doctorStacks and others. No statements were collapsed onto one line."},
+    {"criterion": "The functions the brief leaves out (Iterator.Run, intervention.parse, newRun, metrics.Aggregate, runBriefCheck) are not touched beyond what an extraction strictly needs.", "met": true, "evidence": "git diff touches only close.go, doctor.go, init.go, iterate.go and plan.go. The hunks are the five named functions and their extracted helpers; doctorPlanInfo only names the existing anonymous struct."},
+    {"criterion": "No command's output, exit code, files written or session arguments change, and no earlier test changes (H1-H7: the unchanged tests are the behaviour check).", "met": true, "evidence": "No *_test.go file is in the diff. The diff is a mechanical extraction with the same message strings, ordering and error paths; the go check passed (exit 0)."}
+  ],
+  "findings": [],
+  "notes": "iterate sits exactly at the 100-line bound, so any later addition to it needs another extraction. T5's own gate keeps checking the bound."
+}

@@ -52,13 +52,7 @@ func (p *Planner) baseGates(t term, plan *state.Plan, timeout time.Duration) ([]
 	var problems []string
 	for _, task := range plan.Tasks {
 		t.say("checking the gate of %s on the base", task.ID)
-		var env []string
-		for _, kv := range os.Environ() {
-			if strings.HasPrefix(kv, "VLOOP_ACTIVE_TASK=") || strings.HasPrefix(kv, "VLOOP_GATE_TASK=") {
-				continue
-			}
-			env = append(env, kv)
-		}
+		env := dropEnv(os.Environ(), "VLOOP_ACTIVE_TASK", "VLOOP_GATE_TASK")
 		env = append(env, "VLOOP_ACTIVE_TASK="+task.ID, "VLOOP_GATE_TASK="+task.ID)
 		cmd, err := state.GateCommand(root, plan.Shell, task.Verify, env)
 		if err != nil {

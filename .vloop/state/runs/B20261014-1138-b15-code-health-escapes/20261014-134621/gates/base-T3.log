@@ -1,0 +1,6 @@
+GATE FAIL: the environment is filtered in more than one place:
+4 functions filter an environment by variable name; one may
+internal/driver/acceptance.go:42 baseGates filters an environment by name
+internal/driver/checks.go:53 runCheck filters an environment by name
+internal/driver/iterate.go:837 runGate filters an environment by name
+internal/driver/session.go:320 Run filters an environment by name

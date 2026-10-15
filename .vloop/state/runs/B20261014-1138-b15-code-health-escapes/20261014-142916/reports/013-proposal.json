@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "The per-task table gains test:code and $/kloc columns, by_task JSON gains test_code_ratio and per_1000_code_lines_usd (null where code+ is 0, optional in metrics/v2), the summary cost line ends $<c>/kloc, and the all-briefs headers are test:code and $/kloc.",
+  "files": ["internal/metrics/metrics.go", "internal/metrics/print.go", "internal/metrics/print_test.go", "schemas/metrics.v2.json", "internal/cli/metrics_test.go", "cmd/vloop/b3_e2e_test.go"],
+  "verified": "vloop task gate T8 run in foreground; go test of internal/metrics, internal/cli -run Metrics and cmd/vloop -run B3|E2E pass.",
+  "notes": "Docs still say 'per 1,000 code lines' (docs/guide/metrics.md:235 etc.); that is T13's. lines_test.go and run_iterate_test.go needed no change."
+}

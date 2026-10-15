@@ -106,9 +106,13 @@ before closing anything.
 Until B4 ships `vloop brief close`, by hand:
 
 1. Fix what the operator agrees to fix, on the work branch, test first.
-2. Record defects: `vloop defect add "<summary>" --brief <name> --task <id>
-   --origin <brief|plan|work|env> --found-by <gate|review|operator|user>
-   --kind <…>`, then `vloop defect set <id> status fixed` (and `fixed-by`).
+2. Record findings before merge as verification-finding interventions:
+   `vloop intervention add "<summary>" --brief <name> --kind
+   verification-finding --origin <brief|plan|work|env> --phase verify
+   --automatable partly --by operator`. Record defects only for escapes, found
+   after the merge: `vloop defect add "<summary>" --brief <name> --task <id>
+   --origin <brief|plan|work|env> --found-by <…> --kind <…>`, then `vloop
+   defect set <id> status fixed` (and `fixed-by`).
 3. Mark the brief consumed: frontmatter `status: consumed`, the body
    `**Status:**` line to "consumed — … **Do not re-plan from this brief.**",
    and a `## Run record` — outcome, spend (from `vloop metrics`), what was

@@ -1,0 +1,5 @@
+GATE FAIL: H3, the plan at the last commit is picked in more than one place:
+3 functions pick the plan at the last commit; one may
+internal/cli/defect.go:172 defectMatrix picks the run, last task or plan commit itself
+internal/defect/defect.go:139 CheckTask picks the run, last task or plan commit itself
+internal/metrics/metrics.go:169 planSHA picks the run, last task or plan commit itself

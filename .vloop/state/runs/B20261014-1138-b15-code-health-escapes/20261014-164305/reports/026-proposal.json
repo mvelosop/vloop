@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T14",
+  "outcome": "blocked",
+  "summary": "The worked example is committed as cmd/vloop/b20261014_e2e_test.go and the gate passes; the before/after real-data metrics comparison (acceptance 2) could not be done because building a base-commit binary is denied in this session.",
+  "files": ["cmd/vloop/b20261014_e2e_test.go"],
+  "verified": "vloop task gate T14 exited 0 and printed ok.",
+  "notes": "Needs the operator: build the base binary (git archive of the merge-base with main, go build ./cmd/vloop in .vloop/tmp) and diff `vloop metrics` per consumed brief against this build; only the defects line (operator, escaped) and the cost line ending should move. Current-build defects lines and cost endings per brief are in the previous T14 journal entry. No fixes were needed; nothing under .vloop/ was written but .vloop/tmp/."
+}

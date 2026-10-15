@@ -149,7 +149,7 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 - `cost.total_usd` (gate-review sessions included), `cost.plan_usd`, `cost.work_usd` and `cost.review_usd` are
   sums of the sessions' costs, unrounded in JSON and rounded to cents only for
   display. `cost.per_1000_code_lines_usd` is the total per 1,000 delivered code
-  lines.
+  lines (`$/kloc`).
 - `tokens` holds `input`, `output`, `cache_read` and `cache_creation` totals and
   `cache_hit_ratio` = `cache_read` / (`input` + `cache_read` + `cache_creation`).
 - `permission_denials` counts the tool calls the sessions were denied.
@@ -175,7 +175,7 @@ records carry it (`session/v1` does, the legacy shell loop's do not), else `null
 
 `--by task` and `by_task` give one row per task in plan order: `id`, `area`,
 `kind` (`-` or `null` when missing), `attempts` (its iterations), `churn`,
-`agent_ms`, `cost_usd` and `models`.
+`agent_ms`, `cost_usd` and `models`, with `test_code_ratio` (the task's test / code lines churned) and `per_1000_code_lines_usd` (`$/kloc`: its cost per 1,000 churned code lines), `null` where it churned no code. The text table has the same two as columns, `test:code` and `$/kloc`, between `other+` and `agent`, `-` for such a task.
 
 ## Missing records
 
@@ -188,7 +188,11 @@ summary says so on a `records` line.
 ## Defects, release and status
 
 - `defects` holds `in_loop`, `operator`, `escaped`, `total` and
-  `removal_efficiency`; see [defects.md](defects.md).
+  `removal_efficiency`; see [defects.md](defects.md). `operator` has two
+  sources: recorded defects found by the operator before the brief's merge, and
+  `verification-finding` interventions that name an origin. A defect is
+  **escaped** when it was recorded after the release commit's time, whatever
+  its `found-by`.
   Each iteration that ended `check_failed` derives a defect of kind
   `regression` (origin `work`) found by the gate: a check caught what the
   work broke.
@@ -232,7 +236,7 @@ row over all of them.
            churn      code <n> · test <n> · docs <n> · rework <r>
  time      agent <m> min (work <m> · review <m>) · plan <m> min[ · gate review <m> min] · gates <m|n/a> · wall <m> min
  rate      <r> code lines/min · <r> incl. tests
- cost      $<t> · plan <c> · work <c> · review <c>[ · gate review <c>] · $<c> per 1,000 code lines
+ cost      $<t> · plan <c> · work <c> · review <c>[ · gate review <c>] · $<c>/kloc
  models    plan <models> · work <models> · review <models>[ · gate review <models>]
  defects   in-loop <n> · operator <n> · escaped <n> · removal efficiency <p>%
 ```
@@ -247,5 +251,5 @@ line under `delivered` saying how many delivered lines match no stack in
 delivered nothing. The JSON keeps the zeros and the `other` count.
 
 The cross-brief table has one row per brief in name order: `brief`, `tasks`,
-`first-pass`, `code`, `test`, `t:c`, `agent` (minutes), `$/1k`, `in-loop`,
+`first-pass`, `code`, `test`, `test:code`, `agent` (minutes), `$/kloc`, `in-loop`,
 `operator`, `escaped` and `efficiency`.

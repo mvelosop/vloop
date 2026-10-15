@@ -1,14 +1,14 @@
 package runs
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mvelosop/vloop/internal/gitrun"
 )
 
 // Commit is one commit, as far as metrics need it.
@@ -28,6 +28,18 @@ type Owned struct {
 	Plan   Commit
 	Run    *Commit // nil while no run commit follows the plan
 	Tasks  []Commit
+}
+
+// PlanSHA is the commit whose plan describes the run's end: the run commit,
+// else the last task commit, else the plan commit.
+func (o *Owned) PlanSHA() string {
+	if o.Run != nil {
+		return o.Run.SHA
+	}
+	if n := len(o.Tasks); n > 0 {
+		return o.Tasks[n-1].SHA
+	}
+	return o.Plan.SHA
 }
 
 // PlanTask is a task as the plan at a commit records it. The shell loop's
@@ -59,13 +71,7 @@ type PlanDoc struct {
 const fieldSep = "\x1f"
 
 func git(root string, args ...string) ([]byte, error) {
-	cmd := exec.Command("git", append([]string{"-C", root}, args...)...)
-	var out, errb bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &out, &errb
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("git %s: %w: %s", strings.Join(args, " "), err, strings.TrimSpace(errb.String()))
-	}
-	return out.Bytes(), nil
+	return gitrun.Capture(root, args...)
 }
 
 func parseLog(b []byte) []Commit {

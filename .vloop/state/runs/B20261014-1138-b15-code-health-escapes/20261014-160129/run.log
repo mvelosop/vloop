@@ -1,0 +1,39 @@
+── iteration 17 (1 this run) · T10 · 9/14 done ──
+   Count a recorded defect as escaped when it was created after its brief merged
+   work T10 · 1m04s · $0.15 · run $0.15 / $40.00
+   check go
+   review T10 · 0m33s · $0.13 · run $0.28 / $40.00
+   review: PASS
+   T10 done
+── iteration 18 (2 this run) · T11 · 10/14 done ──
+   Record operator findings as verification-finding interventions with an origin
+   work T11 · 8m27s · $0.63 · run $0.91 / $40.00
+   check go
+   review T11 · 0m34s · $0.18 · run $1.09 / $40.00
+   review: FAIL
+── iteration 19 (3 this run) · T11 · 10/14 done ──
+   Record operator findings as verification-finding interventions with an origin
+   work T11 · 1m19s · $0.17 · run $1.26 / $40.00
+   check go
+   review T11 · 0m18s · $0.11 · run $1.37 / $40.00
+   review: PASS
+   T11 done
+── iteration 20 (4 this run) · T12 · 11/14 done ──
+   Retire the defect triage: rule, rule-outcome and close's defect report
+   work T12 · 9m05s · $0.31 · run $1.69 / $40.00
+   check go
+   review T12 · 0m19s · $0.12 · run $1.81 / $40.00
+   review: PASS
+   T12 done
+── iteration 21 (5 this run) · T13 · 12/14 done ──
+   Describe the new model in the docs, the domain and both operate playbooks
+   work T13 · 1m17s · $0.36 · run $2.17 / $40.00
+   GATE DISPUTE T13 — blocked for the operator; no review, no attempt charged
+   T13 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+1 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261014-1138-b15-code-health-escapes/20261014-160129  (5 iteration(s) this run)
+plan:   12/14 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

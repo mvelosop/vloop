@@ -1,0 +1,13 @@
+── iteration 27 (1 this run) · T14 · 13/14 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data check
+   work T14 · 0m29s · $0.09 · run $0.09 / $40.00
+   check go
+   review T14 · 0m16s · $0.09 · run $0.17 / $40.00
+   review: PASS
+   T14 done
+   check go
+
+═══ complete ═══
+run:    B20261014-1138-b15-code-health-escapes/20261014-170916  (1 iteration(s) this run)
+plan:   14/14 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261014-1138-b15-code-health-escapes.md

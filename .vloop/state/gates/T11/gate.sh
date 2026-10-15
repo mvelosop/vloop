@@ -1,104 +1,110 @@
 #!/bin/sh
-# Gate T11 — the defect report at close (brief L12): `vloop defect set` takes
-# `rule` (<where>: <which>) and `rule-outcome` (fired|missed|absent|none) and
-# refuses anything else with exit 2; `vloop brief close` prints, before its last
-# line, `squash-merge with the trailer`, the brief's defects with their rule,
-# outcome or untriaged, and recurrences, then the untriaged hint; with no
-# defects, `defects of <run id>: none`; --dry-run prints the report and writes
-# nothing. The operate skill's close step triages, within its ceiling.
+# Gate T11 — E3: intervention add takes --origin brief|plan|work|env, required
+# with --kind verification-finding and refused with any other kind (exit 2);
+# the record carries origin: after by:, intervention set sets it, and
+# schemas/intervention.v2.json has it as an optional property. brief close
+# --finding "<origin>: <summary>" records one verification-finding
+# intervention per finding (phase verify, automatable partly, by operator) and
+# prints `recorded .vloop/interventions/<id>.md`; a finding without an origin
+# is refused before anything is written (exit 2). The operator count is the
+# operator defects not escaped plus the verification-finding interventions
+# that carry an origin, with no overlap; the run record lists the
+# interventions after the defects; --dry-run counts and lists them the same.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-RULE='brief-check: must-change list'
-HINT="vloop defect set <id> rule '<where>: <which>' and rule-outcome fired|missed|absent|none"
-# set <want exit> <args...>: vloop defect set in $R, expecting that exit code.
-dset() { w=$1; shift; inr "$B" defect set "$@" </dev/null >"$t/set.out" 2>&1; c=$?; [ "$c" = "$w" ] || fail "vloop defect set $*: exit $c, want $w: $(cat "$t/set.out")"; }
-# fields <line>: the report line's columns, one per line (columns are two or more spaces apart).
-fields() { printf '%s\n' "$1" | sed -e 's/^ *//' -e 's/   */|/g' | tr '|' '\n'; }
+N=$RUN.loop-brief
+M=B20260101-0800-merged.loop-brief
+squeezed() { sed -e 's/[[:space:]][[:space:]]*/ /g' -e 's/^ //' -e 's/ $//' "$1"; }
+dl() { squeezed "$1" | grep -E '^defects ' | head -n 1; }
+clean() { [ -z "$(git -C "$R" status --porcelain)" ] || fail "$1 wrote: $(git -C "$R" status --porcelain)"; }
+# iadd <want exit> <args...>: vloop intervention add on $M in $R.
+iadd() {
+  w=$1; shift
+  inr "$B" intervention add "y" --brief "$M" --phase verify --automatable no --by operator "$@" </dev/null >"$t/out" 2>"$t/err"; c=$?
+  [ "$c" = "$w" ] || fail "vloop intervention add --brief $M $*: exit $c, want $w: $(cat "$t/err")"
+}
+idoc() { # idoc <id> <brief> <kind> [<origin line>]
+  printf -- '---\nid: %s\nbrief: %s\nphase: verify\nkind: %s\nautomatable: no\nby: operator\n%sschema: intervention/v2\noptions: 0\nrecommended: 0\ndecided: ""\nagreement: no-options\noccurred: 2026-01-01\nrecorded: 2026-01-01T09:00:00Z\n---\nfixture %s\n' \
+    "$1" "$2" "$3" "${4:+$4
+}" "$1"
+}
 
-runrepo d
-# Three earlier defects of another brief, a day apart, for the recurrence.
-printf -- '---\nname: B20250101-0900-old.loop-brief\ndescription: An old brief\nkind: brief\nstatus: draft\n---\n# Old\n' >"$R/docs/briefs/B20250101-0900-old.loop-brief.md"
-mkdir -p "$R/.vloop/defects" || fail mkdir
-for i in 1 2 3; do
-  cat >"$R/.vloop/defects/D2025010$i-0900-old-$i.md" <<D
----
-id: D2025010$i-0900-old-$i
-brief: B20250101-0900-old.loop-brief
-origin: brief
-found-by: operator
-kind: spec-gap
-severity: low
-status: open
-fixed-by: ""
-case: ""
-created: 2025-01-0${i}T09:00:00Z
----
-old defect $i
-D
+runrepo c T1
+putbrief "${M%.loop-brief}" consumed
+commit "a merged brief"
+touch "$t/stub/fail-T1"
+vrun c.run
+[ "$got" = 0 ] || fail "vloop run: exit $got: $(tail -n 15 "$t/c.run")"
+
+iadd 2 --kind verification-finding
+[ "$(cat "$t/err")" = "vloop: --kind verification-finding needs --origin brief, plan, work or env" ] || fail "verification-finding without --origin printed: $(cat "$t/err")"
+iadd 2 --kind repair --origin work
+[ "$(cat "$t/err")" = "vloop: --origin is only for --kind verification-finding" ] || fail "--origin with --kind repair printed: $(cat "$t/err")"
+[ -z "$(ls -A "$R/.vloop/interventions" 2>/dev/null)" ] || fail "a refused intervention add wrote a record"
+iadd 0 --kind verification-finding --origin plan
+p=$(tail -n 1 "$t/out"); f=$R/$p; id=$(basename "$p" .md)
+[ -f "$f" ] || fail "intervention add printed '$p', not a record"
+awk '$0 == "---" { n++; next } n == 1' "$f" >"$t/fm"
+[ "$(grep -A1 -Fx 'by: operator' "$t/fm" | tail -n 1)" = "origin: plan" ] || fail "the record does not carry origin: plan right after by::
+$(cat "$t/fm")"
+inr "$B" intervention show "$id" --json </dev/null >"$t/show" 2>&1 || fail "intervention show: $(cat "$t/show")"
+[ "$("$JQ" -r .origin "$t/show")" = plan ] || fail "intervention show --json has no origin plan: $(cat "$t/show")"
+inr "$B" intervention set "$id" origin work </dev/null >"$t/o" 2>&1 || fail "intervention set $id origin work: $(cat "$t/o")"
+grep -Fxq 'origin: work' "$f" || fail "intervention set did not set origin"
+"$JQ" -e '.properties.origin != null and ((.required // []) | index("origin") == null)' "$top/schemas/intervention.v2.json" >/dev/null 2>&1 ||
+  fail "schemas/intervention.v2.json does not have origin as an optional property"
+"$JQ" '.origin = "work"' "$t/show" >"$t/show2" && inr "$B" schema validate intervention/v2 "$t/show2" </dev/null >"$t/o" 2>&1 ||
+  fail "a record with an origin does not validate against intervention/v2: $(cat "$t/o")"
+
+# Interventions on the run's brief that the operator count must not take: a
+# verification-finding with no origin, a repair with one.
+idoc I20250101-0001-old-finding "$N" verification-finding >"$R/.vloop/interventions/I20250101-0001-old-finding.md"
+idoc I20250101-0002-repair-origin "$N" repair "origin: work" >"$R/.vloop/interventions/I20250101-0002-repair-origin.md"
+now=$(date +%s); k=0
+while [ $k -le 10 ]; do s=$(stamp $((now + k))); idoc "I$s-other" "$M" repair >"$R/.vloop/interventions/I$s-other.md"; k=$((k + 1)); done
+commit "fixtures"
+want=I$(stamp $((now + 11)))-z
+
+for bad in "spec gap: z" "Brief: z" "z"; do
+  inr "$B" brief close "$BRIEF" --finding "$bad" </dev/null >"$t/o" 2>"$t/e"; c=$?
+  [ "$c" = 2 ] || fail "close --finding '$bad': exit $c, want 2: $(cat "$t/e")"
+  [ "$(cat "$t/e")" = 'vloop: a finding starts with whose defect it is: --finding "<brief|plan|work|env>: <summary>"' ] ||
+    fail "close --finding '$bad' printed: $(cat "$t/e")"
+  clean "close --finding '$bad'"
 done
-commit "old defects"
-vrun d.run
-[ "$got" = 0 ] || fail "vloop run: exit $got: $(tail -n 20 "$t/d.run")"
+inr "$B" brief close "$BRIEF" --dry-run --finding "brief: z" </dev/null >"$t/dry" 2>&1 || fail "close --dry-run: $(cat "$t/dry")"
+clean "close --dry-run"
+[ "$(dl "$t/dry")" = "defects in-loop 1 · operator 1 · escaped 0 · removal efficiency 100%" ] || fail "close --dry-run's defects line is '$(dl "$t/dry")'"
+grep -Fxq "would record .vloop/interventions/$want.md" "$t/dry" || fail "close --dry-run does not print 'would record .vloop/interventions/$want.md':
+$(cat "$t/dry")"
 
-# No defects yet: the report says none, and a dry run writes nothing.
-inr "$B" brief close "$BRIEF" --dry-run --no-findings </dev/null >"$t/none" 2>&1 || fail "close --dry-run --no-findings: $(cat "$t/none")"
-grep -Fxq "defects of $RUN: none" "$t/none" || fail "a brief with no defects: no 'defects of $RUN: none' in:
-$(cat "$t/none")"
-
-inr "$B" defect add "the must-change list missed a test" --brief "$RUN.loop-brief" --found-by review --kind spec-gap --origin brief </dev/null >"$t/add" 2>&1 || fail "defect add: $(cat "$t/add")"
-id1=$(basename "$(head -n 1 "$t/add")" .md)
-f1="$R/.vloop/defects/$id1.md"
-[ -f "$f1" ] || fail "defect add printed '$(cat "$t/add")', not a defect file"
-dset 0 "$id1" rule "$RULE"
-dset 0 "$id1" rule-outcome missed
-cp "$f1" "$t/before"
-dset 2 "$id1" rule-outcome forgot
-dset 2 "$id1" rule 'linter: x'
-cmp -s "$f1" "$t/before" || fail "a refused defect set changed the record"
-for w in 'guideline: D20261011-1455' 'brief-check: x' 'gate: x' 'gate-review: unpassable' 'review: x' 'skill: x'; do dset 0 "$id1" rule "$w"; done
-for o in fired missed absent none; do dset 0 "$id1" rule-outcome "$o"; done
-dset 0 "$id1" rule "$RULE"
-dset 0 "$id1" rule-outcome missed
-for i in 1 2 3; do dset 0 "D2025010$i-0900-old-$i" rule "$RULE"; done
-commit "triage"
-
-inr "$B" brief close "$BRIEF" --dry-run --finding a --finding b </dev/null >"$t/dry" 2>&1 || fail "close --dry-run: $(cat "$t/dry")"
-[ -z "$(git -C "$R" status --porcelain)" ] || fail "close --dry-run wrote: $(git -C "$R" status --porcelain)"
-grep -Fxq "defects of $RUN" "$t/dry" || fail "close --dry-run prints no report: $(cat "$t/dry")"
-
-inr "$B" brief close "$BRIEF" --finding a --finding b </dev/null >"$t/close" 2>&1 || fail "close: exit $?: $(cat "$t/close")"
-tail -n 1 "$t/close" | grep -q '^squash-merge with the trailer: ' || fail "close's last line is not the squash-merge line: $(tail -n 1 "$t/close")"
-h=$(grep -Fxn "defects of $RUN" "$t/close" | cut -d: -f1)
-[ -n "$h" ] || fail "close prints no 'defects of $RUN':
+inr "$B" brief close "$BRIEF" --finding "brief: z" </dev/null >"$t/close" 2>&1 || fail "close: $(cat "$t/close")"
+grep -Fxq "recorded .vloop/interventions/$want.md" "$t/close" || fail "close does not print 'recorded .vloop/interventions/$want.md':
 $(cat "$t/close")"
-# The report: the lines after the header, up to the untriaged hint.
-awk -v h="$h" 'NR <= h { next } !/^ / { exit } !/untriaged: vloop defect set/ { print }' "$t/close" >"$t/rows"
-[ "$(wc -l <"$t/rows" | tr -d ' ')" = 3 ] || fail "the report does not have one line per defect of the brief (3):
-$(cat "$t/close")"
-short1=$(printf '%s' "$id1" | cut -d- -f1-2)
-r1=$(grep -E "^ +($id1|$short1) " "$t/rows") || fail "no report line for $id1: $(cat "$t/rows")"
-fields "$r1" >"$t/f1"
-printf '%s\n' spec-gap review "$RULE" missed 'recurs ×3 (D20250101-0900, D20250102-0900, D20250103-0900)' >"$t/want1"
-tail -n +2 "$t/f1" | cmp -s - "$t/want1" || fail "the report line for $id1 is '$r1'; want kind, found-by, rule, outcome and recurs:
-$(cat "$t/want1")"
-grep -v -E "^ +($id1|$short1) " "$t/rows" >"$t/new"
-while IFS= read -r l; do
-  fields "$l" | tail -n +2 >"$t/fn"
-  printf '%s\n' bug operator '—' untriaged | cmp -s - "$t/fn" || fail "a finding's report line is '$l'; want kind bug, found-by operator, — and untriaged"
-done <"$t/new"
-awk -v h="$h" 'NR > h' "$t/close" | sed 's/^ *//' | grep -Fxq "2 untriaged: $HINT" || fail "no '2 untriaged: $HINT' line:
-$(cat "$t/close")"
-hint=$(grep -Fn "untriaged: $HINT" "$t/close" | cut -d: -f1)
-[ "$hint" -lt "$(wc -l <"$t/close" | tr -d ' ')" ] || fail "the untriaged hint is not before the squash-merge line"
-d1=$(grep -E "^ +($id1|$short1) " "$t/dry") || fail "close --dry-run's report has no line for $id1: $(cat "$t/dry")"
-[ "$(fields "$d1")" = "$(fields "$r1")" ] || fail "close --dry-run's report differs on $id1: '$d1' against '$r1'"
+grep -q '^recorded \.vloop/defects/' "$t/close" && fail "close still records a defect: $(cat "$t/close")"
+[ -z "$(ls -A "$R/.vloop/defects" 2>/dev/null)" ] || fail "close wrote a defect file: $(ls "$R/.vloop/defects")"
+case "$(tail -n 1 "$t/close")" in "squash-merge with the trailer: "*) ;; *) fail "close's last line: $(tail -n 1 "$t/close")" ;; esac
+[ "$(dl "$t/close")" = "defects in-loop 1 · operator 1 · escaped 0 · removal efficiency 100%" ] || fail "close's defects line is '$(dl "$t/close")'"
+f=$R/.vloop/interventions/$want.md
+[ -f "$f" ] || fail "no $want.md"
+awk '$0 == "---" { n++; next } n == 1' "$f" >"$t/fm"
+for l in "id: $want" "brief: $N" "phase: verify" "kind: verification-finding" "automatable: partly" "by: operator" "origin: brief"; do
+  grep -Fxq "$l" "$t/fm" || fail "$want.md has no '$l':
+$(cat "$f")"
+done
+[ "$(awk '$0 == "---" { n++; next } n == 2 && NF { print; exit }' "$f")" = z ] || fail "$want.md's summary is not z:
+$(cat "$f")"
+git -C "$R" show --name-only --format= HEAD | grep -Fxq ".vloop/interventions/$want.md" || fail "the close commit does not carry $want.md"
+rl=$(grep -n -F -- "- $want — verification-finding, brief, found by operator: z" "$R/$BRIEF" | cut -d: -f1)
+[ -n "$rl" ] || fail "the run record has no '- $want — verification-finding, brief, found by operator: z':
+$(sed -n '/## Run record/,$p' "$R/$BRIEF")"
+gl=$(grep -n -F -- "- $RUN/i1-gate — " "$R/$BRIEF" | cut -d: -f1)
+[ -n "$gl" ] && [ "$gl" -lt "$rl" ] || fail "the run record does not list the intervention after the defects:
+$(sed -n '/## Run record/,$p' "$R/$BRIEF")"
 
-inr "$B" defect set --help >"$t/help" 2>&1
-grep -Fq 'rule-outcome' "$t/help" || fail "vloop defect set --help does not list rule-outcome"
-grep -q '[^-]rule[^-]' "$t/help" || fail "vloop defect set --help does not list rule"
-
-O=$top/plugin/skills/operate/SKILL.md
-[ "$(wc -w <"$O" | tr -d ' ')" -le 1750 ] || fail "the operate skill is over its ceiling of 1,750 words"
-grep -Fq 'rule-outcome' "$O" || fail "the operate skill's close step does not triage with rule-outcome"
-grep -Fq 'untriaged' "$O" || fail "the operate skill does not speak of untriaged defects"
+# Both sources, no overlap: an operator defect of the unmerged brief adds one.
+mkdir -p "$R/.vloop/defects"
+defectdoc D20250101-0003-op "$N" operator 2025-01-01T00:00:00Z >"$R/.vloop/defects/D20250101-0003-op.md"
+inr "$B" metrics "$BRIEF" </dev/null >"$t/m" 2>&1 || fail "metrics: $(cat "$t/m")"
+[ "$(dl "$t/m")" = "defects in-loop 1 · operator 2 · escaped 0 · removal efficiency 100%" ] || fail "an operator defect and a finding: the defects line is '$(dl "$t/m")', want operator 2"
 echo "gate T11: ok"

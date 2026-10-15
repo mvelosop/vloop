@@ -28,10 +28,12 @@ var (
 	Kinds        = []string{"direction", "decision", "context-supply", "halt", "verification-finding", "repair", "carry-forward", "ceremony"}
 	Automatables = []string{"yes", "partly", "no"}
 	Bys          = []string{"operator", "assistant", "both"}
+	// Origins say whose defect a verification finding is.
+	Origins = []string{"brief", "plan", "work", "env"}
 )
 
 // SetFields are the fields `intervention set` may change.
-var SetFields = []string{"brief", "phase", "kind", "automatable", "by", "occurred", "recommended", "decided", "adjusted"}
+var SetFields = []string{"brief", "phase", "kind", "automatable", "by", "origin", "occurred", "recommended", "decided", "adjusted"}
 
 // Agreements are the values of the derived agreement field.
 var Agreements = []string{"recommended", "other-option", "adjusted", "different", "no-options"}
@@ -62,6 +64,7 @@ type Intervention struct {
 	Kind        string `json:"kind"`
 	Automatable string `json:"automatable"`
 	By          string `json:"by"`
+	Origin      string `json:"origin,omitempty"`
 	Occurred    string `json:"occurred"`
 	Recorded    string `json:"recorded"`
 	Backfilled  bool   `json:"backfilled,omitempty"`
@@ -109,7 +112,7 @@ func DeriveAgreement(options, recommended int, decided string, adjusted bool) (s
 
 // NewInput is what `intervention add` takes.
 type NewInput struct {
-	Summary, Brief, Phase, Kind, Automatable, By, Trigger, Done, Automation string
+	Summary, Brief, Phase, Kind, Automatable, By, Origin, Trigger, Done, Automation string
 
 	Context string
 	Options []string
@@ -172,6 +175,8 @@ func Validate(field, value string) error {
 		valid = Automatables
 	case "by":
 		valid = Bys
+	case "origin":
+		valid = Origins
 	case "occurred":
 		if _, err := time.Parse("2006-01-02", value); err != nil {
 			return &config.InvalidValueError{Key: field, Value: value}
@@ -197,7 +202,7 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	summary := oneLine(in.Summary)
 	v := Intervention{
 		Schema: "intervention/v2", Agreement: "no-options", Options: []string{}, Brief: defect.BriefName(in.Brief), Phase: in.Phase, Kind: in.Kind,
-		Automatable: in.Automatable, By: in.By, Occurred: now.Format("2006-01-02"),
+		Automatable: in.Automatable, By: in.By, Origin: in.Origin, Occurred: now.Format("2006-01-02"),
 		Recorded: now.UTC().Format("2006-01-02T15:04:05Z"), Summary: summary,
 		Trigger: oneLine(in.Trigger), Done: oneLine(in.Done), Automation: oneLine(in.Automation),
 	}
@@ -226,15 +231,12 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	if slug == "defect" && summary == "" {
 		slug = "intervention"
 	}
-	base := "I" + now.Format("20060102-1504") + "-" + slug
-	for n := 1; ; n++ {
-		id := base
-		if n > 1 {
-			id = base + "-" + strconv.Itoa(n)
-		}
+	for {
+		id := defect.StampedID(dir, "I", slug, now, nil)
 		v.ID = id
 		f, err := os.OpenFile(filepath.Join(dir, id+".md"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
 		if errors.Is(err, os.ErrExist) {
+			now = now.Add(time.Second)
 			continue
 		}
 		if err != nil {
@@ -252,6 +254,9 @@ func render(v Intervention) string {
 	var b strings.Builder
 	b.WriteString("---\n")
 	fmt.Fprintf(&b, "id: %s\nbrief: %s\nphase: %s\nkind: %s\nautomatable: %s\nby: %s\n", v.ID, frontmatter.Quote(v.Brief), v.Phase, v.Kind, v.Automatable, v.By)
+	if v.Origin != "" {
+		fmt.Fprintf(&b, "origin: %s\n", v.Origin)
+	}
 	fmt.Fprintf(&b, "schema: intervention/v2\noptions: %d\nrecommended: %d\ndecided: %s\n", len(v.Options), v.Recommended.Option, frontmatter.Quote(v.decision))
 	if v.Decided.Adjusted {
 		b.WriteString("adjusted: true\n")
@@ -320,6 +325,8 @@ func parse(text string) (Intervention, error) {
 			v.Automatable = val
 		case "by":
 			v.By = val
+		case "origin":
+			v.Origin = val
 		case "occurred":
 			v.Occurred = val
 		case "recorded":
@@ -545,6 +552,9 @@ func Set(root, id, field, value string) error {
 		line := updates[k]
 		if !doc.Replace(k, line) && line != "" { // field absent: insert where I1 orders it
 			at := doc.Len()
+			if i := doc.Find("by"); k == "origin" && i >= 0 { // right after by:
+				at = i + 1
+			}
 			if k == "adjusted" { // between decided and agreement
 				if i := doc.Find("agreement"); i >= 0 {
 					at = i

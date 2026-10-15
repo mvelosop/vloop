@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T8",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "`vloop metrics <brief> --by task` gains two columns between other+ and agent: test:code (the task's test+ / code+) and $/kloc (the task's cost per 1,000 of its code+ lines, no $ sign), both with two decimals and both `-` where code+ is 0. A task with code+ 200, test+ 300 and cost 0.50 shows 1.50 and 2.50.", "met": true, "evidence": "print.go PrintByTask and dashFloat; metrics.go byTask uses ratio() (nil when code is 0); print_test.go TestPrintByTaskRatioColumns asserts 1.50/2.50 and -/-"},
+    {"criterion": "`--json` by_task entries gain test_code_ratio and per_1000_code_lines_usd, null where the task's code lines are 0; schemas/metrics.v2.json gains both as optional properties of a by_task item, and the output still validates against metrics/v2.", "met": true, "evidence": "ReportTask fields are pointers with those json tags, no omitempty, so null is emitted; the schema gains both as optional nullable numbers"},
+    {"criterion": "The summary's cost line ends ` · $<c>/kloc` instead of ` · $<c> per 1,000 code lines`; its figure still uses delivered code lines.", "met": true, "evidence": "print.go:117 uses %s/kloc with r.Cost.Per1000Code unchanged; the cli and b3 e2e summary expectations were updated"},
+    {"criterion": "The all-briefs table's headers t:c and $/1k become test:code and $/kloc; the values are unchanged.", "met": true, "evidence": "print.go printBriefTable header; metrics_test.go TestMetricsCommandCrossBrief"},
+    {"criterion": "The earlier tests that change are only internal/metrics/print_test.go, internal/metrics/lines_test.go, internal/cli/metrics_test.go, cmd/vloop/b3_e2e_test.go and cmd/vloop/run_iterate_test.go, and only by the two per-task columns, the cost line's `$<c>/kloc` and the all-briefs headers; committed tests cover both columns, the `-` and null cases and the new summary ending.", "met": false, "evidence": "The changed tests stay in scope, but no committed test exercises the JSON by_task fields or their null case: grep finds no test_code_ratio/per_1000_code_lines_usd assertion. The `-` case is tested only through a hand-built struct, not through byTask with code+ 0."}
+  ],
+  "findings": [
+    {"summary": "No committed test covers the JSON test_code_ratio/per_1000_code_lines_usd fields or the null case where code+ is 0, nor byTask producing nil for a zero-code task", "kind": "bug"}
+  ],
+  "notes": "Implementation looks correct; only test coverage of the JSON/null path is missing. Add a test of byTask or the --json output with a zero-code task."
+}

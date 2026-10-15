@@ -1,0 +1,26 @@
+ok  	github.com/mvelosop/vloop	0.273s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
+ok  	github.com/mvelosop/vloop/cmd/vloop	198.868s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/budget	0.243s
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+--- FAIL: TestGuideDefectsCoversSchema (0.00s)
+    guide_test.go:105: defects.md does not mention the defect field or value "fired"
+    guide_test.go:105: defects.md does not mention the defect field or value "missed"
+FAIL
+FAIL	github.com/mvelosop/vloop/internal/cli	64.907s
+ok  	github.com/mvelosop/vloop/internal/closing	(cached)
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	6.268s
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/state	(cached)
+FAIL

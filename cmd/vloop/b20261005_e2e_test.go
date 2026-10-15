@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"testing"
@@ -139,6 +140,7 @@ func TestWorkedExampleB11(t *testing.T) {
 		t.Fatal("no brief after init")
 	}
 	brief := strings.TrimSuffix(filepath.Base(briefs[0]), ".md")
+	b15MergeBrief(t, s.dir, "docs/briefs/"+brief+".md")
 	r = s.run(nil, "defect", "add", "a CRLF defect", "--found-by", "operator", "--brief", brief)
 	if r.code != 0 {
 		t.Fatalf("defect add: %d %s", r.code, r.err)
@@ -206,4 +208,37 @@ func TestWorkedExampleB11(t *testing.T) {
 	if h := strings.ToLower(r.out + r.err); !strings.Contains(h, "brief") || !strings.Contains(h, "vloop init") {
 		t.Errorf("vloop --help: %s", r.out+r.err)
 	}
+}
+
+// b15MergeBrief makes the brief at rel (repo-relative) released (M-5): a commit
+// on main whose frontmatter says status: consumed, built with a scratch index
+// so the working tree and the current branch stay as they are.
+func b15MergeBrief(t *testing.T, dir, rel string) {
+	t.Helper()
+	b, err := os.ReadFile(filepath.Join(dir, filepath.FromSlash(rel)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	text := regexp.MustCompile(`(?m)^status:.*$`).ReplaceAllString(string(b), "status: consumed")
+	env := append(os.Environ(), "GIT_INDEX_FILE="+filepath.Join(t.TempDir(), "index"),
+		"GIT_CONFIG_GLOBAL=/dev/null", "GIT_CONFIG_NOSYSTEM=1",
+		"GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@example.com", "GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@example.com")
+	g := func(stdin string, args ...string) string {
+		c := exec.Command("git", append([]string{"-C", dir}, args...)...)
+		c.Env, c.Stdin = env, strings.NewReader(stdin)
+		out, err := c.Output()
+		if err != nil {
+			t.Fatalf("git %v: %v", args, err)
+		}
+		return strings.TrimSpace(string(out))
+	}
+	blob := g(text, "hash-object", "-w", "--stdin")
+	parent := []string{}
+	if exec.Command("git", "-C", dir, "rev-parse", "--verify", "-q", "main").Run() == nil {
+		g("", "read-tree", "main")
+		parent = []string{"-p", "main"}
+	}
+	g("", "update-index", "--add", "--cacheinfo", "100644,"+blob+","+rel)
+	tree := g("", "write-tree")
+	g("", "update-ref", "refs/heads/main", g("", append([]string{"commit-tree", tree, "-m", "merge " + rel}, parent...)...))
 }
