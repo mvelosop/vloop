@@ -1,0 +1,25 @@
+ok  	github.com/mvelosop/vloop	0.279s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	0.997s
+--- FAIL: TestWorkedExampleB7PluginPath (0.05s)
+    b7_e2e_test.go:37: extracted skills = ["gate-review" "operate" "plan" "review" "verify" "work"], want gate-review operate plan review work
+FAIL
+FAIL	github.com/mvelosop/vloop/cmd/vloop	210.682s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/budget	0.135s
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	64.457s
+ok  	github.com/mvelosop/vloop/internal/closing	0.258s
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	6.403s
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
+ok  	github.com/mvelosop/vloop/internal/metrics	3.348s
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/state	(cached)
+FAIL

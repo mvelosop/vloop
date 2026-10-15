@@ -142,6 +142,7 @@ docs/briefs/<name>.md                     the briefs
 .vloop/interventions/<id>.md              recorded interventions (data)
 .vloop/tmp/proposal.json                  the work session's report, read back by the driver
 .vloop/tmp/verdict.json                   the review session's verdict, read back by the driver
+.vloop/tmp/verify.json                    the verify session's findings report, kept by the driver
 .vloop/tmp/checks.json                    the checks that ran this iteration, handed to the review session
 .vloop/tmp/gate-verdict.json               the gate review session's verdict, read back by the driver
 .vloop/tmp/plan-problems.md                what the plan session must revise, written by the driver

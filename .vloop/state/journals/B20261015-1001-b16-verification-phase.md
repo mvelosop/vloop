@@ -62,3 +62,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added the missing committed tests for the verify session: no findings, missing and invalid report, failed session, cost ceiling, revert lines, exit 9 on a moved ref, status phase and session/v2 record, and the resume. Production code is unchanged this attempt.
 - **Files:** cmd/vloop/run_verify_test.go
 - **Notes for next iteration:** V1: no earlier test changed this attempt. The harness defaultScript already writes an empty verify/v1 report, so a test of a missing report must rm .vloop/tmp/verify.json in the verify phase. The status test runs the built binary from the stub script and writes to $dir/status.txt.
+
+## T5 — Write the /vloop:verify skill within a 1,500-word ceiling
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** Added plugin/skills/verify/SKILL.md (1,032 words): three passes (example, contract, surface), findings with claim/observed/where, verify/v1 report validated by vloop schema validate, writes only under .vloop/tmp/. The budget gains verify with a ceiling of 1,500.
+- **Files:** plugin/skills/verify/SKILL.md, internal/budget/budget.go, internal/cli/readme_test.go, README.md, docs/domain/domain-model.md
+- **Notes for next iteration:** V2: earlier test changed only where it enumerates skills: TestReadmeNamesTheSkills (internal/cli/readme_test.go) gains verify; internal/budget/budget_test.go needed no edit because it iterates budget.Skills. README.md Skills section now says six skills and names /vloop:verify. The eval case plugin/evals/verify-planted-mismatches is not part of this task. domain-model.md On disk layout gained .vloop/tmp/verify.json because TestPluginSkills checks skill paths against it. TestTaskGate* in internal/cli fail inside a loop session (plan-changed env guard), unrelated.

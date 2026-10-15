@@ -1,0 +1,15 @@
+{
+ "schema": "proposal/v1",
+ "task": "T5",
+ "outcome": "done",
+ "summary": "Added plugin/skills/verify/SKILL.md (1,032 words): three passes (example, contract, surface), findings with claim/observed/where, verify/v1 report validated by vloop schema validate, writes only under .vloop/tmp/. The budget gains verify with a ceiling of 1,500.",
+ "files": [
+  "plugin/skills/verify/SKILL.md",
+  "internal/budget/budget.go",
+  "internal/cli/readme_test.go",
+  "README.md",
+  "docs/domain/domain-model.md"
+ ],
+ "verified": "vloop task gate T5 exited 0 and printed gate T5: ok.",
+ "notes": "V2: earlier test changed only where it enumerates skills: TestReadmeNamesTheSkills (internal/cli/readme_test.go) gains verify; internal/budget/budget_test.go needed no edit because it iterates budget.Skills. README.md Skills section now says six skills and names /vloop:verify. The eval case plugin/evals/verify-planted-mismatches is not part of this task. domain-model.md On disk layout gained .vloop/tmp/verify.json because TestPluginSkills checks skill paths against it. TestTaskGate* in internal/cli fail inside a loop session (plan-changed env guard), unrelated."
+}

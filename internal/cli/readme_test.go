@@ -148,7 +148,7 @@ func TestReadmeNamesTheSkills(t *testing.T) {
 	if !regexp.MustCompile(`(?m)^#+ .*Skills`).MatchString(text) {
 		t.Error("README has no heading with \"Skills\"")
 	}
-	for _, k := range []string{"plan", "work", "review", "gate-review", "operate"} {
+	for _, k := range []string{"plan", "work", "review", "gate-review", "operate", "verify"} {
 		if !strings.Contains(text, "/vloop:"+k) {
 			t.Errorf("README does not name /vloop:%s", k)
 		}

@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 8,
+  "iteration": 9,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T11:21:38Z",
+  "updated": "2026-10-15T11:28:15Z",
   "shell": "sh",
   "checks": [
     {
@@ -178,8 +178,8 @@
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/009-go.fail.log"
     },
     {
       "id": "T6",
