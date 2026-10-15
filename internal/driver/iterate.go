@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -139,6 +140,14 @@ func (it *Iterator) warn(format string, a ...any) {
 	}
 }
 
+// clearTmp empties .vloop/tmp/ but for the run lock, warning of any entry it
+// cannot remove.
+func (it *Iterator) clearTmp() {
+	ClearTmp(it.Root, func(entry string, err error) {
+		it.warn("warning: cannot clear %s: %v", path.Join(tmpDir, entry), err)
+	})
+}
+
 // Run works the plan under Root until it ends. A run that cannot continue
 // because of a refusal is a *Halt; every other ending is the returned Ending.
 func (it *Iterator) Run() (Ending, error) {
@@ -214,6 +223,7 @@ func (it *Iterator) Run() (Ending, error) {
 			if blocked > 0 {
 				end = Ending{Status: "blocked", Code: ExitBlocked}
 			} else {
+				it.clearTmp()
 				line, err := it.finalPass()
 				if err != nil {
 					return Ending{}, err
@@ -445,7 +455,6 @@ type workReport struct {
 }
 
 func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterResult, error) {
-	root := it.Root
 	plan := it.plan
 	iter := plan.Iteration + 1
 	started := it.now().UTC()
@@ -453,10 +462,8 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	it.say("── iteration %d (%d this run) · %s · %d/%d done ──", iter, runIters, id, done, total)
 	it.say("   %s", task.Title)
 
-	// A stale handoff from an earlier session is never this session's report.
-	for _, f := range []string{"proposal.json", "verdict.json"} {
-		_ = os.Remove(filepath.Join(root, filepath.FromSlash(tmpDir), f))
-	}
+	// No earlier session's scratch, and no stale handoff, reaches this session.
+	it.clearTmp()
 
 	// 1. work session
 	w, err := it.workSession(task, iter)

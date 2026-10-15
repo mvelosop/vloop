@@ -6,3 +6,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md`
 - **Tasks:** 11
+
+## T1 — Clear .vloop/tmp/ at run start and before every work session and the final pass
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** driver.ClearTmp empties .vloop/tmp/ but for .running (symlinks removed, not followed; unremovable entries warn and the run continues); called at run start after the lock, before every work session and before the final pass.
+- **Files:** internal/driver/cleartmp.go, internal/driver/cleartmp_test.go, internal/driver/iterate.go, internal/cli/run.go
+- **Notes for next iteration:** Evidence nothing relies on .vloop/tmp/ surviving a resume: the files there are plan-problems.md (acceptance.go, written by plan session and read by the next round in the same Plan() call), gate-verdict.json (gatereview.go), proposal.json/verdict.json/checks.json (iterate.go, checks.go: written and read within one iteration), nohooks (gitguard.go gitCmd recreates it on every use), plugin/ and fence/ (Runner.Run in session.go calls ExtractPlugin/ExtractFence before every session), gate-refused (iterate.go removes it before a work session), .running (kept). Clearing points: internal/cli/run.go after AcquireLock; Iterator.iterate before the work session (this also replaces the old proposal.json/verdict.json removal and covers right-after-plan-acceptance); before finalPass. Not between plan rounds nor between work and review. No earlier test changed (S1 not touched). Unit tests cover .running kept, symlink not followed, warning for an unremovable entry, a missing folder; the plan-round and work-to-review hand-offs are covered by the T1 gate script, there is no Go harness running the whole driver. go test ./internal/cli fails when run inside a loop session unless VLOOP_PLAN_SHA256 is unset; that is the session env, not the change.

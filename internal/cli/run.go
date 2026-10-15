@@ -100,6 +100,10 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 			}
 			defer release()
 
+			driver.ClearTmp(root, func(entry string, err error) {
+				fmt.Fprintf(errOut, "warning: cannot clear .vloop/tmp/%s: %v\n", entry, err)
+			})
+
 			awakeWarn := ""
 			if budget.KeepAwake {
 				if err := driver.KeepAwake(); err != nil {
