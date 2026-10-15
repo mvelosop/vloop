@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/9 done** · iteration 9
+**Status:** running · **8/9 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:34:47Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:39:39Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Make prepare create the release branch and open the PR
 - [x] **T6** — Make publish find the release commit, tag it and create the GitHub release
 - [x] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
-- [ ] **T8** — Describe the release tool in the docs and the operator's playbook
+- [x] **T8** — Describe the release tool in the docs and the operator's playbook
 - [ ] **T9** — Close: run the worked example line for line and the real-data check
 
 ## Tasks
@@ -181,7 +181,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Describe the release tool in the docs and the operator's playbook
 
-`pending` · depends on: T7
+`done` · depends on: T7
 
 D1: the docs still describe the manual ceremony this brief retires — five edits and a stamped -X main.version build. They must say the version comes from plugin.json and the release is prepare, the operator's merge, publish, then install and upgrade; this repository's operator playbook must make the release one short step that runs the tool; and the tool gets a short README of its own.
 

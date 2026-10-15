@@ -5,9 +5,9 @@
   "base": "84088d72854b8319d798b7340adb010a975dc398",
   "branch": "B20261015-1651-b17-release",
   "status": "running",
-  "iteration": 9,
+  "iteration": 10,
   "created": "2026-10-15T16:30:00Z",
-  "updated": "2026-10-15T17:34:47Z",
+  "updated": "2026-10-15T17:39:39Z",
   "shell": "sh",
   "checks": [
     {
@@ -251,7 +251,7 @@
         "No doc still tells the operator to edit the version in cmd/vloop/main.go or the tests."
       ],
       "verify": "sh .vloop/state/gates/T8/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

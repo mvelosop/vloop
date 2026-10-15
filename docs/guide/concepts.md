@@ -276,25 +276,29 @@ carries none, and `vloop doctor` warns in this repository that the binary
 carries no commit. Build releases with the stamped build:
 
 ```
-go build -ldflags "-X main.version=<v> -X main.commit=<sha>" -o vloop ./cmd/vloop
+go build -ldflags "-X main.commit=<sha>" -o vloop ./cmd/vloop
 ```
 
-Release steps, as vloop's own releases are made:
+The version is not stamped: the binary reads it from the embedded
+`plugin/.claude-plugin/plugin.json`, so the stamped build sets the commit only.
 
-1. **A release branch and PR** (`release/v<v>`) that sets the version in
-   `cmd/vloop/main.go` and `plugin/.claude-plugin/plugin.json`, and in the tests
-   that pin it (`cmd/vloop/e2e_test.go`, `cmd/vloop/run_harness_test.go`,
-   `internal/cli/root_test.go`). The full suite and `claude plugin validate` pass
-   before it merges.
-2. **Squash-merge** it to the default branch, with the operator's go-ahead.
-3. **Tag** the merge commit: `git tag -a v<v> -m "<what it carries>"`, then push
-   the tag. A version with a suffix (`0.9.0-beta.1`) is a pre-release; upgrading
-   to or from one needs `vloop upgrade --yes`.
-4. **Build stamped** with the tag's version and the merge commit's sha (the
-   command above) wherever the released vloop runs.
-5. **Upgrade the repository** with `vloop upgrade --yes` on its own branch, in its
-   own PR: it refreshes the install stamp and the `CLAUDE.md` section. The README
-   installs `@latest`, so it needs no change.
+Release steps, as vloop's own releases are made with `tools/release`:
+
+1. **Prepare**: `go run ./tools/release prepare <version>` makes the checks
+   (module major, retraction, version after the latest tag, tag absent, `main`
+   clean and equal to origin, the config's checks, `claude plugin validate`),
+   then opens a `release/<version>` branch and PR that changes only the version
+   in `plugin.json`. `--dry-run` writes nothing.
+2. **Merge**: the operator squash-merges the PR to the default branch.
+3. **Publish**: `go run ./tools/release publish <version>` tags the merge commit
+   (annotated), pushes the tag, creates the GitHub release with its notes, then
+   waits for the module proxy and proves the public install. A re-run finishes an
+   interrupted release. A version with a suffix (`0.9.0-beta.1`) is a
+   pre-release; upgrading to or from one needs `vloop upgrade --yes`.
+4. **Install** the released vloop wherever it runs.
+5. **Upgrade the repository** with `vloop upgrade --yes` on its own branch, in
+   its own PR: it refreshes the install stamp and the `CLAUDE.md` section. The
+   README installs `@latest`, so it needs no change.
 
 A binary stamped with HEAD still draws the self-hosting warning; build the next
 vloop with a released one.

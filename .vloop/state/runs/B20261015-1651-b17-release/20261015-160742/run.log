@@ -75,3 +75,10 @@ committing the plan
    review T7 · 0m16s · $0.10 · run $8.41 / $40.00
    review: PASS
    T7 done
+── iteration 10 (10 this run) · T8 · 7/9 done ──
+   Describe the release tool in the docs and the operator's playbook
+   work T8 · 0m27s · $0.13 · run $8.54 / $40.00
+   check go
+   review T8 · 0m15s · $0.09 · run $8.63 / $40.00
+   review: PASS
+   T8 done
