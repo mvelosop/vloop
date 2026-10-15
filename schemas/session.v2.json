@@ -8,7 +8,7 @@
     "schema": { "const": "session/v2" },
     "run_id": { "type": "string" },
     "iteration": { "type": "integer" },
-    "phase": { "enum": ["plan", "work", "review", "gate-review"] },
+    "phase": { "enum": ["plan", "work", "review", "gate-review", "verify"] },
     "task": { "type": "string" },
     "model": { "type": "string" },
     "effort": { "type": ["string", "null"] },
@@ -35,7 +35,7 @@
     "is_error": { "type": "boolean" },
     "permission_denials": { "type": "array" }
   },
-  "if": { "properties": { "phase": { "enum": ["plan", "gate-review"] } }, "required": ["phase"] },
+  "if": { "properties": { "phase": { "enum": ["plan", "gate-review", "verify"] } }, "required": ["phase"] },
   "then": { "not": { "required": ["task"] } },
   "else": { "required": ["task"] }
 }

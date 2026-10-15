@@ -24,6 +24,7 @@ var invalidAt = map[string]string{
 	"session2":     "",
 	"metrics2":     "/tasks/done",
 	"gate-verdict": "/tasks/0/findings/0/kind",
+	"verify":       "/findings/0/kind",
 
 	// export/v1 has one fixture pair per record type; the name is the part before the dash.
 	"export-brief":        "",
@@ -54,7 +55,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "metrics/v1", "metrics/v2", "proposal/v1", "session/v1", "session/v2", "state/v1", "state/v2", "verdict/v1"}
+	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "metrics/v1", "metrics/v2", "proposal/v1", "session/v1", "session/v2", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}
@@ -126,5 +127,17 @@ func TestUnknownKeysAllowed(t *testing.T) {
 	doc := strings.Replace(string(fixture(t, "proposal.valid.json")), `"task"`, `"x_new":{"a":1},"task"`, 1)
 	if vs, _ := Validate("proposal/v1", []byte(doc)); len(vs) != 0 {
 		t.Fatalf("%+v", vs)
+	}
+}
+
+func TestSessionV2VerifyHasNoTask(t *testing.T) {
+	valid := string(fixture(t, "session2.valid.json"))
+	verify := strings.Replace(valid, `"phase":"gate-review"`, `"phase":"verify"`, 1)
+	if vs, _ := Validate("session/v2", []byte(verify)); len(vs) != 0 {
+		t.Fatalf("verify session without task: %+v", vs)
+	}
+	withTask := strings.Replace(verify, `"phase":"verify",`, `"phase":"verify","task":"T1",`, 1)
+	if vs, _ := Validate("session/v2", []byte(withTask)); len(vs) != 1 {
+		t.Fatalf("verify session with task: %+v", vs)
 	}
 }

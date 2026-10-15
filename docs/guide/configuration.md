@@ -22,10 +22,12 @@ environment and in `config set`.
 | `model.work` | `sonnet` | any model name | `VLOOP_MODEL_WORK` | model of the work sessions |
 | `model.review` | `sonnet` | any model name | `VLOOP_MODEL_REVIEW` | model of the review sessions |
 | `model.gate-review` | `sonnet` | any model name | `VLOOP_MODEL_GATE_REVIEW` | model of the gate-review session |
+| `model.verify` | `sonnet` | any model name | `VLOOP_MODEL_VERIFY` | model of the verify session |
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` | effort of the plan session |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` | effort of the work sessions |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` | effort of the review sessions |
 | `effort.gate-review` | unset | same | `VLOOP_EFFORT_GATE_REVIEW` | effort of the gate-review session |
+| `effort.verify` | unset | same | `VLOOP_EFFORT_VERIFY` | effort of the verify session |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
 | `metrics.stacks` | unset | a list of preset names (below) | `VLOOP_METRICS_STACKS` | presets that classify changed lines as code, test, docs or excluded |
@@ -43,6 +45,7 @@ environment and in `config set`.
 | `run.gate-scratch` | unset | a list of doublestar globs | `VLOOP_RUN_GATE_SCRATCH` | repo-relative folders (for example `web/.gate/`) a gate may write into; they are emptied after every gate, and a gate that changes anything else in the tree fails |
 | `run.git-config-ignore` | unset | a list of patterns over `git config --list` keys, `*` matching any run of characters, dots included | `VLOOP_RUN_GIT_CONFIG_IGNORE` | keys of `.git/config` the guard leaves out when it compares the file around every session, gate and check, added to the built-in `branch.*.vscode-merge-base` (an editor's bookkeeping), which is always applied. The guard compares entries, not bytes, so any other key added, removed or changed halts the run (exit 9) and is named. A pattern that could ignore a `core`, `filter`, `include` or `includeif` key is refused: `vloop config set` exits 2, `vloop run` exits 1 |
 | `run.session-timeout` | `60` | a whole number of minutes, 1 or more | `VLOOP_RUN_SESSION_TIMEOUT`  | minutes a plan, work or review session may run; a session still running is killed with everything it started and is a session error (exit 7) |
+| `run.verify` | `true` | `true` or `false` | `VLOOP_RUN_VERIFY`  | whether `vloop run` ends with a verify session that checks the built surface against the brief |
 | `run.keep-awake` | `on` | `on` or `off` | `VLOOP_RUN_KEEP_AWAKE`  | `on` holds a no-idle-sleep hold for the lifetime of `vloop run` (macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`); `off` takes none |
 
 `model.*` and `effort.*` are stored under `[model]` and `[effort]`, the

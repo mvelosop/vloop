@@ -1,21 +1,32 @@
-ok  	github.com/mvelosop/vloop	(cached)
-ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	195.008s
-ok  	github.com/mvelosop/vloop/internal/brief	0.224s
+--- FAIL: TestSchemasAreEmbedded (0.00s)
+    embed_test.go:19: embedded schemas: 17 entries, err <nil>
+FAIL
+FAIL	github.com/mvelosop/vloop	0.258s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	0.906s
+--- FAIL: TestWorkedExampleEnglishSession (0.04s)
+    e2e_test.go:136: got code=0 out="language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\nmodel.gate-review=sonnet (default)\nmodel.verify=sonnet (default)\neffort.plan= (default)\neffort.work= (default)\neffort.review= (default)\neffort.gate-review= (default)\neffort.verify= (default)\nshell=sh (default)\nareas= (default)\nmetrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\nrun.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\nrun.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.gate-scratch= (default)\nrun.git-config-ignore= (default)\nrun.session-timeout=60 (default)\nrun.verify=true (default)\nrun.keep-awake=on (default)\n" err=""
+        want code=0 out="language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\nmodel.gate-review=sonnet (default)\neffort.plan= (default)\neffort.work= (default)\neffort.review= (default)\neffort.gate-review= (default)\nshell=sh (default)\nareas= (default)\nmetrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\nrun.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\nrun.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.gate-scratch= (default)\nrun.git-config-ignore= (default)\nrun.session-timeout=60 (default)\nrun.keep-awake=on (default)\n" err=""
+--- FAIL: TestWorkedExampleB2Commands (0.20s)
+    b2_e2e_test.go:128: got code=0 out="defect/v1\nexport/v1\ngate-verdict/v1\ninstall/v1\nintervention/v1\nintervention/v2\niteration/v1\niteration/v2\nmetrics/v1\nmetrics/v2\nproposal/v1\nsession/v1\nsession/v2\nstate/v1\nstate/v2\nverdict/v1\nverify/v1\n" err=""
+        want code=0 out="defect/v1\nexport/v1\ngate-verdict/v1\ninstall/v1\nintervention/v1\nintervention/v2\niteration/v1\niteration/v2\nmetrics/v1\nmetrics/v2\nproposal/v1\nsession/v1\nsession/v2\nstate/v1\nstate/v2\nverdict/v1\n" err=""
+FAIL
+FAIL	github.com/mvelosop/vloop/cmd/vloop	201.154s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	63.033s
-ok  	github.com/mvelosop/vloop/internal/closing	(cached)
-ok  	github.com/mvelosop/vloop/internal/config	(cached)
-ok  	github.com/mvelosop/vloop/internal/defect	(cached)
-ok  	github.com/mvelosop/vloop/internal/detect	(cached)
-ok  	github.com/mvelosop/vloop/internal/driver	6.225s
+ok  	github.com/mvelosop/vloop/internal/cli	62.935s
+ok  	github.com/mvelosop/vloop/internal/closing	0.269s
+ok  	github.com/mvelosop/vloop/internal/config	0.190s
+ok  	github.com/mvelosop/vloop/internal/defect	2.483s
+ok  	github.com/mvelosop/vloop/internal/detect	0.307s
+ok  	github.com/mvelosop/vloop/internal/driver	6.511s
 ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
 ok  	github.com/mvelosop/vloop/internal/install	(cached)
-ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
-ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	0.273s
+ok  	github.com/mvelosop/vloop/internal/metrics	3.722s
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
-ok  	github.com/mvelosop/vloop/internal/schema	(cached)
-ok  	github.com/mvelosop/vloop/internal/state	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	0.209s
+ok  	github.com/mvelosop/vloop/internal/state	1.391s
+FAIL

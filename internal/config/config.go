@@ -79,10 +79,12 @@ var Keys = []Key{
 	{Name: "model.work", Default: "sonnet"},
 	{Name: "model.review", Default: "sonnet"},
 	{Name: "model.gate-review", Default: "sonnet"},
+	{Name: "model.verify", Default: "sonnet"},
 	{Name: "effort.plan", Valid: efforts},
 	{Name: "effort.work", Valid: efforts},
 	{Name: "effort.review", Valid: efforts},
 	{Name: "effort.gate-review", Valid: efforts},
+	{Name: "effort.verify", Valid: efforts},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
 	{Name: "metrics.stacks", List: true, Stacks: true},
@@ -100,6 +102,7 @@ var Keys = []Key{
 	{Name: "run.gate-scratch", List: true, Glob: true},
 	{Name: "run.git-config-ignore", List: true, Glob: true, GitKeys: true},
 	{Name: BudgetKeys.SessionTimeout, Default: "60", Int: true, Min: 1},
+	{Name: "run.verify", Default: "true", Valid: []string{"true", "false"}},
 	{Name: BudgetKeys.KeepAwake, Default: "on", Valid: []string{"on", "off"}},
 }
 

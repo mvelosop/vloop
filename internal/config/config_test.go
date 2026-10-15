@@ -43,13 +43,13 @@ func TestDefaultsEveryRow(t *testing.T) {
 		set      bool
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
-		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
+		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
-		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.git-config-ignore", "", false}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
+		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.git-config-ignore", "", false}, {"run.session-timeout", "60", true}, {"run.verify", "true", true}, {"run.keep-awake", "on", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -580,5 +580,24 @@ func TestGitConfigIgnoreMixedCaseProtectedRefused(t *testing.T) {
 	}
 	if err := Set(root, "run.git-config-ignore", "Branch.Main.Foo-Bar"); err != nil {
 		t.Errorf("mixed-case subsection pattern refused: %v", err)
+	}
+}
+
+func TestVerifyKeys(t *testing.T) {
+	root := scratch(t)
+	var iv *InvalidValueError
+	if err := Set(root, "run.verify", "maybe"); !errors.As(err, &iv) {
+		t.Errorf("run.verify=maybe: %v", err)
+	}
+	if err := Set(root, "effort.verify", "huge"); !errors.As(err, &iv) {
+		t.Errorf("effort.verify=huge: %v", err)
+	}
+	for k, v := range map[string]string{"run.verify": "false", "effort.verify": "high", "model.verify": "opus"} {
+		if err := Set(root, k, v); err != nil {
+			t.Fatalf("%s: %v", k, err)
+		}
+		if got, err := Get(root, k); err != nil || got.Value != v {
+			t.Errorf("%s = %q, %v", k, got.Value, err)
+		}
 	}
 }
