@@ -132,3 +132,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added cmd/vloop/b16_e2e_test.go: the B16 worked example line for line (config list, verify run with 2 findings, no report, README revert, run.verify=false, close --dry-run, metrics, clearing, retired warnings) and the three planted failures.
 - **Files:** cmd/vloop/b16_e2e_test.go
 - **Notes for next iteration:** Real-data check: the T11 gate compares vloop metrics of every consumed brief and vloop brief check of every brief in docs/briefs/ against a build of the plan's base; identical but for must-change list: and external format: lines, and it exited 0. No product code changed. Messages in the test were asserted against the built binary (the tests passed).
+
+## Run ended — complete
+
+- **Run:** `B20261015-1001-b16-verification-phase` · 18 iteration(s) this run
+- **Plan:** 11/11 done, 0 blocked
