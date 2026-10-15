@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":206339,"exit":0,"name":"go"}],"ended":"2026-10-15T17:54:59Z","gate":{"duration_ms":12395,"exit":0},"iteration":13,"outcome":"done","run_id":"B20261015-1651-b17-release","schema":"iteration/v2","started":"2026-10-15T17:49:33Z","task":"T9"}
