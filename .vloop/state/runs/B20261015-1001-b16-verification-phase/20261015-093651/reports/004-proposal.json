@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "brief check no longer reads ## Pinning tests or ## External formats nor prints the must-change list/external format lines; init's guidelines file is the title and one sentence in en and es.",
+  "files": ["internal/brief/check.go", "internal/brief/pinning.go", "internal/brief/extformat.go", "internal/brief/pinning_test.go", "internal/brief/extformat_test.go", "internal/cli/init.go", "internal/cli/init_test.go", "cmd/vloop/b14_e2e_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go test ./internal/brief and ./cmd/vloop pass.",
+  "notes": "K2: earlier tests changed are TestInitGuidelinesTemplate (init_test.go) and TestWorkedExampleB14Init, TestWorkedExampleB14BriefCheck, TestWorkedExampleB14RealDataBriefCheck (b14_e2e_test.go); they pinned the retired sections/warnings and now assert their absence. TestWorkedExampleB14BriefCheck is the committed test that a guidelines file with both sections yields neither line. b14HasLine helper removed (unused). go test ./internal/cli TestTaskGate* fail inside a loop session (plan-changed env guard), unrelated to this change. Files were deleted with rm, not git rm; the driver commits."
+}

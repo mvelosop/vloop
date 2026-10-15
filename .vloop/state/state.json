@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T10:28:27Z",
+  "updated": "2026-10-15T10:37:16Z",
   "shell": "sh",
   "checks": [
     {
@@ -76,7 +76,7 @@
         "A committed test, run by the checks, asserts that brief check prints neither line for a guidelines file that still has both sections."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

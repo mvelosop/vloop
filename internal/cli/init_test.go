@@ -219,22 +219,9 @@ func TestInitGuidelinesTemplate(t *testing.T) {
 			t.Fatalf("%s: code %d", lang, code)
 		}
 		got := readFile(t, d, ".vloop/repo-guidelines.md")
-		for _, h := range []string{"\n## Pinning tests\n", "\n## External formats\n"} {
-			if !strings.Contains(got, h) {
-				t.Errorf("%s: no %q in:\n%s", lang, h, got)
-			}
-		}
-		inComment := false
-		for _, l := range strings.Split(got, "\n") {
-			if strings.HasPrefix(l, "<!--") {
-				inComment = true
-			}
-			if strings.HasPrefix(l, "- ") && !inComment {
-				t.Errorf("%s: rule outside a comment: %q", lang, l)
-			}
-			if strings.Contains(l, "-->") {
-				inComment = false
-			}
+		// K2 retired the two sections: the title and one sentence only.
+		if n := len(strings.Split(strings.TrimSpace(got), "\n\n")); n != 2 || strings.Contains(got, "## ") || strings.Contains(got, "<!--") {
+			t.Errorf("%s: not the title and one sentence:\n%s", lang, got)
 		}
 		if lang == "es" && !strings.Contains(got, "lecciones") {
 			t.Errorf("es prose is not Spanish:\n%s", got)

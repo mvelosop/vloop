@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/11 done** · iteration 3
+**Status:** running · **2/11 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T10:28:27Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T10:37:16Z
 
 ## Progress
 
 - [x] **T1** — Clear .vloop/tmp/ at run start and before every work session and the final pass · 2 attempt(s)
-- [ ] **T2** — Retire brief check's must-change list and external format warnings and init's two guidelines sections
+- [x] **T2** — Retire brief check's must-change list and external format warnings and init's two guidelines sections
 - [ ] **T3** — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2
 - [ ] **T4** — Run one verify session after the final pass of every complete run and keep its report
 - [ ] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling
@@ -47,7 +47,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Retire brief check's must-change list and external format warnings and init's two guidelines sections
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 vloop brief check warns from two sections of .vloop/repo-guidelines.md — `## Pinning tests` and `## External formats` — that no repository uses and that send tool rules to every session. K2 removes the reading of both, both warnings, and the two sections from the guidelines file vloop init writes. It comes early so later tasks do not read code that is going away.
 

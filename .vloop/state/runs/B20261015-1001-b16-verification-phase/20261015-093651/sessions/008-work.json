@@ -1,0 +1,31 @@
+{
+  "cost_usd": 0.2465567,
+  "duration_ms": 299431,
+  "effort": null,
+  "ended": "2026-10-15T10:33:29Z",
+  "is_error": false,
+  "iteration": 4,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 34590,
+      "cache_read_input_tokens": 507167,
+      "cost_usd": 0.2465567,
+      "input_tokens": 30,
+      "output_tokens": 5742
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "git rm -q internal/brief/pinning.go internal/brief/extformat.go internal/brief/pinning_test.go internal/brief/extformat_test.go\npython3 - \u003c\u003c'E'\nimport re\np='internal/brief/check.go'\ns=open(p).read()\ns…",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261015-1001-b16-verification-phase",
+  "schema": "session/v1",
+  "started": "2026-10-15T10:28:28Z",
+  "task": "T2",
+  "turns": 16,
+  "wall_ms": 300629
+}
