@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/9 done** · iteration 5
+**Status:** running · **4/9 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:01:43Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:07:43Z
 
 ## Progress
 
 - [x] **T1** — Read the binary's version from the embedded plugin.json · 1 attempt(s)
 - [x] **T2** — Record the module version in .vloop/install.json · 1 attempt(s)
 - [x] **T3** — Add tools/release with the notes subcommand
-- [ ] **T4** — Make prepare's checks, refusing before anything is written
+- [x] **T4** — Make prepare's checks, refusing before anything is written
 - [ ] **T5** — Make prepare create the release branch and open the PR
 - [ ] **T6** — Make publish find the release commit, tag it and create the GitHub release
 - [ ] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
@@ -90,7 +90,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Make prepare's checks, refusing before anything is written
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 `prepare <version>` must refuse a bad release before it writes, commits, tags or pushes anything. This task builds the checks in the brief's order — version form, module-path major, retraction, after the latest tag, tag absent, on main / clean / equal to origin/main after a fetch, every [[check]] then `claude plugin validate plugin` — and --dry-run, which makes them all and writes nothing. T5 adds what prepare does once they pass.
 

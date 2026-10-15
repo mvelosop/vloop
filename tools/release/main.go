@@ -2,6 +2,7 @@
 // It is a repository-owned program, not a vloop subcommand.
 //
 //	release notes <from> <to>   the release notes for the range from..to, on stdout
+//	release prepare <version>   check a release; --dry-run writes nothing
 package main
 
 import (
@@ -19,8 +20,11 @@ func main() {
 // run executes one invocation against the repository at dir and returns the
 // exit code: 0 done, 1 refused or failed, 2 usage.
 func run(args []string, dir string, stdout, stderr io.Writer) int {
+	if len(args) > 0 && args[0] == "prepare" {
+		return prepare(dir, args[1:], stdout, stderr)
+	}
 	if len(args) == 0 || args[0] != "notes" {
-		fmt.Fprintln(stderr, "usage: release notes <from> <to>")
+		fmt.Fprintln(stderr, "usage: release notes <from> <to> | prepare <version> [--dry-run]")
 		return 2
 	}
 	if len(args) != 3 {

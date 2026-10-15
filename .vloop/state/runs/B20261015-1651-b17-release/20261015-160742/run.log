@@ -47,3 +47,10 @@ committing the plan
    review T3 · 0m18s · $0.11 · run $6.84 / $40.00
    review: PASS
    T3 done
+── iteration 6 (6 this run) · T4 · 3/9 done ──
+   Make prepare's checks, refusing before anything is written
+   work T4 · 1m49s · $0.34 · run $7.18 / $40.00
+   check go
+   review T4 · 0m20s · $0.12 · run $7.30 / $40.00
+   review: PASS
+   T4 done
