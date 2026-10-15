@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/11 done** · iteration 13
+**Status:** running · **8/11 done** · iteration 14
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:52:24Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:59:22Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling · 1 attempt(s)
 - [x] **T6** — Add the verify-planted-mismatches eval case · 1 attempt(s)
 - [x] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
-- [ ] **T8** — Print the verify findings first in vloop brief close and close --dry-run
+- [x] **T8** — Print the verify findings first in vloop brief close and close --dry-run
 - [ ] **T9** — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
 - [ ] **T10** — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks
 - [ ] **T11** — Close: commit the worked example as an end-to-end test and pass the real-data check
@@ -177,7 +177,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Print the verify findings first in vloop brief close and close --dry-run
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 The operator states findings (or --no-findings) at close; they should do so having read what the verify session found. vloop brief close and its --dry-run now print, before anything else, the newest verify report of the brief's runs. Recording stays the operator's: a verify finding becomes an intervention only when passed as a --finding.
 

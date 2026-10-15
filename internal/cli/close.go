@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -121,6 +122,9 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 		return incompletePlan(root, briefPath, c)
 	}
 
+	if !g.JSON {
+		printVerifyReport(out, root, m)
+	}
 	now := time.Now()
 	status, statusText := "consumed", "consumed — closed "+now.Format("2006-01-02")+" as run "+runID+". **Do not re-plan from this brief.**"
 	if opt.abandon {
@@ -180,6 +184,41 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 	printClosed(out, report, files, sha, subject)
 	fmt.Fprintf(out, "squash-merge with the trailer: %s\n", trailer)
 	return nil
+}
+
+// printVerifyReport prints the report of the newest of the brief's run folders
+// that holds reports/verify.json, so the operator states findings having read
+// it. It records nothing.
+func printVerifyReport(out io.Writer, root string, m *runs.Model) {
+	for i := len(m.Folders) - 1; i >= 0; i-- {
+		p := m.Folders[i].Path
+		raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(p), "reports", "verify.json"))
+		if err != nil {
+			continue
+		}
+		var rep struct {
+			Findings []struct {
+				Kind     string `json:"kind"`
+				Claim    string `json:"claim"`
+				Observed string `json:"observed"`
+				Where    string `json:"where"`
+			} `json:"findings"`
+		}
+		if json.Unmarshal(raw, &rep) != nil {
+			continue
+		}
+		head := "verify of " + m.RunID + "/" + path.Base(p)
+		if len(rep.Findings) == 0 {
+			fmt.Fprintf(out, "%s: no findings\n", head)
+			return
+		}
+		fmt.Fprintf(out, "%s: %d finding(s)\n", head, len(rep.Findings))
+		for j, f := range rep.Findings {
+			fmt.Fprintf(out, "  %d. %s — %s\n     brief:    %s\n     observed: %s\n", j+1, f.Kind, f.Where, f.Claim, f.Observed)
+		}
+		return
+	}
+	fmt.Fprintln(out, "no verify report — verify by hand")
 }
 
 // encodeClosed prints the close's --json result.

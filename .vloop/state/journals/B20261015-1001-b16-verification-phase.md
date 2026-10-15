@@ -97,3 +97,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop metrics shows the verify session after gate review on the time, cost and models lines, in the total but not agent, and adds verify to the instructions line when plugin/skills/verify/SKILL.md exists; --json gains the optional verify fields.
 - **Files:** internal/metrics/time.go, internal/metrics/metrics.go, internal/metrics/instructions.go, internal/metrics/print.go, schemas/metrics.v2.json, internal/metrics/print_test.go
 - **Notes for next iteration:** Verify JSON fields are pointers with omitempty, present only when the brief held a verify session (or the verify skill exists, for instructions.verify), so older briefs print and serialise as before. TestPrintSummaryVerify in internal/metrics/print_test.go covers the three lines, instructions, JSON fields and the no-verify case. go test ./internal/cli task_gate tests failed only because they ran inside a work session (plan-changed guard), not from this change.
+
+## T8 — Print the verify findings first in vloop brief close and close --dry-run
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop brief close and close --dry-run now print the newest verify report of the brief's run folders first (findings block, 'no findings', or 'no verify report — verify by hand'); close records nothing from it.
+- **Files:** internal/cli/close.go, internal/cli/close_test.go, internal/cli/close_flags_test.go
+- **Notes for next iteration:** V4: close_test.go and close_flags_test.go changed only where they pin close's first line (now prefixed by the no-verify-report line). Block is skipped under --json so the JSON output stays one document. TestTaskGate* fail inside a loop session (plan-changed guard), unrelated.

@@ -185,7 +185,7 @@ func TestCloseCommitsFindingsSnapshotAndBrief(t *testing.T) {
 	if w := "squash-merge with the trailer: Vloop-Brief: " + closeName; lines[n-1] != w {
 		t.Errorf("last line = %q, want %q", lines[n-1], w)
 	}
-	if !strings.HasPrefix(collapse(out), closeBrief+" consumed · not merged\n") {
+	if !strings.HasPrefix(collapse(out), noVerify+closeBrief+" consumed · not merged\n") {
 		t.Errorf("summary: %q", out)
 	}
 
@@ -382,5 +382,43 @@ func TestCloseRefusesFindingWithoutOrigin(t *testing.T) {
 	}
 	if s := gitOutput(t, dir, "status", "--porcelain", "--untracked-files=all"); s != "" {
 		t.Errorf("a refused close wrote: %s", s)
+	}
+}
+
+// noVerify is the first line close prints when no run folder holds a verify
+// report (V4).
+const noVerify = "no verify report — verify by hand\n"
+
+func TestCloseVerifyBlock(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	folder := ".loop/state/runs/" + closeBrief + "/"
+	report := func(name, body string) {
+		write(t, dir, folder+name+"/reports/verify.json", body)
+		gitIn(t, dir, "2026-01-01T10:00:00Z", "add", "-A")
+		gitIn(t, dir, "2026-01-01T10:00:00Z", "commit", "-q", "-m", "report "+name)
+	}
+	first := func() string {
+		code, out, errs := runCLI(t, dir, "brief", "close", closeName, "--dry-run", "--no-findings")
+		if code != 0 || errs != "" {
+			t.Fatalf("exit %d: %s", code, errs)
+		}
+		return strings.SplitN(out, closeBrief+" ", 2)[0]
+	}
+	if got := first(); got != "no verify report — verify by hand\n" {
+		t.Errorf("no report: %q", got)
+	}
+	report("20260101-090000", `{"schema":"verify/v1","findings":[],"checked":{"example_lines":0,"sentences":0,"surfaces":0},"notes":""}`)
+	if got, want := first(), "verify of "+closeBrief+"/20260101-090000: no findings\n"; got != want {
+		t.Errorf("empty: %q, want %q", got, want)
+	}
+	write(t, dir, folder+"20260101-095000/loop.log", "[loop] planning from docs/briefs/"+closeName+".md using opus\n")
+	report("20260101-095000", `{"schema":"verify/v1","findings":[{"kind":"example","claim":"exit 2","observed":"exit 1","where":"Worked example"}],"checked":{"example_lines":1,"sentences":0,"surfaces":0},"notes":""}`)
+	want := "verify of " + closeBrief + "/20260101-095000: 1 finding(s)\n  1. example — Worked example\n     brief:    exit 2\n     observed: exit 1\n"
+	if got := first(); got != want {
+		t.Errorf("newest: %q, want %q", got, want)
+	}
+	code, out, errs := runCLI(t, dir, "brief", "close", closeName)
+	if code != 2 || out != "" || errs != "vloop: "+closeFindingsMsg+"\n" {
+		t.Errorf("refusal: exit %d %q %q", code, out, errs)
 	}
 }

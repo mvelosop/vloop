@@ -14,7 +14,7 @@ func TestCloseAbandonStalledRun(t *testing.T) {
 	if code != 0 || errs != "" {
 		t.Fatalf("exit %d: %s", code, errs)
 	}
-	if !strings.HasPrefix(collapse(out), closeBrief+" abandoned · not merged\n") {
+	if !strings.HasPrefix(collapse(out), noVerify+closeBrief+" abandoned · not merged\n") {
 		t.Errorf("summary: %q", out)
 	}
 	brief, err := os.ReadFile(filepath.Join(dir, "docs/briefs/"+closeName+".md"))
@@ -73,7 +73,7 @@ func TestCloseDryRunWritesNothing(t *testing.T) {
 	}
 	lines := strings.Split(strings.TrimRight(out, "\n"), "\n")
 	n := len(lines)
-	if !strings.HasPrefix(collapse(out), closeBrief+" consumed · not merged\n") || !strings.Contains(collapse(out), "operator 1") {
+	if !strings.HasPrefix(collapse(out), noVerify+closeBrief+" consumed · not merged\n") || !strings.Contains(collapse(out), "operator 1") {
 		t.Errorf("summary: %q", out)
 	}
 	if !strings.HasPrefix(lines[n-4], "would record .vloop/interventions/I") || !strings.HasSuffix(lines[n-4], "-readme-omits-the-flag.md") {
@@ -109,7 +109,7 @@ func TestCloseDryRunRefusalsStillWin(t *testing.T) {
 		t.Errorf("no findings flag: exit %d %q %q", code, out, errs)
 	}
 	code, out, _ = runCLI(t, dir, "brief", "close", closeName, "--abandon", "x", "--no-findings", "--dry-run")
-	if code != 0 || !strings.HasPrefix(collapse(out), closeBrief+" abandoned") {
+	if code != 0 || !strings.HasPrefix(collapse(out), noVerify+closeBrief+" abandoned") {
 		t.Errorf("abandon dry run: exit %d %q", code, out)
 	}
 }

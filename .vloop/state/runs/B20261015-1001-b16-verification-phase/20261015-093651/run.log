@@ -98,3 +98,10 @@ committing the plan
    review T7 · 0m18s · $0.12 · run $12.68 / $40.00
    review: PASS
    T7 done
+── iteration 14 (14 this run) · T8 · 7/11 done ──
+   Print the verify findings first in vloop brief close and close --dry-run
+   work T8 · 2m04s · $0.24 · run $12.92 / $40.00
+   check go
+   review T8 · 0m14s · $0.09 · run $13.01 / $40.00
+   review: PASS
+   T8 done

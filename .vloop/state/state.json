@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 13,
+  "iteration": 14,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T11:52:24Z",
+  "updated": "2026-10-15T11:59:22Z",
   "shell": "sh",
   "checks": [
     {
@@ -259,7 +259,7 @@
         "Committed tests, run by the checks, cover the block, the empty report, no report and the newest-folder choice. internal/cli/close_test.go and internal/cli/close_flags_test.go change only where they pin close's first lines, and only to the new behaviour, the notes naming V4 for each."
       ],
       "verify": "sh .vloop/state/gates/T8/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
