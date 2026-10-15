@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **10/11 done** · iteration 17
+**Status:** running · **11/11 done** · iteration 18
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T12:17:23Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T12:24:37Z
 
 ## Progress
 
@@ -18,7 +18,7 @@
 - [x] **T8** — Print the verify findings first in vloop brief close and close --dry-run
 - [x] **T9** — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
 - [x] **T10** — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks · 1 attempt(s)
-- [ ] **T11** — Close: commit the worked example as an end-to-end test and pass the real-data check
+- [x] **T11** — Close: commit the worked example as an end-to-end test and pass the real-data check
 
 ## Tasks
 
@@ -241,7 +241,7 @@ sh .vloop/state/gates/T10/gate.sh
 
 ### T11 — Close: commit the worked example as an end-to-end test and pass the real-data check
 
-`pending` · depends on: T10
+`done` · depends on: T10
 
 The last task proves the brief as a whole: its worked example, line for line, as a committed end-to-end test with stub sessions in temporary repositories, its planted failures, and the real-data check on this repository's briefs. No verify session runs for real in this run — B16 is run by 0.10.0 — so this test is the whole brief's evidence until the next release.
 

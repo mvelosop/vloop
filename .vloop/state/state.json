@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 17,
+  "iteration": 18,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T12:17:23Z",
+  "updated": "2026-10-15T12:24:37Z",
   "shell": "sh",
   "checks": [
     {
@@ -359,7 +359,7 @@
         "No product code changes in this task unless the worked example exposes a defect, which the notes then name with the contract item it violates."
       ],
       "verify": "sh .vloop/state/gates/T11/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

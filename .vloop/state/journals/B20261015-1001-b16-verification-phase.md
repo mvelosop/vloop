@@ -125,3 +125,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Fixed the review finding: both operate playbooks now quote `vloop brief close <brief> --dry-run` with the required brief argument. The rest of the docs were already accepted.
 - **Files:** plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md
 - **Notes for next iteration:** Only the command quote changed this attempt; operate SKILL.md is 1,647 words.
+
+## T11 — Close: commit the worked example as an end-to-end test and pass the real-data check
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added cmd/vloop/b16_e2e_test.go: the B16 worked example line for line (config list, verify run with 2 findings, no report, README revert, run.verify=false, close --dry-run, metrics, clearing, retired warnings) and the three planted failures.
+- **Files:** cmd/vloop/b16_e2e_test.go
+- **Notes for next iteration:** Real-data check: the T11 gate compares vloop metrics of every consumed brief and vloop brief check of every brief in docs/briefs/ against a build of the plan's base; identical but for must-change list: and external format: lines, and it exited 0. No product code changed. Messages in the test were asserted against the built binary (the tests passed).

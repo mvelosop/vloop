@@ -125,3 +125,10 @@ committing the plan
    review T10 · 0m21s · $0.11 · run $13.92 / $40.00
    review: PASS
    T10 done
+── iteration 18 (18 this run) · T11 · 10/11 done ──
+   Close: commit the worked example as an end-to-end test and pass the real-data check
+   work T11 · 1m50s · $0.32 · run $14.24 / $40.00
+   check go
+   review T11 · 0m15s · $0.11 · run $14.35 / $40.00
+   review: PASS
+   T11 done
