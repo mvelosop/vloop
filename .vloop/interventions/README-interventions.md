@@ -72,6 +72,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | no | recommended | [I20261011-2339-b14-skills-measured-in-words-with-ceilin](I20261011-2339-b14-skills-measured-in-words-with-ceilin.md) |
 | design | decision | no | recommended | [I20261011-2353-b14-closing-a-brief-triggers-the-learnin](I20261011-2353-b14-closing-a-brief-triggers-the-learnin.md) |
 | design | decision | no | recommended | [I20261014-1143-b15-s-design-forks-operator-count-escape](I20261014-1143-b15-s-design-forks-operator-count-escape.md) |
+| design | decision | no | recommended | [I20261015-101819-b16-s-design-forks-scope-filtered-to-the](I20261015-101819-b16-s-design-forks-scope-filtered-to-the.md) |
 | design | direction | no | no-options | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | no-options | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | no-options | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
@@ -112,8 +113,11 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | partly | no-options | [I20261014-1823-t1-reset-after-the-check-failed-on-the-p](I20261014-1823-t1-reset-after-the-check-failed-on-the-p.md) |
 | halt | repair | no | no-options | [I20261014-1823-t10-s-disputed-gate-fixed-the-real-data](I20261014-1823-t10-s-disputed-gate-fixed-the-real-data.md) |
 | halt | repair | partly | no-options | [I20261014-1823-t13-s-disputed-gate-fixed-bsd-awk-consum](I20261014-1823-t13-s-disputed-gate-fixed-bsd-awk-consum.md) |
+| halt | repair | yes | no-options | [I20261015-151132-base-check-halted-on-a-github-pr-extensi](I20261015-151132-base-check-halted-on-a-github-pr-extensi.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
+| verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
+| verify | direction | no | no-options | [I20261015-151133-operator-fix-the-three-problems-found-in](I20261015-151133-operator-fix-the-three-problems-found-in.md) |
 | verify | halt | partly | no-options | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |
 | verify | repair | partly | no-options | [I20260930-0805-the-planning-session-moved-this-repo-s-r](I20260930-0805-the-planning-session-moved-this-repo-s-r.md) |
 | verify | repair | yes | no-options | [I20260930-1300-a-rehearsal-clone-took-the-work-branch-a](I20260930-1300-a-rehearsal-clone-took-the-work-branch-a.md) |
