@@ -2,7 +2,7 @@
 name: B20261015-1001-b16-verification-phase.loop-brief
 description: Add a verification phase — one /vloop:verify session after the final pass that checks the worked example, the contract and every surface stating a changed behaviour, its findings shown at close — clear .vloop/tmp so no session's scratch reaches a check, let an earlier test change only where the contract changes what it pins, and retire brief check's pinning-test and external-format warnings
 kind: brief
-status: draft
+status: ready
 created: 2026-10-15
 seeds: The roadmap's B16 row, filtered at design time on 2026-10-15; vloop release follows as B17
 depends-on: [B20261014-1138-b15-code-health-escapes.loop-brief]
