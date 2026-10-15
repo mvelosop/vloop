@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added run.verify, model.verify and effort.verify config keys, schemas/verify.v1.json, and verify as a task-less phase of session/v2; documented the keys in docs/guide/configuration.md.
 - **Files:** internal/config/config.go, schemas/verify.v1.json, schemas/session.v2.json, docs/guide/configuration.md, internal/config/config_test.go, internal/cli/config_test.go, internal/cli/schema_test.go, internal/schema/schema_test.go, internal/schema/testdata/verify.valid.json, internal/schema/testdata/verify.invalid.json
 - **Notes for next iteration:** V1: earlier tests changed only where they enumerate keys/schema names: TestConfigListDefaults, TestConfigListJSONOrderAndNull (internal/cli/config_test.go), the key list in internal/config/config_test.go, TestSchemaList (count 16 to 17) and TestNames, each only to add the three keys or verify/v1. configuration.md gained three rows because guide tests require every key documented. Nothing consumes the keys yet (T4); ModelEffort resolves model.verify/effort.verify generically once a Phase constant exists.
+
+## T3 — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Fixed the check failure: three earlier tests that enumerate config keys and schema names now include the verify keys and verify/v1.
+- **Files:** embed_test.go, cmd/vloop/e2e_test.go, cmd/vloop/b2_e2e_test.go
+- **Notes for next iteration:** V1: the check failure was three enumerations outside the named files: TestSchemasAreEmbedded (embed_test.go, 16 to 17), TestWorkedExampleEnglishSession (e2e_test.go, config list gains model.verify, effort.verify, run.verify) and TestWorkedExampleB2Commands (b2_e2e_test.go, schema list gains verify/v1); each changed only to add the new names. Production code unchanged this attempt.

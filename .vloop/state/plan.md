@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/11 done** · iteration 5
+**Status:** running · **3/11 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T10:45:34Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T10:53:15Z
 
 ## Progress
 
 - [x] **T1** — Clear .vloop/tmp/ at run start and before every work session and the final pass · 2 attempt(s)
 - [x] **T2** — Retire brief check's must-change list and external format warnings and init's two guidelines sections
-- [ ] **T3** — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2 · 1 attempt(s)
+- [x] **T3** — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2 · 1 attempt(s)
 - [ ] **T4** — Run one verify session after the final pass of every complete run and keep its report
 - [ ] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling
 - [ ] **T6** — Add the verify-planted-mismatches eval case
@@ -69,7 +69,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2
 
-`pending` · 1 attempt(s) · depends on: T2
+`done` · 1 attempt(s) · depends on: T2
 
 The verify session needs its configuration and its two record formats before the driver can run it (T4). This task adds run.verify, model.verify and effort.verify; schemas/verify.v1.json, the report the session writes; and verify as a phase of session/v2 with no task, like plan and gate-review. Nothing runs a verify session yet.
 
@@ -79,8 +79,6 @@ The verify session needs its configuration and its two record formats before the
 - schemas/verify.v1.json defines verify/v1: `schema`, `findings` (each `{kind, claim, observed, where}`, kind one of `example`, `contract`, `surface`, all four required strings), `checked` (`{example_lines, sentences, surfaces}`, integers) and `notes`; `vloop schema list` lists it and `vloop schema validate verify/v1` accepts a valid report and rejects one that breaks any of those rules.
 - schemas/session.v2.json's phase gains `verify`, which, like plan and gate-review, has no task; no schema version changes and existing records stay valid.
 - Committed tests, run by the checks, cover the three keys, the report schema (valid and invalid cases) and the verify phase in session/v2. internal/cli/config_test.go and internal/config/config_test.go change only where they enumerate the keys, and only to add the three (V1), the notes naming V1 for each; the schema package's list of names changes only to add verify/v1.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/005-go.fail.log
 
 <details><summary>verify command</summary>
 
