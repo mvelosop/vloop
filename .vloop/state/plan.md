@@ -51,7 +51,7 @@ v0.11.0 showed that a public `go install …@v0.11.0` writes "commit":"unknown" 
 
 **Acceptance**
 
-- `vloop init` and `vloop upgrade` write "module": "<module version>" into .vloop/install.json, immediately after "commit", when the binary's build info carries a module version (the value `vloop version` prints as module); they leave the key out otherwise — including on an upgrade by a binary with none, over a stamp that had one.
+- `vloop init` and `vloop upgrade` write "module": "&lt;module version&gt;" into .vloop/install.json, immediately after "commit", when the binary's build info carries a module version (the value `vloop version` prints as module); they leave the key out otherwise — including on an upgrade by a binary with none, over a stamp that had one.
 - schemas/install.v1.json gains `module` as an optional string property; `required` and the schema name (install/v1) are unchanged, and a stamp without module stays valid.
 - No other behaviour of init or upgrade changes (I1 only).
 - Committed tests, run by the checks, cover init and upgrade with and without a module version (through the existing build-info seam, not a real network install) and the schema accepting a stamp with a string module and without one. An earlier test changes only where it pins the stamp's exact content, and only to the new behaviour; the notes name I1 for each.
@@ -74,7 +74,7 @@ The release tool is a repository-owned Go program, `go run ./tools/release`, not
 
 - tools/release is `package main` in this module (it may use internal packages); no new dependency in go.mod, and no `vloop` subcommand is added for releasing.
 - `notes <from> <to>` prints, on stdout with exit 0, the brief's exact Markdown: `## Briefs`, a blank line, `- **<title>** — <description>` lines; a blank line; `## Other changes`, a blank line, `- <subject>` lines. A section with no lines is left out; with neither the output is `No changes.`
-- Commits are those after <from> up to and including <to> (tags or revisions). A brief is named by a commit's `Vloop-Brief: <name>` trailer; one line per brief, oldest first; <title> is the brief's first heading with a leading `Brief — ` and `vloop ` removed, else the brief's name; <description> is its frontmatter description; both read at <to>.
+- Commits are those after &lt;from&gt; up to and including &lt;to&gt; (tags or revisions). A brief is named by a commit's `Vloop-Brief: <name>` trailer; one line per brief, oldest first; &lt;title&gt; is the brief's first heading with a leading `Brief — ` and `vloop ` removed, else the brief's name; &lt;description&gt; is its frontmatter description; both read at &lt;to&gt;.
 - Other changes are the commits without the trailer whose changes touch a file outside docs/, .vloop/ and CLAUDE.md and whose subject does not start `Release v`, oldest first.
 - Refusals are one stderr line starting `release: `; exit codes are 0 done, 1 refused or failed, 2 usage (a wrong number of arguments or an unknown subcommand).
 - The task's notes carry the real-data check, run on a clone of this repository: the full output of `notes v0.10.0 v0.11.0` (B16 alone under Briefs) and of `notes v0.9.0 v0.10.0` (B13, B14 and B15).
@@ -97,7 +97,7 @@ sh .vloop/state/gates/T3/gate.sh
 **Acceptance**
 
 - The checks run in the brief's order, each with its exact message: `release: <version> is not a version: vX.Y.Z or vX.Y.Z-<pre>` (exit 2); `release: <version> needs the module path to end in /v<major>, and github.com/mvelosop/vloop does not`; `release: <version> is retracted in go.mod` (single versions and ranges); `release: <version> is not after the latest release <tag>`; `release: tag <version> already exists` (locally or on origin); `release: prepare runs on main, not <branch>`; `release: the working tree is not clean`; `release: main is not origin/main — pull or push first`; `release: check <name> failed` with the check's output on stderr; `release: claude plugin validate plugin failed` — each exit 1 except the first.
-- Versions are vX.Y.Z or vX.Y.Z-<pre> (semver); the latest release is the highest tag that is a version (other tags are ignored), and a pre-release sorts before its release (v0.12.0-rc.1 < v0.12.0). The module path is read from go.mod.
+- Versions are vX.Y.Z or vX.Y.Z-&lt;pre&gt; (semver); the latest release is the highest tag that is a version (other tags are ignored), and a pre-release sorts before its release (v0.12.0-rc.1 &lt; v0.12.0). The module path is read from go.mod.
 - Every refusal happens before anything is written: no file, commit, branch, tag or push, and no gh call that writes. A refusal that wrote anything is a violation.
 - `--dry-run` (accepted after the version, as `prepare v0.12.0 --dry-run`) makes every check, the [[check]] runs and claude plugin validate included, prints what it would do, and writes nothing.
 - git, gh, go and claude are run from PATH. The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
@@ -115,11 +115,11 @@ sh .vloop/state/gates/T4/gate.sh
 
 `done` · depends on: T4
 
-Once its checks pass, prepare does the first outward half of a release so the operator only has to review and squash-merge: a release/<version> branch from main whose one commit, `Release <version>`, changes only plugin.json's version (one line, thanks to V1), pushed, with a PR titled `Release <version>` whose body is the notes from the latest version tag to main. The merge stays the operator's.
+Once its checks pass, prepare does the first outward half of a release so the operator only has to review and squash-merge: a release/&lt;version&gt; branch from main whose one commit, `Release <version>`, changes only plugin.json's version (one line, thanks to V1), pushed, with a PR titled `Release <version>` whose body is the notes from the latest version tag to main. The merge stays the operator's.
 
 **Acceptance**
 
-- prepare <version> creates release/<version> from main, sets plugin/.claude-plugin/plugin.json's version (the version without its v) changing only that line, commits `Release <version>` as the branch's one commit, pushes the branch to origin, and opens a PR with gh titled `Release <version>` whose body is `notes <latest version tag> main`.
+- prepare &lt;version&gt; creates release/&lt;version&gt; from main, sets plugin/.claude-plugin/plugin.json's version (the version without its v) changing only that line, commits `Release <version>` as the branch's one commit, pushes the branch to origin, and opens a PR with gh titled `Release <version>` whose body is `notes <latest version tag> main`.
 - On success stdout ends with exactly `prepared release/<version>: <PR url>` and `squash-merge it, then: go run ./tools/release publish <version>`; exit 0.
 - The tool never merges, never pushes or commits to main and never tags. Any of those is a violation.
 - The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
@@ -141,9 +141,9 @@ After the operator's merge, publish does the second outward half. It fetches ori
 
 **Acceptance**
 
-- publish <version> fetches origin and finds the release commit before anything is written; none refuses `release: no release commit for <version> on origin/main — merge the release PR first` (exit 1), with no tag and no release created. Tagging before finding the release commit is a violation.
-- It creates the annotated tag <version> on the release commit (not origin/main's tip), message `<version>: <brief titles joined by "; ">` from the briefs of `notes <previous version tag> <release commit>`, or `<version>` alone without briefs, and pushes it. A tag already on that commit is kept; one elsewhere refuses `release: tag <version> points at <sha>, not the release commit <sha>` (exit 1), leaving the tag as it was.
-- It runs `gh release create <version> --verify-tag`, titled <version>, with `notes <previous version tag> <version>` as the notes, and --prerelease for a version with a -<pre> suffix. An existing release is kept.
+- publish &lt;version&gt; fetches origin and finds the release commit before anything is written; none refuses `release: no release commit for <version> on origin/main — merge the release PR first` (exit 1), with no tag and no release created. Tagging before finding the release commit is a violation.
+- It creates the annotated tag &lt;version&gt; on the release commit (not origin/main's tip), message `<version>: <brief titles joined by "; ">` from the briefs of `notes <previous version tag> <release commit>`, or `<version>` alone without briefs, and pushes it. A tag already on that commit is kept; one elsewhere refuses `release: tag <version> points at <sha>, not the release commit <sha>` (exit 1), leaving the tag as it was.
+- It runs `gh release create <version> --verify-tag`, titled &lt;version&gt;, with `notes <previous version tag> <version>` as the notes, and --prerelease for a version with a -&lt;pre&gt; suffix. An existing release is kept.
 - On success stdout ends with exactly the brief's four lines: `published <version>: <release url>`, `install: go install github.com/mvelosop/vloop/cmd/vloop@<version>`, `then, in each repository: vloop upgrade`, `and for the plugin: claude plugin marketplace update vloop && claude plugin update vloop@vloop`.
 - publish never pushes to main and never merges. The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
 - Committed tests, run by the checks, cover the release-commit search (including a decoy subject whose plugin.json does not hold the version), the refusal before any write, the tag's commit and message, the tag elsewhere, and gh's arguments for a release and a pre-release.
@@ -165,7 +165,7 @@ A release is done only when `go install …@<version>` from the public proxy ins
 **Acceptance**
 
 - After the tag and the release, publish retries `go list -m github.com/mvelosop/vloop@<version>` every 30 seconds until it succeeds, up to --wait (default 10m), else refuses `release: the module proxy does not serve <version> after <wait>` (exit 1).
-- Then `go install github.com/mvelosop/vloop/cmd/vloop@<version>` into a temporary GOBIN (never inside the repository), whose `vloop version --json` must report the version (without v) and the module (<version>); otherwise `release: go install …@<version> reports version <v>, module <m>` (exit 1).
+- Then `go install github.com/mvelosop/vloop/cmd/vloop@<version>` into a temporary GOBIN (never inside the repository), whose `vloop version --json` must report the version (without v) and the module (&lt;version&gt;); otherwise `release: go install …@<version> reports version <v>, module <m>` (exit 1).
 - Each step already done prints `<step>: already done` (`tag: already done`, `release: already done`) and is skipped; a fully done release re-runs only the public-install check and ends with the four success lines, exit 0.
 - `publish <version> --dry-run` makes the checks it can without writing — no tag, push or release — and prints each step.
 - The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
