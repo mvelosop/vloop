@@ -2,7 +2,7 @@
   "schema": "metrics/v2",
   "brief": "B20261015-1001-b16-verification-phase.loop-brief",
   "run_id": "B20261015-1001-b16-verification-phase",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 11,
@@ -50,7 +50,7 @@
     "gates_ms": 147242,
     "checks_ms": 3655171,
     "gate_review_ms": 191484,
-    "wall_ms": null
+    "wall_ms": 10060000
   },
   "rate": {
     "code_per_min": 3.893740133594526,
@@ -93,19 +93,19 @@
   },
   "defects": {
     "in_loop": 8,
-    "operator": 0,
+    "operator": 1,
     "escaped": 0,
-    "total": 8,
+    "total": 9,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 1,
+    "total": 5,
     "by_agreement": {
       "recommended": 1,
       "other-option": 0,
-      "adjusted": 0,
+      "adjusted": 1,
       "different": 0,
-      "no-options": 0
+      "no-options": 3
     }
   },
   "instructions": {
@@ -113,6 +113,7 @@
     "gate_review": 2088,
     "work": 2436,
     "review": 2291,
+    "verify": 1806,
     "guidelines_rules": 2
   },
   "records": {
