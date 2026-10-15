@@ -15,3 +15,8 @@ planned: B20261015-1651-b17-release — 9 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 2m10s · $0.49 · run $5.55 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/9 done ──
+   Read the binary's version from the embedded plugin.json
+   work T1 · 4m22s · $0.17 · run $5.72 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261015-1651-b17-release/20261015-160742/checks/001-go.fail.log; review skipped

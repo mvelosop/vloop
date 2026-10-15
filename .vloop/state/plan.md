@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/9 done** · iteration 0
+**Status:** running · **0/9 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T16:33:31Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T16:41:27Z
 
 ## Progress
 
-- [ ] **T1** — Read the binary's version from the embedded plugin.json
+- [ ] **T1** — Read the binary's version from the embedded plugin.json · 1 attempt(s)
 - [ ] **T2** — Record the module version in .vloop/install.json
 - [ ] **T3** — Add tools/release with the notes subcommand
 - [ ] **T4** — Make prepare's checks, refusing before anything is written
@@ -22,7 +22,7 @@
 
 ### T1 — Read the binary's version from the embedded plugin.json
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 Today a release edits the version in five places (main.go, plugin.json and three tests). V1 makes the embedded plugin/.claude-plugin/plugin.json the one version source, so a release bump is one line — the line `prepare` (T5) will change — and the binary and plugin can never disagree. Every later task relies on it: the release commit changes only plugin.json.
 
@@ -34,6 +34,8 @@ Today a release edits the version in five places (main.go, plugin.json and three
 - No test pins a version literal: the tests that compared 0.11.0 (cmd/vloop/e2e_test.go, cmd/vloop/run_harness_test.go's stub plugin list, internal/cli/root_test.go) read the version from the embedded plugin.json instead. A test still containing "0.11.0" as the expected version is a violation.
 - A committed test, run by the checks, proves the binary's version equals the embedded plugin.json's version. An earlier test changes only where it pins the version literal, and only to read it from plugin.json; the task's notes name V1 for each test changed.
 - `go generate ./...` leaves docs/guide/commands.md unchanged, or the regenerated file is part of the change.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261015-1651-b17-release/20261015-160742/checks/001-go.fail.log
 
 <details><summary>verify command</summary>
 

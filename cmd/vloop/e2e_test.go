@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/mvelosop/vloop/internal/cli"
 )
 
 var binPath string
@@ -127,7 +129,11 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 	if r.code != 0 || r.err != "" {
 		t.Fatalf("version: %+v", r)
 	}
-	want := `{"version":"0.11.0","commit":"unknown","plugin":"0.11.0","go":"` + runtime.Version() +
+	pv, err := cli.PluginVersion()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := `{"version":"` + pv + `","commit":"unknown","plugin":"` + pv + `","go":"` + runtime.Version() +
 		`","os":"` + runtime.GOOS + `","arch":"` + runtime.GOARCH + `"}` + "\n"
 	if r.out != want {
 		t.Fatalf("version --json = %q, want %q", r.out, want)
