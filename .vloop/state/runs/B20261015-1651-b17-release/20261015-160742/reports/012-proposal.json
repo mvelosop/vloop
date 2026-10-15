@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "blocked",
+  "summary": "tools/release/e2e_test.go (TestReleaseSequence) plays the worked example with stubs and a local bare origin and passes the gate. The real-data check on a clone could not be run: commands operating in a clone outside the repo are denied.",
+  "files": ["tools/release/e2e_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed ok.",
+  "notes": "Acceptance 2 (notes v0.10.0 v0.11.0, notes v0.9.0 v0.10.0, prepare v0.12.0 --dry-run in a clone of this repo) is unmet: git clone to a temp dir succeeded, but every Bash command running the tool or git inside that clone was permission-denied. The operator must run those three commands in a clone (origin = local repo) and record outputs. The gate passes; the block concerns only acceptance 2."
+}
