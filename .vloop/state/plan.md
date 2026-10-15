@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/9 done** · iteration 6
+**Status:** running · **5/9 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:07:43Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:13:00Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Record the module version in .vloop/install.json · 1 attempt(s)
 - [x] **T3** — Add tools/release with the notes subcommand
 - [x] **T4** — Make prepare's checks, refusing before anything is written
-- [ ] **T5** — Make prepare create the release branch and open the PR
+- [x] **T5** — Make prepare create the release branch and open the PR
 - [ ] **T6** — Make publish find the release commit, tag it and create the GitHub release
 - [ ] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
 - [ ] **T8** — Describe the release tool in the docs and the operator's playbook
@@ -113,7 +113,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Make prepare create the release branch and open the PR
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 Once its checks pass, prepare does the first outward half of a release so the operator only has to review and squash-merge: a release/<version> branch from main whose one commit, `Release <version>`, changes only plugin.json's version (one line, thanks to V1), pushed, with a PR titled `Release <version>` whose body is the notes from the latest version tag to main. The merge stays the operator's.
 
