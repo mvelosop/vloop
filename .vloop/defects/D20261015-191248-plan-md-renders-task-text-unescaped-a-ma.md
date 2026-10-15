@@ -5,8 +5,8 @@ origin: work
 found-by: operator
 kind: bug
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: d608be3
 case: "internal/state/state_test.go:TestMarkdownEscapesText"
 created: 2026-10-15T18:12:48Z
 ---
