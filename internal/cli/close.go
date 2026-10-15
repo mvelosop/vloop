@@ -51,6 +51,9 @@ func newBriefClose(g *Globals) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if none == (len(findings) > 0) {
+				if !none && !dry && !cmd.Flags().Changed("abandon") {
+					showVerifyReport(g, cmd.OutOrStdout(), args[0])
+				}
 				return Usage(errors.New(closeFindingsMsg))
 			}
 			for _, f := range findings {
@@ -184,6 +187,24 @@ func runBriefClose(g *Globals, cmd *cobra.Command, arg string, findings []string
 	printClosed(out, report, files, sha, subject)
 	fmt.Fprintf(out, "squash-merge with the trailer: %s\n", trailer)
 	return nil
+}
+
+// showVerifyReport is what a bare close prints before it refuses: the verify
+// report, read so the operator can choose --finding or --no-findings. It writes
+// nothing, and prints nothing when the brief's runs cannot be read.
+func showVerifyReport(g *Globals, out io.Writer, arg string) {
+	if g.JSON {
+		return
+	}
+	root, err := g.gitRoot()
+	if err != nil {
+		return
+	}
+	m, err := runs.Read(root, runs.BriefPath(root, arg))
+	if err != nil || len(m.Folders) == 0 {
+		return
+	}
+	printVerifyReport(out, root, m)
 }
 
 // printVerifyReport prints the report of the newest of the brief's run folders

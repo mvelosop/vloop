@@ -247,7 +247,8 @@ marked.
   `master`.
 - **M-6** Closing is one commit on the work branch — intervention files, the snapshot
   and the brief — with the trailer `Vloop-Brief: <name>`, after the operator has
-  stated findings or `--no-findings`.
+  stated findings or `--no-findings`. A close with neither shows the newest verify
+  report and refuses, writing nothing.
 - **M-7** An export carries numbers and titles only: no file contents, no
   absolute paths, no credentials.
 

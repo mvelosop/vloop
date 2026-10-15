@@ -139,7 +139,11 @@ func TestCloseRefusals(t *testing.T) {
 				args = []string{closeName}
 			}
 			code, out, errs := runCLI(t, dir, append([]string{"brief", "close"}, args...)...)
-			if code != c.code || out != "" || errs != c.want {
+			wantOut := ""
+			if c.name == "neither flag" { // a bare close shows the verify report first
+				wantOut = "no verify report — verify by hand\n"
+			}
+			if code != c.code || out != wantOut || errs != c.want {
 				t.Fatalf("exit %d, want %d\nstdout %q\nstderr %q\nwant   %q", code, c.code, out, errs, c.want)
 			}
 			if headOf(t, dir) != head || gitOutput(t, dir, "status", "--porcelain", "--untracked-files=all") != status {
@@ -418,7 +422,7 @@ func TestCloseVerifyBlock(t *testing.T) {
 		t.Errorf("newest: %q, want %q", got, want)
 	}
 	code, out, errs := runCLI(t, dir, "brief", "close", closeName)
-	if code != 2 || out != "" || errs != "vloop: "+closeFindingsMsg+"\n" {
+	if code != 2 || out != want || errs != "vloop: "+closeFindingsMsg+"\n" {
 		t.Errorf("refusal: exit %d %q %q", code, out, errs)
 	}
 }

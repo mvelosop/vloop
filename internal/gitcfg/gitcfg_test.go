@@ -12,6 +12,9 @@ func TestMatch(t *testing.T) {
 		{BuiltinIgnore, "branch.a.b.vscode-merge-base", true},
 		{BuiltinIgnore, "branch.main.remote", false},
 		{BuiltinIgnore, "core.vscode-merge-base", false},
+		{BuiltinIgnorePR, "branch.B1.github-pr-base-branch", true},
+		{BuiltinIgnorePR, "branch.release/v1.github-pr-owner-number", true},
+		{BuiltinIgnorePR, "core.github-pr-base-branch", false},
 		{"gitlens.*", "gitlens.x.y", true},
 		{"gitlens.*", "gitlens.", true},
 		{"gitlens.*", "gitlen.x", false},
@@ -84,5 +87,19 @@ func TestNormalizeMixedCase(t *testing.T) {
 	}
 	if !Match("branch.*.vscode-merge-base", "branch.x.vscode-merge-base") || Match("core.x", "core.y") {
 		t.Error("lower-case patterns changed")
+	}
+}
+
+func TestBuiltinIgnores(t *testing.T) {
+	t.Parallel()
+	for _, k := range []string{"branch.b.vscode-merge-base", "branch.b.github-pr-base-branch", "branch.b.github-pr-owner-number"} {
+		if !Ignored(BuiltinIgnores, k) {
+			t.Errorf("%s is not ignored by the built-in patterns", k)
+		}
+	}
+	for _, k := range []string{"branch.b.remote", "branch.b.merge", "core.hookspath"} {
+		if Ignored(BuiltinIgnores, k) {
+			t.Errorf("%s is ignored by the built-in patterns", k)
+		}
 	}
 }

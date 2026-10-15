@@ -66,6 +66,16 @@ func TestRunGitConfigIgnoredKeyContinues(t *testing.T) {
 	wantExit(t, r.runWith(nil, runBrief), 0)
 }
 
+// The GitHub Pull Requests extension's branch keys are editor metadata, ignored
+// by default as vscode-merge-base is (B16's base check halted on one).
+func TestRunGitConfigGitHubPRKeysIgnored(t *testing.T) {
+	t.Parallel()
+	r := newRunRepo(t)
+	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = work ]; then printf '[branch "x"]\n\tgithub-pr-base-branch = o#r#main\n\tgithub-pr-owner-number = o#r#1\n' >> .git/config; fi
+`)
+	wantExit(t, r.runWith(nil, runBrief), 0)
+}
+
 func TestRunGitConfigIgnoreFromEnvironment(t *testing.T) {
 	t.Parallel()
 	r := newRunRepo(t)

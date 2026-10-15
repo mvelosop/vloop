@@ -482,7 +482,7 @@ func AddChecks(root string, add []CheckDef) error {
 	if len(add) == 0 {
 		return nil
 	}
-	file, _, err := readFile(root)
+	file, raw, err := readFile(root)
 	if err != nil {
 		return err
 	}
@@ -508,11 +508,24 @@ func AddChecks(root string, add []CheckDef) error {
 	if err := toml.NewEncoder(&buf).Encode(file); err != nil {
 		return err
 	}
+	out := buf.Bytes()
+	if len(bytes.TrimSpace(raw)) > 0 {
+		// Appended as text, so the operator's comments and layout stay.
+		var tail bytes.Buffer
+		if err := toml.NewEncoder(&tail).Encode(map[string]any{"check": tables[len(cur):]}); err != nil {
+			return err
+		}
+		edited := append(bytes.TrimRight(append([]byte{}, raw...), "\n"), "\n\n"...)
+		edited = append(edited, tail.Bytes()...)
+		if sameKeys(edited, file) {
+			out = edited
+		}
+	}
 	p := filePath(root)
 	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(p, buf.Bytes(), 0o644)
+	return os.WriteFile(p, out, 0o644)
 }
 
 // Get resolves one key under root.
@@ -639,12 +652,24 @@ func Set(root, name, value string) error {
 	if err := toml.NewEncoder(&buf).Encode(file); err != nil {
 		return err
 	}
-	if raw != nil && bytes.Equal(raw, buf.Bytes()) {
+	out := buf.Bytes()
+	if len(bytes.TrimSpace(raw)) > 0 {
+		rhs := ""
+		if value != "" {
+			if rhs, err = valueText(dst[leaf]); err != nil {
+				return err
+			}
+		}
+		if edited, ok := editKey(raw, name, rhs); ok && sameKeys(edited, file) {
+			out = edited
+		}
+	}
+	if raw != nil && bytes.Equal(raw, out) {
 		return nil
 	}
 	p := filePath(root)
 	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(p, buf.Bytes(), 0o644)
+	return os.WriteFile(p, out, 0o644)
 }

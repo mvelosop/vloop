@@ -252,8 +252,10 @@ defect's `rule` and `rule-outcome` (see [defects.md](defects.md)), and
 
 ## Closing and release
 
-When a run is finished and you have verified it, `vloop brief close <brief>` on
-the work branch records your findings as defects (`--finding`, or
+When a run is finished, `vloop brief close <brief>` with no flag prints the verify
+session's findings and refuses, writing nothing. Once you have verified the run,
+`vloop brief close <brief>` on the work branch records your findings as
+verification-finding interventions (`--finding "<origin>: <summary>"`, or
 `--no-findings` to say there were none), freezes the metrics as a snapshot, writes
 the run record into the brief, marks it `consumed` and makes one commit. It
 prints the `Vloop-Brief: <name>` trailer the squash-merge commit must carry.

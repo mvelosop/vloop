@@ -221,3 +221,28 @@ func TestWorkedExampleB16PlantedBlockedDriver(t *testing.T) {
 		t.Errorf("the planted run did not reach the verify line:\n%s", res.out)
 	}
 }
+
+// A bare close prints the verify report, then refuses for the flag it needs and
+// writes nothing; --dry-run without a flag refuses as before, since what it
+// would preview depends on the flag.
+func TestB16BareCloseShowsVerifyReport(t *testing.T) {
+	t.Parallel()
+	r := newRunRepo(t)
+	wantExit(t, b16Run(r, b16Report2), 0)
+	folder := filepath.Base(r.runFolder())
+	head := r.git("rev-parse", "HEAD")
+
+	bare := r.vloop("brief", "close", runBrief)
+	wantExit(t, bare, 2)
+	if !strings.HasPrefix(bare.out, "verify of "+runID+"/"+folder+": 2 finding(s)\n  1. example — Worked example, line 3; vloop greet --loud\n") {
+		t.Errorf("bare close's stdout:\n%s", bare.out)
+	}
+	wantIn(t, "stderr", bare.err, `say what you found before merge: --finding "<summary>" (repeatable) or --no-findings`)
+	if got := r.git("rev-parse", "HEAD"); got != head || r.git("status", "--porcelain") != "" {
+		t.Errorf("bare close wrote something: HEAD %s -> %s, status %q", head, got, r.git("status", "--porcelain"))
+	}
+
+	dry := r.vloop("brief", "close", runBrief, "--dry-run")
+	wantExit(t, dry, 2)
+	wantNotIn(t, "stdout", dry.out, "verify of")
+}

@@ -38,10 +38,10 @@ type gitGuard struct {
 }
 
 // snapshotGit takes the guard, resolving the ignore patterns once: the built-in
-// one and run.git-config-ignore. A pattern source that cannot be read leaves
-// the built-in one alone; the run refuses such a source before it starts.
+// ones and run.git-config-ignore. A pattern source that cannot be read leaves
+// the built-in ones alone; the run refuses such a source before it starts.
 func snapshotGit(root string) gitGuard {
-	ignore := []string{gitcfg.BuiltinIgnore}
+	ignore := append([]string{}, gitcfg.BuiltinIgnores...)
 	if v, err := config.Get(root, "run.git-config-ignore"); err == nil {
 		ignore = append(ignore, v.List...)
 	}

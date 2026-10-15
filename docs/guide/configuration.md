@@ -43,7 +43,7 @@ environment and in `config set`.
 | `run.convergence-min` | `6` | an integer, 0 or more | `VLOOP_RUN_CONVERGENCE_MIN`  | iterations a run must have taken before convergence is judged |
 | `run.gate-timeout` | `15` | a whole number of minutes, 1 or more | `VLOOP_RUN_GATE_TIMEOUT`  | minutes a gate may run, in `vloop run` and in `vloop task gate`; a gate still running is killed with everything it started and has failed |
 | `run.gate-scratch` | unset | a list of doublestar globs | `VLOOP_RUN_GATE_SCRATCH` | repo-relative folders (for example `web/.gate/`) a gate may write into; they are emptied after every gate, and a gate that changes anything else in the tree fails |
-| `run.git-config-ignore` | unset | a list of patterns over `git config --list` keys, `*` matching any run of characters, dots included | `VLOOP_RUN_GIT_CONFIG_IGNORE` | keys of `.git/config` the guard leaves out when it compares the file around every session, gate and check, added to the built-in `branch.*.vscode-merge-base` (an editor's bookkeeping), which is always applied. The guard compares entries, not bytes, so any other key added, removed or changed halts the run (exit 9) and is named. A pattern that could ignore a `core`, `filter`, `include` or `includeif` key is refused: `vloop config set` exits 2, `vloop run` exits 1 |
+| `run.git-config-ignore` | unset | a list of patterns over `git config --list` keys, `*` matching any run of characters, dots included | `VLOOP_RUN_GIT_CONFIG_IGNORE` | keys of `.git/config` the guard leaves out when it compares the file around every session, gate and check, added to the built-in `branch.*.vscode-merge-base` and `branch.*.github-pr-*` (VS Code's and its GitHub Pull Requests extension's bookkeeping), which are always applied. The guard compares entries, not bytes, so any other key added, removed or changed halts the run (exit 9) and is named. A pattern that could ignore a `core`, `filter`, `include` or `includeif` key is refused: `vloop config set` exits 2, `vloop run` exits 1 |
 | `run.session-timeout` | `60` | a whole number of minutes, 1 or more | `VLOOP_RUN_SESSION_TIMEOUT`  | minutes a plan, work or review session may run; a session still running is killed with everything it started and is a session error (exit 7) |
 | `run.verify` | `true` | `true` or `false` | `VLOOP_RUN_VERIFY`  | whether `vloop run` ends with a verify session that checks the built surface against the brief |
 | `run.keep-awake` | `on` | `on` or `off` | `VLOOP_RUN_KEEP_AWAKE`  | `on` holds a no-idle-sleep hold for the lifetime of `vloop run` (macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`); `off` takes none |
@@ -68,7 +68,8 @@ code = ["internal/brief/templates/**"]
 A check is a command that proves a part of the repository still works. Checks are
 `[[check]]` tables in `.vloop/config.toml`, the only place they are defined:
 there is no environment variable for them, and `vloop config set` leaves them in
-place when it rewrites the file.
+place. `vloop config set` edits the file's text in place: comments, order and
+layout stay, and a new key goes beside the keys of its table.
 
 ```
 [[check]]
