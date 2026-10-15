@@ -5,9 +5,9 @@
   "base": "84088d72854b8319d798b7340adb010a975dc398",
   "branch": "B20261015-1651-b17-release",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-10-15T16:30:00Z",
-  "updated": "2026-10-15T17:13:00Z",
+  "updated": "2026-10-15T17:18:44Z",
   "shell": "sh",
   "checks": [
     {
@@ -192,7 +192,7 @@
         "Committed tests, run by the checks, cover the release-commit search (including a decoy subject whose plugin.json does not hold the version), the refusal before any write, the tag's commit and message, the tag elsewhere, and gh's arguments for a release and a pre-release."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

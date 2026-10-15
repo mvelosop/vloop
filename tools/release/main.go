@@ -3,6 +3,7 @@
 //
 //	release notes <from> <to>   the release notes for the range from..to, on stdout
 //	release prepare <version>   check a release; --dry-run writes nothing
+//	release publish <version>   tag the merged release commit and create the GitHub release
 package main
 
 import (
@@ -23,8 +24,11 @@ func run(args []string, dir string, stdout, stderr io.Writer) int {
 	if len(args) > 0 && args[0] == "prepare" {
 		return prepare(dir, args[1:], stdout, stderr)
 	}
+	if len(args) > 0 && args[0] == "publish" {
+		return publish(dir, args[1:], stdout, stderr)
+	}
 	if len(args) == 0 || args[0] != "notes" {
-		fmt.Fprintln(stderr, "usage: release notes <from> <to> | prepare <version> [--dry-run]")
+		fmt.Fprintln(stderr, "usage: release notes <from> <to> | prepare <version> [--dry-run] | publish <version>")
 		return 2
 	}
 	if len(args) != 3 {

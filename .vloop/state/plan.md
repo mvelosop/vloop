@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/9 done** · iteration 7
+**Status:** running · **6/9 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:13:00Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:18:44Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Add tools/release with the notes subcommand
 - [x] **T4** — Make prepare's checks, refusing before anything is written
 - [x] **T5** — Make prepare create the release branch and open the PR
-- [ ] **T6** — Make publish find the release commit, tag it and create the GitHub release
+- [x] **T6** — Make publish find the release commit, tag it and create the GitHub release
 - [ ] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
 - [ ] **T8** — Describe the release tool in the docs and the operator's playbook
 - [ ] **T9** — Close: run the worked example line for line and the real-data check
@@ -135,7 +135,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Make publish find the release commit, tag it and create the GitHub release
 
-`pending` · depends on: T5
+`done` · depends on: T5
 
 After the operator's merge, publish does the second outward half. It fetches origin and first finds the release commit — the newest on origin/main whose subject starts `Release <version>` and whose plugin.json holds the version — then tags it (annotated, message from the brief titles), pushes the tag and creates the GitHub release with the notes. Finding the commit comes before any write, so publish before the merge refuses cleanly. T7 adds the public-install check and the re-run.
 
