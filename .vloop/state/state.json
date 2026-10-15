@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T11:15:28Z",
+  "updated": "2026-10-15T11:21:38Z",
   "shell": "sh",
   "checks": [
     {
@@ -147,9 +147,9 @@
         "Committed tests, run by the checks, cover each message above, the kept report, the record, the fence, run.verify = false, the cost ceiling and the resume. cmd/vloop/e2e_test.go, cmd/vloop/run_harness_test.go, the end-to-end tests whose stub runs end complete and internal/cli/fence_test.go change only where they pin what V1 changes (a session after the final pass, its line, a fifth fence), and only to the new behaviour, the notes naming V1 for each."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "the committed tests omit most of the messages and cases criterion 6 requires: no findings, invalid report, failed session, cost ceiling, revert line, exit 9, resume, status phase"
+      "notes": ""
     },
     {
       "id": "T5",

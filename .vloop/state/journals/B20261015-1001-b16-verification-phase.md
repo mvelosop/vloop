@@ -55,3 +55,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The driver runs one /vloop:verify session after the final pass of a complete run (fence/verify.json = review fence, reverts, warnings, report kept as reports/verify.json, session/v2 record, status names the phase); run.verify=false and the cost ceiling skip it.
 - **Files:** internal/driver/iterate.go, internal/driver/session.go, internal/driver/resolve.go, fence/verify.json, internal/cli/fence_test.go, cmd/vloop/run_harness_test.go, cmd/vloop/run_iterate_test.go, cmd/vloop/run_safety_test.go, cmd/vloop/run_verify_test.go
 - **Notes for next iteration:** V1: earlier tests changed only for the new session: the stub in run_harness_test.go answers /vloop:verify; defaultScript writes an empty verify/v1 report; TestRun01HappyPath counts 7 sessions; TestRun15TelemetryContract lists 007-verify.json and accepts session/v2 for verify; fencePhases gains verify with the review fence's expectations. TestTaskGate* in internal/cli fail inside a loop session (plan-changed env guard), unrelated. verifySession is in internal/driver/iterate.go; it clears .vloop/tmp/ again after the final pass so check leftovers are gone.
+
+## T4 — Run one verify session after the final pass of every complete run and keep its report
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added the missing committed tests for the verify session: no findings, missing and invalid report, failed session, cost ceiling, revert lines, exit 9 on a moved ref, status phase and session/v2 record, and the resume. Production code is unchanged this attempt.
+- **Files:** cmd/vloop/run_verify_test.go
+- **Notes for next iteration:** V1: no earlier test changed this attempt. The harness defaultScript already writes an empty verify/v1 report, so a test of a missing report must rm .vloop/tmp/verify.json in the verify phase. The status test runs the built binary from the stub script and writes to $dir/status.txt.
