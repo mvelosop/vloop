@@ -83,3 +83,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added the plugin/evals/verify-planted-mismatches case (case.yaml, prompt.md, scaffold.sh, five graders) and its row in the README's other-cases table.
 - **Files:** plugin/evals/verify-planted-mismatches/case.yaml, plugin/evals/verify-planted-mismatches/prompt.md, plugin/evals/verify-planted-mismatches/scaffold.sh, plugin/evals/verify-planted-mismatches/graders/finds-example-exit-code.md, plugin/evals/verify-planted-mismatches/graders/finds-contract-sentence.md, plugin/evals/verify-planted-mismatches/graders/finds-stale-readme.md, plugin/evals/verify-planted-mismatches/graders/sound-line-not-flagged.md, plugin/evals/verify-planted-mismatches/graders/report-validates.md, plugin/evals/README.md
 - **Notes for next iteration:** Scaffold commits baseline (README, brief, old bin/greet), records that commit as the plan base, then commits the built result and a one-task state/v2 plan. Planted: no-arg exit 1 vs briefed 2; --shout unimplemented; README says args ignored.
+
+## T6 — Add the verify-planted-mismatches eval case
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Fixed the check failure: the verify-planted-mismatches prompt.md grants the same allowed_tools as the other skill cases, so it covers the fence and stays inside the guide's --allow-tools.
+- **Files:** plugin/evals/verify-planted-mismatches/prompt.md
+- **Notes for next iteration:** TestEvalGrantsCoverFence requires every eval's allowed_tools to include the fence's allow rules (Edit, vloop task list/show/validate/gate) and only Bash rules named in docs/guide/evals.md; Bash(bash:*) and Bash(cd:*) are not in the guide. The grant was copied from gate-review-planted-gates.

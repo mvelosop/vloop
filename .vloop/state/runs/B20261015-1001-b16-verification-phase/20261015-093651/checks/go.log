@@ -1,24 +1,15 @@
-ok  	github.com/mvelosop/vloop	0.269s
+ok  	github.com/mvelosop/vloop	0.245s
 ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	202.490s
+ok  	github.com/mvelosop/vloop/cmd/vloop	202.318s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
---- FAIL: TestEvalGrantsCoverFence (0.00s)
-    skills_test.go:867: eval verify-planted-mismatches: allowed_tools lacks the fence's Edit
-    skills_test.go:867: eval verify-planted-mismatches: allowed_tools lacks the fence's Bash(vloop task list:*)
-    skills_test.go:867: eval verify-planted-mismatches: allowed_tools lacks the fence's Bash(vloop task show:*)
-    skills_test.go:867: eval verify-planted-mismatches: allowed_tools lacks the fence's Bash(vloop task validate:*)
-    skills_test.go:867: eval verify-planted-mismatches: allowed_tools lacks the fence's Bash(vloop task gate:*)
-    skills_test.go:867: eval verify-planted-mismatches: Bash(bash:*) is not in the guide's --allow-tools
-    skills_test.go:867: eval verify-planted-mismatches: Bash(cd:*) is not in the guide's --allow-tools
-FAIL
-FAIL	github.com/mvelosop/vloop/internal/cli	65.686s
+ok  	github.com/mvelosop/vloop/internal/cli	65.198s
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
 ok  	github.com/mvelosop/vloop/internal/detect	(cached)
-ok  	github.com/mvelosop/vloop/internal/driver	6.372s
+ok  	github.com/mvelosop/vloop/internal/driver	6.186s
 ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
@@ -28,4 +19,3 @@ ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
 ok  	github.com/mvelosop/vloop/internal/schema	(cached)
 ok  	github.com/mvelosop/vloop/internal/state	(cached)
-FAIL

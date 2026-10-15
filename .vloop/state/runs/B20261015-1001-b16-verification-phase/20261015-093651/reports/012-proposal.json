@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Fixed the check failure: the verify-planted-mismatches prompt.md grants the same allowed_tools as the other skill cases, so it covers the fence and stays inside the guide's --allow-tools.",
+  "files": ["plugin/evals/verify-planted-mismatches/prompt.md"],
+  "verified": "vloop task gate T6 exited 0 and printed ok; go test ./internal/cli -run TestEvalGrants passed.",
+  "notes": "TestEvalGrantsCoverFence requires every eval's allowed_tools to include the fence's allow rules (Edit, vloop task list/show/validate/gate) and only Bash rules named in docs/guide/evals.md; Bash(bash:*) and Bash(cd:*) are not in the guide. The grant was copied from gate-review-planted-gates."
+}

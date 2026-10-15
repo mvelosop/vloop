@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/11 done** · iteration 11
+**Status:** running · **6/11 done** · iteration 12
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:37:35Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:42:22Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2 · 1 attempt(s)
 - [x] **T4** — Run one verify session after the final pass of every complete run and keep its report · 1 attempt(s)
 - [x] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling · 1 attempt(s)
-- [ ] **T6** — Add the verify-planted-mismatches eval case · 1 attempt(s)
+- [x] **T6** — Add the verify-planted-mismatches eval case · 1 attempt(s)
 - [ ] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
 - [ ] **T8** — Print the verify findings first in vloop brief close and close --dry-run
 - [ ] **T9** — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
@@ -134,7 +134,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Add the verify-planted-mismatches eval case
 
-`pending` · 1 attempt(s) · depends on: T5
+`done` · 1 attempt(s) · depends on: T5
 
 A skill's behaviour cannot be gated, since gates never run claude, so V2 measures /vloop:verify with an eval case the operator runs on demand: a small built result whose brief has one sound worked-example line and three planted mismatches. The graders require one finding of each matching kind and none on the sound line.
 
@@ -144,8 +144,6 @@ A skill's behaviour cannot be gated, since gates never run claude, so V2 measure
 - The scaffold, run in an empty directory with vloop on PATH and no claude or network, builds a git repository with a small built result, a loop brief whose worked example has one sound line and whose result plants three mismatches — a worked-example line whose exit code differs, a Behaviour contract sentence the result does not do, a README that states the old behaviour — and a state/v2 plan whose base precedes the built result, so the diff against the base holds it.
 - The graders read .vloop/tmp/verify.json and require one finding of kind example on the planted line, one of kind contract on the planted sentence, one of kind surface on the README, and no finding on the sound line; one grader checks the session validated its report.
 - plugin/evals/README.md's other-cases table gains the row `verify-planted-mismatches` | `/vloop:verify` | what it asks. No gate or check runs the case.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/011-go.fail.log
 
 <details><summary>verify command</summary>
 

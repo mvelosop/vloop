@@ -84,3 +84,10 @@ committing the plan
    work T6 · 0m40s · $0.19 · run $12.01 / $40.00
    check go
    CHECK FAIL T6 — check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/011-go.fail.log; review skipped
+── iteration 12 (12 this run) · T6 · 5/11 done ──
+   Add the verify-planted-mismatches eval case
+   work T6 · 0m23s · $0.12 · run $12.13 / $40.00
+   check go
+   review T6 · 0m19s · $0.11 · run $12.24 / $40.00
+   review: PASS
+   T6 done
