@@ -1,0 +1,1 @@
+GATE FAIL: vloop init: /private/var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/gate.BKUbPX/r1/.vloop/install.json has module '(none)', want 'v0.12.0': {"schema":"install/v1","version":"0.11.0","commit":"unknown","initialized":"2026-10-15T16:31:12Z","upgraded":null}

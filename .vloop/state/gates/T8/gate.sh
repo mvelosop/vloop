@@ -1,95 +1,42 @@
 #!/bin/sh
-# Gate T8 — V4: vloop brief close and close --dry-run print first, on stdout,
-# the report of the newest of the brief's run folders that holds
-# reports/verify.json — "verify of <run id>/<folder>: <n> finding(s)" and one
-# block per finding in the report's order, "…: no findings" for an empty list,
-# "no verify report — verify by hand" when no folder holds one — then close's
-# output as before. Close still needs --finding or --no-findings, and a verify
-# finding is recorded only when passed as a --finding.
+# Gate T8 — D1: concepts.md's "The stamped release build" says the version
+# comes from plugin.json, the stamped build sets the commit only, and the
+# release is prepare, the operator's merge, publish, then install and upgrade;
+# the operator skill runs the tool and records the release intervention;
+# tools/release has a README under 300 words.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-S=$t/stub
-# dry <out>: close --dry-run --no-findings in $R, stdout in $t/<out>.
-dry() {
-  inr "$B" brief close "$BRIEF" --dry-run --no-findings </dev/null >"$t/$1" 2>"$t/$1.err" || fail "close --dry-run --no-findings: $(cat "$t/$1.err")"
-  [ -z "$(git -C "$R" status --porcelain)" ] || fail "close --dry-run wrote: $(git -C "$R" status --porcelain)"
-}
-# head_is <out> <expected file>: the output starts with exactly those lines.
-head_is() {
-  n=$(wc -l <"$2" | tr -d ' ')
-  head -n "$n" "$t/$1" >"$t/$1.head"
-  cmp -s "$2" "$t/$1.head" || fail "$1 does not start with
-$(cat "$2")
-it starts with
-$(head -n $((n + 2)) "$t/$1")"
-}
-# rest_ok <out> <lines of the head>: what follows is close's dry-run output.
-rest_ok() {
-  tail -n +$(($2 + 1)) "$t/$1" | grep -v '^[[:space:]]*$' >"$t/$1.rest"
-  head -n 1 "$t/$1.rest" | grep -q "^$RUN " || fail "$1: after the verify block, close's output does not follow: $(head -n 3 "$t/$1.rest")"
-  [ "$(tail -n 1 "$t/$1.rest")" = "would commit [vloop] close $RUN" ] || fail "$1: the last line is '$(tail -n 1 "$t/$1.rest")'"
-}
+xbuild
 
-runrepo v T1
-cat >>"$R/.vloop/config.toml" <<CFG
+f=docs/guide/concepts.md
+awk '/^### The stamped release build/ { p = 1; print; next } p && /^#/ { exit } p { print }' "$f" >"$t/sec"
+[ -s "$t/sec" ] || fail "$f has no section 'The stamped release build'"
+grep -q 'plugin\.json' "$t/sec" || fail "the section does not say the version comes from plugin.json"
+! grep -q 'main\.version' "$t/sec" || fail "the section still stamps main.version: $(grep -n 'main\.version' "$t/sec")"
+grep -q 'main\.commit' "$t/sec" || fail "the section's stamped build does not set the commit (-X main.commit)"
+first() { grep -n -- "$1" "$t/sec" | head -n 1 | cut -d: -f1; }
+p=$(first 'tools/release prepare'); u=$(first 'tools/release publish')
+[ -n "$p" ] || fail "the section does not name go run ./tools/release prepare"
+# The merge and the upgrade are the first mentions after prepare and publish.
+m=$(awk -v p="$p" 'NR >= p && /[Mm]erge/ { print NR; exit }' "$t/sec")
+g=$(awk -v u="${u:-0}" 'NR >= u && /vloop upgrade/ { print NR; exit }' "$t/sec")
+[ -n "$u" ] || fail "the section does not name go run ./tools/release publish"
+[ -n "$g" ] || fail "the section does not name vloop upgrade after publish"
+[ -n "$m" ] || fail "the section does not name the operator's merge after prepare"
+[ "$p" -le "$m" ] && [ "$m" -le "$u" ] && [ "$u" -le "$g" ] ||
+  fail "the section's steps are not prepare, merge, publish, then upgrade (lines $p, $m, $u, $g)"
 
-[[check]]
-name = "final"
-paths = ["nomatch/**"]
-run = "test ! -e '$S/failfinal'"
-CFG
-commit final
-printf ': >"$dir/failfinal"\n' >"$S/plan.sh"
-vreport "$S/verify-report.json" 2
-vrun v1.run
-[ "$got" = 2 ] || fail "harness: the failing final pass did not end the first run blocked (exit $got): $(tail -n 10 "$t/v1.run")"
-f1=$(basename "$(lastdir)")
-rm -f "$S/failfinal" "$S/plan.sh"
-sleep 1
-vrun v2.run
-[ "$got" = 0 ] || fail "the resumed run: exit $got: $(tail -n 10 "$t/v2.run")"
-f2=$(basename "$(lastdir)")
-[ "$f1" != "$f2" ] || fail "harness: both runs share the folder $f1"
-[ -f "$R/.vloop/state/runs/$RUN/$f2/reports/verify.json" ] || fail "the complete run left no reports/verify.json (T4, the driver's verify session, comes first)"
-after=$(git -C "$R" rev-parse HEAD)
+k=.claude/skills/vloop-operator/SKILL.md
+l=$(grep -n 'tools/release' "$k" | head -n 1 | cut -d: -f1)
+[ -n "$l" ] || fail "$k does not run the release tool"
+# The step: from its first mention of the tool, at most 20 lines, within its section.
+awk -v l="$l" 'NR > l && /^#/ { exit } NR >= l && NR < l + 20 { print }' "$k" >"$t/ksec"
+grep -q 'tools/release publish' "$t/ksec" || fail "the skill's release step does not run publish"
+grep -q 'intervention' "$t/ksec" || fail "the skill's release step does not record the release intervention"
 
-cat >"$t/two" <<EOF
-verify of $RUN/$f2: 2 finding(s)
-  1. example — Worked example, line 3; vloop greet --loud
-     brief:    exit 2
-     observed: exit 1
-  2. surface — README.md:12
-     brief:    greet prints in upper case with --loud
-     observed: README.md says --loud is not supported
-EOF
-dry d1
-head_is d1 "$t/two"
-rest_ok d1 7
-
-# An older folder's report is not the newest.
-mkdir -p "$R/.vloop/state/runs/$RUN/$f1/reports" || fail mkdir
-vreport "$R/.vloop/state/runs/$RUN/$f1/reports/verify.json" 0
-commit "an older report"
-dry d2
-head_is d2 "$t/two"
-git -C "$R" rm -q ".vloop/state/runs/$RUN/$f2/reports/verify.json" && commit "drop the newest report"
-dry d3
-printf 'verify of %s/%s: no findings\n' "$RUN" "$f1" >"$t/none"
-head_is d3 "$t/none"
-rest_ok d3 1
-git -C "$R" rm -q ".vloop/state/runs/$RUN/$f1/reports/verify.json" && commit "drop every report"
-dry d4
-printf 'no verify report — verify by hand\n' >"$t/noreport"
-head_is d4 "$t/noreport"
-rest_ok d4 1
-
-# The real close, back at the run's own state.
-git -C "$R" reset -q --hard "$after" || fail "reset to the run"
-inr "$B" brief close "$BRIEF" </dev/null >"$t/c0" 2>&1; c=$?
-[ "$c" = 2 ] || fail "close with neither --finding nor --no-findings: exit $c, want 2"
-[ -z "$(git -C "$R" status --porcelain)" ] || fail "a refused close wrote: $(git -C "$R" status --porcelain)"
-inr "$B" brief close "$BRIEF" --no-findings </dev/null >"$t/c1" 2>"$t/c1.err" || fail "close --no-findings: $(cat "$t/c1.err")"
-head_is c1 "$t/two"
-[ "$(git -C "$R" log -1 --format=%s)" = "[vloop] close $RUN" ] || fail "close made no close commit"
-[ -z "$(ls -A "$R/.vloop/interventions" 2>/dev/null)" ] || fail "close recorded a verify finding the operator did not pass: $(ls "$R/.vloop/interventions")"
+r=tools/release/README.md
+[ -f "$r" ] || fail "no $r"
+w=$(wc -w <"$r" | tr -d ' ')
+[ "$w" -lt 300 ] || fail "$r has $w words, want under 300"
+for c in notes prepare publish; do grep -q "$c" "$r" || fail "$r does not describe $c"; done
 echo "gate T8: ok"
