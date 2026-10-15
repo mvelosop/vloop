@@ -1,0 +1,7 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": { "example_lines": 14, "sentences": 14, "surfaces": 6 },
+  "notes": "The tool's worked example (refusals, prepare, publish before and after the merge, re-run, mismatched install) was checked by running tools/release's TestReleaseSequence, which plays those lines with stubs and a local bare origin, not by hand. The notes real-data check matches the brief (v0.10.0..v0.11.0 lists B16 alone; v0.9.0..v0.10.0 lists B13, B14, B15). The `prepare v0.12.0 --dry-run` real-data check was not run: it fetches origin, and the run's constraints forbid reaching the real origin. The I1 stamp (commit then module, absent without a module) was checked from the upgrade test and the install.Stamp field, not from a live `vloop init`: a scratch repo under .vloop/tmp is seen as already initialized by the parent repository. Surfaces read: docs/guide/concepts.md, the vloop-operator skill, tools/release/README.md (174 words), schemas/install.v1.json, vloop --help, and a search of docs, README and plugin for the retired -X main.version flag and the five-place bump (none left)."
+}
+

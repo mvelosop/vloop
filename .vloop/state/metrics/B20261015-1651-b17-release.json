@@ -43,33 +43,33 @@
     "rework": 1.0447058823529412
   },
   "time": {
-    "agent_ms": 1827650,
-    "work_ms": 1673470,
-    "review_ms": 154180,
+    "agent_ms": 1892878,
+    "work_ms": 1719135,
+    "review_ms": 173743,
     "plan_ms": 1192518,
-    "gates_ms": 72436,
-    "checks_ms": 2058065,
+    "gates_ms": 84831,
+    "checks_ms": 2264404,
     "gate_review_ms": 129928,
-    "wall_ms": null
+    "wall_ms": 5560000
   },
   "rate": {
-    "code_per_min": 27.904686345853964,
-    "code_test_per_min": 55.44825322134982
+    "code_per_min": 26.943099343961944,
+    "code_test_per_min": 53.53752328464909
   },
   "cost": {
-    "total_usd": 8.9970304,
+    "total_usd": 9.2157493,
     "plan_usd": 5.059098199999999,
-    "work_usd": 2.5303068,
-    "review_usd": 0.9171878999999998,
+    "work_usd": 2.6527477,
+    "review_usd": 1.0134659,
     "gate_review_usd": 0.4904375,
-    "per_1000_code_lines_usd": 10.584741647058824
+    "per_1000_code_lines_usd": 10.842058000000002
   },
   "tokens": {
-    "input": 470,
-    "output": 213982,
-    "cache_read": 12424213,
-    "cache_creation": 771075,
-    "cache_hit_ratio": 0.9415308313474678
+    "input": 494,
+    "output": 218645,
+    "cache_read": 12721622,
+    "cache_creation": 806650,
+    "cache_hit_ratio": 0.9403386827741718
   },
   "models": {
     "plan": [
@@ -122,9 +122,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 19,
-  "iterations": 12,
-  "iterations_per_closed": 1.5,
+  "permission_denials": 20,
+  "iterations": 13,
+  "iterations_per_closed": 1.625,
   "by_task": [
     {
       "id": "T1",
@@ -330,7 +330,7 @@
       "id": "T9",
       "area": null,
       "kind": "test",
-      "attempts": 2,
+      "attempts": 3,
       "churn": {
         "code": 0,
         "test": 112,
@@ -343,8 +343,8 @@
           "other": 0
         }
       },
-      "agent_ms": 145262,
-      "cost_usd": 0.37006179999999994,
+      "agent_ms": 210490,
+      "cost_usd": 0.5887806999999999,
       "models": [
         "claude-sonnet-5-5"
       ],
