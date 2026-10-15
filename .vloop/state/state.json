@@ -5,9 +5,9 @@
   "base": "84088d72854b8319d798b7340adb010a975dc398",
   "branch": "B20261015-1651-b17-release",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-15T16:30:00Z",
-  "updated": "2026-10-15T16:52:08Z",
+  "updated": "2026-10-15T16:56:30Z",
   "shell": "sh",
   "checks": [
     {
@@ -76,9 +76,9 @@
         "Committed tests, run by the checks, cover init and upgrade with and without a module version (through the existing build-info seam, not a real network install) and the schema accepting a stamp with a string module and without one. An earlier test changes only where it pins the stamp's exact content, and only to the new behaviour; the notes name I1 for each."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "no committed test shows install/v1 accepting a stamp with a string module and one without"
+      "notes": ""
     },
     {
       "id": "T3",

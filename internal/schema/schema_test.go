@@ -141,3 +141,17 @@ func TestSessionV2VerifyHasNoTask(t *testing.T) {
 		t.Fatalf("verify session with task: %+v", vs)
 	}
 }
+
+func TestInstallModuleIsOptionalString(t *testing.T) {
+	valid := string(fixture(t, "install.valid.json"))
+	withModule := strings.Replace(valid, `"commit":"abc1234",`, `"commit":"abc1234","module":"v0.1.0",`, 1)
+	for name, doc := range map[string]string{"without module": valid, "string module": withModule} {
+		if vs, err := Validate("install/v1", []byte(doc)); err != nil || len(vs) != 0 {
+			t.Errorf("%s: %+v %v", name, vs, err)
+		}
+	}
+	notString := strings.Replace(valid, `"commit":"abc1234",`, `"commit":"abc1234","module":5,`, 1)
+	if vs, _ := Validate("install/v1", []byte(notString)); len(vs) == 0 {
+		t.Error("a module that is not a string was accepted")
+	}
+}

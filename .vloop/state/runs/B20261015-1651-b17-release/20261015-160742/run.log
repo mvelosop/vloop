@@ -33,3 +33,10 @@ committing the plan
    check go
    review T2 · 0m17s · $0.09 · run $6.23 / $40.00
    review: FAIL
+── iteration 4 (4 this run) · T2 · 1/9 done ──
+   Record the module version in .vloop/install.json
+   work T2 · 0m29s · $0.13 · run $6.37 / $40.00
+   check go
+   review T2 · 0m16s · $0.09 · run $6.46 / $40.00
+   review: PASS
+   T2 done
