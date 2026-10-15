@@ -1,0 +1,10 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": {
+    "example_lines": 3,
+    "sentences": 4,
+    "surfaces": 2
+  },
+  "notes": "nothing found"
+}

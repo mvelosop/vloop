@@ -51,5 +51,6 @@ the only thing that stops it.
 | `work-disputes-impossible-gate` | `/vloop:work` | a gate no correct implementation passes is reported as a `gate_dispute`, not edited |
 | `operate-proposes-options` | `/vloop:operate` | a run halted on a gate dispute: the skill proposes one to three real options, recommends one and says why, amends no gate before the operator answers, and pads no straw option |
 | `language-es` | `/vloop:plan` | with `language = "es"`, titles and acceptance are Spanish and keys stay English |
+| `verify-planted-mismatches` | `/vloop:verify` | a small built result whose brief has one sound worked-example line and three planted mismatches (an example line whose exit code differs, a Behaviour contract sentence not done, a README stating the old behaviour): one finding of each matching kind and none on the sound line |
 
 `gate-review-real-misses` is for macOS hosts: its first gate's `grep -P` is a defect only where `grep` is BSD grep, which rejects the option. Its scaffold exits non-zero on a host whose `grep` accepts `-P`, and on any host where a planted gate does not fail for its recorded reason. The scaffold needs `vloop` on `PATH`.

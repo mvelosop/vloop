@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Added the missing committed tests for the verify session: no findings, missing and invalid report, failed session, cost ceiling, revert lines, exit 9 on a moved ref, status phase and session/v2 record, and the resume. Production code is unchanged this attempt.",
+  "files": ["cmd/vloop/run_verify_test.go"],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: ok; go test ./cmd/vloop -run TestRunVerify passes.",
+  "notes": "V1: no earlier test changed this attempt. The harness defaultScript already writes an empty verify/v1 report, so a test of a missing report must rm .vloop/tmp/verify.json in the verify phase. The status test runs the built binary from the stub script and writes to $dir/status.txt."
+}

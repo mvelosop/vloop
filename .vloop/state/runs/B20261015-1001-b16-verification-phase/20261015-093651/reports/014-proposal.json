@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T8",
+  "outcome": "done",
+  "summary": "vloop brief close and close --dry-run now print the newest verify report of the brief's run folders first (findings block, 'no findings', or 'no verify report — verify by hand'); close records nothing from it.",
+  "files": ["internal/cli/close.go", "internal/cli/close_test.go", "internal/cli/close_flags_test.go"],
+  "verified": "vloop task gate T8 exited 0 and printed gate T8: ok; go test ./internal/cli -run Close passes.",
+  "notes": "V4: close_test.go and close_flags_test.go changed only where they pin close's first line (now prefixed by the no-verify-report line). Block is skipped under --json so the JSON output stays one document. TestTaskGate* fail inside a loop session (plan-changed guard), unrelated."
+}

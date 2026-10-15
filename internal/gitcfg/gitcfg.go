@@ -5,9 +5,17 @@ package gitcfg
 
 import "strings"
 
-// BuiltinIgnore is the pattern always applied: VS Code writes
+// BuiltinIgnore is a pattern always applied: VS Code writes
 // branch.<name>.vscode-merge-base when the work branch is created.
 const BuiltinIgnore = "branch.*.vscode-merge-base"
+
+// BuiltinIgnorePR is a pattern always applied: VS Code's GitHub Pull Requests
+// extension writes branch.<name>.github-pr-base-branch and
+// github-pr-owner-number (B16's base check halted on the first).
+const BuiltinIgnorePR = "branch.*.github-pr-*"
+
+// BuiltinIgnores are the editor keys the guard never sees.
+var BuiltinIgnores = []string{BuiltinIgnore, BuiltinIgnorePR}
 
 // protectedSections are the sections whose keys run code or pull in more
 // configuration, in the order a refusal names them.

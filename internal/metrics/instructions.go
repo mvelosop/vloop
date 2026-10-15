@@ -13,6 +13,7 @@ type Instructions struct {
 	GateReview      *int `json:"gate_review"`
 	Work            *int `json:"work"`
 	Review          *int `json:"review"`
+	Verify          *int `json:"verify,omitempty"`
 	GuidelinesRules int  `json:"guidelines_rules"`
 }
 
@@ -55,6 +56,7 @@ func MeasureInstructions(root, sha string) *Instructions {
 		GateReview:      kind("gate-review", ""),
 		Work:            kind("work", "work"),
 		Review:          kind("review", "review"),
+		Verify:          kind("verify", ""),
 		GuidelinesRules: rules,
 	}
 }

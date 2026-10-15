@@ -19,6 +19,8 @@ const defaultScript = `case "$PHASE" in
     printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$TASK" "$TASK" > .vloop/tmp/proposal.json;;
   review) mkdir -p .vloop/tmp
     printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"none"}\n' "$TASK" > .vloop/tmp/verdict.json;;
+  verify) mkdir -p .vloop/tmp
+    printf '{"schema":"verify/v1","findings":[],"checked":{"example_lines":0,"sentences":0,"surfaces":0},"notes":"none"}\n' > .vloop/tmp/verify.json;;
 esac
 `
 
@@ -190,8 +192,8 @@ func TestRun01HappyPath(t *testing.T) {
 		t.Error("plan.md is not what vloop status --markdown renders")
 	}
 	wantIn(t, "journal", r.journal(), "## T1 — Task T1", "## T2 — Task T2", "- **Outcome:** done (review: PASS)", "## Run ended — complete")
-	if n := r.sessions(); n != 6 {
-		t.Errorf("%d sessions, want 6 (plan, the gate review, then work and review twice)", n)
+	if n := r.sessions(); n != 7 {
+		t.Errorf("%d sessions, want 7 (plan, the gate review, then work and review twice, then verify; V1)", n)
 	}
 	wantIn(t, "argv", strings.Join(r.argv(), "\n"), "-p /vloop:work T1 ", "-p /vloop:review T2 ")
 	r.wantClean()

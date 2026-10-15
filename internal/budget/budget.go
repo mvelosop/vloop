@@ -12,7 +12,7 @@ import (
 )
 
 // Skills lists the plugin skills in the order Check reports them.
-var Skills = []string{"plan", "gate-review", "work", "review", "operate"}
+var Skills = []string{"plan", "gate-review", "work", "review", "operate", "verify"}
 
 // Ceilings is each skill's word ceiling, so that growth by drift becomes a
 // recorded decision: a failing test, and an edit of the number and of its
@@ -23,6 +23,7 @@ var Ceilings = map[string]int{
 	"work":        1800, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
 	"review":      1650, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
 	"operate":     1750, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
+	"verify":      1500, // 2026-10-15, B16 (V2, L10): the ceiling set with the skill
 }
 
 // CountWords counts the whitespace-separated words of data, as wc -w does.

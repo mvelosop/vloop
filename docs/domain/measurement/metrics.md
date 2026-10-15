@@ -15,9 +15,9 @@ at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *
 | --- | --- | --- |
 | tasks | planned, done, blocked, first-pass, the brief's estimate (B-4), iterations per closed task | attempts |
 | size | delivered and churned lines per category, deletions, rework, test:code | churned lines per category, test:code |
-| time | agent (work + review), plan, gates, checks (`checks_ms`), gate review (`gate_review_ms`), wall | agent |
+| time | agent (work + review), plan, gates, checks (`checks_ms`), gate review (`gate_review_ms`), verify (`verify_ms`), wall | agent |
 | rate | delivered code lines per agent minute, with and without tests | — |
-| cost | total and per phase (gate review included), `$/kloc` (per 1,000 delivered code lines); tokens and cache-hit ratio | cost, `$/kloc` |
+| cost | total and per phase (gate review and verify included; verify as `verify_usd`), `$/kloc` (per 1,000 delivered code lines); tokens and cache-hit ratio | cost, `$/kloc` |
 | models | the models actually used per phase; the configured effort | the work model |
 | defects | in-loop, operator (recorded operator defects before release plus verification-finding interventions with an origin), escaped (by time against release), removal efficiency; a `check_failed` iteration derives a `work` defect found by the gate, counted apart as check failures | — |
 | instructions | words each session kind starts with (skill + `.vloop/repo-guidelines.md` + `CLAUDE.md`) and the guidelines' rule count; `n/a` for a kind with no skill | — |
@@ -41,10 +41,10 @@ at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *
 ## Instructions
 
 The summary's `instructions` line, after `interventions`, gives the words each
-session kind (plan, gate review, work, review) starts with, counted at the
+session kind (plan, gate review, work, review, verify) starts with, counted at the
 commit the brief's delivered lines are measured to, and the number of rules in
 the guidelines file. `--json` carries the same as an optional `instructions`
-object (`plan`, `gate_review`, `work`, `review`, `guidelines_rules`; `null` for
+object (`plan`, `gate_review`, `work`, `review`, `verify`, `guidelines_rules`; `null` for
 a kind with no skill), absent in snapshots written before it existed. Computed
 from git (M-1); nothing is recorded during a run.
 
@@ -81,3 +81,13 @@ templates and its schemas are product code in `.md` and `.json` files.
   froze. Live metrics may later differ — a config change reclassifies lines,
   a defect recorded after release lowers removal efficiency — and that difference
   is the point: the snapshot is what the operator saw at close.
+
+## The verify session
+
+Where the brief's runs hold a verify session, the summary adds ` · verify <m> min`
+after gate review on the time line, ` · verify <c>` on the cost line and
+` · verify <models>` on the models line, and ` · verify <n>` after `review <n>`
+on the instructions line when the tree holds the verify skill. The total cost
+includes it; `agent` does not. `--json` gains the optional `time.verify_ms`,
+`cost.verify_usd`, `models.verify`, `effort.verify` and `instructions.verify`.
+A brief with no verify session prints as before.

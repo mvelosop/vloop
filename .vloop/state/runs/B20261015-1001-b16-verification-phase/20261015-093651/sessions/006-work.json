@@ -1,0 +1,31 @@
+{
+  "cost_usd": 0.305831,
+  "duration_ms": 64397,
+  "effort": null,
+  "ended": "2026-10-15T10:24:34Z",
+  "is_error": false,
+  "iteration": 3,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 46013,
+      "cache_read_input_tokens": 556470,
+      "cost_usd": 0.305831,
+      "input_tokens": 26,
+      "output_tokens": 6608
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop/cmd/vloop; cat \u003e\u003e run_git_test.go \u003c\u003c'EOF'\n\n// S1: the driver empties .vloop/tmp/ of everything but .running at run start,\n// before every work session and before the final p…",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261015-1001-b16-verification-phase",
+  "schema": "session/v1",
+  "started": "2026-10-15T10:23:29Z",
+  "task": "T1",
+  "turns": 14,
+  "wall_ms": 65350
+}

@@ -164,7 +164,7 @@ func TestRun15TelemetryContract(t *testing.T) {
 	r.scripted(twoTasks(t), defaultScript)
 	wantExit(t, r.vloop("run", runBrief), 0)
 
-	want := "001-plan.json 002-gate-review.json 003-work.json 004-review.json 005-work.json 006-review.json"
+	want := "001-plan.json 002-gate-review.json 003-work.json 004-review.json 005-work.json 006-review.json 007-verify.json"
 	if got := strings.Join(r.sessionFiles(), " "); got != want {
 		t.Fatalf("session files %q, want %q", got, want)
 	}
@@ -174,7 +174,7 @@ func TestRun15TelemetryContract(t *testing.T) {
 		var rec map[string]any
 		sessionRecord(t, f, &rec)
 		want := "session/v1"
-		if rec["phase"] == "gate-review" {
+		if rec["phase"] == "gate-review" || rec["phase"] == "verify" {
 			want = "session/v2"
 			if _, has := rec["task"]; has || rec["iteration"] != float64(0) {
 				t.Errorf("the gate review record is %v, want iteration 0 and no task", rec)
@@ -183,7 +183,7 @@ func TestRun15TelemetryContract(t *testing.T) {
 		if v := r.vloop("schema", "validate", want, f); v.code != 0 {
 			t.Errorf("%s is not %s: %+v", n, want, v)
 		}
-		if rec["phase"] == "gate-review" {
+		if rec["phase"] == "gate-review" || rec["phase"] == "verify" {
 			continue
 		}
 		if rec["phase"] == "plan" {

@@ -144,7 +144,8 @@ slices ARE this list.>
   runs the whole test suite: a flake in code the branch never touched will block
   a correct task, attempt after attempt.
 - **No task may weaken a check to pass.** A check that is wrong is a blocked task
-  with a note, not an edit to the check.
+  with a note, not an edit to the check. An earlier test changes only where it
+  pins behaviour the contract changes, and only to the new behaviour.
 - **New tooling is proven by fixtures** — name the cases each fixture must cover,
   including the ones where it must fail.
 - Repo-relative paths everywhere. No absolute paths in any file or commit message.

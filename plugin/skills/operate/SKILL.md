@@ -152,18 +152,22 @@ intervention migrate` brings older records to the current version.
 ## 5. Closing and merging
 
 1. Fix what the operator agrees to fix, on the work branch, test first.
-2. Close: `vloop brief close <brief> --finding "<brief|plan|work|env>: <what you found>"`
+2. Read the verify findings: `vloop brief close <brief>` with no flag prints them
+   (the newest run's `reports/verify.json`, or `no verify report — verify by
+   hand`), then refuses and writes nothing. Judge each one; close records nothing
+   from it. Each one you accept is passed as `--finding "<origin>: <summary>"`.
+3. Close: `vloop brief close <brief> --finding "<brief|plan|work|env>: <what you found>"`
    (repeatable; the origin is whose defect it is),
    or `--no-findings` when you found nothing — state it, do not skip it.
    `--dry-run` first shows what would be recorded. It records the findings as
    verification-finding interventions, snapshots the metrics, writes the run record, marks the brief
    consumed and commits, and prints the trailer for the merge. A plan that did
    not complete is closed with `--abandon "<reason>"`.
-3. With the operator's go-ahead only: squash-merge the work branch into the
+4. With the operator's go-ahead only: squash-merge the work branch into the
    default branch with a message ending in the printed trailer, `Vloop-Brief:
    <brief name>`. **Keep the work branch**: its per-iteration commits are the
    evidence of the run.
-4. Check that nothing on the local default branch is missing from the remote one
+5. Check that nothing on the local default branch is missing from the remote one
    before moving it to match.
 
 ## Lessons, where they bite

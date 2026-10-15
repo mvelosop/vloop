@@ -47,6 +47,7 @@ type ReportTime struct {
 	GatesMS      *int64 `json:"gates_ms"`
 	ChecksMS     *int64 `json:"checks_ms"`
 	GateReviewMS int64  `json:"gate_review_ms"`
+	VerifyMS     *int64 `json:"verify_ms,omitempty"`
 	WallMS       *int64 `json:"wall_ms"`
 }
 
@@ -58,14 +59,16 @@ type ReportCost struct {
 	Review      float64  `json:"review_usd"`
 	GateReview  float64  `json:"gate_review_usd"`
 	Per1000Code *float64 `json:"per_1000_code_lines_usd"`
+	VerifyUSD   *float64 `json:"verify_usd,omitempty"`
 }
 
 // PerPhase holds one value per session phase.
 type PerPhase[T any] struct {
-	Plan       T `json:"plan"`
-	Work       T `json:"work"`
-	Review     T `json:"review"`
-	GateReview T `json:"gate-review"`
+	Plan       T  `json:"plan"`
+	Work       T  `json:"work"`
+	Review     T  `json:"review"`
+	GateReview T  `json:"gate-review"`
+	Verify     *T `json:"verify,omitempty"`
 }
 
 // ReportDefects is the `defects` object.
@@ -218,12 +221,20 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	t := CountTasks(m, plan, briefText)
 	r.Tasks = ReportTasks{t.Planned, t.Done, t.Blocked, t.FirstPass, t.Estimate}
 	r.Size = ReportSize{jsonLines(size.Delivered), jsonLines(size.Churn), size.TestCode(), size.Rework()}
-	r.Time = ReportTime{u.Time.AgentMS, u.Time.WorkMS, u.Time.ReviewMS, u.Time.PlanMS, u.Time.GateMS, u.Time.ChecksMS, u.Time.GateReviewMS, u.Time.WallMS}
+	r.Time = ReportTime{u.Time.AgentMS, u.Time.WorkMS, u.Time.ReviewMS, u.Time.PlanMS, u.Time.GateMS, u.Time.ChecksMS, u.Time.GateReviewMS, nil, u.Time.WallMS}
 	r.Rate = u.Rate
-	r.Cost = ReportCost{u.Cost.Total, u.Cost.Plan, u.Cost.Work, u.Cost.Review, u.Cost.GateReview, u.Cost.Per1kCode}
+	r.Cost = ReportCost{u.Cost.Total, u.Cost.Plan, u.Cost.Work, u.Cost.Review, u.Cost.GateReview, u.Cost.Per1kCode, nil}
 	r.Tokens = u.Tokens
-	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview]), splitList(u.Models[PhaseGateReview])}
-	r.Effort = PerPhase[*string]{strp(u.Effort[PhasePlan]), strp(u.Effort[PhaseWork]), strp(u.Effort[PhaseReview]), strp(u.Effort[PhaseGateReview])}
+	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview]), splitList(u.Models[PhaseGateReview]), nil}
+	r.Effort = PerPhase[*string]{strp(u.Effort[PhasePlan]), strp(u.Effort[PhaseWork]), strp(u.Effort[PhaseReview]), strp(u.Effort[PhaseGateReview]), nil}
+	if u.Time.VerifyMS != 0 || u.Cost.Verify != 0 || u.Models[PhaseVerify] != "" || u.Effort[PhaseVerify] != "" {
+		r.Time.VerifyMS = &u.Time.VerifyMS
+		r.Cost.VerifyUSD = &u.Cost.Verify
+		vm := splitList(u.Models[PhaseVerify])
+		r.Models.Verify = &vm
+		ve := strp(u.Effort[PhaseVerify])
+		r.Effort.Verify = &ve
+	}
 	r.PermissionDenials = u.Denials
 	r.Iterations = t.Iterations
 	r.IterationsPerClosed = t.IterationsPerClosed

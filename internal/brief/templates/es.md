@@ -152,6 +152,8 @@ ordenadas, las porciones hermanas SON esta lista.>
   intento tras intento.
 - **Ninguna tarea puede debilitar una comprobación para pasar.** Una comprobación
   errónea es una tarea bloqueada con una nota, no una edición de la comprobación.
+  Una prueba anterior cambia solo donde fija un comportamiento que el contrato
+  cambia, y solo hacia el comportamiento nuevo.
 - **Las herramientas nuevas se prueban con fixtures**: nombra los casos que cada
   fixture debe cubrir, incluidos aquellos en los que debe fallar.
 - Rutas relativas al repo en todas partes. Ninguna ruta absoluta en archivos ni

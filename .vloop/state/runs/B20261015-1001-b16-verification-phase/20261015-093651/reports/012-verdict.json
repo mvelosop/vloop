@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/evals/verify-planted-mismatches/ holds case.yaml (name verify-planted-mismatches, context.scaffold_script: scaffold.sh), prompt.md (max_turns, allowed_tools sufficient for the skill to build, run and validate, body `/vloop:verify`), graders/*.md each with type and weight, and scaffold.sh, all in the layout plugin/evals/README.md describes and the existing cases use (the format is taken from those files, not from memory).", "met": true, "evidence": "case.yaml, prompt.md (max_turns 60, allowed_tools now covering the fence and inside the guide's list; the go check passes), five graders each with type and weight, scaffold.sh using _lib.sh like sibling cases"},
+    {"criterion": "The scaffold, run in an empty directory with vloop on PATH and no claude or network, builds a git repository with a small built result, a loop brief whose worked example has one sound line and whose result plants three mismatches — a worked-example line whose exit code differs, a Behaviour contract sentence the result does not do, a README that states the old behaviour — and a state/v2 plan whose base precedes the built result, so the diff against the base holds it.", "met": true, "evidence": "scaffold.sh: baseline commit, then bin/greet exits 1 where the brief says 2, no --shout, README says ignores arguments; plan base is the baseline commit; the gate scaffold run and state/v2 validation passed"},
+    {"criterion": "The graders read .vloop/tmp/verify.json and require one finding of kind example on the planted line, one of kind contract on the planted sentence, one of kind surface on the README, and no finding on the sound line; one grader checks the session validated its report.", "met": true, "evidence": "graders finds-example-exit-code, finds-contract-sentence, finds-stale-readme, sound-line-not-flagged focus on verify.json; report-validates is a regex on the trace for 'vloop schema validate verify/v1'"},
+    {"criterion": "plugin/evals/README.md's other-cases table gains the row `verify-planted-mismatches` | `/vloop:verify` | what it asks. No gate or check runs the case.", "met": true, "evidence": "plugin/evals/README.md:54 has the row in the other-cases table"}
+  ],
+  "findings": [],
+  "notes": "The only change this iteration is the prompt.md allowed_tools fix for TestEvalGrantsCoverFence; the go check now exits 0."
+}

@@ -21,6 +21,7 @@ gates/T<n>.log              the last gate output per task
 gates/base-T<n>.log         the task's gate on the base, at acceptance
 checks/<name>.log           the last output of each check; final-<name>.log for the final pass
 reports/gate-review-<round>.json  the gate review's verdict
+reports/verify.json         the verify session's report (verify/v1), when the run completed and run.verify is on
 run.log                     the driver's own log (the shell loop's is loop.log)
 ```
 
@@ -64,7 +65,21 @@ After a done iteration whose gates all passed, the driver runs the checks whose
 paths match what the iteration changed (untracked files included), stops at the
 first failure and never re-runs one. When the last task is done every check runs
 once more in a **final pass**: a check that fails there ends the run blocked,
-exit 2. A resume with every task done repeats the final pass. A resume of a plan still
+exit 2. A resume with every task done repeats the final pass.
+
+After the final pass of a complete run, and before the run commit, one **verify
+session** (phase `verify`, `/vloop:verify`, no argument) runs when `run.verify`
+is `true`. It checks the worked example, the contract and the surfaces against a
+fresh build, and the driver keeps its report as `reports/verify.json`. It is
+advisory: a finding, a missing report, a failed session or a reached cost
+ceiling is a warning, the run still ends `complete`, exit 0, and a resume with
+every task done repeats the final pass, then the verify session.
+
+The driver **clears** `.vloop/tmp/` — every entry but `.running`, the run's
+lock — at run start, before every work session, before the final pass and
+before the verify session (S1), so no session's scratch reaches a check. It is
+not cleared between the plan session's rounds or between a work session and its
+review: those hand-offs survive. A resume of a plan still
 `planning` resumes acceptance (see [plan](plan.md#acceptance)). v1 records stay
 readable.
 

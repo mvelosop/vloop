@@ -183,43 +183,17 @@ func writeRepoFile(root, rel string, content []byte) error {
 // guidelinesPath is the repository's lessons file; every loop session receives it.
 const guidelinesPath = ".vloop/repo-guidelines.md"
 
-// guidelinesTemplate is the empty guidelines file. The two headings are the
-// same in every language because vloop brief check reads them; the examples
-// sit inside HTML comments so they are not rules.
+// guidelinesTemplate is the empty guidelines file: the title and one sentence.
 func guidelinesTemplate(lang string) string {
 	if lang == "es" {
 		return `# Lecciones de este repositorio
 
 Este archivo guarda las lecciones de este repositorio y todas las sesiones del bucle lo reciben.
-
-## Pinning tests
-
-Las pruebas que fijan un comportamiento: si un contrato menciona la frase, las restricciones deben nombrarlas.
-
-<!-- - when ` + "`<frase>`" + `: ` + "`<prueba>`" + `, ` + "`<prueba>`" + ` -->
-
-## External formats
-
-Los formatos externos: si un contrato menciona la frase, las referencias vinculantes deben citar su fuente.
-
-<!-- - ` + "`<frase>`" + `: ` + "`<ruta>`" + ` -->
 `
 	}
 	return `# Lessons of this repository
 
 This file holds this repository's lessons, and every loop session receives it.
-
-## Pinning tests
-
-Tests that pin a behaviour: when a contract mentions the phrase, Constraints must name them.
-
-<!-- - when ` + "`<phrase>`" + `: ` + "`<name>`" + `, ` + "`<name>`" + ` -->
-
-## External formats
-
-External formats: when a contract mentions the phrase, Binding references must cite its source.
-
-<!-- - ` + "`<phrase>`" + `: ` + "`<path>`" + ` -->
 `
 }
 

@@ -55,7 +55,8 @@ func TestWorkedExampleB4Close(t *testing.T) {
 	s := b4Fixture(t, b3Opts{})
 	before := b4Refs(t, s)
 
-	b4Err(t, s.run(nil, "brief", "close", b4Name), 2,
+	// A bare close shows the verify report first (B16), then refuses.
+	expect(t, s.run(nil, "brief", "close", b4Name), 2, "no verify report — verify by hand\n",
 		"vloop: say what you found before merge: --finding \"<summary>\" (repeatable) or --no-findings\n")
 
 	r := s.run(nil, "brief", "close", b4Name, "--finding", "work: README omits the flag", "--dry-run")

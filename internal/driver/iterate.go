@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -139,6 +140,14 @@ func (it *Iterator) warn(format string, a ...any) {
 	}
 }
 
+// clearTmp empties .vloop/tmp/ but for the run lock, warning of any entry it
+// cannot remove.
+func (it *Iterator) clearTmp() {
+	ClearTmp(it.Root, func(entry string, err error) {
+		it.warn("warning: cannot clear %s: %v", path.Join(tmpDir, entry), err)
+	})
+}
+
 // Run works the plan under Root until it ends. A run that cannot continue
 // because of a refusal is a *Halt; every other ending is the returned Ending.
 func (it *Iterator) Run() (Ending, error) {
@@ -214,6 +223,7 @@ func (it *Iterator) Run() (Ending, error) {
 			if blocked > 0 {
 				end = Ending{Status: "blocked", Code: ExitBlocked}
 			} else {
+				it.clearTmp()
 				line, err := it.finalPass()
 				if err != nil {
 					return Ending{}, err
@@ -223,6 +233,9 @@ func (it *Iterator) Run() (Ending, error) {
 					end = Ending{Status: "blocked", Code: ExitBlocked, Note: line}
 				} else {
 					end = Ending{Status: "complete"}
+					if err := it.verifySession(); err != nil {
+						return Ending{}, err
+					}
 				}
 			}
 			break
@@ -445,7 +458,6 @@ type workReport struct {
 }
 
 func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterResult, error) {
-	root := it.Root
 	plan := it.plan
 	iter := plan.Iteration + 1
 	started := it.now().UTC()
@@ -453,10 +465,8 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	it.say("── iteration %d (%d this run) · %s · %d/%d done ──", iter, runIters, id, done, total)
 	it.say("   %s", task.Title)
 
-	// A stale handoff from an earlier session is never this session's report.
-	for _, f := range []string{"proposal.json", "verdict.json"} {
-		_ = os.Remove(filepath.Join(root, filepath.FromSlash(tmpDir), f))
-	}
+	// No earlier session's scratch, and no stale handoff, reaches this session.
+	it.clearTmp()
 
 	// 1. work session
 	w, err := it.workSession(task, iter)
@@ -805,6 +815,78 @@ func (it *Iterator) reviewSession(task *state.Task, iter int, outcome string, ch
 	}
 	it.say("   review: %s", verdict)
 	return outcome, verdict, findings, nil
+}
+
+// verifySession runs the one verification session of a complete run, when
+// run.verify allows it, and keeps its findings report. It is a report, not a
+// gate: nothing it finds changes the run's ending. Only a ref or a git
+// setting it moved halts the run, as for any session.
+func (it *Iterator) verifySession() error {
+	root := it.Root
+	if on, err := config.Get(root, "run.verify"); err == nil && on.Value == "false" {
+		return nil
+	}
+	if it.spent >= it.Budgets.CostCeiling {
+		it.warn("vloop: cost ceiling reached — verify skipped")
+		return nil
+	}
+	it.clearTmp()
+	model, effort := it.resolved.For(nil, PhaseVerify)
+	before := refsState(root)
+	guard := snapshotState(root)
+	gguard := snapshotGit(root)
+	inputs := snapshotInputs(root, it.RunDir)
+	tree := snapshotTree(root)
+	res, err := it.r.Run(Spec{Phase: PhaseVerify, Model: model, Effort: effort, PlanSHA: guard.hash()})
+	it.spent += res.Cost
+	if err != nil {
+		it.warn("vloop: the verify session failed to run — verify by hand; see %s", relRunDir(root, it.RunDir)+"run.log")
+		return nil
+	}
+	it.sessionDone(Spec{Phase: PhaseVerify}, res)
+	if _, err := it.restoreInputs(inputs, PhaseVerify, res.Path); err != nil {
+		return err
+	}
+	if err := it.gitChanged(gguard, PhaseVerify); err != nil {
+		return err
+	}
+	if err := it.gitRefsMoved(before, "verify", PhaseVerify); err != nil {
+		return err
+	}
+	changed, failed := tree.revert()
+	if len(failed) > 0 {
+		return halt(ExitPreflight, "the verify session changed files the driver could not revert: %s", strings.Join(failed, "; "))
+	}
+	for _, p := range changed {
+		it.warn("vloop: the verify session changed %s — reverted", p)
+	}
+	guard.restoreTouched()
+	if res.TimedOut || res.ExitCode != 0 || !res.Recorded {
+		it.warn("vloop: the verify session failed to run — verify by hand; see %s", relRunDir(root, it.RunDir)+"run.log")
+		return nil
+	}
+	data, ok := it.readReport("verify.json", "verify/v1")
+	if !ok {
+		it.warn("vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand")
+		return nil
+	}
+	var v struct {
+		Findings []json.RawMessage `json:"findings"`
+	}
+	_ = json.Unmarshal(data, &v)
+	dir := filepath.Join(it.RunDir, "reports")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(dir, "verify.json"), []byte(it.r.Mask(string(data))+"\n"), 0o644); err != nil {
+		return err
+	}
+	if len(v.Findings) == 0 {
+		it.say("verify: no findings")
+	} else {
+		it.say("verify: %d finding(s) — see %sreports/verify.json", len(v.Findings), relRunDir(root, it.RunDir))
+	}
+	return nil
 }
 
 // repeatBlocked notes where a task ended blocked and says so when it is the

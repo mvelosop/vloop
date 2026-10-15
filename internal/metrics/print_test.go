@@ -115,3 +115,36 @@ func TestByTaskRatiosAndJSONNull(t *testing.T) {
 		t.Errorf("T1 JSON: %s", b)
 	}
 }
+
+// A brief whose runs held a verify session shows it after gate review on the
+// time, cost, models and instructions lines and in --json; one without keeps
+// its output and omits the fields.
+func TestPrintSummaryVerify(t *testing.T) {
+	r := &Report{}
+	r.Cost.Total, r.Cost.GateReview = 1.5, 0.5
+	r.Time.GateReviewMS = 120000
+	r.Models.GateReview = []string{"sonnet"}
+	vms, vusd, vm := int64(60000), 0.25, []string{"haiku"}
+	r.Time.VerifyMS, r.Cost.VerifyUSD, r.Models.Verify = &vms, &vusd, &vm
+	n := 40
+	r.Instructions = &Instructions{Review: &n, Verify: &n}
+	var b bytes.Buffer
+	PrintSummary(&b, r)
+	for _, want := range []string{"· verify 1.0 min ·", "· verify 0.25 ·", "· verify haiku\n", "review 40 · verify 40 words"} {
+		if !strings.Contains(b.String(), want) {
+			t.Errorf("summary lacks %q:\n%s", want, b.String())
+		}
+	}
+	j, _ := json.Marshal(r)
+	for _, want := range []string{`"verify_ms":60000`, `"verify_usd":0.25`, `"verify":["haiku"]`, `"verify":40`} {
+		if !strings.Contains(string(j), want) {
+			t.Errorf("json lacks %s: %s", want, j)
+		}
+	}
+	b.Reset()
+	PrintSummary(&b, &Report{})
+	j, _ = json.Marshal(&Report{})
+	if strings.Contains(b.String(), "verify") || strings.Contains(string(j), "verify") {
+		t.Errorf("a brief with no verify session mentions verify:\n%s\n%s", b.String(), j)
+	}
+}

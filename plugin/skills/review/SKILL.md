@@ -87,7 +87,10 @@ Then ask the questions the criteria do not:
   named failure mode of this loop.
 - **Did it touch its own gate?** A change under `.vloop/state/gates/`, or to a
   test that existed before the task so that it passes, is a goalpost move even
-  when the rewrite is better. Say so.
+  when the rewrite is better. Say so. The exception: an earlier test changed
+  where the contract changes the behaviour it pins, and now asserting the new
+  behaviour, is licensed; cite the contract item for each changed earlier test
+  in the verdict.
 - **Did it break something earlier?** The gate catches this mechanically, but
   look at whether the change was the *right* fix or a way to quiet a failure.
 - **Are there absolute paths anywhere?** `/Users/...` in any file, log, or

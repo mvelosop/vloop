@@ -43,13 +43,13 @@ func TestDefaultsEveryRow(t *testing.T) {
 		set      bool
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
-		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
+		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
-		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.git-config-ignore", "", false}, {"run.session-timeout", "60", true}, {"run.keep-awake", "on", true},
+		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.git-config-ignore", "", false}, {"run.session-timeout", "60", true}, {"run.verify", "true", true}, {"run.keep-awake", "on", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -580,5 +580,111 @@ func TestGitConfigIgnoreMixedCaseProtectedRefused(t *testing.T) {
 	}
 	if err := Set(root, "run.git-config-ignore", "Branch.Main.Foo-Bar"); err != nil {
 		t.Errorf("mixed-case subsection pattern refused: %v", err)
+	}
+}
+
+func TestVerifyKeys(t *testing.T) {
+	root := scratch(t)
+	var iv *InvalidValueError
+	if err := Set(root, "run.verify", "maybe"); !errors.As(err, &iv) {
+		t.Errorf("run.verify=maybe: %v", err)
+	}
+	if err := Set(root, "effort.verify", "huge"); !errors.As(err, &iv) {
+		t.Errorf("effort.verify=huge: %v", err)
+	}
+	for k, v := range map[string]string{"run.verify": "false", "effort.verify": "high", "model.verify": "opus"} {
+		if err := Set(root, k, v); err != nil {
+			t.Fatalf("%s: %v", k, err)
+		}
+		if got, err := Get(root, k); err != nil || got.Value != v {
+			t.Errorf("%s = %q, %v", k, got.Value, err)
+		}
+	}
+}
+
+// The config file is the operator's: set and remove edit its text, so comments,
+// order and layout survive (B16: config set dropped this repository's comments).
+func TestSetKeepsCommentsAndLayout(t *testing.T) {
+	root := scratch(t)
+	const body = `# The check below is slow.
+run.gate-timeout = 30
+
+[metrics]
+  code = ["schemas/**"]
+  # eval cases are tests
+  test = [
+    "plugin/evals/**",
+  ]
+  stacks = ["go"]
+
+# The repository's checks.
+[[check]]
+  name = "go"
+  paths = ["**"]
+  run = "go test ./..."
+`
+	writeCfg(t, root, body)
+	steps := []struct{ key, value, want string }{
+		// a new key of a table written as dotted keys at the root
+		{"run.git-config-ignore", "branch.*.github-pr-*", `run.gate-timeout = 30
+run.git-config-ignore = ["branch.*.github-pr-*"]
+`},
+		// an existing key of a dotted table
+		{"run.gate-timeout", "45", "run.gate-timeout = 45\n"},
+		// an existing multi-line key of a [table]
+		{"metrics.test", "x/**", "  # eval cases are tests\n  test = [\"x/**\"]\n  stacks = [\"go\"]\n"},
+		// a new key of a [table]
+		{"metrics.docs", "docs/**", "  stacks = [\"go\"]\n  docs = [\"docs/**\"]\n"},
+		// a new root key, a new table
+		{"language", "es", "run.gate-timeout = 45\nrun.git-config-ignore = [\"branch.*.github-pr-*\"]\nlanguage = \"es\"\n"},
+		{"model.plan", "opus", "  run = \"go test ./...\"\n\n[model]\n  plan = \"opus\"\n"},
+	}
+	for _, s := range steps {
+		if err := Set(root, s.key, s.value); err != nil {
+			t.Fatalf("set %s: %v", s.key, err)
+		}
+		got := readCfg(t, root)
+		if !strings.Contains(got, s.want) {
+			t.Errorf("after set %s=%s, want %q in:\n%s", s.key, s.value, s.want, got)
+		}
+		for _, c := range []string{"# The check below is slow.", "# eval cases are tests", "# The repository's checks."} {
+			if !strings.Contains(got, c) {
+				t.Errorf("after set %s, comment %q lost:\n%s", s.key, c, got)
+			}
+		}
+		if v, err := Get(root, s.key); err != nil || (v.Value != s.value && strings.Join(v.List, ",") != s.value) {
+			t.Errorf("get %s = %+v, %v", s.key, v, err)
+		}
+	}
+	if err := Set(root, "model.plan", ""); err != nil {
+		t.Fatal(err)
+	}
+	if got := readCfg(t, root); strings.Contains(got, "[model]") || !strings.HasSuffix(got, "  run = \"go test ./...\"\n") {
+		t.Errorf("removing the last key of [model] left:\n%s", got)
+	}
+	if err := Set(root, "metrics.test", ""); err != nil {
+		t.Fatal(err)
+	}
+	if got := readCfg(t, root); strings.Contains(got, "x/**") || !strings.Contains(got, "# eval cases are tests") {
+		t.Errorf("removing metrics.test left:\n%s", got)
+	}
+	cs, err := Checks(root)
+	if err != nil || len(cs) != 1 || cs[0].Run != "go test ./..." {
+		t.Errorf("checks = %+v, %v", cs, err)
+	}
+}
+
+func TestAddChecksKeepsComments(t *testing.T) {
+	root := scratch(t)
+	writeCfg(t, root, "# mine\nlanguage = \"en\" # inline\n")
+	if err := AddChecks(root, []CheckDef{{Name: "go", Paths: []string{"**"}, Run: "go test ./..."}}); err != nil {
+		t.Fatal(err)
+	}
+	got := readCfg(t, root)
+	if !strings.HasPrefix(got, "# mine\nlanguage = \"en\" # inline\n\n[[check]]\n") {
+		t.Errorf("file = %q", got)
+	}
+	if cs, err := Checks(root); err != nil || len(cs) != 1 {
+		t.Errorf("checks = %+v, %v", cs, err)
 	}
 }

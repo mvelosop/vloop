@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The driver removes every entry under .vloop/tmp/ except .running (the run's lock) at run start — after taking the lock and before any session, plugin or fence extraction, or plan acceptance — and before every work session (so also right after plan acceptance) and before the final pass.", "met": true, "evidence": "internal/cli/run.go:103 clears right after AcquireLock and before Plan; internal/driver/iterate.go:226 before the final pass and :466 before every work session; ClearTmp keeps .running (cleartmp.go, cleartmp_test.go)"},
+    {"criterion": "It does not clear between the plan session's rounds nor between a work session and its review: plan-problems.md, a plan round's own scratch, proposal.json, checks.json and a work session's scratch reach the session that follows. Removing .running, or clearing at either of those two points, is a violation.", "met": true, "evidence": "only three call sites exist; TestRunClearsTmpAtItsPointsOnly asserts round 2 sees round 1's scratch and plan-problems.md and review sees proposal.json, checks.json and w1.txt"},
+    {"criterion": "A symbolic link under .vloop/tmp/ is removed, never followed: what it points at outside the folder survives. An entry that cannot be removed prints `warning: cannot clear .vloop/tmp/<entry>: <error>` and the run continues.", "met": true, "evidence": "run_git_test.go: symlink to a file outside survives and the link is gone; TestRunClearsTmpWarnsOnUnremovableEntry asserts the warning and exit 0"},
+    {"criterion": "No new command; `vloop plugin path` clears nothing and behaves as today; the plugin, the fence and the hooks folder are recreated before use after a clearing.", "met": true, "evidence": "clearing added only in run.go and iterate.go; proposal notes name where plugin/fence/nohooks are recreated; full go check passes"},
+    {"criterion": "The task's notes state, with the evidence (the code paths read), that nothing relies on .vloop/tmp/ surviving a resume: every file there is written for the session that follows within one run.", "met": true, "evidence": "proposal.json notes list the code paths per file (acceptance.go, gatereview.go, iterate.go, checks.go, gitguard.go, session.go)"},
+    {"criterion": "Committed tests, run by the checks, cover the clearing points, .running kept, the two hand-offs kept, a symlink not followed and the warning for an entry that cannot be removed; tests build their repositories in temporary directories with a temporary HOME. An earlier test changes only where it pins behaviour this contract changes, and only to the new behaviour, the notes naming S1 for each.", "met": true, "evidence": "the two new tests in cmd/vloop/run_git_test.go cover all points via newRunRepo; notes name S1 and the four adjusted earlier tests; go check log shows cmd/vloop ok"}
+  ],
+  "findings": [],
+  "notes": "The warning test skips on Windows/root, which is reasonable."
+}

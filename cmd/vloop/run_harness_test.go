@@ -23,7 +23,7 @@ const runBriefName = "B20260101-0900-demo.loop-brief"
 // doctor makes, and for -p prompts sets the variables below and sources the
 // per-test script:
 //
-//	PHASE  plan|work|review|gate-review      TASK   the task id (work, review), else empty
+//	PHASE  plan|work|review|gate-review|verify      TASK   the task id (work, review), else empty
 //	ARG    the prompt's argument (the brief path for plan, the task id otherwise)
 //	MODEL  the --model it was given    ATTEMPT  1-based count of this PHASE+ARG so far
 //	STUB_COST, STUB_EXIT, STUB_DURATION, STUB_TURNS, STUB_ERROR  the result JSON and exit code
@@ -56,6 +56,7 @@ case "$cmd" in
   /vloop:work) PHASE=work; TASK="$ARG";;
   /vloop:review) PHASE=review; TASK="$ARG";;
   /vloop:gate-review) PHASE=gate-review; TASK=""; ARG="";;
+  /vloop:verify) PHASE=verify; TASK=""; ARG="";;
   *) echo "stub claude: unrecognised prompt: $prompt" >&2; exit 64;;
 esac
 n=$(cat "$dir/count.$PHASE.$(echo "$ARG" | tr '/ ' '__')" 2>/dev/null || echo 0)

@@ -80,16 +80,6 @@ func (r *runRepo) b14Check(n int, brief string) (int, []string) {
 	return res.code, lines
 }
 
-func b14HasLine(t *testing.T, lines []string, want string) {
-	t.Helper()
-	for _, l := range lines {
-		if l == want {
-			return
-		}
-	}
-	t.Fatalf("no line %q in:\n%s", want, strings.Join(lines, "\n"))
-}
-
 func b14NoWarning(t *testing.T, lines []string, prefix string) {
 	t.Helper()
 	for _, l := range lines {
@@ -174,9 +164,10 @@ func TestWorkedExampleB14Init(t *testing.T) {
 	if at < 0 || at+1 >= len(lines) || lines[at+1] != "wrote "+b14File {
 		t.Fatalf("init does not print 'wrote %s' right after install.json: %q", b14File, lines)
 	}
+	// K2 retired the two sections: the template is the title and one sentence.
 	for _, h := range []string{"## Pinning tests", "## External formats"} {
-		if !strings.Contains(r.read(b14File), "\n"+h+"\n") {
-			t.Fatalf("the template has no %q:\n%s", h, r.read(b14File))
+		if strings.Contains(r.read(b14File), h) {
+			t.Fatalf("the template still has %q:\n%s", h, r.read(b14File))
 		}
 	}
 
@@ -208,14 +199,10 @@ func TestWorkedExampleB14Init(t *testing.T) {
 	b5Has(t, kept, "wrote .vloop/install.json")
 }
 
+// K2 retired the must-change list and external format warnings: a guidelines
+// file that still has both sections is ordinary text.
 func TestWorkedExampleB14BriefCheck(t *testing.T) {
 	t.Parallel()
-	const (
-		all  = "TestConfigListDefaults, TestConfigListJSONOrderAndNull, TestDefaultsEveryRow, TestWorkedExampleEnglishSession"
-		tail = " (" + b14File + ")"
-		mc   = `! must-change list: the contract mentions "config key" but Constraints do not name `
-		ef   = `! external format: the contract mentions "eval case" but Binding references do not cite docs/guide/evals.md` + tail
-	)
 	r := newRunRepo(t)
 	r.write(b14File, b14Seed)
 	n := 0
@@ -224,34 +211,17 @@ func TestWorkedExampleB14BriefCheck(t *testing.T) {
 		return r.b14Check(n, b14Brief(fmt.Sprintf("B20260101-%04d-case.loop-brief", 1000+n), what, contract, constraints, refs))
 	}
 
-	code, lines := check("A thing.", "It adds a config key.", "- Keep TestConfigListDefaults green.", "")
+	code, lines := check("A thing.", "It adds a config key and a new eval case.", "- Keep TestConfigListDefaults green.", "")
 	if code != 0 {
-		t.Fatalf("a warning exits %d, not 0: %v", code, lines)
-	}
-	b14HasLine(t, lines, mc+"TestConfigListJSONOrderAndNull, TestDefaultsEveryRow, TestWorkedExampleEnglishSession"+tail)
-
-	_, lines = check("A thing.", "It adds a config key.", "- Keep "+all+" green.", "")
-	b14NoWarning(t, lines, "must-change list:")
-
-	_, lines = check("It adds a config key.", "Nothing else.", "- Keep TestConfigListDefaults green.", "")
-	b14NoWarning(t, lines, "must-change list:")
-
-	_, lines = check("A thing.", "A new eval case.", "", "")
-	b14HasLine(t, lines, ef)
-
-	_, lines = check("A thing.", "A new eval case.", "", "- `docs/guide/evals.md` — the eval case format")
-	b14NoWarning(t, lines, "external format:")
-
-	// No guidelines file: neither warning, and nothing else changes.
-	if err := os.Remove(filepath.Join(r.dir, filepath.FromSlash(b14File))); err != nil {
-		t.Fatal(err)
-	}
-	code, lines = check("A thing.", "It adds a config key and a new eval case.", "", "")
-	if code != 0 {
-		t.Fatalf("no guidelines file: exit %d: %v", code, lines)
+		t.Fatalf("exit %d, not 0: %v", code, lines)
 	}
 	b14NoWarning(t, lines, "must-change list:")
 	b14NoWarning(t, lines, "external format:")
+	for _, l := range lines {
+		if strings.Contains(l, "must-change list") || strings.Contains(l, "external format") {
+			t.Fatalf("a retired warning: %q", l)
+		}
+	}
 }
 
 func TestWorkedExampleB14RunArguments(t *testing.T) {
@@ -547,30 +517,26 @@ func (r *runRepo) b14MetricsAt(root string, args ...string) result {
 func TestWorkedExampleB14RealDataBriefCheck(t *testing.T) {
 	t.Parallel()
 	root := b14Root(t)
-	const (
-		p    = "! must-change list: the contract mentions "
-		tail = " (" + b14File + ")"
-	)
 	r := newRunRepo(t)
 	r.write(b14File, b14Seed)
-	for _, c := range []struct{ brief, want string }{
-		{"B20261003-2049-gate-model", `"schemas/" but Constraints do not name TestWorkedExampleB2Commands, TestSchemasAreEmbedded, TestWorkedExampleB6RealData`},
-		{"B20261004-1434-interventions-options", `"schemas/" but Constraints do not name TestSchemasAreEmbedded, TestWorkedExampleB6RealData`},
-		{"B20261008-2144-b12-field-reliability", `"config key" but Constraints do not name TestConfigListDefaults, TestConfigListJSONOrderAndNull, TestDefaultsEveryRow`},
-		{"B20261011-2100-b13-docs-onboarding", `"closing lines" but Constraints do not name TestInitPointsAtBothWaysToLoadThePlugin`},
+	for _, c := range []string{
+		"B20261003-2049-gate-model",
+		"B20261004-1434-interventions-options",
+		"B20261008-2144-b12-field-reliability",
+		"B20261011-2100-b13-docs-onboarding",
 	} {
-		raw, err := os.ReadFile(filepath.Join(root, "docs", "briefs", c.brief+".loop-brief.md"))
+		raw, err := os.ReadFile(filepath.Join(root, "docs", "briefs", c+".loop-brief.md"))
 		if err != nil {
 			t.Fatal(err)
 		}
 		text := strings.Replace(string(raw), "\nstatus: consumed\n", "\nstatus: ready\n", 1)
 		if text == string(raw) {
-			t.Fatalf("%s: no 'status: consumed' to set to ready", c.brief)
+			t.Fatalf("%s: no 'status: consumed' to set to ready", c)
 		}
-		rel := "docs/briefs/" + c.brief + ".loop-brief.md"
+		rel := "docs/briefs/" + c + ".loop-brief.md"
 		r.write(rel, text)
 		res := r.vloop("brief", "check", rel)
-		b14HasLine(t, b14Trim(res.out+res.err), p+c.want+tail)
+		b14NoWarning(t, b14Trim(res.out+res.err), "must-change list:")
 	}
 }
 

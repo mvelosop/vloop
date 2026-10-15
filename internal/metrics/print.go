@@ -106,6 +106,11 @@ func PrintSummary(out io.Writer, r *Report) {
 		grCost = fmt.Sprintf(" · gate review %.2f", r.Cost.GateReview)
 		grModels = " · gate review " + joinModels(r.Models.GateReview)
 	}
+	if r.Time.VerifyMS != nil && r.Cost.VerifyUSD != nil && r.Models.Verify != nil {
+		grTime += " · verify " + minutes(*r.Time.VerifyMS) + " min"
+		grCost += fmt.Sprintf(" · verify %.2f", *r.Cost.VerifyUSD)
+		grModels += " · verify " + joinModels(*r.Models.Verify)
+	}
 	fmt.Fprintf(out, " time      agent %s min (work %s · review %s) · plan %s min%s · gates %s · wall %s min\n",
 		minutes(t.AgentMS), minutes(t.WorkMS), minutes(t.ReviewMS), minutes(t.PlanMS), grTime, optMinutes(t.GatesMS), optMinutes(t.WallMS))
 	fmt.Fprintf(out, " rate      %s code lines/min · %s incl. tests\n",
@@ -130,8 +135,12 @@ func PrintSummary(out io.Writer, r *Report) {
 			}
 			return thousands(*n)
 		}
-		fmt.Fprintf(out, " instructions  plan %s · gate review %s · work %s · review %s words · guidelines %d rules\n",
-			w(in.Plan), w(in.GateReview), w(in.Work), w(in.Review), in.GuidelinesRules)
+		verify := ""
+		if in.Verify != nil {
+			verify = " · verify " + w(in.Verify)
+		}
+		fmt.Fprintf(out, " instructions  plan %s · gate review %s · work %s · review %s%s words · guidelines %d rules\n",
+			w(in.Plan), w(in.GateReview), w(in.Work), w(in.Review), verify, in.GuidelinesRules)
 	}
 	if n := len(r.Records.Missing); n > 0 {
 		var l []string

@@ -1,13 +1,13 @@
 ---
 name: session
-description: Binds the Session entity — the plan, work and review kinds, what each reads and writes (plan, proposal, verdict), the fence they run under, what they must never do, and the telemetry record each leaves
+description: Binds the Session entity — the plan, work, review, gate-review and verify kinds, what each reads and writes (plan, proposal, verdict, verify report), the fence they run under, what they must never do, and the telemetry record each leaves
 ---
 # Session
 
 A fresh `claude -p` process with one job and no memory of any other; sessions
 share nothing but files (S-1). *Part of [execution](execution-context.md).*
 
-## The four kinds
+## The five kinds
 
 | Kind | Invoked with | Reads | Writes |
 | --- | --- | --- | --- |
@@ -15,6 +15,7 @@ share nothing but files (S-1). *Part of [execution](execution-context.md).*
 | **work** | one task id | the brief, the plan, the task's references and notes | the working tree for that task, then a **proposal** |
 | **review** | one task id | the brief, the task's acceptance, the diff, the checks' results (`.vloop/tmp/checks.json`) | a **verdict** |
 | **gate-review** | none | the brief, the plan, the gates, their logs on the base | a **gate verdict** |
+| **verify** | none | the brief, the plan's base diff and a fresh build of the result | a **verify report** (`.vloop/tmp/verify.json`) |
 
 The review sees the diff and the acceptance, not the proposal's summary, so it
 judges the work rather than the claim (S-3).
@@ -40,6 +41,16 @@ kinds. The gate-review session judges the plan's gates, not a task; it has no
 per-task model override. The driver keeps the verdict as
 `reports/gate-review-<round>.json`; a missing or invalid one is a `FAIL`.
 
+## Verify report — `verify/v1`
+
+`schema`, `findings` (each `{kind, claim, observed, where}`, `kind` one of
+`example`, `contract`, `surface`), `checked` (`{example_lines, sentences,
+surfaces}`) and `notes`. The verify session runs once, after the final pass of a
+complete run, with no argument; it checks the brief's worked example, its
+contract sentences and every surface stating a changed behaviour. The driver
+keeps a valid report as `reports/verify.json`. A finding never changes the run's
+ending, exit code or a task; the operator reads them at close.
+
 ## What a session never does
 
 Commit, set a status, or move a git ref (S-2). The **fence** — the permission
@@ -52,7 +63,7 @@ the mutating `git remote` subcommands, `update-ref`, `symbolic-ref`, `tag`,
 `git diff`, `log` and `show`; recursive `rm`; `vloop -C` and `vloop brief new`),
 web access, and reads of the user's global Claude directory. No fence lets a
 session write under `.git/`. Each phase has its own fence. The plan fence allows writing only
-`.vloop/state/state.json`, `.vloop/state/gates/**` and `.vloop/tmp/**`; the work, review and gate-review fences allow
+`.vloop/state/state.json`, `.vloop/state/gates/**` and `.vloop/tmp/**`; the work, review, gate-review and verify fences allow
 nothing under `.vloop/` but `.vloop/tmp/**`.
 
 **The fence is advisory.** It is a first line that saves attempts, not a
@@ -73,7 +84,7 @@ but `.vloop/tmp/` (S-4).
 
 `run_id`, `iteration`, `phase`, `task` (none for `plan`), the configured
 `model` and `effort`, `models_used` (per model: tokens and cost), `started`,
-`ended`, `wall_ms`, `duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A gate-review session's record is `session/v2` (iteration 0, no task). `ended` and `wall_ms` are the driver's own
+`ended`, `wall_ms`, `duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A gate-review or verify session's record is `session/v2` (iteration 0, no task). `ended` and `wall_ms` are the driver's own
 measurement around the session process (the wall time, including any time the
 machine slept); `duration_ms` stays what the CLI reported, and both are optional
 so older records stay readable, with no version change. A denied Bash call in
@@ -83,7 +94,7 @@ record is reported by the metrics, never silently skipped.
 
 ## Skills, as built
 
-`/vloop:plan`, `/vloop:gate-review`, `/vloop:work` and `/vloop:review` are the plugin's session skills,
+`/vloop:plan`, `/vloop:gate-review`, `/vloop:work`, `/vloop:review` and `/vloop:verify` are the plugin's session skills,
 and `/vloop:operate` the operator's playbook (not a session). They write their
 prose in the repo's `language` (C-4).
 

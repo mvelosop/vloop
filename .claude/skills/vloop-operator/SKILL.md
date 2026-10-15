@@ -54,9 +54,10 @@ and bring the operator a proposal:
    a halt.
    **Ask the operator to close VS Code (or any editor open on the repository)
    for the run.** VS Code writes `branch.*.vscode-merge-base` into `.git/config`
-   when a branch is created, and the driver's guard cannot tell that from a
-   gate's write: it halted B11's acceptance and a visum-monorepo plan with exit 9
-   (`D20261005-1125-the-driver-s-git-config…`, open until B12). `vloop status` shows progress. `--plan-only` first when the
+   when a branch is created, and its GitHub Pull Requests extension
+   `branch.*.github-pr-*`; the guard ignores both (B12, B16), but any other
+   editor key halts the run with exit 9, as `vscode-merge-base` halted B11's
+   acceptance and a visum-monorepo plan. `vloop status` shows progress. `--plan-only` first when the
    operator wants to see the task split. B1–B7 ran under `.loop/run.sh`.
 3. Resuming on another branch than the one that planned needs the brief path
    again; the driver refuses without it (exit 1) and says so.
@@ -106,6 +107,10 @@ before closing anything.
 Until B4 ships `vloop brief close`, by hand:
 
 1. Fix what the operator agrees to fix, on the work branch, test first.
+   First read the verify findings `vloop brief close <brief>` prints with no flag
+   (the newest `reports/verify.json`; it then refuses and writes nothing);
+   record each one you accept with `--finding "<origin>: <summary>"`, previewed
+   with `--dry-run` and that flag, then closed.
 2. Record findings before merge as verification-finding interventions:
    `vloop intervention add "<summary>" --brief <name> --kind
    verification-finding --origin <brief|plan|work|env> --phase verify

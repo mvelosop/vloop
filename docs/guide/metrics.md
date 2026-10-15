@@ -131,6 +131,9 @@ Each of `delivered` and `churn` holds `code`, `test`, `docs` and `other`, and a
   was recorded. The final pass writes no iteration record, so it is not counted.
 - **gate review** (`gate_review_ms`): the duration of the gate-review sessions,
   the gate-review phase before any work. It is not part of `agent_ms`.
+- **verify** (`verify_ms`): the duration of the verify sessions, the phase
+  after the final pass. It is not part of `agent_ms`; absent when the brief's
+  runs held none.
 - **wall** (`wall_ms`): from the first plan session's `started` (the plan
   commit's committer time when no plan session record exists) to the last run
   commit's. `null` without a run commit.
@@ -146,7 +149,7 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 
 ## Cost and tokens
 
-- `cost.total_usd` (gate-review sessions included), `cost.plan_usd`, `cost.work_usd` and `cost.review_usd` are
+- `cost.total_usd` (gate-review and verify sessions included), `cost.verify_usd` (absent without a verify session), `cost.plan_usd`, `cost.work_usd` and `cost.review_usd` are
   sums of the sessions' costs, unrounded in JSON and rounded to cents only for
   display. `cost.per_1000_code_lines_usd` is the total per 1,000 delivered code
   lines (`$/kloc`).
@@ -156,7 +159,7 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 
 ## Models and effort
 
-`models` lists, for each of `plan`, `gate-review`, `work` and `review`, the models seen in the
+`models` lists, for each of `plan`, `gate-review`, `work`, `review` and `verify`, the models seen in the
 sessions' model usage, sorted. `effort` gives each phase's effort level when the
 records carry it (`session/v1` does, the legacy shell loop's do not), else `null`.
 
@@ -234,15 +237,17 @@ row over all of them.
  tasks     <p> planned (brief said <n>–<m>) · <d> done · <b> blocked · first-pass <f>/<p>
  size      delivered  code <n> · test <n> · docs <n> · test:code <r>
            churn      code <n> · test <n> · docs <n> · rework <r>
- time      agent <m> min (work <m> · review <m>) · plan <m> min[ · gate review <m> min] · gates <m|n/a> · wall <m> min
+ time      agent <m> min (work <m> · review <m>) · plan <m> min[ · gate review <m> min][ · verify <m> min] · gates <m|n/a> · wall <m> min
  rate      <r> code lines/min · <r> incl. tests
- cost      $<t> · plan <c> · work <c> · review <c>[ · gate review <c>] · $<c>/kloc
- models    plan <models> · work <models> · review <models>[ · gate review <models>]
+ cost      $<t> · plan <c> · work <c> · review <c>[ · gate review <c>][ · verify <c>] · $<c>/kloc
+ models    plan <models> · work <models> · review <models>[ · gate review <models>][ · verify <models>]
  defects   in-loop <n> · operator <n> · escaped <n> · removal efficiency <p>%
 ```
 
 The bracketed `gate review` parts appear only for a brief whose plan had a
-gate review (vloop 2 and later).
+gate review (vloop 2 and later); the `verify` parts only for a brief whose run
+held a verify session, with `effort.verify` and `instructions.verify` in
+`--json`.
 
 When a brief delivered no line classified as code or test, the cross-brief
 table shows `n/a` in `code` and `test` rather than 0, and the summary adds a

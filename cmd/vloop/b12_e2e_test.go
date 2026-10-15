@@ -115,7 +115,7 @@ func TestWorkedExampleB12(t *testing.T) {
 		t.Parallel()
 		r := newRunRepo(t)
 		r.scripted(planJSON(t, planTask("T1", map[string]any{
-			"verify": "if [ -f .vloop/tmp/tamper ]; then rm -f .vloop/tmp/tamper; printf '[core]\\n\\tfsmonitor = true\\n' >> .git/config; fi; test -f T1.out"})),
+			"verify": "if [ -f .git/tamper ]; then rm -f .git/tamper; printf '[core]\\n\\tfsmonitor = true\\n' >> .git/config; fi; test -f T1.out"})),
 			defaultScript+`if [ "$PHASE" = plan ]; then STUB_COST=0.37; fi
 if [ "$PHASE" = gate-review ]; then STUB_COST=0.21; fi
 `)
@@ -124,7 +124,7 @@ if [ "$PHASE" = gate-review ]; then STUB_COST=0.21; fi
 		if err != nil {
 			t.Fatal(err)
 		}
-		r.write(".vloop/tmp/tamper", "")
+		r.write(".git/tamper", "")
 		res := r.vloop("run", runBrief)
 		wantExit(t, res, 9)
 		wantIn(t, "stderr", res.err, "the gate of T1 changed .git/config (core.fsmonitor)")

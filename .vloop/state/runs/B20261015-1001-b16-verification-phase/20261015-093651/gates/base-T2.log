@@ -1,0 +1,19 @@
+GATE FAIL: vloop init --language en: the guidelines file is not the title and its one sentence:
+# Lessons of this repository
+
+This file holds this repository's lessons, and every loop session receives it.
+
+## Pinning tests
+
+Tests that pin a behaviour: when a contract mentions the phrase, Constraints must name them.
+
+<!-- - when `<phrase>`: `<name>`, `<name>` -->
+
+## External formats
+
+External formats: when a contract mentions the phrase, Binding references must cite its source.
+
+<!-- - `<phrase>`: `<path>` -->
+want exactly (blank lines aside):
+# Lessons of this repository
+This file holds this repository's lessons, and every loop session receives it.

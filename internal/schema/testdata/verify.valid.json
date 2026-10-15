@@ -1,0 +1,1 @@
+{"schema":"verify/v1","findings":[{"kind":"example","claim":"exit 2","observed":"exit 1","where":"Worked example, line 3"}],"checked":{"example_lines":3,"sentences":4,"surfaces":2},"notes":"none"}

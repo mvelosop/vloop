@@ -235,21 +235,8 @@ session it starts (plan, gate review, work and review) as appended system
 instructions; with no file, or an empty one, the sessions start as before. A
 guideline never overrides the brief or a domain invariant.
 
-A rule is a line starting with `- ` at the left margin, in any section. Two
-sections are also read by `vloop brief check`, and their headings are the same
-in every language:
-
-- `## Pinning tests`: ``- when `<phrase>`: `<name>`, `<name>` `` names the tests
-  a change to that phrase must also change.
-- `## External formats`: ``- `<phrase>`: `<path>` `` names the document a
-  format comes from.
-
-Each gives one warning, never a problem, and never changes the exit code:
-
-- `must-change list:` the Behaviour contract mentions `<phrase>`
-  (case-insensitively) but Constraints do not name every test of the rule.
-- `external format:` the Behaviour contract mentions `<phrase>` but the Binding
-  references do not cite its `<path>`.
+A rule is a line starting with `- ` at the left margin, in any section.
+`vloop brief check` does not read the file.
 
 Every rule cites the defect or intervention that taught it (`D20261011-1455`,
 `I20261011-0900`), in its line. `vloop doctor` warns, under `guidelines`, when
@@ -265,8 +252,10 @@ defect's `rule` and `rule-outcome` (see [defects.md](defects.md)), and
 
 ## Closing and release
 
-When a run is finished and you have verified it, `vloop brief close <brief>` on
-the work branch records your findings as defects (`--finding`, or
+When a run is finished, `vloop brief close <brief>` with no flag prints the verify
+session's findings and refuses, writing nothing. Once you have verified the run,
+`vloop brief close <brief>` on the work branch records your findings as
+verification-finding interventions (`--finding "<origin>: <summary>"`, or
 `--no-findings` to say there were none), freezes the metrics as a snapshot, writes
 the run record into the brief, marks it `consumed` and makes one commit. It
 prints the `Vloop-Brief: <name>` trailer the squash-merge commit must carry.

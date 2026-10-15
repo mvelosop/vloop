@@ -1,0 +1,16 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "vloop metrics shows the verify session after gate review on the time, cost and models lines, in the total but not agent, and adds verify to the instructions line when plugin/skills/verify/SKILL.md exists; --json gains the optional verify fields.",
+  "files": [
+    "internal/metrics/time.go",
+    "internal/metrics/metrics.go",
+    "internal/metrics/instructions.go",
+    "internal/metrics/print.go",
+    "schemas/metrics.v2.json",
+    "internal/metrics/print_test.go"
+  ],
+  "verified": "vloop task gate T7 exited 0 and printed gate T7: ok.",
+  "notes": "Verify JSON fields are pointers with omitempty, present only when the brief held a verify session (or the verify skill exists, for instructions.verify), so older briefs print and serialise as before. TestPrintSummaryVerify in internal/metrics/print_test.go covers the three lines, instructions, JSON fields and the no-verify case. go test ./internal/cli task_gate tests failed only because they ran inside a work session (plan-changed guard), not from this change."
+}

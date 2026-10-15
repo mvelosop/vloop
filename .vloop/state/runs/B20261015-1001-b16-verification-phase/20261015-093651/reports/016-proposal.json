@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T10",
+  "outcome": "done",
+  "summary": "The session, run, domain-model, metrics, brief and concepts pages, the metrics guide and both operate playbooks now describe the verify session, its report, the clearing of .vloop/tmp/ and V3's fields; the retired warnings are gone; commands.md regenerated.",
+  "files": ["docs/domain/execution/session.md", "docs/domain/execution/run.md", "docs/domain/domain-model.md", "docs/domain/measurement/metrics.md", "docs/guide/metrics.md", "docs/domain/briefing/brief.md", "docs/guide/concepts.md", "plugin/skills/operate/SKILL.md", ".claude/skills/vloop-operator/SKILL.md"],
+  "verified": "sh .vloop/state/gates/T10/gate.sh printed gate T10: ok.",
+  "notes": "docs/guide/configuration.md and commands.md already had the verify keys; commands.md regenerated unchanged or nearly. The close-step wording quotes the message 'no verify report — verify by hand' from the brief's V4, not from a run of the binary."
+}
