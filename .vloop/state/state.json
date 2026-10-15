@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261015-1651-b17-release.loop-brief.md",
   "base": "84088d72854b8319d798b7340adb010a975dc398",
   "branch": "B20261015-1651-b17-release",
-  "status": "running",
+  "status": "stalled",
   "iteration": 12,
   "created": "2026-10-15T16:30:00Z",
-  "updated": "2026-10-15T17:43:51Z",
+  "updated": "2026-10-15T17:43:52Z",
   "shell": "sh",
   "checks": [
     {

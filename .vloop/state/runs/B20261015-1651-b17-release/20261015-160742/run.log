@@ -93,3 +93,12 @@ committing the plan
    work T9 · 0m33s · $0.08 · run $9.00 / $40.00
    work session reported blocked
    T9 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+   no recorded progress (2/2)
+
+═══ stalled ═══
+run:    B20261015-1651-b17-release/20261015-160742  (12 iteration(s) this run)
+plan:   8/9 done, 0 blocked
+no recorded progress 2 times running — read .vloop/state/runs/B20261015-1651-b17-release/20261015-160742/
+
+T9 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
+T9 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
