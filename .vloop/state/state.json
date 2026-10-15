@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 14,
+  "iteration": 15,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T11:59:22Z",
+  "updated": "2026-10-15T12:05:26Z",
   "shell": "sh",
   "checks": [
     {
@@ -286,7 +286,7 @@
         "Each skill stays within its word ceiling (work 1,800, review 1,650) and changes only as K1 requires; no ceiling is raised. Any committed test that pins the templates' text changes only where K1 changes it, the notes naming K1."
       ],
       "verify": "sh .vloop/state/gates/T9/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

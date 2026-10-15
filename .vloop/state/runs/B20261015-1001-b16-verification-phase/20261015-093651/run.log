@@ -105,3 +105,10 @@ committing the plan
    review T8 · 0m14s · $0.09 · run $13.01 / $40.00
    review: PASS
    T8 done
+── iteration 15 (15 this run) · T9 · 8/11 done ──
+   State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
+   work T9 · 0m48s · $0.15 · run $13.16 / $40.00
+   check go
+   review T9 · 0m19s · $0.08 · run $13.24 / $40.00
+   review: PASS
+   T9 done

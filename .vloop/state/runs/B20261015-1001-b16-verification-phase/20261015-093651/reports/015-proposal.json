@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "done",
+  "summary": "Both brief templates, the work and review skills and the architect skill now state K1: an earlier test changes only where it pins behaviour the contract changes, and only to the new behaviour; work names the contract item in notes, review cites it.",
+  "files": ["internal/brief/templates/en.md", "internal/brief/templates/es.md", "plugin/skills/work/SKILL.md", "plugin/skills/review/SKILL.md", ".claude/skills/vloop-architect/SKILL.md"],
+  "verified": "vloop task gate T9 exited 0 and printed gate T9: ok; go test ./internal/brief/... passed.",
+  "notes": "No committed test pinned the templates' changed text, so no existing test changed. Skills stay under ceilings (work 1,800, review 1,650)."
+}

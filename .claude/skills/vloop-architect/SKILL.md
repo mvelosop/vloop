@@ -66,8 +66,9 @@ Every brief so far also carried:
 - the lessons as constraints, verbatim where they apply (gates on macOS's BSD
   tools; sessions never move refs; tests build fixtures in temporary
   directories and address them with `git -C`);
-- an explicit list of earlier tests that *must* change (e.g. `config list`
-  gaining keys) — otherwise "no task may weaken a check" blocks the task.
+- the rule for earlier tests: one changes only where it pins behaviour the
+  contract changes, and only to the new behaviour; the work session names the
+  contract item in its notes and the review cites it. No list is needed.
 
 **Binding references — precise, never a folder.** Cite entity pages, or
 `docs/domain/domain-model.md` with the invariant IDs that apply, one path per

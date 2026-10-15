@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/11 done** · iteration 14
+**Status:** running · **9/11 done** · iteration 15
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:59:22Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T12:05:26Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Add the verify-planted-mismatches eval case · 1 attempt(s)
 - [x] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
 - [x] **T8** — Print the verify findings first in vloop brief close and close --dry-run
-- [ ] **T9** — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
+- [x] **T9** — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
 - [ ] **T10** — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks
 - [ ] **T11** — Close: commit the worked example as an end-to-end test and pass the real-data check
 
@@ -197,7 +197,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
 
-`pending` · depends on: T8
+`done` · depends on: T8
 
 Briefs have had to list the earlier tests their contract will change, and missed some five times. K1 replaces the list with a rule every session already holds: an earlier test changes only where it pins behaviour the contract changes, and only to the new behaviour; the work session names the contract item in its notes and the review cites it. The brief templates, the work and review skills and the architect skill say so.
 

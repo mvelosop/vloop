@@ -104,3 +104,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop brief close and close --dry-run now print the newest verify report of the brief's run folders first (findings block, 'no findings', or 'no verify report — verify by hand'); close records nothing from it.
 - **Files:** internal/cli/close.go, internal/cli/close_test.go, internal/cli/close_flags_test.go
 - **Notes for next iteration:** V4: close_test.go and close_flags_test.go changed only where they pin close's first line (now prefixed by the no-verify-report line). Block is skipped under --json so the JSON output stays one document. TestTaskGate* fail inside a loop session (plan-changed guard), unrelated.
+
+## T9 — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Both brief templates, the work and review skills and the architect skill now state K1: an earlier test changes only where it pins behaviour the contract changes, and only to the new behaviour; work names the contract item in notes, review cites it.
+- **Files:** internal/brief/templates/en.md, internal/brief/templates/es.md, plugin/skills/work/SKILL.md, plugin/skills/review/SKILL.md, .claude/skills/vloop-architect/SKILL.md
+- **Notes for next iteration:** No committed test pinned the templates' changed text, so no existing test changed. Skills stay under ceilings (work 1,800, review 1,650).

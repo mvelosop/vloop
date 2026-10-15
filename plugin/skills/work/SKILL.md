@@ -130,6 +130,9 @@ would not want repeated.
   gate fixtures in `.vloop/state/gates/`, which are not yours to edit: the plan
   session wrote them and only the operator amends them. Do not edit a test file
   that already existed when you started in order to make the gate pass either.
+  The one exception: an earlier test may change only where it pins behaviour the
+  brief's contract changes, and only to the new behaviour; name the contract item
+  for each such test in your proposal's notes.
   Gates were authored before any implementation existed, and that is the only
   reason they mean anything: a session that writes both the work and the gate
   has a gate that proves nothing — *however correct its rewrite happens to be*.
