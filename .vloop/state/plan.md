@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/11 done** · iteration 2
+**Status:** running · **1/11 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T10:23:28Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T10:28:27Z
 
 ## Progress
 
-- [ ] **T1** — Clear .vloop/tmp/ at run start and before every work session and the final pass · 2 attempt(s)
+- [x] **T1** — Clear .vloop/tmp/ at run start and before every work session and the final pass · 2 attempt(s)
 - [ ] **T2** — Retire brief check's must-change list and external format warnings and init's two guidelines sections
 - [ ] **T3** — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2
 - [ ] **T4** — Run one verify session after the final pass of every complete run and keep its report
@@ -24,7 +24,7 @@
 
 ### T1 — Clear .vloop/tmp/ at run start and before every work session and the final pass
 
-`pending` · 2 attempt(s) · depends on: none
+`done` · 2 attempt(s) · depends on: none
 
 B15's first task burned three attempts on a file a plan session had left in .vloop/tmp/, which the repository's check then failed on. The driver now empties .vloop/tmp/ of everything but its lock at run start and before every work session and the final pass, so no session's scratch outlives the next session. It comes first so no later task of this run meets stale scratch; T4 adds the same clearing before the verify session.
 
@@ -36,8 +36,6 @@ B15's first task burned three attempts on a file a plan session had left in .vlo
 - No new command; `vloop plugin path` clears nothing and behaves as today; the plugin, the fence and the hooks folder are recreated before use after a clearing.
 - The task's notes state, with the evidence (the code paths read), that nothing relies on .vloop/tmp/ surviving a resume: every file there is written for the session that follows within one run.
 - Committed tests, run by the checks, cover the clearing points, .running kept, the two hand-offs kept, a symlink not followed and the warning for an entry that cannot be removed; tests build their repositories in temporary directories with a temporary HOME. An earlier test changes only where it pins behaviour this contract changes, and only to the new behaviour, the notes naming S1 for each.
-
-**From the last attempt:** No committed test covers the clearing points or the two kept hand-offs at run level; only ClearTmp itself is unit-tested, so clearing at a forbidden point would pass the checks.; The task's notes lack the evidence (code paths read) that nothing relies on .vloop/tmp/ surviving a resume; they refer to a journal of an earlier attempt.
 
 <details><summary>verify command</summary>
 

@@ -28,3 +28,10 @@ committing the plan
    check go
    review T1 · 0m30s · $0.14 · run $8.95 / $40.00
    review: FAIL
+── iteration 3 (3 this run) · T1 · 0/11 done ──
+   Clear .vloop/tmp/ at run start and before every work session and the final pass
+   work T1 · 1m05s · $0.31 · run $9.25 / $40.00
+   check go
+   review T1 · 0m20s · $0.11 · run $9.36 / $40.00
+   review: PASS
+   T1 done

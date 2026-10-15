@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -155,4 +156,97 @@ fi
 		t.Error("work started before the gate review passed")
 	}
 	r.wantTask("T1", "done", 0)
+}
+
+// S1: the driver empties .vloop/tmp/ of everything but .running at run start,
+// before every work session and before the final pass, and at no other point:
+// a plan round's scratch and plan-problems.md reach the next round, and
+// proposal.json, checks.json and a work session's scratch reach its review.
+func TestRunClearsTmpAtItsPointsOnly(t *testing.T) {
+	t.Parallel()
+	r := newRunRepo(t)
+	r.write(".vloop/config.toml", runCheckConfig+`
+[[check]]
+name = "late"
+paths = ["nomatch/**"]
+run = "test ! -e .vloop/tmp/late.txt"
+`)
+	r.commitAll("late check")
+	keep := filepath.Join(t.TempDir(), "keep.txt")
+	if err := os.WriteFile(keep, nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	tmp := filepath.Join(r.dir, ".vloop", "tmp")
+	if err := os.MkdirAll(filepath.Join(tmp, "olddir"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(tmp, "old.txt"), nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(keep, filepath.Join(tmp, "linkfile")); err != nil {
+		t.Skipf("no symbolic links: %v", err)
+	}
+	r.rounds(planJSON(t, planTask("T1", map[string]any{"verify": "true"})),
+		planJSON(t, planTask("T1", nil)))
+	r.script(strings.Replace(defaultScript, `cp "$dir/plan.json" .vloop/state/state.json`,
+		`n=$(cat "$dir/pn" 2>/dev/null || echo 0); n=$((n+1)); echo $n > "$dir/pn"; cp "$dir/plan.$n.json" .vloop/state/state.json`, 1) + `
+seen() { [ -e ".vloop/tmp/$1" ] || [ -L ".vloop/tmp/$1" ]; }
+note() { echo "$*" >> "$dir/s1"; }
+seen .running || note "$PHASE: .running missing"
+case "$PHASE" in
+  plan)
+    n=$(cat "$dir/pn")
+    for e in old.txt olddir linkfile; do seen $e && note "plan round $n saw the stale $e"; done
+    if [ "$n" = 1 ]; then : > .vloop/tmp/plan-scratch.txt
+    else
+      seen plan-problems.md || note "plan round $n: plan-problems.md was cleared"
+      seen plan-scratch.txt || note "plan round $n: round 1's scratch was cleared"
+    fi;;
+  work)
+    for e in old.txt olddir linkfile plan-scratch.txt plan-problems.md; do seen $e && note "work saw $e"; done
+    : > .vloop/tmp/w1.txt; : > .vloop/tmp/late.txt;;
+  review)
+    for e in proposal.json checks.json w1.txt; do seen $e || note "review found no $e"; done;;
+esac
+`)
+	wantExit(t, r.vloop("run", runBrief), 0)
+	if b, err := os.ReadFile(filepath.Join(r.stub, "s1")); err == nil {
+		t.Errorf("the scratch was not cleared as S1 requires:\n%s", b)
+	}
+	if n := r.planSessions(); n != 2 {
+		t.Errorf("%d plan sessions, want 2", n)
+	}
+	r.wantTask("T1", "done", 0)
+	if _, err := os.Stat(keep); err != nil {
+		t.Errorf("clearing followed a symbolic link out of .vloop/tmp/: %v", err)
+	}
+	for _, e := range []string{"old.txt", "olddir", "linkfile", "late.txt"} {
+		if _, err := os.Lstat(filepath.Join(tmp, e)); err == nil {
+			t.Errorf(".vloop/tmp/%s outlived the run", e)
+		}
+	}
+}
+
+// S1: an entry that cannot be removed is a warning and the run goes on.
+func TestRunClearsTmpWarnsOnUnremovableEntry(t *testing.T) {
+	t.Parallel()
+	if runtime.GOOS == "windows" || os.Geteuid() == 0 {
+		t.Skip("directory permissions do not stop removal here")
+	}
+	r := newRunRepo(t)
+	locked := filepath.Join(r.dir, ".vloop", "tmp", "locked")
+	if err := os.MkdirAll(locked, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(locked, "f"), nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(locked, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.Chmod(locked, 0o755) })
+	r.scripted(oneTask(t), defaultScript)
+	res := r.vloop("run", runBrief)
+	wantExit(t, res, 0)
+	wantIn(t, "output", r.outputs(res), "warning: cannot clear .vloop/tmp/locked")
 }

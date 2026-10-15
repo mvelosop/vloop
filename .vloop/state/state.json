@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T10:23:28Z",
+  "updated": "2026-10-15T10:28:27Z",
   "shell": "sh",
   "checks": [
     {
@@ -54,9 +54,9 @@
         "Committed tests, run by the checks, cover the clearing points, .running kept, the two hand-offs kept, a symlink not followed and the warning for an entry that cannot be removed; tests build their repositories in temporary directories with a temporary HOME. An earlier test changes only where it pins behaviour this contract changes, and only to the new behaviour, the notes naming S1 for each."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 2,
-      "notes": "No committed test covers the clearing points or the two kept hand-offs at run level; only ClearTmp itself is unit-tested, so clearing at a forbidden point would pass the checks.; The task's notes lack the evidence (code paths read) that nothing relies on .vloop/tmp/ surviving a resume; they refer to a journal of an earlier attempt."
+      "notes": ""
     },
     {
       "id": "T2",

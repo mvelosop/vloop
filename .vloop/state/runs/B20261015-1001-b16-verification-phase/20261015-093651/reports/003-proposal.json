@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added run-level tests (cmd/vloop/run_git_test.go) driving a full run: clearing at run start, before each work session and before the final pass, .running kept, plan-round and work-to-review hand-offs kept, a symlink not followed, and the warning for an unremovable entry.",
+  "files": ["cmd/vloop/run_git_test.go"],
+  "verified": "vloop task gate T1 exited 0; go test -run TestRunClearsTmp ./cmd/vloop ok.",
+  "notes": "Evidence nothing relies on .vloop/tmp/ surviving a resume (code paths read): plan-problems.md is written and read by the next round inside one Plan() call (internal/driver/acceptance.go); gate-verdict.json (gatereview.go), proposal.json, verdict.json and checks.json (iterate.go, checks.go) are written and read within one iteration; nohooks is recreated on every use (gitguard.go gitCmd); plugin/ and fence/ are extracted before every session (session.go Runner.Run); gate-refused is removed by iterate.go before a work session; .running is kept. Production code (internal/driver/cleartmp.go, iterate.go, internal/cli/run.go) is unchanged this attempt. S1: earlier tests changed in a previous attempt are TestRunBaseGateHaltResumesAcceptance, TestWorkedExampleB12/halt_in_acceptance_resumes, TestRunGateReviewHaltResumesAcceptance and TestRunChecksNotRunAfterFailedGateAndNeverRerun, whose markers moved from .vloop/tmp/ to .git/ because the contract clears .vloop/tmp/ at run start."
+}
