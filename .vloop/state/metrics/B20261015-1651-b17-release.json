@@ -2,11 +2,11 @@
   "schema": "metrics/v2",
   "brief": "B20261015-1651-b17-release.loop-brief",
   "run_id": "B20261015-1651-b17-release",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 9,
-    "done": 8,
+    "done": 9,
     "blocked": 0,
     "first_pass": 6,
     "estimate": {
@@ -50,26 +50,28 @@
     "gates_ms": 84831,
     "checks_ms": 2264404,
     "gate_review_ms": 129928,
-    "wall_ms": 5560000
+    "verify_ms": 50620,
+    "wall_ms": 6483000
   },
   "rate": {
     "code_per_min": 26.943099343961944,
     "code_test_per_min": 53.53752328464909
   },
   "cost": {
-    "total_usd": 9.2157493,
+    "total_usd": 9.431388700000001,
     "plan_usd": 5.059098199999999,
     "work_usd": 2.6527477,
     "review_usd": 1.0134659,
     "gate_review_usd": 0.4904375,
-    "per_1000_code_lines_usd": 10.842058000000002
+    "per_1000_code_lines_usd": 11.095751411764708,
+    "verify_usd": 0.21563939999999998
   },
   "tokens": {
-    "input": 494,
-    "output": 218645,
-    "cache_read": 12721622,
-    "cache_creation": 806650,
-    "cache_hit_ratio": 0.9403386827741718
+    "input": 520,
+    "output": 223294,
+    "cache_read": 13161156,
+    "cache_creation": 837936,
+    "cache_hit_ratio": 0.9401086258676312
   },
   "models": {
     "plan": [
@@ -83,29 +85,33 @@
     ],
     "gate-review": [
       "claude-sonnet-5-5"
+    ],
+    "verify": [
+      "claude-sonnet-5-5"
     ]
   },
   "effort": {
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 2,
-    "operator": 0,
+    "operator": 2,
     "escaped": 0,
-    "total": 2,
+    "total": 4,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 1,
+    "total": 3,
     "by_agreement": {
       "recommended": 1,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 2
     }
   },
   "instructions": {
@@ -122,9 +128,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 20,
+  "permission_denials": 22,
   "iterations": 13,
-  "iterations_per_closed": 1.625,
+  "iterations_per_closed": 1.4444444444444444,
   "by_task": [
     {
       "id": "T1",
