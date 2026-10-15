@@ -91,3 +91,10 @@ committing the plan
    review T6 · 0m19s · $0.11 · run $12.24 / $40.00
    review: PASS
    T6 done
+── iteration 13 (13 this run) · T7 · 6/11 done ──
+   Show the verify session in vloop metrics' time, cost, models and instructions lines
+   work T7 · 5m12s · $0.32 · run $12.56 / $40.00
+   check go
+   review T7 · 0m18s · $0.12 · run $12.68 / $40.00
+   review: PASS
+   T7 done

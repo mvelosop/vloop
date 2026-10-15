@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 12,
+  "iteration": 13,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T11:42:22Z",
+  "updated": "2026-10-15T11:52:24Z",
   "shell": "sh",
   "checks": [
     {
@@ -230,7 +230,7 @@
         "Committed tests, run by the checks, cover the three lines, the instructions line with and without the skill, the JSON fields and the unchanged output without a verify session. internal/metrics/print_test.go, internal/metrics/time_test.go and internal/metrics/instructions_test.go change only where they pin what V3 changes, and only to the new behaviour, the notes naming V3 for each."
       ],
       "verify": "sh .vloop/state/gates/T7/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

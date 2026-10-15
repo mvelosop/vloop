@@ -17,6 +17,7 @@ const (
 	PhaseWork       = "work"
 	PhaseReview     = "review"
 	PhaseGateReview = "gate-review"
+	PhaseVerify     = "verify"
 )
 
 // Time is where a brief's time went, in milliseconds. Agent time is work plus
@@ -30,6 +31,7 @@ type Time struct {
 	GateMS       *int64 `json:"gate_ms"`
 	ChecksMS     *int64 `json:"checks_ms"`
 	GateReviewMS int64  `json:"gate_review_ms"`
+	VerifyMS     int64  `json:"verify_ms"`
 	WallMS       *int64 `json:"wall_ms"`
 }
 
@@ -47,6 +49,7 @@ type Cost struct {
 	Work        float64  `json:"work"`
 	Review      float64  `json:"review"`
 	GateReview  float64  `json:"gate_review"`
+	Verify      float64  `json:"verify"`
 	Per1kCode   *float64 `json:"per_1k_code_lines"`
 	PerPhase1kC struct {
 		Plan   *float64 `json:"plan"`
@@ -159,6 +162,9 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 			case PhaseGateReview:
 				u.Time.GateReviewMS += s.TimeMS()
 				u.Cost.GateReview += s.CostUSD
+			case PhaseVerify:
+				u.Time.VerifyMS += s.TimeMS()
+				u.Cost.Verify += s.CostUSD
 			default:
 				continue
 			}
@@ -214,7 +220,7 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	u.Rate.CodePerMin = fratio(float64(delivered.Code), minutes)
 	u.Rate.CodeTestPerMin = fratio(float64(delivered.Code+delivered.Test), minutes)
 
-	u.Cost.Total = u.Cost.Plan + u.Cost.Work + u.Cost.Review + u.Cost.GateReview
+	u.Cost.Total = u.Cost.Plan + u.Cost.Work + u.Cost.Review + u.Cost.GateReview + u.Cost.Verify
 	kc := float64(delivered.Code) / 1000
 	u.Cost.Per1kCode = fratio(u.Cost.Total, kc)
 	u.Cost.PerPhase1kC.Plan = fratio(u.Cost.Plan, kc)

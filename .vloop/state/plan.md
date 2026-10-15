@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/11 done** · iteration 12
+**Status:** running · **7/11 done** · iteration 13
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:42:22Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:52:24Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Run one verify session after the final pass of every complete run and keep its report · 1 attempt(s)
 - [x] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling · 1 attempt(s)
 - [x] **T6** — Add the verify-planted-mismatches eval case · 1 attempt(s)
-- [ ] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
+- [x] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
 - [ ] **T8** — Print the verify findings first in vloop brief close and close --dry-run
 - [ ] **T9** — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
 - [ ] **T10** — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks
@@ -155,7 +155,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Show the verify session in vloop metrics' time, cost, models and instructions lines
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 The verify session costs money and time once per run, as the gate review does, and the metrics show it the same way: after gate review on the time, cost and models lines, in the total but not in agent, and in --json. A brief with no verify session — every brief consumed so far — prints exactly what it prints today.
 

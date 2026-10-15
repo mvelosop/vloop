@@ -90,3 +90,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Fixed the check failure: the verify-planted-mismatches prompt.md grants the same allowed_tools as the other skill cases, so it covers the fence and stays inside the guide's --allow-tools.
 - **Files:** plugin/evals/verify-planted-mismatches/prompt.md
 - **Notes for next iteration:** TestEvalGrantsCoverFence requires every eval's allowed_tools to include the fence's allow rules (Edit, vloop task list/show/validate/gate) and only Bash rules named in docs/guide/evals.md; Bash(bash:*) and Bash(cd:*) are not in the guide. The grant was copied from gate-review-planted-gates.
+
+## T7 — Show the verify session in vloop metrics' time, cost, models and instructions lines
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop metrics shows the verify session after gate review on the time, cost and models lines, in the total but not agent, and adds verify to the instructions line when plugin/skills/verify/SKILL.md exists; --json gains the optional verify fields.
+- **Files:** internal/metrics/time.go, internal/metrics/metrics.go, internal/metrics/instructions.go, internal/metrics/print.go, schemas/metrics.v2.json, internal/metrics/print_test.go
+- **Notes for next iteration:** Verify JSON fields are pointers with omitempty, present only when the brief held a verify session (or the verify skill exists, for instructions.verify), so older briefs print and serialise as before. TestPrintSummaryVerify in internal/metrics/print_test.go covers the three lines, instructions, JSON fields and the no-verify case. go test ./internal/cli task_gate tests failed only because they ran inside a work session (plan-changed guard), not from this change.
