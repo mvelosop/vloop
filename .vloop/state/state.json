@@ -5,9 +5,9 @@
   "base": "84088d72854b8319d798b7340adb010a975dc398",
   "branch": "B20261015-1651-b17-release",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-15T16:30:00Z",
-  "updated": "2026-10-15T16:46:09Z",
+  "updated": "2026-10-15T16:52:08Z",
   "shell": "sh",
   "checks": [
     {
@@ -77,8 +77,8 @@
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "no committed test shows install/v1 accepting a stamp with a string module and one without"
     },
     {
       "id": "T3",

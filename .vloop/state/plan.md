@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/9 done** · iteration 2
+**Status:** running · **1/9 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T16:46:09Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T16:52:08Z
 
 ## Progress
 
 - [x] **T1** — Read the binary's version from the embedded plugin.json · 1 attempt(s)
-- [ ] **T2** — Record the module version in .vloop/install.json
+- [ ] **T2** — Record the module version in .vloop/install.json · 1 attempt(s)
 - [ ] **T3** — Add tools/release with the notes subcommand
 - [ ] **T4** — Make prepare's checks, refusing before anything is written
 - [ ] **T5** — Make prepare create the release branch and open the PR
@@ -45,7 +45,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Record the module version in .vloop/install.json
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 v0.11.0 showed that a public `go install …@v0.11.0` writes "commit":"unknown" to .vloop/install.json, so the stamp cannot say which release it is. I1 records the module version (as `vloop version` prints it) in the stamp, right after commit, whenever the binary carries one, so every install — public ones included — is identified. Publish's install check (T7) relies on the same build info.
 
@@ -55,6 +55,8 @@ v0.11.0 showed that a public `go install …@v0.11.0` writes "commit":"unknown" 
 - schemas/install.v1.json gains `module` as an optional string property; `required` and the schema name (install/v1) are unchanged, and a stamp without module stays valid.
 - No other behaviour of init or upgrade changes (I1 only).
 - Committed tests, run by the checks, cover init and upgrade with and without a module version (through the existing build-info seam, not a real network install) and the schema accepting a stamp with a string module and without one. An earlier test changes only where it pins the stamp's exact content, and only to the new behaviour; the notes name I1 for each.
+
+**From the last attempt:** no committed test shows install/v1 accepting a stamp with a string module and one without
 
 <details><summary>verify command</summary>
 
