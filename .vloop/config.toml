@@ -1,6 +1,9 @@
 # The [[check]] below runs cmd/vloop's ~9-minute package; the default 15 would
 # leave it no headroom (B11 owns the suite's speed).
 run.gate-timeout = 30
+# VS Code's GitHub Pull Requests extension writes these branch keys; they are
+# editor metadata, not a session's write (B16's base check halted on one).
+run.git-config-ignore = ["branch.*.github-pr-*"]
 
 [metrics]
   code = ["internal/brief/templates/**", "schemas/**"]
