@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/11 done** · iteration 6
+**Status:** running · **3/11 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T10:53:15Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:15:28Z
 
 ## Progress
 
 - [x] **T1** — Clear .vloop/tmp/ at run start and before every work session and the final pass · 2 attempt(s)
 - [x] **T2** — Retire brief check's must-change list and external format warnings and init's two guidelines sections
 - [x] **T3** — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2 · 1 attempt(s)
-- [ ] **T4** — Run one verify session after the final pass of every complete run and keep its report
+- [ ] **T4** — Run one verify session after the final pass of every complete run and keep its report · 1 attempt(s)
 - [ ] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling
 - [ ] **T6** — Add the verify-planted-mismatches eval case
 - [ ] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
@@ -90,7 +90,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Run one verify session after the final pass of every complete run and keep its report
 
-`pending` · depends on: T1, T3
+`pending` · 1 attempt(s) · depends on: T1, T3
 
 The loop checks each task alone; whether the brief as a whole does what it says was found only by the operator after the run. When every task is done and the final pass passes, the driver now runs one independent /vloop:verify session and keeps its findings report in the run folder — a report, not a gate: nothing about the run's ending changes. The fence and vloop status's naming of the phase land here, where a running verify session makes them observable.
 
@@ -102,6 +102,8 @@ The loop checks each task alone; whether the brief as a whole does what it says 
 - A finding never changes the run's ending, its exit code, the plan's status or any task: no code path reads the findings to decide anything. A driver that blocks, fails or re-opens work on a finding is the violation.
 - The record is sessions/NNN-verify.json, session/v2, iteration 0, no task; its cost counts toward the run's spend; the run commit holds it and reports/verify.json. `vloop status` names the phase `verify` while the session runs.
 - Committed tests, run by the checks, cover each message above, the kept report, the record, the fence, run.verify = false, the cost ceiling and the resume. cmd/vloop/e2e_test.go, cmd/vloop/run_harness_test.go, the end-to-end tests whose stub runs end complete and internal/cli/fence_test.go change only where they pin what V1 changes (a session after the final pass, its line, a fifth fence), and only to the new behaviour, the notes naming V1 for each.
+
+**From the last attempt:** the committed tests omit most of the messages and cases criterion 6 requires: no findings, invalid report, failed session, cost ceiling, revert line, exit 9, resume, status phase
 
 <details><summary>verify command</summary>
 

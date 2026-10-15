@@ -23,6 +23,7 @@ const (
 	PhaseWork       = "work"
 	PhaseReview     = "review"
 	PhaseGateReview = "gate-review"
+	PhaseVerify     = "verify"
 )
 
 // Runner starts the sessions of one run. The zero value of the optional fields
@@ -484,7 +485,7 @@ func (r *Runner) record(s Spec, task string, started, ended time.Time, raw map[s
 		effort = s.Effort
 	}
 	schemaName := "session/v1"
-	if s.Phase == PhaseGateReview {
+	if s.Phase == PhaseGateReview || s.Phase == PhaseVerify {
 		schemaName = "session/v2"
 	}
 	rec := map[string]any{

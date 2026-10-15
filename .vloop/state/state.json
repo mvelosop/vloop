@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T10:53:15Z",
+  "updated": "2026-10-15T11:15:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -148,8 +148,8 @@
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "the committed tests omit most of the messages and cases criterion 6 requires: no findings, invalid report, failed session, cost ceiling, revert line, exit 9, resume, status phase"
     },
     {
       "id": "T5",
