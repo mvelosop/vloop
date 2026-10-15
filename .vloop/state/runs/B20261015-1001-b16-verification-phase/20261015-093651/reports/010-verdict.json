@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/skills/verify/SKILL.md (frontmatter `name: verify` and a description) makes three passes from the brief, the whole diff against the plan's base and a fresh build of the result into a scratch directory: (1) each worked-example line run as written in a scratch directory, output and exit code compared with the brief's (`example`); (2) each Behaviour contract sentence stating an observable behaviour, checked by running or reading the result (`contract`); (3) each surface — help text, guides, domain pages, README, messages — that states a behaviour the brief changed, read against the new behaviour (`surface`).", "met": true, "evidence": "plugin/skills/verify/SKILL.md has frontmatter name: verify and a description; sections 2 (scratch build), Pass 1 example, Pass 2 contract, Pass 3 surface; reads git diff <base>"},
+    {"criterion": "A finding quotes what the brief or the surface says (`claim`), what was observed (`observed`) and where (`where`: the brief's section or example line, and the file and line or the command); the skill says it does not judge whose defect a finding is — the operator does at close.", "met": true, "evidence": "SKILL.md section 4 lists claim/observed/where; intro says it does not judge whose defect and the operator decides at close"},
+    {"criterion": "The skill changes nothing outside .vloop/tmp/, writes .vloop/tmp/verify.json with `checked` counts, and validates it with `vloop schema validate verify/v1 .vloop/tmp/verify.json`; it writes in the repository's language (C-4) like the other session skills.", "met": true, "evidence": "SKILL.md sections 5 and 6: checked counts, validate command, Language subsection, 'change nothing outside .vloop/tmp/'"},
+    {"criterion": "The skill is at most 1,500 words; the budget's skill list gains `verify` with a ceiling of 1,500 and a dated comment, so a verify skill one word past it fails internal/budget's committed test. internal/budget/budget_test.go and internal/cli/readme_test.go change only where they enumerate the skills, and only to add verify, the notes naming V2 for each.", "met": true, "evidence": "wc -w gives 1029; internal/budget/budget.go adds verify to Skills and Ceilings 1500 with a 2026-10-15 B16 (V2) comment; readme_test.go only adds \"verify\" to the skills list; budget_test.go untouched; go check passes"}
+  ],
+  "findings": [],
+  "notes": "cmd/vloop/b7_e2e_test.go also changed, only the expected extracted-skill list gaining verify; a necessary consequence of adding the skill, which the criterion's list of files did not name."
+}

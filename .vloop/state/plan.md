@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/11 done** · iteration 9
+**Status:** running · **5/11 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:28:15Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T11:32:52Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Retire brief check's must-change list and external format warnings and init's two guidelines sections
 - [x] **T3** — Add the verify config keys, the verify/v1 report schema and the verify phase in session/v2 · 1 attempt(s)
 - [x] **T4** — Run one verify session after the final pass of every complete run and keep its report · 1 attempt(s)
-- [ ] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling · 1 attempt(s)
+- [x] **T5** — Write the /vloop:verify skill within a 1,500-word ceiling · 1 attempt(s)
 - [ ] **T6** — Add the verify-planted-mismatches eval case
 - [ ] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
 - [ ] **T8** — Print the verify findings first in vloop brief close and close --dry-run
@@ -113,7 +113,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Write the /vloop:verify skill within a 1,500-word ceiling
 
-`pending` · 1 attempt(s) · depends on: T4
+`done` · 1 attempt(s) · depends on: T4
 
 The driver starts /vloop:verify (T4); this task writes what that session does: three passes — the worked example run line by line, the Behaviour contract's observable sentences, and every surface stating a behaviour the brief changed — reported as verify/v1 findings that quote the claim, what was observed and where. The budget holds the skill to 1,500 words so it cannot grow by drift.
 
@@ -123,8 +123,6 @@ The driver starts /vloop:verify (T4); this task writes what that session does: t
 - A finding quotes what the brief or the surface says (`claim`), what was observed (`observed`) and where (`where`: the brief's section or example line, and the file and line or the command); the skill says it does not judge whose defect a finding is — the operator does at close.
 - The skill changes nothing outside .vloop/tmp/, writes .vloop/tmp/verify.json with `checked` counts, and validates it with `vloop schema validate verify/v1 .vloop/tmp/verify.json`; it writes in the repository's language (C-4) like the other session skills.
 - The skill is at most 1,500 words; the budget's skill list gains `verify` with a ceiling of 1,500 and a dated comment, so a verify skill one word past it fails internal/budget's committed test. internal/budget/budget_test.go and internal/cli/readme_test.go change only where they enumerate the skills, and only to add verify, the notes naming V2 for each.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/009-go.fail.log
 
 <details><summary>verify command</summary>
 

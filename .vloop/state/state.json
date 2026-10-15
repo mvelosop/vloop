@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 9,
+  "iteration": 10,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T11:28:15Z",
+  "updated": "2026-10-15T11:32:52Z",
   "shell": "sh",
   "checks": [
     {
@@ -177,9 +177,9 @@
         "The skill is at most 1,500 words; the budget's skill list gains `verify` with a ceiling of 1,500 and a dated comment, so a verify skill one word past it fails internal/budget's committed test. internal/budget/budget_test.go and internal/cli/readme_test.go change only where they enumerate the skills, and only to add verify, the notes naming V2 for each."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/009-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T6",

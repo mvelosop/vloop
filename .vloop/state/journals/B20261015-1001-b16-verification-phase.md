@@ -69,3 +69,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added plugin/skills/verify/SKILL.md (1,032 words): three passes (example, contract, surface), findings with claim/observed/where, verify/v1 report validated by vloop schema validate, writes only under .vloop/tmp/. The budget gains verify with a ceiling of 1,500.
 - **Files:** plugin/skills/verify/SKILL.md, internal/budget/budget.go, internal/cli/readme_test.go, README.md, docs/domain/domain-model.md
 - **Notes for next iteration:** V2: earlier test changed only where it enumerates skills: TestReadmeNamesTheSkills (internal/cli/readme_test.go) gains verify; internal/budget/budget_test.go needed no edit because it iterates budget.Skills. README.md Skills section now says six skills and names /vloop:verify. The eval case plugin/evals/verify-planted-mismatches is not part of this task. domain-model.md On disk layout gained .vloop/tmp/verify.json because TestPluginSkills checks skill paths against it. TestTaskGate* in internal/cli fail inside a loop session (plan-changed env guard), unrelated.
+
+## T5 — Write the /vloop:verify skill within a 1,500-word ceiling
+
+- **Outcome:** done (review: PASS)
+- **Summary:** plugin/skills/verify/SKILL.md (1,032 words) with three passes, findings and verify/v1 report; budget gains verify at 1,500. Fixed the check failure: the B7 plugin-path test now lists verify among extracted skills.
+- **Files:** plugin/skills/verify/SKILL.md, internal/budget/budget.go, internal/cli/readme_test.go, README.md, docs/domain/domain-model.md, cmd/vloop/b7_e2e_test.go
+- **Notes for next iteration:** V2: the check failure was TestWorkedExampleB7PluginPath (cmd/vloop/b7_e2e_test.go) enumerating extracted skills; changed only to add verify. Production code unchanged this attempt.
