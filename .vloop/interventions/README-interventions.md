@@ -143,6 +143,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | close | ceremony | yes | no-options | [I20260930-2215-b5-closed-by-vloop-after-three-runs](I20260930-2215-b5-closed-by-vloop-after-three-runs.md) |
 | close | ceremony | yes | no-options | [I20261001-1015-b6-closed-with-a-finding](I20261001-1015-b6-closed-with-a-finding.md) |
 | close | ceremony | yes | no-options | [I20261011-2054-v0-9-0-released-so-b13-runs-on-b12-s-fix](I20261011-2054-v0-9-0-released-so-b13-runs-on-b12-s-fix.md) |
+| close | ceremony | yes | no-options | [I20261015-094100-v0-10-0-released-so-b16-runs-on-b14-s-an](I20261015-094100-v0-10-0-released-so-b16-runs-on-b14-s-an.md) |
 | close | repair | yes | no-options | [I20260929-2048-local-main-reset-to-the-pre-merge-commit](I20260929-2048-local-main-reset-to-the-pre-merge-commit.md) |
 | next | carry-forward | no | no-options | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | no-options | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |
