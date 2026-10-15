@@ -193,3 +193,29 @@ func TestUpgradeLeavesV1InterventionAlone(t *testing.T) {
 		t.Errorf("upgrade rewrote a v1 record:\n%s", b)
 	}
 }
+
+func TestStampModule(t *testing.T) {
+	d := initRepo(t, map[string]string{"go.mod": "module a\n"})
+	if _, _, code := runPluginCLI(t, Build{Version: "0.1.0", Commit: "unknown", Module: "v0.1.0"}, d, "init"); code != 0 {
+		t.Fatalf("init exit %d", code)
+	}
+	if got := readFile(t, d, ".vloop/install.json"); !strings.Contains(got, `"commit":"unknown","module":"v0.1.0","initialized"`) {
+		t.Errorf("init stamp = %q", got)
+	}
+	if _, _, code := runPluginCLI(t, Build{Version: "0.1.1", Commit: "unknown", Module: "v0.1.1"}, d, "upgrade"); code != 0 {
+		t.Fatalf("upgrade exit %d", code)
+	}
+	if got := readFile(t, d, ".vloop/install.json"); !strings.Contains(got, `"commit":"unknown","module":"v0.1.1","initialized"`) {
+		t.Errorf("upgrade stamp = %q", got)
+	}
+	if _, _, code := runPluginCLI(t, Build{Version: "0.1.2", Commit: "abc"}, d, "upgrade"); code != 0 {
+		t.Fatalf("upgrade exit %d", code)
+	}
+	if got := readFile(t, d, ".vloop/install.json"); strings.Contains(got, "module") {
+		t.Errorf("stamp kept a module: %q", got)
+	}
+	d2 := upgradeFixture(t, "0.1.0")
+	if got := readFile(t, d2, ".vloop/install.json"); strings.Contains(got, "module") {
+		t.Errorf("init without module wrote one: %q", got)
+	}
+}

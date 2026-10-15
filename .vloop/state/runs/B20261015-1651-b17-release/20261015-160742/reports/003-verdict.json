@@ -1,0 +1,9 @@
+{"schema":"verdict/v1","task":"T2","verdict":"FAIL",
+"criteria":[
+{"criterion":"`vloop init` and `vloop upgrade` write \"module\": \"<module version>\" into .vloop/install.json, immediately after \"commit\", when the binary's build info carries a module version (the value `vloop version` prints as module); they leave the key out otherwise — including on an upgrade by a binary with none, over a stamp that had one.","met":true,"evidence":"init.go:95 and upgrade.go:121 set Module from b.Module; install.go Module has omitempty and sits after Commit; TestStampModule asserts the ordering and the removal on upgrade."},
+{"criterion":"schemas/install.v1.json gains `module` as an optional string property; `required` and the schema name (install/v1) are unchanged, and a stamp without module stays valid.","met":true,"evidence":"schemas/install.v1.json adds \"module\": {\"type\":\"string\"}; required untouched."},
+{"criterion":"No other behaviour of init or upgrade changes (I1 only).","met":true,"evidence":"The diff touches only the stamp fields."},
+{"criterion":"Committed tests, run by the checks, cover init and upgrade with and without a module version (through the existing build-info seam, not a real network install) and the schema accepting a stamp with a string module and without one. An earlier test changes only where it pins the stamp's exact content, and only to the new behaviour; the notes name I1 for each.","met":false,"evidence":"TestStampModule covers init/upgrade with and without module, but the diff adds no test that validates a stamp with a string module and one without against install/v1 (nothing in internal/schema or internal/cli/schema_test.go changed)."}
+],
+"findings":[{"summary":"no committed test shows install/v1 accepting a stamp with a string module and one without","kind":"bug"}],
+"notes":"Add a schema validation test for install/v1 with and without module (e.g. in internal/schema/schema_test.go)."}

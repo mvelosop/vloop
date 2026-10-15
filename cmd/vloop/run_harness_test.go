@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/mvelosop/vloop/internal/cli"
 )
 
 // The run harness: a vloop-initialised scratch repository on main, a fake home
@@ -39,7 +41,7 @@ dir=$(dirname "$0")
 echo "$*" >> "$dir/argv.log"
 case "$1" in
   --version) echo "2.0.0 (Claude Code)"; exit 0;;
-  plugin) echo '[{"id":"vloop@vloop","version":"0.11.0","enabled":true}]'; exit 0;;
+  plugin) echo '[{"id":"vloop@vloop","version":"@PLUGIN_VERSION@","enabled":true}]'; exit 0;;
 esac
 prompt=""; MODEL=""
 while [ $# -gt 0 ]; do
@@ -148,7 +150,7 @@ func newRunRepo(t *testing.T) *runRepo {
 	if err := os.WriteFile(filepath.Join(r.home, ".claude.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(r.stub, "claude"), []byte(runStubSource), 0o755); err != nil {
+	if err := os.WriteFile(filepath.Join(r.stub, "claude"), []byte(strings.ReplaceAll(runStubSource, "@PLUGIN_VERSION@", pluginVersion(t))), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -317,4 +319,15 @@ esac
 	if ents, _ := os.ReadDir(r.home); len(ents) != 1 {
 		t.Fatalf("the fake home holds more than .claude.json: %v", ents)
 	}
+}
+
+// pluginVersion is the embedded plugin.json's version, which the stub's plugin
+// list must report: the tests never pin it.
+func pluginVersion(t *testing.T) string {
+	t.Helper()
+	v, err := cli.PluginVersion()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return v
 }

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The binary's version is the embedded plugin.json's (cli.PluginVersion); main.go keeps only the stampable commit. The previous attempt's failing b5/b13/b14 e2e tests are fixed.",
+  "files": ["cmd/vloop/b5_e2e_test.go", "cmd/vloop/main.go", "internal/cli/version.go", "internal/cli/root_test.go", "cmd/vloop/e2e_test.go", "cmd/vloop/run_harness_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go test -run 'B5|B13|B14' ./cmd/vloop passes.",
+  "notes": "V1: root_test.go (TestVersionJSON, TestVersionText, TestVersionModule), e2e_test.go (TestWorkedExampleEnglishSession), run_harness_test.go (stub plugin list) read the version from plugin.json; TestBinaryVersionIsPluginVersion added. b5_e2e_test.go's b5Binary (V1) no longer stamps -X main.version, which has no effect now; it builds with go build -overlay replacing the embedded plugin.json with a copy at the wanted version, so B5/B13/B14 e2e tests keep their per-version binaries. TestTaskGate* in internal/cli fail only inside a loop session (plan-changed guard)."
+}

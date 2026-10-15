@@ -118,7 +118,7 @@ func runUpgrade(b Build, g *Globals, cmd *cobra.Command, dryRun, yes bool, now t
 		fmt.Fprintln(out, "each check is a starting point — edit it in "+config.FilePath)
 	}
 	up := now.UTC().Format("2006-01-02T15:04:05Z")
-	st.Version, st.Commit, st.Upgraded = b.Version, b.Commit, &up
+	st.Version, st.Commit, st.Module, st.Upgraded = b.Version, b.Commit, b.Module, &up
 	if err := install.Write(root, st); err != nil {
 		return Problem(err)
 	}

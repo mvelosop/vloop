@@ -1,180 +1,89 @@
 #!/bin/sh
-# Gate T4 — V1's driver: after the final pass of a complete run, one session
-# of phase verify (/vloop:verify, no argument), under a fence that allows what
-# the review fence allows, model.verify honoured, .vloop/tmp/ cleared before
-# it, vloop status naming it; its valid report kept as
-# <run dir>reports/verify.json and announced; its record sessions/NNN-verify.json
-# (session/v2, iteration 0, no task); both in the run commit. A missing or
-# invalid report, a session that fails to run, the cost ceiling and a change
-# outside .vloop/tmp/ are warnings — the run still ends complete, exit 0 — and
-# a finding never changes the ending. A resume with every task done repeats
-# the final pass, then the verify session. Refs moved: exit 9. With
-# run.verify = false nothing of it happens.
+# Gate T4 — P1's checks: go run ./tools/release prepare <version> refuses, in the
+# brief's order and with its exact messages, before anything is written; and
+# --dry-run makes every check, prints what it would do and writes nothing.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-S=$t/stub
-# verified <run out>: the run ended complete, exit 0, every task done, with
-# the run commit as HEAD.
-verified() {
-  [ "$got" = 0 ] || fail "$1: vloop run exited $got, want 0: $(tail -n 15 "$t/$1")"
-  [ "$("$JQ" -r .status "$R/.vloop/state/state.json")" = complete ] || fail "$1: the plan is not complete"
-  "$JQ" -e '[.tasks[] | select(.status != "done")] | length == 0' "$R/.vloop/state/state.json" >/dev/null || fail "$1: a task is not done"
-  rd=$(lastdir)
-  [ "$(git -C "$R" log -1 --format=%s)" = "[vloop] run $RUN/$(basename "$rd"): complete" ] || fail "$1: HEAD is '$(git -C "$R" log -1 --format=%s)', not the run commit"
-  [ -z "$(git -C "$R" status --porcelain)" ] || fail "$1: the run left the tree dirty: $(git -C "$R" status --porcelain)"
+xbuild
+buildrel
+mkrel
+
+# no <exit> <message> <prepare args...>: prepare refuses with exactly that, writing nothing.
+no() {
+  e=$1 m=$2; shift 2
+  quiet; rel prepare "$@"; refuse "$e" "$m"; unchanged
 }
-asked() { grep -q -- '-p /vloop:verify' "$S/argv.log"; }
-noverify() { grep -E '(^|[^a-z])verify(:| session| skipped)' "$t/$1" && fail "$1: the run printed a verify line"; return 0; }
-sessfiles() { ls "$R/$rd"sessions/ 2>/dev/null | grep -E '^[0-9]+-verify\.json$'; }
+rel prepare
+[ "$got" = 2 ] || fail "prepare without a version: want exit 2; $(said)"
+no 2 "release: 0.12.0 is not a version: vX.Y.Z or vX.Y.Z-<pre>" 0.12.0
+no 2 "release: v0.12 is not a version: vX.Y.Z or vX.Y.Z-<pre>" v0.12
+no 2 "release: v0.12.0- is not a version: vX.Y.Z or vX.Y.Z-<pre>" v0.12.0-
+no 1 "release: v2.0.0 needs the module path to end in /v2, and github.com/mvelosop/vloop does not" v2.0.0
+no 1 "release: v1.0.0 is retracted in go.mod" v1.0.0
+no 1 "release: v1.0.0 is retracted in go.mod" v1.0.0 --dry-run
+no 1 "release: v0.13.1 is retracted in go.mod" v0.13.1
+no 1 "release: v0.11.0 is not after the latest release v0.11.0" v0.11.0
+no 1 "release: v0.10.5 is not after the latest release v0.11.0" v0.10.5
+# A pre-release sorts before its release.
+no 1 "release: v0.11.0-rc.2 is not after the latest release v0.11.0" v0.11.0-rc.2
 
-# --- A: two findings; model, fence, status, clearing, the commit
-runrepo a T1
-cat >>"$R/.vloop/config.toml" <<'CFG'
+# A tag that exists only on origin, or only here, refuses (either refusal names it).
+# tagno <version>: prepare <version> refuses for its existing tag, writing nothing.
+tagno() {
+  quiet; rel prepare "$1"
+  case "$(cat "$t/err")" in
+  "release: tag $1 already exists" | "release: $1 is not after the latest release $1") ;;
+  *) fail "an existing tag $1: want exit 1 and 'release: tag $1 already exists'; $(said)" ;;
+  esac
+  [ "$got" = 1 ] || fail "an existing tag $1: want exit 1; $(said)"
+  unchanged
+}
+spull; git -C "$S" tag v0.14.0 && git -C "$S" push -q origin v0.14.0 || fail "origin-only tag"
+tagno v0.14.0
+git -C "$S" push -q origin :refs/tags/v0.14.0 && git -C "$S" tag -d v0.14.0 >/dev/null || fail untag
+git -C "$W" tag -d v0.14.0 >/dev/null 2>&1
+git -C "$W" tag v0.15.0 || fail "local-only tag"
+tagno v0.15.0
+git -C "$W" tag -d v0.15.0 >/dev/null || fail untag
 
-[[check]]
-name = "touch"
-paths = ["nomatch/**"]
-run = "mkdir -p .vloop/tmp && : >.vloop/tmp/fromcheck.txt"
-CFG
-# Not fatal here: on a tree without T3 the missing session is the failure to report; the model is asserted below.
-inr "$B" config set model.verify haiku </dev/null >"$t/o" 2>&1
-commit config
-vreport "$S/verify-report.json" 2
-cat >"$S/work-T1.sh" <<'W'
-: >.vloop/tmp/fromwork.txt
-W
-cat >"$S/verify.sh" <<'V'
-cp "$dir/verify-report.json" .vloop/tmp/verify.json
-for e in fromcheck.txt fromwork.txt proposal.json verdict.json; do
-  [ -e ".vloop/tmp/$e" ] && echo "the verify session saw .vloop/tmp/$e" >>"$dir/norunning"
-done
-vloop status >"$dir/status.txt" 2>&1
-vloop status --json >"$dir/status.json" 2>&1
-V
-vrun a.run
-verified a.run
-[ ! -s "$S/norunning" ] || fail "verify session: $(cat "$S/norunning")"
-asked || fail "no /vloop:verify session ran: $(cat "$S/argv.log")"
-[ "$(grep -c -- '-p /vloop:verify' "$S/argv.log")" = 1 ] || fail "more than one verify session ran"
-tail -n 1 "$S/argv.log" | grep -q -- '-p /vloop:verify --model haiku' || fail "the last session was not /vloop:verify with model.verify's haiku: $(tail -n 1 "$S/argv.log")"
-grep -Eq "^ *verify: 2 finding\\(s\\) — see $(echo "$rd" | sed 's/\./\\./g')reports/verify\\.json\$" "$t/a.run" ||
-  fail "no 'verify: 2 finding(s) — see ${rd}reports/verify.json':
-$(tail -n 15 "$t/a.run")"
-[ -f "$R/${rd}reports/verify.json" ] || fail "no ${rd}reports/verify.json"
-[ "$("$JQ" -S . "$R/${rd}reports/verify.json")" = "$("$JQ" -S . "$S/verify-report.json")" ] || fail "${rd}reports/verify.json is not the session's report:
-$(cat "$R/${rd}reports/verify.json")"
-sf=$(sessfiles)
-[ "$(echo "$sf" | grep -c .)" = 1 ] || fail "want one sessions/NNN-verify.json in $rd, found: $sf"
-rec=$R/${rd}sessions/$sf
-inr "$B" schema validate session/v2 "$rec" </dev/null >"$t/o" 2>&1 || fail "$sf does not validate as session/v2: $(cat "$t/o")"
-"$JQ" -e '.schema == "session/v2" and .phase == "verify" and .iteration == 0 and (has("task") | not) and .model == "haiku"' "$rec" >/dev/null ||
-  fail "$sf is not a session/v2 verify record at iteration 0 with no task and model haiku: $(cat "$rec")"
-git -C "$R" show --name-only --format= HEAD >"$t/files"
-grep -Fxq "${rd}reports/verify.json" "$t/files" && grep -Fxq "${rd}sessions/$sf" "$t/files" ||
-  fail "the run commit does not hold ${rd}reports/verify.json and ${rd}sessions/$sf:
-$(cat "$t/files")"
-[ -f "$S/fence-verify.json" ] && [ -f "$S/fence-review.json" ] || fail "harness: no fence captured for the review or verify session"
-[ "$("$JQ" -S . "$S/fence-verify.json")" = "$("$JQ" -S . "$S/fence-review.json")" ] || fail "the verify session's fence does not allow exactly what the review fence allows:
-$(diff "$S/fence-review.json" "$S/fence-verify.json")"
-grep -q '^running: verify for ' "$S/status.txt" || fail "vloop status during the verify session: $(cat "$S/status.txt")"
-"$JQ" -e '.running.phase == "verify" and (.running.task == null)' "$S/status.json" >/dev/null 2>&1 || fail "vloop status --json during the verify session: $(cat "$S/status.json")"
+# The repository's state, in order: on main, a clean tree, main = origin/main
+# after a fetch — each checked after the version's checks.
+git -C "$W" checkout -q -b feature || fail checkout
+printf 'dirty\n' >>"$W/README.md"
+no 1 "release: v0.11.0 is not after the latest release v0.11.0" v0.11.0
+no 1 "release: prepare runs on main, not feature" v0.12.0
+git -C "$W" checkout -q main || fail checkout
+no 1 "release: the working tree is not clean" v0.12.0
+opush "Tweak the docs (#8)" docs/x.md
+no 1 "release: the working tree is not clean" v0.12.0
+git -C "$W" checkout -q -- README.md || fail restore
+no 1 "release: main is not origin/main — pull or push first" v0.12.0
+git -C "$W" pull -q --ff-only origin main || fail pull
+printf 'package main\n' >"$W/cmd/local.go"; sc "$W" "Local work"
+no 1 "release: main is not origin/main — pull or push first" v0.12.0
+git -C "$W" push -q origin main || fail push
 
-# --- B: no findings; the session edits README.md, adds stray.txt, edits the config
-resetstub
-runrepo b T1
-vreport "$S/verify-report.json" 0
-cat >"$S/verify.sh" <<'V'
-cp "$dir/verify-report.json" .vloop/tmp/verify.json
-echo changed >>README.md
-: >stray.txt
-echo '# changed' >>.vloop/config.toml
-V
-vrun b.run
-verified b.run
-grep -Eq '^ *verify: no findings$' "$t/b.run" || fail "no 'verify: no findings': $(tail -n 15 "$t/b.run")"
-for p in README.md stray.txt; do
-  grep -Fxq "vloop: the verify session changed $p — reverted" "$t/b.run" || fail "no 'vloop: the verify session changed $p — reverted':
-$(tail -n 15 "$t/b.run")"
-done
-[ ! -e "$R/stray.txt" ] || fail "stray.txt was kept"
-git -C "$R" diff --quiet main HEAD -- README.md .vloop/config.toml || fail "the verify session's edits reached the run commit"
-[ -f "$R/${rd}reports/verify.json" ] || fail "the report of a verify session whose changes were reverted was not kept"
+# The checks, then claude plugin validate plugin.
+: >"$t/check-fail"; : >"$t/stub/claude-fail"; : >"$t/stub/claude.log"
+quiet; rel prepare v0.12.0
+errline 1 "release: check unit failed"
+grep -q unit-check-says-hello "$t/err" || fail "the failed check's output is not on stderr; $(said)"
+! grep -q '^release: claude' "$t/err" || fail "a failed check went on to claude plugin validate; $(said)"
+! grep -q '^plugin validate' "$t/stub/claude.log" || fail "claude plugin validate ran after a check failed: $(cat "$t/stub/claude.log")"
+unchanged
+rm -f "$t/check-fail"
+quiet; rel prepare v0.12.0
+errline 1 "release: claude plugin validate plugin failed"
+grep -q '^plugin validate' "$t/stub/claude.log" || fail "no claude plugin validate call: $(cat "$t/stub/claude.log")"
+unchanged
+rm -f "$t/stub/claude-fail"
 
-# --- C: no report; an invalid report
-resetstub
-runrepo c T1
-printf ':\n' >"$S/verify.sh"
-vrun c.run
-verified c.run
-grep -Fxq 'vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand' "$t/c.run" || fail "no report: $(tail -n 15 "$t/c.run")"
-[ ! -e "$R/${rd}reports/verify.json" ] || fail "a report was kept though the session left none"
-resetstub
-runrepo c2 T1
-vreport "$S/verify-report.json" 2
-"$JQ" '.findings[0].kind = "bug"' "$S/verify-report.json" >"$S/v.json" && mv "$S/v.json" "$S/verify-report.json"
-vrun c2.run
-verified c2.run
-grep -Fxq 'vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand' "$t/c2.run" || fail "invalid report: $(tail -n 15 "$t/c2.run")"
-grep -Eq '^ *verify: [0-9]+ finding' "$t/c2.run" && fail "an invalid report was announced as findings"
-
-# --- D: the session fails to run
-resetstub
-runrepo d T1
-echo 3 >"$S/exit-verify"
-vrun d.run
-verified d.run
-grep -Fxq "vloop: the verify session failed to run — verify by hand; see ${rd}run.log" "$t/d.run" || fail "failed session: $(tail -n 15 "$t/d.run")"
-
-# --- E: the cost ceiling is reached by the last review
-resetstub
-runrepo e T1
-echo 0.25 >"$S/cost"
-vrun e.run --cost-ceiling 1
-verified e.run
-grep -Fxq 'vloop: cost ceiling reached — verify skipped' "$t/e.run" || fail "ceiling: $(tail -n 15 "$t/e.run")"
-asked && fail "a verify session ran past the cost ceiling"
-
-# --- F: run.verify = false
-resetstub
-runrepo f T1
-inr "$B" config set run.verify false </dev/null >"$t/o" 2>&1 || fail "config set run.verify false: $(cat "$t/o")"
-commit off
-vreport "$S/verify-report.json" 2
-vrun f.run
-verified f.run
-asked && fail "a verify session ran with run.verify = false"
-noverify f.run
-[ -z "$(sessfiles)" ] && [ ! -e "$R/${rd}reports/verify.json" ] || fail "run.verify = false left verify records"
-
-# --- G: the final pass fails, then the resume repeats it and verifies
-resetstub
-runrepo g T1
-cat >>"$R/.vloop/config.toml" <<CFG
-
-[[check]]
-name = "final"
-paths = ["nomatch/**"]
-run = "test ! -e '$S/failfinal'"
-CFG
-commit final
-printf ': >"$dir/failfinal"\n' >"$S/plan.sh"
-vreport "$S/verify-report.json" 2
-vrun g1.run
-[ "$got" = 2 ] || fail "harness: the failing final pass did not end the run blocked (exit $got): $(tail -n 10 "$t/g1.run")"
-asked && fail "a verify session ran after a final pass that failed"
-rm -f "$S/failfinal" "$S/plan.sh"
-sleep 1
-vrun g2.run
-verified g2.run
-asked || fail "the resume with every task done ran no verify session: $(cat "$S/argv.log")"
-grep -Eq '^ *verify: 2 finding\(s\) — see ' "$t/g2.run" || fail "the resume printed no verify line: $(tail -n 15 "$t/g2.run")"
-[ -f "$R/${rd}reports/verify.json" ] || fail "the resume's run folder has no reports/verify.json"
-
-# --- H: the verify session moves a ref
-resetstub
-runrepo h T1
-printf 'git tag planted-by-verify\ncp "$dir/verify-report.json" .vloop/tmp/verify.json\n' >"$S/verify.sh"
-vreport "$S/verify-report.json" 0
-vrun h.run
-[ "$got" = 9 ] || fail "a verify session that moved a ref: exit $got, want 9: $(tail -n 10 "$t/h.run")"
+# --dry-run: every check made, nothing written.
+: >"$t/checks-ran"; : >"$t/stub/claude.log"
+quiet; rel prepare v0.12.0 --dry-run
+[ "$got" = 0 ] && [ -s "$t/out" ] || fail "prepare v0.12.0 --dry-run: want exit 0 and what it would do on stdout; $(said)"
+[ -s "$t/checks-ran" ] || fail "prepare --dry-run did not run the checks; $(said)"
+grep -q '^plugin validate' "$t/stub/claude.log" || fail "prepare --dry-run did not run claude plugin validate; $(said)"
+unchanged
+! git -C "$O" rev-parse -q --verify refs/heads/release/v0.12.0 >/dev/null || fail "prepare --dry-run pushed release/v0.12.0"
 echo "gate T4: ok"

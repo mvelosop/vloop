@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "tools/release prepare <version> makes the brief's checks in order (version, module major, retraction, after latest tag, tag absent locally and on origin, main/clean/origin-equal after fetch, [[check]]s, claude plugin validate plugin), refusing before any write; --dry-run makes them all and prints what it would do.",
+  "files": ["tools/release/main.go", "tools/release/prepare.go", "tools/release/prepare_test.go"],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: ok; go test ./tools/... passes.",
+  "notes": "prepare.go: prepareChecks returns a refusal and writes nothing (its only side effect is the fetch of origin/main). After the checks pass, non-dry-run prints a placeholder line; T5 replaces it with branch, commit, push and PR. A failed check or validate prints its output on stderr before the release: line. Checks run via sh -c in the repo root (pwsh on Windows) from config.Checks."
+}

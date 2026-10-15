@@ -23,6 +23,7 @@ type Stamp struct {
 	Schema      string  `json:"schema"`
 	Version     string  `json:"version"`
 	Commit      string  `json:"commit"`
+	Module      string  `json:"module,omitempty"`
 	Initialized string  `json:"initialized"`
 	Upgraded    *string `json:"upgraded"`
 }

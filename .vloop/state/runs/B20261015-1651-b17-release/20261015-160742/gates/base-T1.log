@@ -1,0 +1,1 @@
+GATE FAIL: with plugin.json at 9.8.7 the binary's version is not 9.8.7: {"version":"0.11.0","commit":"unknown","plugin":"9.8.7","go":"go1.27.1","os":"darwin","arch":"arm64"}

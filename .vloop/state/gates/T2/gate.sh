@@ -1,69 +1,57 @@
 #!/bin/sh
-# Gate T2 — K2: vloop brief check no longer reads "## Pinning tests" or
-# "## External formats" from .vloop/repo-guidelines.md and never prints a
-# must-change list: or external format: line; every other line, and the exit
-# code, are what the plan's base prints. vloop init's guidelines file is the
-# title and its one sentence, in en and es. doctor's guidelines line is as the
-# base prints it.
+# Gate T2 — I1: vloop init and vloop upgrade write "module": "<module version>"
+# into .vloop/install.json, right after commit, when the binary carries a module
+# version, and leave it out otherwise; install/v1 takes module as an optional
+# string. The module-carrying binary is installed the way a user installs a
+# release: go install …@v0.12.0 through a module proxy (a local file proxy).
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-basebin
-BB=$t/vloop-base
-nonblank() { grep -v '^[[:space:]]*$' "$1"; }
+xbuild
+go build -buildvcs=false -o "$t/vloop" ./cmd/vloop || fail "go build ./cmd/vloop"
+B=$t/vloop
+proxybin v0.12.0 0.12.0
+[ "$("$P" version --json | "$JQ" -r '.module + " " + .commit')" = "v0.12.0 unknown" ] ||
+  fail "harness: the proxy-installed binary does not carry module v0.12.0 and no commit: $("$P" version --json)"
 
-# --- init's guidelines file, en and es, against the base's first two lines
-for lang in en es; do
-  newrepo "n$lang" --language "$lang"
-  N=$R/.vloop/repo-guidelines.md
-  R=$t/b$lang
-  mkdir -p "$R" && git -C "$R" init -q -b main || fail "git init $R"
-  inr "$BB" init --language "$lang" </dev/null >"$R.init" 2>&1 || fail "base vloop init: $(cat "$R.init")"
-  nonblank "$R/.vloop/repo-guidelines.md" | head -n 2 >"$t/want-$lang"
-  nonblank "$N" >"$t/got-$lang"
-  cmp -s "$t/want-$lang" "$t/got-$lang" || fail "vloop init --language $lang: the guidelines file is not the title and its one sentence:
-$(cat "$N")
-want exactly (blank lines aside):
-$(cat "$t/want-$lang")"
-done
+# vl <binary> <repo> <args...>: vloop in <repo>, temporary HOME; output in $t/vl.out.
+vl() {
+  b=$1 r=$2; shift 2
+  (cd "$r" && env -i PATH="$t/gitonly:$SYS" HOME="$t/home" TMPDIR="$t/tmp" LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null \
+    GIT_CONFIG_NOSYSTEM=1 "$b" "$@") </dev/null >"$t/vl.out" 2>&1 || fail "vloop $* in $r: $(cat "$t/vl.out")"
+}
+newrepo() { mkdir -p "$1" && git -C "$1" init -q -b main && printf '# r\n' >"$1/README.md" || fail "git init $1"; }
+# hasmodule <stamp> <module>: module is <module> and comes right after commit.
+hasmodule() {
+  [ "$("$JQ" -r '.module // "(none)"' "$1")" = "$2" ] || fail "$3: $1 has module '$("$JQ" -r '.module // "(none)"' "$1")', want '$2': $(cat "$1")"
+  [ "$("$JQ" -r '[keys_unsorted[]] | (index("module") - index("commit"))' "$1")" = 1 ] ||
+    fail "$3: module does not follow commit in $1: $(cat "$1")"
+  [ "$("$JQ" -r .commit "$1")" = unknown ] || fail "$3: commit is not unknown in $1: $(cat "$1")"
+}
 
-# --- brief check with a guidelines file that has both sections
-newrepo k2
-cat >"$R/.vloop/repo-guidelines.md" <<'GL'
-# Lessons of this repository
+# init by a binary that carries a module version.
+newrepo "$t/r1"; vl "$P" "$t/r1" init
+hasmodule "$t/r1/.vloop/install.json" v0.12.0 "vloop init"
+"$B" schema validate install/v1 "$t/r1/.vloop/install.json" >"$t/sv" 2>&1 || fail "install/v1 rejects the stamp init wrote: $(cat "$t/sv")"
 
-This file holds this repository's lessons, and every loop session receives it.
+# init by a binary that carries none, then upgrade by one that does.
+newrepo "$t/r2"; vl "$B" "$t/r2" init
+[ "$("$JQ" 'has("module")' "$t/r2/.vloop/install.json")" = false ] ||
+  fail "vloop init by a binary with no module version wrote a module: $(cat "$t/r2/.vloop/install.json")"
+vl "$P" "$t/r2" upgrade --yes
+hasmodule "$t/r2/.vloop/install.json" v0.12.0 "vloop upgrade"
+[ "$("$JQ" -r .version "$t/r2/.vloop/install.json")" = 0.12.0 ] || fail "vloop upgrade did not record version 0.12.0: $(cat "$t/r2/.vloop/install.json")"
 
-## Pinning tests
+# upgrade by a binary with no module version leaves none, even where one was.
+newrepo "$t/r3"; vl "$B" "$t/r3" init
+"$JQ" '.version = "0.10.0" | .module = "v0.10.0"' "$t/r3/.vloop/install.json" >"$t/st.json" &&
+  mv "$t/st.json" "$t/r3/.vloop/install.json" || fail "stamp edit"
+vl "$B" "$t/r3" upgrade --yes
+[ "$("$JQ" 'has("module")' "$t/r3/.vloop/install.json")" = false ] ||
+  fail "vloop upgrade by a binary with no module version left a module in the stamp: $(cat "$t/r3/.vloop/install.json")"
 
-- when `config key`: `TestConfigList`, `TestConfigGet`
-
-## External formats
-
-- `manifest`: `docs/manifest-spec.md`
-GL
-briefdoc "$RUN" ready | sed 's/^An unknown id exits 1\.$/An unknown id exits 1. A new config key changes the manifest./' >"$R/$BRIEF" || fail brief
-grep -q 'config key changes the manifest' "$R/$BRIEF" || fail "the fixture brief has no contract sentence to match"
-commit fixtures
-for b in base:"$BB" new:"$B"; do
-  n=${b%%:*} bin=${b#*:}
-  inr "$bin" brief check "$BRIEF" </dev/null >"$t/chk-$n" 2>&1; echo $? >"$t/chk-$n.exit"
-  inr "$bin" brief check "$BRIEF" --json </dev/null >"$t/chkj-$n" 2>&1; echo $? >"$t/chkj-$n.exit"
-  inr "$bin" doctor </dev/null >"$t/doc-$n" 2>&1
-done
-grep -q 'must-change list:' "$t/chk-base" && grep -q 'external format:' "$t/chk-base" ||
-  fail "harness: the base does not warn on the fixture, so the comparison proves nothing: $(cat "$t/chk-base")"
-grep -q -e 'must-change list:' -e 'external format:' "$t/chk-new" && fail "brief check still prints a retired warning:
-$(cat "$t/chk-new")"
-grep -q -e 'must-change list' -e 'external format' "$t/chkj-new" && fail "brief check --json still carries a retired warning:
-$(cat "$t/chkj-new")"
-retire "$t/chk-base" >"$t/chk-want"
-cmp -s "$t/chk-want" "$t/chk-new" || fail "brief check's other lines changed:
-$(diff "$t/chk-want" "$t/chk-new")"
-cmp -s "$t/chk-base.exit" "$t/chk-new.exit" || fail "brief check exits $(cat "$t/chk-new.exit"), the base $(cat "$t/chk-base.exit")"
-cmp -s "$t/chkj-base.exit" "$t/chkj-new.exit" || fail "brief check --json exits $(cat "$t/chkj-new.exit"), the base $(cat "$t/chkj-base.exit")"
-grep 'guidelines' "$t/doc-base" >"$t/dg-base"; grep 'guidelines' "$t/doc-new" >"$t/dg-new"
-[ -s "$t/dg-base" ] || fail "harness: the base's doctor prints no guidelines line"
-cmp -s "$t/dg-base" "$t/dg-new" || fail "doctor's guidelines line changed:
-base: $(cat "$t/dg-base")
-now:  $(cat "$t/dg-new")"
+# The schema: module is an optional string.
+printf '{"schema":"install/v1","version":"0.12.0","commit":"unknown","module":5,"initialized":"2026-01-01T00:00:00Z","upgraded":null}\n' >"$t/bad.json"
+if "$B" schema validate install/v1 "$t/bad.json" >"$t/sv" 2>&1; then fail "install/v1 accepts a module that is not a string: $(cat "$t/sv")"; fi
+printf '{"schema":"install/v1","version":"0.12.0","commit":"abc","initialized":"2026-01-01T00:00:00Z","upgraded":null}\n' >"$t/plain.json"
+"$B" schema validate install/v1 "$t/plain.json" >"$t/sv" 2>&1 || fail "install/v1 rejects a stamp without module: $(cat "$t/sv")"
 echo "gate T2: ok"

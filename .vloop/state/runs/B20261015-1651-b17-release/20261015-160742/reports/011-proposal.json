@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T9",
+  "outcome": "blocked",
+  "summary": "Added tools/release/e2e_test.go (TestReleaseSequence) playing the worked example with stubs and a local bare origin; the gate and go test ./tools/... pass. The real-data clone check could not be run: git clone was denied in this session.",
+  "files": ["tools/release/e2e_test.go"],
+  "verified": "vloop task gate T9 exited 0 and printed ok; go test ./tools/..., go vet ./tools/... and gofmt -l tools were clean.",
+  "notes": "Worked example as asserted by TestReleaseSequence (temp HOME, stub gh/go/claude, local bare origin): prepare 0.12.0 exit 2 'is not a version'; v2.0.0 exit 1 module path /v2; v1.0.0 exit 1 retracted; v0.11.0 exit 1 not after latest; prepare on topic exit 1 'runs on main, not topic'; each refusal wrote nothing; prepare v0.12.0 exit 0 and one-commit Release v0.12.0 changing only plugin.json; publish before merge exit 1 'no release commit ... merge the release PR first'; after git merge --squash publish exit 0 with annotated tag on the release commit and the four closing lines; re-run exit 0 with tag: already done and release: already done; install reporting 0.11.0/v0.11.0 exit 1. No product fix was needed. Real data, run in the working repo (not a clone, read-only): 'notes v0.10.0 v0.11.0' exit 0, lists B16 alone; 'notes v0.9.0 v0.10.0' exit 0, lists B13, B14, B15 plus Other changes (Design: B14, the learning loop (#32)). The gate itself does the clone check of both notes ranges and passed. NOT done: 'prepare v0.12.0 --dry-run' on a clean main of a local clone: Bash denied git clone (both into a temp dir and under .vloop/tmp), and this repo is on a work branch, so prepare would refuse in place. Operator needs to run it: git clone <local repo> into a temp dir, then go run ./tools/release prepare v0.12.0 --dry-run, and confirm it passes with nothing written."
+}

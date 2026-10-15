@@ -115,6 +115,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | no | no-options | [I20261014-1823-t10-s-disputed-gate-fixed-the-real-data](I20261014-1823-t10-s-disputed-gate-fixed-the-real-data.md) |
 | halt | repair | partly | no-options | [I20261014-1823-t13-s-disputed-gate-fixed-bsd-awk-consum](I20261014-1823-t13-s-disputed-gate-fixed-bsd-awk-consum.md) |
 | halt | repair | yes | no-options | [I20261015-151132-base-check-halted-on-a-github-pr-extensi](I20261015-151132-base-check-halted-on-a-github-pr-extensi.md) |
+| halt | repair | partly | no-options | [I20261015-215305-t9-stalled-on-a-check-the-fence-forbids](I20261015-215305-t9-stalled-on-a-check-the-fence-forbids.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
@@ -140,6 +141,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | recommended | [I20261006-1028-b11-verified-the-worked-example-held-by](I20261006-1028-b11-verified-the-worked-example-held-by.md) |
 | verify | verification-finding | partly | no-options | [I20261011-2233-verification-t3-changed-testinitdoesnotp](I20261011-2233-verification-t3-changed-testinitdoesnotp.md) |
 | verify | verification-finding | partly | no-options | [I20261015-151154-v4-left-the-order-of-close-s-verify-repo](I20261015-151154-v4-left-the-order-of-close-s-verify-repo.md) |
+| verify | verification-finding | partly | no-options | [I20261015-215245-t9-s-real-data-check-required-a-session](I20261015-215245-t9-s-real-data-check-required-a-session.md) |
+| verify | verification-finding | partly | no-options | [I20261015-215246-the-session-fence-denies-read-only-git-t](I20261015-215246-the-session-fence-denies-read-only-git-t.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

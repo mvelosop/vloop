@@ -1,0 +1,2 @@
+stat ~/source/personal/vloop/tools/release: directory not found
+GATE FAIL: go build ./tools/release

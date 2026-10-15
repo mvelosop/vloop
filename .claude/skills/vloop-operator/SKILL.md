@@ -151,6 +151,13 @@ and the commit, and prints the trailer for step 4.
    refreshed: `tools/interventions-index.sh --write` (`--check` in
    verification). Why: `docs/design-notes/vloop-interventions-b1-b4.md`.
 
+7. **Release**, when the operator asks for one: `go run ./tools/release prepare
+   <version>` opens the release PR; merge it on the operator's go-ahead; then
+   `go run ./tools/release publish <version>` tags, releases and proves the
+   public install. Record a `ceremony` intervention for the release with
+   `vloop intervention add`. Then install and `vloop upgrade` in each
+   repository. See `tools/release/README.md`.
+
 ## Lessons, where they bite
 
 - **Gates run on macOS's BSD tools.** No empty alternatives in `grep -E`, no

@@ -24,6 +24,10 @@ type versionInfo struct {
 	Arch    string `json:"arch"`
 }
 
+// PluginVersion is the embedded plugin.json's version, which is also the
+// binary's: the one version source.
+func PluginVersion() (string, error) { return pluginVersion() }
+
 // pluginVersion reads the version from the embedded plugin.json, never from
 // the working tree.
 func pluginVersion() (string, error) {

@@ -92,7 +92,7 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 	steps = append(steps, configStep(out, root, haveConfig, detected, chosen, lang, starter))
 	// 2. stamp
 	stamp := install.Stamp{
-		Version: b.Version, Commit: b.Commit,
+		Version: b.Version, Commit: b.Commit, Module: b.Module,
 		Initialized: now.UTC().Format("2006-01-02T15:04:05Z"),
 	}
 	steps = append(steps, initStep{path: install.Path, verb: "wrote", write: func() error { return install.Write(root, stamp) }})

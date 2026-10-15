@@ -1,0 +1,17 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []},
+    {"task": "T7", "verdict": "PASS", "findings": []},
+    {"task": "T8", "verdict": "PASS", "findings": []},
+    {"task": "T9", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "T1, T2 and T8 fail on the base at their behavioural assertions. T3-T7 and T9 fail on the base with 'stat tools/release: directory not found', the plain absence of the tool. Their bodies were read against the brief (order of refusals, exact messages, fixtures, matchers) and the real-data titles and descriptions were checked against the repository's tags and trailers."
+}
+

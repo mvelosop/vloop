@@ -1,0 +1,9 @@
+{"schema":"verdict/v1","task":"T2","verdict":"PASS",
+"criteria":[
+{"criterion":"`vloop init` and `vloop upgrade` write \"module\": \"<module version>\" into .vloop/install.json, immediately after \"commit\", when the binary's build info carries a module version (the value `vloop version` prints as module); they leave the key out otherwise — including on an upgrade by a binary with none, over a stamp that had one.","met":true,"evidence":"init.go:95 and upgrade.go:121 set Module from b.Module; Stamp.Module is omitempty and follows Commit; TestStampModule asserts the ordering and the removal on upgrade."},
+{"criterion":"schemas/install.v1.json gains `module` as an optional string property; `required` and the schema name (install/v1) are unchanged, and a stamp without module stays valid.","met":true,"evidence":"schemas/install.v1.json adds module as type string; required untouched; the new schema test validates a stamp without module."},
+{"criterion":"No other behaviour of init or upgrade changes (I1 only).","met":true,"evidence":"Diff touches only the stamp fields."},
+{"criterion":"Committed tests, run by the checks, cover init and upgrade with and without a module version (through the existing build-info seam, not a real network install) and the schema accepting a stamp with a string module and without one. An earlier test changes only where it pins the stamp's exact content, and only to the new behaviour; the notes name I1 for each.","met":true,"evidence":"TestStampModule (Build seam) plus new TestInstallModuleIsOptionalString in internal/schema/schema_test.go validating with, without, and non-string module; no earlier test changed."}
+],
+"findings":[],
+"notes":"none"}

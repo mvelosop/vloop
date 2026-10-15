@@ -1,0 +1,15 @@
+── iteration 13 (1 this run) · T9 · 8/9 done ──
+   Close: run the worked example line for line and the real-data check
+   work T9 · 0m46s · $0.12 · run $0.12 / $40.00
+   check go
+   review T9 · 0m20s · $0.10 · run $0.22 / $40.00
+   review: PASS
+   T9 done
+   check go
+   verify · 0m51s · $0.22 · run $0.43 / $40.00
+verify: no findings
+
+═══ complete ═══
+run:    B20261015-1651-b17-release/20261015-174933  (1 iteration(s) this run)
+plan:   9/9 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261015-1651-b17-release.md

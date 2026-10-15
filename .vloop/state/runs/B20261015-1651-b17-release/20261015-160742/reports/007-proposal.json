@@ -1,0 +1,5 @@
+{"schema":"proposal/v1","task":"T5","outcome":"done",
+"summary":"prepare now creates release/<version> from main, commits `Release <version>` changing only plugin.json's version line, pushes it to origin and opens the PR with gh (title `Release <version>`, body `notes <latest tag> main`), then prints the two closing lines.",
+"files":["tools/release/prepare.go","tools/release/open_test.go"],
+"verified":"vloop task gate T5 equivalent (sh .vloop/state/gates/T5/gate.sh) printed gate T5: ok; go test ./tools/... and go vet pass.",
+"notes":"openRelease in prepare.go switches to the branch, commits, pushes and switches back to main (deferred), so main stays checked out. prepareChecks now also returns the latest version tag. The version line is replaced by regex on the first \"version\" key to keep the diff to one line. open_test.go uses a stub gh on PATH and the local bare origin from prepared()."}

@@ -1,0 +1,1 @@
+GATE FAIL: the section still stamps main.version: 10:go build -ldflags "-X main.version=<v> -X main.commit=<sha>" -o vloop ./cmd/vloop

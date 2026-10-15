@@ -243,6 +243,62 @@ func note(t Task) string {
 	return ""
 }
 
+// mdText escapes &, < and > outside code spans, so a Markdown preview shows
+// a task's <from> or <title> as written instead of taking it for an HTML tag.
+func mdText(s string) string {
+	var b strings.Builder
+	for i := 0; i < len(s); {
+		if s[i] == '`' {
+			n := 0
+			for i+n < len(s) && s[i+n] == '`' {
+				n++
+			}
+			fence := s[i : i+n]
+			if end := closingFence(s[i+n:], fence); end >= 0 {
+				span := i + n + end + n
+				b.WriteString(s[i:span])
+				i = span
+				continue
+			}
+			b.WriteString(fence)
+			i += n
+			continue
+		}
+		switch s[i] {
+		case '&':
+			b.WriteString("&amp;")
+		case '<':
+			b.WriteString("&lt;")
+		case '>':
+			b.WriteString("&gt;")
+		default:
+			b.WriteByte(s[i])
+		}
+		i++
+	}
+	return b.String()
+}
+
+// closingFence is the index in s of a backtick run exactly as long as fence,
+// or -1.
+func closingFence(s, fence string) int {
+	for j := 0; j < len(s); {
+		if s[j] != '`' {
+			j++
+			continue
+		}
+		n := 0
+		for j+n < len(s) && s[j+n] == '`' {
+			n++
+		}
+		if n == len(fence) {
+			return j
+		}
+		j += n
+	}
+	return -1
+}
+
 // Markdown renders p for human reading, as .loop/render-plan.sh renders its plan.
 func (p *Plan) Markdown() string {
 	var b strings.Builder
@@ -263,7 +319,7 @@ func (p *Plan) Markdown() string {
 		if t.Status == "done" {
 			mark = "x"
 		}
-		w("- [%s] **%s** — %s%s", mark, t.ID, t.Title, note(t))
+		w("- [%s] **%s** — %s%s", mark, t.ID, mdText(t.Title), note(t))
 	}
 	w("")
 	w("## Tasks")
@@ -273,12 +329,12 @@ func (p *Plan) Markdown() string {
 		if len(t.DependsOn) > 0 {
 			deps = strings.Join(t.DependsOn, ", ")
 		}
-		w("### %s — %s", t.ID, t.Title)
+		w("### %s — %s", t.ID, mdText(t.Title))
 		w("")
 		w("`%s`%s · depends on: %s", t.Status, note(t), deps)
 		w("")
 		if t.Goal != "" {
-			w("%s", t.Goal)
+			w("%s", mdText(t.Goal))
 		} else {
 			w("_no goal recorded_")
 		}
@@ -286,11 +342,11 @@ func (p *Plan) Markdown() string {
 		w("**Acceptance**")
 		w("")
 		for _, a := range t.Acceptance {
-			w("- %s", a)
+			w("- %s", mdText(a))
 		}
 		w("")
 		if t.Notes != "" {
-			w("**From the last attempt:** %s", t.Notes)
+			w("**From the last attempt:** %s", mdText(t.Notes))
 			w("")
 		}
 		w("<details><summary>verify command</summary>")

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The binary's version is now the embedded plugin.json's version via cli.PluginVersion(); cmd/vloop/main.go keeps only the stampable commit variable.",
+  "files": ["cmd/vloop/main.go", "internal/cli/version.go", "internal/cli/root_test.go", "cmd/vloop/e2e_test.go", "cmd/vloop/run_harness_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go generate left docs/guide/commands.md unchanged.",
+  "notes": "V1: root_test.go (TestVersionJSON, TestVersionText, TestVersionModule), e2e_test.go (TestWorkedExampleEnglishSession) and run_harness_test.go (stub plugin list, placeholder @PLUGIN_VERSION@) now read the version from the embedded plugin.json. Added TestBinaryVersionIsPluginVersion. TestTaskGate* in internal/cli fail only inside a loop session (plan-changed guard), not a code defect."
+}

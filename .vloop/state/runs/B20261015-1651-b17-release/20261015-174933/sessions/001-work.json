@@ -1,0 +1,31 @@
+{
+  "cost_usd": 0.12244089999999999,
+  "duration_ms": 44681,
+  "effort": null,
+  "ended": "2026-10-15T17:50:19Z",
+  "is_error": false,
+  "iteration": 13,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 19393,
+      "cache_read_input_tokens": 181609,
+      "cost_usd": 0.12244089999999999,
+      "input_tokens": 14,
+      "output_tokens": 2668
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd .vloop/tmp \u0026\u0026 rm -rf g \u0026\u0026 mkdir g \u0026\u0026 cp ../state/gates/T9/* g/ \u0026\u0026 ls g \u0026\u0026 grep -n 'rel()' -A12 g/lib.sh | head -40",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261015-1651-b17-release",
+  "schema": "session/v1",
+  "started": "2026-10-15T17:49:33Z",
+  "task": "T9",
+  "turns": 8,
+  "wall_ms": 45665
+}

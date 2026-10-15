@@ -1,56 +1,86 @@
 #!/bin/sh
-# Gate T9 — K1: a brief written by vloop brief new (en and es) states in its
-# Constraints, beside "No task may weaken a check to pass", that an earlier
-# test changes only where it pins behaviour the contract changes, and only to
-# the new behaviour. The work and review skills the plugin hands to sessions
-# carry the rule (the review's goalpost check now licensed by the contract),
-# each within its word ceiling; the architect skill no longer asks for a list
-# of earlier tests that must change.
+# Gate T9 — the brief's worked example, line for line, in one fixture: the
+# prepare refusals, prepare, publish before the merge, the operator's real
+# squash-merge of the pushed branch, publish, the re-run, a go install that
+# reports another version; a proxy-installed v0.12.0 upgrading a repository;
+# and the real-data check of notes on a local clone of this repository.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-basebin
-# section <file> <heading>: the lines of that level-2 section.
-section() { awk -v h="$2" '$0 == h { p = 1; next } p && /^## / { exit } p' "$1"; }
-# newbrief <bin> <out>: vloop brief new in $R with that binary; the file in $t/<out>.
-newbrief() {
-  inr "$1" brief new "demo-$2" </dev/null >"$t/$2.p" 2>&1 || fail "brief new: $(cat "$t/$2.p")"
-  cp "$R/$(tail -n 1 "$t/$2.p")" "$t/$2" || fail "brief new printed '$(tail -n 1 "$t/$2.p")'"
-}
+xbuild
+buildrel
+mkrel
 
-newrepo en
-newbrief "$B" en-new; newbrief "$t/vloop-base" en-base
-section "$t/en-new" '## Constraints' >"$t/cn"; section "$t/en-base" '## Constraints' >"$t/cb"
-grep -q 'No task may weaken a check to pass' "$t/cn" || fail "the en Constraints lost 'No task may weaken a check to pass'"
-grep -Fxv -f "$t/cb" "$t/cn" >"$t/cadd"
-grep -qi 'earlier test' "$t/cadd" && grep -qi 'new behaviour' "$t/cadd" && grep -qi 'contract' "$t/cadd" ||
-  fail "the en template's Constraints do not state that an earlier test changes only where the contract changes what it pins, and only to the new behaviour; added lines:
-$(cat "$t/cadd")"
+quiet; rel prepare 0.12.0; refuse 2 "release: 0.12.0 is not a version: vX.Y.Z or vX.Y.Z-<pre>"; unchanged
+quiet; rel prepare v2.0.0; refuse 1 "release: v2.0.0 needs the module path to end in /v2, and github.com/mvelosop/vloop does not"; unchanged
+quiet; rel prepare v1.0.0; refuse 1 "release: v1.0.0 is retracted in go.mod"; unchanged
+quiet; rel prepare v0.11.0; refuse 1 "release: v0.11.0 is not after the latest release v0.11.0"; unchanged
+git -C "$W" checkout -q -b topic || fail checkout
+quiet; rel prepare v0.12.0; refuse 1 "release: prepare runs on main, not topic"; unchanged
+git -C "$W" checkout -q main || fail checkout
 
-newrepo es --language es
-newbrief "$B" es-new; newbrief "$t/vloop-base" es-base
-section "$t/es-new" '## Restricciones' >"$t/sn"; section "$t/es-base" '## Restricciones' >"$t/sb"
-grep -q 'Ninguna tarea puede debilitar una comprobación' "$t/sn" || fail "the es Restricciones lost 'Ninguna tarea puede debilitar una comprobación'"
-grep -Fxv -f "$t/sb" "$t/sn" >"$t/sadd"
-grep -qi 'prueba' "$t/sadd" && grep -qi 'contrato' "$t/sadd" || fail "the es template's Restricciones do not state the rule (an earlier test — prueba — changed only as the contrato licenses); added lines:
-$(cat "$t/sadd")"
+main0=$(git -C "$O" rev-parse refs/heads/main)
+rel prepare v0.12.0
+[ "$got" = 0 ] || fail "prepare v0.12.0: want exit 0; $(said)"
+printf '%s\n' "prepared release/v0.12.0: https://github.example/mvelosop/vloop/pull/7" \
+  "squash-merge it, then: go run ./tools/release publish v0.12.0" >"$t/tail.want"
+tailis "$t/tail.want"
+rb=$(git -C "$O" rev-parse -q --verify refs/heads/release/v0.12.0) || fail "origin has no release/v0.12.0"
+[ "$(git -C "$O" rev-list --count "$main0..$rb")" = 1 ] && [ "$(git -C "$O" log -1 --format=%s "$rb")" = "Release v0.12.0" ] ||
+  fail "release/v0.12.0 is not one commit 'Release v0.12.0': $(git -C "$O" log --oneline "$main0..$rb")"
+[ "$(git -C "$O" diff --name-only "$main0" "$rb")" = plugin/.claude-plugin/plugin.json ] || fail "the release commit changes more than plugin.json"
 
-inr "$B" plugin path </dev/null >"$t/pp" 2>&1 || fail "vloop plugin path: $(cat "$t/pp")"
-p=$(tail -n 1 "$t/pp")
-case "$p" in /*) P=$p ;; *) P=$R/$p ;; esac
-for k in work:1800 review:1650; do
-  s=${k%:*} c=${k#*:} F=$P/skills/${k%:*}/SKILL.md
-  [ -f "$F" ] || fail "no skills/$s/SKILL.md in the extracted plugin"
-  git -C "$top" show "$BASE:plugin/skills/$s/SKILL.md" >"$t/$s.base" || fail "the base's $s skill"
-  grep -Fxv -f "$t/$s.base" "$F" >"$t/$s.add"
-  grep -qi 'earlier test' "$t/$s.add" && grep -qi 'contract' "$t/$s.add" || fail "the $s skill states no rule for changing an earlier test under the contract; added lines:
-$(cat "$t/$s.add")"
-  w=$(wc -w <"$F" | tr -d ' ')
-  [ "$w" -le "$c" ] || fail "the $s skill is $w words, over its ceiling of $c"
+: >"$t/stub/proxy-v0.12.0"
+quiet; rel publish v0.12.0
+refuse 1 "release: no release commit for v0.12.0 on origin/main — merge the release PR first"; unchanged
+
+# The operator squash-merges the pushed branch.
+spull
+git -C "$S" fetch -q origin && git -C "$S" merge -q --squash origin/release/v0.12.0 >/dev/null &&
+  git -C "$S" commit -q -m "Release v0.12.0 (#7)" && git -C "$S" push -q origin main || fail "squash-merge of release/v0.12.0"
+RC=$(git -C "$S" rev-parse HEAD)
+: >"$t/stub/gh.log"
+rel publish v0.12.0
+[ "$got" = 0 ] || fail "publish v0.12.0: want exit 0; $(said)"
+printf '%s\n' "published v0.12.0: https://github.example/mvelosop/vloop/releases/tag/v0.12.0" \
+  "install: go install github.com/mvelosop/vloop/cmd/vloop@v0.12.0" \
+  "then, in each repository: vloop upgrade" \
+  "and for the plugin: claude plugin marketplace update vloop && claude plugin update vloop@vloop" >"$t/tail.want"
+tailis "$t/tail.want"
+[ "$(git -C "$O" cat-file -t refs/tags/v0.12.0)" = tag ] && [ "$(git -C "$O" rev-parse 'refs/tags/v0.12.0^{commit}')" = "$RC" ] ||
+  fail "v0.12.0 is not an annotated tag on the release commit $RC"
+grep '^release create v0.12.0 ' "$t/stub/gh.log" | grep -q -- ' --verify-tag' || fail "gh did not see 'release create v0.12.0 --verify-tag': $(cat "$t/stub/gh.log")"
+
+rel publish v0.12.0
+[ "$got" = 0 ] || fail "publish v0.12.0 again: want exit 0; $(said)"
+cat "$t/out" "$t/err" | grep -Fxq "tag: already done" && cat "$t/out" "$t/err" | grep -Fxq "release: already done" ||
+  fail "the re-run did not say tag: already done and release: already done; $(said)"
+tailis "$t/tail.want"
+
+printf '0.11.0\nv0.11.0\n' >"$t/stub/report"
+rel publish v0.12.0
+[ "$got" = 1 ] && grep -Eq '^release: go install (…|github\.com/mvelosop/vloop/cmd/vloop)@v0\.12\.0 reports version 0\.11\.0, module v0\.11\.0$' "$t/err" ||
+  fail "want exit 1 and 'release: go install …@v0.12.0 reports version 0.11.0, module v0.11.0'; $(said)"
+
+# A binary whose build info carries module v0.12.0 and no VCS stamp, then vloop upgrade.
+go build -buildvcs=false -o "$t/vloop" ./cmd/vloop || fail "go build ./cmd/vloop"
+proxybin v0.12.0 0.12.0
+mkdir -p "$t/u" && git -C "$t/u" init -q -b main || fail "git init"
+for b in "$t/vloop init" "$P upgrade --yes"; do
+  (cd "$t/u" && env -i PATH="$t/gitonly:$SYS" HOME="$t/home" TMPDIR="$t/tmp" LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null $b) </dev/null >"$t/vl" 2>&1 ||
+    fail "vloop ${b##*/}: $(cat "$t/vl")"
 done
-grep -qi 'goalpost' "$P/skills/review/SKILL.md" || fail "the review skill no longer names a goalpost move"
-grep -qi 'notes' "$t/work.add" || fail "the work skill does not say to name the contract item in the proposal's notes"
-grep -Eqi 'cite|item' "$t/review.add" || fail "the review skill does not have the verdict cite the contract item"
-A=.claude/skills/vloop-architect/SKILL.md
-grep -Fq 'earlier tests that *must* change' "$A" && fail "$A still asks for an explicit list of earlier tests that must change"
-grep -qi 'earlier test' "$A" || fail "$A does not state the rule for earlier tests"
+[ "$("$JQ" -r '.commit + " " + .module' "$t/u/.vloop/install.json")" = "unknown v0.12.0" ] ||
+  fail ".vloop/install.json does not have commit unknown and module v0.12.0: $(cat "$t/u/.vloop/install.json")"
+
+# Real data: notes on a local clone of this repository.
+git clone -q "$top" "$t/self" || fail "local clone of this repository"
+W=$t/self
+briefs() {
+  rel notes "$1" "$2"
+  [ "$got" = 0 ] || fail "notes $1 $2 on this repository: $(said)"
+  awk '/^## Briefs$/ { p = 1; next } /^## / { p = 0 } p && /^- / { print }' "$t/out" | sed 's/^- \*\*\([^*]*\)\*\*.*/\1/'
+}
+[ "$(briefs v0.10.0 v0.11.0)" = "B16: the verification phase" ] || fail "notes v0.10.0 v0.11.0 does not list B16 alone; $(said)"
+printf '%s\n' "B13: docs and onboarding" "B14: the learning loop" "B15: code health, and defects narrowed to escapes" >"$t/want"
+[ "$(briefs v0.9.0 v0.10.0)" = "$(cat "$t/want")" ] || fail "notes v0.9.0 v0.10.0 does not list B13, B14 and B15; $(said)"
 echo "gate T9: ok"

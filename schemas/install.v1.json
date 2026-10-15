@@ -8,6 +8,7 @@
     "schema": { "const": "install/v1" },
     "version": { "type": "string" },
     "commit": { "type": "string" },
+    "module": { "type": "string" },
     "initialized": { "type": "string" },
     "upgraded": { "type": ["string", "null"] }
   }

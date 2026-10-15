@@ -111,7 +111,7 @@ func TestMarkdown(t *testing.T) {
 	md := p.Markdown()
 	for _, want := range []string{
 		"# Plan — B20260101-0900-a\n",
-		"- [x] **T1** — Skeleton <a> & b\n",
+		"- [x] **T1** — Skeleton &lt;a&gt; &amp; b\n",
 		"- [ ] **T2** — Config · 1 attempt(s)\n",
 		"`pending` · 1 attempt(s) · depends on: T1\n",
 		"`done` · depends on: none\n",
@@ -119,6 +119,32 @@ func TestMarkdown(t *testing.T) {
 	} {
 		if !strings.Contains(md, want) {
 			t.Errorf("markdown lacks %q", want)
+		}
+	}
+}
+
+// Angle brackets in a task's text are escaped outside code spans, so a
+// Markdown preview does not take <from> or <title> for HTML tags; code spans
+// keep them as written.
+func TestMarkdownEscapesText(t *testing.T) {
+	p := &Plan{RunID: "r", Tasks: []Task{{
+		ID: "T1", Title: "notes <from> <to>", Status: "pending",
+		Goal:       "write \"module\": \"<v>\" & more",
+		Acceptance: []string{"after <from> up to `Vloop-Brief: <name>` and ``a ` <b>`` then <c>"},
+		Notes:      "saw <x>",
+		Verify:     "test 1 -lt 2 && echo <ok>",
+	}}}
+	md := p.Markdown()
+	for _, want := range []string{
+		"- [ ] **T1** — notes &lt;from&gt; &lt;to&gt;\n",
+		"### T1 — notes &lt;from&gt; &lt;to&gt;\n",
+		"write \"module\": \"&lt;v&gt;\" &amp; more\n",
+		"- after &lt;from&gt; up to `Vloop-Brief: <name>` and ``a ` <b>`` then &lt;c&gt;\n",
+		"**From the last attempt:** saw &lt;x&gt;\n",
+		"test 1 -lt 2 && echo <ok>\n",
+	} {
+		if !strings.Contains(md, want) {
+			t.Errorf("markdown lacks %q:\n%s", want, md)
 		}
 	}
 }
