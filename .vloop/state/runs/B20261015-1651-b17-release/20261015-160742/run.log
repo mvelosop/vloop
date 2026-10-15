@@ -82,3 +82,8 @@ committing the plan
    review T8 · 0m15s · $0.09 · run $8.63 / $40.00
    review: PASS
    T8 done
+── iteration 11 (11 this run) · T9 · 8/9 done ──
+   Close: run the worked example line for line and the real-data check
+   work T9 · 1m53s · $0.29 · run $8.91 / $40.00
+   work session reported blocked
+   T9 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.

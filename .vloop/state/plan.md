@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/9 done** · iteration 10
+**Status:** running · **8/9 done** · iteration 11
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:39:39Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:42:25Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Make publish find the release commit, tag it and create the GitHub release
 - [x] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
 - [x] **T8** — Describe the release tool in the docs and the operator's playbook
-- [ ] **T9** — Close: run the worked example line for line and the real-data check
+- [ ] **T9** — Close: run the worked example line for line and the real-data check · 1 attempt(s)
 
 ## Tasks
 
@@ -203,7 +203,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Close: run the worked example line for line and the real-data check
 
-`pending` · depends on: T8
+`pending` · 1 attempt(s) · depends on: T8
 
 The brief's worked example is its acceptance in one sequence: prepare's refusals, prepare, publish before and after the operator's squash-merge, the re-run, a mismatched install, and a proxy-installed v0.12.0 upgrading a repository. This task runs it end to end against a fixture and the real-data check against a clone of this repository, fixes any discrepancy it finds within the brief's contract, and leaves an end-to-end test behind so the sequence stays true.
 
@@ -213,6 +213,8 @@ The brief's worked example is its acceptance in one sequence: prepare's refusals
 - The notes carry the real-data check on a clone of this repository: the outputs of `notes v0.10.0 v0.11.0` and `notes v0.9.0 v0.10.0`, and `prepare v0.12.0 --dry-run` on a clean, current main of the clone (whose origin is the local repository, never the real one) passing every check, with nothing written.
 - A committed end-to-end test, run by the checks, plays the worked example's sequence (refusals, prepare, publish before and after a squash-merge, the re-run, the mismatched install) with stubs and a local bare origin. The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
 - Any fix made here stays within the brief's contract and names the item it serves in the notes; no check is weakened to pass.
+
+**From the last attempt:** Added tools/release/e2e_test.go (TestReleaseSequence) playing the worked example with stubs and a local bare origin; the gate and go test ./tools/... pass. The real-data clone check could not be run: git clone was denied in this session. — T9 GATE PASSES while the session reports blocked — the work satisfies its own gate; the block is about something else.
 
 <details><summary>verify command</summary>
 
