@@ -1,0 +1,18 @@
+GATE FAIL: the scratch was not cleared as S1 requires:
+plan round 1 saw the stale .vloop/tmp/old.txt
+plan round 1 saw the stale .vloop/tmp/olddir
+plan round 1 saw the stale .vloop/tmp/linkdir
+plan round 1 saw the stale .vloop/tmp/linkfile
+plan round 2 saw the stale .vloop/tmp/old.txt
+plan round 2 saw the stale .vloop/tmp/olddir
+plan round 2 saw the stale .vloop/tmp/linkdir
+plan round 2 saw the stale .vloop/tmp/linkfile
+T1's work session saw .vloop/tmp/scratch/x.txt
+T1's work session saw .vloop/tmp/plan-scratch.txt
+T1's work session saw .vloop/tmp/gate-verdict.json
+T1's work session saw .vloop/tmp/scratch/x.txt
+T1's work session saw .vloop/tmp/plan-scratch.txt
+T1's work session saw .vloop/tmp/gate-verdict.json
+T1's work session saw .vloop/tmp/scratch/x.txt
+T1's work session saw .vloop/tmp/plan-scratch.txt
+T1's work session saw .vloop/tmp/gate-verdict.json

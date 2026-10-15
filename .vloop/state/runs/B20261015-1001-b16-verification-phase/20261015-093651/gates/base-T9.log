@@ -1,0 +1,2 @@
+GATE FAIL: the en template's Constraints do not state that an earlier test changes only where the contract changes what it pins, and only to the new behaviour; added lines:
+

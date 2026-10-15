@@ -1,0 +1,39 @@
+package budget
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+// The gate's own judge of V2's word ceiling, overlaid into the package for one
+// run and never written into the tree.
+func gateSkill(t *testing.T, dir, skill string, words int) {
+	d := filepath.Join(dir, "skills", skill)
+	if err := os.MkdirAll(d, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	body := strings.TrimSpace(strings.Repeat("w ", words))
+	if err := os.WriteFile(filepath.Join(d, "SKILL.md"), []byte(body+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGateT5VerifyCeiling(t *testing.T) {
+	if msgs := Check(filepath.Join(os.Getenv("GATE_TOP"), "plugin")); len(msgs) != 0 {
+		t.Fatalf("the plugin's skills are not within their ceilings: %v", msgs)
+	}
+	dir := t.TempDir()
+	for _, s := range []string{"plan", "gate-review", "work", "review", "operate"} {
+		gateSkill(t, dir, s, 10)
+	}
+	gateSkill(t, dir, "verify", 1500)
+	if msgs := Check(dir); len(msgs) != 0 {
+		t.Fatalf("a verify skill of 1,500 words is reported over budget: %v", msgs)
+	}
+	gateSkill(t, dir, "verify", 1501)
+	if msgs := Check(dir); len(msgs) != 1 || !strings.HasPrefix(msgs[0], "verify:") {
+		t.Fatalf("a verify skill of 1,501 words: the budget reports %v, want one message for verify", msgs)
+	}
+}

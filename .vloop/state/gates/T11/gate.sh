@@ -1,110 +1,91 @@
 #!/bin/sh
-# Gate T11 — E3: intervention add takes --origin brief|plan|work|env, required
-# with --kind verification-finding and refused with any other kind (exit 2);
-# the record carries origin: after by:, intervention set sets it, and
-# schemas/intervention.v2.json has it as an optional property. brief close
-# --finding "<origin>: <summary>" records one verification-finding
-# intervention per finding (phase verify, automatable partly, by operator) and
-# prints `recorded .vloop/interventions/<id>.md`; a finding without an origin
-# is refused before anything is written (exit 2). The operator count is the
-# operator defects not escaped plus the verification-finding interventions
-# that carry an origin, with no overlap; the run record lists the
-# interventions after the defects; --dry-run counts and lists them the same.
+# Gate T11 — close: the worked example end to end with a fresh build, the
+# real-data check on this repository, and the brief's planted failures.
+#  - a run whose verify session finds 2: the run line, the close dry-run's
+#    block, the metrics lines; a run with run.verify = false: none of them;
+#    stale scratch gone at run start, .running held throughout;
+#  - real data: vloop metrics of every consumed brief and vloop brief check of
+#    every brief print what the plan's base prints, but for the retired
+#    must-change list: and external format: lines;
+#  - planted: a driver that ends blocked on a finding, a clearing that removes
+#    .running, and a verify skill padded past 1,500 words are each caught.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-N=$RUN.loop-brief
-M=B20260101-0800-merged.loop-brief
-squeezed() { sed -e 's/[[:space:]][[:space:]]*/ /g' -e 's/^ //' -e 's/ $//' "$1"; }
-dl() { squeezed "$1" | grep -E '^defects ' | head -n 1; }
-clean() { [ -z "$(git -C "$R" status --porcelain)" ] || fail "$1 wrote: $(git -C "$R" status --porcelain)"; }
-# iadd <want exit> <args...>: vloop intervention add on $M in $R.
-iadd() {
-  w=$1; shift
-  inr "$B" intervention add "y" --brief "$M" --phase verify --automatable no --by operator "$@" </dev/null >"$t/out" 2>"$t/err"; c=$?
-  [ "$c" = "$w" ] || fail "vloop intervention add --brief $M $*: exit $c, want $w: $(cat "$t/err")"
-}
-idoc() { # idoc <id> <brief> <kind> [<origin line>]
-  printf -- '---\nid: %s\nbrief: %s\nphase: verify\nkind: %s\nautomatable: no\nby: operator\n%sschema: intervention/v2\noptions: 0\nrecommended: 0\ndecided: ""\nagreement: no-options\noccurred: 2026-01-01\nrecorded: 2026-01-01T09:00:00Z\n---\nfixture %s\n' \
-    "$1" "$2" "$3" "${4:+$4
-}" "$1"
+S=$t/stub
+line() { sq "$1" | grep -E "^$2 " | head -n 1; }
+# v1ok <bin> <name>: a run in a fresh repository whose verify session finds 2
+# ends complete, exit 0, every task done, and says so; status 1 otherwise.
+v1ok() {
+  resetstub; runrepo "$2" T1; vreport "$S/verify-report.json" 2
+  : >"$t/stub/argv.log"; inr "$1" run "$BRIEF" </dev/null >"$t/$2.run" 2>&1; got=$?
+  [ "$got" = 0 ] && [ "$("$JQ" -r .status "$R/.vloop/state/state.json")" = complete ] &&
+    "$JQ" -e '[.tasks[] | select(.status != "done")] | length == 0' "$R/.vloop/state/state.json" >/dev/null &&
+    grep -Eq "^ *verify: 2 finding\\(s\\) — see $(lastdir | sed 's/\./\\./g')reports/verify\\.json\$" "$t/$2.run"
 }
 
-runrepo c T1
-putbrief "${M%.loop-brief}" consumed
-commit "a merged brief"
-touch "$t/stub/fail-T1"
-vrun c.run
-[ "$got" = 0 ] || fail "vloop run: exit $got: $(tail -n 15 "$t/c.run")"
-
-iadd 2 --kind verification-finding
-[ "$(cat "$t/err")" = "vloop: --kind verification-finding needs --origin brief, plan, work or env" ] || fail "verification-finding without --origin printed: $(cat "$t/err")"
-iadd 2 --kind repair --origin work
-[ "$(cat "$t/err")" = "vloop: --origin is only for --kind verification-finding" ] || fail "--origin with --kind repair printed: $(cat "$t/err")"
-[ -z "$(ls -A "$R/.vloop/interventions" 2>/dev/null)" ] || fail "a refused intervention add wrote a record"
-iadd 0 --kind verification-finding --origin plan
-p=$(tail -n 1 "$t/out"); f=$R/$p; id=$(basename "$p" .md)
-[ -f "$f" ] || fail "intervention add printed '$p', not a record"
-awk '$0 == "---" { n++; next } n == 1' "$f" >"$t/fm"
-[ "$(grep -A1 -Fx 'by: operator' "$t/fm" | tail -n 1)" = "origin: plan" ] || fail "the record does not carry origin: plan right after by::
-$(cat "$t/fm")"
-inr "$B" intervention show "$id" --json </dev/null >"$t/show" 2>&1 || fail "intervention show: $(cat "$t/show")"
-[ "$("$JQ" -r .origin "$t/show")" = plan ] || fail "intervention show --json has no origin plan: $(cat "$t/show")"
-inr "$B" intervention set "$id" origin work </dev/null >"$t/o" 2>&1 || fail "intervention set $id origin work: $(cat "$t/o")"
-grep -Fxq 'origin: work' "$f" || fail "intervention set did not set origin"
-"$JQ" -e '.properties.origin != null and ((.required // []) | index("origin") == null)' "$top/schemas/intervention.v2.json" >/dev/null 2>&1 ||
-  fail "schemas/intervention.v2.json does not have origin as an optional property"
-"$JQ" '.origin = "work"' "$t/show" >"$t/show2" && inr "$B" schema validate intervention/v2 "$t/show2" </dev/null >"$t/o" 2>&1 ||
-  fail "a record with an origin does not validate against intervention/v2: $(cat "$t/o")"
-
-# Interventions on the run's brief that the operator count must not take: a
-# verification-finding with no origin, a repair with one.
-idoc I20250101-0001-old-finding "$N" verification-finding >"$R/.vloop/interventions/I20250101-0001-old-finding.md"
-idoc I20250101-0002-repair-origin "$N" repair "origin: work" >"$R/.vloop/interventions/I20250101-0002-repair-origin.md"
-now=$(date +%s); k=0
-while [ $k -le 10 ]; do s=$(stamp $((now + k))); idoc "I$s-other" "$M" repair >"$R/.vloop/interventions/I$s-other.md"; k=$((k + 1)); done
-commit "fixtures"
-want=I$(stamp $((now + 11)))-z
-
-for bad in "spec gap: z" "Brief: z" "z"; do
-  inr "$B" brief close "$BRIEF" --finding "$bad" </dev/null >"$t/o" 2>"$t/e"; c=$?
-  [ "$c" = 2 ] || fail "close --finding '$bad': exit $c, want 2: $(cat "$t/e")"
-  [ "$(cat "$t/e")" = 'vloop: a finding starts with whose defect it is: --finding "<brief|plan|work|env>: <summary>"' ] ||
-    fail "close --finding '$bad' printed: $(cat "$t/e")"
-  clean "close --finding '$bad'"
-done
-inr "$B" brief close "$BRIEF" --dry-run --finding "brief: z" </dev/null >"$t/dry" 2>&1 || fail "close --dry-run: $(cat "$t/dry")"
-clean "close --dry-run"
-[ "$(dl "$t/dry")" = "defects in-loop 1 · operator 1 · escaped 0 · removal efficiency 100%" ] || fail "close --dry-run's defects line is '$(dl "$t/dry")'"
-grep -Fxq "would record .vloop/interventions/$want.md" "$t/dry" || fail "close --dry-run does not print 'would record .vloop/interventions/$want.md':
-$(cat "$t/dry")"
-
-inr "$B" brief close "$BRIEF" --finding "brief: z" </dev/null >"$t/close" 2>&1 || fail "close: $(cat "$t/close")"
-grep -Fxq "recorded .vloop/interventions/$want.md" "$t/close" || fail "close does not print 'recorded .vloop/interventions/$want.md':
-$(cat "$t/close")"
-grep -q '^recorded \.vloop/defects/' "$t/close" && fail "close still records a defect: $(cat "$t/close")"
-[ -z "$(ls -A "$R/.vloop/defects" 2>/dev/null)" ] || fail "close wrote a defect file: $(ls "$R/.vloop/defects")"
-case "$(tail -n 1 "$t/close")" in "squash-merge with the trailer: "*) ;; *) fail "close's last line: $(tail -n 1 "$t/close")" ;; esac
-[ "$(dl "$t/close")" = "defects in-loop 1 · operator 1 · escaped 0 · removal efficiency 100%" ] || fail "close's defects line is '$(dl "$t/close")'"
-f=$R/.vloop/interventions/$want.md
-[ -f "$f" ] || fail "no $want.md"
-awk '$0 == "---" { n++; next } n == 1' "$f" >"$t/fm"
-for l in "id: $want" "brief: $N" "phase: verify" "kind: verification-finding" "automatable: partly" "by: operator" "origin: brief"; do
-  grep -Fxq "$l" "$t/fm" || fail "$want.md has no '$l':
-$(cat "$f")"
-done
-[ "$(awk '$0 == "---" { n++; next } n == 2 && NF { print; exit }' "$f")" = z ] || fail "$want.md's summary is not z:
-$(cat "$f")"
-git -C "$R" show --name-only --format= HEAD | grep -Fxq ".vloop/interventions/$want.md" || fail "the close commit does not carry $want.md"
-rl=$(grep -n -F -- "- $want — verification-finding, brief, found by operator: z" "$R/$BRIEF" | cut -d: -f1)
-[ -n "$rl" ] || fail "the run record has no '- $want — verification-finding, brief, found by operator: z':
-$(sed -n '/## Run record/,$p' "$R/$BRIEF")"
-gl=$(grep -n -F -- "- $RUN/i1-gate — " "$R/$BRIEF" | cut -d: -f1)
-[ -n "$gl" ] && [ "$gl" -lt "$rl" ] || fail "the run record does not list the intervention after the defects:
-$(sed -n '/## Run record/,$p' "$R/$BRIEF")"
-
-# Both sources, no overlap: an operator defect of the unmerged brief adds one.
-mkdir -p "$R/.vloop/defects"
-defectdoc D20250101-0003-op "$N" operator 2025-01-01T00:00:00Z >"$R/.vloop/defects/D20250101-0003-op.md"
+# --- the worked example
+newrepo cfg
+inr "$B" config list </dev/null >"$t/cl" 2>&1 || fail "config list: $(cat "$t/cl")"
+grep -Eq '^run\.verify=true( |$)' "$t/cl" && grep -Eq '^model\.verify=sonnet( |$)' "$t/cl" && grep -Eq '^effort\.verify=' "$t/cl" ||
+  fail "config list lacks run.verify = true, model.verify = sonnet or effort.verify: $(cat "$t/cl")"
+v1ok "$B" w || fail "a run whose verify session finds 2: exit $got: $(tail -n 15 "$t/w.run")"
+rd=$(lastdir)
+git -C "$R" show --name-only --format= HEAD | grep -Eq "^$(echo "$rd" | sed 's/\./\\./g')sessions/[0-9]+-verify\.json\$" ||
+  fail "the run commit holds no sessions/NNN-verify.json"
+inr "$B" brief close "$BRIEF" --dry-run --no-findings </dev/null >"$t/dry" 2>"$t/dry.err" || fail "close --dry-run: $(cat "$t/dry.err")"
+[ "$(head -n 1 "$t/dry")" = "verify of $RUN/$(basename "$rd"): 2 finding(s)" ] || fail "close --dry-run starts: $(head -n 3 "$t/dry")"
+[ "$(sed -n 2p "$t/dry")" = "  1. example — Worked example, line 3; vloop greet --loud" ] || fail "close --dry-run's first finding: $(sed -n 2,4p "$t/dry")"
 inr "$B" metrics "$BRIEF" </dev/null >"$t/m" 2>&1 || fail "metrics: $(cat "$t/m")"
-[ "$(dl "$t/m")" = "defects in-loop 1 · operator 2 · escaped 0 · removal efficiency 100%" ] || fail "an operator defect and a finding: the defects line is '$(dl "$t/m")', want operator 2"
+line "$t/m" time | grep -Eq ' · gate review [0-9.]+ min · verify [0-9.]+ min · gates ' || fail "time line: $(line "$t/m" time)"
+line "$t/m" cost | grep -Eq ' · gate review [0-9.]+ · verify [0-9.]+ · ' || fail "cost line: $(line "$t/m" cost)"
+
+resetstub; runrepo off T1
+inr "$B" config set run.verify false </dev/null >"$t/o" 2>&1 || fail "config set run.verify false: $(cat "$t/o")"
+commit off
+mkdir -p "$R/.vloop/tmp" && : >"$R/.vloop/tmp/old.txt"
+printf '[ -e .vloop/tmp/old.txt ] && echo "the plan session saw the stale old.txt" >>"$dir/norunning"\n' >"$S/plan.sh"
+vrun off.run
+[ "$got" = 0 ] || fail "run.verify = false: exit $got: $(tail -n 10 "$t/off.run")"
+grep -q -- '-p /vloop:verify' "$S/argv.log" && fail "a verify session ran with run.verify = false"
+grep -Eq '^ *verify:' "$t/off.run" && fail "a verify line with run.verify = false"
+[ ! -s "$S/norunning" ] || fail "$(cat "$S/norunning")"
+inr "$B" brief close "$BRIEF" --dry-run --no-findings </dev/null >"$t/dry2" 2>&1 || fail "close --dry-run: $(cat "$t/dry2")"
+[ "$(head -n 1 "$t/dry2")" = "no verify report — verify by hand" ] || fail "close --dry-run with no report starts: $(head -n 2 "$t/dry2")"
+
+# --- real data, on this repository, against the plan's base
+basebin
+for b in $(grep -l '^status: consumed' docs/briefs/*.md); do
+  "$t/vloop-base" metrics "$b" </dev/null >"$t/rb" 2>&1; eb=$?
+  "$B" metrics "$b" </dev/null >"$t/rn" 2>&1; en=$?
+  [ "$eb" = "$en" ] && cmp -s "$t/rb" "$t/rn" || fail "vloop metrics $b differs from the base's:
+$(diff "$t/rb" "$t/rn")"
+done
+for b in docs/briefs/*.md; do
+  "$t/vloop-base" brief check "$b" </dev/null >"$t/cb0" 2>&1; retire "$t/cb0" >"$t/cb"
+  "$B" brief check "$b" </dev/null >"$t/cn" 2>&1
+  cmp -s "$t/cb" "$t/cn" || fail "vloop brief check $b differs from the base's beyond the retired lines:
+$(diff "$t/cb" "$t/cn")"
+done
+
+# --- planted: a driver that ends blocked on a verify finding is caught
+cat >"$t/plant-vloop" <<P
+#!/bin/sh
+"$B" "\$@"; c=\$?
+if [ "\$1" = run ] && [ "\$c" = 0 ] && ls .vloop/state/runs/*/*/reports/verify.json >/dev/null 2>&1; then exit 2; fi
+exit \$c
+P
+chmod +x "$t/plant-vloop"
+v1ok "$t/plant-vloop" plant1 && fail "a driver that ends the run blocked on a verify finding is not caught"
+# --- planted: a clearing that removes .running is caught
+resetstub; runrepo plant2 T1
+printf 'rm -f .vloop/tmp/.running\n' >"$S/plan.sh"
+vrun plant2.run
+[ -s "$S/norunning" ] || fail ".running removed during the run is not caught by the sessions' check"
+# --- planted: a verify skill padded past 1,500 words fails the budget test
+mkdir -p "$t/pad/internal" "$t/pad/plugin" && cp "$top/go.mod" "$top/go.sum" "$t/pad/" && cp -R "$top/internal/budget" "$t/pad/internal/" &&
+  cp -R "$top/plugin/skills" "$t/pad/plugin/" || fail "copy for the padded skill"
+(cd "$t/pad" && go test -count=1 ./internal/budget) >"$t/pad0" 2>&1 || fail "the budget test fails on the unpadded copy: $(tail -n 10 "$t/pad0")"
+i=0; while [ $i -lt 1501 ]; do printf 'pad ' ; i=$((i + 1)); done >>"$t/pad/plugin/skills/verify/SKILL.md"
+(cd "$t/pad" && go test -count=1 ./internal/budget) >"$t/pad1" 2>&1 && fail "plugin/skills/verify/SKILL.md padded past 1,500 words does not fail the budget test"
+grep -q 'verify' "$t/pad1" || fail "the budget test's failure does not name the verify skill: $(tail -n 10 "$t/pad1")"
 echo "gate T11: ok"

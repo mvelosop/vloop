@@ -1,72 +1,95 @@
 #!/bin/sh
-# Gate T8 — M1: the per-task table gains test:code (test+ / code+) and $/kloc
-# (cost per 1,000 code+ lines), two decimals, between other+ and agent, both
-# "-" where code+ is 0; --json by_task gains test_code_ratio and
-# per_1000_code_lines_usd, null where code+ is 0, as optional properties of
-# schemas/metrics.v2.json; the summary's cost line ends "$<c>/kloc"; the
-# all-briefs headers t:c and $/1k become test:code and $/kloc, values unchanged.
-# A stub run: T1 writes 200 code and 300 test lines, T2 no code.
+# Gate T8 — V4: vloop brief close and close --dry-run print first, on stdout,
+# the report of the newest of the brief's run folders that holds
+# reports/verify.json — "verify of <run id>/<folder>: <n> finding(s)" and one
+# block per finding in the report's order, "…: no findings" for an empty list,
+# "no verify report — verify by hand" when no folder holds one — then close's
+# output as before. Close still needs --finding or --no-findings, and a verify
+# finding is recorded only when passed as a --finding.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-runrepo m T1 T2
-inr "$B" config set metrics.stacks go </dev/null >/dev/null 2>&1 || fail "config set metrics.stacks go"
-commit stacks
-cat >"$t/stub/work-T1.sh" <<'W'
-mkdir -p src; i=0; : >src/a.go; while [ $i -lt 200 ]; do echo "// $i" >>src/a.go; i=$((i+1)); done
-i=0; : >src/a_test.go; while [ $i -lt 300 ]; do echo "// $i" >>src/a_test.go; i=$((i+1)); done
-W
-vrun m.run
-rm -f "$t/stub/work-T1.sh"
-[ "$got" = 0 ] || fail "vloop run: exit $got: $(tail -n 15 "$t/m.run")"
+S=$t/stub
+# dry <out>: close --dry-run --no-findings in $R, stdout in $t/<out>.
+dry() {
+  inr "$B" brief close "$BRIEF" --dry-run --no-findings </dev/null >"$t/$1" 2>"$t/$1.err" || fail "close --dry-run --no-findings: $(cat "$t/$1.err")"
+  [ -z "$(git -C "$R" status --porcelain)" ] || fail "close --dry-run wrote: $(git -C "$R" status --porcelain)"
+}
+# head_is <out> <expected file>: the output starts with exactly those lines.
+head_is() {
+  n=$(wc -l <"$2" | tr -d ' ')
+  head -n "$n" "$t/$1" >"$t/$1.head"
+  cmp -s "$2" "$t/$1.head" || fail "$1 does not start with
+$(cat "$2")
+it starts with
+$(head -n $((n + 2)) "$t/$1")"
+}
+# rest_ok <out> <lines of the head>: what follows is close's dry-run output.
+rest_ok() {
+  tail -n +$(($2 + 1)) "$t/$1" | grep -v '^[[:space:]]*$' >"$t/$1.rest"
+  head -n 1 "$t/$1.rest" | grep -q "^$RUN " || fail "$1: after the verify block, close's output does not follow: $(head -n 3 "$t/$1.rest")"
+  [ "$(tail -n 1 "$t/$1.rest")" = "would commit [vloop] close $RUN" ] || fail "$1: the last line is '$(tail -n 1 "$t/$1.rest")'"
+}
 
-inr "$B" metrics "$BRIEF" --by task --json </dev/null >"$t/j" 2>&1 || fail "metrics --by task --json: $(cat "$t/j")"
-row() { "$JQ" -c --arg id "$1" '.by_task[] | select(.id == $id)' "$t/j"; }
-[ "$(row T1 | "$JQ" .churn.code)" = 200 ] && [ "$(row T1 | "$JQ" .churn.test)" = 300 ] ||
-  fail "fixture: T1 did not churn 200 code and 300 test lines: $(row T1)"
-[ "$(row T2 | "$JQ" .churn.code)" = 0 ] || fail "fixture: T2 churned code: $(row T2)"
-cost=$(row T1 | "$JQ" .cost_usd)
-row T1 | "$JQ" -e --argjson c "$cost" '(.test_code_ratio - 1.5 | fabs) < 1e-9 and (.per_1000_code_lines_usd - ($c * 1000 / 200) | fabs) < 1e-9' >/dev/null 2>&1 ||
-  fail "by_task T1 (code+ 200, test+ 300, cost $cost): want test_code_ratio 1.5 and per_1000_code_lines_usd $cost*1000/200: $(row T1)"
-row T2 | "$JQ" -e 'has("test_code_ratio") and has("per_1000_code_lines_usd") and .test_code_ratio == null and .per_1000_code_lines_usd == null' >/dev/null ||
-  fail "by_task T2 (code+ 0): want test_code_ratio and per_1000_code_lines_usd null: $(row T2)"
-inr "$B" schema validate metrics/v2 "$t/j" </dev/null >"$t/v" 2>&1 || fail "the --by task --json output does not validate against metrics/v2: $(cat "$t/v")"
-S=$top/schemas/metrics.v2.json
-"$JQ" -e '.properties.by_task.items as $i | ($i | if has("$ref") then error("ref") else . end) |
-  (.properties | has("test_code_ratio") and has("per_1000_code_lines_usd")) and
-  ((.required // []) | index("test_code_ratio") == null and index("per_1000_code_lines_usd") == null)' "$S" >/dev/null 2>&1 ||
-  fail "schemas/metrics.v2.json: by_task items do not carry test_code_ratio and per_1000_code_lines_usd as optional properties"
+runrepo v T1
+cat >>"$R/.vloop/config.toml" <<CFG
 
-inr "$B" metrics "$BRIEF" --by task </dev/null >"$t/tbl" 2>&1 || fail "metrics --by task: $(cat "$t/tbl")"
-h=$(head -n 1 "$t/tbl")
-col() { printf '%s\n' "$h" | tr -s ' ' '\n' | grep -nFx -- "$1" | cut -d: -f1; }
-o=$(col other+) c1=$(col test:code) c2=$(col '$/kloc') a=$(col agent)
-[ -n "$o" ] && [ -n "$c1" ] && [ -n "$c2" ] && [ -n "$a" ] && [ "$c1" = $((o + 1)) ] && [ "$c2" = $((o + 2)) ] && [ "$a" = $((o + 3)) ] ||
-  fail "the per-task header is not '… other+  test:code  \$/kloc  agent …': $h"
-cell() { awk -v id="$1" -v n="$2" '$1 == id { print $n }' "$t/tbl"; }
-want=$(awk -v c="$cost" 'BEGIN { printf "%.2f", c * 1000 / 200 }')
-[ "$(cell T1 "$c1")" = 1.50 ] && [ "$(cell T1 "$c2")" = "$want" ] || fail "T1's row gives test:code '$(cell T1 "$c1")' and \$/kloc '$(cell T1 "$c2")', want 1.50 and $want:
-$(cat "$t/tbl")"
-[ "$(cell T2 "$c1")" = - ] && [ "$(cell T2 "$c2")" = - ] || fail "T2's row (code+ 0) gives '$(cell T2 "$c1")' '$(cell T2 "$c2")', want - and -:
-$(cat "$t/tbl")"
+[[check]]
+name = "final"
+paths = ["nomatch/**"]
+run = "test ! -e '$S/failfinal'"
+CFG
+commit final
+printf ': >"$dir/failfinal"\n' >"$S/plan.sh"
+vreport "$S/verify-report.json" 2
+vrun v1.run
+[ "$got" = 2 ] || fail "harness: the failing final pass did not end the first run blocked (exit $got): $(tail -n 10 "$t/v1.run")"
+f1=$(basename "$(lastdir)")
+rm -f "$S/failfinal" "$S/plan.sh"
+sleep 1
+vrun v2.run
+[ "$got" = 0 ] || fail "the resumed run: exit $got: $(tail -n 10 "$t/v2.run")"
+f2=$(basename "$(lastdir)")
+[ "$f1" != "$f2" ] || fail "harness: both runs share the folder $f1"
+[ -f "$R/.vloop/state/runs/$RUN/$f2/reports/verify.json" ] || fail "the complete run left no reports/verify.json (T4, the driver's verify session, comes first)"
+after=$(git -C "$R" rev-parse HEAD)
 
-inr "$B" metrics "$BRIEF" --json </dev/null >"$t/sj" 2>&1 || fail "metrics --json: $(cat "$t/sj")"
-k=$("$JQ" -r '.cost.per_1000_code_lines_usd' "$t/sj" | awk '{ printf "%.2f", $1 }')
-inr "$B" metrics "$BRIEF" </dev/null >"$t/sum" 2>&1 || fail "metrics: $(cat "$t/sum")"
-cl=$(grep -E '^ *cost ' "$t/sum") || fail "no cost line: $(cat "$t/sum")"
-case "$cl" in *" · \$$k/kloc") ;; *) fail "the cost line does not end ' · \$$k/kloc': '$cl'" ;; esac
-grep -Fq 'per 1,000 code lines' "$t/sum" && fail "the summary still says 'per 1,000 code lines': $cl"
+cat >"$t/two" <<EOF
+verify of $RUN/$f2: 2 finding(s)
+  1. example — Worked example, line 3; vloop greet --loud
+     brief:    exit 2
+     observed: exit 1
+  2. surface — README.md:12
+     brief:    greet prints in upper case with --loud
+     observed: README.md says --loud is not supported
+EOF
+dry d1
+head_is d1 "$t/two"
+rest_ok d1 7
 
-inr "$B" metrics </dev/null >"$t/all" 2>&1 || fail "metrics (all briefs): $(cat "$t/all")"
-ah=$(head -n 1 "$t/all")
-printf '%s\n' "$ah" | tr -s ' ' '\n' >"$t/ah"
-grep -Fxq 'test:code' "$t/ah" && grep -Fxq '$/kloc' "$t/ah" || fail "the all-briefs header has no test:code and \$/kloc: $ah"
-grep -Fxq 't:c' "$t/ah" && fail "the all-briefs header still has t:c: $ah"
-grep -Fxq '$/1k' "$t/ah" && fail "the all-briefs header still has \$/1k: $ah"
-ac() { grep -nFx -- "$1" "$t/ah" | cut -d: -f1; }
-r=$(awk -v id="$RUN" '$1 == id' "$t/all")
-tc=$("$JQ" -r '.size.test_code_ratio' "$t/sj" | awk '{ printf "%.2f", $1 }')
-[ "$(printf '%s\n' "$r" | awk -v n="$(ac test:code)" '{ print $n }')" = "$tc" ] &&
-  [ "$(printf '%s\n' "$r" | awk -v n="$(ac '$/kloc')" '{ print $n }')" = "$k" ] ||
-  fail "the all-briefs row's test:code and \$/kloc are not the brief's $tc and $k: $ah
-$r"
+# An older folder's report is not the newest.
+mkdir -p "$R/.vloop/state/runs/$RUN/$f1/reports" || fail mkdir
+vreport "$R/.vloop/state/runs/$RUN/$f1/reports/verify.json" 0
+commit "an older report"
+dry d2
+head_is d2 "$t/two"
+git -C "$R" rm -q ".vloop/state/runs/$RUN/$f2/reports/verify.json" && commit "drop the newest report"
+dry d3
+printf 'verify of %s/%s: no findings\n' "$RUN" "$f1" >"$t/none"
+head_is d3 "$t/none"
+rest_ok d3 1
+git -C "$R" rm -q ".vloop/state/runs/$RUN/$f1/reports/verify.json" && commit "drop every report"
+dry d4
+printf 'no verify report — verify by hand\n' >"$t/noreport"
+head_is d4 "$t/noreport"
+rest_ok d4 1
+
+# The real close, back at the run's own state.
+git -C "$R" reset -q --hard "$after" || fail "reset to the run"
+inr "$B" brief close "$BRIEF" </dev/null >"$t/c0" 2>&1; c=$?
+[ "$c" = 2 ] || fail "close with neither --finding nor --no-findings: exit $c, want 2"
+[ -z "$(git -C "$R" status --porcelain)" ] || fail "a refused close wrote: $(git -C "$R" status --porcelain)"
+inr "$B" brief close "$BRIEF" --no-findings </dev/null >"$t/c1" 2>"$t/c1.err" || fail "close --no-findings: $(cat "$t/c1.err")"
+head_is c1 "$t/two"
+[ "$(git -C "$R" log -1 --format=%s)" = "[vloop] close $RUN" ] || fail "close made no close commit"
+[ -z "$(ls -A "$R/.vloop/interventions" 2>/dev/null)" ] || fail "close recorded a verify finding the operator did not pass: $(ls "$R/.vloop/interventions")"
 echo "gate T8: ok"
