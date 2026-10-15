@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 16,
+  "iteration": 17,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T12:11:40Z",
+  "updated": "2026-10-15T12:17:23Z",
   "shell": "sh",
   "checks": [
     {
@@ -329,9 +329,9 @@
         "docs/guide/commands.md is regenerated with cmd/gendocs and its staleness test passes. Exit codes and messages quoted in any doc are taken from running the built binary, not from memory (repository guideline). No doc describes behaviour this brief does not build."
       ],
       "verify": "sh .vloop/state/gates/T10/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "operate playbooks quote `vloop brief close --dry-run` without the required <brief> argument, which fails; must be `vloop brief close <brief> --dry-run`"
+      "notes": ""
     },
     {
       "id": "T11",

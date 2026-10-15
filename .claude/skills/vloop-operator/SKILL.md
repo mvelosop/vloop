@@ -106,7 +106,7 @@ before closing anything.
 Until B4 ships `vloop brief close`, by hand:
 
 1. Fix what the operator agrees to fix, on the work branch, test first.
-   First read the verify findings `vloop brief close --dry-run` prints (the
+   First read the verify findings `vloop brief close <brief> --dry-run` prints (the
    newest `reports/verify.json`); record each one you accept with `--finding
    "<origin>: <summary>"` at close.
 2. Record findings before merge as verification-finding interventions:

@@ -152,7 +152,7 @@ intervention migrate` brings older records to the current version.
 ## 5. Closing and merging
 
 1. Fix what the operator agrees to fix, on the work branch, test first.
-2. Read the verify findings: `vloop brief close --dry-run` prints them first
+2. Read the verify findings: `vloop brief close <brief> --dry-run` prints them first
    (the verify of the newest run's `reports/verify.json`, or `no verify report —
    verify by hand`). Judge each one; close records nothing from it. Each one
    you accept is passed as `--finding "<origin>: <summary>"`.

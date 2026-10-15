@@ -118,3 +118,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The session, run, domain-model, metrics, brief and concepts pages, the metrics guide and both operate playbooks now describe the verify session, its report, the clearing of .vloop/tmp/ and V3's fields; the retired warnings are gone; commands.md regenerated.
 - **Files:** docs/domain/execution/session.md, docs/domain/execution/run.md, docs/domain/domain-model.md, docs/domain/measurement/metrics.md, docs/guide/metrics.md, docs/domain/briefing/brief.md, docs/guide/concepts.md, plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md
 - **Notes for next iteration:** docs/guide/configuration.md and commands.md already had the verify keys; commands.md regenerated unchanged or nearly. The close-step wording quotes the message 'no verify report — verify by hand' from the brief's V4, not from a run of the binary.
+
+## T10 — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Fixed the review finding: both operate playbooks now quote `vloop brief close <brief> --dry-run` with the required brief argument. The rest of the docs were already accepted.
+- **Files:** plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md
+- **Notes for next iteration:** Only the command quote changed this attempt; operate SKILL.md is 1,647 words.

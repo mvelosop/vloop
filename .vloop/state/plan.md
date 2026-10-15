@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **9/11 done** · iteration 16
+**Status:** running · **10/11 done** · iteration 17
 
-**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T12:11:40Z
+**Brief:** `docs/briefs/B20261015-1001-b16-verification-phase.loop-brief.md` · **Updated:** 2026-10-15T12:17:23Z
 
 ## Progress
 
@@ -17,7 +17,7 @@
 - [x] **T7** — Show the verify session in vloop metrics' time, cost, models and instructions lines
 - [x] **T8** — Print the verify findings first in vloop brief close and close --dry-run
 - [x] **T9** — State the contract-licensed earlier-test rule in the templates and the work, review and architect skills
-- [ ] **T10** — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks · 1 attempt(s)
+- [x] **T10** — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks · 1 attempt(s)
 - [ ] **T11** — Close: commit the worked example as an end-to-end test and pass the real-data check
 
 ## Tasks
@@ -219,7 +219,7 @@ sh .vloop/state/gates/T9/gate.sh
 
 ### T10 — Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks
 
-`pending` · 1 attempt(s) · depends on: T9
+`done` · 1 attempt(s) · depends on: T9
 
 Every surface that states the behaviour this brief changed must say the new behaviour: the session and run pages, the domain model's On disk list, the metrics pages, the configuration guide, the brief page and concepts guide (whose two warnings retired), and both operate playbooks, whose close step now reads the verify findings. commands.md is regenerated last, after every command change.
 
@@ -230,8 +230,6 @@ Every surface that states the behaviour this brief changed must say the new beha
 - docs/domain/briefing/brief.md and docs/guide/concepts.md: the must-change list and external format warnings and the `## Pinning tests` and `## External formats` sections are removed, not marked retired in place.
 - plugin/skills/operate/SKILL.md (within 1,750 words) and .claude/skills/vloop-operator/SKILL.md (step 5): the close step reads the verify findings close prints and records each one the operator accepts with --finding "<origin>: <summary>".
 - docs/guide/commands.md is regenerated with cmd/gendocs and its staleness test passes. Exit codes and messages quoted in any doc are taken from running the built binary, not from memory (repository guideline). No doc describes behaviour this brief does not build.
-
-**From the last attempt:** operate playbooks quote `vloop brief close --dry-run` without the required <brief> argument, which fails; must be `vloop brief close <brief> --dry-run`
 
 <details><summary>verify command</summary>
 
