@@ -89,7 +89,7 @@ func TestRunBaseGateHaltResumesAcceptance(t *testing.T) {
 	t.Parallel()
 	r := newRunRepo(t)
 	r.scripted(planJSON(t, planTask("T1", map[string]any{
-		"verify": "if [ -f .vloop/tmp/tamper ]; then rm -f .vloop/tmp/tamper; printf '[core]\\n\\tfsmonitor = false\\n' >> .git/config; fi; test -f T1.out"})), defaultScript)
+		"verify": "if [ -f .git/tamper ]; then rm -f .git/tamper; printf '[core]\\n\\tfsmonitor = false\\n' >> .git/config; fi; test -f T1.out"})), defaultScript)
 	cfg := filepath.Join(r.dir, ".git", "config")
 	orig, err := os.ReadFile(cfg)
 	if err != nil {
@@ -98,7 +98,7 @@ func TestRunBaseGateHaltResumesAcceptance(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(r.dir, ".vloop", "tmp"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(r.dir, ".vloop", "tmp", "tamper"), nil, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(r.dir, ".git", "tamper"), nil, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	res := r.vloop("run", runBrief)
@@ -126,8 +126,8 @@ func TestRunBaseGateHaltResumesAcceptance(t *testing.T) {
 func TestRunGateReviewHaltResumesAcceptance(t *testing.T) {
 	t.Parallel()
 	r := newRunRepo(t)
-	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = gate-review ] && [ ! -f .vloop/tmp/reviewed ]; then
-  : > .vloop/tmp/reviewed
+	r.scripted(oneTask(t), defaultScript+`if [ "$PHASE" = gate-review ] && [ ! -f .git/reviewed ]; then
+  : > .git/reviewed
   printf '[core]\n\tfsmonitor = false\n' >> .git/config
 fi
 `)

@@ -1,103 +1,15 @@
 ok  	github.com/mvelosop/vloop	(cached)
 ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
---- FAIL: TestRunGateReviewHaltResumesAcceptance (2.18s)
-    run_git_test.go:145: exit 9, want 0
-        stdout: resuming acceptance of B20260101-0900-demo: round 1
-        checking the gate of T1 on the base
-        planned: B20260101-0900-demo — 1 tasks
-        reviewing the gates using sonnet (round 1)
-           gate review · 0m00s · $0.10 · run $0.10 / $40.00
-        
-        stderr: vloop: the gate review changed .git/config (core.fsmonitor) — nothing was committed; restore it, then re-run
---- FAIL: TestRunBaseGateHaltResumesAcceptance (3.74s)
-    run_git_test.go:105: exit 0, want 9
-        stdout: checking the base: all
-        created and switched to branch B20260101-0900-demo
-        planning from docs/briefs/B20260101-0900-demo.loop-brief.md using opus
-           plan · 0m00s · $0.10 · run $0.10 / $40.00
-        checking the gate of T1 on the base
-        planned: B20260101-0900-demo — 1 tasks
-        reviewing the gates using sonnet (round 1)
-           gate review · 0m00s · $0.10 · run $0.20 / $40.00
-        committing the plan
-        ── iteration 1 (1 this run) · T1 · 0/1 done ──
-           Task T1
-           work T1 · 0m00s · $0.10 · run $0.30 / $40.00
-           check all
-           review T1 · 0m00s · $0.10 · run $0.40 / $40.00
-           review: PASS
-           T1 done
-           check all
-        
-        ═══ complete ═══
-        run:    B20260101-0900-demo/20261015-101244  (1 iteration(s) this run)
-        plan:   1/1 done, 0 blocked
-        plan complete. journal: .vloop/state/journals/B20260101-0900-demo.md
-        B20260101-0900-demo  ready · not merged
-         tasks     1 planned (brief said 2–3) · 1 done · 0 blocked · first-pass 1/1
-         size      delivered  code 0 · test 0 · docs 0 · test:code n/a
-                   churn      code 0 · test 0 · docs 0 · rework n/a
-         time      agent 0.0 min (work 0.0 · review 0.0) · plan 0.0 min · gate review 0.0 min · gates 0.0 · wall 0.0 min
-         rate      0.0 code lines/min · 0.0 incl. tests
-         cost      $0.40 · plan 0.10 · work 0.10 · review 0.10 · gate review 0.10 · n/a/kloc
-         models    plan opus · work sonnet · review sonnet · gate review sonnet
-         defects   in-loop 0 · operator 0 · escaped 0 · removal efficiency n/a
-         interventions  0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0
-         instructions  plan n/a · gate review n/a · work n/a · review n/a words · guidelines 0 rules
-        
-        stderr: 
---- FAIL: TestRunChecksNotRunAfterFailedGateAndNeverRerun (4.90s)
-    run_checks_test.go:101: outcomes = gate_failed,done, want gate_failed,check_failed,done
-    run_checks_test.go:108: the check ran 1 times, want 4
---- FAIL: TestWorkedExampleB12 (0.00s)
-    --- FAIL: TestWorkedExampleB12/halt_in_acceptance_resumes (2.76s)
-        b12_e2e_test.go:129: exit 0, want 9
-            stdout: checking the base: all
-            created and switched to branch B20260101-0900-demo
-            planning from docs/briefs/B20260101-0900-demo.loop-brief.md using opus
-               plan · 0m00s · $0.37 · run $0.37 / $40.00
-            checking the gate of T1 on the base
-            planned: B20260101-0900-demo — 1 tasks
-            reviewing the gates using sonnet (round 1)
-               gate review · 0m00s · $0.21 · run $0.58 / $40.00
-            committing the plan
-            ── iteration 1 (1 this run) · T1 · 0/1 done ──
-               Task T1
-               work T1 · 0m00s · $0.10 · run $0.68 / $40.00
-               check all
-               review T1 · 0m00s · $0.10 · run $0.78 / $40.00
-               review: PASS
-               T1 done
-               check all
-            
-            ═══ complete ═══
-            run:    B20260101-0900-demo/20261015-101319  (1 iteration(s) this run)
-            plan:   1/1 done, 0 blocked
-            plan complete. journal: .vloop/state/journals/B20260101-0900-demo.md
-            B20260101-0900-demo  ready · not merged
-             tasks     1 planned (brief said 2–3) · 1 done · 0 blocked · first-pass 1/1
-             size      delivered  code 0 · test 0 · docs 0 · test:code n/a
-                       churn      code 0 · test 0 · docs 0 · rework n/a
-             time      agent 0.0 min (work 0.0 · review 0.0) · plan 0.0 min · gate review 0.0 min · gates 0.0 · wall 0.0 min
-             rate      0.0 code lines/min · 0.0 incl. tests
-             cost      $0.78 · plan 0.37 · work 0.10 · review 0.10 · gate review 0.21 · n/a/kloc
-             models    plan opus · work sonnet · review sonnet · gate review sonnet
-             defects   in-loop 0 · operator 0 · escaped 0 · removal efficiency n/a
-             interventions  0 · recommended 0 · other-option 0 · adjusted 0 · different 0 · no-options 0
-             instructions  plan n/a · gate review n/a · work n/a · review n/a words · guidelines 0 rules
-            
-            stderr: 
-FAIL
-FAIL	github.com/mvelosop/vloop/cmd/vloop	195.779s
+ok  	github.com/mvelosop/vloop/cmd/vloop	195.003s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	64.544s
+ok  	github.com/mvelosop/vloop/internal/cli	(cached)
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
 ok  	github.com/mvelosop/vloop/internal/detect	(cached)
-ok  	github.com/mvelosop/vloop/internal/driver	6.181s
+ok  	github.com/mvelosop/vloop/internal/driver	(cached)
 ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
@@ -107,4 +19,3 @@ ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
 ok  	github.com/mvelosop/vloop/internal/schema	(cached)
 ok  	github.com/mvelosop/vloop/internal/state	(cached)
-FAIL

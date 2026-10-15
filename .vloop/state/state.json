@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T10:15:33Z",
+  "updated": "2026-10-15T10:23:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -55,8 +55,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/001-go.fail.log"
+      "attempts": 2,
+      "notes": "No committed test covers the clearing points or the two kept hand-offs at run level; only ClearTmp itself is unit-tested, so clearing at a forbidden point would pass the checks.; The task's notes lack the evidence (code paths read) that nothing relies on .vloop/tmp/ surviving a resume; they refer to a journal of an earlier attempt."
     },
     {
       "id": "T2",

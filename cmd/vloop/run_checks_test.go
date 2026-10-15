@@ -89,7 +89,7 @@ func countArgv(r *runRepo, prefix string) int {
 
 func TestRunChecksNotRunAfterFailedGateAndNeverRerun(t *testing.T) {
 	t.Parallel()
-	r := checksRepo(t, "[[check]]\nname = \"count\"\npaths = [\"**\"]\nrun = \"echo x >> .vloop/tmp/count; test $(wc -l < .vloop/tmp/count) -ne 2\"\n")
+	r := checksRepo(t, "[[check]]\nname = \"count\"\npaths = [\"**\"]\nrun = \"echo x >> .git/count; test $(wc -l < .git/count) -ne 2\"\n")
 	r.scripted(planJSON(t, planTask("T1", nil)),
 		defaultScript+`if [ "$PHASE:$ATTEMPT" = work:1 ]; then rm -f T1.out; fi`+"\n")
 	wantExit(t, r.vloop("run", runBrief), 0)
@@ -104,7 +104,7 @@ func TestRunChecksNotRunAfterFailedGateAndNeverRerun(t *testing.T) {
 		t.Errorf("an iteration whose gate failed ran checks %q", got)
 	}
 	// base, the failed iteration, the done iteration and the final pass: no re-run.
-	if lines := strings.Count(r.read(".vloop/tmp/count"), "\n"); lines != 4 {
+	if lines := strings.Count(r.read(".git/count"), "\n"); lines != 4 {
 		t.Errorf("the check ran %d times, want 4", lines)
 	}
 }
