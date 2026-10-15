@@ -20,3 +20,10 @@ committing the plan
    work T1 · 4m22s · $0.17 · run $5.72 / $40.00
    check go
    CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261015-1651-b17-release/20261015-160742/checks/001-go.fail.log; review skipped
+── iteration 2 (2 this run) · T1 · 0/9 done ──
+   Read the binary's version from the embedded plugin.json
+   work T1 · 0m46s · $0.15 · run $5.87 / $40.00
+   check go
+   review T1 · 0m22s · $0.12 · run $5.99 / $40.00
+   review: PASS
+   T1 done

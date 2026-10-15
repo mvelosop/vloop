@@ -28,8 +28,34 @@ func b5Binary(t *testing.T, version string) string {
 		return p
 	}
 	p := filepath.Join(filepath.Dir(binPath), "vloop-"+version)
-	ld := "-X main.version=" + version + " -X main.commit=b5test"
-	if out, err := exec.Command("go", "build", "-ldflags", ld, "-o", p, ".").CombinedOutput(); err != nil {
+	// The version is the embedded plugin.json's, so build over a copy of it
+	// carrying the wanted version.
+	real, err := filepath.Abs(filepath.Join("..", "..", "plugin", ".claude-plugin", "plugin.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(real)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var pj map[string]any
+	if err := json.Unmarshal(raw, &pj); err != nil {
+		t.Fatal(err)
+	}
+	pj["version"] = version
+	raw, _ = json.Marshal(pj)
+	dir := t.TempDir()
+	alt := filepath.Join(dir, "plugin.json")
+	if err := os.WriteFile(alt, raw, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	ov, _ := json.Marshal(map[string]any{"Replace": map[string]string{real: alt}})
+	ovp := filepath.Join(dir, "overlay.json")
+	if err := os.WriteFile(ovp, ov, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	ld := "-X main.commit=b5test"
+	if out, err := exec.Command("go", "build", "-overlay", ovp, "-ldflags", ld, "-o", p, ".").CombinedOutput(); err != nil {
 		t.Fatalf("build vloop %s: %v\n%s", version, err, out)
 	}
 	b5Bins[version] = p

@@ -1,24 +1,10 @@
 ok  	github.com/mvelosop/vloop	(cached)
 ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
---- FAIL: TestWorkedExampleB5Session (0.19s)
-    b5_e2e_test.go:223: got code=1 out=[] err="vloop: already initialized by vloop 0.11.0 — run vloop upgrade\n"
-        want code=1 out=[] err="vloop: already initialized by vloop 0.1.0 — run vloop upgrade\n"
---- FAIL: TestWorkedExampleB5PlantedFailures (2.22s)
-    --- FAIL: TestWorkedExampleB5PlantedFailures/operator_text_around_the_markers (0.76s)
-        b5_e2e_test.go:296: the marked section was not refreshed: "# Shop\n\nThe operator's own notes.\n\n<!-- vloop:begin -->\n## vloop\n\nSessions started by the vloop loop (plan, gate review, work, review) follow these rules:\n\n1. Use repo-relative paths only, in files, logs and commit messages.\n2. A work session does one task and stops; it does not start the next one.\n3. Sessions never commit, set a task status or move git refs; the driver does.\n4. A task is done only when its gate passes and the review passes it.\n5. Halting cleanly with an account of what blocked you is a success; faking progress is the only failure.\n\nIn an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules. If /vloop:operate is not available, the vloop plugin is not loaded: say so, give the user the two ways to load it (claude plugin install vloop@vloop after claude plugin marketplace add mvelosop/vloop, or claude --plugin-dir \"$(vloop plugin path)\"), and meanwhile work from vloop --help.\n\nWritten by vloop 0.11.0.\n<!-- vloop:end -->\n\n## Mine\n\nKeep this, byte for byte.\n  trailing  \n"
-    --- FAIL: TestWorkedExampleB5PlantedFailures/plugin_version_warning (0.25s)
-        b5_e2e_test.go:332: no stdout line "! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — update the one that is behind" in "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n! plugin the vloop plugin is 0.1.0 but this binary is 0.11.0 — update the one that is behind\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n✓ guidelines 0 rule(s)\n- self-hosting\ndoctor: 0 problem(s), 2 warning(s)\n"
-    --- FAIL: TestWorkedExampleB5PlantedFailures/stray_file_removed_by_plugin_path (0.09s)
-        b5_e2e_test.go:367: got code=0 out=[".vloop/tmp/plugin/0.11.0"] err=""
-            want code=0 out=[".vloop/tmp/plugin/0.2.0"] err=""
---- FAIL: TestWorkedExampleB13 (0.71s)
-    b13_e2e_test.go:100: no stdout line "✓ plugin" in "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n! plugin the vloop plugin is 0.9.0 but this binary is 0.11.0 — update the one that is behind\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n✓ guidelines 0 rule(s)\n- self-hosting\ndoctor: 0 problem(s), 2 warning(s)\n"
-FAIL
-FAIL	github.com/mvelosop/vloop/cmd/vloop	206.538s
+ok  	github.com/mvelosop/vloop/cmd/vloop	204.099s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	63.207s
+ok  	github.com/mvelosop/vloop/internal/cli	(cached)
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
@@ -33,4 +19,3 @@ ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
 ok  	github.com/mvelosop/vloop/internal/schema	(cached)
 ok  	github.com/mvelosop/vloop/internal/state	(cached)
-FAIL

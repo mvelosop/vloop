@@ -5,9 +5,9 @@
   "base": "84088d72854b8319d798b7340adb010a975dc398",
   "branch": "B20261015-1651-b17-release",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-15T16:30:00Z",
-  "updated": "2026-10-15T16:41:27Z",
+  "updated": "2026-10-15T16:46:09Z",
   "shell": "sh",
   "checks": [
     {
@@ -46,9 +46,9 @@
         "`go generate ./...` leaves docs/guide/commands.md unchanged, or the regenerated file is part of the change."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261015-1651-b17-release/20261015-160742/checks/001-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T2",
