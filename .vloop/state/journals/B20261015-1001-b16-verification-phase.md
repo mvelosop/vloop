@@ -76,3 +76,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** plugin/skills/verify/SKILL.md (1,032 words) with three passes, findings and verify/v1 report; budget gains verify at 1,500. Fixed the check failure: the B7 plugin-path test now lists verify among extracted skills.
 - **Files:** plugin/skills/verify/SKILL.md, internal/budget/budget.go, internal/cli/readme_test.go, README.md, docs/domain/domain-model.md, cmd/vloop/b7_e2e_test.go
 - **Notes for next iteration:** V2: the check failure was TestWorkedExampleB7PluginPath (cmd/vloop/b7_e2e_test.go) enumerating extracted skills; changed only to add verify. Production code unchanged this attempt.
+
+## T6 — Add the verify-planted-mismatches eval case
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** Added the plugin/evals/verify-planted-mismatches case (case.yaml, prompt.md, scaffold.sh, five graders) and its row in the README's other-cases table.
+- **Files:** plugin/evals/verify-planted-mismatches/case.yaml, plugin/evals/verify-planted-mismatches/prompt.md, plugin/evals/verify-planted-mismatches/scaffold.sh, plugin/evals/verify-planted-mismatches/graders/finds-example-exit-code.md, plugin/evals/verify-planted-mismatches/graders/finds-contract-sentence.md, plugin/evals/verify-planted-mismatches/graders/finds-stale-readme.md, plugin/evals/verify-planted-mismatches/graders/sound-line-not-flagged.md, plugin/evals/verify-planted-mismatches/graders/report-validates.md, plugin/evals/README.md
+- **Notes for next iteration:** Scaffold commits baseline (README, brief, old bin/greet), records that commit as the plan base, then commits the built result and a one-task state/v2 plan. Planted: no-arg exit 1 vs briefed 2; --shout unimplemented; README says args ignored.

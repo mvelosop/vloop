@@ -79,3 +79,8 @@ committing the plan
    review T5 · 0m19s · $0.10 · run $11.82 / $40.00
    review: PASS
    T5 done
+── iteration 11 (11 this run) · T6 · 5/11 done ──
+   Add the verify-planted-mismatches eval case
+   work T6 · 0m40s · $0.19 · run $12.01 / $40.00
+   check go
+   CHECK FAIL T6 — check go failed — see .vloop/state/runs/B20261015-1001-b16-verification-phase/20261015-093651/checks/011-go.fail.log; review skipped
