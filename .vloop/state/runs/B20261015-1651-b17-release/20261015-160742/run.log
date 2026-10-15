@@ -40,3 +40,10 @@ committing the plan
    review T2 · 0m16s · $0.09 · run $6.46 / $40.00
    review: PASS
    T2 done
+── iteration 5 (5 this run) · T3 · 2/9 done ──
+   Add tools/release with the notes subcommand
+   work T3 · 1m13s · $0.27 · run $6.73 / $40.00
+   check go
+   review T3 · 0m18s · $0.11 · run $6.84 / $40.00
+   review: PASS
+   T3 done

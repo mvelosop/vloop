@@ -5,9 +5,9 @@
   "base": "84088d72854b8319d798b7340adb010a975dc398",
   "branch": "B20261015-1651-b17-release",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-10-15T16:30:00Z",
-  "updated": "2026-10-15T16:56:30Z",
+  "updated": "2026-10-15T17:01:43Z",
   "shell": "sh",
   "checks": [
     {
@@ -105,7 +105,7 @@
         "Committed tests, run by the checks, cover the notes format, the trailer, title and description rules, the exclusions and the empty sections, building their repositories in temporary directories with a temporary HOME and git -C; no test reads this repository's history or reaches the network."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

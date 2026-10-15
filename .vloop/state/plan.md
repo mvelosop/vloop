@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/9 done** · iteration 4
+**Status:** running · **3/9 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T16:56:30Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:01:43Z
 
 ## Progress
 
 - [x] **T1** — Read the binary's version from the embedded plugin.json · 1 attempt(s)
 - [x] **T2** — Record the module version in .vloop/install.json · 1 attempt(s)
-- [ ] **T3** — Add tools/release with the notes subcommand
+- [x] **T3** — Add tools/release with the notes subcommand
 - [ ] **T4** — Make prepare's checks, refusing before anything is written
 - [ ] **T5** — Make prepare create the release branch and open the PR
 - [ ] **T6** — Make publish find the release commit, tag it and create the GitHub release
@@ -66,7 +66,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Add tools/release with the notes subcommand
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 The release tool is a repository-owned Go program, `go run ./tools/release`, not a vloop subcommand. This task creates it with `notes <from> <to>`, the Markdown release notes built from the briefs merged in the range (found by their Vloop-Brief trailers) and the other code changes; prepare (T5) uses it as the PR body and publish (T6) as the release notes. It also runs the real-data check against this repository's own tags.
 
