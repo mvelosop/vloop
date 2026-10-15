@@ -142,13 +142,17 @@ docs/briefs/<name>.md                     the briefs
 .vloop/interventions/<id>.md              recorded interventions (data)
 .vloop/tmp/proposal.json                  the work session's report, read back by the driver
 .vloop/tmp/verdict.json                   the review session's verdict, read back by the driver
-.vloop/tmp/verify.json                    the verify session's findings report, kept by the driver
+.vloop/tmp/verify.json                    the verify session's findings report, kept by the driver as reports/verify.json
 .vloop/tmp/checks.json                    the checks that ran this iteration, handed to the review session
 .vloop/tmp/gate-verdict.json               the gate review session's verdict, read back by the driver
 .vloop/tmp/plan-problems.md                what the plan session must revise, written by the driver
 .vloop/tmp/plugin/<version>/              the plugin extracted for sessions
 .vloop/tmp/fence/<version>/settings.json  the fence extracted for sessions
 ```
+
+`.vloop/tmp/` is cleared between sessions (S1): at run start, before every work
+session, the final pass and the verify session, everything but the run's
+`.running` lock.
 
 ## Invariants
 

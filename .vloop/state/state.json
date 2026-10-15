@@ -5,9 +5,9 @@
   "base": "744f173872ad88141bb820e6969245b18db8c8c1",
   "branch": "B20261015-1001-b16-verification-phase",
   "status": "running",
-  "iteration": 15,
+  "iteration": 16,
   "created": "2026-10-15T09:55:12Z",
-  "updated": "2026-10-15T12:05:26Z",
+  "updated": "2026-10-15T12:11:40Z",
   "shell": "sh",
   "checks": [
     {
@@ -330,8 +330,8 @@
       ],
       "verify": "sh .vloop/state/gates/T10/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "operate playbooks quote `vloop brief close --dry-run` without the required <brief> argument, which fails; must be `vloop brief close <brief> --dry-run`"
     },
     {
       "id": "T11",

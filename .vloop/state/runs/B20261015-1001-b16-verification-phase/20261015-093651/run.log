@@ -112,3 +112,9 @@ committing the plan
    review T9 · 0m19s · $0.08 · run $13.24 / $40.00
    review: PASS
    T9 done
+── iteration 16 (16 this run) · T10 · 9/11 done ──
+   Describe the verify phase, the clearing and the retired warnings in the docs, the domain and both operate playbooks
+   work T10 · 0m55s · $0.26 · run $13.50 / $40.00
+   check go
+   review T10 · 0m36s · $0.16 · run $13.66 / $40.00
+   review: FAIL

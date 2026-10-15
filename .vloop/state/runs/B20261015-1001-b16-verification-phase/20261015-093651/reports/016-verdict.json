@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T10",
+  "verdict": "FAIL",
+  "criteria": [
+    {"criterion": "docs/domain/execution/session.md: five kinds (a verify row: invoked with none, reads the brief, the plan's base diff and a fresh build, writes the verify/v1 report), the verify fence, and the verify/v1 report .vloop/tmp/verify.json. docs/domain/execution/run.md: the verify session after the final pass, reports/verify.json in the run folder, and S1's clearing points with the lock kept. docs/domain/domain-model.md: the On disk list gains .vloop/tmp/verify.json and says .vloop/tmp/ is cleared between sessions.", "met": true, "evidence": "session.md five-kinds table, verify/v1 section and fence sentence; run.md verify session and clearing paragraph; domain-model.md On disk list and clearing note"},
+    {"criterion": "docs/domain/measurement/metrics.md and docs/guide/metrics.md: V3's summary parts and JSON fields (time.verify_ms, cost.verify_usd, models.verify, effort.verify, instructions.verify). docs/guide/configuration.md: run.verify, model.verify and effort.verify.", "met": true, "evidence": "metrics.md 'The verify session' section and guide/metrics.md summary template; configuration.md already lists run.verify, model.verify, effort.verify (lines 25, 30, 48)"},
+    {"criterion": "docs/domain/briefing/brief.md and docs/guide/concepts.md: the must-change list and external format warnings and the `## Pinning tests` and `## External formats` sections are removed, not marked retired in place.", "met": true, "evidence": "the diff deletes both warnings and both section descriptions from brief.md and concepts.md"},
+    {"criterion": "plugin/skills/operate/SKILL.md (within 1,750 words) and .claude/skills/vloop-operator/SKILL.md (step 5): the close step reads the verify findings close prints and records each one the operator accepts with --finding \"<origin>: <summary>\".", "met": false, "evidence": "both playbooks tell the operator to run `vloop brief close --dry-run` with no brief name, but internal/cli/close.go:49-51 declares `close <brief>` with cobra.ExactArgs(1), so that command fails with a usage error. 1647 words, within the ceiling."},
+    {"criterion": "docs/guide/commands.md is regenerated with cmd/gendocs and its staleness test passes. Exit codes and messages quoted in any doc are taken from running the built binary, not from memory (repository guideline). No doc describes behaviour this brief does not build.", "met": false, "evidence": "the command quoted in the playbooks was not taken from the binary (see above); the repository guideline requires running existing commands"}
+  ],
+  "findings": [
+    {"summary": "operate playbooks quote `vloop brief close --dry-run` without the required <brief> argument, which fails; must be `vloop brief close <brief> --dry-run`", "kind": "bug"}
+  ],
+  "notes": "Fix the command in plugin/skills/operate/SKILL.md step 5.2 and .claude/skills/vloop-operator/SKILL.md; everything else looks right. The vloop-operator wording also sits in a 'Until B4 ships' hand-run list, which may be stale but is not a finding."
+}
