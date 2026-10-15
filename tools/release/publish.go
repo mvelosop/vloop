@@ -5,9 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
+	"time"
 )
+
+// proxyInterval is how long publish pauses between asks of the module proxy.
+var proxyInterval = 30 * time.Second
 
 const pluginJSON = "plugin/.claude-plugin/plugin.json"
 
@@ -91,14 +98,88 @@ func briefTitles(dir, from, to string) ([]string, error) {
 	return titles, nil
 }
 
+// waitProxy asks `go list -m <module>@<version>` until it succeeds or wait has
+// passed, outside the repository so its go.mod plays no part.
+func waitProxy(module, version string, wait time.Duration) bool {
+	deadline := time.Now().Add(wait)
+	for {
+		cmd := exec.Command("go", "list", "-m", module+"@"+version)
+		cmd.Dir = os.TempDir()
+		if err := cmd.Run(); err == nil {
+			return true
+		}
+		left := time.Until(deadline)
+		if left <= 0 {
+			return false
+		}
+		time.Sleep(min(proxyInterval, left))
+	}
+}
+
+// installCheck installs module/cmd/vloop@version into a temporary GOBIN and
+// returns what the binary reports as version and module.
+func installCheck(module, version string) (string, string, error) {
+	tmp, err := os.MkdirTemp("", "release-install")
+	if err != nil {
+		return "", "", err
+	}
+	defer os.RemoveAll(tmp)
+	bin := filepath.Join(tmp, "bin")
+	cmd := exec.Command("go", "install", module+"/cmd/vloop@"+version)
+	cmd.Dir = tmp
+	cmd.Env = append(os.Environ(), "GOBIN="+bin)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return "", "", fmt.Errorf("go install %s/cmd/vloop@%s: %s %w", module, version, out, err)
+	}
+	exe := filepath.Join(bin, "vloop")
+	if runtime.GOOS == "windows" {
+		exe += ".exe"
+	}
+	vc := exec.Command(exe, "version", "--json")
+	vc.Dir = tmp
+	out, err := vc.Output()
+	if err != nil {
+		return "", "", fmt.Errorf("vloop version --json: %w", err)
+	}
+	var r struct {
+		Version string `json:"version"`
+		Module  string `json:"module"`
+	}
+	if err := json.Unmarshal(out, &r); err != nil {
+		return "", "", fmt.Errorf("vloop version --json: %w", err)
+	}
+	return r.Version, r.Module, nil
+}
+
 // publish finds the release commit before any write, then tags it, pushes the
-// tag and creates the GitHub release.
+// tag, creates the GitHub release and proves the public install. Each step
+// already done is skipped, so a re-run finishes an interrupted release.
 func publish(dir string, args []string, stdout, stderr io.Writer) int {
-	if len(args) != 1 || strings.HasPrefix(args[0], "-") {
-		fmt.Fprintln(stderr, "usage: release publish <version>")
+	usage := func() int {
+		fmt.Fprintln(stderr, "usage: release publish <version> [--wait <duration>] [--dry-run]")
 		return 2
 	}
-	version := args[0]
+	version, dryRun, wait := "", false, 10*time.Minute
+	for i := 0; i < len(args); i++ {
+		switch a := args[i]; {
+		case a == "--dry-run":
+			dryRun = true
+		case a == "--wait" && i+1 < len(args):
+			d, err := time.ParseDuration(args[i+1])
+			if err != nil {
+				return usage()
+			}
+			wait = d
+			i++
+		case strings.HasPrefix(a, "-") || version != "":
+			return usage()
+		default:
+			version = a
+		}
+	}
+	if version == "" {
+		return usage()
+	}
 	v, ok := parseVersion(version)
 	if !ok {
 		fmt.Fprintf(stderr, "release: %s is not a version: vX.Y.Z or vX.Y.Z-<pre>\n", version)
@@ -159,17 +240,22 @@ func publish(dir string, args []string, stdout, stderr io.Writer) int {
 		if len(titles) > 0 {
 			msg += ": " + strings.Join(titles, "; ")
 		}
-		if local, _ := gitOut(dir, "rev-parse", "-q", "--verify", "refs/tags/"+version+"^{commit}"); local != "" && local != rc {
+		local, _ := gitOut(dir, "rev-parse", "-q", "--verify", "refs/tags/"+version+"^{commit}")
+		if dryRun {
+			fmt.Fprintf(stdout, "tag: would tag %s on %s and push it\n", version, rc)
+		} else if local != "" && local != rc {
 			return fail("tag %s points at %s, not the release commit %s", version, local, rc)
-		} else if local == "" {
-			if _, err := git(dir, "tag", "-a", version, "-m", msg, rc); err != nil {
+		} else {
+			if local == "" {
+				if _, err := git(dir, "tag", "-a", version, "-m", msg, rc); err != nil {
+					return fail("%s", err)
+				}
+			}
+			if _, err := git(dir, "push", "-q", "origin", "refs/tags/"+version); err != nil {
 				return fail("%s", err)
 			}
+			fmt.Fprintf(stdout, "tag: %s on %s\n", version, rc)
 		}
-		if _, err := git(dir, "push", "-q", "origin", "refs/tags/"+version); err != nil {
-			return fail("%s", err)
-		}
-		fmt.Fprintf(stdout, "tag: %s on %s\n", version, rc)
 	}
 
 	url, done := "", false
@@ -177,7 +263,9 @@ func publish(dir string, args []string, stdout, stderr io.Writer) int {
 		url, done = strings.TrimSpace(out), true
 		fmt.Fprintln(stdout, "release: already done")
 	}
-	if !done {
+	if !done && dryRun {
+		fmt.Fprintf(stdout, "release: would create the GitHub release %s\n", version)
+	} else if !done {
 		body, err := notes(dir, from, rc)
 		if err != nil {
 			return fail("%s", err)
@@ -196,6 +284,22 @@ func publish(dir string, args []string, stdout, stderr io.Writer) int {
 		url = strings.TrimSpace(so.String())
 	}
 
+	if dryRun {
+		fmt.Fprintf(stdout, "proxy: would wait up to %s for go list -m %s@%s\n", wait, module, version)
+		fmt.Fprintf(stdout, "install: would go install %s/cmd/vloop@%s into a temporary GOBIN and check what it reports\n", module, version)
+		fmt.Fprintln(stdout, "dry run: nothing written")
+		return 0
+	}
+	if !waitProxy(module, version, wait) {
+		return fail("the module proxy does not serve %s after %s", version, wait)
+	}
+	gotV, gotM, err := installCheck(module, version)
+	if err != nil {
+		return fail("%s", err)
+	}
+	if gotV != strings.TrimPrefix(version, "v") || gotM != version {
+		return fail("go install %s/cmd/vloop@%s reports version %s, module %s", module, version, gotV, gotM)
+	}
 	fmt.Fprintf(stdout, "published %s: %s\n", version, url)
 	fmt.Fprintf(stdout, "install: go install %s/cmd/vloop@%s\n", module, version)
 	fmt.Fprintln(stdout, "then, in each repository: vloop upgrade")

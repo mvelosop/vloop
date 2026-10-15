@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/9 done** · iteration 8
+**Status:** running · **7/9 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:18:44Z
+**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:34:47Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Make prepare's checks, refusing before anything is written
 - [x] **T5** — Make prepare create the release branch and open the PR
 - [x] **T6** — Make publish find the release commit, tag it and create the GitHub release
-- [ ] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
+- [x] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
 - [ ] **T8** — Describe the release tool in the docs and the operator's playbook
 - [ ] **T9** — Close: run the worked example line for line and the real-data check
 
@@ -158,7 +158,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Make publish prove the public install, and finish an interrupted release on re-run
 
-`pending` · depends on: T6
+`done` · depends on: T6
 
 A release is done only when `go install …@<version>` from the public proxy installs it: v0.11.0's install was found wanting by hand. publish waits for the proxy to serve the version, installs into a temporary GOBIN and checks what the binary reports. Because the proxy can lag, every step already done is skipped on a re-run, so an interrupted publish is finished by running it again.
 

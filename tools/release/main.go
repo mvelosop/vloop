@@ -28,7 +28,7 @@ func run(args []string, dir string, stdout, stderr io.Writer) int {
 		return publish(dir, args[1:], stdout, stderr)
 	}
 	if len(args) == 0 || args[0] != "notes" {
-		fmt.Fprintln(stderr, "usage: release notes <from> <to> | prepare <version> [--dry-run] | publish <version>")
+		fmt.Fprintln(stderr, "usage: release notes <from> <to> | prepare <version> [--dry-run] | publish <version> [--wait <duration>] [--dry-run]")
 		return 2
 	}
 	if len(args) != 3 {

@@ -68,3 +68,10 @@ committing the plan
    review T6 · 0m16s · $0.10 · run $8.00 / $40.00
    review: PASS
    T6 done
+── iteration 9 (9 this run) · T7 · 6/9 done ──
+   Make publish prove the public install, and finish an interrupted release on re-run
+   work T7 · 11m43s · $0.31 · run $8.31 / $40.00
+   check go
+   review T7 · 0m16s · $0.10 · run $8.41 / $40.00
+   review: PASS
+   T7 done
