@@ -16,7 +16,7 @@ depends-on: [B20261014-1138-b15-code-health-escapes.loop-brief]
 - **Produced by:** the roadmap's B16 row
   (`docs/design-notes/vloop-roadmap-b12-b17.md`), the T1 triage's P6, and the
   design act of 2026-10-15, with the forks settled with the operator
-  (recorded as `I20261015-101819-b16-s-design-forks-scope-filtered-to-the`).
+  (recorded in `.vloop/interventions/I20261015-101819-b16-s-design-forks-scope-filtered-to-the.md`).
 - **Run by:** `vloop run` from the latest released vloop (0.10.0), whose
   skills predate K1 — see Constraints.
 
