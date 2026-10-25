@@ -58,6 +58,16 @@ type Cost struct {
 	} `json:"per_phase_per_1k_code_lines"`
 }
 
+// Credits are the Copilot credits the sessions reported, in total and per phase.
+type Credits struct {
+	Total      float64 `json:"total"`
+	Plan       float64 `json:"plan"`
+	Work       float64 `json:"work"`
+	Review     float64 `json:"review"`
+	GateReview float64 `json:"gate_review"`
+	Verify     float64 `json:"verify,omitempty"` // present when the verify session reported credits
+}
+
 // TokenTotals are token counts summed over every counted session.
 type TokenTotals struct {
 	Input         int64    `json:"input"`
@@ -72,6 +82,7 @@ type Usage struct {
 	Time    Time
 	Rate    Rate
 	Cost    Cost
+	Credits Credits
 	Tokens  TokenTotals
 	Models  map[string]string // phase -> sorted, comma-joined models
 	Agents  map[string]string // phase -> sorted, comma-joined agents
@@ -156,18 +167,23 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 				}
 				u.Time.PlanMS += s.TimeMS()
 				u.Cost.Plan += s.CostUSD
+				u.Credits.Plan += s.Credits
 			case PhaseWork:
 				u.Time.WorkMS += s.TimeMS()
 				u.Cost.Work += s.CostUSD
+				u.Credits.Work += s.Credits
 			case PhaseReview:
 				u.Time.ReviewMS += s.TimeMS()
 				u.Cost.Review += s.CostUSD
+				u.Credits.Review += s.Credits
 			case PhaseGateReview:
 				u.Time.GateReviewMS += s.TimeMS()
 				u.Cost.GateReview += s.CostUSD
+				u.Credits.GateReview += s.Credits
 			case PhaseVerify:
 				u.Time.VerifyMS += s.TimeMS()
 				u.Cost.Verify += s.CostUSD
+				u.Credits.Verify += s.Credits
 			default:
 				continue
 			}
@@ -235,6 +251,7 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	u.Rate.CodeTestPerMin = fratio(float64(delivered.Code+delivered.Test), minutes)
 
 	u.Cost.Total = u.Cost.Plan + u.Cost.Work + u.Cost.Review + u.Cost.GateReview + u.Cost.Verify
+	u.Credits.Total = u.Credits.Plan + u.Credits.Work + u.Credits.Review + u.Credits.GateReview + u.Credits.Verify
 	kc := float64(delivered.Code) / 1000
 	u.Cost.Per1kCode = fratio(u.Cost.Total, kc)
 	u.Cost.PerPhase1kC.Plan = fratio(u.Cost.Plan, kc)

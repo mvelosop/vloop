@@ -61,6 +61,7 @@ type Session struct {
 	DurationMS int64
 	WallMS     *int64 // the driver's own measurement; nil on records that predate it
 	CostUSD    float64
+	Credits    float64 // Copilot credits; 0 where the agent reports none
 	Denials    int
 	Models     map[string]Tokens
 	IsError    bool
@@ -413,6 +414,7 @@ type rawSession struct {
 	WallMS     *int64  `json:"wall_ms"`
 	TotalCost  float64 `json:"total_cost_usd"`
 	CostUSD    float64 `json:"cost_usd"`
+	Credits    float64 `json:"credits"`
 	IsError    bool    `json:"is_error"`
 	Denials    []any   `json:"permission_denials"`
 	ModelUsage map[string]struct {
@@ -439,7 +441,7 @@ func readSession(p string) (Session, error) {
 	s := Session{
 		Phase: r.Phase, Iteration: r.Iteration, Task: r.Task, Model: r.Model,
 		Started: parseTime(r.Started), DurationMS: r.DurationMS, WallMS: r.WallMS, IsError: r.IsError,
-		CostUSD: r.CostUSD, Denials: len(r.Denials), Models: map[string]Tokens{},
+		CostUSD: r.CostUSD, Credits: r.Credits, Denials: len(r.Denials), Models: map[string]Tokens{},
 	}
 	s.Agent = r.Agent
 	if s.Agent == "" {

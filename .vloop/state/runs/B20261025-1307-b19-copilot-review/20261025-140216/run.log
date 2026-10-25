@@ -30,3 +30,10 @@ committing the plan
    review T2 · 0m40s · $0.16 · run $7.00 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/5 done ──
+   Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
+   work T3 · 8m54s · $0.62 · run $7.62 / $40.00
+   check go
+   review T3 · 0m28s · $0.16 · run $7.78 / $40.00
+   review: PASS
+   T3 done

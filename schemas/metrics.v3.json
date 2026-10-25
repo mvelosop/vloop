@@ -79,6 +79,19 @@
         "per_1000_code_lines_usd": { "type": ["number", "null"] }
       }
     },
+    "credits": {
+      "type": "object",
+      "description": "Copilot credits the sessions reported, in total and per phase; 0 where an agent reports none",
+      "required": ["total", "plan", "work", "review", "gate_review"],
+      "properties": {
+        "total": { "type": "number", "minimum": 0 },
+        "plan": { "type": "number", "minimum": 0 },
+        "work": { "type": "number", "minimum": 0 },
+        "review": { "type": "number", "minimum": 0 },
+        "gate_review": { "type": "number", "minimum": 0 },
+        "verify": { "type": "number", "minimum": 0 }
+      }
+    },
     "tokens": {
       "type": "object",
       "required": ["input", "output", "cache_read", "cache_creation", "cache_hit_ratio"],

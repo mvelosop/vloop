@@ -5,9 +5,9 @@
   "base": "c2ef299de4890eb8c5b119a62753b170de163a17",
   "branch": "B20261025-1307-b19-copilot-review",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-25T14:26:16Z",
-  "updated": "2026-10-25T15:04:07Z",
+  "updated": "2026-10-25T15:19:01Z",
   "shell": "sh",
   "checks": [
     {
@@ -155,7 +155,7 @@
         "Committed tests the checks run cover the parse (result present and absent, no checkpoint, several checkpoints with the last counting, exitCode not 0, codeChanges dropped), the estimated cost at a configured price, the schemas accepting and refusing as above, and credits and ≈ in metrics; a behaviour shipped with no such test is a violation."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

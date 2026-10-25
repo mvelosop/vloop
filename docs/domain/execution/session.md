@@ -8,7 +8,7 @@ A fresh process of its phase's agent — Claude Code by default — with one job
 no memory of any other; sessions share nothing but files (S-1). Everything
 agent-specific (preflight, the phases it supports, the command and
 environment, whether stdout is a record, its mapping onto the record) is the
-agent's adapter's; claude is the only adapter. *Part of [execution](execution-context.md).*
+agent's adapter's; claude and, for review sessions only, copilot are the adapters. *Part of [execution](execution-context.md).*
 
 ## The five kinds
 
@@ -85,13 +85,20 @@ but `.vloop/tmp/` (S-4).
 
 ## The record it leaves — `session/v3`
 
-`run_id`, `iteration`, `phase`, `agent` (the adapter that ran it, `claude`),
+`run_id`, `iteration`, `phase`, `agent` (the adapter that ran it, `claude` or `copilot`),
 `task` (none for `plan`), the configured `model` and `effort`, `models_used`
 (per model: tokens and cost), `started`, `ended`, `wall_ms`, `duration_ms`,
-`cost_usd`, `cost_source`, `turns`, `is_error`, `permission_denials`. A
+`cost_usd`, `cost_source`, optional `credits`, `turns`, `is_error`, `permission_denials`. A
 gate-review or verify session has iteration 0 and no task. `cost_source` is
 `reported` when the agent's output carries a cost (for claude, the key
-`total_cost_usd`), else `none` with `cost_usd` 0. `ended` and `wall_ms` are the
+`total_cost_usd`), `estimated` when the driver computed it, else `none` with
+`cost_usd` 0. A copilot record carries `credits` (the last
+`session.usage_checkpoint`'s `totalNanoAiu` / 1e9) and `cost_usd` = credits ×
+`copilot.credit-usd`, source `estimated`; with no checkpoint, credits and cost
+are 0 and the source `none`. It has a record exactly when Copilot printed a
+`result` event; `models_used` holds the session's model with zero tokens, and
+nothing of the result's `codeChanges` (absolute paths) is recorded. A claude
+record has no `credits` and never the `estimated` source. `ended` and `wall_ms` are the
 driver's own measurement around the session process (the wall time, including
 any time the machine slept); `duration_ms` is the agent's own clock (the agent clock, `agent_ms` in the
 metrics), so the two differ. `session/v1` and `session/v2` records, written before agents were

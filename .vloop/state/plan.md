@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/5 done** · iteration 3
+**Status:** running · **3/5 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:04:07Z
+**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:19:01Z
 
 ## Progress
 
 - [x] **T1** — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot · 1 attempt(s)
 - [x] **T2** — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
-- [ ] **T3** — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
+- [x] **T3** — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
 - [ ] **T4** — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
 - [ ] **T5** — Close the run: every gate at once and the worked example line for line
 
@@ -66,7 +66,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Copilot reports credits, not dollars, and prints JSON Lines, not one document, so the Copilot adapter must decide whether there is a record and map the events onto session/v3, with cost_usd estimated from copilot.credit-usd so the run's cost ceiling, per-task costs and metrics still count review spend. session/v3 and metrics/v3 are unreleased, so they gain credits in place. Claude records must stay exactly as they are.
 

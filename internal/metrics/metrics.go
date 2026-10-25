@@ -127,6 +127,7 @@ type Report struct {
 	Time    ReportTime         `json:"time"`
 	Rate    Rate               `json:"rate"`
 	Cost    ReportCost         `json:"cost"`
+	Credits Credits            `json:"credits"`
 	Tokens  TokenTotals        `json:"tokens"`
 	Models  PerPhase[[]string] `json:"models"`
 	Agents  PerPhase[[]string] `json:"agents"`
@@ -225,6 +226,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	r.Time = ReportTime{u.Time.AgentMS, u.Time.WorkMS, u.Time.ReviewMS, u.Time.PlanMS, u.Time.GateMS, u.Time.ChecksMS, u.Time.GateReviewMS, nil, u.Time.WallMS}
 	r.Rate = u.Rate
 	r.Cost = ReportCost{u.Cost.Total, u.Cost.Plan, u.Cost.Work, u.Cost.Review, u.Cost.GateReview, u.Cost.Per1kCode, nil}
+	r.Credits = u.Credits
 	r.Tokens = u.Tokens
 	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview]), splitList(u.Models[PhaseGateReview]), nil}
 	r.Agents = PerPhase[[]string]{splitList(u.Agents[PhasePlan]), splitList(u.Agents[PhaseWork]), splitList(u.Agents[PhaseReview]), splitList(u.Agents[PhaseGateReview]), nil}

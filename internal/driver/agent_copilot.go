@@ -1,6 +1,8 @@
 package driver
 
 import (
+	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -27,7 +29,11 @@ var copilotDenials = []string{
 // directory.
 const copilotGuidelinesName = "AGENTS.md"
 
-type copilotAdapter struct{ bin string }
+type copilotAdapter struct {
+	bin       string
+	model     string  // the session's model, the one entry of models_used
+	creditUSD float64 // dollars per credit, for the estimated cost
+}
 
 func (copilotAdapter) Name() string { return AgentCopilot }
 
@@ -117,7 +123,56 @@ func (a copilotAdapter) Command(s Spec, root string, env []string, p Prepared) *
 	return cmd
 }
 
-// Parse leaves the record missing; reading Copilot's JSON Lines is a later step.
-func (copilotAdapter) Parse(stdout []byte, mask func(string) string) (Output, bool) {
-	return Output{}, false
+// Parse reads Copilot's JSON Lines. There is a record exactly when a result
+// event was printed. Credits are the last usage checkpoint's totalNanoAiu / 1e9
+// and the cost is those credits at the configured price, so cost_source is
+// estimated; with no checkpoint both are zero and the source is none. Nothing
+// of the result's codeChanges is kept: it holds absolute paths.
+func (a copilotAdapter) Parse(stdout []byte, mask func(string) string) (Output, bool) {
+	var (
+		result     bool
+		o          Output
+		nano       float64
+		checkpoint bool
+	)
+	for _, line := range bytes.Split(stdout, []byte("\n")) {
+		var ev struct {
+			Type     string `json:"type"`
+			ExitCode int    `json:"exitCode"`
+			Data     struct {
+				NanoAIU *float64 `json:"totalNanoAiu"`
+			} `json:"data"`
+			Usage struct {
+				SessionDurationMS float64 `json:"sessionDurationMs"`
+			} `json:"usage"`
+		}
+		if json.Unmarshal(bytes.TrimSpace(line), &ev) != nil {
+			continue
+		}
+		switch ev.Type {
+		case "assistant.turn_start":
+			o.Turns++
+		case "session.usage_checkpoint":
+			if ev.Data.NanoAIU != nil {
+				nano, checkpoint = *ev.Data.NanoAIU, true
+			}
+		case "result":
+			result = true
+			o.IsError = ev.ExitCode != 0
+			o.AgentMS = int64(ev.Usage.SessionDurationMS)
+		}
+	}
+	if !result {
+		return Output{}, false
+	}
+	credits := nano / 1e9
+	o.Credits = &credits
+	o.CostSource = CostNone
+	if checkpoint {
+		o.CostSource = CostEstimated
+		o.Cost = credits * a.creditUSD
+	}
+	o.Denials = []json.RawMessage{}
+	o.ModelsUsed = map[string]usage{a.model: {Cost: o.Cost}}
+	return o, true
 }
