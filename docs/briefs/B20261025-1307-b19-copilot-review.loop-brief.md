@@ -2,7 +2,7 @@
 name: B20261025-1307-b19-copilot-review.loop-brief
 description: Let review sessions run on GitHub Copilot CLI through a second adapter behind B18's seam — the embedded plugin, an isolated Copilot home, a deny list that keeps a session from acting outward, credits recorded and priced — marked experimental until B20 fences it
 kind: brief
-status: draft
+status: ready
 created: 2026-10-25
 seeds: The Copilot series' second brief (docs/design-notes/multi-agent-backends.md → "The sequence, as briefs"), settled with the operator on 2026-10-25
 depends-on: [B20261025-0930-b18-agent-per-phase.loop-brief]
