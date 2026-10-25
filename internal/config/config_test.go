@@ -44,7 +44,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
 		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
@@ -686,5 +686,49 @@ func TestAddChecksKeepsComments(t *testing.T) {
 	}
 	if cs, err := Checks(root); err != nil || len(cs) != 1 {
 		t.Errorf("checks = %+v, %v", cs, err)
+	}
+}
+
+func TestAgentKeys(t *testing.T) {
+	for _, p := range []string{"plan", "work", "review", "gate-review", "verify"} {
+		root, k := scratch(t), "agent."+p
+		if v, err := Get(root, k); err != nil || v.Value != "claude" || v.Source != SourceDefault {
+			t.Errorf("%s default: %+v %v", k, v, err)
+		}
+		if err := Set(root, k, "claude"); err != nil {
+			t.Fatal(err)
+		}
+		if v, _ := Get(root, k); v.Source != SourceFile || !strings.Contains(readCfg(t, root), "[agent]") {
+			t.Errorf("%s file: %+v", k, v)
+		}
+		before := readCfg(t, root)
+		var iv *InvalidValueError
+		if err := Set(root, k, "copilot"); !errors.As(err, &iv) || err.Error() != "invalid value \"copilot\" for "+k+": want one of claude" {
+			t.Errorf("%s set copilot: %v", k, err)
+		}
+		if readCfg(t, root) != before {
+			t.Errorf("%s: refused set changed the file", k)
+		}
+		ev := EnvVar(k)
+		t.Setenv(ev, "claude")
+		if v, _ := Get(root, k); v.Source != SourceEnv {
+			t.Errorf("%s env: %+v", k, v)
+		}
+		t.Setenv(ev, "copilot")
+		var se *SourceError
+		if _, err := Get(root, k); !errors.As(err, &se) || se.Source != ev {
+			t.Errorf("%s bad env: %v", k, err)
+		}
+		if _, err := List(root); !errors.As(err, &se) {
+			t.Errorf("%s bad env list: %v", k, err)
+		}
+		t.Setenv(ev, "")
+		writeCfg(t, root, "[agent]\n"+p+" = \"copilot\"\n")
+		if _, err := Get(root, k); !errors.As(err, &se) {
+			t.Errorf("%s bad file: %v", k, err)
+		}
+	}
+	if EnvVar("agent.gate-review") != "VLOOP_AGENT_GATE_REVIEW" {
+		t.Error("env var name")
 	}
 }

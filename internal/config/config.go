@@ -29,6 +29,9 @@ const (
 	SourceEnv     = "env"
 )
 
+// agents are the registered agent CLIs.
+var agents = []string{"claude"}
+
 var efforts = []string{"low", "medium", "high", "xhigh", "max"}
 
 // Key describes one configuration key. Valid is nil when any non-empty string
@@ -85,6 +88,11 @@ var Keys = []Key{
 	{Name: "effort.review", Valid: efforts},
 	{Name: "effort.gate-review", Valid: efforts},
 	{Name: "effort.verify", Valid: efforts},
+	{Name: "agent.plan", Default: "claude", Valid: agents},
+	{Name: "agent.work", Default: "claude", Valid: agents},
+	{Name: "agent.review", Default: "claude", Valid: agents},
+	{Name: "agent.gate-review", Default: "claude", Valid: agents},
+	{Name: "agent.verify", Default: "claude", Valid: agents},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
 	{Name: "metrics.stacks", List: true, Stacks: true},

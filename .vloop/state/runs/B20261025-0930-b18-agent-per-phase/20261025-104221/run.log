@@ -10,3 +10,8 @@ planned: B20261025-0930-b18-agent-per-phase — 4 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 1m23s · $0.26 · run $4.02 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/4 done ──
+   Add the five agent.<phase> config keys and resolve them as model and effort are
+   work T1 · 4m59s · $0.28 · run $4.30 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261025-0930-b18-agent-per-phase/20261025-104221/checks/001-go.fail.log; review skipped

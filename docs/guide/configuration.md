@@ -28,6 +28,11 @@ environment and in `config set`.
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` | effort of the review sessions |
 | `effort.gate-review` | unset | same | `VLOOP_EFFORT_GATE_REVIEW` | effort of the gate-review session |
 | `effort.verify` | unset | same | `VLOOP_EFFORT_VERIFY` | effort of the verify session |
+| `agent.plan` | `claude` | `claude` | `VLOOP_AGENT_PLAN` | agent CLI of the plan session |
+| `agent.work` | `claude` | `claude` | `VLOOP_AGENT_WORK` | agent CLI of the work sessions |
+| `agent.review` | `claude` | `claude` | `VLOOP_AGENT_REVIEW` | agent CLI of the review sessions |
+| `agent.gate-review` | `claude` | `claude` | `VLOOP_AGENT_GATE_REVIEW` | agent CLI of the gate-review session |
+| `agent.verify` | `claude` | `claude` | `VLOOP_AGENT_VERIFY` | agent CLI of the verify session |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
 | `metrics.stacks` | unset | a list of preset names (below) | `VLOOP_METRICS_STACKS` | presets that classify changed lines as code, test, docs or excluded |
@@ -48,7 +53,7 @@ environment and in `config set`.
 | `run.verify` | `true` | `true` or `false` | `VLOOP_RUN_VERIFY`  | whether `vloop run` ends with a verify session that checks the built surface against the brief |
 | `run.keep-awake` | `on` | `on` or `off` | `VLOOP_RUN_KEEP_AWAKE`  | `on` holds a no-idle-sleep hold for the lifetime of `vloop run` (macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`); `off` takes none |
 
-`model.*` and `effort.*` are stored under `[model]` and `[effort]`, the
+`model.*`, `effort.*` and `agent.*` are stored under `[model]`, `[effort]` and `[agent]`, the
 `metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. the two timeouts are whole minutes. `vloop run`'s `--max-iterations`, `--cost-ceiling`, `--max-attempts` and `--stall-limit` flags override the first four `run.*` keys for one run (flag, then environment, then file, then default). For example:
 
 ```
