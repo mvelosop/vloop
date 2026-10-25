@@ -41,7 +41,7 @@ type Adapter interface {
 }
 
 // Prepared is what an adapter's Prepare returns for its own Command.
-type Prepared struct{ Fence, Plugin string }
+type Prepared struct{ Fence, Plugin, Home, Guidelines string }
 
 // Output is a session's result as the agent reported it.
 type Output struct {
@@ -54,11 +54,14 @@ type Output struct {
 	ModelsUsed map[string]usage
 }
 
-// adapterFor is the adapter of an agent name; claude is the only one, run as
-// the given command ("claude" when empty).
+// adapterFor is the adapter of an agent name, claude run as the given command
+// ("claude" when empty); copilot is run as "copilot".
 func adapterFor(name, bin string) (Adapter, error) {
 	if name == "" || name == AgentClaude {
 		return claudeAdapter{bin: bin}, nil
+	}
+	if name == AgentCopilot {
+		return copilotAdapter{}, nil
 	}
 	return nil, fmt.Errorf("unknown agent %q", name)
 }

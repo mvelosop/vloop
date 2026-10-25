@@ -23,3 +23,10 @@ committing the plan
    review T1 · 0m29s · $0.14 · run $6.53 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/5 done ──
+   Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
+   work T2 · 2m56s · $0.30 · run $6.84 / $40.00
+   check go
+   review T2 · 0m40s · $0.16 · run $7.00 / $40.00
+   review: PASS
+   T2 done

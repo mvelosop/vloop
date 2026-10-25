@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Fixed the check failure from the first attempt: configuration.md documents agent.review's copilot value and the new copilot.credit-usd key, and the config list tests expect it.
 - **Files:** docs/guide/configuration.md, internal/cli/config_test.go
 - **Notes for next iteration:** Earlier work (config.go, stub copilot) is unchanged. config_test.go list expectations changed only for the new copilot.credit-usd key (contract item: new key). TestTaskGate* failures are an artifact of running inside a driver session, not a defect.
+
+## T2 — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
+
+- **Outcome:** done (review: PASS)
+- **Summary:** A copilot adapter (internal/driver/agent_copilot.go) behind adapterFor starts review sessions with its own per-session COPILOT_HOME and guidelines directory under .vloop/tmp/, the embedded plugin and the C2 deny patterns; tests added.
+- **Files:** internal/driver/agent.go, internal/driver/agent_copilot.go, internal/driver/agent_copilot_test.go
+- **Notes for next iteration:** Prepared gained Home and Guidelines fields. Guidelines are copied to AGENTS.md in a fresh copilot-guidelines-* dir; COPILOT_HOME is a fresh copilot-home-* dir. Parse returns not-a-record on purpose (T3). Runner has no copilot command override: copilot is looked up on PATH.

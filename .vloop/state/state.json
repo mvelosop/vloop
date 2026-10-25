@@ -5,9 +5,9 @@
   "base": "c2ef299de4890eb8c5b119a62753b170de163a17",
   "branch": "B20261025-1307-b19-copilot-review",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-25T14:26:16Z",
-  "updated": "2026-10-25T14:55:22Z",
+  "updated": "2026-10-25T15:04:07Z",
   "shell": "sh",
   "checks": [
     {
@@ -104,7 +104,7 @@
         "Committed tests the checks run, using the harness's stub copilot, cover: the argv of a copilot review session (with and without effort), its working directory and environment (COPILOT_HOME under .vloop/tmp/ and empty, the dropped and passed variables), the guidelines directory with and without .vloop/repo-guidelines.md, and the presence of every C2 denial with --allow-all-tools and --disable-builtin-mcps; a behaviour shipped with no such test is a violation. The argv tests of the claude adapter are unchanged."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

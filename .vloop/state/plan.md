@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/5 done** · iteration 2
+**Status:** running · **2/5 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T14:55:22Z
+**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:04:07Z
 
 ## Progress
 
 - [x] **T1** — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot · 1 attempt(s)
-- [ ] **T2** — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
+- [x] **T2** — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
 - [ ] **T3** — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
 - [ ] **T4** — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
 - [ ] **T5** — Close the run: every gate at once and the worked example line for line
@@ -42,7 +42,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 With agent.review = copilot every review session must become a GitHub Copilot CLI session started by a second adapter behind B18's seam, running the plugin embedded in the binary, with a Copilot home of its own under .vloop/tmp/ (never ~/.copilot) and a deny list that stops what a review must never do outward: gh, push and remote changes, network commands, global git config, rm and the git commands the review skill forbids, web fetch, the built-in GitHub MCP server. The deny list is a denylist until B20 fences Copilot, so it must also leave the review able to read the diff and run vloop and the checks. Claude sessions must not change by a byte. Parsing Copilot's output into the record is T3's; this task may leave the record missing.
 
