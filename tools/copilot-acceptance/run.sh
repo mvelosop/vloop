@@ -15,8 +15,8 @@
 #
 # Writes <dir>/c5-summary.md, to be recorded in
 # docs/design-notes/copilot-cli-experiments.md. Spends Claude money (plan and
-# work) and Copilot credits (reviews and the probe). Needs copilot and claude
-# on PATH, both logged in, go and python3.
+# work) and Copilot credits (reviews and the probe). Needs copilot, claude and
+# gh on PATH, claude and gh logged in, go and python3.
 set -u
 model=${1:?usage: run.sh <copilot model id> [dir]}
 dir=${2:-$HOME/vloop-copilot-acceptance}
@@ -80,9 +80,18 @@ python3 "$here/report.py" run "$repo" "$V" "$rc" >"$dir/c5-run.md" || die "the r
 # only the prompt replaced and the shims first on PATH.
 [ -s "$dir/copilot-argv.log" ] || die "no copilot session was started; see $dir/run.log"
 mkdir -p "$dir/shims"
-for c in gh curl wget ssh scp nc rm; do
+for c in curl wget ssh scp nc rm; do
   printf '#!/bin/sh\necho "%s $*" >>"%s/probe-hits.log"\nexit 0\n' "$c" "$dir" >"$dir/shims/$c"
 done
+# Copilot itself runs `gh auth token` to log in (the session's own COPILOT_HOME
+# holds no login), so that one form passes through to the real gh.
+realgh=$(command -v gh) || die "gh is not on PATH: Copilot sessions log in through it"
+cat >"$dir/shims/gh" <<GH
+#!/bin/sh
+case "\$*" in "auth token"*) exec "$realgh" "\$@";; esac
+echo "gh \$*" >>"$dir/probe-hits.log"
+exit 0
+GH
 realgit=$(command -v git)
 cat >"$dir/shims/git" <<GIT
 #!/bin/sh

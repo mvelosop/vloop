@@ -137,6 +137,76 @@ moved, no gate or plan touched.
 | Cost per session | $0.13, $0.15 | 22, 23 credits (~$0.15) | 22, 17 credits (~$0.13) |
 | Time per session | 43 s, 115 s | 72 s, 67 s | 55 s, 62 s |
 
+## Acceptance on the real CLI (B19's C5, 2026-10-25)
+
+vloop 0.12.0 built from the B19 branch (`d1f5278`), Copilot CLI 1.0.103, Node
+24.22.1. Instead of the kit's fixture, the operator chose the reference brief
+these experiments replayed: a fresh repository from `mvelosop/url-shortener-template`,
+the brief as it stood before the 0.12.0 run, the same `app` check, plan and work
+on Claude with the defaults, every review on Copilot with `gpt-5.6-terra`. The
+argv and environment of each Copilot session were logged by a wrapper.
+
+### C5.1 — the run
+
+| | 0.12.0 reference (all Claude) | B19, reviews on Copilot (Terra) |
+|---|---|---|
+| Tasks | 11/11 | 10/11, T11 blocked (see below) |
+| First pass | — | 9/11 |
+| Plan rounds | — | 2 (the gate review sent T9's gate back: it passed before T9's work) |
+| Reviews | — | 20, every record `session/v3` with `agent: "copilot"`, credits and `cost_source: "estimated"`; every verdict `verdict/v1` |
+| Review cost | — | 288 credits, ≈ $1.92, 35 s mean |
+| Total | $5.33 | ≈ $8.29, 57 min of wall time |
+
+What Terra's reviews found:
+
+- **T7**: no slug-format guard before the hit-count update on `GET /:slug`.
+  Defensive rather than required (only the generator writes slugs, and the
+  worked example's 404s held); fixed on the retry.
+- **T11, a real gap, misnamed.** The close criterion asked for `pnpm test`,
+  `test:e2e` and `smoke` in a fresh copy; T11's gate only installs, builds and
+  boots there, and no check ran `smoke`. Terra called it a gate gap, as in the
+  replays. It is a check gap: a gate never runs the repository's suite (the
+  plan skill's rule), and the gate review did not flag a criterion no gate may
+  judge and no check covered. The operator first put the suite into the gate,
+  then reverted that and added `pnpm smoke` to the `app` check.
+- **T11, a self-feeding false positive.** On "no absolute paths in any committed
+  file", Terra flagged the placeholder text of its own earlier finding, which
+  the driver had copied into the task notes, `plan.md` and the verdicts, then
+  the `${TMPDIR:-/tmp}` fallback of the gate scripts. An operator note scoping
+  the criterion to the product's files did not change the verdict. A work
+  session cannot change `.vloop/` records, so T11 blocked twice more. The
+  operator verified the product by hand (clean-install chain, the worked
+  example with curl, Swagger, a restart) and closed it as abandoned.
+
+So the run did not complete, for causes in vloop's plan and review rules, not
+in the adapter: every Copilot session started, logged in, wrote a valid record
+and verdict, and was parsed.
+
+### C5.2 — the deny probe
+
+The last review session's logged argv and environment, with only the prompt
+replaced (`tools/copilot-acceptance/report.py`), shims first on `PATH`.
+
+| Form | Result | Copilot's message |
+|---|---|---|
+| `gh c5-1`, `git status && gh c5-2` | denied | `Permission to run this tool was denied due to the following rules: shell(gh:*)` |
+| `sh -c "gh c5-3"` | **ran** | — |
+| `env gh c5-4` | **ran** | — |
+| `git push c5-5`, `git -C . push c5-6` | denied | `… rules: shell(git push:*)` |
+| `git remote`, `git config --global --get`, `curl`, `wget`, `ssh`, `rm -f` | denied | `… rules: shell(<the stem>:*)` |
+| web fetch of `https://example.com` | denied | `Permission to access this URL was denied.` |
+
+- Copilot parses `&&` chains and `git -C`; it does not look through `sh -c` or
+  `env`. Those two are B20's input; the shims stopped them.
+- The denial is not its own event type: it is a `tool.execution_complete`
+  event with `success: false` and `error.code: "denied"` (the message as
+  above), which is what `permission_denials` would have to parse.
+- **Copilot logs in through `gh`.** A session's own `COPILOT_HOME` holds no
+  login, so the CLI runs `gh auth token` (the first probe, with `gh` shimmed,
+  failed to log in). An interactive `/login` does not reach vloop's sessions;
+  `vloop doctor` and the preflight do not check the GitHub CLI's login.
+- The CLI also runs `git remote -v` and `git config` reads of its own at start.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts

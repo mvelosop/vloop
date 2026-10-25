@@ -5,8 +5,13 @@ CLI. Gates use a stub `copilot`; this proves what a stub cannot.
 
 ```
 npm install -g @github/copilot     # then: copilot, and log in once
+gh auth status                     # vloop's Copilot sessions log in through gh
 tools/copilot-acceptance/run.sh <copilot model id> [dir]
 ```
+
+Each vloop Copilot session has its own `COPILOT_HOME`, which holds no login, so
+Copilot logs in with `gh auth token`: the GitHub CLI must be logged in. The `gh`
+shim of the probe passes that one form through.
 
 `<dir>` defaults to `~/vloop-copilot-acceptance` and must not sit inside a vloop
 repository. The first run may stop at `vloop doctor` asking for Claude's folder
