@@ -1,0 +1,20 @@
+{
+  "schema": "verify/v1",
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "docs/domain/domain-model.md:98: \"| **session** | a fresh `claude -p` process: `plan`, `work` or `review`; sessions share nothing but files |\"",
+      "observed": "The glossary still defines a session as a `claude -p` process. The brief rewords the session page so that a session is no longer defined that way. docs/domain/execution/session.md now says \"A fresh process of its phase's agent — Claude Code by default\". The glossary also lists only three phases, but there are five.",
+      "where": "brief Binding references (session.md reworded) and \"Decided here\"; docs/domain/domain-model.md:98"
+    },
+    {
+      "kind": "surface",
+      "claim": "internal/metrics/metrics.go:20: \"JSONLines is Lines as metrics/v2 spells it\"",
+      "observed": "The package now emits metrics/v3, but the comment names only metrics/v2. The JSONLines shape itself is unchanged from v2.",
+      "where": "brief A3; internal/metrics/metrics.go:20"
+    }
+  ],
+  "checked": { "example_lines": 5, "sentences": 9, "surfaces": 12 },
+  "notes": "I ran the five config lines of the Worked example as written, with the changed binary built into .vloop/tmp/vs/bin. `vloop init` inside .vloop/tmp reports 'already initialized' because it finds the parent repo's .vloop, so I ran the example in a mktemp directory outside the repo. That directory is not under .vloop/tmp and is not cleaned up. All five lines gave the stated output and exit code: 0, 0, 2 with config.toml unchanged, 1, 0. I also checked that `vloop doctor` prints the VLOOP_AGENT_WORK source error, that `config list` shows the five agent.* keys, and that `schema list` includes session/v3 and metrics/v3. I did not run the base-versus-changed stub comparison, the planted-flag diff, `metrics --json` on a harness run, or the v1/v2 base-written run-directory example. The comparison needs a base binary built from the base SHA. The repo's tests have no base-binary comparison. Only the gate scripts under .vloop/state/gates/ (T1 and T2 mention git archive) do, and I did not run those. I ran only cmd/vloop TestRunClaudeInvocations and TestRunRecords*. They pass and pin argv, cwd, env pass-through and drops, and session/v3 agent and cost_source, including cost_source none without total_cost_usd. The records of the run's own sessions are session/v1, written by the installed vloop, so they cannot show v3. The contract sentences on records and metrics were checked by reading the diff (internal/runs, internal/metrics, doctor.go, the docs), not by running a harness run."
+}
+

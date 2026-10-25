@@ -41,3 +41,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Reconciled docs that still named session/v1 or metrics/v2 as what vloop writes; the finished tree passes all gates together.
 - **Files:** docs/domain/measurement/metrics.md, docs/domain/bounded-contexts.md, docs/domain/platform/platform-context.md, docs/domain/execution/run.md, docs/domain/execution/session.md, docs/guide/metrics.md, docs/guide/concepts.md
 - **Notes for next iteration:** Docs only, no code change. Remaining session/v1, session/v2 and metrics/v2 mentions describe older records and snapshots that still read. configuration.md already listed the five agent keys.
+
+## Run ended — complete
+
+- **Run:** `B20261025-0930-b18-agent-per-phase` · 5 iteration(s) this run
+- **Plan:** 4/4 done, 0 blocked
