@@ -11,3 +11,8 @@ planned: B20261025-1307-b19-copilot-review — 5 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 3m33s · $0.47 · run $5.89 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/5 done ──
+   Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot
+   work T1 · 13m52s · $0.34 · run $6.23 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261025-1307-b19-copilot-review/20261025-140216/checks/001-go.fail.log; review skipped
