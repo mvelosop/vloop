@@ -2,7 +2,7 @@
   "schema": "metrics/v2",
   "brief": "B20261025-1307-b19-copilot-review.loop-brief",
   "run_id": "B20261025-1307-b19-copilot-review",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 5,
@@ -50,26 +50,28 @@
     "gates_ms": 280123,
     "checks_ms": 1292785,
     "gate_review_ms": 212937,
-    "wall_ms": null
+    "verify_ms": 59949,
+    "wall_ms": 5864000
   },
   "rate": {
     "code_per_min": 8.553302367735357,
     "code_test_per_min": 24.78191911181602
   },
   "cost": {
-    "total_usd": 8.440760800000001,
+    "total_usd": 8.601462900000001,
     "plan_usd": 5.422974800000001,
     "work_usd": 1.8738491,
     "review_usd": 0.6732087999999999,
     "gate_review_usd": 0.4707280999999999,
-    "per_1000_code_lines_usd": 27.94953907284769
+    "per_1000_code_lines_usd": 28.481665231788085,
+    "verify_usd": 0.16070210000000001
   },
   "tokens": {
-    "input": 406,
-    "output": 166143,
-    "cache_read": 15062074,
-    "cache_creation": 640206,
-    "cache_hit_ratio": 0.9592036674489957
+    "input": 430,
+    "output": 169526,
+    "cache_read": 15418715,
+    "cache_creation": 662996,
+    "cache_hit_ratio": 0.9587476567951991
   },
   "models": {
     "plan": [
@@ -83,29 +85,33 @@
     ],
     "gate-review": [
       "claude-sonnet-5-5"
+    ],
+    "verify": [
+      "claude-sonnet-5-5"
     ]
   },
   "effort": {
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 1,
-    "operator": 0,
+    "operator": 6,
     "escaped": 0,
-    "total": 1,
+    "total": 7,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 1,
+    "total": 7,
     "by_agreement": {
       "recommended": 1,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 6
     }
   },
   "instructions": {
@@ -122,7 +128,7 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 4,
+  "permission_denials": 8,
   "iterations": 6,
   "iterations_per_closed": 1.2,
   "by_task": [
