@@ -37,3 +37,10 @@ committing the plan
    review T3 · 0m28s · $0.16 · run $7.78 / $40.00
    review: PASS
    T3 done
+── iteration 5 (5 this run) · T4 · 3/5 done ──
+   Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
+   work T4 · 2m18s · $0.33 · run $8.11 / $40.00
+   check go
+   review T4 · 0m27s · $0.11 · run $8.22 / $40.00
+   review: PASS
+   T4 done

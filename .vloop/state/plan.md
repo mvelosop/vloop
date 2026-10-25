@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/5 done** · iteration 4
+**Status:** running · **4/5 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:19:01Z
+**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:27:35Z
 
 ## Progress
 
 - [x] **T1** — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot · 1 attempt(s)
 - [x] **T2** — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
 - [x] **T3** — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
-- [ ] **T4** — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
+- [x] **T4** — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
 - [ ] **T5** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
@@ -92,7 +92,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 A Copilot review session is not fenced until B20, so the operator must be told so wherever the choice is made, and the run must not start with a review model that cannot work: model.review defaults to the Claude alias sonnet, which is not a Copilot model id. Copilot also loads a repository's .claude/skills/, where a skill named like the plugin's review can be picked instead of /vloop:review, so doctor names that risk. The configuration guide documents the new value, key and status.
 
