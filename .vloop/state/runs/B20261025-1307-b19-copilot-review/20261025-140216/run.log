@@ -16,3 +16,10 @@ committing the plan
    work T1 · 13m52s · $0.34 · run $6.23 / $40.00
    check go
    CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261025-1307-b19-copilot-review/20261025-140216/checks/001-go.fail.log; review skipped
+── iteration 2 (2 this run) · T1 · 0/5 done ──
+   Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot
+   work T1 · 1m57s · $0.16 · run $6.39 / $40.00
+   check go
+   review T1 · 0m29s · $0.14 · run $6.53 / $40.00
+   review: PASS
+   T1 done

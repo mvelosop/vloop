@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/5 done** · iteration 1
+**Status:** running · **1/5 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T14:49:17Z
+**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T14:55:22Z
 
 ## Progress
 
-- [ ] **T1** — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot · 1 attempt(s)
+- [x] **T1** — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot · 1 attempt(s)
 - [ ] **T2** — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
 - [ ] **T3** — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
 - [ ] **T4** — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
@@ -18,7 +18,7 @@
 
 ### T1 — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 Opening review sessions to GitHub Copilot CLI starts with configuration: agent.review must accept copilot while every other phase stays claude only, and the credit price that turns Copilot's credits into an estimated dollar cost needs a key. The committed run harness also needs a stub copilot, following the stub claude's pattern, so the adapter (T2), the record (T3) and doctor (T4) can be tested offline. Nothing a session receives changes in this task.
 
@@ -31,8 +31,6 @@ Opening review sessions to GitHub Copilot CLI starts with configuration: agent.r
 - cmd/vloop/run_harness_test.go gains a stub copilot beside the stub claude, following its pattern: it logs each argument on its own line, its working directory and environment, answers --version, and for `-p "/vloop:review <task>"` plays a per-test script and prints JSON Lines (assistant.turn_start, session.usage_checkpoint with data.totalNanoAiu, a result event with exitCode and usage.sessionDurationMs). The stub claude, argv.log and every existing harness test are unchanged.
 - Violation: copilot accepted for agent.plan, agent.work, agent.gate-review or agent.verify; a new error message or exit code for an invalid agent value instead of the existing one.
 - Committed tests the checks run cover the new values and key: agent.review copilot accepted and agent.&lt;other&gt; copilot refused (set, environment, file), copilot.credit-usd default, environment, file and refusal of non-positive values. A key shipped with no test that exercises it is a violation.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261025-1307-b19-copilot-review/20261025-140216/checks/001-go.fail.log
 
 <details><summary>verify command</summary>
 

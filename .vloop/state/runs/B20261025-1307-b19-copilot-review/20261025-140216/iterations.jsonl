@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":212334,"exit":1,"name":"go"}],"ended":"2026-10-25T14:49:17Z","gate":{"duration_ms":2194,"exit":0},"iteration":1,"outcome":"check_failed","run_id":"B20261025-1307-b19-copilot-review","schema":"iteration/v2","started":"2026-10-25T14:31:50Z","task":"T1"}
+{"attempt":2,"checks":[{"duration_ms":215871,"exit":0,"name":"go"}],"ended":"2026-10-25T14:55:22Z","gate":{"duration_ms":2062,"exit":0},"iteration":2,"outcome":"done","run_id":"B20261025-1307-b19-copilot-review","schema":"iteration/v2","started":"2026-10-25T14:49:17Z","task":"T1"}

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Fixed the check failure from the first attempt: configuration.md documents agent.review's copilot value and the new copilot.credit-usd key, and the config list tests expect it.",
+  "files": ["docs/guide/configuration.md", "internal/cli/config_test.go"],
+  "verified": "sh .vloop/state/gates/T1/gate.sh printed gate T1: ok; go test ./internal/cli fails only TestTaskGate* because VLOOP_PLAN_SHA256 is set in this session.",
+  "notes": "Earlier work (config.go, stub copilot) is unchanged. config_test.go list expectations changed only for the new copilot.credit-usd key (contract item: new key). TestTaskGate* failures are an artifact of running inside a driver session, not a defect."
+}

@@ -5,9 +5,9 @@
   "base": "c2ef299de4890eb8c5b119a62753b170de163a17",
   "branch": "B20261025-1307-b19-copilot-review",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-25T14:26:16Z",
-  "updated": "2026-10-25T14:49:17Z",
+  "updated": "2026-10-25T14:55:22Z",
   "shell": "sh",
   "checks": [
     {
@@ -51,9 +51,9 @@
         "Committed tests the checks run cover the new values and key: agent.review copilot accepted and agent.<other> copilot refused (set, environment, file), copilot.credit-usd default, environment, file and refusal of non-positive values. A key shipped with no test that exercises it is a violation."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261025-1307-b19-copilot-review/20261025-140216/checks/001-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T2",
