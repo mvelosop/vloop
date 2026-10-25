@@ -1,6 +1,9 @@
 # Multi-agent backends (Copilot, Grok, …) — exploration
 
-Status: exploration, not a brief. Written 2026-10-21 from an interactive session.
+Status: exploration, not a brief. Written 2026-10-21 from an interactive session;
+corrected 2026-10-25 after the Copilot CLI experiments, whose findings are
+`docs/design-notes/copilot-cli-experiments.md`. Where the two disagree, the
+findings win.
 
 ## Short answer
 
@@ -15,14 +18,15 @@ pluggable.
 
 | # | Coupling | Where | What a new backend needs |
 |---|---|---|---|
-| 1 | argv: `-p`, `--model`, `--effort`, `--permission-mode auto`, `--settings <fence>`, `--plugin-dir`, `--strict-mcp-config`, `--output-format json`, `--append-system-prompt-file` | `Args`, `WithGuidelines` | Its own argv builder |
-| 2 | Prompt is a slash command (`/vloop:work T3`) relying on Claude Code loading the plugin's skills | `Prompt` | Render `plugin/skills/<phase>/SKILL.md` as plain prompt text, argument substituted, plus `.vloop/repo-guidelines.md` |
+| 1 | argv: `-p`, `--model`, `--effort`, `--permission-mode auto`, `--setting-sources project`, `--settings <fence>`, `--plugin-dir`, `--strict-mcp-config`, `--output-format json`, `--append-system-prompt-file` | `Args`, `WithGuidelines` | Its own argv builder |
+| 2 | Prompt is a slash command (`/vloop:work T3`) relying on Claude Code loading the plugin's skills | `Prompt` | Copilot CLI loads the plugin unchanged and runs the slash command (findings); plain-text rendering only for a harness that loads no plugins. `.vloop/repo-guidelines.md` still needs a route |
 | 3 | The fence: Claude settings JSON allow/deny per phase | `fence/*.json`, `ExtractFence` | Translate to the backend's permission model, or sandbox (hardest part) |
-| 4 | Output parsing: `total_cost_usd`, `num_turns`, `permission_denials`, `modelUsage` → session/v1 | `record` | A per-backend parser; missing fields already become zero values |
-| 5 | Cost budgets in USD | `cost.go`, `budgets.go`, `run.*` keys | Copilot bills premium requests, not dollars: per-backend unit, or turn/wall budgets |
+| 4 | Output parsing: `total_cost_usd`, `num_turns`, `permission_denials`, `modelUsage` → session/v1; the Runner decides "no record" when stdout is not one JSON document | `record`, `Runner.Run` | A per-backend parser that also decides whether there is a record: Copilot prints JSON Lines |
+| 5 | Cost budgets in USD | `cost.go`, `budgets.go`, `run.*` keys | Copilot reports credits (`totalNanoAiu`), not dollars: an estimate (credits × plan price) or turn/wall budgets |
 | 6 | Config `model.work = "sonnet"` assumes Claude aliases | `internal/config/config.go` | `agent.<phase>` keys, or `model.<phase> = "copilot:gpt-5"` |
 | 7 | doctor checks `claude` on PATH and folder trust | `internal/cli/doctor.go` | Per-backend check |
 | 8 | Plugin `SessionStart` hook and `claude plugin eval` suites | `plugin/hooks`, `plugin/evals` | Hook can go; evals matter (below) |
+| 9 | The domain defines a session as "a fresh `claude -p` process" | `docs/domain/execution/session.md` | Reworded per backend, with the record versions it documents |
 
 ## Proposed architecture
 
@@ -62,19 +66,32 @@ Runner (unchanged: masking, lock, timeout/RunGroup, session/v1 record, stderr fi
 
 ## Copilot vs Grok
 
-- Copilot: GitHub's Copilot CLI has a non-interactive prompt mode, model
-  selection and tool permission flags — a straightforward adapter.
-- Grok: no known first-party agentic CLI. Practical route: a multi-provider
-  harness (e.g. OpenCode) pointed at xAI's OpenAI-compatible API. Avoid writing
-  our own Go agent loop — larger than everything else combined.
-- Flags of both CLIs were not verified; check current docs before a brief.
+- Copilot: verified with Copilot CLI 1.0.101 — `-p`, `--model`,
+  `--allow-all-tools`, `--deny-tool`, `--no-ask-user`, `--output-format json`
+  (JSON Lines), `COPILOT_HOME`, `preToolUse` hooks. A straightforward adapter;
+  details in the findings note.
+- Grok: not tried. A multi-provider harness pointed at xAI's API remains the
+  likely route; avoid writing our own Go agent loop.
 
-## Suggested sequence (as briefs)
+## The sequence, as briefs
 
-1. Refactor only: `Agent` interface, Claude the sole implementation, all tests green.
-2. Prompt rendering: skill-as-text prompt, tested against Claude in a no-plugin mode.
-3. Fence audit: driver-backed vs fence-only rules; add cheap driver backstops.
-4. First non-Claude backend, read-only phases only, turn/wall budgets.
-5. Backend-agnostic eval runner; then open review/work phases per eval results.
+Settled with the operator on 2026-10-25, Copilot first:
 
-Steps 1 and 3 are worth doing even if no other model is ever added.
+1. **B18 — agent per phase.** The `agent.<phase>` keys and the seam, Claude the
+   only adapter, its argv byte-identical; `session/v3` and `metrics/v3` record
+   the agent.
+2. **B19 — the Copilot adapter for review sessions.** Open before it is
+   written: the interim permission policy until B20 (the findings' deny list is
+   a denylist, so network commands stay allowed); `COPILOT_HOME` and the plugin
+   install; the guidelines route; credits and the cost estimate; skill-name
+   collisions.
+3. **B20 — the fence for non-Claude agents, and a second reviewer.** The fence
+   audit below decides what hooks must enforce; the fence probe's outcome is
+   recorded first. A second reviewer as an added opinion, not a veto, as the
+   findings suggest.
+
+Plain-text prompt rendering is no longer on the path for Copilot; it returns
+if a harness that loads no plugins is added. A backend-agnostic eval runner is
+deferred: the replays qualified Copilot for review, and opening work or plan to
+another agent needs it first.
+The fence audit is worth doing even if no other model is ever added.
