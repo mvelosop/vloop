@@ -156,7 +156,7 @@ keys are in [configuration.md](configuration.md#checks).
 `42ee0a6`, `27871b2`, `d219473`); those tags were removed, and `go.mod` retracts
 `v1.0.0` in case a copy surfaces, so `go install …@latest` resolves to the 0.x
 line. Run records and PRs that name them are history. The
-`v2` in schema names (`state/v2`, `intervention/v2`, `metrics/v2`) is a format
+`v2` and `v3` in schema names (`state/v2`, `intervention/v2`, `metrics/v3`) is a format
 version, unrelated to the release number.
 
 - **The gate model.** The plan is `state/v2`: a task's gate may have a
@@ -167,7 +167,7 @@ version, unrelated to the release number.
 - **Interventions.** Records are `intervention/v2`, with options and a
   recommendation; `vloop intervention migrate` converts older records.
   `vloop metrics --interventions` reports agreement.
-- **Metrics.** `metrics/v2` documents; `--workspace` and `metrics export` read
+- **Metrics.** `metrics/v3` documents; `--workspace` and `metrics export` read
   across repositories. See [metrics.md](metrics.md).
 - **Exit codes.** Exit `2` now means usage only; every other failure,
   including a failed plan session or a mid-run error, exits `1`. For `vloop run`

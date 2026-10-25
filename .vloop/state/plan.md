@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/4 done** · iteration 4
+**Status:** running · **4/4 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T12:01:59Z
+**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T12:13:37Z
 
 ## Progress
 
 - [x] **T1** — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are · 1 attempt(s)
 - [x] **T2** — Start every session through a seam with a Claude adapter, and write session/v3 records
 - [x] **T3** — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
-- [ ] **T4** — Close the run: every gate at once and the worked example line for line
+- [x] **T4** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
@@ -96,7 +96,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Close the run: every gate at once and the worked example line for line
 
-`pending` · depends on: T1, T2, T3
+`done` · depends on: T1, T2, T3
 
 The earlier gates each ran while their task was the newest; this task checks the finished tree against all of them together and against the brief's worked example, and reconciles whatever drifted between tasks — docs that still name session/v1, session/v2 or metrics/v2 as what vloop writes, or a config page row out of step. It adds no behaviour of its own.
 

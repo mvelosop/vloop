@@ -5,9 +5,9 @@
   "base": "8aa98974a124f45a833844dafb9603d404a858b5",
   "branch": "B20261025-0930-b18-agent-per-phase",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-10-25T11:01:34Z",
-  "updated": "2026-10-25T12:01:59Z",
+  "updated": "2026-10-25T12:13:37Z",
   "shell": "sh",
   "checks": [
     {
@@ -192,7 +192,7 @@
         "The task adds no behaviour: any code change it makes fixes a divergence from the brief's contract that an earlier task left, and its work notes name it; such a fix ships with the committed test that would have caught it."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

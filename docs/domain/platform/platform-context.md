@@ -39,7 +39,7 @@ printed and applied by `vloop schema list|show|validate`:
 
 | Schema | Context |
 | --- | --- |
-| `state/v1`, `proposal/v1`, `verdict/v1`, `session/v1`, `iteration/v1` | execution |
+| `state/v1`, `proposal/v1`, `verdict/v1`, `session/v3`, `iteration/v1` | execution |
 | `metrics/v1`, `defect/v1`, `export/v1` | measurement |
 
 ## CLI conventions

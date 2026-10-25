@@ -5,7 +5,7 @@ description: Binds the Metrics entity — what is measured per brief and per tas
 # Metrics
 
 A brief's numbers, recomputed on every call from raw sources (M-1), frozen once
-at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *Part of
+at close as a snapshot (`metrics/v3`; v1 and v2 snapshots stay readable). *Part of
 [measurement](measurement-context.md).* Every field and formula:
 [`docs/guide/metrics.md`](../../guide/metrics.md).
 
