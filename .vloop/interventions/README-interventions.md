@@ -76,6 +76,11 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | no | recommended | [I20261015-165314-b17-s-design-forks-a-repository-owned-re](I20261015-165314-b17-s-design-forks-a-repository-owned-re.md) |
 | design | decision | no | recommended | [I20261025-104133-b18-s-design-forks-copilot-first-the-ser](I20261025-104133-b18-s-design-forks-copilot-first-the-ser.md) |
 | design | decision | no | recommended | [I20261025-140145-b19-s-interim-policy-a-deny-list-with-ch](I20261025-140145-b19-s-interim-policy-a-deny-list-with-ch.md) |
+| design | decision | no | recommended | [I20261025-230659-c-2-changed-to-the-git-boundary-a-nested](I20261025-230659-c-2-changed-to-the-git-boundary-a-nested.md) |
+| design | decision | no | recommended | [I20261025-230700-a-check-gap-halts-for-the-operator-befor](I20261025-230700-a-check-gap-halts-for-the-operator-befor.md) |
+| design | decision | no | recommended | [I20261025-230701-release-0-13-0-after-the-two-hardening-b](I20261025-230701-release-0-13-0-after-the-two-hardening-b.md) |
+| design | decision | no | recommended | [I20261025-230702-hardening-order-the-loop-s-judgment-b20](I20261025-230702-hardening-order-the-loop-s-judgment-b20.md) |
+| design | decision | no | different | [I20261025-230710-no-operator-override-to-mark-a-blocked-t](I20261025-230710-no-operator-override-to-mark-a-blocked-t.md) |
 | design | direction | no | no-options | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | no-options | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | no-options | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
