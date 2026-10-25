@@ -44,3 +44,10 @@ committing the plan
    review T4 · 0m27s · $0.11 · run $8.22 / $40.00
    review: PASS
    T4 done
+── iteration 6 (6 this run) · T5 · 4/5 done ──
+   Close the run: every gate at once and the worked example line for line
+   work T5 · 2m45s · $0.12 · run $8.34 / $40.00
+   check go
+   review T5 · 0m31s · $0.10 · run $8.44 / $40.00
+   review: PASS
+   T5 done

@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** With agent.review copilot, doctor and the run preflight check copilot, print the experimental warning and skill-collision warnings, and vloop run refuses a default model.review; configuration.md documents the experimental status and C2's deny list.
 - **Files:** internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_copilot_test.go, docs/guide/configuration.md
 - **Notes for next iteration:** Copilot checks live in doctorCopilot (doctor.go), gated by copilotReview(root); runPreflight prints the agent.review and .claude/skills/* warnings as '  ! ' lines and refuses a default model.review via config Source. Tests in doctor_copilot_test.go call runPreflight directly. TestTaskGate* fail only inside a driver session (plan-hash guard).
+
+## T5 — Close the run: every gate at once and the worked example line for line
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Checked the finished tree against the T1-T4 gates and the brief's worked example; nothing had drifted, so no change was needed.
+- **Files:** none
+- **Notes for next iteration:** No code or doc edits. docs/domain/execution/session.md and docs/guide/configuration.md already document copilot for review, credits, the estimated cost source and the experimental status; no page under docs/domain or docs/guide still says claude is the only agent.

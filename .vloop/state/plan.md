@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/5 done** · iteration 5
+**Status:** running · **5/5 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:27:35Z
+**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:39:05Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
 - [x] **T3** — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
 - [x] **T4** — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
-- [ ] **T5** — Close the run: every gate at once and the worked example line for line
+- [x] **T5** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
@@ -116,7 +116,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Close the run: every gate at once and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4
+`done` · depends on: T1, T2, T3, T4
 
 Each earlier gate ran while its task was the newest; this task checks the finished tree against all of them together, including B18's comparison gate, and against the brief's worked example, and reconciles whatever drifted between tasks — a doc that still says claude is the only agent or that a record has no credits, a config row out of step. It adds no behaviour of its own; C5, the proof on the real Copilot CLI, is the operator's at close.
 
