@@ -1,0 +1,42 @@
+{
+  "cost_usd": 5.422974800000001,
+  "duration_ms": 1336311,
+  "effort": null,
+  "ended": "2026-10-25T14:28:07Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 196070,
+      "cache_read_input_tokens": 9365494,
+      "cost_usd": 5.422974800000001,
+      "input_tokens": 144,
+      "output_tokens": 99037
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "P=$(mktemp -d \"${TMPDIR:-/tmp}/proto.XXXXXX\") \u0026\u0026 echo $P \u003e /tmp/vloop-proto-path \u0026\u0026 git archive HEAD | tar -x -C $P \u0026\u0026 cd $P \u0026\u0026 git init -q \u0026\u0026 git add -A \u0026\u0026 git -c user.name=x -c user.email=x@x commit…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "P=/var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/proto.3P9x8y; R=~/source/personal/vloop; echo \"gitdir: $R/.git\" \u003e \"$P/.git\"; rm -rf \"$P/.vloop/state/gates/T2\"; cp -R \"$R/.vloop/state/gates/T2\" \"$P/…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "P=/var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/proto.3P9x8y; R=~/source/personal/vloop; rm -rf \"$P/.vloop/state/gates/T2\"; cp -R \"$R/.vloop/state/gates/T2\" \"$P/.vloop/state/gates/\" \u0026\u0026 echo 'echo s…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "rm -rf /var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/proto.3P9x8y /var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/copilot.go.orig /var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/t3-nocredits.sh; …",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "plan",
+  "run_id": "B20261025-1307-b19-copilot-review",
+  "schema": "session/v1",
+  "started": "2026-10-25T14:05:50Z",
+  "turns": 73,
+  "wall_ms": 1337243
+}

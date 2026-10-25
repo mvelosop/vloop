@@ -1,0 +1,13 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Every gate fails on the base at its first behavioural assertion: config set agent.review copilot is refused with 'want one of claude'. T5 fails because it runs T1 first. Gates take 1 to 5 seconds each. I exercised the matchers and fixtures on the base binary: the env and file error forms, the doctor line format '! <name> <message>', the metrics cost line, models_used token fields, the cost-ceiling exit code 6, and session numbering. They match what the gates expect. B18's comparison gate passes on the base. Claude logs are deterministic across two runs, so the T2 diff of claude sessions is stable. The checks that fail at the first assertion (the stub deny-pattern probes, the copilot record and metrics assertions) could only be read, not run, until the work exists."
+}
+

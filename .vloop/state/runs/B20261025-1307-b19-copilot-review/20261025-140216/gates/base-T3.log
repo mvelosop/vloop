@@ -1,0 +1,1 @@
+GATE FAIL: vloop config set agent.review copilot: vloop: invalid value "copilot" for agent.review: want one of claude
