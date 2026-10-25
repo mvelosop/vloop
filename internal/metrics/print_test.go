@@ -148,3 +148,33 @@ func TestPrintSummaryVerify(t *testing.T) {
 		t.Errorf("a brief with no verify session mentions verify:\n%s\n%s", b.String(), j)
 	}
 }
+
+// Credits mark the cost as estimated with ≈; a brief with none shows no ≈.
+func TestPrintSummaryEstimatedCost(t *testing.T) {
+	r := &Report{}
+	r.Cost.Total = 6.91
+	var b bytes.Buffer
+	PrintSummary(&b, r)
+	if strings.Contains(b.String(), "≈") {
+		t.Errorf("a brief with no credits shows ≈:\n%s", b.String())
+	}
+	r.Credits.Total, r.Credits.Review = 14.2, 14.2
+	b.Reset()
+	PrintSummary(&b, r)
+	if !strings.Contains(b.String(), "cost      ≈$6.91 ·") {
+		t.Errorf("an estimated cost is not marked:\n%s", b.String())
+	}
+}
+
+// Session credits add up in total and per phase.
+func TestAggregateCredits(t *testing.T) {
+	m := &runs.Model{Folders: []runs.Folder{{Sessions: []runs.Session{
+		{Phase: PhaseReview, Credits: 5, CostUSD: 0.05},
+		{Phase: PhaseReview, Credits: 9.2, CostUSD: 0.09},
+		{Phase: PhaseWork, CostUSD: 1},
+	}}}}
+	u := Aggregate(m, Counts{})
+	if u.Credits.Total != 14.2 || u.Credits.Review != 14.2 || u.Credits.Work != 0 {
+		t.Errorf("credits %+v", u.Credits)
+	}
+}

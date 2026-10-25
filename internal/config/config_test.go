@@ -44,7 +44,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
 		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"copilot.credit-usd", "0.0066667", true}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
@@ -703,6 +703,32 @@ func TestAgentKeys(t *testing.T) {
 		}
 		before := readCfg(t, root)
 		var iv *InvalidValueError
+		if p == "review" {
+			if err := Set(root, k, "copilot"); err != nil {
+				t.Errorf("%s set copilot: %v", k, err)
+			}
+			if v, _ := Get(root, k); v.Value != "copilot" || v.Source != SourceFile {
+				t.Errorf("%s copilot: %+v", k, v)
+			}
+			if err := Set(root, k, "grok"); !errors.As(err, &iv) || err.Error() != "invalid value \"grok\" for agent.review: want one of claude, copilot" {
+				t.Errorf("%s set grok: %v", k, err)
+			}
+			if err := Set(root, k, "claude"); err != nil {
+				t.Fatal(err)
+			}
+			before = readCfg(t, root)
+			t.Setenv(EnvVar(k), "copilot")
+			if v, err := Get(root, k); err != nil || v.Value != "copilot" || v.Source != SourceEnv {
+				t.Errorf("%s env copilot: %+v %v", k, v, err)
+			}
+			t.Setenv(EnvVar(k), "")
+			writeCfg(t, root, "[agent]\nreview = \"copilot\"\n")
+			if v, err := Get(root, k); err != nil || v.Value != "copilot" {
+				t.Errorf("%s file copilot: %+v %v", k, v, err)
+			}
+			writeCfg(t, root, before)
+			continue
+		}
 		if err := Set(root, k, "copilot"); !errors.As(err, &iv) || err.Error() != "invalid value \"copilot\" for "+k+": want one of claude" {
 			t.Errorf("%s set copilot: %v", k, err)
 		}
@@ -730,5 +756,49 @@ func TestAgentKeys(t *testing.T) {
 	}
 	if EnvVar("agent.gate-review") != "VLOOP_AGENT_GATE_REVIEW" {
 		t.Error("env var name")
+	}
+}
+
+func TestCopilotCreditKey(t *testing.T) {
+	root := scratch(t)
+	k := "copilot.credit-usd"
+	if v, err := Get(root, k); err != nil || v.Value != "0.0066667" || v.Source != SourceDefault {
+		t.Fatalf("default: %+v %v", v, err)
+	}
+	if EnvVar(k) != "VLOOP_COPILOT_CREDIT_USD" {
+		t.Errorf("env var = %s", EnvVar(k))
+	}
+	writeCfg(t, root, "language = \"en\"\n")
+	before := readCfg(t, root)
+	for _, bad := range []string{"0", "0.0", "-1", "abc"} {
+		var iv *InvalidValueError
+		if err := Set(root, k, bad); !errors.As(err, &iv) {
+			t.Errorf("set %q: %v", bad, err)
+		}
+		if readCfg(t, root) != before {
+			t.Errorf("refused set %q changed the file", bad)
+		}
+		t.Setenv(EnvVar(k), bad)
+		var se *SourceError
+		if _, err := Get(root, k); !errors.As(err, &se) || se.Source != EnvVar(k) {
+			t.Errorf("env %q: %v", bad, err)
+		}
+		t.Setenv(EnvVar(k), "")
+	}
+	t.Setenv(EnvVar(k), "0.02")
+	if v, err := Get(root, k); err != nil || v.Value != "0.02" || v.Source != SourceEnv {
+		t.Errorf("env: %+v %v", v, err)
+	}
+	t.Setenv(EnvVar(k), "")
+	if err := Set(root, k, "0.01"); err != nil {
+		t.Fatal(err)
+	}
+	if v, err := Get(root, k); err != nil || v.Value != "0.01" || v.Source != SourceFile {
+		t.Errorf("file: %+v %v", v, err)
+	}
+	writeCfg(t, root, "[copilot]\n  credit-usd = -2\n")
+	var se *SourceError
+	if _, err := Get(root, k); !errors.As(err, &se) {
+		t.Errorf("bad file: %v", err)
 	}
 }

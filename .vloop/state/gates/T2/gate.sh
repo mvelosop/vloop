@@ -1,111 +1,148 @@
 #!/bin/sh
-# Gate T2 — A2 and the session half of A3: every session starts through the
-# Claude adapter and nothing claude receives changes. A run of this tree and a
-# run of the base binary ($BASE, built with git archive) in the same fixture
-# path, with the same environment and stub, must hand claude the same argv,
-# working directory and environment for plan, gate-review, work, review and
-# verify — with and without .vloop/repo-guidelines.md, with and without an
-# effort, with and without a plan hash (the plan has none, the later sessions
-# one). The comparison is shown to catch a planted extra flag. The one value
-# normalized is VLOOP_PLAN_SHA256 (normlog in lib.sh: a digest of a plan that
-# carries the driver's timestamps). Records are session/v3 with agent and
-# cost_source and otherwise the base's fields; preflight, doctor, stderr
-# capture, SESSION RECORD MISSING and exit codes are the base's.
+# Gate T2 — C1's session and C2's denials. In a fixture run with
+# agent.review = copilot and an explicit model.review, every review session is
+# a copilot session (the stub in stub-copilot.sh) and every other session is
+# claude's, exactly as in the same run with every phase on claude. For each
+# review session: -p "/vloop:review <task>", --model, --effort only when
+# effort.review is set, --plugin-dir the extracted plugin the claude sessions
+# get, --no-ask-user, --output-format json, --allow-all-tools,
+# --disable-builtin-mcps, and none of --allow-all-paths, --add-dir, --sandbox,
+# --no-sandbox, --allow-all, --yolo; the repository root as working
+# directory; the environment a claude review session gets plus COPILOT_HOME
+# (an empty directory under .vloop/tmp/, never reused, never ~/.copilot) and,
+# with guidelines, COPILOT_CUSTOM_INSTRUCTIONS_DIRS naming a directory under
+# .vloop/tmp/ that holds them. The stub applies the --deny-tool patterns it was
+# given to every C2 form and to commands a review needs, and each verdict is
+# checked here. Last, B18's comparison gate (b18/, byte for byte as B18 ran
+# it) still passes: claude sessions are unchanged.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
 newbin
-basebin base
-basebin planted 's/"--strict-mcp-config",/"--strict-mcp-config", "--planted",/'
-S=$t/bin/new
 
-# Byte-identity, in the four configurations.
-compare plain;                 allphases plain
-compare guide guidelines;      allphases guide
-compare effort $EFFORTS;       allphases effort
-compare both guidelines $EFFORTS; allphases both
-grep -q '^arg --append-system-prompt-file$' "$t/plain.new.log" && fail "plain: a guidelines flag without .vloop/repo-guidelines.md"
-grep -q '^arg --append-system-prompt-file$' "$t/guide.new.log" || fail "guide: the fixture did not exercise the guidelines file"
-grep -q '^arg --effort$' "$t/plain.new.log" && fail "plain: an effort flag with no effort set"
-grep -q '^arg --effort$' "$t/effort.new.log" || fail "effort: the fixture did not exercise an effort"
-for p in "/vloop:plan $BRIEF" /vloop:gate-review "/vloop:work T1" "/vloop:review T1" /vloop:verify; do
-  b=$(sessionblock "$t/plain.new.log" "$p")
-  [ -n "$b" ] || fail "no session started with -p '$p'"
-  for kv in CLAUDE_CODE_USE_FOUNDRY=1 ANTHROPIC_FOUNDRY_RESOURCE=gate-resource ANTHROPIC_DEFAULT_SONNET_MODEL=gate-sonnet; do
-    echo "$b" | grep -qx "env $kv" || fail "'$p': $kv did not reach claude"
+# The same two-task run, all on claude and with copilot reviews.
+fixture; runfix "$t/cl" $CARRY
+[ "$rc" = 0 ] || fail "the all-claude run exited $rc: $(tail -8 "$t/cl")"
+CFG=$COPILOT_CFG fixture; runfix "$t/cop" $CARRY
+[ "$rc" = 0 ] || fail "the run with agent.review copilot exited $rc: $(tail -8 "$t/cop")"
+L=$t/cop.log
+s=$(sessions "$L" copilot | tr '\n' ';')
+[ "$s" = "/vloop:review T1;/vloop:review T2;" ] || fail "copilot sessions started with -p '$s', want the reviews of T1 and T2"
+sessions "$L" claude | grep -q '^/vloop:review' && fail "a review session started on claude with agent.review copilot"
+for p in "/vloop:plan $BRIEF" /vloop:gate-review "/vloop:work T1" "/vloop:work T2" /vloop:verify; do
+  sessions "$L" claude | grep -qxF "$p" || fail "no claude session started with -p '$p'"
+done
+
+# Claude sessions: what claude received is what it receives in the all-claude
+# run, every session but the reviews.
+noreview() {
+  awk 'function flush() { if (inb && !drop) printf "%s", buf; buf = ""; inb = 0; drop = 0 }
+    /^=== / { flush(); if ($0 == "=== claude") { inb = 1; buf = $0 "\n" } next }
+    inb { buf = buf $0 "\n"; if ($0 ~ /^arg \/vloop:review /) drop = 1 }
+    END { flush() }' "$1"
+}
+noreview "$t/cl.log" >"$t/cl.claude"; noreview "$L" >"$t/cop.claude"
+diff "$t/cl.claude" "$t/cop.claude" >"$t/claude.diff" ||
+  fail "with copilot reviews, what the claude sessions received differs from the all-claude run (< all claude, > copilot reviews):
+$(head -30 "$t/claude.diff")"
+
+C2="gh pr view 1
+gh api repos/o/r
+gh auth status
+git push origin main
+git push
+git remote add other https://example.invalid/r.git
+git remote -v
+git config --global user.name x
+git config --system core.editor x
+git config --file ../outside.cfg a.b c
+curl https://example.invalid
+wget https://example.invalid
+ssh host.invalid
+scp a host.invalid:b
+nc host.invalid 80
+rm -rf build
+rm x
+git commit -m x
+git reset --hard
+git checkout main
+git switch main
+git stash
+git branch x
+git tag v1"
+NEEDED="git diff
+git diff HEAD
+git status --short
+git log -1
+git show HEAD
+vloop task show T1
+printf x
+cat .vloop/tmp/proposal.json
+jq . .vloop/tmp/proposal.json
+go test ./...
+ls
+grep -rn x ."
+# review <log> <task> <name>: the checks every copilot review session passes.
+review() {
+  b=$(block "$1" copilot "/vloop:review $2")
+  [ -n "$b" ] || fail "$3: no copilot session started with -p '/vloop:review $2'"
+  [ "$(argafter "$b" -p)" = "/vloop:review $2" ] || fail "$3: -p is not followed by '/vloop:review $2'"
+  [ "$(argafter "$b" --model)" = "$MODEL" ] || fail "$3: --model '$(argafter "$b" --model)', want $MODEL"
+  [ "$(argafter "$b" --output-format)" = json ] || fail "$3: --output-format '$(argafter "$b" --output-format)', want json"
+  for f in --no-ask-user --allow-all-tools --disable-builtin-mcps; do
+    echo "$b" | grep -qx "arg $f" || fail "$3: no $f"
   done
-  echo "$b" | grep -Eq '^env VLOOP_(ACTIVE_TASK|GATE_TASK|PLAN_SHA256)=leaked$' && fail "'$p': a variable the base drops reached claude"
-  echo "$b" | grep -qx "cwd $t/repo" || fail "'$p': claude did not start in the repository root"
-done
-sessionblock "$t/plain.new.log" "/vloop:plan $BRIEF" | grep -q '^env VLOOP_PLAN_SHA256=' && fail "the plan session got a plan hash"
-sessionblock "$t/plain.new.log" "/vloop:work T1" | grep -q '^env VLOOP_PLAN_SHA256=H' || fail "the work session got no plan hash"
-
-# The comparison catches a planted extra flag, and only that.
-fixture "$t/bin/base"; runfix "$t/bin/planted" "$t/planted" $CARRY
-if diff "$t/planted.log" "$t/plain.new.log" >"$t/planted.diff"; then fail "the comparison did not catch a planted --planted flag"; fi
-grep -q '^< arg --planted$' "$t/planted.diff" || fail "the planted flag is not in the comparison's diff"
-grep '^[<>]' "$t/planted.diff" | grep -vqx '< arg --planted' && fail "the planted change shows more than the flag: $(head -10 "$t/planted.diff")"
-
-# Records: session/v3, agent and cost_source, and every other field the base's.
-nb=$(ls "$t/plain.base.sessions" | tr '\n' ' '); nn=$(ls "$t/plain.new.sessions" | tr '\n' ' ')
-[ "$nb" = "$nn" ] || fail "session record files '$nn', the base wrote '$nb'"
-[ "$(ls "$t/plain.new.sessions" | wc -l | tr -d ' ')" = 5 ] || fail "a run of five sessions left records '$nn'"
-drop='del(.schema, .agent, .cost_source, .started, .ended, .wall_ms)'
-for f in $nn; do
-  r="$t/plain.new.sessions/$f"
-  j=$("$JQ" -c '[.schema, .agent, .cost_source]' "$r") || fail "$f is not JSON"
-  [ "$j" = '["session/v3","claude","reported"]' ] || fail "$f: schema, agent, cost_source = $j, want session/v3, claude, reported"
-  "$S" schema validate session/v3 "$r" >"$t/v.out" 2>&1 || fail "vloop schema validate session/v3 $f: $(cat "$t/v.out")"
-  a=$("$JQ" -S -c "$drop" "$t/plain.base.sessions/$f") b=$("$JQ" -S -c "$drop" "$r")
-  [ "$a" = "$b" ] || fail "$f differs from the base's record beyond schema, agent and cost_source:
-base: $a
-new:  $b"
-  for k in started ended wall_ms; do
-    [ "$("$JQ" "has(\"$k\")" "$r")" = true ] || fail "$f has no $k"
+  bad=$(echo "$b" | grep -E '^arg (--allow-all-paths|--add-dir|--sandbox|--no-sandbox|--allow-all|--yolo|--allow-all-urls|--allow-url|--config-dir)(=.*)?$') &&
+    fail "$3: started with $bad"
+  echo "$b" | grep -q '^arg --append-system-prompt-file' && fail "$3: given claude's --append-system-prompt-file"
+  cw=$(block "$1" claude "/vloop:work $2")
+  pd=$(argafter "$b" --plugin-dir)
+  [ -n "$pd" ] && [ "$pd" = "$(argafter "$cw" --plugin-dir)" ] || fail "$3: --plugin-dir '$pd', the claude sessions' '$(argafter "$cw" --plugin-dir)'"
+  echo "$b" | grep -qx 'plugin ok' || fail "$3: --plugin-dir holds no skills/review/SKILL.md when the session starts"
+  echo "$b" | grep -qx "cwd $t/repo" || fail "$3: did not start in the repository root: $(echo "$b" | grep '^cwd ')"
+  echo "$b" | grep -qx 'home empty' || fail "$3: COPILOT_HOME is $(echo "$b" | grep '^home ') when the session starts, want an empty directory"
+  h=$(echo "$b" | sed -n 's/^env COPILOT_HOME=//p')
+  case "$h" in "$t/repo/.vloop/tmp/"?*) ;; *) fail "$3: COPILOT_HOME '$h' is not under the repository's .vloop/tmp/";; esac
+  for c in $(echo "$b" | sed -n 's/^env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=//p' | tr ',:' '  '); do
+    case "$c" in "$t/repo/.vloop/tmp/"?*) ;; *) fail "$3: COPILOT_CUSTOM_INSTRUCTIONS_DIRS names '$c', not under the repository's .vloop/tmp/";; esac
   done
+  echo "$C2" | while IFS= read -r c; do
+    echo "$b" | grep -qxF "probe denied shell $c" || { echo "GATE FAIL: $3: the deny patterns do not stop '$c' ($(echo "$b" | grep -F "probe allowed shell $c"))" >&2; exit 1; }
+  done || exit 1
+  echo "$NEEDED" | while IFS= read -r c; do
+    echo "$b" | grep -qxF "probe allowed shell $c" || { echo "GATE FAIL: $3: a deny pattern stops '$c', which a review needs" >&2; exit 1; }
+  done || exit 1
+  echo "$b" | grep -qx 'probe denied url https://example.invalid/page' || fail "$3: the deny patterns do not stop the url tool"
+  echo "$b" | grep -qx 'probe allowed write .vloop/tmp/verdict.json' || fail "$3: a deny pattern stops the file tools writing .vloop/tmp/verdict.json"
+}
+for k in T1 T2; do review "$L" "$k" "review $k"; done
+# The environment: a claude review session's, plus the copilot variables.
+for k in T1 T2; do
+  envof "$(block "$t/cl.log" claude "/vloop:review $k")" | grep -Ev '^env COPILOT_(HOME|CUSTOM_INSTRUCTIONS_DIRS)=' >"$t/env.cl"
+  envof "$(block "$L" copilot "/vloop:review $k")" | grep -Ev '^env COPILOT_(HOME|CUSTOM_INSTRUCTIONS_DIRS)=' >"$t/env.cop"
+  [ -s "$t/env.cl" ] || fail "no environment logged for the all-claude review of $k"
+  diff "$t/env.cl" "$t/env.cop" >"$t/env.diff" ||
+    fail "review $k: the copilot session's environment, but for COPILOT_HOME and COPILOT_CUSTOM_INSTRUCTIONS_DIRS, differs from a claude review's (< claude, > copilot):
+$(head -20 "$t/env.diff")"
 done
-# The schema requires what the record must carry and knows two cost sources.
-w="$t/plain.new.sessions/003-work.json"
-for e in 'del(.ended)' 'del(.wall_ms)' 'del(.agent)' 'del(.cost_source)' '.cost_source = "estimated"' '.schema = "session/v2"'; do
-  "$JQ" "$e" "$w" >"$t/bad.json" || fail jq
-  "$S" schema validate session/v3 "$t/bad.json" >/dev/null 2>&1 && fail "session/v3 accepts a record with $e"
-done
-# The older schemas still validate the base's records.
-"$S" schema validate session/v1 "$t/plain.base.sessions/003-work.json" >/dev/null 2>&1 || fail "session/v1 no longer validates a base work record"
-"$S" schema validate session/v2 "$t/plain.base.sessions/002-gate-review.json" >/dev/null 2>&1 || fail "session/v2 no longer validates a base gate-review record"
+[ -e "$t/home/.copilot" ] && fail "the run created ~/.copilot"
+grep -qx 'guidelines absent' "$L" || fail "without .vloop/repo-guidelines.md a copilot session found the lesson"
 
-# Captured stderr is the base's.
-diff -r "$t/plain.base.stderr" "$t/plain.new.stderr" >"$t/stderr.diff" || fail "captured stderr differs from the base's: $(head -10 "$t/stderr.diff")"
+# Guidelines: handed over through COPILOT_CUSTOM_INSTRUCTIONS_DIRS.
+CFG=$COPILOT_CFG fixture plan.json guidelines; runfix "$t/gl" $CARRY
+[ "$rc" = 0 ] || fail "the run with guidelines exited $rc: $(tail -8 "$t/gl")"
+review "$t/gl.log" T1 "review T1 with guidelines"
+b=$(block "$t/gl.log" copilot "/vloop:review T1")
+echo "$b" | grep -qx 'guidelines found' ||
+  fail "with .vloop/repo-guidelines.md, no directory in COPILOT_CUSTOM_INSTRUCTIONS_DIRS ('$(echo "$b" | sed -n 's/^env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=//p')') holds them"
 
-# No cost field: cost_source none, cost_usd 0.
-MODES=nocost compare nocost; allphases nocost
-for f in $(ls "$t/nocost.new.sessions"); do
-  j=$("$JQ" -c '[.schema, .agent, .cost_source, .cost_usd]' "$t/nocost.new.sessions/$f")
-  [ "$j" = '["session/v3","claude","none",0]' ] || fail "with no total_cost_usd, $f: schema, agent, cost_source, cost_usd = $j"
-  "$S" schema validate session/v3 "$t/nocost.new.sessions/$f" >/dev/null 2>&1 || fail "session/v3 rejects $f with cost_source none"
-done
+# Effort.
+CFG="$COPILOT_CFG
+effort.review high" fixture; runfix "$t/ef" $CARRY
+[ "$rc" = 0 ] || fail "the run with effort.review high exited $rc: $(tail -8 "$t/ef")"
+review "$t/ef.log" T1 "review T1 with an effort"
+[ "$(argafter "$(block "$t/ef.log" copilot "/vloop:review T1")" --effort)" = high ] || fail "effort.review high: no --effort high"
+block "$L" copilot "/vloop:review T1" | grep -q '^arg --effort' && fail "an --effort with effort.review unset"
 
-# SESSION RECORD MISSING, exit codes and halts as the base: a silent work
-# session, then one whose stdout is not JSON, and a review that exits 3.
-for m in silent.work garbage.work "garbage.review exit.review=3" "silent.verify exit.verify=3"; do
-  n=$(echo "$m" | tr ' .=' '___')
-  MODES=$m compare "$n"
-  grep 'SESSION RECORD MISSING' "$t/$n.base.runlog" >"$t/$n.bm" 2>/dev/null; grep 'SESSION RECORD MISSING' "$t/$n.new.runlog" >"$t/$n.nm" 2>/dev/null
-  cmp -s "$t/$n.bm" "$t/$n.nm" || fail "$m: SESSION RECORD MISSING lines '$(cat "$t/$n.nm")', the base's '$(cat "$t/$n.bm")'"
-  [ "$(ls "$t/$n.base.sessions" | tr '\n' ' ')" = "$(ls "$t/$n.new.sessions" | tr '\n' ' ')" ] || fail "$m: the records written differ from the base's"
-done
-grep -q 'SESSION RECORD MISSING work' "$t/silent_work.new.runlog" || fail "a silent work session logged no SESSION RECORD MISSING"
-grep -q 'SESSION RECORD MISSING work' "$t/garbage_work.new.runlog" || fail "a work session printing no JSON logged no SESSION RECORD MISSING"
-
-# Preflight and doctor as the base, passing and failing.
-for m in "" noversion; do
-  fixture "$t/bin/base"; [ -n "$m" ] && : >"$t/stub/$m"
-  (cd "$t/repo" && venv "$t/bin/base" doctor >"$t/db" 2>&1); a=$?
-  (cd "$t/repo" && venv "$S" doctor >"$t/dn" 2>&1); b=$?
-  [ "$a" = "$b" ] || fail "doctor ${m:-ok} exited $b, the base $a"
-  diff "$t/db" "$t/dn" >"$t/dd" || fail "doctor ${m:-ok} prints other than the base: $(cat "$t/dd")"
-done
-[ "$a" != 0 ] || fail "the fixture's broken claude did not fail doctor"
-MODES=noversion compare preflight
-[ "$brc" != 0 ] || fail "the fixture's broken claude did not fail the run's preflight"
-grep -q '^arg -p$' "$t/preflight.new.log" && fail "a session started after a failed preflight"
+# B18's comparison gate, unchanged.
+sh "$G/b18/gate.sh" >"$t/b18.out" 2>&1 || fail "B18's comparison gate fails: $(tail -5 "$t/b18.out")"
 echo "gate T2: ok"

@@ -106,8 +106,14 @@
     "cost_source": {
       "enum": [
         "reported",
+        "estimated",
         "none"
       ]
+    },
+    "credits": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Copilot credits the session used; absent on records of agents that report none"
     },
     "turns": {
       "type": "integer"
@@ -119,6 +125,17 @@
       "type": "array"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "agent": { "const": "claude" } },
+        "required": ["agent"]
+      },
+      "then": {
+        "properties": { "cost_source": { "enum": ["reported", "none"] } }
+      }
+    }
+  ],
   "if": {
     "properties": {
       "phase": {

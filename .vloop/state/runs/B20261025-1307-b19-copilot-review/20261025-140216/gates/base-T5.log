@@ -1,0 +1,2 @@
+GATE FAIL:  vloop config set agent.review copilot: exit 2, want 0 (stdout '', stderr 'vloop: invalid value "copilot" for agent.review: want one of claude')
+GATE FAIL: gate T1 fails on the finished tree

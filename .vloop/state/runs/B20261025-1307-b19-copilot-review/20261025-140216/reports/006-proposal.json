@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Checked the finished tree against the T1-T4 gates and the brief's worked example; nothing had drifted, so no change was needed.",
+  "files": [],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: ok.",
+  "notes": "No code or doc edits. docs/domain/execution/session.md and docs/guide/configuration.md already document copilot for review, credits, the estimated cost source and the experimental status; no page under docs/domain or docs/guide still says claude is the only agent."
+}

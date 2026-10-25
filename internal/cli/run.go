@@ -188,6 +188,8 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++
+		case c.Result == resWarning && (c.Name == "agent.review" || strings.HasPrefix(c.Name, ".claude/skills/")):
+			fmt.Fprintf(errOut, "  ! %s %s\n", c.Name, c.Message)
 		}
 	}
 	if hook := preCommitHook(root); hook != "" {
@@ -195,6 +197,11 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 	}
 	if bad > 0 {
 		return Problem(fmt.Errorf("preflight failed — %d problem(s), nothing has run", bad))
+	}
+	if copilotReview(root) {
+		if m, err := config.Get(root, "model.review"); err == nil && m.Source == config.SourceDefault {
+			return Problem(fmt.Errorf("agent.review is copilot but model.review is the default %q, a Claude alias: set model.review to a Copilot model id", m.Value))
+		}
 	}
 	return nil
 }

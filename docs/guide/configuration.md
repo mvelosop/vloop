@@ -30,9 +30,10 @@ environment and in `config set`.
 | `effort.verify` | unset | same | `VLOOP_EFFORT_VERIFY` | effort of the verify session |
 | `agent.plan` | `claude` | `claude` | `VLOOP_AGENT_PLAN` | agent CLI of the plan session |
 | `agent.work` | `claude` | `claude` | `VLOOP_AGENT_WORK` | agent CLI of the work sessions |
-| `agent.review` | `claude` | `claude` | `VLOOP_AGENT_REVIEW` | agent CLI of the review sessions |
+| `agent.review` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_REVIEW` | agent CLI of the review sessions (`copilot` is experimental) |
 | `agent.gate-review` | `claude` | `claude` | `VLOOP_AGENT_GATE_REVIEW` | agent CLI of the gate-review session |
 | `agent.verify` | `claude` | `claude` | `VLOOP_AGENT_VERIFY` | agent CLI of the verify session |
+| `copilot.credit-usd` | `0.0066667` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot credit, for the estimated cost of a copilot review session |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
 | `metrics.stacks` | unset | a list of preset names (below) | `VLOOP_METRICS_STACKS` | presets that classify changed lines as code, test, docs or excluded |
@@ -52,6 +53,8 @@ environment and in `config set`.
 | `run.session-timeout` | `60` | a whole number of minutes, 1 or more | `VLOOP_RUN_SESSION_TIMEOUT`  | minutes a plan, work or review session may run; a session still running is killed with everything it started and is a session error (exit 7) |
 | `run.verify` | `true` | `true` or `false` | `VLOOP_RUN_VERIFY`  | whether `vloop run` ends with a verify session that checks the built surface against the brief |
 | `run.keep-awake` | `on` | `on` or `off` | `VLOOP_RUN_KEEP_AWAKE`  | `on` holds a no-idle-sleep hold for the lifetime of `vloop run` (macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`); `off` takes none |
+
+**Copilot review sessions are experimental until B20.** `agent.review = "copilot"` runs the review sessions on the GitHub Copilot CLI, with no fence: a deny list stands in for it. The deny list stops `gh`, `git push` and `git remote`, `git config --global`, `--system` and `--file`, network commands (`curl`, `wget`, `ssh`, `scp`, `nc`), `rm`, the git commands the skills forbid (`git commit`, `reset`, `checkout`, `switch`, `stash`, `branch`, `tag`), web fetch and Copilot's built-in MCP servers. It does not stop anything not named, nor other forms of the named commands. `vloop doctor` and `vloop run` say so with a warning, check that `copilot` is on PATH and that `copilot --version` runs, and `vloop run` refuses to start while `model.review` is still the default `sonnet`, a Claude alias: set it to a Copilot model id. `vloop doctor` also warns of each `.claude/skills/` directory whose name ends in `review`, which a copilot session may load instead of `/vloop:review`.
 
 `model.*`, `effort.*` and `agent.*` are stored under `[model]`, `[effort]` and `[agent]`, the
 `metrics.*` keys under `[metrics]`, the `run.*` budgets under `[run]` as TOML numbers. the two timeouts are whole minutes. `vloop run`'s `--max-iterations`, `--cost-ceiling`, `--max-attempts` and `--stall-limit` flags override the first four `run.*` keys for one run (flag, then environment, then file, then default). For example:

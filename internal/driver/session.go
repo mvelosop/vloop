@@ -329,6 +329,9 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	if !ad.Supports(s.Phase) {
 		return Result{}, fmt.Errorf("agent %s does not support the %s phase", ad.Name(), s.Phase)
 	}
+	if ad, err = r.withSession(ad, s); err != nil {
+		return Result{}, err
+	}
 	prep, err := ad.Prepare(r.Root, r.Version, s.Phase)
 	if err != nil {
 		return Result{}, err
@@ -437,6 +440,9 @@ func (r *Runner) record(s Spec, agent, task string, started, ended time.Time, o 
 		"turns":              o.Turns,
 		"is_error":           o.IsError,
 		"permission_denials": o.Denials,
+	}
+	if o.Credits != nil {
+		rec["credits"] = *o.Credits
 	}
 	if task != "" {
 		rec["task"] = task

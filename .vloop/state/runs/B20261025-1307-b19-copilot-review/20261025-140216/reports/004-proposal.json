@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "The Copilot adapter's Parse reads the JSON Lines into session/v3 (credits, estimated cost, turns, duration, is_error; no record without a result event); session/v3 and metrics/v3 gain credits and the estimated source; metrics carries credits and marks an estimated cost with ≈.",
+  "files": ["internal/driver/agent.go", "internal/driver/agent_copilot.go", "internal/driver/agent_copilot_parse_test.go", "internal/driver/session.go", "internal/runs/runs.go", "internal/metrics/time.go", "internal/metrics/metrics.go", "internal/metrics/print.go", "internal/metrics/print_test.go", "internal/schema/session_credits_test.go", "schemas/session.v3.json", "schemas/metrics.v3.json", "docs/domain/execution/session.md"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok.",
+  "notes": "Runner.withSession gives the copilot adapter the session model and copilot.credit-usd (read via config.Get, so file and VLOOP_COPILOT_CREDIT_USD both apply) before Prepare; Parse stays free of config. The ceiling needs no change: spendIn sums cost_usd. The ≈ shows when metrics credits.total > 0. credits.verify is omitempty so a brief without verify keeps no 'verify' text (TestPrintSummaryVerify). session/v3 refuses cost_source estimated for agent claude through an allOf if/then. TestTaskGate* fail only inside a driver session (plan-hash guard), as in T1."
+}

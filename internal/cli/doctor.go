@@ -109,6 +109,10 @@ func runDoctor(b Build, root string) []doctorCheck {
 
 	hasClaude := doctorClaude(add)
 
+	if cerr == nil && copilotReview(root) {
+		doctorCopilot(root, add)
+	}
+
 	if doctorTrusted(root) {
 		add("trust", resPass, "")
 	} else {
@@ -189,6 +193,35 @@ func doctorClaude(add func(name, result, msg string)) bool {
 		add("claude", resPass, "")
 	}
 	return found
+}
+
+// copilotExperimental is the warning every place that chooses copilot for the
+// review sessions gives.
+const copilotExperimental = "is copilot: experimental — review sessions are not fenced until B20 (docs/guide/configuration.md)"
+
+// copilotReview reports whether agent.review is copilot.
+func copilotReview(root string) bool {
+	v, err := config.Get(root, "agent.review")
+	return err == nil && v.Value == driver.AgentCopilot
+}
+
+// doctorCopilot adds the checks of a copilot review agent: copilot found and
+// working, the experimental warning, and a warning for each project skill
+// whose name ends in review, which a copilot session may pick instead of
+// /vloop:review.
+func doctorCopilot(root string, add func(name, result, msg string)) {
+	if _, problem := driver.AgentPreflight(driver.AgentCopilot); problem != "" {
+		add("copilot", resProblem, problem)
+	} else {
+		add("copilot", resPass, "")
+	}
+	add("agent.review", resWarning, copilotExperimental)
+	entries, _ := os.ReadDir(filepath.Join(root, ".claude", "skills"))
+	for _, e := range entries {
+		if e.IsDir() && strings.HasSuffix(e.Name(), "review") {
+			add(".claude/skills/"+e.Name(), resWarning, "may be loaded instead of /vloop:review by a copilot session")
+		}
+	}
 }
 
 // doctorPlanShell adds the gate shell, plan and branch checks.

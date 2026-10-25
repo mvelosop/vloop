@@ -89,6 +89,63 @@ fi
 exit "$STUB_EXIT"
 `
 
+// runCopilotStubSource is the stub copilot, beside the stub claude and
+// following its pattern. It appends each invocation to copilot.log: a header
+// "=== copilot", each argument on its own line, the working directory and the
+// environment. It answers --version, and for -p "/vloop:review <task>" sets
+// TASK, MODEL (from --model), ATTEMPT and the variables below, sources the
+// per-test script copilot-script.sh when there is one (in the stub's working
+// directory), and prints JSON Lines: assistant.turn_start events,
+// session.usage_checkpoint events carrying data.totalNanoAiu, and a result
+// event with exitCode and usage.sessionDurationMs.
+//
+//	STUB_NANOAIU  the last checkpoint's totalNanoAiu (default 14200000000)
+//	STUB_EXIT     the result's exitCode and the process exit code (default 0)
+//	STUB_DURATION usage.sessionDurationMs (default 18000)
+//	STUB_TURNS    assistant.turn_start events (default 3)
+//	STUB_SILENT=1 print no result event
+const runCopilotStubSource = `#!/bin/sh
+dir=$(dirname "$0")
+{
+  echo "=== copilot"
+  for a in "$@"; do printf 'arg %s\n' "$a"; done
+  printf 'cwd %s\n' "$(pwd -P)"
+  env | LC_ALL=C sort | sed 's/^/env /'
+} >> "$dir/copilot.log"
+case "$1" in
+  --version) echo "GitHub Copilot CLI 1.0.101"; exit 0;;
+esac
+prompt=""; MODEL=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -p) prompt="$2"; shift 2;;
+    --model) MODEL="$2"; shift 2;;
+    *) shift;;
+  esac
+done
+cmd="${prompt%% *}"
+TASK="${prompt#* }"
+if [ "$cmd" != /vloop:review ] || [ "$TASK" = "$prompt" ]; then
+  echo "stub copilot: unrecognised prompt: $prompt" >&2; exit 64
+fi
+n=$(cat "$dir/count.copilot.$TASK" 2>/dev/null || echo 0)
+ATTEMPT=$((n + 1))
+echo "$ATTEMPT" > "$dir/count.copilot.$TASK"
+STUB_NANOAIU=14200000000; STUB_EXIT=0; STUB_DURATION=18000; STUB_TURNS=3; STUB_SILENT=0
+if [ -f "$dir/copilot-script.sh" ]; then . "$dir/copilot-script.sh"; fi
+printf '{"type":"session.start","data":{"sessionId":"stub"}}\n'
+i=1
+while [ "$i" -le "$STUB_TURNS" ]; do
+  printf '{"type":"assistant.turn_start","data":{"turnId":"%s"}}\n' "$i"
+  i=$((i + 1))
+done
+printf '{"type":"session.usage_checkpoint","data":{"totalNanoAiu":%s}}\n' "$STUB_NANOAIU"
+if [ "$STUB_SILENT" != 1 ]; then
+  printf '{"type":"result","sessionId":"stub","exitCode":%s,"usage":{"premiumRequests":1,"sessionDurationMs":%s}}\n' "$STUB_EXIT" "$STUB_DURATION"
+fi
+exit "$STUB_EXIT"
+`
+
 // runRepo is a harness repository: the scratch repository, its fake home and
 // the stub directory.
 type runRepo struct {
@@ -162,6 +219,10 @@ func newRunRepo(t *testing.T) *runRepo {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(r.stub, "claude"), []byte(strings.ReplaceAll(runStubSource, "@PLUGIN_VERSION@", pluginVersion(t))), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.WriteFile(filepath.Join(r.stub, "copilot"), []byte(runCopilotStubSource), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -272,6 +333,72 @@ func (r *runRepo) vloop(args ...string) result {
 func (r *runRepo) claude(args ...string) result {
 	r.t.Helper()
 	return r.exec(filepath.Join(r.stub, "claude"), r.env(), args...)
+}
+
+// copilotScript sets the stub copilot's per-test script, like script.
+func (r *runRepo) copilotScript(body string) {
+	r.t.Helper()
+	if err := os.WriteFile(filepath.Join(r.stub, "copilot-script.sh"), []byte(body), 0o644); err != nil {
+		r.t.Fatal(err)
+	}
+}
+
+// copilot runs the stub copilot directly, as the driver would.
+func (r *runRepo) copilot(args ...string) result {
+	r.t.Helper()
+	return r.exec(filepath.Join(r.stub, "copilot"), r.env(), args...)
+}
+
+func TestRunHarnessCopilot(t *testing.T) {
+	t.Parallel()
+	r := newRunRepo(t)
+	if v := r.copilot("--version"); v.code != 0 || !strings.Contains(v.out, "Copilot CLI") {
+		t.Fatalf("--version: %+v", v)
+	}
+	r.copilotScript("STUB_NANOAIU=5000000000; STUB_TURNS=2; STUB_DURATION=7000\n")
+	res := r.copilot("-p", "/vloop:review T1", "--model", "gpt-5.6-terra")
+	if res.code != 0 {
+		t.Fatalf("review: %+v", res)
+	}
+	lines := strings.Split(strings.TrimSpace(res.out), "\n")
+	var turns, checkpoints int
+	var last map[string]any
+	for _, l := range lines {
+		var ev map[string]any
+		if err := json.Unmarshal([]byte(l), &ev); err != nil {
+			t.Fatalf("line %q: %v", l, err)
+		}
+		switch ev["type"] {
+		case "assistant.turn_start":
+			turns++
+		case "session.usage_checkpoint":
+			checkpoints++
+			if ev["data"].(map[string]any)["totalNanoAiu"] != float64(5000000000) {
+				t.Errorf("checkpoint = %v", ev)
+			}
+		case "result":
+			last = ev
+		}
+	}
+	if turns != 2 || checkpoints != 1 || last == nil || last["exitCode"] != float64(0) ||
+		last["usage"].(map[string]any)["sessionDurationMs"] != float64(7000) {
+		t.Errorf("events: turns %d checkpoints %d result %v", turns, checkpoints, last)
+	}
+	b, err := os.ReadFile(filepath.Join(r.stub, "copilot.log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"arg -p\narg /vloop:review T1\narg --model\narg gpt-5.6-terra\n", "\ncwd ", "\nenv HOME="} {
+		if !strings.Contains(string(b), want) {
+			t.Errorf("copilot.log lacks %q:\n%s", want, b)
+		}
+	}
+	if len(r.argv()) != 0 {
+		t.Errorf("the stub copilot wrote to argv.log: %v", r.argv())
+	}
+	if bad := r.copilot("-p", "/vloop:work T1"); bad.code != 64 {
+		t.Errorf("a non-review prompt: %+v", bad)
+	}
 }
 
 func TestRunHarness(t *testing.T) {

@@ -5,16 +5,21 @@ import (
 	"fmt"
 	"os/exec"
 	"sort"
+	"strconv"
 	"strings"
+
+	"github.com/mvelosop/vloop/internal/config"
 )
 
 // AgentClaude is the agent every phase resolves to unless configured otherwise.
 const AgentClaude = "claude"
 
-// Cost sources of a session record: the agent reported a cost, or printed none.
+// Cost sources of a session record: the agent reported a cost, the driver
+// estimated it from credits, or the agent printed none.
 const (
-	CostReported = "reported"
-	CostNone     = "none"
+	CostReported  = "reported"
+	CostEstimated = "estimated"
+	CostNone      = "none"
 )
 
 // Adapter is everything agent-specific about starting a session and reading
@@ -41,11 +46,12 @@ type Adapter interface {
 }
 
 // Prepared is what an adapter's Prepare returns for its own Command.
-type Prepared struct{ Fence, Plugin string }
+type Prepared struct{ Fence, Plugin, Home, Guidelines string }
 
 // Output is a session's result as the agent reported it.
 type Output struct {
 	Cost       float64
+	Credits    *float64 // Copilot credits; nil for an agent that reports none
 	CostSource string
 	AgentMS    int64 // the agent's own clock for the session
 	Turns      int
@@ -54,11 +60,33 @@ type Output struct {
 	ModelsUsed map[string]usage
 }
 
-// adapterFor is the adapter of an agent name; claude is the only one, run as
-// the given command ("claude" when empty).
+// withSession gives an adapter what only the session knows and its Parse needs:
+// the model, and the price of a Copilot credit.
+func (r *Runner) withSession(ad Adapter, s Spec) (Adapter, error) {
+	c, ok := ad.(copilotAdapter)
+	if !ok {
+		return ad, nil
+	}
+	got, err := config.Get(r.Root, "copilot.credit-usd")
+	if err != nil {
+		return nil, err
+	}
+	price, err := strconv.ParseFloat(got.Value, 64)
+	if err != nil {
+		return nil, fmt.Errorf("copilot.credit-usd %q: %w", got.Value, err)
+	}
+	c.model, c.creditUSD = s.Model, price
+	return c, nil
+}
+
+// adapterFor is the adapter of an agent name, claude run as the given command
+// ("claude" when empty); copilot is run as "copilot".
 func adapterFor(name, bin string) (Adapter, error) {
 	if name == "" || name == AgentClaude {
 		return claudeAdapter{bin: bin}, nil
+	}
+	if name == AgentCopilot {
+		return copilotAdapter{}, nil
 	}
 	return nil, fmt.Errorf("unknown agent %q", name)
 }

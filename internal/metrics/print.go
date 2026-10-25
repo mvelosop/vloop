@@ -119,8 +119,13 @@ func PrintSummary(out io.Writer, r *Report) {
 	if r.Cost.Per1000Code != nil {
 		per1k = fmt.Sprintf("$%.2f", *r.Cost.Per1000Code)
 	}
-	fmt.Fprintf(out, " cost      $%.2f · plan %.2f · work %.2f · review %.2f%s · %s/kloc\n",
-		r.Cost.Total, r.Cost.Plan, r.Cost.Work, r.Cost.Review, grCost, per1k)
+	// Credits are reported only by agents whose cost is estimated from them.
+	approx := ""
+	if r.Credits.Total > 0 {
+		approx = "≈"
+	}
+	fmt.Fprintf(out, " cost      %s$%.2f · plan %.2f · work %.2f · review %.2f%s · %s/kloc\n",
+		approx, r.Cost.Total, r.Cost.Plan, r.Cost.Work, r.Cost.Review, grCost, per1k)
 	fmt.Fprintf(out, " models    plan %s · work %s · review %s%s\n",
 		joinModels(r.Models.Plan), joinModels(r.Models.Work), joinModels(r.Models.Review), grModels)
 	fmt.Fprintf(out, " defects   in-loop %d · operator %d · escaped %d · removal efficiency %s\n",

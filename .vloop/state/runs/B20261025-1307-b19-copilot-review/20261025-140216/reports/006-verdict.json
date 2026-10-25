@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The gates of T1, T2 (with B18's comparison gate inside it), T3 and T4 all pass on the finished tree, run together.", "met": true, "evidence": ".vloop/state/gates/T5/gate.sh runs the T1-T4 gates first and fails if any fails; the driver re-ran it and it passed (gates/T5.log)"},
+    {"criterion": "Every line of the brief's worked example holds against the changed binary: the config lines with their output and exit codes, the default-model refusal, doctor's experimental warning, a one-task run whose review is a copilot session with every C2 denial and --disable-builtin-mcps, COPILOT_HOME under .vloop/tmp/ and the repository root as working directory, its record (agent copilot, credits 14.2, cost_usd 14.2 × the default price, cost_source estimated, turns 3, duration_ms 18000, permission_denials []) while plan, work and verify run on claude, SESSION RECORD MISSING for a stub that prints no result event, and metrics with credits total 14.2 and agents review [\"copilot\"].", "met": true, "evidence": "gate.sh asserts each of these lines (config exits, refusal, doctor warning, copilot argv/env/cwd, record fields, claude sessions); it passed on the unchanged tree"},
+    {"criterion": "No page under docs/domain/ or docs/guide/ still says claude is the only agent a review may run on, or that a session record never carries credits, except where it describes older records.", "met": true, "evidence": "docs/domain/execution/session.md:11,88-101 and docs/guide/configuration.md:33,36,57 document copilot for review, credits and the estimated source; grep for 'only claude' phrasing finds nothing stale; session.md:101 limits 'no credits' to claude records"},
+    {"criterion": "The task adds no behaviour: any code change it makes fixes a divergence from the brief's contract that an earlier task left, its work notes name it, and it ships with the committed test that would have caught it.", "met": true, "evidence": "git diff HEAD shows no source or doc change (only run-state logs); proposal lists no files"}
+  ],
+  "findings": [],
+  "notes": "No-op close: nothing had drifted. C5 (real Copilot CLI) remains the operator's."
+}

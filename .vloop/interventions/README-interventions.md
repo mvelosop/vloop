@@ -147,6 +147,12 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261015-215246-the-session-fence-denies-read-only-git-t](I20261015-215246-the-session-fence-denies-read-only-git-t.md) |
 | verify | verification-finding | partly | no-options | [I20261025-123516-the-domain-glossary-docs-domain-domain-m](I20261025-123516-the-domain-glossary-docs-domain-domain-m.md) |
 | verify | verification-finding | partly | no-options | [I20261025-123517-a-metrics-comment-still-named-only-metri](I20261025-123517-a-metrics-comment-still-named-only-metri.md) |
+| verify | verification-finding | partly | no-options | [I20261025-223642-a-copilot-session-s-own-copilot-home-hol](I20261025-223642-a-copilot-session-s-own-copilot-home-hol.md) |
+| verify | verification-finding | partly | no-options | [I20261025-223643-the-c2-deny-list-does-not-see-through-sh](I20261025-223643-the-c2-deny-list-does-not-see-through-sh.md) |
+| verify | verification-finding | partly | no-options | [I20261025-223644-the-verify-session-s-scratch-repository](I20261025-223644-the-verify-session-s-scratch-repository.md) |
+| verify | verification-finding | partly | no-options | [I20261025-223645-in-the-c5-run-the-rule-that-a-gate-never](I20261025-223645-in-the-c5-run-the-rule-that-a-gate-never.md) |
+| verify | verification-finding | partly | no-options | [I20261025-223646-in-the-c5-run-the-review-applied-no-abso](I20261025-223646-in-the-c5-run-the-review-applied-no-abso.md) |
+| verify | verification-finding | partly | no-options | [I20261025-223647-53-recurred-an-unmasked-temp-dir-in-the](I20261025-223647-53-recurred-an-unmasked-temp-dir-in-the.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
