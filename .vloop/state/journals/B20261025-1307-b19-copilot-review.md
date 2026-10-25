@@ -48,3 +48,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Checked the finished tree against the T1-T4 gates and the brief's worked example; nothing had drifted, so no change was needed.
 - **Files:** none
 - **Notes for next iteration:** No code or doc edits. docs/domain/execution/session.md and docs/guide/configuration.md already document copilot for review, credits, the estimated cost source and the experimental status; no page under docs/domain or docs/guide still says claude is the only agent.
+
+## Run ended — complete
+
+- **Run:** `B20261025-1307-b19-copilot-review` · 6 iteration(s) this run
+- **Plan:** 5/5 done, 0 blocked
