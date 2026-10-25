@@ -29,3 +29,10 @@ committing the plan
    review T2 · 0m36s · $0.20 · run $5.62 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/4 done ──
+   Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
+   work T3 · 12m33s · $0.50 · run $6.12 / $40.00
+   check go
+   review T3 · 0m47s · $0.20 · run $6.31 / $40.00
+   review: PASS
+   T3 done

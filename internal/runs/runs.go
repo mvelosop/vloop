@@ -56,6 +56,7 @@ type Session struct {
 	Task       string // from the iteration the session names; empty for plan sessions
 	Model      string
 	Effort     string
+	Agent      string // the CLI that ran the session; claude on session/v1 and v2 records
 	Started    time.Time
 	DurationMS int64
 	WallMS     *int64 // the driver's own measurement; nil on records that predate it
@@ -406,6 +407,7 @@ type rawSession struct {
 	Task       string  `json:"task"`
 	Model      string  `json:"model"`
 	Effort     *string `json:"effort"`
+	Agent      string  `json:"agent"`
 	Started    string  `json:"started"`
 	DurationMS int64   `json:"duration_ms"`
 	WallMS     *int64  `json:"wall_ms"`
@@ -438,6 +440,10 @@ func readSession(p string) (Session, error) {
 		Phase: r.Phase, Iteration: r.Iteration, Task: r.Task, Model: r.Model,
 		Started: parseTime(r.Started), DurationMS: r.DurationMS, WallMS: r.WallMS, IsError: r.IsError,
 		CostUSD: r.CostUSD, Denials: len(r.Denials), Models: map[string]Tokens{},
+	}
+	s.Agent = r.Agent
+	if s.Agent == "" {
+		s.Agent = "claude"
 	}
 	if r.Effort != nil {
 		s.Effort = *r.Effort

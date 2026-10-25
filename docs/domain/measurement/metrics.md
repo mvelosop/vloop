@@ -19,6 +19,7 @@ at close as a snapshot (`metrics/v2`; v1 records and snapshots stay readable). *
 | rate | delivered code lines per agent minute, with and without tests | — |
 | cost | total and per phase (gate review and verify included; verify as `verify_usd`), `$/kloc` (per 1,000 delivered code lines); tokens and cache-hit ratio | cost, `$/kloc` |
 | models | the models actually used per phase; the configured effort | the work model |
+| agents | the sorted distinct agents (the CLI that ran a session) per phase, beside `models`; `session/v1` and `session/v2` records carry none and count as `claude`, `session/v3` records count as their `agent` field | — |
 | defects | in-loop, operator (recorded operator defects before release plus verification-finding interventions with an origin), escaped (by time against release), removal efficiency; a `check_failed` iteration derives a `work` defect found by the gate, counted apart as check failures | — |
 | instructions | words each session kind starts with (skill + `.vloop/repo-guidelines.md` + `CLAUDE.md`) and the guidelines' rule count; `n/a` for a kind with no skill | — |
 | records | session records that should exist and do not | — |
@@ -82,6 +83,16 @@ templates and its schemas are product code in `.md` and `.json` files.
   a defect recorded after release lowers removal efficiency — and that difference
   is the point: the snapshot is what the operator saw at close.
 
+## Agents and metrics/v3
+
+`--json` is `metrics/v3`: everything `metrics/v2` had, unchanged, plus `agents`,
+required and per phase like `models` (a phase that did not run has the same empty
+or absent value `models` has). `agents` names the CLI that ran a phase's sessions;
+it is not the agent clock, `agent_ms`, which is work plus review time. Saved
+`metrics/v2` snapshots stay valid against `schemas/metrics.v2.json` and keep
+reading in `brief close`, the workspace table and the cross-brief table; new
+snapshots are `metrics/v3`. `export/v1` does not change.
+
 ## The verify session
 
 Where the brief's runs hold a verify session, the summary adds ` · verify <m> min`
@@ -89,5 +100,5 @@ after gate review on the time line, ` · verify <c>` on the cost line and
 ` · verify <models>` on the models line, and ` · verify <n>` after `review <n>`
 on the instructions line when the tree holds the verify skill. The total cost
 includes it; `agent` does not. `--json` gains the optional `time.verify_ms`,
-`cost.verify_usd`, `models.verify`, `effort.verify` and `instructions.verify`.
+`cost.verify_usd`, `models.verify`, `agents.verify`, `effort.verify` and `instructions.verify`.
 A brief with no verify session prints as before.

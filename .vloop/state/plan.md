@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/4 done** · iteration 3
+**Status:** running · **3/4 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T11:43:28Z
+**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T12:01:59Z
 
 ## Progress
 
 - [x] **T1** — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are · 1 attempt(s)
 - [x] **T2** — Start every session through a seam with a Claude adapter, and write session/v3 records
-- [ ] **T3** — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
+- [x] **T3** — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
 - [ ] **T4** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
@@ -71,7 +71,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 `vloop metrics --json` moves to metrics/v3, which adds `agents` per phase beside `models`, so a mixed-agent run is visible in its metrics once B19 lands. Everything already recorded must keep reading: session/v1 and v2 records count as claude, and metrics/v2 snapshots stay readable by brief close, the workspace table and the cross-brief table.
 

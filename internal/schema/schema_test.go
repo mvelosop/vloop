@@ -23,6 +23,7 @@ var invalidAt = map[string]string{
 	"iteration2":   "/checks/0/exit",
 	"session2":     "",
 	"metrics2":     "/tasks/done",
+	"metrics3":     "/agents/work",
 	"gate-verdict": "/tasks/0/findings/0/kind",
 	"verify":       "/findings/0/kind",
 
@@ -42,6 +43,9 @@ func schemaName(base string) string {
 	if n, ok := strings.CutSuffix(base, "2"); ok {
 		return n + "/v2"
 	}
+	if n, ok := strings.CutSuffix(base, "3"); ok {
+		return n + "/v3"
+	}
 	return strings.SplitN(base, "-", 2)[0] + "/v1"
 }
 
@@ -55,7 +59,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "metrics/v1", "metrics/v2", "proposal/v1", "session/v1", "session/v2", "session/v3", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
+	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "metrics/v1", "metrics/v2", "metrics/v3", "proposal/v1", "session/v1", "session/v2", "session/v3", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}

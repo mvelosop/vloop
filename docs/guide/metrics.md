@@ -163,6 +163,9 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 sessions' model usage, sorted. `effort` gives each phase's effort level when the
 records carry it (`session/v1` does, the legacy shell loop's do not), else `null`.
 
+`agents` (`metrics/v3`) lists, per phase and sorted, the agents that ran the sessions. Records written
+before `session/v3` carry none and count as `claude`.
+
 ## Tasks and iterations
 
 - `tasks.planned`, `tasks.done` and `tasks.blocked` count the tasks in the plan

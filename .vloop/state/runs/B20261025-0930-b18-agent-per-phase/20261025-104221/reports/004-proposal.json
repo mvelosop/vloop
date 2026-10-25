@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "vloop metrics --json, workspace JSON and new snapshots are metrics/v3: metrics/v2 plus agents per phase (claude for session/v1 and v2 records, the agent field for session/v3). schemas/metrics.v3.json added; docs and tests updated.",
+  "files": ["schemas/metrics.v3.json", "internal/metrics/metrics.go", "internal/metrics/time.go", "internal/metrics/time_test.go", "internal/runs/runs.go", "internal/schema/schema_test.go", "internal/schema/testdata/metrics3.valid.json", "internal/schema/testdata/metrics3.invalid.json", "internal/closing/closing_test.go", "internal/cli/close_test.go", "internal/cli/metrics_test.go", "internal/cli/schema_test.go", "cmd/vloop/b2_e2e_test.go", "cmd/vloop/b4_e2e_test.go", "cmd/vloop/b14_e2e_test.go", "cmd/vloop/run_snapshot_test.go", "embed_test.go", "docs/domain/measurement/metrics.md", "docs/guide/metrics.md"],
+  "verified": "vloop task gate T3 equivalent (sh .vloop/state/gates/T3/gate.sh) exited 0 and printed gate T3: ok; go vet, gofmt, cross builds clean.",
+  "notes": "Existing tests changed only where they pin metrics/v2 as the --json/snapshot schema or the schema count/list (contract item: --json is metrics/v3): b2/b4/b14 e2e, run_snapshot, cli close/metrics/schema tests, embed_test, schema_test, closing_test (fixtureReport now reads metrics3.valid.json). Report.Agents mirrors Models (verify only when the phase ran); by_task has no agents. In go test ./..., TestTaskGate* in internal/cli fail here with 'the plan was changed during this session' - they fail inside the running loop session, not from this change; nothing else fails."
+}

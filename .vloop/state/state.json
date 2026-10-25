@@ -5,9 +5,9 @@
   "base": "8aa98974a124f45a833844dafb9603d404a858b5",
   "branch": "B20261025-0930-b18-agent-per-phase",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-25T11:01:34Z",
-  "updated": "2026-10-25T11:43:28Z",
+  "updated": "2026-10-25T12:01:59Z",
   "shell": "sh",
   "checks": [
     {
@@ -156,7 +156,7 @@
         "Committed tests the checks run cover agents in metrics/v3 for v1, v2 and v3 records and the reading of a metrics/v2 snapshot; an earlier test changes only where it pins metrics/v2 as the --json schema, and the work notes name that contract item."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
