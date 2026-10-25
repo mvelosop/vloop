@@ -75,6 +75,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | design | decision | no | recommended | [I20261015-101819-b16-s-design-forks-scope-filtered-to-the](I20261015-101819-b16-s-design-forks-scope-filtered-to-the.md) |
 | design | decision | no | recommended | [I20261015-165314-b17-s-design-forks-a-repository-owned-re](I20261015-165314-b17-s-design-forks-a-repository-owned-re.md) |
 | design | decision | no | recommended | [I20261025-104133-b18-s-design-forks-copilot-first-the-ser](I20261025-104133-b18-s-design-forks-copilot-first-the-ser.md) |
+| design | decision | no | recommended | [I20261025-140145-b19-s-interim-policy-a-deny-list-with-ch](I20261025-140145-b19-s-interim-policy-a-deny-list-with-ch.md) |
 | design | direction | no | no-options | [I20260929-1830-naming-and-scope-corrections-on-review-o](I20260929-1830-naming-and-scope-corrections-on-review-o.md) |
 | design | direction | no | no-options | [I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl](I20260929-2155-gates-run-in-any-shell-of-the-os-not-onl.md) |
 | design | direction | no | no-options | [I20260929-2318-b3-split-in-two-and-the-roadmap-renumber](I20260929-2318-b3-split-in-two-and-the-roadmap-renumber.md) |
