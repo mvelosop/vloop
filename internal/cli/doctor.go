@@ -179,21 +179,16 @@ func doctorConfig(root string, vals []config.Value, isRepo bool, add func(name, 
 	}
 }
 
-// doctorClaude adds the claude check and reports whether claude runs.
+// doctorClaude adds the claude check, from the Claude adapter's preflight, and
+// reports whether claude is found.
 func doctorClaude(add func(name, result, msg string)) bool {
-	_, lerr := exec.LookPath("claude")
-	hasClaude := lerr == nil
-	switch {
-	case !hasClaude:
-		add("claude", resProblem, "claude is not on PATH")
-	default:
-		if err := exec.Command("claude", "--version").Run(); err != nil {
-			add("claude", resProblem, "claude --version failed: "+err.Error())
-		} else {
-			add("claude", resPass, "")
-		}
+	found, problem := driver.AgentPreflight(driver.AgentClaude)
+	if problem != "" {
+		add("claude", resProblem, problem)
+	} else {
+		add("claude", resPass, "")
 	}
-	return hasClaude
+	return found
 }
 
 // doctorPlanShell adds the gate shell, plan and branch checks.

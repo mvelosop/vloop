@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Sessions now start through an Adapter seam (internal/driver/agent.go) with a Claude adapter owning preflight, supported phases, preparation, command/environment, and stdout-to-record mapping; records are session/v3 (agent, cost_source) with schemas/session.v3.json, and session.md is reworded.",
+  "files": ["internal/driver/agent.go", "internal/driver/session.go", "internal/driver/iterate.go", "internal/driver/plan.go", "internal/driver/gatereview.go", "internal/cli/doctor.go", "schemas/session.v3.json", "docs/domain/execution/session.md", "cmd/vloop/run_harness_test.go", "cmd/vloop/run_agent_test.go", "internal/driver/session_test.go", "cmd/vloop/b2_e2e_test.go", "cmd/vloop/b6_e2e_test.go", "cmd/vloop/run_plan_test.go", "cmd/vloop/run_safety_test.go", "cmd/vloop/run_verify_test.go", "internal/cli/schema_test.go", "internal/schema/schema_test.go", "embed_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go test ./... passes except five TestTaskGate* that fail only because this session's env has VLOOP_PLAN_SHA256 set (pass with it unset).",
+  "notes": "Spec.Agent selects the adapter (empty = claude); work/review/verify take it from Resolved.Agent, plan/gate-review from ResolveAgent per session. Runner.Claude is now the claude adapter's command. doctorClaude calls driver.AgentPreflight. Existing tests changed only where they pin session/v1 or session/v2 in a record or the schema list/count (contract item: records are session/v3): TestSessionFieldMapping, run_plan_test, run_safety_test, run_verify_test, b6_e2e_test, b2_e2e_test, schema_test, embed_test. The harness stub gained invocations.log and STUB_NOCOST. argv tests in session_test.go unchanged."
+}

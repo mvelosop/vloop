@@ -624,7 +624,7 @@ func (it *Iterator) workSession(task *state.Task, iter int) (workReport, error) 
 	gguard := snapshotGit(root)
 	inputs := snapshotInputs(root, it.RunDir)
 	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-	wres, err := it.r.Run(Spec{Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
+	wres, err := it.r.Run(Spec{Agent: it.resolved.Agent(PhaseWork), Phase: PhaseWork, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 	it.spent += wres.Cost
 	if err == nil {
 		it.sessionDone(Spec{Phase: PhaseWork, Arg: id}, wres)
@@ -748,7 +748,7 @@ func (it *Iterator) reviewSession(task *state.Task, iter int, outcome string, ch
 	inputs := snapshotInputs(root, it.RunDir)
 	tree := snapshotTree(root)
 	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-	rres, err := it.r.Run(Spec{Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
+	rres, err := it.r.Run(Spec{Agent: it.resolved.Agent(PhaseReview), Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 	it.spent += rres.Cost
 	if err == nil {
 		it.sessionDone(Spec{Phase: PhaseReview, Arg: id}, rres)
@@ -837,7 +837,7 @@ func (it *Iterator) verifySession() error {
 	gguard := snapshotGit(root)
 	inputs := snapshotInputs(root, it.RunDir)
 	tree := snapshotTree(root)
-	res, err := it.r.Run(Spec{Phase: PhaseVerify, Model: model, Effort: effort, PlanSHA: guard.hash()})
+	res, err := it.r.Run(Spec{Agent: it.resolved.Agent(PhaseVerify), Phase: PhaseVerify, Model: model, Effort: effort, PlanSHA: guard.hash()})
 	it.spent += res.Cost
 	if err != nil {
 		it.warn("vloop: the verify session failed to run — verify by hand; see %s", relRunDir(root, it.RunDir)+"run.log")

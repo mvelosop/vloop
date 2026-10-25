@@ -22,3 +22,10 @@ committing the plan
    review T1 · 0m24s · $0.14 · run $4.59 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/4 done ──
+   Start every session through a seam with a Claude adapter, and write session/v3 records
+   work T2 · 19m34s · $0.83 · run $5.42 / $40.00
+   check go
+   review T2 · 0m36s · $0.20 · run $5.62 / $40.00
+   review: PASS
+   T2 done

@@ -190,7 +190,7 @@ func TestRunVerifyStatusAndRecord(t *testing.T) {
 	if err := json.Unmarshal(raw, &rec); err != nil {
 		t.Fatal(err)
 	}
-	if rec.Schema != "session/v2" || rec.Phase != "verify" || rec.Iteration != 0 || strings.Contains(string(raw), `"task"`) {
+	if rec.Schema != "session/v3" || rec.Phase != "verify" || rec.Iteration != 0 || strings.Contains(string(raw), `"task"`) {
 		t.Errorf("record = %s", raw)
 	}
 }

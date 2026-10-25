@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "session/v3",
+  "description": "One session's telemetry record",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "iteration",
+    "phase",
+    "agent",
+    "model",
+    "effort",
+    "models_used",
+    "started",
+    "ended",
+    "duration_ms",
+    "wall_ms",
+    "cost_usd",
+    "cost_source",
+    "turns",
+    "is_error",
+    "permission_denials"
+  ],
+  "properties": {
+    "schema": {
+      "const": "session/v3"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "iteration": {
+      "type": "integer"
+    },
+    "phase": {
+      "enum": [
+        "plan",
+        "work",
+        "review",
+        "gate-review",
+        "verify"
+      ]
+    },
+    "agent": {
+      "type": "string"
+    },
+    "task": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "effort": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "models_used": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "input_tokens",
+          "output_tokens",
+          "cache_read_input_tokens",
+          "cache_creation_input_tokens",
+          "cost_usd"
+        ],
+        "properties": {
+          "input_tokens": {
+            "type": "integer"
+          },
+          "output_tokens": {
+            "type": "integer"
+          },
+          "cache_read_input_tokens": {
+            "type": "integer"
+          },
+          "cache_creation_input_tokens": {
+            "type": "integer"
+          },
+          "cost_usd": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "started": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ended": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_ms": {
+      "type": "integer"
+    },
+    "wall_ms": {
+      "type": "integer"
+    },
+    "cost_usd": {
+      "type": "number"
+    },
+    "cost_source": {
+      "enum": [
+        "reported",
+        "none"
+      ]
+    },
+    "turns": {
+      "type": "integer"
+    },
+    "is_error": {
+      "type": "boolean"
+    },
+    "permission_denials": {
+      "type": "array"
+    }
+  },
+  "if": {
+    "properties": {
+      "phase": {
+        "enum": [
+          "plan",
+          "gate-review",
+          "verify"
+        ]
+      }
+    },
+    "required": [
+      "phase"
+    ]
+  },
+  "then": {
+    "not": {
+      "required": [
+        "task"
+      ]
+    }
+  },
+  "else": {
+    "required": [
+      "task"
+    ]
+  }
+}

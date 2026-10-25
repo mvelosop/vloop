@@ -529,7 +529,11 @@ func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effor
 	root := p.Root
 	before := refsState(root)
 	gguard := snapshotGit(root)
-	res, err := r.Run(Spec{Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
+	agent, err := ResolveAgent(root, PhasePlan)
+	if err != nil {
+		return halt(ExitPreflight, "%v", err)
+	}
+	res, err := r.Run(Spec{Agent: agent, Phase: PhasePlan, Arg: briefPath, Model: model, Effort: effort})
 	if err != nil {
 		return halt(ExitPreflight, "planning session failed: %v", err)
 	}

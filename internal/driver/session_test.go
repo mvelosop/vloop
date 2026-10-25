@@ -153,7 +153,7 @@ func TestSessionFieldMapping(t *testing.T) {
 	}
 	got := readJSON(t, res.Path)
 	want := map[string]any{
-		"schema": "session/v1", "run_id": "B1-x", "iteration": 3.0, "phase": "work", "task": "T2",
+		"schema": "session/v3", "agent": "claude", "cost_source": "reported", "run_id": "B1-x", "iteration": 3.0, "phase": "work", "task": "T2",
 		"model": "sonnet", "effort": "high", "started": "2026-01-02T03:04:05Z",
 		"ended": "2026-01-02T03:04:05Z", "wall_ms": 0.0, "duration_ms": 1234.0, "cost_usd": 0.5, "turns": 7.0, "is_error": false,
 		"permission_denials": []any{map[string]any{"tool_name": "Bash"}},

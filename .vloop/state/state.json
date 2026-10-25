@@ -5,9 +5,9 @@
   "base": "8aa98974a124f45a833844dafb9603d404a858b5",
   "branch": "B20261025-0930-b18-agent-per-phase",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-25T11:01:34Z",
-  "updated": "2026-10-25T11:18:32Z",
+  "updated": "2026-10-25T11:43:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -118,7 +118,7 @@
         "The run harness stub in cmd/vloop/run_harness_test.go also logs each argument on its own line, its working directory and its environment, and a committed harness test pins, for a default run, each phase's argv and that the pass-through variables reach claude and the dropped ones do not; committed tests cover session/v3 records with cost_source reported and none. An earlier test changes only where it pins session/v1 or session/v2 in a record, the work notes name that contract item, and the argv tests in internal/driver/session_test.go are unchanged."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/4 done** · iteration 2
+**Status:** running · **2/4 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T11:18:32Z
+**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T11:43:28Z
 
 ## Progress
 
 - [x] **T1** — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are · 1 attempt(s)
-- [ ] **T2** — Start every session through a seam with a Claude adapter, and write session/v3 records
+- [x] **T2** — Start every session through a seam with a Claude adapter, and write session/v3 records
 - [ ] **T3** — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
 - [ ] **T4** — Close the run: every gate at once and the worked example line for line
 
@@ -43,7 +43,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Start every session through a seam with a Claude adapter, and write session/v3 records
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Every session vloop starts is built inline as `claude -p` in the driver; this task moves everything agent-specific behind one seam with a Claude adapter (preflight and the phases it supports, per-run preparation, command and environment, deciding whether stdout is a record, mapping it onto the record), so B19 can add Copilot by adding an adapter. Nothing a Claude session receives may change: the gate builds the base binary and diffs argv, working directory and environment for every phase. Records gain the adapter's identity: session/v3 with agent and cost_source.
 
