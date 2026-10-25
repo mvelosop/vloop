@@ -2,7 +2,7 @@
 name: B20261025-0930-b18-agent-per-phase.loop-brief
 description: Choose the agent CLI per session phase through a seam the driver starts every session through, with Claude Code as the only agent and its sessions unchanged, and record the agent in sessions and metrics
 kind: brief
-status: draft
+status: ready
 created: 2026-10-25
 seeds: The operator's draft of 2026-10-23, written after the GitHub Copilot CLI experiments, revised on 2026-10-25 against the code; the first of the Copilot series B18–B20
 depends-on: [B20261015-1651-b17-release.loop-brief]
