@@ -17,7 +17,7 @@ import (
 // Schema is the name of the document Report marshals to.
 const Schema = "metrics/v3"
 
-// JSONLines is Lines as metrics/v2 spells it: added counts, deleted apart.
+// JSONLines is Lines as metrics/v2 and v3 spell it: added counts, deleted apart.
 type JSONLines struct {
 	Code    int    `json:"code"`
 	Test    int    `json:"test"`

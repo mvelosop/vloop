@@ -95,7 +95,7 @@ classDiagram
 | **attempt** | one failed try at a task; `attempts` counts them |
 | **iteration** | one pass of the driver: pick a task, work, gate, review, commit |
 | **run** | one driver invocation; its telemetry is a run folder |
-| **session** | a fresh `claude -p` process: `plan`, `work` or `review`; sessions share nothing but files |
+| **session** | a fresh process of its phase's agent (Claude Code by default): `plan`, `gate-review`, `work`, `review` or `verify`; sessions share nothing but files |
 | **proposal** | the work session's report on its task |
 | **verdict** | the review session's independent `PASS` or `FAIL`, with findings |
 | **finding** | one problem a verdict names, with a kind |
