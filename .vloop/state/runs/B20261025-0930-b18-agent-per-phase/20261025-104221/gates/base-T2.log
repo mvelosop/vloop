@@ -1,0 +1,1 @@
+GATE FAIL: 001-plan.json: schema, agent, cost_source = ["session/v1",null,null], want session/v3, claude, reported

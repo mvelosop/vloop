@@ -1,0 +1,25 @@
+{
+  "cost_usd": 0.2551815,
+  "duration_ms": 82538,
+  "effort": null,
+  "ended": "2026-10-25T11:04:55Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 47202,
+      "cache_read_input_tokens": 296715,
+      "cost_usd": 0.2551815,
+      "input_tokens": 16,
+      "output_tokens": 3667
+    }
+  },
+  "permission_denials": [],
+  "phase": "gate-review",
+  "run_id": "B20261025-0930-b18-agent-per-phase",
+  "schema": "session/v2",
+  "started": "2026-10-25T11:03:31Z",
+  "turns": 10,
+  "wall_ms": 83412
+}

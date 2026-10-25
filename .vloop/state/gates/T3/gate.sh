@@ -1,114 +1,87 @@
 #!/bin/sh
-# Gate T3 — N1: go run ./tools/release notes <from> <to> prints the briefs
-# merged after <from> up to and including <to> (by their Vloop-Brief trailers,
-# one line each, oldest first, title and description read at <to>) and the other
-# code changes; and the real-data check on a local clone of this repository.
+# Gate T3 — the metrics half of A3. Over a run directory the base binary wrote
+# (session/v1 and session/v2 records, a metrics/v2 snapshot), this tree's
+# `vloop metrics`, `metrics --by task`, `metrics --workspace` and
+# `brief close --dry-run` keep every line the base prints, and
+# `vloop metrics --json` is metrics/v3: the base's document plus `agents`,
+# per phase like `models`, all claude. Over a run this tree wrote (session/v3
+# records), the same, and the snapshot it commits is metrics/v3. The older
+# metrics/v2 schema still validates the base's snapshot.
 G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
 . "$G/lib.sh"
-xbuild
-buildrel
-stubs
-
-# The fixture history, oldest first:
-#   c0  Initial                       tag v0.10.0
-#   c1  Alpha drafted                 docs only
-#   c2  A1: the alpha (#2)            Vloop-Brief alpha; cmd/
-#   c3  Fix the README (#3)           README.md
-#   c4  Notes only (#4)               docs/, .vloop/, CLAUDE.md
-#   c5  Release v0.10.1 (#5)          plugin.json
-#   c6  Beta drafted                  docs only; beta has no heading
-#   c7  B2 work (#6)                  Vloop-Brief beta; tools/ and docs/
-#   c8  Alpha follow-up (#7)          Vloop-Brief alpha again
-#   c9  Tidy tools (#8)               docs/ and tools/
-#   c10 Alpha described again         docs only: alpha's description changes
-#   c11 Gamma (#9)                    Vloop-Brief gamma; heading without "vloop "   tag v0.11.0
-W=$t/notes
-git init -q -b main "$W" || fail "git init"; ident "$W"
-mkdir -p "$W/plugin/.claude-plugin" "$W/cmd" "$W/tools" "$W/docs" "$W/.vloop" || fail mkdir
-printf 'module github.com/mvelosop/vloop\n\ngo 1.22\n' >"$W/go.mod"
-printf '{\n  "name": "vloop",\n  "version": "0.10.0"\n}\n' >"$W/plugin/.claude-plugin/plugin.json"
-printf '# n\n' >"$W/README.md"; printf '# rules\n' >"$W/CLAUDE.md"; printf 'package main\n' >"$W/cmd/x.go"
-sc "$W" "Initial"; git -C "$W" tag -a v0.10.0 -m v0.10.0 || fail tag
-A=B20260101-0900-alpha.loop-brief; Bb=B20260102-0900-beta.loop-brief; Gm=B20260103-0900-gamma.loop-brief
-brief "$W" "$A" "Build the alpha, first cut" "# Brief — vloop A1: the alpha"; sc "$W" "Alpha drafted"; c1=$(git -C "$W" rev-parse HEAD)
-printf 'package main\n' >"$W/cmd/alpha.go"; sc "$W" "A1: the alpha (#2)" "$A"; c2=$(git -C "$W" rev-parse HEAD)
-printf '# n\n\nFixed.\n' >"$W/README.md"; sc "$W" "Fix the README (#3)"; c3=$(git -C "$W" rev-parse HEAD)
-printf 'n\n' >"$W/docs/notes.md"; printf 'x = 1\n' >"$W/.vloop/x.toml"; printf '# rules\n\nMore.\n' >"$W/CLAUDE.md"
-sc "$W" "Notes only (#4)"
-setver "$W" 0.10.1; sc "$W" "Release v0.10.1 (#5)"; c5=$(git -C "$W" rev-parse HEAD)
-brief "$W" "$Bb" "Beta, described"; sc "$W" "Beta drafted"
-printf 'b\n' >"$W/tools/b.sh"; printf 'y\n' >"$W/docs/y.md"; sc "$W" "B2 work (#6)" "$Bb"
-printf 'package main\n' >"$W/cmd/alpha2.go"; sc "$W" "Alpha follow-up (#7)" "$A"
-printf 'z\n' >"$W/docs/z.md"; printf 't\n' >"$W/tools/t.sh"; sc "$W" "Tidy tools (#8)"; c9=$(git -C "$W" rev-parse HEAD)
-brief "$W" "$A" "Build the alpha, final cut" "# Brief — vloop A1: the alpha"; sc "$W" "Alpha described again"
-brief "$W" "$Gm" "Gamma, described" "# Brief — Gamma lands"
-printf 'package main\n' >"$W/cmd/g.go"; sc "$W" "Gamma (#9)" "$Gm"
-git -C "$W" tag -a v0.11.0 -m v0.11.0 || fail tag
-
-# notes <from> <to> <expected...>: stdout is exactly the expected lines, exit 0.
-notes() {
-  f=$1 to=$2; shift 2
-  printf '%s\n' "$@" >"$t/want"
-  rel notes "$f" "$to"
-  [ "$got" = 0 ] && [ "$(cat "$t/out")" = "$(cat "$t/want")" ] || fail "notes $f $to: want exit 0 and
-$(cat "$t/want")
-$(said)"
+newbin
+basebin base
+S=$t/bin/new
+# vin <binary> <out> args...: vloop in the fixture; fails on a non-zero exit.
+vin() { b=$1 o=$2; shift 2; (cd "$t/repo" && venv "$b" "$@" >"$o" 2>&1) || fail "vloop $* ($(basename "$b")) failed: $(tail -5 "$o")"; }
+# keeps <base out> <new out> <what>: every line of the base's output appears in
+# the new output, in the same order (the new output may add lines).
+keeps() {
+  awk 'NR == FNR { want[++n] = $0; next } i < n && $0 == want[i + 1] { i++ } END { if (i < n) { print want[i + 1]; exit 1 } }' "$1" "$2" >"$t/miss" ||
+    fail "$3: the line '$(cat "$t/miss")' the base prints is gone:
+$(cat "$2")"
 }
-notes v0.10.0 v0.11.0 \
-  "## Briefs" "" \
-  "- **A1: the alpha** — Build the alpha, final cut" \
-  "- **$Bb** — Beta, described" \
-  "- **Gamma lands** — Gamma, described" \
-  "" "## Other changes" "" \
-  "- Fix the README (#3)" \
-  "- Tidy tools (#8)"
-# Title and description are read at <to>.
-notes v0.10.0 "$c9" \
-  "## Briefs" "" \
-  "- **A1: the alpha** — Build the alpha, first cut" \
-  "- **$Bb** — Beta, described" \
-  "" "## Other changes" "" \
-  "- Fix the README (#3)" \
-  "- Tidy tools (#8)"
-# After <from>, up to and including <to>; an empty section is left out.
-notes "$c1" "$c2" "## Briefs" "" "- **A1: the alpha** — Build the alpha, first cut"
-notes "$c2" "$c3" "## Other changes" "" "- Fix the README (#3)"
-notes "$c3" "$c5" "No changes."
-notes v0.11.0 v0.11.0 "No changes."
-# Usage and refusals.
-rel notes v0.10.0
-[ "$got" = 2 ] || fail "notes with one argument: want exit 2; $(said)"
-rel notes v0.10.0 no-such-revision
-[ "$got" = 1 ] && [ "$(wc -l <"$t/err" | tr -d ' ')" = 1 ] && grep -q '^release: ' "$t/err" ||
-  fail "notes to an unknown revision: want exit 1 and one stderr line starting 'release: '; $(said)"
+# agents <metrics json> <what>: metrics/v3, and agents mirrors models: the same
+# phases, ["claude"] where models has any, models' own empty value where not.
+agents() {
+  [ "$("$JQ" -r .schema "$1")" = metrics/v3 ] || fail "$2: schema $("$JQ" -c .schema "$1"), want metrics/v3"
+  "$JQ" -e '(.agents | type) == "object" and (.models | keys) == (.agents | keys) and
+    all(.models | keys[]; . as $k | if ($ARGS.named.m[$k] | length) > 0 then $ARGS.named.a[$k] == ["claude"] else $ARGS.named.a[$k] == $ARGS.named.m[$k] end)' \
+    --argjson m "$("$JQ" -c .models "$1")" --argjson a "$("$JQ" -c .agents "$1")" "$1" >/dev/null ||
+    fail "$2: agents $("$JQ" -c .agents "$1") does not mirror models $("$JQ" -c .models "$1")"
+  cp "$1" "$t/m3.json" && "$S" schema validate metrics/v3 "$t/m3.json" >"$t/v.out" 2>&1 || fail "$2: vloop schema validate metrics/v3: $(cat "$t/v.out")"
+}
 
-# Real data, on a local clone of this repository (read only; its origin is never touched).
-git clone -q "$top" "$t/self" || fail "local clone of this repository"
-W=$t/self
-# bline <tag> <brief name> <heading title>: the brief's line, its description read at <tag>.
-bline() {
-  d=$(git -C "$W" show "$1:docs/briefs/$2.md" | sed -n 's/^description: //p' | head -n 1)
-  [ -n "$d" ] || fail "harness: no description for $2 at $1"
-  echo "- **$3** — $d"
-}
-# briefs <from> <to>: the lines of the Briefs section of notes <from> <to>.
-briefs() {
-  rel notes "$1" "$2"
-  [ "$got" = 0 ] || fail "notes $1 $2 on this repository: $(said)"
-  awk '/^## Briefs$/ { p = 1; next } /^## / { p = 0 } p && /^- / { print }' "$t/out"
-}
-{ bline v0.11.0 B20261015-1001-b16-verification-phase.loop-brief "B16: the verification phase"; } >"$t/want"
-briefs v0.10.0 v0.11.0 >"$t/got"
-cmp -s "$t/want" "$t/got" || fail "notes v0.10.0 v0.11.0 does not list B16 alone under Briefs: want
-$(cat "$t/want")
-$(said)"
-{
-  bline v0.10.0 B20261011-2100-b13-docs-onboarding.loop-brief "B13: docs and onboarding"
-  bline v0.10.0 B20261011-2251-b14-learning-loop.loop-brief "B14: the learning loop"
-  bline v0.10.0 B20261014-1138-b15-code-health-escapes.loop-brief "B15: code health, and defects narrowed to escapes"
-} >"$t/want"
-briefs v0.9.0 v0.10.0 >"$t/got"
-cmp -s "$t/want" "$t/got" || fail "notes v0.9.0 v0.10.0 does not list B13, B14 and B15 under Briefs: want
-$(cat "$t/want")
-$(said)"
+# A run directory the base wrote.
+fixture "$t/bin/base"; runfix "$t/bin/base" "$t/base"
+[ "$rc" = 0 ] || fail "the base's run exited $rc"
+snap=$t/repo/.vloop/state/metrics/B20260101-0900-demo.json
+[ "$("$JQ" -r .schema "$snap")" = metrics/v2 ] || fail "the base's run left no metrics/v2 snapshot"
+"$S" schema validate metrics/v2 "$snap" >/dev/null 2>&1 || fail "metrics/v2 no longer validates the base's snapshot"
+printf '[[repo]]\npath = "%s"\n' "$t/repo" >"$t/ws.toml"
+for side in base new; do
+  vin "$t/bin/$side" "$t/$side.m" metrics
+  vin "$t/bin/$side" "$t/$side.mb" metrics "$BNAME"
+  vin "$t/bin/$side" "$t/$side.bt" metrics --by task
+  vin "$t/bin/$side" "$t/$side.ws" metrics --workspace "$t/ws.toml"
+  vin "$t/bin/$side" "$t/$side.cl" brief close --dry-run --no-findings "$BNAME"
+  vin "$t/bin/$side" "$t/$side.j" --json metrics "$BNAME"
+  vin "$t/bin/$side" "$t/$side.wj" --json metrics --workspace "$t/ws.toml"
+done
+keeps "$t/base.m" "$t/new.m" "vloop metrics over a base-written run"
+keeps "$t/base.mb" "$t/new.mb" "vloop metrics <brief> over a base-written run"
+keeps "$t/base.bt" "$t/new.bt" "vloop metrics --by task over a base-written run"
+keeps "$t/base.ws" "$t/new.ws" "vloop metrics --workspace over a base-written run"
+keeps "$t/base.cl" "$t/new.cl" "vloop brief close --dry-run over a base-written run"
+agents "$t/new.j" "vloop --json metrics over a base-written run"
+[ "$("$JQ" -S -c 'del(.schema)' "$t/base.j")" = "$("$JQ" -S -c 'del(.schema, .agents)' "$t/new.j")" ] ||
+  fail "vloop --json metrics over a base-written run differs from the base's beyond schema and agents:
+base: $("$JQ" -S -c 'del(.schema)' "$t/base.j")
+new:  $("$JQ" -S -c 'del(.schema, .agents)' "$t/new.j")"
+[ "$("$JQ" -c 'length' "$t/new.wj")" = 1 ] || fail "metrics --workspace --json: $(cat "$t/new.wj")"
+"$JQ" '.[0]' "$t/new.wj" >"$t/new.w0" && agents "$t/new.w0" "vloop --json metrics --workspace"
+[ "$("$JQ" -S -c '.[0] | del(.schema)' "$t/base.wj")" = "$("$JQ" -S -c '.[0] | del(.schema, .agents)' "$t/new.wj")" ] ||
+  fail "vloop --json metrics --workspace differs from the base's beyond schema and agents"
+[ "$("$JQ" -c '.agents | to_entries | map(.value) | unique' "$t/new.j")" = '[["claude"]]' ] ||
+  fail "over a run of all five phases, agents is $("$JQ" -c .agents "$t/new.j")"
+
+# A run this tree wrote: the same numbers, agents claude, a metrics/v3 snapshot.
+fixture "$t/bin/base"; runfix "$S" "$t/run3"
+[ "$rc" = 0 ] || fail "this tree's run exited $rc: $(tail -5 "$t/run3")"
+[ "$("$JQ" -r .schema "$t/run3.sessions/003-work.json")" = session/v3 ] || fail "this tree's run did not write session/v3 records"
+vin "$S" "$t/v3.j" --json metrics "$BNAME"
+agents "$t/v3.j" "vloop --json metrics over this tree's run"
+[ "$("$JQ" -c .models "$t/v3.j")" = "$("$JQ" -c .models "$t/base.j")" ] || fail "models over this tree's run $("$JQ" -c .models "$t/v3.j"), the base's $("$JQ" -c .models "$t/base.j")"
+[ "$("$JQ" -c '.agents | to_entries | map(.value) | unique' "$t/v3.j")" = '[["claude"]]' ] || fail "agents over this tree's run: $("$JQ" -c .agents "$t/v3.j")"
+[ "$("$JQ" -r .schema "$snap")" = metrics/v3 ] || fail "this tree's run committed a $("$JQ" -r .schema "$snap") snapshot, want metrics/v3"
+cp "$snap" "$t/snap3.json" && "$S" schema validate metrics/v3 "$t/snap3.json" >"$t/v.out" 2>&1 || fail "the new snapshot fails metrics/v3: $(cat "$t/v.out")"
+"$JQ" 'del(.agents)' "$t/snap3.json" >"$t/bad.json"
+"$S" schema validate metrics/v3 "$t/bad.json" >/dev/null 2>&1 && fail "metrics/v3 accepts a document with no agents"
+vin "$S" "$t/v3.m" metrics; [ -s "$t/v3.m" ] || fail "vloop metrics over this tree's run printed nothing"
+
+# A run with no verify session: agents has no verify, as models has none.
+fixture "$t/bin/base"; runfix "$S" "$t/nover" VLOOP_RUN_VERIFY=false
+[ "$rc" = 0 ] || fail "a run with run.verify false exited $rc"
+vin "$S" "$t/nover.j" --json metrics "$BNAME"
+agents "$t/nover.j" "vloop --json metrics over a run with no verify session"
 echo "gate T3: ok"
