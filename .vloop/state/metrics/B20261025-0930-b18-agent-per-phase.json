@@ -1,0 +1,222 @@
+{
+  "schema": "metrics/v2",
+  "brief": "B20261025-0930-b18-agent-per-phase.loop-brief",
+  "run_id": "B20261025-0930-b18-agent-per-phase",
+  "status": "ready",
+  "merged": null,
+  "tasks": {
+    "planned": 4,
+    "done": 0,
+    "blocked": 0,
+    "first_pass": 0,
+    "estimate": {
+      "min": 4,
+      "max": 5
+    }
+  },
+  "size": {
+    "delivered": {
+      "code": 24,
+      "test": 77,
+      "docs": 6,
+      "other": 0,
+      "deleted": {
+        "code": 3,
+        "test": 1,
+        "docs": 1,
+        "other": 0
+      }
+    },
+    "churn": {
+      "code": 24,
+      "test": 77,
+      "docs": 6,
+      "other": 0,
+      "deleted": {
+        "code": 3,
+        "test": 1,
+        "docs": 1,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 3.2083333333333335,
+    "rework": 1
+  },
+  "time": {
+    "agent_ms": 298921,
+    "work_ms": 298921,
+    "review_ms": 0,
+    "plan_ms": 1006249,
+    "gates_ms": 10866,
+    "checks_ms": 208711,
+    "gate_review_ms": 83412,
+    "wall_ms": null
+  },
+  "rate": {
+    "code_per_min": 4.817326316986763,
+    "code_test_per_min": 20.27291491731929
+  },
+  "cost": {
+    "total_usd": 4.2986550999999995,
+    "plan_usd": 3.7651035999999998,
+    "work_usd": 0.27837,
+    "review_usd": 0,
+    "gate_review_usd": 0.2551815,
+    "per_1000_code_lines_usd": 179.11062916666666
+  },
+  "tokens": {
+    "input": 172,
+    "output": 82715,
+    "cache_read": 6770573,
+    "cache_creation": 227888,
+    "cache_hit_ratio": 0.9674136363486984
+  },
+  "models": {
+    "plan": [
+      "claude-opus-5-5"
+    ],
+    "work": [
+      "claude-sonnet-5-5"
+    ],
+    "review": [],
+    "gate-review": [
+      "claude-sonnet-5-5"
+    ]
+  },
+  "effort": {
+    "plan": null,
+    "work": null,
+    "review": null,
+    "gate-review": null
+  },
+  "defects": {
+    "in_loop": 1,
+    "operator": 0,
+    "escaped": 0,
+    "total": 1,
+    "removal_efficiency": 1
+  },
+  "interventions": {
+    "total": 1,
+    "by_agreement": {
+      "recommended": 1,
+      "other-option": 0,
+      "adjusted": 0,
+      "different": 0,
+      "no-options": 0
+    }
+  },
+  "instructions": {
+    "plan": 4569,
+    "gate_review": 2088,
+    "work": 2436,
+    "review": 2291,
+    "verify": 1806,
+    "guidelines_rules": 2
+  },
+  "records": {
+    "missing": []
+  },
+  "lead_time": {
+    "plan_to_merge_ms": null
+  },
+  "permission_denials": 5,
+  "iterations": 1,
+  "iterations_per_closed": null,
+  "by_task": [
+    {
+      "id": "T1",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 24,
+        "test": 77,
+        "docs": 6,
+        "other": 0,
+        "deleted": {
+          "code": 3,
+          "test": 1,
+          "docs": 1,
+          "other": 0
+        }
+      },
+      "agent_ms": 298921,
+      "cost_usd": 0.27837,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "test_code_ratio": 3.2083333333333335,
+      "per_1000_code_lines_usd": 11.59875
+    },
+    {
+      "id": "T2",
+      "area": null,
+      "kind": "refactor",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T3",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T4",
+      "area": null,
+      "kind": "chore",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    }
+  ]
+}

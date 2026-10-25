@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/4 done** · iteration 1
+**Status:** running · **1/4 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T11:13:34Z
+**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T11:18:32Z
 
 ## Progress
 
-- [ ] **T1** — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are · 1 attempt(s)
+- [x] **T1** — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are · 1 attempt(s)
 - [ ] **T2** — Start every session through a seam with a Claude adapter, and write session/v3 records
 - [ ] **T3** — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
 - [ ] **T4** — Close the run: every gate at once and the worked example line for line
@@ -17,7 +17,7 @@
 
 ### T1 — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 Which agent CLI runs each phase becomes a setting beside model.&lt;phase&gt; and effort.&lt;phase&gt;, so later briefs can mix agents per phase. In this run claude is the only registered agent, so the keys exist, validate, list and resolve, but nothing a session receives changes. The seam task (T2) consumes the resolved agent; this task only defines and resolves it.
 
@@ -32,8 +32,6 @@ Which agent CLI runs each phase becomes a setting beside model.&lt;phase&gt; and
 - docs/guide/configuration.md has a table row for each of the five keys with default `claude` and its `VLOOP_AGENT_<PHASE>` variable.
 - With every VLOOP_AGENT_* set to claude, a run hands claude exactly what the base binary's run hands it (the gate's comparison).
 - Committed tests the checks run cover the new keys (default, environment, file, invalid value refused by set, source error) and the agent's resolution; a key or resolver shipped with no test that exercises it is a violation.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261025-0930-b18-agent-per-phase/20261025-104221/checks/001-go.fail.log
 
 <details><summary>verify command</summary>
 

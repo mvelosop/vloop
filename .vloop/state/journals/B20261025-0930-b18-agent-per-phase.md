@@ -13,3 +13,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added agent.plan/work/review/gate-review/verify config keys (default claude, only valid value claude, VLOOP_AGENT_<PHASE>, stored under [agent]); ResolveRun resolves the agent for work, review and verify once, ResolveAgent resolves it per session for plan and gate-review. Docs rows added.
 - **Files:** internal/config/config.go, internal/config/config_test.go, internal/driver/resolve.go, internal/driver/resolve_test.go, docs/guide/configuration.md
 - **Notes for next iteration:** Resolved.Agent(phase) and driver.ResolveAgent(root, kind) are what T2 consumes; nothing a session receives changes yet. TestDefaultsEveryRow (existing) gained the five agent.* rows because the key list is the contract item that changed.
+
+## T1 — Add the five agent.<phase> config keys and resolve them as model and effort are
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Five agent.<phase> config keys (default claude, only valid value claude, VLOOP_AGENT_<PHASE>, stored under [agent]) with ResolveRun/ResolveAgent resolution and docs rows. This attempt fixed the three existing tests that pinned the old config list.
+- **Files:** internal/config/config.go, internal/config/config_test.go, internal/driver/resolve.go, internal/driver/resolve_test.go, docs/guide/configuration.md, cmd/vloop/e2e_test.go, internal/cli/config_test.go
+- **Notes for next iteration:** Previous attempt failed the go check because three existing tests listed config keys without agent.*: TestWorkedExampleEnglishSession (cmd/vloop/e2e_test.go), TestConfigListDefaults and TestConfigListJSONOrderAndNull (internal/cli/config_test.go). They changed only where the brief's contract adds the five agent keys to config list. Resolved.Agent(phase) and driver.ResolveAgent(root, kind) are what T2 consumes.

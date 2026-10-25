@@ -15,3 +15,10 @@ committing the plan
    work T1 · 4m59s · $0.28 · run $4.30 / $40.00
    check go
    CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261025-0930-b18-agent-per-phase/20261025-104221/checks/001-go.fail.log; review skipped
+── iteration 2 (2 this run) · T1 · 0/4 done ──
+   Add the five agent.<phase> config keys and resolve them as model and effort are
+   work T1 · 0m55s · $0.16 · run $4.46 / $40.00
+   check go
+   review T1 · 0m24s · $0.14 · run $4.59 / $40.00
+   review: PASS
+   T1 done
