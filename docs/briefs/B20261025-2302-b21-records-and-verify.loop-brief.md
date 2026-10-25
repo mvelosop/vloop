@@ -2,7 +2,7 @@
 name: B20261025-2302-b21-records-and-verify.loop-brief
 description: Make a nested git repository its own vloop root, so verify's scratch repositories stop editing the real one; count every record of a brief however it is named; mask the system temp directory in what the driver keeps; and check that Copilot sessions can log in
 kind: brief
-status: draft
+status: ready
 created: 2026-10-25
 seeds: The second of two hardening briefs before the fence (docs/design-notes/vloop-roadmap-b18-b21.md → "Before the fence: hardening"), from B18's and B19's verify sessions, B19's acceptance run and issue #53, settled with the operator on 2026-10-25
 depends-on: [B20261025-2302-b20-gates-checks-review-scope.loop-brief]

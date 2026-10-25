@@ -2,7 +2,7 @@
 name: B20261025-2302-b20-gates-checks-review-scope.loop-brief
 description: Make "a gate never runs the suite" a domain invariant every session obeys, have the gate review check that every acceptance criterion is judged by a gate, a check or the review — halting for the operator on a missing check — and keep vloop's own records out of the review's product constraints
 kind: brief
-status: draft
+status: ready
 created: 2026-10-25
 seeds: The first of two hardening briefs before the fence (docs/design-notes/vloop-roadmap-b18-b21.md → "Before the fence: hardening"), from B19's acceptance run on the URL-shortener reference brief, settled with the operator on 2026-10-25
 depends-on: [B20261025-1307-b19-copilot-review.loop-brief]
