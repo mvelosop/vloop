@@ -43,7 +43,7 @@ flowchart LR
 | briefing | Brief | `internal/brief` | — (frontmatter, checked by `brief check`) | `brief new`, `brief check`, `brief list` |
 | execution | Plan, Task | `internal/state` | `state/v1` | `status`, `task …` |
 | execution | Proposal, Verdict | — (written by sessions) | `proposal/v1`, `verdict/v1` | — |
-| execution | Run, Iteration, Session | `internal/runs` (reads them) | `iteration/v1`, `session/v1` | `run` *(planned, B6)* |
+| execution | Run, Iteration, Session | `internal/runs` (reads them) | `iteration/v1`, `session/v3` | `run` *(planned, B6)* |
 | measurement | Metrics, line classification | `internal/metrics`, `internal/classify` | `metrics/v1` | `metrics …` |
 | measurement | Defect | `internal/defect` | `defect/v1` | `defect add\|list\|set` |
 | measurement | Close, snapshot | `internal/closing` | `metrics/v1` | `brief close` |

@@ -14,7 +14,7 @@ An **iteration** is one pass over one task. *Part of
 `.loop/state/runs/<branch>/<folder>/`):
 
 ```
-sessions/NNN-<phase>.json   one session record each (session/v1)
+sessions/NNN-<phase>.json   one session record each (session/v3)
 iterations.jsonl            one iteration record per line (iteration/v1)
 reports/NNN-verdict.json    the verdict of iteration NNN (verdict/v1)
 gates/T<n>.log              the last gate output per task

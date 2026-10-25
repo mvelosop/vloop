@@ -1,39 +1,37 @@
-# Plan — B20261015-1651-b17-release
+# Plan — B20261025-0930-b18-agent-per-phase
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **9/9 done** · iteration 13
+**Status:** complete · **4/4 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261015-1651-b17-release.loop-brief.md` · **Updated:** 2026-10-15T17:59:15Z
+**Brief:** `docs/briefs/B20261025-0930-b18-agent-per-phase.loop-brief.md` · **Updated:** 2026-10-25T12:18:44Z
 
 ## Progress
 
-- [x] **T1** — Read the binary's version from the embedded plugin.json · 1 attempt(s)
-- [x] **T2** — Record the module version in .vloop/install.json · 1 attempt(s)
-- [x] **T3** — Add tools/release with the notes subcommand
-- [x] **T4** — Make prepare's checks, refusing before anything is written
-- [x] **T5** — Make prepare create the release branch and open the PR
-- [x] **T6** — Make publish find the release commit, tag it and create the GitHub release
-- [x] **T7** — Make publish prove the public install, and finish an interrupted release on re-run
-- [x] **T8** — Describe the release tool in the docs and the operator's playbook
-- [x] **T9** — Close: run the worked example line for line and the real-data check
+- [x] **T1** — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are · 1 attempt(s)
+- [x] **T2** — Start every session through a seam with a Claude adapter, and write session/v3 records
+- [x] **T3** — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
+- [x] **T4** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
-### T1 — Read the binary's version from the embedded plugin.json
+### T1 — Add the five agent.&lt;phase&gt; config keys and resolve them as model and effort are
 
 `done` · 1 attempt(s) · depends on: none
 
-Today a release edits the version in five places (main.go, plugin.json and three tests). V1 makes the embedded plugin/.claude-plugin/plugin.json the one version source, so a release bump is one line — the line `prepare` (T5) will change — and the binary and plugin can never disagree. Every later task relies on it: the release commit changes only plugin.json.
+Which agent CLI runs each phase becomes a setting beside model.&lt;phase&gt; and effort.&lt;phase&gt;, so later briefs can mix agents per phase. In this run claude is the only registered agent, so the keys exist, validate, list and resolve, but nothing a session receives changes. The seam task (T2) consumes the resolved agent; this task only defines and resolves it.
 
 **Acceptance**
 
-- The binary's version is the `version` of the embedded plugin/.claude-plugin/plugin.json: bumping that one line moves `vloop version` and `vloop version --json`, with no other edit.
-- cmd/vloop/main.go holds no version literal and no `version` variable a -X flag could stamp; `-X main.commit=<sha>` still stamps the commit. A version literal left in cmd/vloop/main.go is a violation.
-- `vloop version` and `vloop version --json` print exactly what the base prints for the same build (unstamped, and stamped with a commit).
-- No test pins a version literal: the tests that compared 0.11.0 (cmd/vloop/e2e_test.go, cmd/vloop/run_harness_test.go's stub plugin list, internal/cli/root_test.go) read the version from the embedded plugin.json instead. A test still containing "0.11.0" as the expected version is a violation.
-- A committed test, run by the checks, proves the binary's version equals the embedded plugin.json's version. An earlier test changes only where it pins the version literal, and only to read it from plugin.json; the task's notes name V1 for each test changed.
-- `go generate ./...` leaves docs/guide/commands.md unchanged, or the regenerated file is part of the change.
+- Five keys exist: agent.plan, agent.work, agent.review, agent.gate-review, agent.verify; default claude; the only valid value is claude; environment variables VLOOP_AGENT_PLAN, VLOOP_AGENT_WORK, VLOOP_AGENT_REVIEW, VLOOP_AGENT_GATE_REVIEW, VLOOP_AGENT_VERIFY; `vloop config set` stores them under [agent] in .vloop/config.toml.
+- In a repository initialised by the changed binary with no [agent] table, `vloop config get agent.review` prints `claude` (exit 0) and `--json` prints {"key":"agent.review","value":"claude","source":"default"}.
+- `vloop config set agent.review copilot` prints `vloop: invalid value "copilot" for agent.review: want one of claude` on stderr, exits 2 and leaves .vloop/config.toml byte-identical.
+- `VLOOP_AGENT_WORK=copilot vloop config list` prints `vloop: VLOOP_AGENT_WORK: invalid value "copilot" for agent.work: want one of claude` and exits 1; an invalid agent value in the environment or the file makes `vloop config get`, `vloop config list`, `vloop doctor` and `vloop run` exit 1, and `vloop run` starts no session.
+- `vloop config list` shows each of the five keys as `agent.<phase>=claude (default)`, like every other key.
+- The agent of work, review and verify is resolved once in ResolveRun at run start; the agent of plan and gate-review is resolved per session, when their model and effort are. There is no per-task agent override and the state schema is unchanged.
+- docs/guide/configuration.md has a table row for each of the five keys with default `claude` and its `VLOOP_AGENT_<PHASE>` variable.
+- With every VLOOP_AGENT_* set to claude, a run hands claude exactly what the base binary's run hands it (the gate's comparison).
+- Committed tests the checks run cover the new keys (default, environment, file, invalid value refused by set, source error) and the agent's resolution; a key or resolver shipped with no test that exercises it is a violation.
 
 <details><summary>verify command</summary>
 
@@ -43,18 +41,25 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Record the module version in .vloop/install.json
+### T2 — Start every session through a seam with a Claude adapter, and write session/v3 records
 
-`done` · 1 attempt(s) · depends on: T1
+`done` · depends on: T1
 
-v0.11.0 showed that a public `go install …@v0.11.0` writes "commit":"unknown" to .vloop/install.json, so the stamp cannot say which release it is. I1 records the module version (as `vloop version` prints it) in the stamp, right after commit, whenever the binary carries one, so every install — public ones included — is identified. Publish's install check (T7) relies on the same build info.
+Every session vloop starts is built inline as `claude -p` in the driver; this task moves everything agent-specific behind one seam with a Claude adapter (preflight and the phases it supports, per-run preparation, command and environment, deciding whether stdout is a record, mapping it onto the record), so B19 can add Copilot by adding an adapter. Nothing a Claude session receives may change: the gate builds the base binary and diffs argv, working directory and environment for every phase. Records gain the adapter's identity: session/v3 with agent and cost_source.
 
 **Acceptance**
 
-- `vloop init` and `vloop upgrade` write "module": "&lt;module version&gt;" into .vloop/install.json, immediately after "commit", when the binary's build info carries a module version (the value `vloop version` prints as module); they leave the key out otherwise — including on an upgrade by a binary with none, over a stamp that had one.
-- schemas/install.v1.json gains `module` as an optional string property; `required` and the schema name (install/v1) are unchanged, and a stamp without module stays valid.
-- No other behaviour of init or upgrade changes (I1 only).
-- Committed tests, run by the checks, cover init and upgrade with and without a module version (through the existing build-info seam, not a real network install) and the schema accepting a stamp with a string module and without one. An earlier test changes only where it pins the stamp's exact content, and only to the new behaviour; the notes name I1 for each.
+- Every session (plan, gate-review, work, review, verify) is started through the adapter of its phase's resolved agent; claude is the only adapter registered, and it owns its preflight checks and the phases it supports, any per-run preparation, the command and environment, whether stdout is a record, and the mapping onto the record.
+- With every phase on claude, the argv, working directory and environment claude receives are byte-identical to the base binary's for every phase, with and without .vloop/repo-guidelines.md, with and without a plan hash, with and without an effort; CLAUDE_CODE_USE_FOUNDRY, ANTHROPIC_FOUNDRY_RESOURCE and ANTHROPIC_DEFAULT_SONNET_MODEL still reach claude; VLOOP_ACTIVE_TASK, VLOOP_GATE_TASK and a stale VLOOP_PLAN_SHA256 are still dropped.
+- Violation: any claude flag, environment variable or record field (beyond schema, agent and cost_source) that differs from the base in a default configuration, even if the tests pass.
+- Violation: agent-specific logic left in the driver — the driver building --plugin-dir, --settings or --output-format, parsing stdout as one JSON document, or reading claude's JSON fields (total_cost_usd, modelUsage, permission_denials) itself — instead of in the Claude adapter.
+- Violation: agent-independent logic moved into the adapter — gates, checks, input or git guards, the lock, budget decisions, masking, stderr capture, timeouts or record numbering.
+- Violation: a per-task agent override, a second adapter, a fence change, or more than one session per phase.
+- Every record is session/v3: every field of session/v2, ended and wall_ms required, plus agent ("claude") and cost_source — "reported" when claude's output has the key total_cost_usd, else "none" with cost_usd 0. schemas/session.v3.json validates them and `vloop schema validate session/v3 <file>` works; schemas/session.v1.json and session.v2.json stay and still validate old records.
+- Stderr capture, masking, timeouts, the lock record, the SESSION RECORD MISSING log line (empty stdout, or stdout that is not claude's JSON) and every exit code are unchanged; `vloop doctor` and the run preflight print exactly what the base prints and fail exactly when it fails.
+- Readers that consume records during a run (spend for budgets, the lock) read session/v3 as they read v1 and v2.
+- docs/domain/execution/session.md defines a session as a fresh process of its phase's agent, Claude Code by default (no longer as a `claude -p` process), and its record section documents session/v3 and says v1 and v2 records mean agent claude; where `agent` and the agent clock (agent_ms) both appear, the page says they differ.
+- The run harness stub in cmd/vloop/run_harness_test.go also logs each argument on its own line, its working directory and its environment, and a committed harness test pins, for a default run, each phase's argv and that the pass-through variables reach claude and the dropped ones do not; committed tests cover session/v3 records with cost_source reported and none. An earlier test changes only where it pins session/v1 or session/v2 in a record, the work notes name that contract item, and the argv tests in internal/driver/session_test.go are unchanged.
 
 <details><summary>verify command</summary>
 
@@ -64,21 +69,22 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Add tools/release with the notes subcommand
+### T3 — Report agents per phase in metrics/v3, reading v1, v2 and v3 records and metrics/v2 snapshots
 
-`done` · depends on: T1
+`done` · depends on: T2
 
-The release tool is a repository-owned Go program, `go run ./tools/release`, not a vloop subcommand. This task creates it with `notes <from> <to>`, the Markdown release notes built from the briefs merged in the range (found by their Vloop-Brief trailers) and the other code changes; prepare (T5) uses it as the PR body and publish (T6) as the release notes. It also runs the real-data check against this repository's own tags.
+`vloop metrics --json` moves to metrics/v3, which adds `agents` per phase beside `models`, so a mixed-agent run is visible in its metrics once B19 lands. Everything already recorded must keep reading: session/v1 and v2 records count as claude, and metrics/v2 snapshots stay readable by brief close, the workspace table and the cross-brief table.
 
 **Acceptance**
 
-- tools/release is `package main` in this module (it may use internal packages); no new dependency in go.mod, and no `vloop` subcommand is added for releasing.
-- `notes <from> <to>` prints, on stdout with exit 0, the brief's exact Markdown: `## Briefs`, a blank line, `- **<title>** — <description>` lines; a blank line; `## Other changes`, a blank line, `- <subject>` lines. A section with no lines is left out; with neither the output is `No changes.`
-- Commits are those after &lt;from&gt; up to and including &lt;to&gt; (tags or revisions). A brief is named by a commit's `Vloop-Brief: <name>` trailer; one line per brief, oldest first; &lt;title&gt; is the brief's first heading with a leading `Brief — ` and `vloop ` removed, else the brief's name; &lt;description&gt; is its frontmatter description; both read at &lt;to&gt;.
-- Other changes are the commits without the trailer whose changes touch a file outside docs/, .vloop/ and CLAUDE.md and whose subject does not start `Release v`, oldest first.
-- Refusals are one stderr line starting `release: `; exit codes are 0 done, 1 refused or failed, 2 usage (a wrong number of arguments or an unknown subcommand).
-- The task's notes carry the real-data check, run on a clone of this repository: the full output of `notes v0.10.0 v0.11.0` (B16 alone under Briefs) and of `notes v0.9.0 v0.10.0` (B13, B14 and B15).
-- Committed tests, run by the checks, cover the notes format, the trailer, title and description rules, the exclusions and the empty sections, building their repositories in temporary directories with a temporary HOME and git -C; no test reads this repository's history or reaches the network.
+- `vloop metrics --json` (and --workspace --json, and new snapshots in .vloop/state/metrics/) is metrics/v3: every field metrics/v2 has, unchanged, plus `agents`, per phase like `models`: the sorted distinct agents that ran that phase's sessions, ["claude"] for every phase that ran, and for a phase that did not run the same empty or absent value models uses.
+- schemas/metrics.v3.json validates the document with agents required; `vloop schema validate metrics/v3 <file>` works and metrics.v2.json still validates a base-written snapshot.
+- session/v1 and session/v2 records count as agent claude; session/v3 records count as their agent field.
+- Over a run directory the base binary wrote (session/v1 and v2 records, a metrics/v2 snapshot), `vloop metrics`, `vloop metrics --by task`, `vloop metrics --workspace` and `vloop brief close --dry-run` give the same numbers as the base, and --json differs only by schema and agents.
+- Over a run the changed binary wrote, every value of models equals the base binary's for the same run.
+- Violation: a session/v1 or session/v2 record, or a metrics/v2 snapshot, that vloop metrics, brief close or the workspace table no longer reads; export/v1 and `vloop metrics export` change in any way.
+- docs/domain/measurement/metrics.md documents agents beside models and metrics/v3, and says agents (the CLI that ran a session) is not the agent clock (agent_ms).
+- Committed tests the checks run cover agents in metrics/v3 for v1, v2 and v3 records and the reading of a metrics/v2 snapshot; an earlier test changes only where it pins metrics/v2 as the --json schema, and the work notes name that contract item.
 
 <details><summary>verify command</summary>
 
@@ -88,136 +94,23 @@ sh .vloop/state/gates/T3/gate.sh
 
 </details>
 
-### T4 — Make prepare's checks, refusing before anything is written
+### T4 — Close the run: every gate at once and the worked example line for line
 
-`done` · depends on: T3
+`done` · depends on: T1, T2, T3
 
-`prepare <version>` must refuse a bad release before it writes, commits, tags or pushes anything. This task builds the checks in the brief's order — version form, module-path major, retraction, after the latest tag, tag absent, on main / clean / equal to origin/main after a fetch, every [[check]] then `claude plugin validate plugin` — and --dry-run, which makes them all and writes nothing. T5 adds what prepare does once they pass.
+The earlier gates each ran while their task was the newest; this task checks the finished tree against all of them together and against the brief's worked example, and reconciles whatever drifted between tasks — docs that still name session/v1, session/v2 or metrics/v2 as what vloop writes, or a config page row out of step. It adds no behaviour of its own.
 
 **Acceptance**
 
-- The checks run in the brief's order, each with its exact message: `release: <version> is not a version: vX.Y.Z or vX.Y.Z-<pre>` (exit 2); `release: <version> needs the module path to end in /v<major>, and github.com/mvelosop/vloop does not`; `release: <version> is retracted in go.mod` (single versions and ranges); `release: <version> is not after the latest release <tag>`; `release: tag <version> already exists` (locally or on origin); `release: prepare runs on main, not <branch>`; `release: the working tree is not clean`; `release: main is not origin/main — pull or push first`; `release: check <name> failed` with the check's output on stderr; `release: claude plugin validate plugin failed` — each exit 1 except the first.
-- Versions are vX.Y.Z or vX.Y.Z-&lt;pre&gt; (semver); the latest release is the highest tag that is a version (other tags are ignored), and a pre-release sorts before its release (v0.12.0-rc.1 &lt; v0.12.0). The module path is read from go.mod.
-- Every refusal happens before anything is written: no file, commit, branch, tag or push, and no gh call that writes. A refusal that wrote anything is a violation.
-- `--dry-run` (accepted after the version, as `prepare v0.12.0 --dry-run`) makes every check, the [[check]] runs and claude plugin validate included, prints what it would do, and writes nothing.
-- git, gh, go and claude are run from PATH. The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
-- Committed tests, run by the checks, cover each refusal and its order, the no-write guarantee and --dry-run.
+- The gates of T1, T2 and T3 all pass on the finished tree, run together.
+- Every line of the brief's worked example holds against the changed binary: the config lines with their exact output and exit codes, the stub comparison with no differences for all five phases and the planted flag caught, session/v3 records with agent claude and cost_source reported (none with cost_usd 0 when total_cost_usd is absent), metrics/v3 with agents, and the base-written run directory reading as before.
+- No page under docs/domain/ or docs/guide/ still says that vloop writes session/v1 or session/v2 records or that `vloop metrics --json` prints metrics/v2, except where it describes what older records and snapshots are and that they still read.
+- The task adds no behaviour: any code change it makes fixes a divergence from the brief's contract that an earlier task left, and its work notes name it; such a fix ships with the committed test that would have caught it.
 
 <details><summary>verify command</summary>
 
 ```sh
 sh .vloop/state/gates/T4/gate.sh
-```
-
-</details>
-
-### T5 — Make prepare create the release branch and open the PR
-
-`done` · depends on: T4
-
-Once its checks pass, prepare does the first outward half of a release so the operator only has to review and squash-merge: a release/&lt;version&gt; branch from main whose one commit, `Release <version>`, changes only plugin.json's version (one line, thanks to V1), pushed, with a PR titled `Release <version>` whose body is the notes from the latest version tag to main. The merge stays the operator's.
-
-**Acceptance**
-
-- prepare &lt;version&gt; creates release/&lt;version&gt; from main, sets plugin/.claude-plugin/plugin.json's version (the version without its v) changing only that line, commits `Release <version>` as the branch's one commit, pushes the branch to origin, and opens a PR with gh titled `Release <version>` whose body is `notes <latest version tag> main`.
-- On success stdout ends with exactly `prepared release/<version>: <PR url>` and `squash-merge it, then: go run ./tools/release publish <version>`; exit 0.
-- The tool never merges, never pushes or commits to main and never tags. Any of those is a violation.
-- The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
-- Committed tests, run by the checks, cover the branch, its single commit and diff, the push to a local bare origin, the PR title and body given to a stub gh, and the output.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T5/gate.sh
-```
-
-</details>
-
-### T6 — Make publish find the release commit, tag it and create the GitHub release
-
-`done` · depends on: T5
-
-After the operator's merge, publish does the second outward half. It fetches origin and first finds the release commit — the newest on origin/main whose subject starts `Release <version>` and whose plugin.json holds the version — then tags it (annotated, message from the brief titles), pushes the tag and creates the GitHub release with the notes. Finding the commit comes before any write, so publish before the merge refuses cleanly. T7 adds the public-install check and the re-run.
-
-**Acceptance**
-
-- publish &lt;version&gt; fetches origin and finds the release commit before anything is written; none refuses `release: no release commit for <version> on origin/main — merge the release PR first` (exit 1), with no tag and no release created. Tagging before finding the release commit is a violation.
-- It creates the annotated tag &lt;version&gt; on the release commit (not origin/main's tip), message `<version>: <brief titles joined by "; ">` from the briefs of `notes <previous version tag> <release commit>`, or `<version>` alone without briefs, and pushes it. A tag already on that commit is kept; one elsewhere refuses `release: tag <version> points at <sha>, not the release commit <sha>` (exit 1), leaving the tag as it was.
-- It runs `gh release create <version> --verify-tag`, titled &lt;version&gt;, with `notes <previous version tag> <version>` as the notes, and --prerelease for a version with a -&lt;pre&gt; suffix. An existing release is kept.
-- On success stdout ends with exactly the brief's four lines: `published <version>: <release url>`, `install: go install github.com/mvelosop/vloop/cmd/vloop@<version>`, `then, in each repository: vloop upgrade`, `and for the plugin: claude plugin marketplace update vloop && claude plugin update vloop@vloop`.
-- publish never pushes to main and never merges. The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
-- Committed tests, run by the checks, cover the release-commit search (including a decoy subject whose plugin.json does not hold the version), the refusal before any write, the tag's commit and message, the tag elsewhere, and gh's arguments for a release and a pre-release.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T6/gate.sh
-```
-
-</details>
-
-### T7 — Make publish prove the public install, and finish an interrupted release on re-run
-
-`done` · depends on: T6
-
-A release is done only when `go install …@<version>` from the public proxy installs it: v0.11.0's install was found wanting by hand. publish waits for the proxy to serve the version, installs into a temporary GOBIN and checks what the binary reports. Because the proxy can lag, every step already done is skipped on a re-run, so an interrupted publish is finished by running it again.
-
-**Acceptance**
-
-- After the tag and the release, publish retries `go list -m github.com/mvelosop/vloop@<version>` every 30 seconds until it succeeds, up to --wait (default 10m), else refuses `release: the module proxy does not serve <version> after <wait>` (exit 1).
-- Then `go install github.com/mvelosop/vloop/cmd/vloop@<version>` into a temporary GOBIN (never inside the repository), whose `vloop version --json` must report the version (without v) and the module (&lt;version&gt;); otherwise `release: go install …@<version> reports version <v>, module <m>` (exit 1).
-- Each step already done prints `<step>: already done` (`tag: already done`, `release: already done`) and is skipped; a fully done release re-runs only the public-install check and ends with the four success lines, exit 0.
-- `publish <version> --dry-run` makes the checks it can without writing — no tag, push or release — and prints each step.
-- The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
-- Committed tests, run by the checks, cover the proxy wait and its refusal (with a short --wait), the version mismatch, the temporary GOBIN, the already-done re-runs and --dry-run.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T7/gate.sh
-```
-
-</details>
-
-### T8 — Describe the release tool in the docs and the operator's playbook
-
-`done` · depends on: T7
-
-D1: the docs still describe the manual ceremony this brief retires — five edits and a stamped -X main.version build. They must say the version comes from plugin.json and the release is prepare, the operator's merge, publish, then install and upgrade; this repository's operator playbook must make the release one short step that runs the tool; and the tool gets a short README of its own.
-
-**Acceptance**
-
-- docs/guide/concepts.md, "The stamped release build": the version comes from plugin/.claude-plugin/plugin.json; the stamped build sets the commit only (-X main.commit, no -X main.version); the release steps are `go run ./tools/release prepare <version>`, the operator's squash-merge, `go run ./tools/release publish <version>`, then install and `vloop upgrade` in each repository.
-- .claude/skills/vloop-operator/SKILL.md gains the release as a short step that runs the tool (prepare, merge on the operator's go-ahead, publish) and records the release intervention.
-- tools/release/README.md exists, under 300 words, and describes notes, prepare and publish.
-- docs/guide/commands.md is regenerated if any help text changed; no vloop subcommand appears for releasing.
-- No doc still tells the operator to edit the version in cmd/vloop/main.go or the tests.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T8/gate.sh
-```
-
-</details>
-
-### T9 — Close: run the worked example line for line and the real-data check
-
-`done` · depends on: T8
-
-The brief's worked example is its acceptance in one sequence: prepare's refusals, prepare, publish before and after the operator's squash-merge, the re-run, a mismatched install, and a proxy-installed v0.12.0 upgrading a repository. This task runs it end to end against a fixture and the real-data check against a clone of this repository, fixes any discrepancy it finds within the brief's contract, and leaves an end-to-end test behind so the sequence stays true.
-
-**Acceptance**
-
-- The task's notes carry the worked example run line for line — each command with its actual exit code and output, as run, not recalled — against a fixture repository with a local bare origin and stub gh, go and claude.
-- The notes carry the real-data check on a clone of this repository: the outputs of `notes v0.10.0 v0.11.0` and `notes v0.9.0 v0.10.0`, and `prepare v0.12.0 --dry-run` on a clean, current main of the clone (whose origin is the local repository, never the real one) passing every check, with nothing written.
-- A committed end-to-end test, run by the checks, plays the worked example's sequence (refusals, prepare, publish before and after a squash-merge, the re-run, the mismatched install) with stubs and a local bare origin. The tool's tests use stubs for gh, go and claude on PATH and a local bare repository as origin, in temporary directories with a temporary HOME, addressed with git -C; no test runs the real gh, go install from the network, or this repository's origin.
-- Any fix made here stays within the brief's contract and names the item it serves in the notes; no check is weakened to pass.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T9/gate.sh
 ```
 
 </details>

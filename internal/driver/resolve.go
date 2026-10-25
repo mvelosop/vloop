@@ -26,6 +26,16 @@ func ResolveSession(root, field, kind, taskValue string) (value, source string, 
 	return v.Value, v.Source, nil
 }
 
+// ResolveAgent resolves the agent CLI of a session kind: the environment, else
+// the config file, else the default. There is no per-task override.
+func ResolveAgent(root, kind string) (string, error) {
+	v, err := config.Get(root, "agent."+kind)
+	if err != nil {
+		return "", err
+	}
+	return v.Value, nil
+}
+
 // ModelEffort is the model and effort a session of the phase runs with. task
 // is nil for a plan; a task's override applies to its own phase only, so a
 // review never takes the work model.
@@ -53,16 +63,16 @@ func sessionOverride(s *state.Sessions, phase string) string {
 	return ""
 }
 
-// Resolved is the model and effort of each session kind, read from the config
+// Resolved is the model, effort and agent of each session kind, read from the config
 // once at the start of a run: a session that rewrites the config afterwards
 // changes nothing of the run in progress.
 type Resolved struct {
-	model, effort map[string]string
+	model, effort, agent map[string]string
 }
 
 // ResolveRun resolves the work and review defaults.
 func ResolveRun(root string) (*Resolved, error) {
-	r := &Resolved{model: map[string]string{}, effort: map[string]string{}}
+	r := &Resolved{model: map[string]string{}, effort: map[string]string{}, agent: map[string]string{}}
 	for _, phase := range []string{PhaseWork, PhaseReview, PhaseVerify} {
 		var err error
 		if r.model[phase], _, err = ResolveSession(root, "model", phase, ""); err != nil {
@@ -71,9 +81,15 @@ func ResolveRun(root string) (*Resolved, error) {
 		if r.effort[phase], _, err = ResolveSession(root, "effort", phase, ""); err != nil {
 			return nil, err
 		}
+		if r.agent[phase], err = ResolveAgent(root, phase); err != nil {
+			return nil, err
+		}
 	}
 	return r, nil
 }
+
+// Agent is the agent of the phase, resolved at the start of the run.
+func (r *Resolved) Agent(phase string) string { return r.agent[phase] }
 
 // For is ModelEffort over the values held: the task's override for its own
 // phase, else the default resolved at the start.

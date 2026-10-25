@@ -349,3 +349,27 @@ func TestTimeWallStartsAtFirstPlanSession(t *testing.T) {
 		t.Errorf("wall = %v, want 30 minutes from the plan commit", u.Time.WallMS)
 	}
 }
+
+// session/v1 and v2 records carry no agent and count as claude; session/v3
+// records count as their agent field. The agent is the CLI that ran the
+// session, not the agent clock (agent_ms).
+func TestAgentsPerPhaseFromV1V2V3Records(t *testing.T) {
+	f := newFixture(t)
+	f.folder("20260101-090000", "planning from "+briefRel, "", map[string]string{
+		"001-plan.json":   `{"schema":"session/v1","phase":"plan","iteration":0,"duration_ms":1,"total_cost_usd":0.1}`,
+		"002-work.json":   `{"schema":"session/v2","phase":"work","iteration":1,"duration_ms":1,"total_cost_usd":0.1}`,
+		"003-review.json": `{"schema":"session/v3","agent":"claude","phase":"review","iteration":1,"duration_ms":1,"total_cost_usd":0.1}`,
+		"004-work.json":   `{"schema":"session/v3","agent":"other","phase":"work","iteration":2,"duration_ms":1,"total_cost_usd":0.1}`,
+	})
+	m, err := runs.Load(f.root, "B20260101-0900-a.loop-brief")
+	if err != nil {
+		t.Fatal(err)
+	}
+	u := Aggregate(m, Counts{})
+	if u.Agents["plan"] != "claude" || u.Agents["work"] != "claude,other" || u.Agents["review"] != "claude" {
+		t.Errorf("agents = %v", u.Agents)
+	}
+	if _, ok := u.Agents["verify"]; ok {
+		t.Errorf("agents has a verify entry for a phase that did not run: %v", u.Agents)
+	}
+}

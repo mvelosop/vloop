@@ -4,8 +4,11 @@ description: Binds the Session entity — the plan, work, review, gate-review an
 ---
 # Session
 
-A fresh `claude -p` process with one job and no memory of any other; sessions
-share nothing but files (S-1). *Part of [execution](execution-context.md).*
+A fresh process of its phase's agent — Claude Code by default — with one job and
+no memory of any other; sessions share nothing but files (S-1). Everything
+agent-specific (preflight, the phases it supports, the command and
+environment, whether stdout is a record, its mapping onto the record) is the
+agent's adapter's; claude is the only adapter. *Part of [execution](execution-context.md).*
 
 ## The five kinds
 
@@ -80,14 +83,20 @@ work it judges has it reverted and fails). A session or gate that moves any ref,
 committed. A session writes nothing under `.git/` and nothing under `.vloop/`
 but `.vloop/tmp/` (S-4).
 
-## The record it leaves — `session/v1`, `session/v2`
+## The record it leaves — `session/v3`
 
-`run_id`, `iteration`, `phase`, `task` (none for `plan`), the configured
-`model` and `effort`, `models_used` (per model: tokens and cost), `started`,
-`ended`, `wall_ms`, `duration_ms`, `cost_usd`, `turns`, `is_error`, `permission_denials`. A gate-review or verify session's record is `session/v2` (iteration 0, no task). `ended` and `wall_ms` are the driver's own
-measurement around the session process (the wall time, including any time the
-machine slept); `duration_ms` stays what the CLI reported, and both are optional
-so older records stay readable, with no version change. A denied Bash call in
+`run_id`, `iteration`, `phase`, `agent` (the adapter that ran it, `claude`),
+`task` (none for `plan`), the configured `model` and `effort`, `models_used`
+(per model: tokens and cost), `started`, `ended`, `wall_ms`, `duration_ms`,
+`cost_usd`, `cost_source`, `turns`, `is_error`, `permission_denials`. A
+gate-review or verify session has iteration 0 and no task. `cost_source` is
+`reported` when the agent's output carries a cost (for claude, the key
+`total_cost_usd`), else `none` with `cost_usd` 0. `ended` and `wall_ms` are the
+driver's own measurement around the session process (the wall time, including
+any time the machine slept); `duration_ms` is the agent's own clock (the agent clock, `agent_ms` in the
+metrics), so the two differ. `session/v1` and `session/v2` records, written before agents were
+resolved per phase, mean agent `claude`; they stay readable, with `ended` and
+`wall_ms` optional. A denied Bash call in
 `permission_denials` keeps its `command`, masked, redacted and cut to 200
 characters; other tools keep only the tool name and a `file_path`. A missing
 record is reported by the metrics, never silently skipped.
@@ -103,4 +112,4 @@ prose in the repo's `language` (C-4).
 - The shell loop's `loop-plan`, `loop-work` and `loop-review` skills still
   exist beside vloop's.
 - The shell loop's session records are the raw `claude` JSON plus `phase` and
-  `iteration`, not `session/v1`; vloop reads both.
+  `iteration`, not `session/v3`; vloop reads both.

@@ -35,7 +35,7 @@ type Runner struct {
 	RunDir  string    // the run folder (absolute); records go in its sessions/
 	Log     io.Writer // run log lines, masked; may be nil
 
-	Claude string           // command to run; "claude" when empty
+	Claude string           // the claude adapter's command; "claude" when empty
 	Now    func() time.Time // the driver's clock; time.Now when nil
 	Home   string           // masked to "~"; os.UserHomeDir when empty
 	User   string           // masked to "USER"; the home's base name when empty
@@ -54,6 +54,7 @@ type Spec struct {
 	Arg       string
 	Model     string
 	Effort    string
+	Agent     string // the phase's resolved agent; claude when empty
 	PlanSHA   string // the plan's hash handed to the session; "" for none
 }
 
@@ -244,8 +245,8 @@ const maxCommand = 200
 // cutCommand masks a command, then keeps its first maxCommand characters, with
 // … appended when it was cut. The masking comes first so the cut never splits
 // a secret or a path into something the masks no longer recognize.
-func (r *Runner) cutCommand(c string) string {
-	c = r.Mask(c)
+func cutCommand(mask func(string) string, c string) string {
+	c = mask(c)
 	if n := 0; len(c) > maxCommand {
 		for i := range c {
 			if n == maxCommand {
@@ -256,6 +257,8 @@ func (r *Runner) cutCommand(c string) string {
 	}
 	return c
 }
+
+func (r *Runner) cutCommand(c string) string { return cutCommand(r.Mask, c) }
 
 // maskValue masks every string, and every object key, of a decoded JSON value.
 func (r *Runner) maskValue(v any) any {
@@ -315,15 +318,18 @@ func (r *Runner) next() int {
 	return r.n
 }
 
-// Run starts one session and, if it printed JSON, writes its session/v1 record.
+// Run starts one session and, if it printed JSON, writes its session/v3 record.
 // A non-zero exit of claude is a Result, not an error; an error means the
 // session could not be started or its files written.
 func (r *Runner) Run(s Spec) (Result, error) {
-	plugin, err := ExtractPlugin(r.Root, r.Version)
+	ad, err := adapterFor(s.Agent, r.Claude)
 	if err != nil {
 		return Result{}, err
 	}
-	fence, err := ExtractFence(r.Root, r.Version, s.Phase)
+	if !ad.Supports(s.Phase) {
+		return Result{}, fmt.Errorf("agent %s does not support the %s phase", ad.Name(), s.Phase)
+	}
+	prep, err := ad.Prepare(r.Root, r.Version, s.Phase)
 	if err != nil {
 		return Result{}, err
 	}
@@ -336,16 +342,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	}
 	n := r.next()
 
-	bin := r.Claude
-	if bin == "" {
-		bin = "claude"
-	}
-	cmd := exec.Command(bin, WithGuidelines(Args(s, fence, plugin), r.Root)...)
-	cmd.Dir = r.Root
-	cmd.Env = dropEnv(r.env(), "VLOOP_ACTIVE_TASK", "VLOOP_GATE_TASK", PlanHashEnv)
-	if s.PlanSHA != "" {
-		cmd.Env = append(cmd.Env, PlanHashEnv+"="+s.PlanSHA)
-	}
+	cmd := ad.Command(s, r.Root, r.env(), prep)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 
@@ -366,7 +363,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	if runErr != nil {
 		ee, ok := runErr.(*exec.ExitError)
 		if !ok {
-			return Result{}, fmt.Errorf("cannot start %s: %w", bin, runErr)
+			return Result{}, fmt.Errorf("cannot start %s: %w", cmd.Path, runErr)
 		}
 		res.ExitCode = ee.ExitCode()
 	}
@@ -381,12 +378,12 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		return res, err
 	}
 
-	var raw map[string]json.RawMessage
-	if len(bytes.TrimSpace(stdout.Bytes())) == 0 || json.Unmarshal(stdout.Bytes(), &raw) != nil {
+	out, ok := ad.Parse(stdout.Bytes(), r.Mask)
+	if !ok {
 		r.Logf("SESSION RECORD MISSING %s %s (iteration %d)", s.Phase, orDash(task), s.Iteration)
 		return res, nil
 	}
-	rec, out := r.record(s, task, started, ended, raw)
+	rec := r.record(s, ad.Name(), task, started, ended, out)
 	data, err := r.maskRecord(rec)
 	if err != nil {
 		return res, err
@@ -415,92 +412,28 @@ type usage struct {
 	Cost          float64 `json:"cost_usd"`
 }
 
-type output struct {
-	Cost    float64
-	Turns   int
-	IsError bool
-	Denials []json.RawMessage
-}
-
-// record maps claude's JSON onto session/v1 (session/v2 for a gate review). Fields claude did not print are
-// zero values of the same type; none is made up beyond that.
-func (r *Runner) record(s Spec, task string, started, ended time.Time, raw map[string]json.RawMessage) (map[string]any, output) {
-	var o output
-	get := func(k string, v any) { _ = json.Unmarshal(raw[k], v) }
-	var dur float64
-	var turns float64
-	get("total_cost_usd", &o.Cost)
-	get("duration_ms", &dur)
-	get("num_turns", &turns)
-	get("is_error", &o.IsError)
-	var denials []struct {
-		Tool  string `json:"tool_name"`
-		Input struct {
-			Path     string `json:"file_path"`
-			NotePath string `json:"notebook_path"`
-			Command  string `json:"command"`
-		} `json:"tool_input"`
-	}
-	get("permission_denials", &denials)
-	for _, d := range denials {
-		kept := map[string]string{"tool_name": d.Tool}
-		if p := d.Input.Path + d.Input.NotePath; p != "" {
-			kept["file_path"] = d.Input.Path
-			if d.Input.Path == "" {
-				kept["file_path"] = d.Input.NotePath
-			}
-		}
-		if d.Tool == "Bash" && d.Input.Command != "" {
-			kept["command"] = r.cutCommand(d.Input.Command)
-		}
-		b, _ := json.Marshal(kept)
-		o.Denials = append(o.Denials, b)
-	}
-	o.Turns = int(turns)
-	if o.Denials == nil {
-		o.Denials = []json.RawMessage{}
-	}
-
-	var mu map[string]struct {
-		Input         int64   `json:"inputTokens"`
-		Output        int64   `json:"outputTokens"`
-		CacheRead     int64   `json:"cacheReadInputTokens"`
-		CacheCreation int64   `json:"cacheCreationInputTokens"`
-		Cost          float64 `json:"costUSD"`
-	}
-	get("modelUsage", &mu)
-	used := map[string]usage{}
-	names := make([]string, 0, len(mu))
-	for k := range mu {
-		names = append(names, k)
-	}
-	sort.Strings(names)
-	for _, k := range names {
-		u := mu[k]
-		used[k] = usage{u.Input, u.Output, u.CacheRead, u.CacheCreation, u.Cost}
-	}
-
+// record maps an agent's output onto session/v3. Fields the agent did not
+// report are zero values of the same type; none is made up beyond that.
+func (r *Runner) record(s Spec, agent, task string, started, ended time.Time, o Output) map[string]any {
 	var effort any
 	if s.Effort != "" {
 		effort = s.Effort
 	}
-	schemaName := "session/v1"
-	if s.Phase == PhaseGateReview || s.Phase == PhaseVerify {
-		schemaName = "session/v2"
-	}
 	rec := map[string]any{
-		"schema":             schemaName,
+		"schema":             "session/v3",
 		"run_id":             r.RunID,
 		"iteration":          s.Iteration,
 		"phase":              s.Phase,
+		"agent":              agent,
 		"model":              s.Model,
 		"effort":             effort,
-		"models_used":        used,
+		"models_used":        o.ModelsUsed,
 		"started":            started.Format(time.RFC3339),
 		"ended":              ended.Format(time.RFC3339),
-		"duration_ms":        int64(dur),
+		"duration_ms":        o.AgentMS,
 		"wall_ms":            max(ended.Sub(started).Milliseconds(), 0),
 		"cost_usd":           o.Cost,
+		"cost_source":        o.CostSource,
 		"turns":              o.Turns,
 		"is_error":           o.IsError,
 		"permission_denials": o.Denials,
@@ -508,5 +441,5 @@ func (r *Runner) record(s Spec, task string, started, ended time.Time, raw map[s
 	if task != "" {
 		rec["task"] = task
 	}
-	return rec, o
+	return rec
 }

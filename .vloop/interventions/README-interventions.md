@@ -144,6 +144,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261015-151154-v4-left-the-order-of-close-s-verify-repo](I20261015-151154-v4-left-the-order-of-close-s-verify-repo.md) |
 | verify | verification-finding | partly | no-options | [I20261015-215245-t9-s-real-data-check-required-a-session](I20261015-215245-t9-s-real-data-check-required-a-session.md) |
 | verify | verification-finding | partly | no-options | [I20261015-215246-the-session-fence-denies-read-only-git-t](I20261015-215246-the-session-fence-denies-read-only-git-t.md) |
+| verify | verification-finding | partly | no-options | [I20261025-123516-the-domain-glossary-docs-domain-domain-m](I20261025-123516-the-domain-glossary-docs-domain-domain-m.md) |
+| verify | verification-finding | partly | no-options | [I20261025-123517-a-metrics-comment-still-named-only-metri](I20261025-123517-a-metrics-comment-still-named-only-metri.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

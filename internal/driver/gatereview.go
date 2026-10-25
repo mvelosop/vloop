@@ -36,6 +36,10 @@ func (p *Planner) gateReviewRound(t term, round int) ([]string, error) {
 	if err != nil {
 		return nil, halt(ExitPreflight, "%v", err)
 	}
+	agent, err := ResolveAgent(root, PhaseGateReview)
+	if err != nil {
+		return nil, halt(ExitPreflight, "%v", err)
+	}
 	verdictPath := filepath.Join(root, filepath.FromSlash(gateVerdictFile))
 	if err := os.Remove(verdictPath); err != nil && !os.IsNotExist(err) {
 		return nil, err
@@ -43,7 +47,7 @@ func (p *Planner) gateReviewRound(t term, round int) ([]string, error) {
 	t.say("reviewing the gates using %s (round %d)", model, round)
 	before := refsState(root)
 	gguard := snapshotGit(root)
-	res, err := t.r.Run(Spec{Phase: PhaseGateReview, Model: model, Effort: effort})
+	res, err := t.r.Run(Spec{Agent: agent, Phase: PhaseGateReview, Model: model, Effort: effort})
 	if err != nil {
 		return nil, halt(ExitPreflight, "gate review session failed: %v", err)
 	}

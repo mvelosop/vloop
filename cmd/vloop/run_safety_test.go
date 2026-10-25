@@ -173,9 +173,8 @@ func TestRun15TelemetryContract(t *testing.T) {
 		f := filepath.Join(r.runFolder(), "sessions", n)
 		var rec map[string]any
 		sessionRecord(t, f, &rec)
-		want := "session/v1"
+		want := "session/v3"
 		if rec["phase"] == "gate-review" || rec["phase"] == "verify" {
-			want = "session/v2"
 			if _, has := rec["task"]; has || rec["iteration"] != float64(0) {
 				t.Errorf("the gate review record is %v, want iteration 0 and no task", rec)
 			}

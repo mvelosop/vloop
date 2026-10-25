@@ -98,8 +98,8 @@ func TestWorkedExampleB6Sessions(t *testing.T) {
 	}
 
 	sess := filepath.Join(r.runFolder(), "sessions", "003-work.json")
-	if res := r.vloop("schema", "validate", "session/v1", sess); res.code != 0 {
-		t.Errorf("003-work.json is not session/v1: %+v", res)
+	if res := r.vloop("schema", "validate", "session/v3", sess); res.code != 0 {
+		t.Errorf("003-work.json is not session/v3: %+v", res)
 	}
 	if rec := r.iterations()[0]; rec["schema"] != "iteration/v2" || iterationChecks(rec) != "all:0" {
 		t.Errorf("the first iteration is %v with checks %q, want iteration/v2 with all:0", rec["schema"], iterationChecks(rec))

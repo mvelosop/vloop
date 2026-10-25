@@ -15,9 +15,9 @@ import (
 )
 
 // Schema is the name of the document Report marshals to.
-const Schema = "metrics/v2"
+const Schema = "metrics/v3"
 
-// JSONLines is Lines as metrics/v2 spells it: added counts, deleted apart.
+// JSONLines is Lines as metrics/v2 and v3 spell it: added counts, deleted apart.
 type JSONLines struct {
 	Code    int    `json:"code"`
 	Test    int    `json:"test"`
@@ -115,7 +115,7 @@ type ReportTask struct {
 	Per1000CodeUSD *float64 `json:"per_1000_code_lines_usd"`
 }
 
-// Report is the metrics/v2 document for one brief.
+// Report is the metrics/v3 document for one brief.
 type Report struct {
 	Schema  string             `json:"schema"`
 	Brief   string             `json:"brief"`
@@ -129,6 +129,7 @@ type Report struct {
 	Cost    ReportCost         `json:"cost"`
 	Tokens  TokenTotals        `json:"tokens"`
 	Models  PerPhase[[]string] `json:"models"`
+	Agents  PerPhase[[]string] `json:"agents"`
 	Effort  PerPhase[*string]  `json:"effort"`
 	Defects ReportDefects      `json:"defects"`
 	// Interventions counts the brief's intervention records by agreement.
@@ -226,12 +227,15 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	r.Cost = ReportCost{u.Cost.Total, u.Cost.Plan, u.Cost.Work, u.Cost.Review, u.Cost.GateReview, u.Cost.Per1kCode, nil}
 	r.Tokens = u.Tokens
 	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview]), splitList(u.Models[PhaseGateReview]), nil}
+	r.Agents = PerPhase[[]string]{splitList(u.Agents[PhasePlan]), splitList(u.Agents[PhaseWork]), splitList(u.Agents[PhaseReview]), splitList(u.Agents[PhaseGateReview]), nil}
 	r.Effort = PerPhase[*string]{strp(u.Effort[PhasePlan]), strp(u.Effort[PhaseWork]), strp(u.Effort[PhaseReview]), strp(u.Effort[PhaseGateReview]), nil}
-	if u.Time.VerifyMS != 0 || u.Cost.Verify != 0 || u.Models[PhaseVerify] != "" || u.Effort[PhaseVerify] != "" {
+	if u.Time.VerifyMS != 0 || u.Cost.Verify != 0 || u.Models[PhaseVerify] != "" || u.Agents[PhaseVerify] != "" || u.Effort[PhaseVerify] != "" {
 		r.Time.VerifyMS = &u.Time.VerifyMS
 		r.Cost.VerifyUSD = &u.Cost.Verify
 		vm := splitList(u.Models[PhaseVerify])
 		r.Models.Verify = &vm
+		va := splitList(u.Agents[PhaseVerify])
+		r.Agents.Verify = &va
 		ve := strp(u.Effort[PhaseVerify])
 		r.Effort.Verify = &ve
 	}

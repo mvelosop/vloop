@@ -1,0 +1,2 @@
+{"schema":"gate-verdict/v1","verdict":"PASS","tasks":[{"task":"T1","verdict":"PASS","findings":[]},{"task":"T2","verdict":"PASS","findings":[]},{"task":"T3","verdict":"PASS","findings":[]},{"task":"T4","verdict":"PASS","findings":[]}],"notes":"Each gate fails on the base at its behavioural assertion: T1 on 'unknown config key agent.review', T2 on the record schema being session/v1 not session/v3, T3 on metrics/v2 not metrics/v3, T4 on T1's gate. Byte-identity, planted-flag and fixtures read back fine; T2 takes about 30s."}
+

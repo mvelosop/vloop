@@ -532,11 +532,11 @@ func TestRunPlanCommit(t *testing.T) {
 		Model     string
 		Task      *string
 	}
-	if err := json.Unmarshal(rec, &s); err != nil || s.Schema != "session/v1" || s.RunID != runID ||
+	if err := json.Unmarshal(rec, &s); err != nil || s.Schema != "session/v3" || s.RunID != runID ||
 		s.Iteration != 0 || s.Phase != "plan" || s.Model != "opus" || s.Task != nil {
 		t.Errorf("the plan session record: %s (%v)", rec, err)
 	}
-	if v := r.vloop("schema", "validate", "session/v1", filepath.ToSlash(filepath.Join(".vloop/state/runs", runID, filepath.Base(dirs[0]), "sessions/001-plan.json"))); v.code != 0 {
+	if v := r.vloop("schema", "validate", "session/v3", filepath.ToSlash(filepath.Join(".vloop/state/runs", runID, filepath.Base(dirs[0]), "sessions/001-plan.json"))); v.code != 0 {
 		t.Errorf("the record does not validate: %s%s", v.out, v.err)
 	}
 

@@ -74,6 +74,7 @@ type Usage struct {
 	Cost    Cost
 	Tokens  TokenTotals
 	Models  map[string]string // phase -> sorted, comma-joined models
+	Agents  map[string]string // phase -> sorted, comma-joined agents
 	Effort  map[string]string // phase -> sorted, comma-joined efforts, where recorded
 	Denials int
 	Missing []string // `<task> <phase> (iteration <i>)`
@@ -121,10 +122,12 @@ func fratio(n, d float64) *float64 {
 func Aggregate(m *runs.Model, delivered Counts) Usage {
 	u := Usage{
 		Models:  map[string]string{},
+		Agents:  map[string]string{},
 		Effort:  map[string]string{},
 		Missing: MissingRecords(m),
 	}
 	models := map[string]map[string]bool{}
+	agents := map[string]map[string]bool{}
 	efforts := map[string]map[string]bool{}
 	var gate int64
 	gateKnown := false
@@ -185,6 +188,14 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 				}
 				models[s.Phase][s.Model] = true
 			}
+			if agents[s.Phase] == nil {
+				agents[s.Phase] = map[string]bool{}
+			}
+			agent := s.Agent
+			if agent == "" {
+				agent = "claude"
+			}
+			agents[s.Phase][agent] = true
 			if s.Effort != "" {
 				if efforts[s.Phase] == nil {
 					efforts[s.Phase] = map[string]bool{}
@@ -195,6 +206,9 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	}
 	for p, set := range models {
 		u.Models[p] = joinSet(set)
+	}
+	for p, set := range agents {
+		u.Agents[p] = joinSet(set)
 	}
 	for p, set := range efforts {
 		u.Effort[p] = joinSet(set)
