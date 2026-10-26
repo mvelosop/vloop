@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Both operator playbooks cite P-8 in their gate-repair text and name the check-gap halt in the exit-2 row; the concepts guide says what a check-gap halt is and what to do, in its gate review paragraph and exit-code row.",
+  "files": ["plugin/skills/operate/SKILL.md", ".claude/skills/vloop-operator/SKILL.md", "docs/guide/concepts.md"],
+  "verified": "sh .vloop/state/gates/T5/gate.sh printed 'gate T5: ok'; go test ./internal/budget passes.",
+  "notes": "Operate skill is about 1700 words, under its 1750 ceiling, so budget.go is unchanged. P-8 is cited by id only, not restated."
+}

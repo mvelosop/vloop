@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 6
+**Status:** running · **5/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:48:57Z
+**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:53:39Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing · 2 attempt(s)
 - [x] **T3** — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
 - [x] **T4** — Keep vloop's records under .vloop/ out of the review's product constraints
-- [ ] **T5** — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
+- [x] **T5** — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
 - [ ] **T6** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
@@ -118,7 +118,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 The operator's repair of a gate is where B19's suite crept into a gate, and the check-gap halt is new behaviour the operator has to act on: add the missing check to .vloop/config.toml, commit it, re-run. Both the plugin's operate skill and this repository's own playbook must cite P-8 where they speak of a gate repair, and their halt tables and the concepts guide must say what the new exit-2 halt means and what to do.
 

@@ -51,3 +51,10 @@ committing the plan
    review T4 · 0m24s · $0.11 · run $6.25 / $40.00
    review: PASS
    T4 done
+── iteration 7 (7 this run) · T5 · 4/6 done ──
+   Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
+   work T5 · 0m26s · $0.14 · run $6.39 / $40.00
+   check go
+   review T5 · 0m21s · $0.10 · run $6.48 / $40.00
+   review: PASS
+   T5 done

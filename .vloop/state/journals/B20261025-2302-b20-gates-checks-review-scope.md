@@ -48,3 +48,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The review skill now has a 'The product' section (everything outside .vloop/; records defects are one line in notes) and a reworded absolute-path question with no path-shaped placeholder; cites P-8. The 08-vloop-records-out-of-scope eval case and its README row are added.
 - **Files:** plugin/skills/review/SKILL.md, internal/budget/budget.go, plugin/evals/README.md, plugin/evals/08-vloop-records-out-of-scope/prompt.md, plugin/evals/08-vloop-records-out-of-scope/case.yaml, plugin/evals/08-vloop-records-out-of-scope/task.json, plugin/evals/08-vloop-records-out-of-scope/scaffold.sh, plugin/evals/08-vloop-records-out-of-scope/graders/verdict-is-pass.md, plugin/evals/08-vloop-records-out-of-scope/graders/no-finding.md, plugin/evals/08-vloop-records-out-of-scope/graders/notes-line-about-records.md, plugin/evals/08-vloop-records-out-of-scope/graders/verdict-validates.md
 - **Notes for next iteration:** Review skill is 1680 words; ceiling raised 1650 -> 1820 (the 166 words added, plus a little headroom), with date and reason in the budget.go comment. The scaffold composes the records' home path at run time; the eval itself (claude) was not run.
+
+## T5 — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Both operator playbooks cite P-8 in their gate-repair text and name the check-gap halt in the exit-2 row; the concepts guide says what a check-gap halt is and what to do, in its gate review paragraph and exit-code row.
+- **Files:** plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md, docs/guide/concepts.md
+- **Notes for next iteration:** Operate skill is about 1700 words, under its 1750 ceiling, so budget.go is unchanged. P-8 is cited by id only, not restated.
