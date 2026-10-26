@@ -58,7 +58,7 @@ and bring the operator a proposal:
    `branch.*.github-pr-*`; the guard ignores both (B12, B16), but any other
    editor key halts the run with exit 9, as `vscode-merge-base` halted B11's
    acceptance and a visum-monorepo plan. `vloop status` shows progress. `--plan-only` first when the
-   operator wants to see the task split. B1–B7 ran under `.loop/run.sh`.
+   operator wants to see the task split. B1–B7 ran under the shell loop.
 3. Resuming on another branch than the one that planned needs the brief path
    again; the driver refuses without it (exit 1) and says so.
 

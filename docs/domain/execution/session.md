@@ -117,7 +117,5 @@ prose in the repo's `language` (C-4).
 
 ## Gaps
 
-- The shell loop's `loop-plan`, `loop-work` and `loop-review` skills still
-  exist beside vloop's.
 - The shell loop's session records are the raw `claude` JSON plus `phase` and
   `iteration`, not `session/v3`; vloop reads both.

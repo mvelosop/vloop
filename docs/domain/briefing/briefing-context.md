@@ -26,8 +26,8 @@ starts at a file named `*.loop-brief.md` (B-1).
 ## Invariants it enforces
 
 B-1 to B-6 in [`../domain-model.md`](../domain-model.md#briefs--b). `brief check`
-is where they are checked; the shell loop's `.loop/check-brief.sh` checks the
-subset the shell loop plans from.
+is where they are checked; the shell loop's checker, retired with it, checked the
+subset the shell loop planned from.
 
 ## Boundaries
 
