@@ -5,9 +5,9 @@
   "base": "4f56fe661e5ccec35248d1806a84cd2b2a8bfce6",
   "branch": "B20261025-2302-b21-records-and-verify",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-10-26T01:47:42Z",
-  "updated": "2026-10-26T02:18:22Z",
+  "updated": "2026-10-26T02:22:57Z",
   "shell": "sh",
   "checks": [
     {
@@ -195,7 +195,7 @@
         "No session sets the #53 defect's status; that is the operator's at close"
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

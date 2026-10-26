@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Every gate of T1 to T4 passes on the finished tree, run together", "met": true, "evidence": ".vloop/state/gates/T5/gate.sh runs T1-T4 gates first; gates/T5.log shows gate T1..T4: ok"},
+    {"criterion": "In a scratch vloop repository, the worked example's lines run as written: the nested repository's config set leaves the outer config unchanged, the plain directory reads en, and `intervention add \"s\" --brief B20261022-1234-x …` writes brief: B20261022-1234-x.loop-brief and is listed by the bare name and by the path", "met": true, "evidence": "gate.sh runs those lines in a scratch repo and asserts each; gates/T5.log ends 'gate T5: ok'"},
+    {"criterion": "Any fix this task needs is made in the product, not in a gate, and every check passes", "met": true, "evidence": "git diff HEAD shows no source or gate changes, only run logs; checks.json: go exit 0"},
+    {"criterion": "No session sets the #53 defect's status; that is the operator's at close", "met": true, "evidence": "git status shows no change under .vloop/defects"}
+  ],
+  "findings": [],
+  "notes": "Pure verification task; nothing shipped, so no new tests expected."
+}

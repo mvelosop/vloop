@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/5 done** · iteration 4
+**Status:** running · **5/5 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T02:18:22Z
+**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T02:22:57Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
 - [x] **T3** — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
 - [x] **T4** — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
-- [ ] **T5** — Close the run: every gate at once and the worked example line for line
+- [x] **T5** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
@@ -117,7 +117,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Close the run: every gate at once and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4
+`done` · depends on: T1, T2, T3, T4
 
 The tasks were judged one at a time; this proves them together on the finished tree, with the brief's worked example — the root lines, the intervention lines in a scratch repository, the real-data check on B8, the temp directory in a session record and the Copilot login lines, every planted failure included. Any fix found here is made in the product, never in a gate. After it the operator sets the #53 defect (D20261024-162448) to fixed at close.
 

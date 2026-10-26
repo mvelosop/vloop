@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** doctor gains a `copilot login` row (shown only with agent.review = copilot) and `vloop run` refuses before planning when no GitHub login reaches Copilot sessions; the experimental warning now reads "not fenced yet" and the guide says how a session logs in.
 - **Files:** internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_test.go, internal/cli/doctor_copilot_test.go, docs/guide/configuration.md
 - **Notes for next iteration:** Login = COPILOT_GITHUB_TOKEN/GH_TOKEN/GITHUB_TOKEN non-empty, else `gh auth token` exit 0 with non-blank stdout; output is only tested for presence, never stored or quoted. Existing tests changed only where they pinned the old warning text (R4's warning is the contract item); newDoctorEnv now unsets the three token variables and copilot() installs a stub gh printing a token so non-login tests still pass. internal/cli task_gate tests fail inside a work session only because VLOOP_ACTIVE_TASK is set; they pass with VLOOP_* unset.
+
+## T5 — Close the run: every gate at once and the worked example line for line
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Ran the closing gate on the finished tree: gates T1–T4 and the worked example's scratch-repository lines all pass; no product change was needed.
+- **Files:** none
+- **Notes for next iteration:** No files changed. The #53 defect status is left for the operator at close.
