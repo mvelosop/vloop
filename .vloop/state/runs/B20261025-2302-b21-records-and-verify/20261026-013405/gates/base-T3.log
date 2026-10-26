@@ -1,0 +1,1 @@
+GATE FAIL: a denial naming TMPDIR's path is recorded as 'rm -rf /private/var/folders/ws/6myjg51x6cl_gc8w8v3726080000gn/T/gate.RoPX7F/tl/x.1', want 'rm -rf $TMPDIR/x.1'

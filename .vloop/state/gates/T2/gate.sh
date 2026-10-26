@@ -1,83 +1,107 @@
 #!/bin/sh
-# Gate T2 — J3, the check-gap halt, by the brief's worked example run lines. In
-# a fixture run whose stub gate review writes fixed gate-verdict/v2 verdicts
-# (this folder's *.json, one per round) and a two-task plan:
-#   A  check-gap in round 1      -> the finding printed, the halt line, exit 2,
-#                                   one plan session, no work session, nothing
-#                                   committed, no plan left; a re-run plans afresh
-#   B  uncovered, then PASS      -> sent back once, the plan committed, exit 0
-#   C  check-gap and wrong-reason in round 1 -> both printed, the halt, exit 2,
-#                                   no revision round
-#   D  wrong-reason, then check-gap in round 2 -> the check-gap halt naming
-#                                   gate-review-2.json, not "failed the plan twice"
-#   E  two FAILs with no check-gap -> blocked as today: "failed the plan twice"
-G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
-H=${H:-$G}
-. "$H/lib.sh"
-newbin
-GAP="gate T2 (check-gap): pnpm smoke in a fresh copy: no check runs pnpm smoke"
-WR="gate T1 (wrong-reason): the gate fails on a path typo, not for the missing T1.out"
-UN="gate T2 (uncovered): T2.out holds what the operator meant: no gate, check or review can judge it"
-TWICE="the gate review failed the plan twice"
-has() { trimmed "$1" | grep -qxF -- "$2"; }
-count() { sessions "$1" | grep -c "^$2" | tr -d ' '; }
-# halted <case> <out> <round> <plan sessions>: the check-gap halt of that round.
-halted() {
-  [ "$rc" = 2 ] || fail "$1: vloop run exited $rc, want 2: $(tail -8 "$2")"
-  l=$(runline "$2.err" "vloop: the gate review found")
-  [ "$l" = "$(gapline "$3")" ] || fail "$1: the halt line is '$l', want '$(gapline "$3")' (stderr: $(tail -5 "$2.err"))"
-  rp=$(runpath "$2.err" "vloop: the gate review found")reports/gate-review-$3.json
-  [ -f "$t/repo/$rp" ] || fail "$1: the halt names $rp, which does not exist"
-  (cd "$t/repo" && venv "$t/bin/new" schema validate gate-verdict/v2 "$rp" >/dev/null 2>&1) || fail "$1: $rp does not validate as gate-verdict/v2"
-  "$JQ" -e '[.tasks[].findings[] | select(.kind == "check-gap")] | length == 1' "$t/repo/$rp" >/dev/null || fail "$1: $rp does not hold the check-gap finding"
-  grep -qF "$TWICE" "$2" && fail "$1: the run says '$TWICE': $(grep -F "$TWICE" "$2")"
-  [ "$(count "$2.log" /vloop:plan)" = "$4" ] || fail "$1: $(count "$2.log" /vloop:plan) plan session(s), want $4"
-  [ "$(count "$2.log" /vloop:work)" = 0 ] || fail "$1: a work session ran: $(sessions "$2.log" | tr '\n' ';')"
-  untouched "$1"
-}
+# Gate T2 — R2: a brief named any way. In a local clone of this repository
+# (its committed history and records; nothing is written to this tree), for
+# B8, N = B20261002-2135-vloop-v1-security, given as the bare name N, the
+# .loop-brief name and the path docs/briefs/N.loop-brief.md:
+#   - `intervention add --brief`, `defect add --brief` and `intervention set
+#     <id> brief` write brief: N.loop-brief whatever form they were given;
+#   - an intervention and a defect planted with a bare `brief: N` (as records
+#     written before this brief were) count;
+#   - `vloop metrics <form> --json` gives equal "defects" and "interventions"
+#     in all three forms, each grown by exactly the records added here over the
+#     .loop-brief form's counts before them (threaded, never hardcoded);
+#   - `intervention list --brief` and `defect list --brief` list the same
+#     records in all three forms, the planted bare ones among them;
+#   - `defect add` still refuses a brief that is not a loop brief, and one that
+#     does not exist, writing nothing.
+set -u
+fail() { echo "GATE FAIL: $*" >&2; exit 1; }
+for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GOFLAGS GOBIN
+export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GOTOOLCHAIN=local GOPROXY=off
+JQ=$(command -v jq) || fail "jq is not on PATH"
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
+trap 'chmod -R u+w "$t" 2>/dev/null; rm -rf "$t"' EXIT
+V="$t/bin/vloop"
+mkdir -p "$t/bin" && go build -buildvcs=false -o "$V" ./cmd/vloop || fail "go build of this tree"
+git clone -q . "$t/c" || fail "git clone of this repository"
+cd "$t/c" || fail cd
+git config user.name Gate && git config user.email gate@example.invalid || fail "git config"
+export HOME="$t/home"
+mkdir -p "$HOME"
+N=B20261002-2135-vloop-v1-security
+FORMS="$N $N.loop-brief docs/briefs/$N.loop-brief.md"
+[ -f "docs/briefs/$N.loop-brief.md" ] || fail "fixture: no docs/briefs/$N.loop-brief.md"
+want="$N.loop-brief"
+# briefof <record>: the brief: field of a record's frontmatter, unquoted.
+briefof() { sed -n 's/^brief:[[:space:]]*//p' "$1" | head -1 | sed 's/^"\(.*\)"$/\1/'; }
+metrics() { "$V" metrics "$1" --json >"$t/m.json" 2>"$t/m.err" || fail "vloop metrics $1 exits non-zero: $(cat "$t/m.err")"; }
+metrics "$want"
+d0=$("$JQ" '.defects.total' "$t/m.json") i0=$("$JQ" '.interventions.total' "$t/m.json")
+case "$d0$i0" in *null*|"") fail "vloop metrics $want --json has no defects.total or interventions.total";; esac
 
-# A — a check gap in round 1 halts before any work and keeps nothing.
-fixture; verdicts check-gap.json; runfix "$t/a"
-has "$t/a" "$GAP" || fail "A: the finding line '$GAP' is not printed: $(tail -8 "$t/a")"
-grep -qF "sending" "$t/a" && fail "A: the check gap was sent back to the plan session: $(grep -F sending "$t/a")"
-halted A "$t/a" 1 1
-[ "$(count "$t/a.log" /vloop:gate-review)" = 1 ] || fail "A: $(count "$t/a.log" /vloop:gate-review) gate-review sessions, want 1"
-# ...and the operator's re-run, with the check added, plans afresh and runs.
-rm -f "$t/stub/verdict."*.json "$t/stub/gate-review.count"
-runfix "$t/a2"
-[ "$rc" = 0 ] || fail "A: the re-run after the halt exited $rc, want 0: $(tail -8 "$t/a2")"
-[ "$(count "$t/a2.log" /vloop:plan)" = 1 ] || fail "A: the re-run ran $(count "$t/a2.log" /vloop:plan) plan session(s), want 1 (it plans afresh)"
-grep -qF "resuming acceptance" "$t/a2" && fail "A: the re-run resumed acceptance instead of planning afresh"
+# add, in every form, writes the .loop-brief name.
+n=0
+for f in $FORMS; do
+  n=$((n + 1))
+  p=$("$V" intervention add "gate r2 intervention $n" --brief "$f" --kind repair --phase halt --by operator --automatable no 2>"$t/e") ||
+    fail "intervention add --brief $f exits non-zero: $(cat "$t/e")"
+  [ -f "$p" ] || fail "intervention add --brief $f printed '$p', not a file"
+  [ "$(briefof "$p")" = "$want" ] || fail "intervention add --brief $f wrote brief: $(briefof "$p"), want $want"
+  last=$p
+  p=$("$V" defect add "gate r2 defect $n" --brief "$f" --found-by operator 2>"$t/e") ||
+    fail "defect add --brief $f exits non-zero: $(cat "$t/e")"
+  [ -f "$p" ] || fail "defect add --brief $f printed '$p', not a file"
+  [ "$(briefof "$p")" = "$want" ] || fail "defect add --brief $f wrote brief: $(briefof "$p"), want $want"
+done
+# set brief, given the bare name, writes the .loop-brief name.
+id=$(basename "$last" .md)
+"$V" intervention set "$id" brief "$N" >"$t/o" 2>&1 || fail "intervention set $id brief $N exits non-zero: $(cat "$t/o")"
+[ "$(briefof "$last")" = "$want" ] || fail "intervention set $id brief $N wrote brief: $(briefof "$last"), want $want"
 
-# B — an uncovered criterion goes back to the planner, as any finding does today.
-fixture; verdicts uncovered.json; runfix "$t/b"
-[ "$rc" = 0 ] || fail "B: vloop run exited $rc, want 0: $(tail -8 "$t/b")"
-has "$t/b" "$UN" || fail "B: the finding line '$UN' is not printed"
-grep -qF "sending 1 problem(s) back to the plan session" "$t/b" || fail "B: the uncovered finding was not sent back: $(tail -8 "$t/b")"
-[ "$(count "$t/b.log" /vloop:plan)" = 2 ] || fail "B: $(count "$t/b.log" /vloop:plan) plan session(s), want 2"
-grep -qF "check gap" "$t/b" && fail "B: the run speaks of a check gap: $(grep -F 'check gap' "$t/b")"
-"$JQ" -e '.gate_review.rounds == 2 and .gate_review.verdict == "PASS"' "$t/repo/.vloop/state/state.json" >/dev/null ||
-  fail "B: the plan's gate review is $("$JQ" -c .gate_review "$t/repo/.vloop/state/state.json" 2>&1), want round 2, PASS"
-[ "$(venv git -C "$t/repo" rev-parse HEAD)" != "$FIX" ] || fail "B: the plan was not committed"
+# Records already written with the bare name.
+p=$("$V" intervention add "gate r2 planted bare intervention" --brief "$want" --kind repair --phase halt --by operator --automatable no 2>"$t/e") || fail "planting: $(cat "$t/e")"
+sed "s/^brief:.*/brief: $N/" "$p" >"$t/x" && cat "$t/x" >"$p" || fail "planting"
+pi=$(basename "$p" .md)
+p=$("$V" defect add "gate r2 planted bare defect" --brief "$want" --found-by operator 2>"$t/e") || fail "planting: $(cat "$t/e")"
+sed "s/^brief:.*/brief: $N/" "$p" >"$t/x" && cat "$t/x" >"$p" || fail "planting"
+pd=$(basename "$p" .md)
+[ "$(briefof "$p")" = "$N" ] || fail "planting: the defect's brief is not bare"
 
-# C — a check gap beside another finding: both printed, the halt wins.
-fixture; verdicts check-gap-and-wrong-reason.json; runfix "$t/c"
-has "$t/c" "$GAP" || fail "C: the finding line '$GAP' is not printed: $(tail -8 "$t/c")"
-has "$t/c" "$WR" || fail "C: the finding line '$WR' is not printed: $(tail -8 "$t/c")"
-grep -qF "sending" "$t/c" && fail "C: the plan was sent back for a revision round: $(grep -F sending "$t/c")"
-halted C "$t/c" 1 1
+# The metrics, in every form.
+dw=$((d0 + 4)) iw=$((i0 + 4))
+for f in $FORMS; do
+  metrics "$f"
+  d=$("$JQ" '.defects.total' "$t/m.json") i=$("$JQ" '.interventions.total' "$t/m.json")
+  [ "$d" = "$dw" ] || fail "vloop metrics $f: defects.total $d, want $dw ($d0 before, 4 recorded here, one with a bare brief:)"
+  [ "$i" = "$iw" ] || fail "vloop metrics $f: interventions.total $i, want $iw ($i0 before, 4 recorded here, one with a bare brief:)"
+done
+prev=""
+for f in $FORMS; do
+  metrics "$f"; cur=$("$JQ" -c '{defects, interventions}' "$t/m.json")
+  [ -z "$prev" ] || [ "$cur" = "$prev" ] || fail "vloop metrics $f gives other defects or interventions than the form before it: $cur vs $prev"
+  prev=$cur
+done
 
-# D — a check gap in round 2, after round 1 was sent back for wrong-reason.
-fixture; verdicts wrong-reason.json check-gap.json; runfix "$t/d"
-has "$t/d" "$WR" || fail "D: the round-1 finding '$WR' is not printed"
-has "$t/d" "$GAP" || fail "D: the round-2 finding '$GAP' is not printed: $(tail -8 "$t/d")"
-[ "$(grep -cF "sending 1 problem(s) back to the plan session" "$t/d" | tr -d ' ')" = 1 ] || fail "D: round 1 was not sent back exactly once"
-halted D "$t/d" 2 2
+# The lists, in every form.
+previ="" prevd=""
+for f in $FORMS; do
+  li=$("$V" intervention list --brief "$f" --json 2>"$t/e") || fail "intervention list --brief $f exits non-zero: $(cat "$t/e")"
+  ld=$("$V" defect list --brief "$f" --json 2>"$t/e") || fail "defect list --brief $f exits non-zero: $(cat "$t/e")"
+  ids=$(printf '%s' "$li" | "$JQ" -r '[.[].id] | sort | join(" ")') || fail "intervention list --brief $f --json is not a JSON list"
+  dds=$(printf '%s' "$ld" | "$JQ" -r '[.[].id] | sort | join(" ")') || fail "defect list --brief $f --json is not a JSON list"
+  case " $ids " in *" $pi "*) ;; *) fail "intervention list --brief $f omits $pi, whose brief: is the bare $N";; esac
+  case " $dds " in *" $pd "*) ;; *) fail "defect list --brief $f omits $pd, whose brief: is the bare $N";; esac
+  [ "$(printf '%s\n' $ids | wc -l | tr -d ' ')" = "$iw" ] || fail "intervention list --brief $f lists other than the $iw records the metrics count"
+  [ -z "$previ" ] || [ "$ids" = "$previ" ] || fail "intervention list --brief $f lists other records than the form before it"
+  [ -z "$prevd" ] || [ "$dds" = "$prevd" ] || fail "defect list --brief $f lists other records than the form before it"
+  previ=$ids prevd=$dds
+done
 
-# E — two FAILs without a check gap: blocked, as today.
-fixture; verdicts wrong-reason.json wrong-reason.json; runfix "$t/e"
-[ "$rc" = 2 ] || fail "E: vloop run exited $rc, want 2: $(tail -8 "$t/e")"
-grep -qF "$TWICE" "$t/e.err" || fail "E: no '$TWICE' line: $(tail -5 "$t/e.err")"
-grep -qF "check gap" "$t/e" && fail "E: the run speaks of a check gap"
-"$JQ" -e '.status == "blocked"' "$t/repo/.vloop/state/state.json" >/dev/null || fail "E: the plan is not kept blocked"
+# Refusals, as today.
+before=$(ls .vloop/defects | wc -l)
+for f in docs/briefs/B20260929-1222-initial-setup-for-vloop-cli.architect-brief.md B20991231-0000-no-such-brief B20991231-0000-no-such-brief.loop-brief; do
+  "$V" defect add "gate r2 refused" --brief "$f" >"$t/o" 2>&1 && fail "defect add --brief $f exits 0; a name that is not an existing loop brief is refused"
+done
+[ "$(ls .vloop/defects | wc -l)" = "$before" ] || fail "a refused defect add wrote a record"
 echo "gate T2: ok"

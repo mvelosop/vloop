@@ -1,0 +1,13 @@
+{
+  "schema": "gate-verdict/v1",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Each gate was run on the base and fails at the behavioural assertion the task adds (T1 outer config edited, T2 bare brief written, T3 TMPDIR kept, T4 no copilot login row, T5 via T1). Matchers were read against the brief's literal text and doctor's real output format."
+}
+

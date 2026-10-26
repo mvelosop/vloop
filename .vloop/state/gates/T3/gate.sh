@@ -1,75 +1,93 @@
 #!/bin/sh
-# Gate T3 — J2: coverage in the gate review and the planner's side. The
-# gate-review and plan skills cite P-8 and do not restate it, cite no P-id the
-# domain model does not define, and the gate review names the kinds uncovered
-# and check-gap and writes gate-verdict/v2. The case plugin/evals/
-# gate-review-coverage/ has the eval layout, its scaffold builds a valid
-# state/v2 plan of at least two tasks, with checks, in an empty directory,
-# every planted gate fails on the scaffolded base (checked here, independently
-# of the scaffold), one criterion requires a change to .vloop/state/plan.md,
-# the graders name check-gap, uncovered, unpassable and PASS, the case's files
-# hold no absolute home path, and the README's tables list the case. The word
-# ceilings are the go check's (internal/budget), not this gate's (P-8).
+# Gate T3 — R3: the system temp directory masked as $TMPDIR. This tree's
+# `vloop run` plans a fixture brief with a stub claude (stub-claude.sh) whose
+# plan session was denied Bash commands naming files in the temp directory and
+# wrote the directory to stderr. Three runs, each in a fresh fixture:
+#   1. TMPDIR is a symbolic link to another directory: the denials, given in
+#      both forms, read $TMPDIR/…, and neither form of the directory occurs
+#      anywhere in the run folder (session record, stderr file, run log).
+#   2. TMPDIR=/tmp: the denial keeps /tmp/x.1 as it is.
+#   3. TMPDIR under HOME: the denial reads ~/tmp/x.1 (the home is masked first).
+# Nothing touches this repository's tree or refs, the network or the real HOME.
 set -u
+H=.vloop/state/gates/T3
 fail() { echo "GATE FAIL: $*" >&2; exit 1; }
 for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
-export LC_ALL=C GOTOOLCHAIN=local GOFLAGS= GOPROXY=off GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
+unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT GOFLAGS GOBIN
+export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GOTOOLCHAIN=local
 top=$(pwd -P)
 JQ=$(command -v jq) || fail "jq is not on PATH"
+GITBIN=$(command -v git) || fail "git is not on PATH"
 t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
 trap 'chmod -R u+w "$t" 2>/dev/null; rm -rf "$t"' EXIT
-DM=docs/domain/domain-model.md
-HOMEPATH='/(Users|home)/[A-Za-z0-9_][A-Za-z0-9._-]*'
-flat() { tr '\n' ' ' <"$1" | tr -s ' \t' '  '; }
-# cites <file>: it cites P-8, restates none of P-8's own words, and every P-id
-# it cites is one the domain model defines.
-cites() {
-  [ -f "$1" ] || fail "no $1"
-  grep -qF 'P-8' "$1" || fail "$1 does not cite P-8"
-  f=$(flat "$1")
-  for w in "judges the brief's contract from outside the work" "a check, or a test a task writes"; do
-    case "$f" in *"$w"*) fail "$1 restates P-8 ('$w') instead of citing it";; esac
-  done
-  for id in $(grep -oE 'P-[0-9]+' "$1" | sort -u); do
-    grep -qF "**$id**" "$DM" || fail "$1 cites $id, which $DM does not define"
-  done
+GOMODCACHE=$(go env GOMODCACHE) && GOCACHE=$(go env GOCACHE) && GOPATH=$(go env GOPATH) || fail "go env"
+export GOMODCACHE GOCACHE GOPATH GOPROXY=off
+BRIEF=docs/briefs/B20260101-0900-demo.loop-brief.md
+mkdir -p "$t/bin" && go build -buildvcs=false -o "$t/bin/new" ./cmd/vloop || fail "go build of this tree"
+pv=$("$JQ" -r .version "$top/plugin/.claude-plugin/plugin.json") || fail "plugin version"
+
+# venv <tmpdir> cmd...: cmd in the one environment every fixture invocation gets.
+venv() {
+  vt=$1; shift
+  env -i PATH="$t/stub:/usr/bin:/bin" HOME="$t/home" USER=gateuser LOGNAME=gateuser TMPDIR="$vt" LC_ALL=C \
+    GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 "$@"
 }
-GR=plugin/skills/gate-review/SKILL.md
-cites "$GR"
-cites plugin/skills/plan/SKILL.md
-for k in uncovered check-gap; do
-  grep -qw -- "$k" "$GR" || fail "$GR does not name the finding kind $k"
-done
-grep -qF 'gate-verdict/v2' "$GR" || fail "$GR does not have the session write gate-verdict/v2"
-grep -qF 'gate-verdict/v1' "$GR" && fail "$GR still speaks of gate-verdict/v1: $(grep -nF 'gate-verdict/v1' "$GR" | head -3)"
+# fixture: $t/repo afresh, git on main, `vloop init` by this tree's binary, one
+# check, the brief, committed; a fake home trusting it; the stub claude.
+fixture() {
+  chmod -R u+w "$t/repo" "$t/home" 2>/dev/null; rm -rf "$t/repo" "$t/home" "$t/stub"
+  mkdir -p "$t/repo/docs/briefs" "$t/home" "$t/stub" || fail mkdir
+  ln -s "$GITBIN" "$t/stub/git" && sed "s/@PLUGIN_VERSION@/$pv/" "$H/stub-claude.sh" >"$t/stub/claude" && chmod +x "$t/stub/claude" || fail stub
+  printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$t/repo" >"$t/home/.claude.json"
+  venv /tmp git -C "$t/repo" init -q -b main && venv /tmp git -C "$t/repo" config user.name Gate &&
+    venv /tmp git -C "$t/repo" config user.email gate@example.invalid && venv /tmp git -C "$t/repo" config commit.gpgsign false || fail "git init"
+  echo x >"$t/repo/docs/x.md"
+  (cd "$t/repo" && venv /tmp "$t/bin/new" init >"$t/init.out" 2>&1) || fail "vloop init: $(cat "$t/init.out")"
+  printf '[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' >"$t/repo/.vloop/config.toml"
+  cp "$H/brief.md" "$t/repo/$BRIEF" || fail brief
+  venv /tmp git -C "$t/repo" add -A && venv /tmp git -C "$t/repo" commit -q -m "gate fixture" || fail "fixture commit"
+}
+# plan <tmpdir> <denied path>...: a fresh fixture, then `vloop run` with TMPDIR
+# set to <tmpdir>; the plan session is denied `rm -rf <path>` for each path
+# and writes every path to stderr. $REC is the plan session's record.
+plan() {
+  pt=$1; shift
+  fixture
+  sep="" ; printf '[' >"$t/stub/denials.json"; : >"$t/stub/stderr.txt"
+  for p in "$@"; do
+    printf '%s{"tool_name":"Bash","tool_use_id":"x","tool_input":{"command":"rm -rf %s","description":"d"}}' "$sep" "$p" >>"$t/stub/denials.json"
+    echo "stub: cannot remove $p" >>"$t/stub/stderr.txt"
+    sep=,
+  done
+  printf ']' >>"$t/stub/denials.json"
+  (cd "$t/repo" && venv "$pt" "$t/bin/new" run "$BRIEF" >"$t/run.out" 2>&1)
+  REC=$(find "$t/repo/.vloop/state/runs" -path '*/sessions/001-plan.json' 2>/dev/null | head -1)
+  [ -n "$REC" ] || fail "TMPDIR=$pt: no sessions/001-plan.json in the run folder: $(tail -5 "$t/run.out")"
+  RUNF=$(dirname "$(dirname "$REC")")
+}
+# denied <n>: the n-th denial's command in $REC.
+denied() { "$JQ" -r ".permission_denials[$1].command" "$REC"; }
 
-# The eval case.
-C=plugin/evals/gate-review-coverage
-for f in prompt.md case.yaml scaffold.sh; do [ -f "$C/$f" ] || fail "no $C/$f"; done
-grep -qF '/vloop:gate-review' "$C/prompt.md" || fail "$C/prompt.md does not invoke /vloop:gate-review"
-grep -qE 'scaffold_script: *scaffold\.sh' "$C/case.yaml" || fail "$C/case.yaml does not declare scaffold_script: scaffold.sh"
-ls "$C"/graders/*.md >/dev/null 2>&1 || fail "$C has no graders/*.md"
-for k in check-gap uncovered unpassable PASS; do
-  grep -qwF -- "$k" "$C"/graders/*.md || fail "no grader of $C names $k"
+# 1. A temp directory reached through a symbolic link.
+mkdir -p "$t/real" && ln -s "$t/real" "$t/tl" || fail "temp dirs"
+plan "$t/tl" "$t/tl/x.1" "$t/real/y.2"
+d0=$(denied 0) d1=$(denied 1)
+[ "$d0" = 'rm -rf $TMPDIR/x.1' ] || fail "a denial naming TMPDIR's path is recorded as '$d0', want 'rm -rf \$TMPDIR/x.1'"
+[ "$d1" = 'rm -rf $TMPDIR/y.2' ] || fail "a denial naming TMPDIR's resolved path is recorded as '$d1', want 'rm -rf \$TMPDIR/y.2'"
+for form in "$t/tl" "$t/real"; do
+  hits=$(grep -rlF -- "$form" "$RUNF" | sed "s#^$t/repo/##")
+  [ -z "$hits" ] || fail "the temp directory $form is kept in the run folder: $hits"
 done
-grep -rlE "$HOMEPATH" "$C" >"$t/abs" && fail "$C holds an absolute home path: $(tr '\n' ' ' <"$t/abs")"
-grep -qE '^\| *`gate-review-coverage`' plugin/evals/README.md || fail "plugin/evals/README.md's tables do not list gate-review-coverage"
+ls "$RUNF"/*.stderr >/dev/null 2>&1 || fail "the run folder has no stderr file for the plan session"
+grep -qF -- '$TMPDIR/x.1' "$RUNF"/*.stderr || fail "the plan session's stderr file does not read \$TMPDIR/x.1"
 
-go build -buildvcs=false -o "$t/bin/vloop" ./cmd/vloop || fail "go build of this tree"
-mkdir -p "$t/case" && cd "$t/case" || fail mkdir
-PATH="$t/bin:$PATH" bash "$top/$C/scaffold.sh" >"$t/scaffold.out" 2>&1 || fail "$C/scaffold.sh exits non-zero in an empty directory: $(tail -5 "$t/scaffold.out")"
-S=.vloop/state/state.json
-"$t/bin/vloop" schema validate state/v2 "$S" >"$t/o" 2>&1 || fail "the scaffold's plan is not state/v2: $(head -5 "$t/o")"
-n=$("$JQ" '.tasks | length' "$S")
-[ "$n" -ge 2 ] || fail "the scaffold's plan has $n task(s), want at least 2"
-"$JQ" -e '.checks | length > 0' "$S" >/dev/null || fail "the scaffold's plan holds no check"
-"$JQ" -e '[.tasks[].acceptance[] | select(contains(".vloop/state/plan.md"))] | length > 0' "$S" >/dev/null ||
-  fail "no criterion of the scaffold's plan requires a change to .vloop/state/plan.md"
-sh=$("$JQ" -r '.shell' "$S")
-i=0
-while [ "$i" -lt "$n" ]; do
-  id=$("$JQ" -r ".tasks[$i].id" "$S"); "$JQ" -r ".tasks[$i].verify" "$S" >"$t/verify"
-  "$sh" -c "$(cat "$t/verify")" >"$t/base.out" 2>&1 && fail "the planted gate of $id passes on the scaffolded base"
-  i=$((i + 1))
-done
+# 2. /tmp is left as it is.
+plan /tmp /tmp/x.1
+d0=$(denied 0)
+[ "$d0" = 'rm -rf /tmp/x.1' ] || fail "with TMPDIR=/tmp a denial of /tmp/x.1 is recorded as '$d0' — /tmp must stay as it is"
+
+# 3. A temp directory under the home comes out as ~/….
+plan "$t/home/tmp" "$t/home/tmp/x.1"
+d0=$(denied 0)
+[ "$d0" = 'rm -rf ~/tmp/x.1' ] || fail "with TMPDIR under HOME a denial is recorded as '$d0', want 'rm -rf ~/tmp/x.1'"
 echo "gate T3: ok"
