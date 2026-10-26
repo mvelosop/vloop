@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added run/agent/model/effort.second-review keys, doctor's second-review row and no-independence warning, the reworded copilot experimental warning for both reviewers, and run preflight refusals (default model, login, K1 skill clash) for a copilot second reviewer in use.
 - **Files:** internal/config/config.go, internal/config/config_test.go, internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_copilot_test.go, internal/cli/doctor_second_review_test.go, internal/cli/config_test.go, docs/guide/configuration.md
 - **Notes for next iteration:** Doctor rows for the second review are named 'run.second-review:' (with colon) so the printed line matches the brief's text. Copilot checks (on PATH, version, login, skill clashes) run once when either reviewer is copilot; the experimental warning is per key. Only the key table rows and the Copilot paragraph's first sentence of configuration.md were touched (tests require every key documented); T7 owns the rest. Existing tests changed: config list/JSON/defaults tests (new keys) and copilotWarning const (reworded warning, T4 contract). Under go test ./..., unset VLOOP_PLAN_SHA256.
+
+## T4 — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Second-review keys, doctor rows, no-independence warning, reworded Copilot warning and preflight refusals exist; fixed the e2e config-list test that failed the go check.
+- **Files:** internal/config/config.go, internal/cli/doctor.go, internal/cli/run.go, docs/guide/configuration.md, cmd/vloop/e2e_test.go
+- **Notes for next iteration:** Prior attempt failed the go check because cmd/vloop/e2e_test.go pins `config list` output; updated it for the four new keys (T4 acceptance 1). Under go test ./..., unset VLOOP_PLAN_SHA256.
