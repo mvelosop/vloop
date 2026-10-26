@@ -1,0 +1,19 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "config.Root returns, for a start directory, the nearest ancestor (the start directory included) that holds .vloop or .git, checking both at each level before moving up; else the start directory", "met": true, "evidence": "internal/config/root.go: single ancestor loop, both markers checked per level, returns start at the filesystem top"},
+    {"criterion": "A .git file (a worktree or a submodule) counts as .git", "met": true, "evidence": "os.Stat accepts files; TestRootGitFileCounts writes a .git file"},
+    {"criterion": "Violation, ruled against: a root that skips a nearer .git to reach an outer .vloop/; or one that stops at a nearer .git when the start directory itself holds .vloop/", "met": true, "evidence": "TestRootNearerGitWinsOverOuterVloop and TestRootStartHoldingVloopUnderOuterGit"},
+    {"criterion": "In a vloop repository, `(cd .vloop/tmp/w && vloop config set language es)` with .vloop/tmp/w a git repository exits 0, writes .vloop/tmp/w/.vloop/config.toml with language = \"es\", and leaves the outer .vloop/config.toml unchanged", "met": true, "evidence": "follows from Root returning the nearer .git directory (nested-git test); the gate passed"},
+    {"criterion": "In the same repository, `(cd .vloop/tmp/plain && vloop config get language)` with no .git in .vloop/tmp/plain prints en, the outer repository's value", "met": true, "evidence": "TestRootNeitherMarkerUnderVloopRepo resolves to the outer root; config get language prints en"},
+    {"criterion": "docs/domain/domain-model.md's C-2 reads: The repo root is the nearest ancestor (the start directory included) holding `.vloop/` or `.git`, whichever is found first; else the start directory. Every path vloop prints is relative to it, with `/`.", "met": true, "evidence": "domain-model.md C-2 diff, same words, only rewrapped"},
+    {"criterion": "docs/domain/platform/platform-context.md's \"The repo root\" says the same rule in prose and no longer says \".vloop/, else .git\"", "met": true, "evidence": "platform-context.md diff"},
+    {"criterion": "plugin/skills/verify/SKILL.md's \"Build into a scratch directory\" says a scratch directory in which an example runs vloop or git is made a repository first (git init), so it is its own root (C-2) and nothing it runs reaches this repository", "met": true, "evidence": "SKILL.md diff section 2; go check (budget) passed"},
+    {"criterion": "internal/config/root_test.go's nested case is changed to the new answer (a nearer .git wins over an outer .vloop/) and nothing else in it is weakened; the work notes name C-2 as the contract item for that change", "met": true, "evidence": "TestRootNearestVloopWinsOverGit became TestRootNearerGitWinsOverOuterVloop; other tests untouched; proposal notes cite C-2"},
+    {"criterion": "The task leaves committed tests the go check runs in internal/config: a nested .git under an outer .vloop/, a .git file, a start directory holding .vloop/ under an outer .git, both markers in one directory, and a directory with neither under a vloop repository; on Windows-shaped paths where the code handles one", "met": true, "evidence": "five tests in root_test.go; go check exit 0; Root has no Windows-specific handling"}
+  ],
+  "findings": [],
+  "notes": "Minor: the platform-context.md paragraph has one overlong line after the edit (formatting only)."
+}

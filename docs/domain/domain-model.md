@@ -260,8 +260,9 @@ marked.
 
 - **C-1** Config lives in the repo only (`.vloop/config.toml`), overridden by
   `VLOOP_<KEY>` environment variables. Nothing is global.
-- **C-2** The repo root is the nearest ancestor holding `.vloop/`, else `.git`,
-  else the start directory. Every path vloop prints is relative to it, with `/`.
+- **C-2** The repo root is the nearest ancestor (the start directory included)
+  holding `.vloop/` or `.git`, whichever is found first; else the start
+  directory. Every path vloop prints is relative to it, with `/`.
 - **C-3** Every JSON document vloop defines carries `schema: <name>/v<n>`;
   unknown keys are allowed; the schemas are embedded in the binary.
 - **C-4** `language` (`en`, `es`) selects brief headings, templates and (from

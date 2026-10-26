@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/5 done** · iteration 0
+**Status:** running · **1/5 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T01:50:20Z
+**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T01:54:38Z
 
 ## Progress
 
-- [ ] **T1** — Make a nested git repository its own vloop root (C-2) and have verify make its scratches repositories
+- [x] **T1** — Make a nested git repository its own vloop root (C-2) and have verify make its scratches repositories
 - [ ] **T2** — Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
 - [ ] **T3** — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
 - [ ] **T4** — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
@@ -18,7 +18,7 @@
 
 ### T1 — Make a nested git repository its own vloop root (C-2) and have verify make its scratches repositories
 
-`pending` · depends on: none
+`done` · depends on: none
 
 B18's and B19's verify sessions built scratch repositories under .vloop/tmp/ that resolved to this repository's .vloop/, so their `vloop config set` edited the real config and no verify report was written. C-2 changes so the root is the nearest ancestor holding .vloop/ or .git, whichever is found first, level by level; a directory under a vloop repository with no nearer .git or .vloop/ still resolves to the vloop repository. The verify skill then makes every scratch in which an example runs vloop or git a repository with git init, so nothing it runs reaches this repository.
 

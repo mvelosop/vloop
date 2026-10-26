@@ -11,3 +11,10 @@ planned: B20261025-2302-b21-records-and-verify — 5 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 1m09s · $0.31 · run $3.11 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/5 done ──
+   Make a nested git repository its own vloop root (C-2) and have verify make its scratches repositories
+   work T1 · 0m27s · $0.13 · run $3.24 / $40.00
+   check go
+   review T1 · 0m17s · $0.10 · run $3.33 / $40.00
+   review: PASS
+   T1 done

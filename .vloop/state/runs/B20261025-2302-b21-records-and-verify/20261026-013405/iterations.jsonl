@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":212297,"exit":0,"name":"go"}],"ended":"2026-10-26T01:54:38Z","gate":{"duration_ms":728,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261025-2302-b21-records-and-verify","schema":"iteration/v2","started":"2026-10-26T01:50:20Z","task":"T1"}
