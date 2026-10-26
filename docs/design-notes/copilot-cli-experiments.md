@@ -108,9 +108,33 @@ document. What maps onto a session record:
   asks the model for four canary actions: a shell `touch` under
   `.vloop/state/`, a chained shell command, a file-tool write under
   `.vloop/state/`, and an allowed write under `.vloop/tmp/`. The hook denies the
-  first two by JSON (`permissionDecision: deny`) and the third by exit 2. **Its
-  outcome was not recorded**; it must be re-run and written here before the
-  fence brief.
+  first two by JSON (`permissionDecision: deny`) and the third by exit 2.
+  **Re-run on 2026-10-26** (Copilot CLI 1.0.103, `claude-haiku-4.5`, `-p`
+  with `--allow-all-tools`):
+
+  | Step | Tool | Hook | Result |
+  |---|---|---|---|
+  | `touch .vloop/state/canario-a` | `bash` | JSON deny | denied, file absent |
+  | `echo hola && touch canario-b` | `bash` | JSON deny | denied, file absent |
+  | write `.vloop/state/canario-c.txt` | `create` | exit 2 | denied, file absent |
+  | write `.vloop/tmp/ok.txt` | `create` | allow | written |
+
+  - Hooks load from the session's own `COPILOT_HOME/hooks/` in `-p` mode, and
+    run before every tool call, shell and file tools alike.
+  - The camelCase hook receives `toolName` and `toolArgs`, with the shell
+    command as one string (`toolArgs.command`) and file tools' `path`: a hook
+    sees exactly what `sh -c` or `env` would hide from the deny list.
+  - The PascalCase hook ran only once, for the call the camelCase hook
+    allowed: the first deny ends the call. One spelling is enough.
+  - The model reported each denial with the hook's reason
+    (`fence-probe: canary denied`, `hook exited with code 2`).
+  - **Not measured:** what Copilot does when the hook itself fails (missing
+    command, exit 1, output that is not JSON, timeout) — whether it fails
+    closed. The fence brief's acceptance on the real CLI measures it.
+  - Tool names seen in the experiments' and B19's logs: `bash`, `view`,
+    `read_file`, `create`, `edit`, `apply_patch`, `grep`, `rg`, `grep_search`,
+    `glob`, `file_search`, `skill`, `web_fetch`, `search_code_subagent`. File
+    paths in arguments may be absolute.
 
 ## Results — reviews (13 replayed per model)
 
