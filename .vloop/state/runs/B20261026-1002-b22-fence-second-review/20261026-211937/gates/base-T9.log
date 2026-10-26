@@ -1,0 +1,2 @@
+GATE FAIL: [review] bash 'git diff 1a2b3c..HEAD -- src/': want 'allow' and exit 0, got exit 2, stdout '', stderr 'vloop: unknown command "fence" for "vloop"'
+GATE FAIL: gate T1 fails
