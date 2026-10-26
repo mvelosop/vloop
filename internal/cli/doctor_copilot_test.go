@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const copilotWarning = "agent.review is copilot: experimental — review sessions are not fenced yet (docs/guide/configuration.md)"
+const copilotWarning = "agent.review is copilot: experimental (docs/guide/configuration.md)"
 
 // copilot installs a stub copilot beside the stub claude; versionOK false makes
 // its --version fail.

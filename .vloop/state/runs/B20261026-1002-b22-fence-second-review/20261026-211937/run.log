@@ -51,3 +51,8 @@ committing the plan
    review T3 · 0m29s · $0.12 · run $8.10 / $40.00
    review: PASS
    T3 done
+── iteration 4 (4 this run) · T4 · 3/9 done ──
+   Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
+   work T4 · 6m50s · $0.40 · run $8.51 / $40.00
+   check go
+   CHECK FAIL T4 — check go failed — see .vloop/state/runs/B20261026-1002-b22-fence-second-review/20261026-211937/checks/004-go.fail.log; review skipped

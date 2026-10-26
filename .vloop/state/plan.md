@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/9 done** · iteration 3
+**Status:** running · **3/9 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:20:01Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:31:32Z
 
 ## Progress
 
 - [x] **T1** — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
 - [x] **T2** — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
 - [x] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
-- [ ] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
+- [ ] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning · 1 attempt(s)
 - [ ] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
 - [ ] **T6** — Report the second review in metrics/v4
 - [ ] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
@@ -92,7 +92,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
 
-`pending` · depends on: T3
+`pending` · 1 attempt(s) · depends on: T3
 
 S1's configuration, before the session exists: `run.second-review` says what a second reviewer's verdict does, `agent/model/effort.second-review` say who it is. Doctor tells the operator what is configured and warns when the second reviewer adds no independence. The Copilot warning drops "not fenced": after T3, Copilot reviews run under the hook.
 
@@ -103,6 +103,8 @@ S1's configuration, before the session exists: `run.second-review` says what a s
 - The Copilot warning reads `! agent.review is copilot: experimental (docs/guide/configuration.md)` in doctor and the run preflight, and `! agent.second-review is copilot: experimental (docs/guide/configuration.md)` for a copilot second reviewer, whose doctor rows include the copilot checks (on PATH, --version, login).
 - A copilot second review in use with the default `model.second-review` is refused before any session, naming `model.second-review`, as `agent.review` is; K1's skill refusal also applies when `agent.second-review` is copilot and the second review is in use, and not when `run.second-review` is off.
 - Committed tests cover the keys, the doctor rows and the refusals, and run in the `go` check.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261026-1002-b22-fence-second-review/20261026-211937/checks/004-go.fail.log
 
 <details><summary>verify command</summary>
 

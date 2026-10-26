@@ -5,9 +5,9 @@
   "base": "b46022366ccd9c1bdde441cefe33a593c9abf0f3",
   "branch": "B20261026-1002-b22-fence-second-review",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-26T21:37:24Z",
-  "updated": "2026-10-26T22:20:01Z",
+  "updated": "2026-10-26T22:31:32Z",
   "shell": "sh",
   "checks": [
     {
@@ -167,8 +167,8 @@
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261026-1002-b22-fence-second-review/20261026-211937/checks/004-go.fail.log"
     },
     {
       "id": "T5",

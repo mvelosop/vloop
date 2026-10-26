@@ -190,7 +190,7 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++
-		case c.Result == resWarning && (c.Name == "agent.review" || strings.HasPrefix(c.Name, ".claude/skills/")):
+		case c.Result == resWarning && (c.Name == "agent.review" || c.Name == "agent.second-review" || c.Name == "run.second-review:" && c.Result == resWarning || strings.HasPrefix(c.Name, ".claude/skills/")):
 			fmt.Fprintf(errOut, "  ! %s %s\n", c.Name, c.Message)
 		}
 	}
@@ -200,15 +200,19 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 	if bad > 0 {
 		return Problem(fmt.Errorf("preflight failed — %d problem(s), nothing has run", bad))
 	}
-	if copilotReview(root) {
+	keys := copilotKeys(root)
+	if len(keys) > 0 {
 		if cl := skillClashes(root); len(cl) > 0 {
 			return Problem(fmt.Errorf("%s %s", cl[0].path, cl[0].message()))
 		}
 		if !copilotLoggedIn() {
-			return Problem(errors.New("agent.review is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login"))
+			return Problem(fmt.Errorf("%s is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login", keys[0]))
 		}
-		if m, err := config.Get(root, "model.review"); err == nil && m.Source == config.SourceDefault {
-			return Problem(fmt.Errorf("agent.review is copilot but model.review is the default %q, a Claude alias: set model.review to a Copilot model id", m.Value))
+	}
+	for _, k := range keys {
+		mk := strings.Replace(k, "agent.", "model.", 1)
+		if m, err := config.Get(root, mk); err == nil && m.Source == config.SourceDefault {
+			return Problem(fmt.Errorf("%s is copilot but %s is the default %q, a Claude alias: set %s to a Copilot model id", k, mk, m.Value, mk))
 		}
 	}
 	return nil
