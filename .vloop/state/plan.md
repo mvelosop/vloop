@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/9 done** · iteration 8
+**Status:** running · **8/9 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:33:51Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:41:30Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
 - [x] **T6** — Report the second review in metrics/v4
 - [x] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
-- [ ] **T8** — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
+- [x] **T8** — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
 - [ ] **T9** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -180,7 +180,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
 
-`pending` · depends on: T2, T5
+`done` · depends on: T2, T5
 
 The binary never calls the network, so acceptance on the real Copilot CLI is the operator's, at close. This kit is how the operator measures what no gate can: that Copilot denies each worked-example form under the hook, refuses a skill other than vloop's, what Copilot does when the hook itself fails, and a real feedback-mode run with a copilot second reviewer.
 

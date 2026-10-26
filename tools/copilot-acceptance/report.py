@@ -3,6 +3,7 @@
     report.py run <repo> <vloop> <exit code>   the run's session records and verdicts, as Markdown
     report.py probe <dir> <copilot>            start the probe session from the logged review argv
     report.py summary <dir>                    the probe's results, as Markdown
+    report.py second <repo> <vloop> <exit code>  the second-review records and dissents of a run, as Markdown
 """
 import glob
 import json
@@ -107,6 +108,33 @@ def summary(d):
     print("\n".join(out))
 
 
+def second_report(repo, vloop, rc):
+    out = ["## B22.3 — a feedback-mode run with a copilot second reviewer", "", f"`vloop run` exit {rc}.", "",
+           "| record | agent | model | credits | cost_usd | turns | session/v4 |", "|---|---|---|---|---|---|---|"]
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/sessions/*.json"))):
+        r = json.load(open(f))
+        if r.get("schema") != "session/v4":
+            continue
+        ok = subprocess.run([vloop, "schema", "validate", "session/v4", f], cwd=repo,
+                            capture_output=True).returncode == 0
+        out.append(f"| {os.path.basename(f)} | {r.get('agent')} | {r.get('model')} | {r.get('credits')} "
+                   f"| {r.get('cost_usd')} | {r.get('turns')} | {'ok' if ok else 'INVALID'} |")
+    out += ["", "Second-review lines of the run log:", "", "```"]
+    for f in glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/run.log")) + glob.glob(os.path.join(repo, ".vloop/state/runs/*/run.log")):
+        out += [l for l in open(f).read().splitlines() if "second review" in l]
+    out += ["```", "", "Dissents (iterations.jsonl records with a second_review that dissents):", "", "```"]
+    for f in glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/iterations.jsonl")) + glob.glob(os.path.join(repo, ".vloop/state/runs/*/iterations.jsonl")):
+        for line in open(f):
+            try:
+                sr = json.loads(line).get("second_review") or {}
+            except ValueError:
+                continue
+            if sr.get("dissent"):
+                out.append(json.dumps(sr))
+    out.append("```")
+    print("\n".join(out) + "\n")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "run":
@@ -115,5 +143,7 @@ if __name__ == "__main__":
         probe(*sys.argv[2:4])
     elif cmd == "summary":
         summary(sys.argv[2])
+    elif cmd == "second":
+        second_report(*sys.argv[2:5])
     else:
         sys.exit(__doc__)

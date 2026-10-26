@@ -84,3 +84,10 @@ committing the plan
    review T7 · 0m30s · $0.14 · run $11.58 / $40.00
    review: PASS
    T7 done
+── iteration 9 (9 this run) · T8 · 7/9 done ──
+   Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
+   work T8 · 1m34s · $0.31 · run $11.89 / $40.00
+   check go
+   review T8 · 0m32s · $0.14 · run $12.03 / $40.00
+   review: PASS
+   T8 done
