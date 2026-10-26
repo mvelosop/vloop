@@ -30,3 +30,10 @@ planned: B20261026-1002-b22-fence-second-review — 9 tasks
 reviewing the gates using sonnet (round 2)
    gate review · 0m44s · $0.12 · run $6.18 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/9 done ──
+   Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
+   work T1 · 10m45s · $0.77 · run $6.96 / $40.00
+   check go
+   review T1 · 0m50s · $0.16 · run $7.12 / $40.00
+   review: PASS
+   T1 done

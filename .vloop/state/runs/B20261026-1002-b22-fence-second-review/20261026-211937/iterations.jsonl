@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":228895,"exit":0,"name":"go"}],"ended":"2026-10-26T22:00:16Z","gate":{"duration_ms":6628,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261026-1002-b22-fence-second-review","schema":"iteration/v2","started":"2026-10-26T21:44:44Z","task":"T1"}

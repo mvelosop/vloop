@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/9 done** · iteration 0
+**Status:** running · **1/9 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T21:44:44Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:00:16Z
 
 ## Progress
 
-- [ ] **T1** — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
+- [x] **T1** — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
 - [ ] **T2** — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
 - [ ] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
 - [ ] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
@@ -22,7 +22,7 @@
 
 ### T1 — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
 
-`pending` · depends on: none
+`done` · depends on: none
 
 H1's core. Copilot review sessions today run with every tool allowed and a deny list that `sh -c` and `env` walk past (B19's C5.2). This task builds the one judge — a pure splitter, unwrapper, matcher and path rule set over the embedded review fence plus the adapter's deny-list stems — exposed as `vloop fence check` for the operator and the gates; T2 puts the same judge behind the Copilot hook. Fail closed: what the judge cannot parse it denies.
 

@@ -5,9 +5,9 @@
   "base": "b46022366ccd9c1bdde441cefe33a593c9abf0f3",
   "branch": "B20261026-1002-b22-fence-second-review",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-10-26T21:37:24Z",
-  "updated": "2026-10-26T21:44:44Z",
+  "updated": "2026-10-26T22:00:16Z",
   "shell": "sh",
   "checks": [
     {
@@ -60,7 +60,7 @@
         "No Claude session's argv, fence file or settings change."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

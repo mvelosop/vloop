@@ -152,6 +152,27 @@ Check that the repository, the toolchain and the plugin are ready for a run
 vloop doctor
 ```
 
+## vloop fence
+
+Judge a tool call against a session phase's fence
+
+```
+vloop fence
+```
+
+## vloop fence check
+
+Print allow or deny: <reason> for one tool call; exit 1 on deny
+
+```
+vloop fence check --phase <review|second-review> --root <dir> --tool <name> [--path <p>] ["<command>"] [flags]
+```
+
+- `--path string`: the file path a file tool names, or the skill's name
+- `--phase string`: the session phase: review or second-review
+- `--root string`: the repository root relative paths resolve against
+- `--tool string`: the tool's name, as Copilot spells it
+
 ## vloop init
 
 Set a repository up for vloop

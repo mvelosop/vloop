@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 // AgentCopilot is the GitHub Copilot CLI, which can run review sessions only.
@@ -23,6 +24,18 @@ var copilotDenials = []string{
 	"shell(git commit:*)", "shell(git reset:*)", "shell(git checkout:*)", "shell(git switch:*)",
 	"shell(git stash:*)", "shell(git branch:*)", "shell(git tag:*)",
 	"url",
+}
+
+// CopilotDenyStems are the shell stems of the deny list in the fence's Bash
+// matching form (`git push:*`), for the judge behind the Copilot hook.
+func CopilotDenyStems() []string {
+	var out []string
+	for _, d := range copilotDenials {
+		if s, ok := strings.CutPrefix(d, "shell("); ok {
+			out = append(out, strings.TrimSuffix(s, ")"))
+		}
+	}
+	return out
 }
 
 // copilotGuidelinesName is the file Copilot reads from a custom instructions
