@@ -69,3 +69,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The Copilot acceptance kit gains hook.sh/hook.py (the review session under vloop fence hook asked for each worked-example deny form and a non-vloop skill, plus the hook missing, exit 1, not JSON and timing out) and second.sh (a feedback-mode run with a copilot second reviewer, reported by report.py second); the README documents each part.
 - **Files:** tools/copilot-acceptance/hook.sh, tools/copilot-acceptance/hook.py, tools/copilot-acceptance/second.sh, tools/copilot-acceptance/report.py, tools/copilot-acceptance/README.md
 - **Notes for next iteration:** Not run against real Copilot (no network). hook.py edits the hooks file vloop wrote in the logged review session's COPILOT_HOME (shape from internal/driver/agent_copilot.go, unconfirmed against Copilot docs) and parses tool.execution_start/complete events (data.toolCallId, data.arguments, error.code denied) as written in copilot-cli-experiments.md; the start event's field names are unverified. hook.sh needs run.sh first (reuses its argv log and shims).
+
+## T9 — Close the run: every gate at once, and the worked example line for line
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Closing check: all gates T1–T8 pass together on the final tree; no code changes were needed.
+- **Files:** none
+- **Notes for next iteration:** No gaps found; working tree unchanged by this task.

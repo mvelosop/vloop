@@ -5,9 +5,9 @@
   "base": "b46022366ccd9c1bdde441cefe33a593c9abf0f3",
   "branch": "B20261026-1002-b22-fence-second-review",
   "status": "running",
-  "iteration": 9,
+  "iteration": 10,
   "created": "2026-10-26T21:37:24Z",
-  "updated": "2026-10-26T23:41:30Z",
+  "updated": "2026-10-26T23:51:07Z",
   "shell": "sh",
   "checks": [
     {
@@ -352,7 +352,7 @@
         "The `go` check passes on the final tree."
       ],
       "verify": "sh .vloop/state/gates/T9/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

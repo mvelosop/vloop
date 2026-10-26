@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **8/9 done** · iteration 9
+**Status:** running · **9/9 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:41:30Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:51:07Z
 
 ## Progress
 
@@ -16,7 +16,7 @@
 - [x] **T6** — Report the second review in metrics/v4
 - [x] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
 - [x] **T8** — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
-- [ ] **T9** — Close the run: every gate at once, and the worked example line for line
+- [x] **T9** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
@@ -202,7 +202,7 @@ sh .vloop/state/gates/T8/gate.sh
 
 ### T9 — Close the run: every gate at once, and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4, T5, T6, T7, T8
+`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8
 
 The last check before the operator's acceptance: every gate of this plan passes on the same tree, which together hold the worked example line for line. Any gap found here is fixed in the code it belongs to, not in a gate.
 
