@@ -2,7 +2,8 @@
 
 A Go CLI and Claude Code plugin that packages the autonomous loop: plan a brief
 into tasks, then per task a fresh work session, a gate, an independent review,
-one commit. B1–B7 were built **by** the shell loop vendored in `.loop/`; from
+one commit. B1–B7 were built **by** a shell loop, whose run history stays in
+`.loop/state/` (`.loop/RETIRED.md`); from
 B8 it builds itself with `vloop run`, one brief at a time, following `docs/design-notes/vloop-roadmap.md` — read that first; its
 "Owns" column says what exists and what comes next. The domain — vocabulary,
 invariants, contexts — is `docs/domain/README-domain.md`. The briefs live in
@@ -10,7 +11,7 @@ invariants, contexts — is `docs/domain/README-domain.md`. The briefs live in
 
 ## Which rules bind you
 
-- **Started by `vloop run`** (or, for B1–B7, `.loop/run.sh`) as a plan, work
+- **Started by `vloop run`** (or, for B1–B7, the shell loop) as a plan, work
   or review session: the loop's rules below and the vloop section bind you, all
   of them. You do not commit, you do one task, you set no status.
 - **An interactive session with the operator**: you are the operator's hands,
@@ -34,8 +35,7 @@ GOOS=linux go build ./...   GOOS=windows go build ./...
 
 `gofmt -l .` and `go mod tidy -diff` print nothing on success.
 `.vloop/config.toml` is this repo's own vloop config (`metrics.stacks = ["go"]`);
-`.vloop/defects/` holds its recorded defects. The shell loop's own suite is
-`.loop/tests/run-all.sh`.
+`.vloop/defects/` holds its recorded defects.
 
 <!-- vloop:begin -->
 ## vloop
@@ -53,7 +53,6 @@ In an interactive session you are the operator's hands: follow the operator's pl
 Written by vloop 0.13.0.
 <!-- vloop:end -->
 
-<!-- loop:begin -->
 ## Rules for any session working here
 
 1. **All durable state stays in this repo.** Never write session state, memory,
@@ -77,6 +76,3 @@ Written by vloop 0.13.0.
    with the internet. Package installs are fine.
 8. **Halting cleanly, with a clear account of what blocked you, is a success.
    Faking progress is the only real failure.**
-Loop docs: `.loop/manual.md` (start here) and `.loop/README.md`. Worked briefs:
-`.loop/examples/`. State lives in `.loop/state/state.json`; the driver owns it.
-<!-- loop:end -->

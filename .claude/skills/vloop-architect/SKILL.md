@@ -88,7 +88,7 @@ and then through its index file.
 ## 4. Check it twice
 
 `vloop brief check` on a copy with `status: ready` (one path per binding
-reference); `vloop run` plans from it. `.loop/check-brief.sh` checked B1–B7. Aim for 0 problems and 0 warnings; un-backtick paths that exist only
+reference); `vloop run` plans from it. The shell loop's checker checked B1–B7. Aim for 0 problems and 0 warnings; un-backtick paths that exist only
 after the run. Look for sentences two sessions could read two ways — the review
 of the brief is the cheapest place to find the next spec gap.
 
