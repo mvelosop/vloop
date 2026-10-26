@@ -1,0 +1,25 @@
+{
+  "cost_usd": 0.24108810000000003,
+  "duration_ms": 57206,
+  "effort": null,
+  "ended": "2026-10-26T01:03:12Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 38749,
+      "cache_read_input_tokens": 392681,
+      "cost_usd": 0.24108810000000003,
+      "input_tokens": 22,
+      "output_tokens": 4678
+    }
+  },
+  "permission_denials": [],
+  "phase": "verify",
+  "run_id": "B20261025-2302-b20-gates-checks-review-scope",
+  "schema": "session/v2",
+  "started": "2026-10-26T01:02:14Z",
+  "turns": 11,
+  "wall_ms": 58103
+}

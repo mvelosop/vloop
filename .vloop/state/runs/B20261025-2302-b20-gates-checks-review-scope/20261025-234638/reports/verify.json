@@ -1,0 +1,32 @@
+{
+  "schema": "verify/v1",
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "docs/domain/execution/session.md:40-42: \"## Gate verdict — `gate-verdict/v1`\" ... \"each naming a task and one of five kinds\"",
+      "observed": "The driver now reads gate-verdict/v2 (internal/driver/gatereview.go:78) and the schema has seven kinds (schemas/gate-verdict.v2.json:26, adds uncovered and check-gap); the domain page still names v1 and five kinds",
+      "where": "brief J2 (\"The verdict is gate-verdict/v2\"); docs/domain/execution/session.md:40"
+    },
+    {
+      "kind": "surface",
+      "claim": "docs/domain/execution/plan.md:59-61: \"Acceptance problems and review findings share two rounds; a plan the gate review failed twice is saved blocked and the run ends with exit 2.\"",
+      "observed": "No mention of the check-gap halt (exit 2 in any round, nothing kept, no revision round); the plan page states the acceptance rounds as if they were the only way the gate review ends a run",
+      "where": "brief J3; docs/domain/execution/plan.md:59"
+    },
+    {
+      "kind": "surface",
+      "claim": "docs/guide/evals.md:146: \"`01`–`07b` | nine planted defects in work that passes its gate\" and :148 lists only `gate-review-planted-gates`, `gate-review-real-misses` for /vloop:gate-review",
+      "observed": "evals.md does not mention case `08-vloop-records-out-of-scope` or `gate-review-coverage`; plugin/evals/README.md was updated with both",
+      "where": "brief J5 (\"Both join the tables of plugin/evals/README.md\"); docs/guide/evals.md:146-148"
+    },
+    {
+      "kind": "surface",
+      "claim": "plugin/skills/review/SKILL.md:115: \"only vloop's records are (see \\\"The product\\\" below).\"",
+      "observed": "The \"The product\" section is at line 64, above the question (line ~110), not below",
+      "where": "brief J4 (absolute-path question); plugin/skills/review/SKILL.md:115"
+    }
+  ],
+  "checked": { "example_lines": 13, "sentences": 18, "surfaces": 14 },
+  "notes": "Example lines: the three schema lines were run as written with the built binary (v2 ok exit 0; v1 on the same verdict exit 1; v1 on gate-verdict.valid.json exit 0). The four stub-gate-review run scenarios were checked by running the existing TestRunGateReview* tests in cmd/vloop (all pass; they assert the exit 2 message text, no work session, no state.json/plan.md/gates kept, no plan commit, no 'failed the plan twice'), not by a hand-built stub claude. J5 evals were not run (they need claude; the brief leaves them to the operator at close). The 08 and gate-review-coverage scaffolds were read only, not executed."
+}
+

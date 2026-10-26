@@ -62,3 +62,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** No change needed: every gate of T1 to T5 passes together on the finished tree, and the T6 gate passes.
 - **Files:** none
 - **Notes for next iteration:** No files changed. The two new eval cases (gate-review-coverage, 08-vloop-records-out-of-scope) and the calibrations are the operator's to run at close.
+
+## Run ended — complete
+
+- **Run:** `B20261025-2302-b20-gates-checks-review-scope` · 8 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked

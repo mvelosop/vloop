@@ -65,3 +65,11 @@ committing the plan
    review T6 · 0m15s · $0.07 · run $6.63 / $40.00
    review: PASS
    T6 done
+   check go
+   verify · 0m58s · $0.24 · run $6.88 / $40.00
+verify: 4 finding(s) — see .vloop/state/runs/B20261025-2302-b20-gates-checks-review-scope/20261025-234638/reports/verify.json
+
+═══ complete ═══
+run:    B20261025-2302-b20-gates-checks-review-scope/20261025-234638  (8 iteration(s) this run)
+plan:   6/6 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261025-2302-b20-gates-checks-review-scope.md

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/6 done** · iteration 8
+**Status:** complete · **6/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:58:49Z
+**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T01:03:12Z
 
 ## Progress
 
