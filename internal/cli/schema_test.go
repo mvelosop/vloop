@@ -10,13 +10,13 @@ import (
 
 func TestSchemaList(t *testing.T) {
 	code, out, _ := run(t, "schema", "list")
-	want := "defect/v1\nexport/v1\ngate-verdict/v1\ngate-verdict/v2\ninstall/v1\nintervention/v1\nintervention/v2\niteration/v1\niteration/v2\nmetrics/v1\nmetrics/v2\nmetrics/v3\nproposal/v1\nsession/v1\nsession/v2\nsession/v3\nstate/v1\nstate/v2\nverdict/v1\nverify/v1\n"
+	want := "defect/v1\nexport/v1\ngate-verdict/v1\ngate-verdict/v2\ninstall/v1\nintervention/v1\nintervention/v2\niteration/v1\niteration/v2\niteration/v3\nmetrics/v1\nmetrics/v2\nmetrics/v3\nproposal/v1\nsession/v1\nsession/v2\nsession/v3\nsession/v4\nstate/v1\nstate/v2\nverdict/v1\nverify/v1\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d out %q", code, out)
 	}
 	code, out, _ = run(t, "schema", "list", "--json")
 	var names []string
-	if code != 0 || json.Unmarshal([]byte(out), &names) != nil || len(names) != 20 || names[0] != "defect/v1" {
+	if code != 0 || json.Unmarshal([]byte(out), &names) != nil || len(names) != 22 || names[0] != "defect/v1" {
 		t.Fatalf("code %d out %q", code, out)
 	}
 }

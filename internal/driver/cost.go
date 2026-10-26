@@ -15,7 +15,10 @@ func sessionLine(s Spec, wall time.Duration, cost, spent, ceiling float64) strin
 	if s.Phase == PhaseGateReview {
 		who = "gate review"
 	}
-	if s.Phase == PhaseWork || s.Phase == PhaseReview {
+	if s.Phase == PhaseSecondReview {
+		who = "second review"
+	}
+	if s.Phase == PhaseWork || s.Phase == PhaseReview || s.Phase == PhaseSecondReview {
 		who += " " + s.Arg
 	}
 	secs := int(wall.Round(time.Second) / time.Second)

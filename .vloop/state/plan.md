@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/9 done** · iteration 5
+**Status:** running · **5/9 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:42:43Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:02:47Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
 - [x] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
 - [x] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning · 1 attempt(s)
-- [ ] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
+- [x] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
 - [ ] **T6** — Report the second review in metrics/v4
 - [ ] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
 - [ ] **T8** — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
@@ -114,7 +114,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 S1's behaviour. A second review session from any agent and model judges the same task as a fresh /vloop:review, blind to the primary's verdict, under the same guards; the mode decides whether its verdict is only recorded, fed to the retry, asked only after a pass, or a veto (both-pass, the only mode that can fail a task). Dissents are what the operator reads at close.
 

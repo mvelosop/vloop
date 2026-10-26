@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Second-review keys, doctor rows, no-independence warning, reworded Copilot warning and preflight refusals exist; fixed the e2e config-list test that failed the go check.
 - **Files:** internal/config/config.go, internal/cli/doctor.go, internal/cli/run.go, docs/guide/configuration.md, cmd/vloop/e2e_test.go
 - **Notes for next iteration:** Prior attempt failed the go check because cmd/vloop/e2e_test.go pins `config list` output; updated it for the four new keys (T4 acceptance 1). Under go test ./..., unset VLOOP_PLAN_SHA256.
+
+## T5 — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The optional second review session runs after the primary in record, feedback, on-pass and both-pass, with session/v4 and iteration/v3 records, a kept second verdict, run-log lines and the end-of-run dissent list.
+- **Files:** internal/driver/iterate.go, internal/driver/session.go, internal/driver/agent.go, internal/driver/agent_copilot.go, internal/driver/cost.go, internal/driver/resolve.go, schemas/session.v4.json, schemas/iteration.v3.json, cmd/vloop/run_second_review_test.go
+- **Notes for next iteration:** reviewSession is now reviewRun (shared guards, phase-parametrised) plus a thin wrapper; the second review is secondReviewStep. The primary verdict is copied to reports right after the primary review, then removed from .vloop/tmp/ before the second session. session/v4 is written only for second-review sessions and iteration/v3 only when a second review ran; every other record stays v3/v2 so existing readers and tests are unchanged. Existing tests changed: wantIterations accepts iteration/v3 for iterations with a second review; schema list/count tests (schema_test.go, cli/schema_test.go, b2_e2e_test.go, embed_test.go) list the two new schemas (T5 acceptance 6). metrics/v4 is T6's. Under go test ./..., unset VLOOP_PLAN_SHA256.

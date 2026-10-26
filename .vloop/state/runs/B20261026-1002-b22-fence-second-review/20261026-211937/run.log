@@ -63,3 +63,10 @@ committing the plan
    review T4 · 0m46s · $0.15 · run $8.78 / $40.00
    review: PASS
    T4 done
+── iteration 6 (6 this run) · T5 · 4/9 done ──
+   Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
+   work T5 · 13m30s · $1.14 · run $9.93 / $40.00
+   check go
+   review T5 · 0m43s · $0.21 · run $10.13 / $40.00
+   review: PASS
+   T5 done

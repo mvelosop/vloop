@@ -82,8 +82,12 @@ func (r *runRepo) wantIterations(outcomes ...string) {
 		}
 		f := filepath.Join(r.t.TempDir(), "it.json")
 		os.WriteFile(f, []byte(its[i]["_line"].(string)), 0o644)
-		if res := r.vloop("schema", "validate", "iteration/v2", f); res.code != 0 {
-			r.t.Errorf("iteration record %d is not iteration/v2: %+v", i+1, res)
+		name := "iteration/v2"
+		if its[i]["schema"] == "iteration/v3" { // a second review ran
+			name = "iteration/v3"
+		}
+		if res := r.vloop("schema", "validate", name, f); res.code != 0 {
+			r.t.Errorf("iteration record %d is not %s: %+v", i+1, name, res)
 		}
 	}
 }
