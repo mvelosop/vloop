@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 1
+**Status:** running · **1/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:18:03Z
+**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:21:57Z
 
 ## Progress
 
 - [x] **T1** — State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
-- [ ] **T2** — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
+- [ ] **T2** — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing · 1 attempt(s)
 - [ ] **T3** — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
 - [ ] **T4** — Keep vloop's records under .vloop/ out of the review's product constraints
 - [ ] **T5** — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
@@ -42,7 +42,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 Only the operator can add a check to .vloop/config.toml, so sending a check-gap back to the planner spends a round on something it cannot fix. When any round's gate verdict has a check-gap, the driver prints every finding as today and halts with exit 2 before any work, committing nothing and leaving no plan, so the re-run plans afresh with the new check in its checks. A verdict without a check-gap must behave exactly as today.
 
@@ -55,6 +55,8 @@ Only the operator can add a check to .vloop/config.toml, so sending a check-gap 
 - A verdict with no check-gap behaves exactly as today: uncovered and every other kind are sent back to the planner, and a second FAIL blocks the plan with "the gate review failed the plan twice"
 - A re-run after the halt plans afresh (a new plan session, not "resuming acceptance")
 - The task leaves committed tests the go check runs, covering the check-gap halt (round 1 and round 2, alone and beside another finding) and an uncovered finding being sent back
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261025-2302-b20-gates-checks-review-scope/20261025-234638/checks/002-go.fail.log
 
 <details><summary>verify command</summary>
 

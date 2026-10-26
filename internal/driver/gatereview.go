@@ -12,7 +12,7 @@ import (
 
 const gateVerdictFile = tmpDir + "/gate-verdict.json"
 
-// gateVerdict is the part of gate-verdict/v1 the driver reads.
+// gateVerdict is the part of gate-verdict/v2 the driver reads.
 type gateVerdict struct {
 	Verdict string `json:"verdict"`
 	Notes   string `json:"notes"`
@@ -29,52 +29,54 @@ type gateVerdict struct {
 // gateReviewRound runs the gate-review session of one round and keeps its
 // verdict as reports/gate-review-<round>.json. A missing or invalid verdict is
 // a FAIL; so is a verdict that fails the plan or any task. It returns the
-// problems to send back to the planner, none when the review passed.
-func (p *Planner) gateReviewRound(t term, round int) ([]string, error) {
+// problems to send back to the planner, none when the review passed, and how
+// many of them are check-gap findings: those the planner cannot fix.
+func (p *Planner) gateReviewRound(t term, round int) ([]string, int, error) {
 	root := p.Root
 	model, effort, err := ModelEffort(root, nil, PhaseGateReview)
 	if err != nil {
-		return nil, halt(ExitPreflight, "%v", err)
+		return nil, 0, halt(ExitPreflight, "%v", err)
 	}
 	agent, err := ResolveAgent(root, PhaseGateReview)
 	if err != nil {
-		return nil, halt(ExitPreflight, "%v", err)
+		return nil, 0, halt(ExitPreflight, "%v", err)
 	}
 	verdictPath := filepath.Join(root, filepath.FromSlash(gateVerdictFile))
 	if err := os.Remove(verdictPath); err != nil && !os.IsNotExist(err) {
-		return nil, err
+		return nil, 0, err
 	}
 	t.say("reviewing the gates using %s (round %d)", model, round)
 	before := refsState(root)
 	gguard := snapshotGit(root)
 	res, err := t.r.Run(Spec{Agent: agent, Phase: PhaseGateReview, Model: model, Effort: effort})
 	if err != nil {
-		return nil, halt(ExitPreflight, "gate review session failed: %v", err)
+		return nil, 0, halt(ExitPreflight, "gate review session failed: %v", err)
 	}
 	t.sessionDone(Spec{Phase: PhaseGateReview}, res)
 	if what := gguard.changed(); what != "" {
-		return nil, halt(ExitRefsMoved, "the gate review changed %s — nothing was committed; restore it, then re-run", what)
+		return nil, 0, halt(ExitRefsMoved, "the gate review changed %s — nothing was committed; restore it, then re-run", what)
 	}
 	if len(refsDiff(before, refsState(root))) > 0 {
-		return nil, halt(ExitRefsMoved, "REFS MOVED gate-review — the gate review changed git refs; nothing was committed")
+		return nil, 0, halt(ExitRefsMoved, "REFS MOVED gate-review — the gate review changed git refs; nothing was committed")
 	}
 	if res.TimedOut {
-		return nil, halt(ExitSessionError, "gate review session timed out after %s — see %s", t.r.Timeout, relRunDir(root, t.r.RunDir))
+		return nil, 0, halt(ExitSessionError, "gate review session timed out after %s — see %s", t.r.Timeout, relRunDir(root, t.r.RunDir))
 	}
 
 	report := filepath.Join(t.r.RunDir, "reports", fmt.Sprintf("gate-review-%d.json", round))
 	if err := os.MkdirAll(filepath.Dir(report), 0o755); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	data, rerr := readHandoff(verdictPath)
 	var v gateVerdict
 	var problems []string
+	gaps := 0
 	switch {
 	case rerr != nil:
 		problems = []string{"the gate review left no " + gateVerdictFile + " — that is a FAIL"}
 	default:
-		if viol, err := schema.Validate("gate-verdict/v1", data); err != nil || len(viol) > 0 {
-			problems = []string{"the gate review's " + gateVerdictFile + " does not follow gate-verdict/v1 — that is a FAIL"}
+		if viol, err := schema.Validate("gate-verdict/v2", data); err != nil || len(viol) > 0 {
+			problems = []string{"the gate review's " + gateVerdictFile + " does not follow gate-verdict/v2 — that is a FAIL"}
 		} else if err := json.Unmarshal(data, &v); err != nil {
 			problems = []string{"the gate review's " + gateVerdictFile + " cannot be read — that is a FAIL"}
 		}
@@ -84,6 +86,9 @@ func (p *Planner) gateReviewRound(t term, round int) ([]string, error) {
 		for _, tv := range v.Tasks {
 			failed = failed || tv.Verdict == "FAIL"
 			for _, f := range tv.Findings {
+				if f.Kind == "check-gap" {
+					gaps++
+				}
 				problems = append(problems, fmt.Sprintf("gate %s (%s): %s", tv.Task, f.Kind, f.Summary))
 			}
 		}
@@ -97,12 +102,18 @@ func (p *Planner) gateReviewRound(t term, round int) ([]string, error) {
 	body := data
 	if len(problems) > 0 && (rerr != nil || v.Verdict == "") {
 		// Nothing usable to keep: record the FAIL the driver ruled.
-		body, _ = json.Marshal(map[string]any{"schema": "gate-verdict/v1", "verdict": "FAIL", "tasks": []any{}, "notes": strings.Join(problems, "; ")})
+		body, _ = json.Marshal(map[string]any{"schema": "gate-verdict/v2", "verdict": "FAIL", "tasks": []any{}, "notes": strings.Join(problems, "; ")})
 	}
 	if err := os.WriteFile(report, []byte(t.r.Mask(string(body))+"\n"), 0o644); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return problems, nil
+	return problems, gaps, nil
+}
+
+// checkGapLine is the line a run ends with when the gate review found checks
+// the plan needs and .vloop/config.toml does not have; the path is repo-relative.
+func checkGapLine(root, runDir string, round, gaps int) string {
+	return fmt.Sprintf("the gate review found %d check gap(s): the plan needs a check .vloop/config.toml does not have — add it, commit it, then re-run (see %sreports/gate-review-%d.json)", gaps, relRunDir(root, runDir), round)
 }
 
 // gateReviewFailedLine is the line a plan the gate review failed twice ends

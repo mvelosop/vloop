@@ -19,3 +19,8 @@ committing the plan
    review T1 · 0m19s · $0.10 · run $4.43 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/6 done ──
+   Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
+   work T2 · 2m45s · $0.28 · run $4.71 / $40.00
+   check go
+   CHECK FAIL T2 — check go failed — see .vloop/state/runs/B20261025-2302-b20-gates-checks-review-scope/20261025-234638/checks/002-go.fail.log; review skipped
