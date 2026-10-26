@@ -373,3 +373,32 @@ func TestAgentsPerPhaseFromV1V2V3Records(t *testing.T) {
 		t.Errorf("agents has a verify entry for a phase that did not run: %v", u.Agents)
 	}
 }
+
+func TestSecondReviewAggregate(t *testing.T) {
+	f := newFixture(t)
+	f.folder("20260101-090100", "resuming B20260101-0900-a",
+		`{"iteration":1,"task":"T1","outcome":"done","second_review":{"verdict":"FAIL","dissent":true}}
+{"iteration":2,"task":"T1","outcome":"done","second_review":{"verdict":"FAIL","dissent":true}}
+{"iteration":3,"task":"T2","outcome":"done","second_review":{"verdict":"PASS","dissent":false}}
+`, map[string]string{
+			"001-work.json":          sess("work", 1, 1, 0.1, "m", 1, 1, 0, 0),
+			"002-review.json":        sess("review", 1, 1, 0.1, "m", 1, 1, 0, 0),
+			"003-second-review.json": sess("second-review", 1, 1, 0.1, "m", 1, 1, 0, 0),
+			"004-second-review.json": sess("second-review", 3, 1, 0.1, "m", 1, 1, 0, 0),
+		})
+	m, err := runs.Load(f.root, "B20260101-0900-a.loop-brief")
+	if err != nil {
+		t.Fatal(err)
+	}
+	u := Aggregate(m, Counts{})
+	if u.SecondSessions != 2 || u.Dissents != 2 || len(u.DissentTasks) != 1 || u.DissentTasks[0] != "T1" {
+		t.Errorf("second review = %d sessions, %d dissents, %v", u.SecondSessions, u.Dissents, u.DissentTasks)
+	}
+	if u.Agents["second-review"] != "claude" {
+		t.Errorf("agents = %v", u.Agents)
+	}
+	none := Aggregate(workedRun(t), Counts{})
+	if none.SecondSessions != 0 || none.Dissents != 0 || len(none.DissentTasks) != 0 || none.Agents["second-review"] != "" {
+		t.Errorf("run without a second review: %+v", none.Agents)
+	}
+}

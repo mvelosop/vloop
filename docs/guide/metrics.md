@@ -16,8 +16,8 @@ vloop metrics classify <path>…
 A `<brief>` is a loop brief's path or name. With none, one row per brief that
 has runs is printed. A brief with no runs is `vloop: no runs for <name>`, exit 1.
 `--by task` prints one row per task in plan order; `--json` prints one
-`metrics/v3` document per brief (an array when several). `vloop schema show
-metrics/v3` prints the schema; every key below is a property of it.
+`metrics/v4` document per brief (an array when several). `vloop schema show
+metrics/v4` prints the schema; every key below is a property of it.
 
 ## Where the numbers come from
 
@@ -163,8 +163,8 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
 sessions' model usage, sorted. `effort` gives each phase's effort level when the
 records carry it (`session/v1` and later do, the legacy shell loop's do not), else `null`.
 
-`agents` (`metrics/v3`) lists, per phase and sorted, the agents that ran the sessions. Records written
-before `session/v3` carry none and count as `claude`.
+`agents` (`metrics/v4`) lists, per phase and sorted, the agents that ran the sessions. Records written
+before `session/v3` carry none and count as `claude`. `agents["second-review"]` lists the agents of the second review sessions (`[]` when none ran), and `second_review` holds `mode` (`run.second-review` as configured when the report is built), `sessions`, `dissents` and `dissent_tasks`.
 
 ## Tasks and iterations
 
@@ -205,7 +205,7 @@ summary says so on a `records` line.
 - `status` is the brief's frontmatter status. `merged` is the full SHA of the
   first commit on the default branch (`origin/HEAD`'s target, else `main`, else
   `master`) where the brief says `status: consumed`; `null` when not merged.
-- `schema` is `metrics/v3` (snapshots of earlier briefs may be `metrics/v1` or `metrics/v2`, still read), and `brief` is the brief's file name.
+- `schema` is `metrics/v4` (snapshots of earlier briefs may be `metrics/v1` to `metrics/v3`, still read), and `brief` is the brief's file name.
 
 ## Interventions
 

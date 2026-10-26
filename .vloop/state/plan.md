@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/9 done** · iteration 6
+**Status:** running · **6/9 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:02:47Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:19:12Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
 - [x] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning · 1 attempt(s)
 - [x] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
-- [ ] **T6** — Report the second review in metrics/v4
+- [x] **T6** — Report the second review in metrics/v4
 - [ ] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
 - [ ] **T8** — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
 - [ ] **T9** — Close the run: every gate at once, and the worked example line for line
@@ -138,7 +138,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Report the second review in metrics/v4
 
-`pending` · depends on: T5
+`done` · depends on: T5
 
 S1's measurement: the operator compares runs with and without a second reviewer, so the metrics a run commits must say which agents ran it, how many second sessions there were and where they dissented.
 

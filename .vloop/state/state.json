@@ -5,9 +5,9 @@
   "base": "b46022366ccd9c1bdde441cefe33a593c9abf0f3",
   "branch": "B20261026-1002-b22-fence-second-review",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-10-26T21:37:24Z",
-  "updated": "2026-10-26T23:02:47Z",
+  "updated": "2026-10-26T23:19:12Z",
   "shell": "sh",
   "checks": [
     {
@@ -236,7 +236,7 @@
         "Committed tests cover the new fields for a run with and without a second review, and run in the `go` check."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

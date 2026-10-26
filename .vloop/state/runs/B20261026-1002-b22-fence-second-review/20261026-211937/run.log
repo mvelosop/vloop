@@ -70,3 +70,10 @@ committing the plan
    review T5 · 0m43s · $0.21 · run $10.13 / $40.00
    review: PASS
    T5 done
+── iteration 7 (7 this run) · T6 · 5/9 done ──
+   Report the second review in metrics/v4
+   work T6 · 10m37s · $0.54 · run $10.68 / $40.00
+   check go
+   review T6 · 0m23s · $0.14 · run $10.82 / $40.00
+   review: PASS
+   T6 done

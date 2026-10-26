@@ -3,6 +3,7 @@ package metrics
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -13,11 +14,12 @@ import (
 
 // Phases are the session phases metrics report on.
 const (
-	PhasePlan       = "plan"
-	PhaseWork       = "work"
-	PhaseReview     = "review"
-	PhaseGateReview = "gate-review"
-	PhaseVerify     = "verify"
+	PhasePlan         = "plan"
+	PhaseWork         = "work"
+	PhaseReview       = "review"
+	PhaseSecondReview = "second-review"
+	PhaseGateReview   = "gate-review"
+	PhaseVerify       = "verify"
 )
 
 // Time is where a brief's time went, in milliseconds. Agent time is work plus
@@ -88,7 +90,12 @@ type Usage struct {
 	Agents  map[string]string // phase -> sorted, comma-joined agents
 	Effort  map[string]string // phase -> sorted, comma-joined efforts, where recorded
 	Denials int
-	Missing []string // `<task> <phase> (iteration <i>)`
+	// SecondSessions counts the second-review sessions; DissentTasks lists the
+	// distinct tasks whose second review dissented, and Dissents the iterations.
+	SecondSessions int
+	Dissents       int
+	DissentTasks   []string
+	Missing        []string // `<task> <phase> (iteration <i>)`
 }
 
 // reviewRan is the set of iteration outcomes that mean a review session ran.
@@ -150,6 +157,12 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	for _, f := range m.Folders {
 		for _, it := range f.Iterations {
 			iterations++
+			if it.Dissent {
+				u.Dissents++
+				if !slices.Contains(u.DissentTasks, it.Task) {
+					u.DissentTasks = append(u.DissentTasks, it.Task)
+				}
+			}
 			if it.GateMS != nil {
 				gate += *it.GateMS
 				gateKnown = true
@@ -184,6 +197,8 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 				u.Time.VerifyMS += s.TimeMS()
 				u.Cost.Verify += s.CostUSD
 				u.Credits.Verify += s.Credits
+			case PhaseSecondReview:
+				u.SecondSessions++
 			default:
 				continue
 			}
