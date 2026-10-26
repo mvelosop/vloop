@@ -1,6 +1,6 @@
 ---
 name: B20261026-1002-b22-fence-second-review.loop-brief
-description: Fence Copilot review sessions with a fail-closed vloop hook that judges every tool call against the phase's fence — looking through sh -c, env and the other wrappers — keep them on vloop's own skills, record their denials, and add an optional second reviewer whose verdict is recorded, fed to retries or asked only after a pass, as configured
+description: Fence Copilot review sessions with a fail-closed vloop hook that judges every tool call against the phase's fence — looking through sh -c, env and the other wrappers — keep them on vloop's own skills, record their denials, and add an optional second reviewer whose verdict is recorded, fed to retries, asked only after a pass, or required to pass as well, as configured
 kind: brief
 status: draft
 created: 2026-10-26
@@ -42,13 +42,14 @@ does.
 - **S1 — an optional second reviewer.** Off by default; when on, a second
   review session of any agent and model judges the same task, and
   `run.second-review` says what its verdict does: recorded, fed to the retry,
-  or asked only after a pass. It never decides a task.
+  asked only after a pass, or required to pass as well (`both-pass`, the only
+  mode in which it can fail a task).
 - **A1 — the fence audit and the docs.** Every fence rule classified by who
   enforces it; Copilot review stays experimental but is no longer "not fenced";
   the operator reads dissents at close.
 
 Unchanged: Claude sessions — their argv, fence and settings; the primary
-review decides every task; Copilot runs review sessions only; the driver's
+review decides every task unless `both-pass` is chosen; Copilot runs review sessions only; the driver's
 checks stay the boundary (S-2).
 
 ## Why this shape, and what was rejected
@@ -66,12 +67,13 @@ planner inherits them.
   since B18).
 - **The deny list stays, as a second line.** `--deny-tool` still names the
   stems; the hook is the fence.
-- **The second reviewer is optional and adds an opinion, never a veto.** The
-  experiments found a stricter cross-family reviewer useful as a second
-  opinion and costly as a veto. What its verdict does is the operator's
-  choice, per repository, in config.
-  *Rejected:* a fixed behaviour; a second reviewer that can fail a task the
-  primary passed.
+- **The second reviewer is optional, and what its verdict does is
+  configuration.** The experiments found a stricter cross-family reviewer
+  useful as a second opinion and costly as a veto (it would have repeated
+  acceptable tasks), so three modes only add its opinion; `both-pass` makes it
+  a veto for an operator who wants that cost. The choice is per repository, in
+  config.
+  *Rejected:* a fixed behaviour.
 - **The second reviewer may be any agent and model.** Matching the primary is
   allowed, and warned about.
 - **Copilot review stays experimental.** The "not fenced" wording goes; the
@@ -172,7 +174,8 @@ directory (`~/.claude`), Copilot's (`~/.copilot`) or the GitHub CLI's
 
 ### S1 — the optional second reviewer
 
-- Keys: `run.second-review` — `off` (default), `record`, `feedback`, `on-pass`;
+- Keys: `run.second-review` — `off` (default), `record`, `feedback`, `on-pass`,
+  `both-pass`;
   `agent.second-review` (`claude`, `copilot`; default `claude`),
   `model.second-review` (default `sonnet`), `effort.second-review`; each with
   its environment variable as every key has. P-6 applies without the task
@@ -180,16 +183,22 @@ directory (`~/.claude`), Copilot's (`~/.copilot`) or the GitHub CLI's
   second review needs an explicit Copilot model, as `agent.review` does.
 - When not `off`, a second review session runs after the primary review of an
   iteration — after every primary review for `record` and `feedback`, only
-  after a primary PASS for `on-pass` — never when the primary did not run or
+  after a primary PASS for `on-pass` and `both-pass` — never when the primary
+  did not run or
   ended the run. It runs `/vloop:review <task>` as a fresh session of phase
   `second-review`, under the review fence (the hook's `second-review` phase
   for copilot), with the same guards as the primary: inputs restored, a moved
   ref or git setting halts (exit 9), changed files reverted. It never sees the
   primary's verdict: the driver keeps it out of `.vloop/tmp/` first.
 - Its verdict is read as the primary's is; no valid verdict, a changed file or
-  tampering make it FAIL, with the finding. **It never changes the outcome,
-  the status or the attempts of the task.** A session error or timeout is a
-  warning; the iteration goes on.
+  tampering make it FAIL, with the finding. **In `record`, `feedback` and
+  `on-pass` it never changes the outcome, the status or the attempts of the
+  task**; a session error or timeout is a warning and the iteration goes on.
+- `both-pass`: a task is done only when the primary and the second both PASS.
+  A second FAIL rejects the iteration as a primary FAIL does — the attempt
+  counts, the task is retried or blocked by the same rules — with the second's
+  findings as the task's notes, each prefixed `second review: `. A second
+  session error or timeout is treated as the primary's would be.
 - `feedback`: when the primary did not PASS, the second's findings join the
   task's notes after the primary's, each prefixed `second review: `.
   `record` and `on-pass`: nothing reaches the notes.
@@ -228,8 +237,9 @@ directory (`~/.claude`), Copilot's (`~/.copilot`) or the GitHub CLI's
 - A form in the worked example's deny column that `fence check` allows.
 - A Copilot session started without the hooks file, or a hook that answers
   allow on an error.
-- A second review that changes a task's outcome, status or attempts, or that
-  can read the primary's verdict.
+- A second review that changes a task's outcome, status or attempts in any mode
+  but `both-pass`, a `both-pass` task done without both PASS verdicts, or a
+  second review that can read the primary's verdict.
 - Any change to a Claude session's argv, fence or settings.
 - A gate that runs `copilot` or touches the network.
 
@@ -290,6 +300,10 @@ run.second-review = feedback
   "second review: 1 dissent(s): T1 (primary PASS, second FAIL)"
 run.second-review = record      same outcomes; T2's notes hold the primary's only
 run.second-review = on-pass     second review runs for T1 only
+run.second-review = both-pass   second review runs for T1 only, and fails it:
+                                T1 is retried with notes "second review: <finding>";
+                                with the second failing every time, T1 ends blocked
+                                after its attempts, exactly as a primary FAIL would
 run.second-review = off         no second-review session, no line, no field
 ```
 
@@ -302,7 +316,7 @@ copilot`: `vloop run` exits 1 with the K1 message; renamed to
 - Fencing Claude sessions with the hook.
 - Copilot in phases other than review and second review; plan, work,
   gate-review and verify on another agent.
-- A second reviewer that can fail a task; more than two reviewers.
+- More than two reviewers.
 - A backend-agnostic eval runner.
 - Reporting vloop defects upstream (B23).
 - Dropping the experimental label.
