@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 5,
-    "done": 4,
+    "done": 5,
     "blocked": 0,
-    "first_pass": 4,
+    "first_pass": 5,
     "estimate": {
       "min": 4,
       "max": 5
@@ -43,33 +43,33 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 767573,
-    "work_ms": 685933,
-    "review_ms": 81640,
+    "agent_ms": 807177,
+    "work_ms": 711424,
+    "review_ms": 95753,
     "plan_ms": 683337,
-    "gates_ms": 12477,
-    "checks_ms": 879347,
+    "gates_ms": 26198,
+    "checks_ms": 1087033,
     "gate_review_ms": 68989,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 7.191498398197956,
-    "code_test_per_min": 23.059695950743446
+    "code_per_min": 6.838648772202379,
+    "code_test_per_min": 21.92827595434459
   },
   "cost": {
-    "total_usd": 4.3832933999999995,
+    "total_usd": 4.530535799999999,
     "plan_usd": 2.798463,
-    "work_usd": 0.8480424,
-    "review_usd": 0.42772200000000005,
+    "work_usd": 0.918696,
+    "review_usd": 0.5043108000000001,
     "gate_review_usd": 0.309066,
-    "per_1000_code_lines_usd": 47.64449347826086
+    "per_1000_code_lines_usd": 49.24495434782608
   },
   "tokens": {
-    "input": 272,
-    "output": 87494,
-    "cache_read": 7030259,
-    "cache_creation": 351388,
-    "cache_hit_ratio": 0.9523619806719635
+    "input": 288,
+    "output": 89344,
+    "cache_read": 7205123,
+    "cache_creation": 379194,
+    "cache_hit_ratio": 0.9499668077638849
   },
   "models": {
     "plan": [
@@ -123,7 +123,7 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 3,
-  "iterations": 4,
+  "iterations": 5,
   "iterations_per_closed": 1,
   "by_task": [
     {
@@ -230,7 +230,7 @@
       "id": "T5",
       "area": null,
       "kind": "chore",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -243,9 +243,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 39604,
+      "cost_usd": 0.1472424,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     }

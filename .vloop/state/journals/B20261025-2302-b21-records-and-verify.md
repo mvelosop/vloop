@@ -41,3 +41,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Ran the closing gate on the finished tree: gates T1–T4 and the worked example's scratch-repository lines all pass; no product change was needed.
 - **Files:** none
 - **Notes for next iteration:** No files changed. The #53 defect status is left for the operator at close.
+
+## Run ended — complete
+
+- **Run:** `B20261025-2302-b21-records-and-verify` · 5 iteration(s) this run
+- **Plan:** 5/5 done, 0 blocked

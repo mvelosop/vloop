@@ -46,3 +46,11 @@ committing the plan
    review T5 · 0m14s · $0.08 · run $4.53 / $40.00
    review: PASS
    T5 done
+   check go
+   verify · 0m26s · $0.11 · run $4.64 / $40.00
+vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand
+
+═══ complete ═══
+run:    B20261025-2302-b21-records-and-verify/20261026-013405  (5 iteration(s) this run)
+plan:   5/5 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261025-2302-b21-records-and-verify.md
