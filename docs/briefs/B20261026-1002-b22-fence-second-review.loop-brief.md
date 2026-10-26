@@ -2,7 +2,7 @@
 name: B20261026-1002-b22-fence-second-review.loop-brief
 description: Fence Copilot review sessions with a fail-closed vloop hook that judges every tool call against the phase's fence — looking through sh -c, env and the other wrappers — keep them on vloop's own skills, record their denials, and add an optional second reviewer whose verdict is recorded, fed to retries, asked only after a pass, or required to pass as well, as configured
 kind: brief
-status: draft
+status: ready
 created: 2026-10-26
 seeds: The Copilot series' third brief, the fence (docs/design-notes/multi-agent-backends.md → "The sequence, as briefs"), after the hook probe re-run of 2026-10-26 (docs/design-notes/copilot-cli-experiments.md → "Permissions"), settled with the operator on 2026-10-26
 depends-on: [B20261025-2302-b21-records-and-verify.loop-brief]
