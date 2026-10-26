@@ -176,6 +176,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | close | ceremony | yes | no-options | [I20261011-2054-v0-9-0-released-so-b13-runs-on-b12-s-fix](I20261011-2054-v0-9-0-released-so-b13-runs-on-b12-s-fix.md) |
 | close | ceremony | yes | no-options | [I20261015-094100-v0-10-0-released-so-b16-runs-on-b14-s-an](I20261015-094100-v0-10-0-released-so-b16-runs-on-b14-s-an.md) |
 | close | ceremony | yes | no-options | [I20261015-161603-v0-11-0-released-so-b17-runs-on-b16-s-ve](I20261015-161603-v0-11-0-released-so-b17-runs-on-b16-s-ve.md) |
+| close | ceremony | partly | no-options | [I20261026-092947-v0-13-0-released-after-the-two-hardening](I20261026-092947-v0-13-0-released-after-the-two-hardening.md) |
 | close | repair | yes | no-options | [I20260929-2048-local-main-reset-to-the-pre-merge-commit](I20260929-2048-local-main-reset-to-the-pre-merge-commit.md) |
 | next | carry-forward | no | no-options | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | no-options | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |
