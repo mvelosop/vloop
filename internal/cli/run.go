@@ -185,6 +185,7 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 	for _, c := range runDoctor(b, root) {
 		switch {
 		case c.Name == "branch", c.Name == "gate scratch", c.Name == "checks": // the planner refuses these itself, in its own words
+		case c.Name == "copilot login": // refused below, in its own words
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++
@@ -199,6 +200,9 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		return Problem(fmt.Errorf("preflight failed — %d problem(s), nothing has run", bad))
 	}
 	if copilotReview(root) {
+		if !copilotLoggedIn() {
+			return Problem(errors.New("agent.review is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login"))
+		}
 		if m, err := config.Get(root, "model.review"); err == nil && m.Source == config.SourceDefault {
 			return Problem(fmt.Errorf("agent.review is copilot but model.review is the default %q, a Claude alias: set model.review to a Copilot model id", m.Value))
 		}

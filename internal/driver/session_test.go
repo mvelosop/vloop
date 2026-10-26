@@ -460,3 +460,36 @@ func TestMaskDashedUserForm(t *testing.T) {
 		}
 	}
 }
+
+func TestMaskTempDir(t *testing.T) {
+	real := t.TempDir()
+	link := filepath.Join(t.TempDir(), "tl")
+	if err := os.Symlink(real, link); err != nil {
+		t.Skip("no symbolic links:", err)
+	}
+	real, _ = filepath.EvalSymlinks(real)
+	r := &Runner{Home: "/home/al", User: "al", TempDir: link}
+	if got := r.Mask("rm " + link + "/x.1 " + real + "/y.2"); got != "rm $TMPDIR/x.1 $TMPDIR/y.2" {
+		t.Errorf("Mask: %q", got)
+	}
+	// /tmp and /var/tmp name shared directories and stay as they are
+	for _, d := range []string{"/tmp", "/var/tmp"} {
+		r := &Runner{Home: "/home/al", User: "al", TempDir: d}
+		if got := r.Mask(d + "/x.1"); got != d+"/x.1" {
+			t.Errorf("TMPDIR=%s: Mask: %q", d, got)
+		}
+	}
+	// under the home it is the home that is masked
+	h := &Runner{Home: "/home/al", User: "al", TempDir: "/home/al/tmp"}
+	if got := h.Mask("/home/al/tmp/x.1"); got != "~/tmp/x.1" {
+		t.Errorf("Mask: %q", got)
+	}
+	// a name that merely starts like the temp directory is not it
+	if got := (&Runner{Home: "/home/al", TempDir: "/var/folders/T"}).Mask("/var/folders/T/a /var/folders/Tx"); got != "$TMPDIR/a /var/folders/Tx" {
+		t.Errorf("Mask: %q", got)
+	}
+	w := &Runner{Home: `C:\Users\Alice`, User: "Alice", TempDir: `D:\Temp`}
+	if got := w.Mask(`D:\Temp\x d:/temp/y "D:\\Temp\\z"`); got != `$TMPDIR\x $TMPDIR/y "$TMPDIR\\z"` {
+		t.Errorf("Mask: %q", got)
+	}
+}

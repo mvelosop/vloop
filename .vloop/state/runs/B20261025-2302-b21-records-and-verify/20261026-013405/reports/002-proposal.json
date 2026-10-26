@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Added defect.LoopBriefName and defect.SameBrief; defect add, intervention add, intervention set brief and metrics write the .loop-brief name, and defect and intervention list match a record by either the bare or the .loop-brief name.",
+  "files": ["internal/defect/defect.go", "internal/defect/defect_test.go", "internal/intervention/intervention.go", "internal/intervention/intervention_test.go", "internal/metrics/metrics.go", "internal/cli/defect.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go test of internal/defect, internal/intervention, internal/metrics and cmd/... passes.",
+  "notes": "BriefName is unchanged (blame, close and export still use it). TestListOrderFilterAndRoundTrip in internal/intervention pinned that add writes the bare name B1; changed to B1.loop-brief per the contract item that records are always written with the .loop-brief name. internal/cli TestTaskGate* fail inside a driver session with 'plan was changed during this session' - environmental, not touched by this change."
+}

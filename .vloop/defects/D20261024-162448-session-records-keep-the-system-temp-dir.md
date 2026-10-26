@@ -6,8 +6,8 @@ origin: brief
 found-by: user
 kind: spec-gap
 severity: low
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261025-2302-b21-records-and-verify.loop-brief
 case: ""
 created: 2026-10-24T15:24:48Z
 ---

@@ -54,7 +54,7 @@ func TestListOrderFilterAndRoundTrip(t *testing.T) {
 	if strings.Join(got, " ") != "setup/repair design/decision run/ceremony run/halt" {
 		t.Fatalf("order %v", got)
 	}
-	if v := all[3]; v.Brief != "B1" || v.Trigger != "tr" || v.Done != "dn" || v.Automation != "au" || v.Summary != "c" || v.Schema != "intervention/v2" {
+	if v := all[3]; v.Brief != "B1.loop-brief" || v.Trigger != "tr" || v.Done != "dn" || v.Automation != "au" || v.Summary != "c" || v.Schema != "intervention/v2" {
 		t.Fatalf("round trip %+v", v)
 	}
 	if all[0].Brief != "" {
@@ -256,5 +256,35 @@ func TestAddWritesOriginAfterBy(t *testing.T) {
 	vs, _ := List(root, "")
 	if len(vs) != 1 || vs[0].Origin != "work" {
 		t.Fatalf("origin after set: %+v", vs)
+	}
+}
+
+func TestBriefFormsAreOneBrief(t *testing.T) {
+	root := t.TempDir()
+	forms := []string{"B1-x", "B1-x.loop-brief", "docs/briefs/B1-x.loop-brief.md"}
+	for i, f := range forms {
+		p := add(t, root, "added "+f, "run", "halt", f, t0.Add(time.Duration(i)*time.Second))
+		b, _ := os.ReadFile(filepath.Join(root, p))
+		if !strings.Contains(string(b), "\nbrief: B1-x.loop-brief\n") {
+			t.Errorf("add --brief %q wrote\n%s", f, b)
+		}
+	}
+	// A record written before the .loop-brief name was the rule.
+	p := add(t, root, "planted", "run", "halt", "B1-x.loop-brief", t0.Add(time.Minute))
+	b, _ := os.ReadFile(filepath.Join(root, p))
+	os.WriteFile(filepath.Join(root, p), []byte(strings.Replace(string(b), "brief: B1-x.loop-brief", "brief: B1-x", 1)), 0o644)
+	for _, f := range forms {
+		vs, err := List(root, f)
+		if err != nil || len(vs) != 4 {
+			t.Errorf("List(%q) = %d records, %v; want 4", f, len(vs), err)
+		}
+	}
+	id := strings.TrimSuffix(filepath.Base(p), ".md")
+	if err := Set(root, id, "brief", "B1-x"); err != nil {
+		t.Fatal(err)
+	}
+	b, _ = os.ReadFile(filepath.Join(root, p))
+	if !strings.Contains(string(b), "\nbrief: B1-x.loop-brief\n") {
+		t.Errorf("set brief wrote\n%s", b)
 	}
 }

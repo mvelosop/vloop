@@ -163,6 +163,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261026-012947-in-j5-s-eval-gate-review-coverage-the-fu](I20261026-012947-in-j5-s-eval-gate-review-coverage-the-fu.md) |
 | verify | verification-finding | partly | no-options | [I20261026-012948-eval-sessions-run-in-don-t-ask-mode-were](I20261026-012948-eval-sessions-run-in-don-t-ask-mode-were.md) |
 | verify | verification-finding | partly | no-options | [I20261026-012949-calibration-04-unchecked-criterion-named](I20261026-012949-calibration-04-unchecked-criterion-named.md) |
+| verify | verification-finding | partly | no-options | [I20261026-023243-the-verify-session-left-no-verify-json-f](I20261026-023243-the-verify-session-left-no-verify-json-f.md) |
+| verify | verification-finding | partly | no-options | [I20261026-023244-r2-confirmed-on-real-records-the-url-sho](I20261026-023244-r2-confirmed-on-real-records-the-url-sho.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

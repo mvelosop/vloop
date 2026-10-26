@@ -32,7 +32,9 @@ Build the result fresh, into a scratch directory you create under
 `.vloop/tmp/` — never into the tree, never a global location. Use the repository's own build command with its output pointed there (for a Go
 module, `go build -o <scratch>/<name> ./cmd/<name>`). Run every
 example in a scratch directory of its own, created under
-`<scratch>`, so no run touches the repository. Put the built
+`<scratch>`, so no run touches the repository. A scratch directory in which an
+example runs vloop or git is made a repository first (`git init`), so it is its
+own root (C-2) and nothing it runs reaches this repository. Put the built
 binary first on `PATH` for those runs.
 
 ## 3. The three passes

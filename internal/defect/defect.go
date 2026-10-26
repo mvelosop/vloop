@@ -110,6 +110,22 @@ func BriefName(brief string) string {
 	return strings.TrimSuffix(b, ".md")
 }
 
+// LoopBriefSuffix ends the name of a loop brief, before its .md.
+const LoopBriefSuffix = ".loop-brief"
+
+// LoopBriefName normalises a brief given as the bare name, the .loop-brief
+// name or a path to its file to the .loop-brief name, the one records carry.
+func LoopBriefName(brief string) string {
+	n := BriefName(brief)
+	if n == "" || strings.HasSuffix(n, LoopBriefSuffix) {
+		return n
+	}
+	return n + LoopBriefSuffix
+}
+
+// SameBrief reports whether two brief references, in any form, name one brief.
+func SameBrief(a, b string) bool { return LoopBriefName(a) == LoopBriefName(b) }
+
 // CheckBrief errors unless brief is a *.loop-brief.md in the briefs directory.
 func CheckBrief(root, brief string) error {
 	if !strings.HasSuffix(brief, ".loop-brief") {
@@ -284,7 +300,7 @@ func List(root, brief string) ([]Defect, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%s/%s: %w", Dir, e.Name(), err)
 		}
-		if brief != "" && d.Brief != BriefName(brief) {
+		if brief != "" && !SameBrief(d.Brief, brief) {
 			continue
 		}
 		out = append(out, d)

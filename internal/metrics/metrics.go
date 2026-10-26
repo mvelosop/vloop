@@ -183,7 +183,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	if len(m.Folders) == 0 {
 		return nil, nil
 	}
-	r := &Report{Schema: Schema, Brief: defect.BriefName(brief), RunID: m.RunID}
+	r := &Report{Schema: Schema, Brief: defect.LoopBriefName(brief), RunID: m.RunID}
 	var briefText string
 	if b, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(m.BriefPath))); err == nil {
 		briefText = string(b)

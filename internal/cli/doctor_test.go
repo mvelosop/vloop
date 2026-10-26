@@ -44,7 +44,7 @@ func newDoctorEnv(t *testing.T) *doctorEnv {
 	t.Setenv("USERPROFILE", e.home)
 	t.Setenv("GIT_CONFIG_GLOBAL", os.DevNull)
 	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
-	for _, k := range []string{"GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "VLOOP_SHELL", "VLOOP_LANGUAGE", "VLOOP_METRICS_STACKS"} {
+	for _, k := range []string{"GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "VLOOP_SHELL", "VLOOP_LANGUAGE", "VLOOP_METRICS_STACKS", "COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"} {
 		t.Setenv(k, "")
 		os.Unsetenv(k)
 	}

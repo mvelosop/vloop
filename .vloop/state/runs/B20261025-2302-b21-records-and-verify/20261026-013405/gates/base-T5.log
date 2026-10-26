@@ -1,0 +1,3 @@
+GATE FAIL: config set language es in the nested repository .vloop/tmp/w: the outer .vloop/config.toml changed: -language = "en"
++language = "es"
+GATE FAIL: gate T1 fails on the finished tree

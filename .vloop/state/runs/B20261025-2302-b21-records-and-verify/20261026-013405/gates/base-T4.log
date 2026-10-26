@@ -1,0 +1,1 @@
+GATE FAIL: no token, gh exits 1: doctor's copilot login row is 'rows: 0', want a problem with: no GitHub login reaches Copilot sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login

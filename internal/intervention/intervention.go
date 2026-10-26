@@ -201,7 +201,7 @@ func Add(root string, in NewInput, now time.Time) (string, error) {
 	}
 	summary := oneLine(in.Summary)
 	v := Intervention{
-		Schema: "intervention/v2", Agreement: "no-options", Options: []string{}, Brief: defect.BriefName(in.Brief), Phase: in.Phase, Kind: in.Kind,
+		Schema: "intervention/v2", Agreement: "no-options", Options: []string{}, Brief: defect.LoopBriefName(in.Brief), Phase: in.Phase, Kind: in.Kind,
 		Automatable: in.Automatable, By: in.By, Origin: in.Origin, Occurred: now.Format("2006-01-02"),
 		Recorded: now.UTC().Format("2006-01-02T15:04:05Z"), Summary: summary,
 		Trigger: oneLine(in.Trigger), Done: oneLine(in.Done), Automation: oneLine(in.Automation),
@@ -448,7 +448,7 @@ func List(root, brief string) ([]Intervention, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%s/%s: %w", Dir, e.Name(), err)
 		}
-		if brief != "" && v.Brief != defect.BriefName(brief) {
+		if brief != "" && !defect.SameBrief(v.Brief, brief) {
 			continue
 		}
 		out = append(out, v)
@@ -499,7 +499,7 @@ func Set(root, id, field, value string) error {
 	updates := map[string]string{field: field + ": " + value}
 	switch field {
 	case "brief":
-		updates[field] = field + ": " + frontmatter.Quote(defect.BriefName(value))
+		updates[field] = field + ": " + frontmatter.Quote(defect.LoopBriefName(value))
 	case "recommended", "decided", "adjusted":
 		n := len(v.Options)
 		if n == 0 {

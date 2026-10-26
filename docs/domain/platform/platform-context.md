@@ -8,8 +8,8 @@ What briefing, execution and measurement share and none of them owns.
 
 ## The repo root
 
-The nearest ancestor holding `.vloop/`, else `.git`, else the start directory
-(`-C` changes the start). Every path vloop prints is relative to it, with `/`
+The nearest ancestor (the start directory included) holding `.vloop/` or `.git`,
+whichever is found first, else the start directory (`-C` changes the start). Every path vloop prints is relative to it, with `/`
 on every OS (C-2).
 
 ## Configuration

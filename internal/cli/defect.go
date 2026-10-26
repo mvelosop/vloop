@@ -80,7 +80,7 @@ func newDefectAdd(g *Globals) *cobra.Command {
 			}
 			var attribution fmt.Stringer
 			if in.Brief != "" {
-				in.Brief = defect.BriefName(in.Brief)
+				in.Brief = defect.LoopBriefName(in.Brief)
 				if err := defect.CheckBrief(root, in.Brief); err != nil {
 					return Problem(err)
 				}
@@ -193,7 +193,7 @@ func defectMatrix(root, brief string) (metrics.Matrix, error) {
 	var x metrics.Matrix
 	var briefs []string
 	if brief != "" {
-		briefs = []string{defect.BriefsDir + "/" + defect.BriefName(brief) + ".md"}
+		briefs = []string{defect.BriefsDir + "/" + defect.LoopBriefName(brief) + ".md"}
 	} else {
 		ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(defect.BriefsDir)))
 		if err != nil && !os.IsNotExist(err) {
