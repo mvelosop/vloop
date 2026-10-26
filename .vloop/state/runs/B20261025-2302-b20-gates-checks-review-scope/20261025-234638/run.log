@@ -44,3 +44,10 @@ committing the plan
    review T3 · 0m22s · $0.12 · run $5.91 / $40.00
    review: PASS
    T3 done
+── iteration 6 (6 this run) · T4 · 3/6 done ──
+   Keep vloop's records under .vloop/ out of the review's product constraints
+   work T4 · 0m54s · $0.23 · run $6.14 / $40.00
+   check go
+   review T4 · 0m24s · $0.11 · run $6.25 / $40.00
+   review: PASS
+   T4 done

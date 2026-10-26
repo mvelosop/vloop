@@ -5,9 +5,9 @@
   "base": "366a250ab0dda1843d922d3bcad388e6fc8b7001",
   "branch": "B20261025-2302-b20-gates-checks-review-scope",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-10-26T00:10:00Z",
-  "updated": "2026-10-26T00:43:41Z",
+  "updated": "2026-10-26T00:48:57Z",
   "shell": "sh",
   "checks": [
     {
@@ -185,7 +185,7 @@
         "The review skill's word ceiling rises, if at all, only by what this task adds, with its date and reason in the comment; the go check's budget test passes"
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

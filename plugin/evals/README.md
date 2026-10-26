@@ -18,7 +18,8 @@ What an eval is, the grader types, and how to run and read the suite:
 ## /vloop:review — the reviewer calibration
 
 Nine defects are planted in work that passes its own gate; the review must
-return `FAIL` and name the defect. Every case passes its own gate before the
+return `FAIL` and name the defect. A tenth case, `08`, plants none: it is the
+control that vloop's own records are out of the product. Every case passes its own gate before the
 review sees it (`scaffold.sh` exits non-zero otherwise), and the cases that plant
 a defective gate also require the correct implementation to be rejected by it.
 
@@ -33,6 +34,7 @@ a defective gate also require the correct implementation to be rejected by it.
 | `06-gate-rewrite` | correct work, but the committed gate was rewritten |
 | `07-provenance-weak-criteria` | as 05, with the criteria worded by mechanism only |
 | `07b-provenance-weak-goal` | as 05, with the goal worded by rationale only |
+| `08-vloop-records-out-of-scope` | no defect: correct work, but vloop's records under `.vloop/` hold an absolute path; the review must `PASS` with a line in notes |
 
 **The bar is the calibration's baseline: every case caught, `06` allowed to
 miss.** Measured on sonnet (2026-09-10): 9/9, then 8/9 with `06` not

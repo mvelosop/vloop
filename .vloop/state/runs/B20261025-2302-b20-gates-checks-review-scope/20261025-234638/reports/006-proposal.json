@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "The review skill now has a 'The product' section (everything outside .vloop/; records defects are one line in notes) and a reworded absolute-path question with no path-shaped placeholder; cites P-8. The 08-vloop-records-out-of-scope eval case and its README row are added.",
+  "files": ["plugin/skills/review/SKILL.md", "internal/budget/budget.go", "plugin/evals/README.md", "plugin/evals/08-vloop-records-out-of-scope/prompt.md", "plugin/evals/08-vloop-records-out-of-scope/case.yaml", "plugin/evals/08-vloop-records-out-of-scope/task.json", "plugin/evals/08-vloop-records-out-of-scope/scaffold.sh", "plugin/evals/08-vloop-records-out-of-scope/graders/verdict-is-pass.md", "plugin/evals/08-vloop-records-out-of-scope/graders/no-finding.md", "plugin/evals/08-vloop-records-out-of-scope/graders/notes-line-about-records.md", "plugin/evals/08-vloop-records-out-of-scope/graders/verdict-validates.md"],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: ok; go test ./internal/budget passed.",
+  "notes": "Review skill is 1680 words; ceiling raised 1650 -> 1820 (the 166 words added, plus a little headroom), with date and reason in the budget.go comment. The scaffold composes the records' home path at run time; the eval itself (claude) was not run."
+}
