@@ -158,6 +158,11 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261025-223645-in-the-c5-run-the-rule-that-a-gate-never](I20261025-223645-in-the-c5-run-the-rule-that-a-gate-never.md) |
 | verify | verification-finding | partly | no-options | [I20261025-223646-in-the-c5-run-the-review-applied-no-abso](I20261025-223646-in-the-c5-run-the-review-applied-no-abso.md) |
 | verify | verification-finding | partly | no-options | [I20261025-223647-53-recurred-an-unmasked-temp-dir-in-the](I20261025-223647-53-recurred-an-unmasked-temp-dir-in-the.md) |
+| verify | verification-finding | partly | no-options | [I20261026-012945-the-run-left-the-domain-s-session-and-pl](I20261026-012945-the-run-left-the-domain-s-session-and-pl.md) |
+| verify | verification-finding | partly | no-options | [I20261026-012946-in-j5-s-eval-08-the-review-passed-the-wo](I20261026-012946-in-j5-s-eval-08-the-review-passed-the-wo.md) |
+| verify | verification-finding | partly | no-options | [I20261026-012947-in-j5-s-eval-gate-review-coverage-the-fu](I20261026-012947-in-j5-s-eval-gate-review-coverage-the-fu.md) |
+| verify | verification-finding | partly | no-options | [I20261026-012948-eval-sessions-run-in-don-t-ask-mode-were](I20261026-012948-eval-sessions-run-in-don-t-ask-mode-were.md) |
+| verify | verification-finding | partly | no-options | [I20261026-012949-calibration-04-unchecked-criterion-named](I20261026-012949-calibration-04-unchecked-criterion-named.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

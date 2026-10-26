@@ -39,7 +39,7 @@ and the blocked task's `notes` (`vloop task show <id>`).
 | --- | --- | --- |
 | 0 | complete | verify (step 3) |
 | 1 | preflight or a plan that is not fit | read the message, fix the cause, run again; tell the operator if it is the plan |
-| 2 | blocked: tasks remain, none can run | read the notes; usually a design question → the operator |
+| 2 | blocked: tasks remain, none can run; or a **check-gap halt**: a criterion needs a check no gate may hold; nothing was kept. Add the named check to `.vloop/config.toml`, commit it, re-run (P-8) | read the notes; usually a design question → the operator |
 | 3 | stalled | read the notes; a gate dispute is step 2a, anything else the operator decides |
 | 4 | max iterations | resumable; tell the operator, resume if they agree |
 | 5 | not converging | no resume as is; report what the journal shows |
@@ -54,7 +54,8 @@ A task whose work session diagnosed its gate as one a correct implementation
 cannot pass is blocked with no attempt charged. That is a plan defect, not a
 work failure. You may propose the new gate, with the reason; **you replace it
 only with the operator's approval**, and the replacement must keep the gate's
-intent:
+intent and, per P-8, never add the suite, a check or a task's test to it. A criterion
+that needs a test run is a check you add to `.vloop/config.toml`:
 
 ```
 vloop task verify <id> '<new command>' --reason '<why the old gate was wrong>'

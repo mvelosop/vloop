@@ -1,36 +1,36 @@
-# Plan — B20261025-1307-b19-copilot-review
+# Plan — B20261025-2302-b20-gates-checks-review-scope
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **5/5 done** · iteration 6
+**Status:** complete · **6/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md` · **Updated:** 2026-10-25T15:43:34Z
+**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T01:03:12Z
 
 ## Progress
 
-- [x] **T1** — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot · 1 attempt(s)
-- [x] **T2** — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
-- [x] **T3** — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
-- [x] **T4** — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
-- [x] **T5** — Close the run: every gate at once and the worked example line for line
+- [x] **T1** — State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
+- [x] **T2** — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing · 2 attempt(s)
+- [x] **T3** — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
+- [x] **T4** — Keep vloop's records under .vloop/ out of the review's product constraints
+- [x] **T5** — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
+- [x] **T6** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
-### T1 — Accept copilot for agent.review only, add copilot.credit-usd, and give the run harness a stub copilot
+### T1 — State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
 
-`done` · 1 attempt(s) · depends on: none
+`done` · depends on: none
 
-Opening review sessions to GitHub Copilot CLI starts with configuration: agent.review must accept copilot while every other phase stays claude only, and the credit price that turns Copilot's credits into an estimated dollar cost needs a key. The committed run harness also needs a stub copilot, following the stub claude's pattern, so the adapter (T2), the record (T3) and doctor (T4) can be tested offline. Nothing a session receives changes in this task.
+Every later task cites P-8 and reads gate-verdict/v2, so both must exist first. P-8 makes 'a gate never runs the suite' a domain invariant every session obeys, and v2 is the gate verdict with the two new finding kinds, uncovered and check-gap, that the gate review will use. v1 must stay byte for byte as it is, because verdicts already recorded under .vloop/state/runs/ are validated against it.
 
 **Acceptance**
 
-- `vloop config set agent.review copilot` and `vloop config set model.review gpt-5.6-terra` both exit 0; `vloop config get agent.review` then prints `copilot`, and with `--json` `{"key":"agent.review","value":"copilot","source":"file"}`.
-- `vloop config set agent.work copilot` prints `vloop: invalid value "copilot" for agent.work: want one of claude` on stderr, exits 2 and leaves .vloop/config.toml byte-identical; the same holds for agent.plan, agent.gate-review and agent.verify, and copilot for any of them in the environment or the file is a source error (exit 1) for config get, config list and vloop run, which starts no session.
-- agent.review accepts exactly claude and copilot: another value is refused by config set (exit 2, naming copilot among the valid values) and is a source error from the environment (exit 1); VLOOP_AGENT_REVIEW=copilot reads with source env.
-- A new key copilot.credit-usd: default 0.0066667 (`vloop config get` prints `0.0066667`, source default, and `vloop config list` shows `copilot.credit-usd=0.0066667 (default)`), a number greater than 0 (0, negative and non-numeric values refused by config set with exit 2 and by the environment as a source error naming VLOOP_COPILOT_CREDIT_USD, exit 1), overridden by VLOOP_COPILOT_CREDIT_USD.
-- cmd/vloop/run_harness_test.go gains a stub copilot beside the stub claude, following its pattern: it logs each argument on its own line, its working directory and environment, answers --version, and for `-p "/vloop:review <task>"` plays a per-test script and prints JSON Lines (assistant.turn_start, session.usage_checkpoint with data.totalNanoAiu, a result event with exitCode and usage.sessionDurationMs). The stub claude, argv.log and every existing harness test are unchanged.
-- Violation: copilot accepted for agent.plan, agent.work, agent.gate-review or agent.verify; a new error message or exit code for an invalid agent value instead of the existing one.
-- Committed tests the checks run cover the new values and key: agent.review copilot accepted and agent.&lt;other&gt; copilot refused (set, environment, file), copilot.credit-usd default, environment, file and refusal of non-positive values. A key shipped with no test that exercises it is a violation.
+- docs/domain/domain-model.md has, under "Plans and tasks", P-8 with the brief's wording: A gate judges the brief's contract from outside the work: it never runs the repository's suite, a check, or a test a task writes. The checks run the tests (P-7). Every acceptance criterion is judged by its task's gate, by a check the plan holds, or by the review.
+- schemas/gate-verdict.v2.json exists and is embedded: vloop schema list shows gate-verdict/v2 and still shows gate-verdict/v1
+- gate-verdict/v2 has v1's shape with the finding kinds uncovered and check-gap added and no other change of kinds: a verdict using every v1 kind validates as v2, an unknown kind does not
+- vloop schema validate gate-verdict/v2 on a verdict with uncovered and check-gap exits 0; gate-verdict/v1 on the same verdict exits 1; gate-verdict/v1 on internal/schema/testdata/gate-verdict.valid.json exits 0
+- schemas/gate-verdict.v1.json is unchanged, and every gate-review report committed under .vloop/state/runs/ still validates as gate-verdict/v1
+- The task leaves committed tests the go check runs: valid and invalid v2 testdata under internal/schema/testdata/ exercised by the schema package's tests (a v2 verdict with the new kinds valid, an unknown kind invalid)
 
 <details><summary>verify command</summary>
 
@@ -40,21 +40,21 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Start review sessions on copilot through a Copilot adapter with its own home, the embedded plugin, the guidelines and C2's denials
+### T2 — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
 
-`done` · depends on: T1
+`done` · 2 attempt(s) · depends on: T1
 
-With agent.review = copilot every review session must become a GitHub Copilot CLI session started by a second adapter behind B18's seam, running the plugin embedded in the binary, with a Copilot home of its own under .vloop/tmp/ (never ~/.copilot) and a deny list that stops what a review must never do outward: gh, push and remote changes, network commands, global git config, rm and the git commands the review skill forbids, web fetch, the built-in GitHub MCP server. The deny list is a denylist until B20 fences Copilot, so it must also leave the review able to read the diff and run vloop and the checks. Claude sessions must not change by a byte. Parsing Copilot's output into the record is T3's; this task may leave the record missing.
+Only the operator can add a check to .vloop/config.toml, so sending a check-gap back to the planner spends a round on something it cannot fix. When any round's gate verdict has a check-gap, the driver prints every finding as today and halts with exit 2 before any work, committing nothing and leaving no plan, so the re-run plans afresh with the new check in its checks. A verdict without a check-gap must behave exactly as today.
 
 **Acceptance**
 
-- With agent.review = copilot every review session is started as `copilot` with `-p "/vloop:review <task>"`, `--model <model.review>`, `--effort <effort.review>` only when effort.review is set, `--plugin-dir` the plugin the driver already extracts for claude sessions (the binary's embedded plugin under .vloop/tmp/plugin/&lt;version&gt;), `--no-ask-user`, `--output-format json`, `--allow-all-tools`, the C2 `--deny-tool` patterns and `--disable-builtin-mcps`; the working directory is the repository root. Every other session of the run is a claude session.
-- The copilot session's environment is the one a claude review session gets — the runner's, with VLOOP_ACTIVE_TASK, VLOOP_GATE_TASK and a stale VLOOP_PLAN_SHA256 dropped and the plan hash added — plus COPILOT_HOME set to an empty directory the adapter creates under .vloop/tmp/ for that session (replacing any COPILOT_HOME the runner had) and, when .vloop/repo-guidelines.md exists and is not empty, COPILOT_CUSTOM_INSTRUCTIONS_DIRS naming a directory the adapter prepares under .vloop/tmp/ that holds the guidelines. Variables such as GH_TOKEN pass through so login survives.
-- The deny patterns stop, as Copilot's Kind(argument) patterns with shell(&lt;stem&gt;:*) matching a command stem alone or followed by a space: gh in any form; git push; git remote; git config --global, --system and --file; curl, wget, ssh, scp, nc; rm; git commit, reset, checkout, switch, stash, branch and tag; and the url tool. They do not stop what a review needs: git diff, status, log and show, vloop, printf, cat, jq, go test, ls, grep, and the file tools writing .vloop/tmp/verdict.json.
-- Violation: a copilot session started with --allow-all-paths, --add-dir, --sandbox, --no-sandbox, --allow-all or --yolo; a COPILOT_HOME that is ~/.copilot, outside .vloop/tmp/ or reused across sessions; an installed plugin (`copilot plugin install`) instead of --plugin-dir; any read or write of ~/.copilot.
-- Violation: any change to a claude session's argv, working directory, environment or record — B18's comparison gate (run unchanged inside this task's gate) must pass, and with agent.review = copilot the plan, gate-review, work and verify sessions receive exactly what they receive with every phase on claude.
-- Violation: Copilot specifics (argv, denials, COPILOT_HOME, guidelines directory) built in the driver or the runner instead of the Copilot adapter; the review path (verdict reading, proposal handling, tree revert) learning which agent ran.
-- Committed tests the checks run, using the harness's stub copilot, cover: the argv of a copilot review session (with and without effort), its working directory and environment (COPILOT_HOME under .vloop/tmp/ and empty, the dropped and passed variables), the guidelines directory with and without .vloop/repo-guidelines.md, and the presence of every C2 denial with --allow-all-tools and --disable-builtin-mcps; a behaviour shipped with no such test is a violation. The argv tests of the claude adapter are unchanged.
+- The driver validates the session's .vloop/tmp/gate-verdict.json as gate-verdict/v2
+- When a gate verdict has any check-gap finding, in any round, the run prints every finding of the verdict as it does today (gate &lt;task&gt; (&lt;kind&gt;): &lt;summary&gt;), then ends with exit 2 and the line: vloop: the gate review found &lt;n&gt; check gap(s): the plan needs a check .vloop/config.toml does not have — add it, commit it, then re-run (see &lt;run folder&gt;reports/gate-review-&lt;round&gt;.json), where &lt;n&gt; counts the check-gap findings and &lt;run folder&gt; is repo-relative
+- The check-gap halt sends nothing back to the plan session (no revision round), runs no work session, commits nothing on any branch and leaves no .vloop/state/state.json, gate folders or plan.md behind; the report it names exists
+- A check-gap in round 2 halts with the check-gap line naming gate-review-2.json, not with "the gate review failed the plan twice"
+- A verdict with no check-gap behaves exactly as today: uncovered and every other kind are sent back to the planner, and a second FAIL blocks the plan with "the gate review failed the plan twice"
+- A re-run after the halt plans afresh (a new plan session, not "resuming acceptance")
+- The task leaves committed tests the go check runs, covering the check-gap halt (round 1 and round 2, alone and beside another finding) and an uncovered finding being sent back
 
 <details><summary>verify command</summary>
 
@@ -64,23 +64,23 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Map Copilot's JSON Lines onto session/v3 with credits and an estimated cost, and add credits to metrics/v3
+### T3 — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
 
-`done` · depends on: T2
+`done` · depends on: T1
 
-Copilot reports credits, not dollars, and prints JSON Lines, not one document, so the Copilot adapter must decide whether there is a record and map the events onto session/v3, with cost_usd estimated from copilot.credit-usd so the run's cost ceiling, per-task costs and metrics still count review spend. session/v3 and metrics/v3 are unreleased, so they gain credits in place. Claude records must stay exactly as they are.
+In B19's acceptance run a criterion asked for the suites in a fresh copy, which no gate may run and no check covered, and nobody noticed before work began. The gate review must now rule, for every acceptance criterion, whether the gate, a named check the plan holds, or the review judges it, with two new finding kinds; and the plan skill must ask the planner the same question before it finishes. P-8 is cited, not restated, and the gate-review-coverage eval case is the behaviour's proof, since gates never run claude.
 
 **Acceptance**
 
-- A copilot review session has a record exactly when its stdout holds a result event; otherwise the runner logs `SESSION RECORD MISSING review <task> (iteration <n>)` as for claude and writes no record.
-- The record is session/v3 with agent "copilot", the session's model, duration_ms from result.usage.sessionDurationMs, turns the number of assistant.turn_start events, is_error true exactly when result.exitCode is not 0, credits the last session.usage_checkpoint's data.totalNanoAiu / 1e9, cost_usd credits × copilot.credit-usd (from the default, the file or VLOOP_COPILOT_CREDIT_USD), cost_source "estimated" — or "none" with credits and cost_usd 0 when no checkpoint was printed —, models_used one entry for the session's model with zero tokens and the estimated cost, and permission_denials [].
-- Nothing from result.usage.codeChanges reaches a record, and no absolute path does.
-- session/v3 gains an optional numeric credits and cost_source "estimated"; claude records are unchanged (no credits, reported or none) and the schema still rejects a claude record with cost_source "estimated"; a base-written session/v3 record still validates.
-- `vloop metrics --json` and the committed snapshot (metrics/v3, amended in place) carry credits: the run's total and per phase like cost, 0 where none; agents.review is ["copilot"] for a run with copilot reviews; cost totals, per-phase and per-task costs use cost_usd, estimated or reported, unchanged in logic; the metrics text marks an estimated total with ≈ (`cost ≈$6.91` in the brief), and a run with no estimated cost shows no ≈.
-- The run's cost ceiling counts a copilot review's estimated cost exactly as it counts a claude session's reported cost.
-- Violation: Copilot's JSON Lines parsed in the driver instead of the Copilot adapter; credits or an estimated cost on a claude record; codeChanges or an absolute path in a record; a new schema version instead of amending session/v3 and metrics/v3.
-- docs/domain/execution/session.md's record section documents credits, the estimated cost source and agent copilot.
-- Committed tests the checks run cover the parse (result present and absent, no checkpoint, several checkpoints with the last counting, exitCode not 0, codeChanges dropped), the estimated cost at a configured price, the schemas accepting and refusing as above, and credits and ≈ in metrics; a behaviour shipped with no such test is a violation.
+- plugin/skills/gate-review/SKILL.md reads the plan's checks and, for every task, rules on every acceptance criterion: judged by the gate, by a named check, or by the review (from the diff, or from a check's log)
+- The gate-review skill names the finding kinds uncovered (no gate, check or review could judge the criterion as written) and check-gap (only a check could judge it, and no check the plan holds runs what it names), and its verdict section writes and validates gate-verdict/v2
+- The gate-review skill's unpassable also covers a criterion no work session can meet: one requiring a change under .vloop/ outside .vloop/tmp/ (S-4) or ruling on files only the driver or the planner writes; and it names a gate that runs the suite, a check or a task's test as task-reach, citing P-8
+- plugin/skills/plan/SKILL.md's own statement that a gate never runs the suite becomes a citation of P-8, not a second copy; its "Before you finish" gains: every acceptance criterion is one the gate, a check the plan holds, or the review can judge, and a criterion only a check can judge names that check
+- Neither skill restates P-8's text or cites it by another id
+- plugin/evals/gate-review-coverage/ follows the eval layout (prompt.md invoking /vloop:gate-review, case.yaml, graders/*.md, scaffold.sh); its plan's gates are all sound by the existing three checks, and its tasks carry a criterion only a check could judge, naming a script no check runs (graded check-gap), a criterion nothing could judge (graded uncovered), a criterion requiring a change to .vloop/state/plan.md (graded unpassable), and one task whose every criterion is covered (graded PASS, no finding)
+- The case's scaffold exits non-zero if any planted gate fails the existing checks — at least, if a planted gate passes on the base or fails it other than at a behavioural assertion — so the case measures coverage alone; a scaffold that does not refuse such a gate violates the brief
+- plugin/evals/README.md lists gate-review-coverage in its tables
+- Word ceilings in internal/budget/budget.go rise, if at all, only by what this task adds, each with its date and reason in the comment; the go check's budget test passes
 
 <details><summary>verify command</summary>
 
@@ -90,21 +90,23 @@ sh .vloop/state/gates/T3/gate.sh
 
 </details>
 
-### T4 — Check copilot in doctor and the run preflight, say it is experimental, refuse the default review model, warn of skill collisions, and document it
+### T4 — Keep vloop's records under .vloop/ out of the review's product constraints
 
-`done` · depends on: T2
+`done` · depends on: T1
 
-A Copilot review session is not fenced until B20, so the operator must be told so wherever the choice is made, and the run must not start with a review model that cannot work: model.review defaults to the Claude alias sonnet, which is not a Copilot model id. Copilot also loads a repository's .claude/skills/, where a skill named like the plugin's review can be picked instead of /vloop:review, so doctor names that risk. The configuration guide documents the new value, key and status.
+In B19's acceptance run the review ruled "no absolute paths in any committed file" against vloop's own records, which a work session cannot change, and blocked a task no session could fix. The review skill must judge criteria about files on the product, everything outside .vloop/, and report a defect found only in vloop's records as one line in notes. The 08-vloop-records-out-of-scope eval case proves the behaviour, since gates never run claude.
 
 **Acceptance**
 
-- When agent.review is copilot, `vloop doctor` and the run preflight check that copilot is on PATH and that `copilot --version` runs, as they do for claude: a missing or broken copilot is a problem (doctor exits 1; vloop run exits 1, says why and starts no session).
-- When agent.review is copilot, `vloop doctor` prints `! agent.review is copilot: experimental — review sessions are not fenced until B20 (docs/guide/configuration.md)` and the run preflight prints the same `! …` line; it is a warning, not a problem: doctor exits 0 and the run goes on.
-- When agent.review is copilot and model.review comes from the default, `vloop run` prints `vloop: agent.review is copilot but model.review is the default "sonnet", a Claude alias: set model.review to a Copilot model id`, exits 1 and starts no session; a model.review set in the file or the environment is not refused.
-- When agent.review is copilot, `vloop doctor` warns once for each directory in .claude/skills/ whose name ends in `review`, as `! .claude/skills/<name> may be loaded instead of /vloop:review by a copilot session` (exit 0); a skill whose name does not end in review gets no warning.
-- With every agent claude, doctor and the run need no copilot on PATH, print nothing about copilot (no skill-collision warning either) and behave exactly as before.
-- docs/guide/configuration.md lists `copilot` among agent.review's valid values (and only claude for the other agent keys), has a row for copilot.credit-usd with default `0.0066667` and variable `VLOOP_COPILOT_CREDIT_USD`, and says that copilot review sessions are experimental until B20 and what C2's deny list stops (gh, push and remote changes, network commands, global git config, rm and forbidden git commands, web fetch, built-in MCP servers) and does not (anything not named, and other forms of the named commands).
-- Committed tests the checks run cover the copilot preflight (found, missing, --version failing), the experimental warning in doctor and the run, the default-model refusal (and its absence for a set model), the skill-collision warning, and their absence with every agent claude; a behaviour shipped with no such test is a violation.
+- plugin/skills/review/SKILL.md says the product is every file outside .vloop/; vloop's records under .vloop/ (state, plan, notes, journals, run reports, gate folders) are written by the driver and the planner and a work session cannot change them (S-4); a criterion, constraint or question about "any file" or "every committed file" is judged on the product
+- The review skill says an absolute path, or any other defect, found only in vloop's records is a vloop defect: one line in notes, never a finding and never a reason for met: false
+- The review skill says a gate that leaves the suite to the checks keeps P-8 and is not a gate-gap; a criterion a check judges is judged from that check's log; a criterion nothing could judge is a spec-gap with a line in notes naming the gap in the plan
+- The absolute-path question asks about the files the task changed and the output it produced, and does not let a task's own files out of it — only vloop's records; the skill holds no path-shaped placeholder (no home directory, ~/ or drive path), only a description
+- The review skill cites P-8 by id and does not restate it
+- plugin/evals/08-vloop-records-out-of-scope/ follows the eval layout (prompt.md invoking /vloop:review, case.yaml, graders/*.md, scaffold.sh): correct work that passes its gate, .vloop/state/plan.md and a run report holding an absolute home-directory path and the placeholder text of an earlier finding, a gate that leaves the suite to a check that ran and passed (recorded in .vloop/tmp/checks.json with its log), and criteria including "no absolute paths in any committed file"; its graders expect PASS, no finding, and a notes line about the records
+- The case's committed files hold no literal absolute home path: the scaffold composes the records' path when it runs; and its scaffold exits non-zero if the work fails its own gate
+- plugin/evals/README.md's reviewer-calibration table lists 08-vloop-records-out-of-scope
+- The review skill's word ceiling rises, if at all, only by what this task adds, with its date and reason in the comment; the go check's budget test passes
 
 <details><summary>verify command</summary>
 
@@ -114,23 +116,44 @@ sh .vloop/state/gates/T4/gate.sh
 
 </details>
 
-### T5 — Close the run: every gate at once and the worked example line for line
+### T5 — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
 
-`done` · depends on: T1, T2, T3, T4
+`done` · depends on: T2
 
-Each earlier gate ran while its task was the newest; this task checks the finished tree against all of them together, including B18's comparison gate, and against the brief's worked example, and reconciles whatever drifted between tasks — a doc that still says claude is the only agent or that a record has no credits, a config row out of step. It adds no behaviour of its own; C5, the proof on the real Copilot CLI, is the operator's at close.
+The operator's repair of a gate is where B19's suite crept into a gate, and the check-gap halt is new behaviour the operator has to act on: add the missing check to .vloop/config.toml, commit it, re-run. Both the plugin's operate skill and this repository's own playbook must cite P-8 where they speak of a gate repair, and their halt tables and the concepts guide must say what the new exit-2 halt means and what to do.
 
 **Acceptance**
 
-- The gates of T1, T2 (with B18's comparison gate inside it), T3 and T4 all pass on the finished tree, run together.
-- Every line of the brief's worked example holds against the changed binary: the config lines with their output and exit codes, the default-model refusal, doctor's experimental warning, a one-task run whose review is a copilot session with every C2 denial and --disable-builtin-mcps, COPILOT_HOME under .vloop/tmp/ and the repository root as working directory, its record (agent copilot, credits 14.2, cost_usd 14.2 × the default price, cost_source estimated, turns 3, duration_ms 18000, permission_denials []) while plan, work and verify run on claude, SESSION RECORD MISSING for a stub that prints no result event, and metrics with credits total 14.2 and agents review ["copilot"].
-- No page under docs/domain/ or docs/guide/ still says claude is the only agent a review may run on, or that a session record never carries credits, except where it describes older records.
-- The task adds no behaviour: any code change it makes fixes a divergence from the brief's contract that an earlier task left, its work notes name it, and it ships with the committed test that would have caught it.
+- plugin/skills/operate/SKILL.md and .claude/skills/vloop-operator/SKILL.md both say: a gate repair keeps the gate's intent and never adds the suite, a check or a task's test to it (P-8); a criterion that needs a test run is a check the operator adds to .vloop/config.toml
+- Both halt tables' rows for exit 2 cover the check-gap halt: what it is and that the operator adds the named check to .vloop/config.toml, commits it and re-runs
+- Both cite P-8 by id where they speak of a gate's scope and neither restates it
+- docs/guide/concepts.md's "The gate review" says what a check-gap halt is and what the operator does, and its exit-code row for 2 covers it
+- The operate skill's word ceiling rises, if at all, only by what this task adds, with its date and reason in the comment; the go check's budget test passes
 
 <details><summary>verify command</summary>
 
 ```sh
 sh .vloop/state/gates/T5/gate.sh
+```
+
+</details>
+
+### T6 — Close the run: every gate at once and the worked example line for line
+
+`done` · depends on: T1, T2, T3, T4, T5
+
+The tasks were judged one at a time; this proves them together on the finished tree, with the brief's worked example (the schema lines and the run lines, every planted failure included). After it the operator runs the two new eval cases and the existing gate-review and review calibrations, and records the results in the run record before merging.
+
+**Acceptance**
+
+- Every gate of T1 to T5 passes on the finished tree, run together
+- Any fix this task needs is made in the product, not in a gate, and every check passes
+- No gate of this plan runs the suite, a check or a test a task writes (P-8)
+
+<details><summary>verify command</summary>
+
+```sh
+sh .vloop/state/gates/T6/gate.sh
 ```
 
 </details>

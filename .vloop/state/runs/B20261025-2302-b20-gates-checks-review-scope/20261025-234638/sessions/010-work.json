@@ -1,0 +1,35 @@
+{
+  "cost_usd": 0.4677086000000001,
+  "duration_ms": 113966,
+  "effort": null,
+  "ended": "2026-10-26T00:39:24Z",
+  "is_error": false,
+  "iteration": 5,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 58535,
+      "cache_read_input_tokens": 963766,
+      "cost_usd": 0.4677086000000001,
+      "input_tokens": 36,
+      "output_tokens": 13712
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "python3 - \u003c\u003c'EOF'\np='plugin/evals/gate-review-coverage/scaffold.sh'\ns=open(p).read()\ns=s.replace(\"\"\"err=$(cat \"$d/err\"); rm -rf \"$d\"; '\"\"\",\"\"\"err=$(cat \"$d/err\"); o=$(cat \"$d/out\"); rm -rf \"$d\"; '\"\"\")…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "rm -rf /tmp/covt \u0026\u0026 python3 - \u003c\u003c'EOF'\np='plugin/evals/README.md'\ns=open(p).read()\na=\"| `work-disputes-impossible-gate`\"\nrow=\"| `gate-review-coverage` | `/vloop:gate-review` | four tasks whose gates ar…",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261025-2302-b20-gates-checks-review-scope",
+  "schema": "session/v1",
+  "started": "2026-10-26T00:37:29Z",
+  "task": "T3",
+  "turns": 20,
+  "wall_ms": 114843
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {
+      "task": "T2",
+      "verdict": "FAIL",
+      "findings": [
+        {"summary": "the criterion 'the operator is pleased' names an outcome no command produces and the diff cannot show", "kind": "uncovered"},
+        {"summary": "pnpm smoke in a fresh copy: no check runs pnpm smoke", "kind": "check-gap"}
+      ]
+    }
+  ],
+  "notes": "T2 needs a check the plan does not hold, and one criterion nobody can judge."
+}

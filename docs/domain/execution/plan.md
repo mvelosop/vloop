@@ -58,7 +58,9 @@ The plan session writes the plan and the gate folders `.vloop/state/gates/<id>/`
 gates, every gate run on the base (one that passes, or changes the tree, goes
 back to the planner), then the **gate review**. Acceptance problems and review
 findings share two rounds; a plan the gate review failed twice is saved blocked
-and the run ends with exit 2. Every check must pass on the base before
+and the run ends with exit 2. A `check-gap` finding, in any round, ends the run
+at once with exit 2: nothing is sent back, committed or kept, and the operator
+adds the missing check and re-runs (P-8). Every check must pass on the base before
 planning, and there must be at least one.
 
 The plan stays `planning` until acceptance passes. If the run halts during

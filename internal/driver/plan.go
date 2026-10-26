@@ -681,10 +681,11 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeou
 			return nil, nil, err
 		}
 		reviewed := false
+		gaps := 0
 		if len(problems) == 0 {
 			// The review runs vloop task gate, on the plan stamped and saved above.
 			t.say("planned: %s — %d tasks", runID, len(plan.Tasks))
-			if problems, err = p.gateReviewRound(t, round); err != nil {
+			if problems, gaps, err = p.gateReviewRound(t, round); err != nil {
 				return nil, nil, err
 			}
 			reviewed = true
@@ -703,6 +704,16 @@ func (p *Planner) acceptPlan(t term, runID, briefPath, branch string, gateTimeou
 		}
 		for _, l := range problems {
 			t.warn("  %s", l)
+		}
+		if gaps > 0 {
+			// Only the operator can add a check: nothing goes back to the planner
+			// and nothing is kept, so the re-run plans afresh.
+			_ = os.Remove(state.Path(root))
+			_ = os.RemoveAll(filepath.Join(root, filepath.FromSlash(state.GatesDir)))
+			_ = os.Remove(filepath.Join(root, filepath.FromSlash(planMarkdown)))
+			line := checkGapLine(root, t.r.RunDir, round, gaps)
+			t.r.Logf("%s", t.r.Mask(line))
+			return nil, nil, halt(ExitBlocked, "%s", line)
 		}
 		if round >= planRounds {
 			if reviewed {

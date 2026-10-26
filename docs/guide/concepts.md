@@ -131,7 +131,10 @@ A gate that passes there proves nothing, and one that changes the tree is
 refused; both go back to the plan session. Then a separate gate-review session
 (`/vloop:gate-review`) judges the gates and answers `PASS` or `FAIL`. A `FAIL`
 sends its findings back to the plan session; after two rounds a plan still
-failing is saved blocked and the run ends with exit 2. Amend the gates, then
+failing is saved blocked and the run ends with exit 2. A finding of kind
+`check-gap` (a criterion that only a check could judge, which no gate may hold)
+halts the run at once with exit 2 and keeps nothing: add the named check to
+`.vloop/config.toml`, commit it, and run again. Amend the gates, then
 `vloop run` again to resume.
 
 The plan is stamped on load and stays `planning` until acceptance passes. If a
@@ -196,7 +199,7 @@ adds its own, one per way a run can end:
 | --- | --- | --- |
 | `0` | complete: every task is done | — |
 | `1` | problems or failure, including a failed plan session or a mid-run error | after fixing the cause |
-| `2` | usage; for `vloop run` also blocked: tasks remain but none can run (R-3) | no — a human decides |
+| `2` | usage; for `vloop run` also blocked: tasks remain but none can run (R-3); or a check-gap halt: add the named check to `.vloop/config.toml`, commit, re-run | no — a human decides |
 | `3` | stalled: iterations in a row closed nothing and charged no attempt | yes, once understood |
 | `4` | max iterations: `run.max-iterations` is spent | yes |
 | `5` | not converging: too many iterations per closed task | no |

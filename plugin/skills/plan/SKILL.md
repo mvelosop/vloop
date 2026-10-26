@@ -45,11 +45,9 @@ A gate's judge lives in one of two places, and nowhere else:
 
 **A gate never judges by anything a task writes** — not its tests, its seed
 data, its fixtures, its output files that the gate then reads as truth. A judge
-that a task can reach is a judge the task can bend. And **a gate never runs the
-repository's suite**: the repository's own tests and health checks are the
-*checks*, which run after every iteration (see *The checks*, below). A gate that
-runs the suite duplicates them, slowly, and judges the work by the work's own
-tests.
+that a task can reach is a judge the task can bend. What a gate may and may not
+run is P-8; the repository's own tests and health checks are the *checks*, which
+run after every iteration (see *The checks*, below).
 
 ### Oracle tests: copy, run, leave nothing
 
@@ -432,6 +430,8 @@ Check your own output, and fix what fails rather than reporting it:
    task only when `vloop config get areas` printed a value.
 4. Every task that ships behaviour has an acceptance criterion that names the
    test it must leave behind, for the checks to run.
+   Every acceptance criterion is one the gate, a check the plan holds, or the
+   review can judge, and a criterion only a check can judge names that check.
 5. No `verify` runs the repository's suite or reads anything a task writes; a
    gate that carries an oracle copies it from `.vloop/state/gates/<task id>/`
    into a gate scratch folder, and every gate folder belongs to a task in the

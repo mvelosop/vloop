@@ -30,7 +30,9 @@ the brief or a domain invariant.
 Read, in this order:
 
 1. The plan: `vloop task list` and, for each task, `vloop task show <id> --json`
-   — its `goal`, `acceptance`, `verify` and `references`.
+   — its `goal`, `acceptance`, `verify` and `references`. The plan's `checks`
+   (in `.vloop/state/state.json`, copied from the config) are what a criterion
+   may be judged by besides the gate and the review.
 2. The brief named in the plan's `brief` field, in full. A gate is judged
    against the brief's contract, not against the planner's reading of it.
 3. Each task's gate folder, `.vloop/state/gates/<task id>/`, when it has one —
@@ -67,6 +69,22 @@ it past its timeout.
 
 Then read the gate for what a run cannot show.
 
+## 2b. Rule on every criterion
+
+For every task and every acceptance criterion, say who judges it: the **gate**
+(its `verify` exercises it), a **named check** the plan holds (its `run` runs
+what the criterion names), or the **review** (from the diff, or from a check's
+log). A criterion none of them could judge as written is a finding:
+
+- `uncovered` — it names an outcome no command in the plan produces and the
+  diff cannot show.
+- `check-gap` — only a check could judge it (a script, a suite, a clean
+  install), and no check the plan holds runs what it names. The planner cannot
+  add a check, so say which check is missing.
+- `unpassable` — no work session can meet it: it requires a change under
+  `.vloop/` outside `.vloop/tmp/` (S-4), or rules on files only the driver or
+  the planner writes.
+
 ## 3. Name the findings
 
 Each problem is one finding with a one-line `summary` and a `kind`:
@@ -81,14 +99,19 @@ Each problem is one finding with a one-line `summary` and a `kind`:
   should assert through roles and visible text.
 - `task-reach` — its judge is, or reads, something a task writes: the task's own
   tests, seed data or output, so the task can pass it by writing the judge. A
-  gate that runs the repository's suite is this kind too.
+  gate that runs the repository's suite, a check or a task's test is this kind
+  too (P-8).
 - `unpassable` — no correct implementation could pass it: it contradicts its
   task's acceptance, asserts a clean tree the task must dirty, diffs against a
   baseline fixed at plan time, reads a file the task is meant to change as it
   was before, or needs a session to write under `.vloop/` outside `.vloop/tmp/`
-  (S-4; the plan session's own gate folders aside).
+  (S-4; the plan session's own gate folders aside). So does an acceptance
+  criterion no session can meet, as in section 2b.
 - `pins-unnamed` — it pins a name (a function, file, flag, output label) the
   brief does not, so a correct implementation that chose another name fails.
+- `uncovered` — a criterion nothing could judge (section 2b).
+- `check-gap` — a criterion only a check could judge, which no check the plan
+  holds runs (section 2b).
 
 A gate that passes on the base is a failure of check 1, and the driver has
 already sent such a plan back; if one reaches you, report it as `wrong-reason`.
@@ -100,11 +123,11 @@ planner: name the gate clause and the evidence.
 
 ## 4. Verdict
 
-Write `.vloop/tmp/gate-verdict.json` as `gate-verdict/v1`:
+Write `.vloop/tmp/gate-verdict.json` as `gate-verdict/v2`:
 
 ```json
 {
-  "schema": "gate-verdict/v1",
+  "schema": "gate-verdict/v2",
   "verdict": "FAIL",
   "tasks": [
     {"task": "T1", "verdict": "PASS", "findings": []},
@@ -121,7 +144,7 @@ Write `.vloop/tmp/gate-verdict.json` as `gate-verdict/v1`:
 }
 ```
 
-Then check it: `vloop schema validate gate-verdict/v1 .vloop/tmp/gate-verdict.json`
+Then check it: `vloop schema validate gate-verdict/v2 .vloop/tmp/gate-verdict.json`
 must pass. A file that fails the schema counts as absent, and an absent verdict
 is a `FAIL`.
 

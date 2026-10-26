@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/skills/operate/SKILL.md and .claude/skills/vloop-operator/SKILL.md both say: a gate repair keeps the gate's intent and never adds the suite, a check or a task's test to it (P-8); a criterion that needs a test run is a check the operator adds to .vloop/config.toml", "met": true, "evidence": "operate SKILL.md step 2a and vloop-operator SKILL.md exit-3 row both say the repair keeps intent, never adds the suite, a check or a task's test (P-8), and that a criterion needing a test run is a check added to .vloop/config.toml"},
+    {"criterion": "Both halt tables' rows for exit 2 cover the check-gap halt: what it is and that the operator adds the named check to .vloop/config.toml, commits it and re-runs", "met": true, "evidence": "exit-2 rows in both halt tables now describe the check-gap halt, that nothing was kept, and add the named check to .vloop/config.toml, commit, re-run"},
+    {"criterion": "Both cite P-8 by id where they speak of a gate's scope and neither restates it", "met": true, "evidence": "both cite P-8 by id; the wording is a short paraphrase, not P-8's text (domain-model.md:203), and the gate's restatement check passed"},
+    {"criterion": "docs/guide/concepts.md's \"The gate review\" says what a check-gap halt is and what the operator does, and its exit-code row for 2 covers it", "met": true, "evidence": "concepts.md gate-review paragraph adds the check-gap finding kind, halt at once with exit 2, add the check to .vloop/config.toml, commit, re-run; the exit-2 table row says the same"},
+    {"criterion": "The operate skill's word ceiling rises, if at all, only by what this task adds, with its date and reason in the comment; the go check's budget test passes", "met": true, "evidence": "internal/budget/budget.go is unchanged; operate is 1706 words against the ceiling of 1750; the go check log shows ok for internal/budget"}
+  ],
+  "findings": [],
+  "notes": "Docs-only task; the gate script and the go check cover it. none"
+}

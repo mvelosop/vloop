@@ -1,0 +1,5 @@
+{"schema":"proposal/v1","task":"T2","outcome":"done",
+"summary":"The driver validates the gate verdict as gate-verdict/v2 and halts with exit 2 on any check-gap finding (every finding printed, nothing sent back, no work, no commit, no plan left); uncovered and other kinds are sent back as before.",
+"files":["internal/driver/gatereview.go","internal/driver/plan.go","internal/driver/gatereview_test.go","cmd/vloop/run_gatereview_test.go","cmd/vloop/run_harness_test.go"],
+"verified":"vloop task gate T2 exited 0 and printed gate T2: ok; go test ./cmd/... ./internal/driver/... passed.",
+"notes":"The previous attempt failed the go check because cmd/vloop tests (run_gatereview_test.go, run_harness_test.go) wrote gate-verdict/v1 stubs; changed to gate-verdict/v2 since the brief's contract makes the driver read v2 only. gateReviewRound returns (problems, check-gap count, err); acceptPlan checks gaps before the planRounds test. cmd/vloop tests take ~200s."}

@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The driver validates the session's .vloop/tmp/gate-verdict.json as gate-verdict/v2", "met": true, "evidence": "internal/driver/gatereview.go:78 validates against gate-verdict/v2; the stub verdicts were moved to v2 in cmd/vloop"},
+    {"criterion": "When a gate verdict has any check-gap finding, in any round, the run prints every finding of the verdict as it does today (gate <task> (<kind>): <summary>), then ends with exit 2 and the line: vloop: the gate review found <n> check gap(s): the plan needs a check .vloop/config.toml does not have — add it, commit it, then re-run (see <run folder>reports/gate-review-<round>.json), where <n> counts the check-gap findings and <run folder> is repo-relative", "met": true, "evidence": "gatereview.go:89 counts gaps and builds every finding line; plan.go warns all problems, then halts ExitBlocked with checkGapLine (gatereview.go:115); wantGapHalt asserts the exact line and exit 2"},
+    {"criterion": "The check-gap halt sends nothing back to the plan session (no revision round), runs no work session, commits nothing on any branch and leaves no .vloop/state/state.json, gate folders or plan.md behind; the report it names exists", "met": true, "evidence": "plan.go removes state.json, the gates dir and plan.md before the halt, with no revise call; wantGapHalt asserts no state.json, plan.md or gates, no work session, no plan commits and that the report exists"},
+    {"criterion": "A check-gap in round 2 halts with the check-gap line naming gate-review-2.json, not with \"the gate review failed the plan twice\"", "met": true, "evidence": "the gaps>0 branch in plan.go comes before the round >= planRounds branch; the 'round 2 after a sent-back finding' case asserts gate-review-2.json and the absence of the twice text"},
+    {"criterion": "A verdict with no check-gap behaves exactly as today: uncovered and every other kind are sent back to the planner, and a second FAIL blocks the plan with \"the gate review failed the plan twice\"", "met": true, "evidence": "the old paths are untouched in plan.go; TestRunGateReviewUncoveredIsSentBack asserts 'sending 1 problem(s)'; the existing twice-failed test still passes"},
+    {"criterion": "A re-run after the halt plans afresh (a new plan session, not \"resuming acceptance\")", "met": true, "evidence": "TestRunGateReviewCheckGapHalts re-runs after each halt, expects exit 0 and exactly one more plan session"},
+    {"criterion": "The task leaves committed tests the go check runs, covering the check-gap halt (round 1 and round 2, alone and beside another finding) and an uncovered finding being sent back", "met": true, "evidence": "cmd/vloop/run_gatereview_test.go adds TestRunGateReviewCheckGapHalts (round 1 alone, round 1 beside another finding, round 2) and TestRunGateReviewUncoveredIsSentBack; the go check exited 0"}
+  ],
+  "findings": [],
+  "notes": "Earlier stubs and tests moved from gate-verdict/v1 to v2, which the contract licenses because the driver now reads v2 only. The round 2 case covers a check-gap after a sent-back finding; a check-gap beside another finding in round 2 shares the same code path."
+}

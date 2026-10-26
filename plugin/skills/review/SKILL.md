@@ -61,6 +61,22 @@ tell you where to look. A partial catch through a channel that doesn't block is
 indistinguishable, from the outside, from no catch at all — and the easiest way
 to produce one is to review the summary instead of the work.
 
+## The product
+
+The product is every file outside `.vloop/`. vloop's records under `.vloop/`
+(state, plan, notes, journals, run reports, gate folders) are written by the
+driver and the planner, and a work session cannot change them (S-4). A
+criterion, constraint or question about "any file" or "every committed file" is
+judged on the product, never on the records.
+
+A defect found only in vloop's records, such as an absolute path, is a vloop
+defect: one line in `notes`, never a `finding` and never a reason for
+`met: false`.
+
+A gate that leaves the suite to the checks keeps P-8 and is not a `gate-gap`. A
+criterion a check judges is judged from that check's log. A criterion nothing
+could judge is a `spec-gap`, with a line in `notes` naming the gap in the plan.
+
 ## 2. Rule on each acceptance criterion
 
 Go through them one at a time. For each, decide **met** or **not met**, and be
@@ -93,8 +109,10 @@ Then ask the questions the criteria do not:
   in the verdict.
 - **Did it break something earlier?** The gate catches this mechanically, but
   look at whether the change was the *right* fix or a way to quiet a failure.
-- **Are there absolute paths anywhere?** `/Users/...` in any file, log, or
-  message is a finding.
+- **Are there absolute paths in the files the task changed or the output it
+  produced?** An absolute home-directory path there is a finding, whoever the
+  user is. The task's own files are not let out of this question; only vloop's
+  records are (see "The product" above).
 
 ## 3. Verdict
 

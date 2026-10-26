@@ -1,0 +1,9 @@
+{"schema":"gate-verdict/v1","verdict":"PASS","tasks":[
+{"task":"T1","verdict":"PASS","findings":[]},
+{"task":"T2","verdict":"PASS","findings":[]},
+{"task":"T3","verdict":"PASS","findings":[]},
+{"task":"T4","verdict":"PASS","findings":[]},
+{"task":"T5","verdict":"PASS","findings":[]},
+{"task":"T6","verdict":"PASS","findings":[]}],
+"notes":"Every gate fails on the base at its assertion (T2 via the missing v2/check-gap behaviour in its fixture run). Matchers were checked against the real domain-model heading, halt-table rows, concepts.md paragraph and checks.json format. No gate runs the suite."}
+

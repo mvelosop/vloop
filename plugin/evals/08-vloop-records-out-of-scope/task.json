@@ -1,0 +1,13 @@
+{
+  "id": "T1",
+  "title": "Expose the package version as runstat.version.VERSION",
+  "goal": "Tools that report which runstat produced a file need the version in one importable place instead of reading pyproject.toml at run time.",
+  "files": ["src/runstat/version.py", "tests/test_version.py"],
+  "depends_on": [],
+  "acceptance": [
+    "src/runstat/version.py defines VERSION as the string \"0.1.0\"",
+    "tests/test_version.py asserts that runstat.version.VERSION equals \"0.1.0\"",
+    "no absolute paths in any committed file"
+  ],
+  "verify": "grep -q 'VERSION = \"0.1.0\"' src/runstat/version.py && python3 -c \"import sys; sys.path.insert(0, 'src'); from runstat.version import VERSION; assert VERSION == '0.1.0'\""
+}

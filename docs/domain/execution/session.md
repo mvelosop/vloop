@@ -37,10 +37,11 @@ wrong.
 with evidence), `findings` (`{summary, kind}`, kind `bug`, `spec-gap` or
 `gate-gap`), `notes`. Each finding of a `FAIL` becomes a derived defect (M-4).
 
-## Gate verdict — `gate-verdict/v1`
+## Gate verdict — `gate-verdict/v2`
 
-`verdict` (`PASS` or `FAIL`) and `findings`, each naming a task and one of five
-kinds. The gate-review session judges the plan's gates, not a task; it has no
+`verdict` (`PASS` or `FAIL`) and `findings`, each naming a task and one of seven
+kinds (v1's five, plus `uncovered` and `check-gap`; `gate-verdict/v1` stays for
+verdicts recorded before B20). The gate-review session judges the plan's gates, not a task; it has no
 per-task model override. The driver keeps the verdict as
 `reports/gate-review-<round>.json`; a missing or invalid one is a `FAIL`.
 

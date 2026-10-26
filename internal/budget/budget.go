@@ -21,7 +21,7 @@ var Ceilings = map[string]int{
 	"plan":        4100, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
 	"gate-review": 1550, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
 	"work":        1800, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
-	"review":      1650, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
+	"review":      1820, // 2026-10-26, B20 (J4): 1650 (2026-10-12, B14, L10) plus the 166 words of "The product" section and the reworded path question
 	"operate":     1750, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
 	"verify":      1500, // 2026-10-15, B16 (V2, L10): the ceiling set with the skill
 }

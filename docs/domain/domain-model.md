@@ -200,6 +200,10 @@ marked.
 - **P-7** A plan's checks are the repository's tests and health checks, named
   and scoped by path; they pass on the base, run after every iteration whose
   changes they match, and all run once when the last task is done.
+- **P-8** A gate judges the brief's contract from outside the work: it never
+  runs the repository's suite, a check, or a test a task writes. The checks run
+  the tests (P-7). Every acceptance criterion is judged by its task's gate, by a
+  check the plan holds, or by the review.
 
 ### Sessions — S
 

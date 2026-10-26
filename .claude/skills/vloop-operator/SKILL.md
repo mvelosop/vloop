@@ -73,8 +73,8 @@ branch.
 | --- | --- | --- |
 | 0 | complete | verify (step 4) |
 | 1 | preflight: refused before anything ran | fix the cause it names, re-run |
-| 2 | blocked | read the notes; usually a design question → the operator |
-| 3 | stalled | read the notes. A **gate defect** the work session diagnosed, whose fix keeps the gate's intent, you may fix: `vloop task verify <id> '<cmd>' --reason '…'`, then `vloop task reset <id>`, `vloop task gate <id>` once by hand, resume. Record it later as a `plan`/`gate` defect |
+| 2 | blocked; or a **check-gap halt**: a criterion needs a check no gate may hold; nothing was kept. Add the named check to `.vloop/config.toml`, commit it, re-run (P-8) | read the notes; usually a design question → the operator |
+| 3 | stalled | read the notes. A **gate defect** the work session diagnosed, whose fix keeps the gate's intent and never adds the suite, a check or a task's test to it (P-8; a criterion that needs a test run is a check you add to `.vloop/config.toml`), you may fix: `vloop task verify <id> '<cmd>' --reason '…'`, then `vloop task reset <id>`, `vloop task gate <id>` once by hand, resume. Record it later as a `plan`/`gate` defect |
 | 4, 6 | budget | resumable; tell the operator |
 | 5, 7, 8 | needs a human | report, don't retry blindly |
 | 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog`, `git show-ref` against what the log lists; restore refs (nothing was committed); tell the operator. If the only change is an editor's key in `.git/config` (`vscode-merge-base`), it is the guard defect, not a session: say so, and record it as a recurrence. A halt during plan acceptance discards the plan and its run folder; note the lost session's cost from the log before cleaning, since `vloop metrics` will not have it |

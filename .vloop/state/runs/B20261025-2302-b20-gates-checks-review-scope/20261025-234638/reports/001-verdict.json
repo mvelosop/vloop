@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "docs/domain/domain-model.md has, under \"Plans and tasks\", P-8 with the brief's wording: A gate judges the brief's contract from outside the work: it never runs the repository's suite, a check, or a test a task writes. The checks run the tests (P-7). Every acceptance criterion is judged by its task's gate, by a check the plan holds, or by the review.", "met": true, "evidence": "docs/domain/domain-model.md:203-206 adds P-8 right after P-7 with the exact wording"},
+    {"criterion": "schemas/gate-verdict.v2.json exists and is embedded: vloop schema list shows gate-verdict/v2 and still shows gate-verdict/v1", "met": true, "evidence": "schemas/gate-verdict.v2.json is new; Names() test and schema list tests now expect both gate-verdict/v1 and v2; the go check passed"},
+    {"criterion": "gate-verdict/v2 has v1's shape with the finding kinds uncovered and check-gap added and no other change of kinds: a verdict using every v1 kind validates as v2, an unknown kind does not", "met": true, "evidence": "diff v1 v2 differs only in title, schema const and the two added kinds; gate-verdict2.valid.json uses all seven kinds, gate-verdict2.invalid.json uses 'style' and is expected invalid at /tasks/0/findings/0/kind"},
+    {"criterion": "vloop schema validate gate-verdict/v2 on a verdict with uncovered and check-gap exits 0; gate-verdict/v1 on the same verdict exits 1; gate-verdict/v1 on internal/schema/testdata/gate-verdict.valid.json exits 0", "met": true, "evidence": "v2 valid fixture contains uncovered and check-gap and is validated by the schema package tests; v1 enum lacks them so it rejects; the v1 fixture is untouched and its test still passes"},
+    {"criterion": "schemas/gate-verdict.v1.json is unchanged, and every gate-review report committed under .vloop/state/runs/ still validates as gate-verdict/v1", "met": true, "evidence": "git status shows no change to schemas/gate-verdict.v1.json; no run reports were modified"},
+    {"criterion": "The task leaves committed tests the go check runs: valid and invalid v2 testdata under internal/schema/testdata/ exercised by the schema package's tests (a v2 verdict with the new kinds valid, an unknown kind invalid)", "met": true, "evidence": "internal/schema/testdata/gate-verdict2.{valid,invalid}.json plus the gate-verdict2 entry in invalidAt in internal/schema/schema_test.go; go check exit 0"}
+  ],
+  "findings": [],
+  "notes": "Earlier tests changed (embed_test.go count 19->20, schema list expectations in internal/cli/schema_test.go, cmd/vloop/b2_e2e_test.go, Names() in schema_test.go) only to account for the newly added schema; that is licensed by the contract item adding gate-verdict/v2. The invalidAt realignment is gofmt."
+}
