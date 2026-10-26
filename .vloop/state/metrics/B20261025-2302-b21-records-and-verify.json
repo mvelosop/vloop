@@ -2,7 +2,7 @@
   "schema": "metrics/v2",
   "brief": "B20261025-2302-b21-records-and-verify.loop-brief",
   "run_id": "B20261025-2302-b21-records-and-verify",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 5,
@@ -50,26 +50,28 @@
     "gates_ms": 26198,
     "checks_ms": 1087033,
     "gate_review_ms": 68989,
-    "wall_ms": null
+    "verify_ms": 26022,
+    "wall_ms": 2949000
   },
   "rate": {
     "code_per_min": 6.838648772202379,
     "code_test_per_min": 21.92827595434459
   },
   "cost": {
-    "total_usd": 4.530535799999999,
+    "total_usd": 4.639920999999999,
     "plan_usd": 2.798463,
     "work_usd": 0.918696,
     "review_usd": 0.5043108000000001,
     "gate_review_usd": 0.309066,
-    "per_1000_code_lines_usd": 49.24495434782608
+    "per_1000_code_lines_usd": 50.43392391304347,
+    "verify_usd": 0.10938519999999999
   },
   "tokens": {
-    "input": 288,
-    "output": 89344,
-    "cache_read": 7205123,
-    "cache_creation": 379194,
-    "cache_hit_ratio": 0.9499668077638849
+    "input": 302,
+    "output": 91189,
+    "cache_read": 7385395,
+    "cache_creation": 397414,
+    "cache_hit_ratio": 0.9489001248986427
   },
   "models": {
     "plan": [
@@ -83,29 +85,33 @@
     ],
     "gate-review": [
       "claude-sonnet-5-5"
+    ],
+    "verify": [
+      "claude-sonnet-5-5"
     ]
   },
   "effort": {
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 0,
-    "operator": 0,
+    "operator": 2,
     "escaped": 0,
-    "total": 0,
-    "removal_efficiency": null
+    "total": 2,
+    "removal_efficiency": 1
   },
   "interventions": {
-    "total": 2,
+    "total": 4,
     "by_agreement": {
       "recommended": 2,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 2
     }
   },
   "instructions": {
@@ -122,7 +128,7 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 3,
+  "permission_denials": 6,
   "iterations": 5,
   "iterations_per_closed": 1,
   "by_task": [
