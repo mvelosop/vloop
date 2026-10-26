@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -35,11 +36,12 @@ type Runner struct {
 	RunDir  string    // the run folder (absolute); records go in its sessions/
 	Log     io.Writer // run log lines, masked; may be nil
 
-	Claude string           // the claude adapter's command; "claude" when empty
-	Now    func() time.Time // the driver's clock; time.Now when nil
-	Home   string           // masked to "~"; os.UserHomeDir when empty
-	User   string           // masked to "USER"; the home's base name when empty
-	Env    []string         // base environment; os.Environ when nil
+	Claude  string           // the claude adapter's command; "claude" when empty
+	Now     func() time.Time // the driver's clock; time.Now when nil
+	Home    string           // masked to "~"; os.UserHomeDir when empty
+	User    string           // masked to "USER"; the home's base name when empty
+	TempDir string           // masked to "$TMPDIR"; os.TempDir when empty
+	Env     []string         // base environment; os.Environ when nil
 
 	Timeout time.Duration // a session still running after this is killed with its group; none when zero
 
@@ -204,8 +206,37 @@ func (r *Runner) env() []string {
 	return os.Environ()
 }
 
+// keptTemp are the shared temporary directories that briefs and gates name;
+// they are never masked, whether or not the system temp directory is one.
+var keptTemp = []string{"/tmp", "/var/tmp", "/private/tmp", "/private/var/tmp"}
+
+// tempDirs is the system temp directory as given and, when it is a symbolic
+// link, resolved — longest first, without /tmp and /var/tmp.
+func (r *Runner) tempDirs() []string {
+	t := r.TempDir
+	if t == "" {
+		t = os.TempDir()
+	}
+	var dirs []string
+	for _, d := range []string{t, ""} {
+		if d == "" {
+			if res, err := filepath.EvalSymlinks(t); err == nil {
+				d = res
+			}
+		}
+		d = trimSeps(d)
+		if d == "" || slices.Contains(keptTemp, d) || slices.Contains(dirs, d) {
+			continue
+		}
+		dirs = append(dirs, d)
+	}
+	sort.SliceStable(dirs, func(i, j int) bool { return len(dirs[i]) > len(dirs[j]) })
+	return dirs
+}
+
 // Mask redacts the values of secret-named environment variables, replaces the
-// home with ~ where it ends at a path boundary and the user
+// home with ~ where it ends at a path boundary, then the system temp directory
+// with $TMPDIR, and the user
 // name with USER where it is a whole path component directly under the users
 // directory (Users, home, or the one that holds the home) — never as free
 // text. It works on text; a JSON document is masked through its string values
@@ -215,6 +246,9 @@ func (r *Runner) Mask(s string) string {
 	home, user := r.home()
 	if home = trimSeps(home); home != "" {
 		s = homePattern(home).ReplaceAllString(s, "~${1}")
+	}
+	for _, d := range r.tempDirs() {
+		s = homePattern(d).ReplaceAllString(s, "$$TMPDIR${1}")
 	}
 	if user = trimSeps(user); user != "" {
 		dirs := []string{"Users", "home"}

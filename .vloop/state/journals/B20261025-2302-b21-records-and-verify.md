@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added defect.LoopBriefName and defect.SameBrief; defect add, intervention add, intervention set brief and metrics write the .loop-brief name, and defect and intervention list match a record by either the bare or the .loop-brief name.
 - **Files:** internal/defect/defect.go, internal/defect/defect_test.go, internal/intervention/intervention.go, internal/intervention/intervention_test.go, internal/metrics/metrics.go, internal/cli/defect.go
 - **Notes for next iteration:** BriefName is unchanged (blame, close and export still use it). TestListOrderFilterAndRoundTrip in internal/intervention pinned that add writes the bare name B1; changed to B1.loop-brief per the contract item that records are always written with the .loop-brief name. internal/cli TestTaskGate* fail inside a driver session with 'plan was changed during this session' - environmental, not touched by this change.
+
+## T3 — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Mask now replaces the system temp directory (as given and symlink-resolved) with $TMPDIR after the home and before the user name; /tmp and /var/tmp (and their /private forms) are kept.
+- **Files:** internal/driver/session.go, internal/driver/session_test.go
+- **Notes for next iteration:** Runner.TempDir overrides os.TempDir for tests. keptTemp includes /private/tmp and /private/var/tmp so macOS-resolved /tmp is not masked. Temp masking reuses homePattern (boundaries, JSON-escaped, Windows forms).

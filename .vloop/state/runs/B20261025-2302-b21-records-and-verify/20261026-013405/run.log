@@ -25,3 +25,10 @@ committing the plan
    review T2 · 0m26s · $0.13 · run $3.77 / $40.00
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/5 done ──
+   Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
+   work T3 · 0m57s · $0.17 · run $3.94 / $40.00
+   check go
+   review T3 · 0m16s · $0.08 · run $4.03 / $40.00
+   review: PASS
+   T3 done

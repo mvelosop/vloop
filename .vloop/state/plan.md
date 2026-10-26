@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/5 done** · iteration 2
+**Status:** running · **3/5 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T02:06:22Z
+**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T02:11:32Z
 
 ## Progress
 
 - [x] **T1** — Make a nested git repository its own vloop root (C-2) and have verify make its scratches repositories
 - [x] **T2** — Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
-- [ ] **T3** — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
+- [x] **T3** — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
 - [ ] **T4** — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
 - [ ] **T5** — Close the run: every gate at once and the worked example line for line
 
@@ -69,7 +69,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 A plan session's record kept the machine's temp directory (the per-user temp folder on macOS), which is machine-specific and breaks the no-absolute-paths rule (issue #53, defect D20261024-162448). Mask must replace the system temp directory — os.TempDir() and, where it is a symbolic link, its resolved form — with $TMPDIR wherever it masks the home directory today: session records, stderr files, the run log. It runs after the home masking, so a temp directory under the home still comes out as ~/…, and a temp directory of /tmp or /var/tmp is left alone, because briefs and gates name those. No other directory (GOCACHE, XDG_*, caches) is masked.
 

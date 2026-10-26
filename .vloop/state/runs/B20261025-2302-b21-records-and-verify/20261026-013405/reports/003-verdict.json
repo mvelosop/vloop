@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "With TMPDIR a symbolic link, a plan session denied `rm -rf <TMPDIR>/x.1` and `rm -rf <resolved TMPDIR>/y.2` is recorded in sessions/001-plan.json as `rm -rf $TMPDIR/x.1` and `rm -rf $TMPDIR/y.2`, and neither form of the temp directory occurs anywhere in the run folder (session records, stderr files, the run log)", "met": true, "evidence": "session.go tempDirs returns the given and EvalSymlinks-resolved forms, both replaced in Mask, which is the same path used for records, stderr and log; TestMaskTempDir asserts the symlink and real forms both give $TMPDIR/x.1 and $TMPDIR/y.2"},
+    {"criterion": "The temp directory is masked after the home: with TMPDIR under HOME, a denial of <TMPDIR>/x.1 is recorded as ~/tmp/x.1 (for TMPDIR = HOME/tmp)", "met": true, "evidence": "Mask runs the home replacement before the temp loop; test asserts /home/al/tmp/x.1 -> ~/tmp/x.1"},
+    {"criterion": "Violation, ruled against: /tmp or /var/tmp rewritten to $TMPDIR — with TMPDIR=/tmp a denial of /tmp/x.1 is kept as /tmp/x.1", "met": true, "evidence": "keptTemp skips /tmp, /var/tmp (and /private variants) in tempDirs; test loops both and asserts unchanged"},
+    {"criterion": "Nothing else is newly masked: no GOCACHE, XDG_* or cache path", "met": true, "evidence": "only r.TempDir/os.TempDir and its resolved form are added; no other env or path read in the diff"},
+    {"criterion": "The task leaves committed tests the go check runs in internal/driver: the temp directory and its resolved form masked, /tmp and /var/tmp kept, a temp directory under the home giving ~/…, and a Windows-shaped temp directory where the code handles one", "met": true, "evidence": "TestMaskTempDir in internal/driver/session_test.go covers all four, plus a boundary case; the go check passed (checks.json exit 0)"}
+  ],
+  "findings": [],
+  "notes": "none"
+}
