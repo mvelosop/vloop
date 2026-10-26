@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 4
+**Status:** running · **3/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:37:29Z
+**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:43:41Z
 
 ## Progress
 
 - [x] **T1** — State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
 - [x] **T2** — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing · 2 attempt(s)
-- [ ] **T3** — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
+- [x] **T3** — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
 - [ ] **T4** — Keep vloop's records under .vloop/ out of the review's product constraints
 - [ ] **T5** — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
 - [ ] **T6** — Close the run: every gate at once and the worked example line for line
@@ -66,7 +66,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 In B19's acceptance run a criterion asked for the suites in a fresh copy, which no gate may run and no check covered, and nobody noticed before work began. The gate review must now rule, for every acceptance criterion, whether the gate, a named check the plan holds, or the review judges it, with two new finding kinds; and the plan skill must ask the planner the same question before it finishes. P-8 is cited, not restated, and the gate-review-coverage eval case is the behaviour's proof, since gates never run claude.
 

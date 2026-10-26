@@ -37,3 +37,10 @@ committing the plan
    review T2 · 0m24s · $0.13 · run $5.32 / $40.00
    review: PASS
    T2 done
+── iteration 5 (5 this run) · T3 · 2/6 done ──
+   Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
+   work T3 · 1m55s · $0.47 · run $5.78 / $40.00
+   check go
+   review T3 · 0m22s · $0.12 · run $5.91 / $40.00
+   review: PASS
+   T3 done

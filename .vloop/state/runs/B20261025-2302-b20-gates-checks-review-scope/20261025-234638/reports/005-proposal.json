@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "The gate-review skill now rules on every criterion's coverage (gate, named check or review) with the kinds uncovered and check-gap, widens unpassable and task-reach (P-8), and writes gate-verdict/v2. The plan skill cites P-8 instead of restating it and asks the planner for judgeable criteria. The gate-review-coverage eval case is added and listed in the README.",
+  "files": ["plugin/skills/gate-review/SKILL.md", "plugin/skills/plan/SKILL.md", "plugin/evals/README.md", "plugin/evals/gate-review-coverage/prompt.md", "plugin/evals/gate-review-coverage/case.yaml", "plugin/evals/gate-review-coverage/brief.md", "plugin/evals/gate-review-coverage/scaffold.sh", "plugin/evals/gate-review-coverage/graders/finds-check-gap.md", "plugin/evals/gate-review-coverage/graders/finds-uncovered.md", "plugin/evals/gate-review-coverage/graders/finds-unpassable.md", "plugin/evals/gate-review-coverage/graders/covered-task-passes.md", "plugin/evals/gate-review-coverage/graders/verdict-is-fail.md", "plugin/evals/gate-review-coverage/graders/verdict-validates.md"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok; go test ./internal/budget passes.",
+  "notes": "No word ceiling changed: gate-review is 1527 words (ceiling 1550), plan 3804 (4100). The scaffold exits non-zero if a planted gate passes on the base, fails it without printing its own 'GATE FAIL:' assertion line, or fails a correct implementation (reference impl in a copy); it was run once and exited 0. The eval itself (claude) was not run."
+}
