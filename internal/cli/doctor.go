@@ -197,7 +197,24 @@ func doctorClaude(add func(name, result, msg string)) bool {
 
 // copilotExperimental is the warning every place that chooses copilot for the
 // review sessions gives.
-const copilotExperimental = "is copilot: experimental — review sessions are not fenced until B20 (docs/guide/configuration.md)"
+const copilotExperimental = "is copilot: experimental — review sessions are not fenced yet (docs/guide/configuration.md)"
+
+// copilotNoLogin says what is missing when no GitHub login reaches a Copilot
+// session; the run preflight's refusal builds on the same words.
+const copilotNoLogin = "no GitHub login reaches Copilot sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login"
+
+// copilotLoggedIn reports whether a Copilot session finds a GitHub login: one
+// of the token variables set and not empty, or gh auth token exiting 0 and
+// printing something. A token is only tested for presence, never kept.
+func copilotLoggedIn() bool {
+	for _, k := range []string{"COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"} {
+		if os.Getenv(k) != "" {
+			return true
+		}
+	}
+	out, err := exec.Command("gh", "auth", "token").Output()
+	return err == nil && strings.TrimSpace(string(out)) != ""
+}
 
 // copilotReview reports whether agent.review is copilot.
 func copilotReview(root string) bool {
@@ -214,6 +231,11 @@ func doctorCopilot(root string, add func(name, result, msg string)) {
 		add("copilot", resProblem, problem)
 	} else {
 		add("copilot", resPass, "")
+	}
+	if copilotLoggedIn() {
+		add("copilot login", resPass, "")
+	} else {
+		add("copilot login", resProblem, copilotNoLogin)
 	}
 	add("agent.review", resWarning, copilotExperimental)
 	entries, _ := os.ReadDir(filepath.Join(root, ".claude", "skills"))

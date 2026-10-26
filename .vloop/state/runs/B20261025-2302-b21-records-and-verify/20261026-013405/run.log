@@ -32,3 +32,10 @@ committing the plan
    review T3 · 0m16s · $0.08 · run $4.03 / $40.00
    review: PASS
    T3 done
+── iteration 4 (4 this run) · T4 · 3/5 done ──
+   Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
+   work T4 · 2m41s · $0.24 · run $4.26 / $40.00
+   check go
+   review T4 · 0m22s · $0.12 · run $4.38 / $40.00
+   review: PASS
+   T4 done

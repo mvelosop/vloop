@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Mask now replaces the system temp directory (as given and symlink-resolved) with $TMPDIR after the home and before the user name; /tmp and /var/tmp (and their /private forms) are kept.
 - **Files:** internal/driver/session.go, internal/driver/session_test.go
 - **Notes for next iteration:** Runner.TempDir overrides os.TempDir for tests. keptTemp includes /private/tmp and /private/var/tmp so macOS-resolved /tmp is not masked. Temp masking reuses homePattern (boundaries, JSON-escaped, Windows forms).
+
+## T4 — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
+
+- **Outcome:** done (review: PASS)
+- **Summary:** doctor gains a `copilot login` row (shown only with agent.review = copilot) and `vloop run` refuses before planning when no GitHub login reaches Copilot sessions; the experimental warning now reads "not fenced yet" and the guide says how a session logs in.
+- **Files:** internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_test.go, internal/cli/doctor_copilot_test.go, docs/guide/configuration.md
+- **Notes for next iteration:** Login = COPILOT_GITHUB_TOKEN/GH_TOKEN/GITHUB_TOKEN non-empty, else `gh auth token` exit 0 with non-blank stdout; output is only tested for presence, never stored or quoted. Existing tests changed only where they pinned the old warning text (R4's warning is the contract item); newDoctorEnv now unsets the three token variables and copilot() installs a stub gh printing a token so non-login tests still pass. internal/cli task_gate tests fail inside a work session only because VLOOP_ACTIVE_TASK is set; they pass with VLOOP_* unset.

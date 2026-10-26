@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "doctor gains a `copilot login` row (shown only with agent.review = copilot) and `vloop run` refuses before planning when no GitHub login reaches Copilot sessions; the experimental warning now reads \"not fenced yet\" and the guide says how a session logs in.",
+  "files": ["internal/cli/doctor.go", "internal/cli/run.go", "internal/cli/doctor_test.go", "internal/cli/doctor_copilot_test.go", "docs/guide/configuration.md"],
+  "verified": "vloop task gate T4 exited 0 and printed ok; go test ./internal/cli passes with VLOOP_* unset.",
+  "notes": "Login = COPILOT_GITHUB_TOKEN/GH_TOKEN/GITHUB_TOKEN non-empty, else `gh auth token` exit 0 with non-blank stdout; output is only tested for presence, never stored or quoted. Existing tests changed only where they pinned the old warning text (R4's warning is the contract item); newDoctorEnv now unsets the three token variables and copilot() installs a stub gh printing a token so non-login tests still pass. internal/cli task_gate tests fail inside a work session only because VLOOP_ACTIVE_TASK is set; they pass with VLOOP_* unset."
+}

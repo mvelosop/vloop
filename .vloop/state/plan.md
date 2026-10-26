@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/5 done** · iteration 3
+**Status:** running · **4/5 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T02:11:32Z
+**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T02:18:22Z
 
 ## Progress
 
 - [x] **T1** — Make a nested git repository its own vloop root (C-2) and have verify make its scratches repositories
 - [x] **T2** — Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
 - [x] **T3** — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
-- [ ] **T4** — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
+- [x] **T4** — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
 - [ ] **T5** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
@@ -91,7 +91,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
 
-`pending` · depends on: none
+`done` · depends on: none
 
 B19's acceptance found that a Copilot session's own COPILOT_HOME holds no login, so it falls back to the environment and `gh auth token`; an interactive /login does not reach vloop's sessions, and a run only found out after a failed review session. With agent.review = copilot, doctor gains a copilot login row and `vloop run` refuses before planning when neither COPILOT_GITHUB_TOKEN, GH_TOKEN, GITHUB_TOKEN (set and not empty) nor `gh auth token` (exit 0, prints something) provides a login; the token is never printed, logged or kept. The experimental warning stops naming B20, and the guide says how a session logs in. Take gh's and Copilot's behaviour from their docs or from running them, never from memory (the repository's guidelines); no test runs the real copilot, gh or the network.
 
