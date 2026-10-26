@@ -5,9 +5,9 @@
   "base": "b46022366ccd9c1bdde441cefe33a593c9abf0f3",
   "branch": "B20261026-1002-b22-fence-second-review",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-26T21:37:24Z",
-  "updated": "2026-10-26T22:00:16Z",
+  "updated": "2026-10-26T22:09:31Z",
   "shell": "sh",
   "checks": [
     {
@@ -96,7 +96,7 @@
         "Committed Go tests cover the payload forms, the JSON answer and every exit-2 case, and run in the `go` check."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

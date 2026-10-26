@@ -37,3 +37,10 @@ committing the plan
    review T1 · 0m50s · $0.16 · run $7.12 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/9 done ──
+   Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
+   work T2 · 5m01s · $0.26 · run $7.38 / $40.00
+   check go
+   review T2 · 0m19s · $0.10 · run $7.48 / $40.00
+   review: PASS
+   T2 done

@@ -173,6 +173,17 @@ vloop fence check --phase <review|second-review> --root <dir> --tool <name> [--p
 - `--root string`: the repository root relative paths resolve against
 - `--tool string`: the tool's name, as Copilot spells it
 
+## vloop fence hook
+
+Answer one Copilot preToolUse payload from stdin with an allow or deny line
+
+```
+vloop fence hook --phase <review|second-review> --root <dir> [flags]
+```
+
+- `--phase string`: the session phase: review or second-review
+- `--root string`: the repository root relative paths resolve against
+
 ## vloop init
 
 Set a repository up for vloop

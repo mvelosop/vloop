@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/9 done** · iteration 1
+**Status:** running · **2/9 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:00:16Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:09:31Z
 
 ## Progress
 
 - [x] **T1** — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
-- [ ] **T2** — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
+- [x] **T2** — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
 - [ ] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
 - [ ] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
 - [ ] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
@@ -47,7 +47,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 H1's second half: the command Copilot runs before every tool call. It wraps T1's judge around Copilot's payload so a Copilot review session can do only what the review fence allows. It must never answer allow on an error — that is the violation the review is told to rule on.
 
