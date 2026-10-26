@@ -55,3 +55,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Both operator playbooks cite P-8 in their gate-repair text and name the check-gap halt in the exit-2 row; the concepts guide says what a check-gap halt is and what to do, in its gate review paragraph and exit-code row.
 - **Files:** plugin/skills/operate/SKILL.md, .claude/skills/vloop-operator/SKILL.md, docs/guide/concepts.md
 - **Notes for next iteration:** Operate skill is about 1700 words, under its 1750 ceiling, so budget.go is unchanged. P-8 is cited by id only, not restated.
+
+## T6 — Close the run: every gate at once and the worked example line for line
+
+- **Outcome:** done (review: PASS)
+- **Summary:** No change needed: every gate of T1 to T5 passes together on the finished tree, and the T6 gate passes.
+- **Files:** none
+- **Notes for next iteration:** No files changed. The two new eval cases (gate-review-coverage, 08-vloop-records-out-of-scope) and the calibrations are the operator's to run at close.

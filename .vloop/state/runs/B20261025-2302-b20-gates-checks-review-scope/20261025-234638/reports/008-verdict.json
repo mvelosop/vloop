@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Every gate of T1 to T5 passes on the finished tree, run together", "met": true, "evidence": ".vloop/state/gates/T6/gate.sh loops over T1..T5 gates; gates/T6.log shows gate T1 to T6 ok"},
+    {"criterion": "Any fix this task needs is made in the product, not in a gate, and every check passes", "met": true, "evidence": "git diff HEAD shows no product or gate change (only run logs); checks.json go exit 0, go.log all ok"},
+    {"criterion": "No gate of this plan runs the suite, a check or a test a task writes (P-8)", "met": true, "evidence": "grep of T1-T6 gate.sh finds no go test/run, claude, eval or run-all invocation; T6 gate only calls the other gates"}
+  ],
+  "findings": [],
+  "notes": "No change was needed. The two new eval cases and the calibrations remain the operator's to run at close."
+}

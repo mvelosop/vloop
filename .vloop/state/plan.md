@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 7
+**Status:** running · **6/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:53:39Z
+**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:58:49Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
 - [x] **T4** — Keep vloop's records under .vloop/ out of the review's product constraints
 - [x] **T5** — Cite P-8 in the operator's playbooks and say what a check-gap halt is in them and the guide
-- [ ] **T6** — Close the run: every gate at once and the worked example line for line
+- [x] **T6** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
@@ -140,7 +140,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Close the run: every gate at once and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 The tasks were judged one at a time; this proves them together on the finished tree, with the brief's worked example (the schema lines and the run lines, every planted failure included). After it the operator runs the two new eval cases and the existing gate-review and review calibrations, and records the results in the run record before merging.
 

@@ -5,9 +5,9 @@
   "base": "366a250ab0dda1843d922d3bcad388e6fc8b7001",
   "branch": "B20261025-2302-b20-gates-checks-review-scope",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-10-26T00:10:00Z",
-  "updated": "2026-10-26T00:53:39Z",
+  "updated": "2026-10-26T00:58:49Z",
   "shell": "sh",
   "checks": [
     {
@@ -252,7 +252,7 @@
         "No gate of this plan runs the suite, a check or a test a task writes (P-8)"
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }
