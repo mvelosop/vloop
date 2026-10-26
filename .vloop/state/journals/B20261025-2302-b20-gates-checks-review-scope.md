@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The driver validates the gate verdict as gate-verdict/v2 and halts with exit 2 on any check-gap finding (every finding printed, nothing sent back, no work, no commit, no plan left); uncovered and other kinds are sent back as before.
 - **Files:** internal/driver/gatereview.go, internal/driver/plan.go, internal/driver/gatereview_test.go, cmd/vloop/run_gatereview_test.go, cmd/vloop/run_harness_test.go
 - **Notes for next iteration:** The previous attempt failed the go check because cmd/vloop tests (run_gatereview_test.go, run_harness_test.go) wrote gate-verdict/v1 stubs; changed to gate-verdict/v2 since the brief's contract makes the driver read v2 only. gateReviewRound returns (problems, check-gap count, err); acceptPlan checks gaps before the planRounds test. cmd/vloop tests take ~200s.
+
+## T2 — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The driver reads gate-verdict/v2 and halts with exit 2 on any check-gap finding (all findings printed, nothing sent back, no work, no commit, no plan left); uncovered and other kinds are still sent back. Committed end-to-end tests now cover the halt and the sent-back path.
+- **Files:** internal/driver/gatereview.go, internal/driver/plan.go, internal/driver/gatereview_test.go, cmd/vloop/run_gatereview_test.go, cmd/vloop/run_harness_test.go
+- **Notes for next iteration:** New tests in cmd/vloop/run_gatereview_test.go: TestRunGateReviewCheckGapHalts (round 1 alone, round 1 beside wrong-reason, round 2 after a sent-back finding; each then re-runs and plans afresh) and TestRunGateReviewUncoveredIsSentBack. cmd/vloop stub verdicts were moved from gate-verdict/v1 to v2 because the driver now reads v2 only.

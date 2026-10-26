@@ -30,3 +30,10 @@ committing the plan
    check go
    review T2 · 0m29s · $0.13 · run $4.98 / $40.00
    review: FAIL
+── iteration 4 (4 this run) · T2 · 1/6 done ──
+   Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
+   work T2 · 1m02s · $0.21 · run $5.19 / $40.00
+   check go
+   review T2 · 0m24s · $0.13 · run $5.32 / $40.00
+   review: PASS
+   T2 done

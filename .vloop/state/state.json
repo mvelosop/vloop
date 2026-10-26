@@ -5,9 +5,9 @@
   "base": "366a250ab0dda1843d922d3bcad388e6fc8b7001",
   "branch": "B20261025-2302-b20-gates-checks-review-scope",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-26T00:10:00Z",
-  "updated": "2026-10-26T00:32:18Z",
+  "updated": "2026-10-26T00:37:29Z",
   "shell": "sh",
   "checks": [
     {
@@ -91,9 +91,9 @@
         "The task leaves committed tests the go check runs, covering the check-gap halt (round 1 and round 2, alone and beside another finding) and an uncovered finding being sent back"
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 2,
-      "notes": "No committed test runs the check-gap halt (exit 2, line, nothing kept, no revision round, no commit, round 1 and 2, alone and with another finding, re-run plans afresh) or shows an uncovered finding is still sent back; the task's last acceptance criterion is unmet; The gate (gate.sh) passes without these behaviours being exercised, so it does not enforce the acceptance list"
+      "notes": ""
     },
     {
       "id": "T3",
