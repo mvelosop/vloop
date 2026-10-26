@@ -1,0 +1,14 @@
+{
+  "schema": "verify/v1",
+  "findings": [
+    {
+      "kind": "contract",
+      "claim": "Constraints: \"New tooling is proven by fixtures, including where it must fail: every deny line of the worked example, the unreadable payload, the K1 refusal, each mode of S1.\" and Shape 5: \"Gated on the worked example's second-review lines.\"",
+      "observed": "No test under internal/driver exercises run.second-review: grep for \"both-pass\", \"on-pass\" and \"second review\" in *_test.go matches only config, metrics, schema, doctor and fence-hook tests. go test ./internal/driver -run Second runs one unrelated test (TestNewRunDirSuffixesASecondInTheSameSecond). The two-task stub-agent scenario (feedback, record, on-pass, both-pass, off) has no fixture. I confirmed the modes by reading internal/driver/iterate.go:524-541 and 894-925 only, and ran none of them.",
+      "where": "brief Constraints and Shape item 5; Worked example, \"Second review, with a stub agent\"; internal/driver/*_test.go"
+    }
+  ],
+  "checked": { "example_lines": 35, "sentences": 14, "surfaces": 12 },
+  "notes": "Pass 1: all 16 shell lines and all 10 other-tool lines behave as the brief states, with exit 0 for allow and 1 for deny. The hook with 'not json' gives the deny line and exit 2. An apply_patch payload updating .git/config gives deny with exit 0, and an unknown phase gives exit 2. The second-review lines were not run, for the reason in the finding. K1: 'vloop doctor' shows the error row with the contract's text, and renaming to repo-review leaves a warning only. I could not see 'vloop run' print the K1 refusal itself in the scratch repo, because copilot-not-on-PATH and the untrusted folder fail the preflight first (internal/cli/run.go:178-215 refuses K1 only after those). internal/cli/doctor_copilot_test.go:218-223 covers the text. 'vloop fence check' prints 'deny: skill vloop-review is not vloop\\'s — use /vloop:review' without the 'vloop fence: ' prefix. The hook's reason does carry the prefix. The contract says check prints 'deny: <reason>', so I read this as consistent, but the worked example's '->' lines quote the prefixed form. Surface, outside this brief's changes: docs/guide/concepts.md:39 says 'The plugin ships five skills' and plugin/skills holds six (gate-review, operate, plan, review, verify, work). No skill was added in this run, so I did not count it as a finding. The 'not fenced' wording is gone from docs, plugin and skills. It remains only in earlier briefs. Not verified: Copilot behaviour, which is the operator's acceptance. Scratch files are under .vloop/tmp/verify-scratch and the verify-run*.sh scripts."
+}
+

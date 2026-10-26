@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 9,
-    "done": 8,
+    "done": 9,
     "blocked": 0,
-    "first_pass": 7,
+    "first_pass": 8,
     "estimate": {
       "min": 7,
       "max": 9
@@ -43,26 +43,26 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 4359204,
-    "work_ms": 4085914,
-    "review_ms": 273290,
+    "agent_ms": 4503402,
+    "work_ms": 4217152,
+    "review_ms": 286250,
     "plan_ms": 1006464,
-    "gates_ms": 150700,
-    "checks_ms": 2030193,
+    "gates_ms": 259947,
+    "checks_ms": 2243159,
     "gate_review_ms": 259153,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 24.38977391285198,
-    "code_test_per_min": 36.213033388664535
+    "code_per_min": 23.6088183999563,
+    "code_test_per_min": 35.053499554336916
   },
   "cost": {
-    "total_usd": 12.027519800000002,
+    "total_usd": 12.1602495,
     "plan_usd": 5.3608422000000004,
-    "work_usd": 4.6834313000000005,
-    "review_usd": 1.1595509000000002,
+    "work_usd": 4.7502028,
+    "review_usd": 1.2255091000000002,
     "gate_review_usd": 0.8236954,
-    "per_1000_code_lines_usd": 6.787539390519188
+    "per_1000_code_lines_usd": 6.86244328442438
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 674,
-    "output": 275435,
-    "cache_read": 22182327,
-    "cache_creation": 1093292,
-    "cache_hit_ratio": 0.9530008494050148
+    "input": 692,
+    "output": 277156,
+    "cache_read": 22378284,
+    "cache_creation": 1117264,
+    "cache_hit_ratio": 0.9524197914219467
   },
   "models": {
     "plan": [
@@ -144,8 +144,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 3,
-  "iterations": 9,
-  "iterations_per_closed": 1.125,
+  "iterations": 10,
+  "iterations_per_closed": 1.1111111111111112,
   "by_task": [
     {
       "id": "T1",
@@ -351,7 +351,7 @@
       "id": "T9",
       "area": null,
       "kind": "chore",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -364,9 +364,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 144198,
+      "cost_usd": 0.1327297,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     }

@@ -76,3 +76,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Closing check: all gates T1–T8 pass together on the final tree; no code changes were needed.
 - **Files:** none
 - **Notes for next iteration:** No gaps found; working tree unchanged by this task.
+
+## Run ended — complete
+
+- **Run:** `B20261026-1002-b22-fence-second-review` · 10 iteration(s) this run
+- **Plan:** 9/9 done, 0 blocked
