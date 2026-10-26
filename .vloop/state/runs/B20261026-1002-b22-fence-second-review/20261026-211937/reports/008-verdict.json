@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`docs/design-notes/fence-audit.md` classifies every deny rule of `fence/review.json` and every deny-list pattern of the adapter by who enforces it for a Copilot review session — the driver after the session, the hook, or neither — and says, for each `neither`, what covers it.", "met": true, "evidence": "fence-audit.md has a table row per deny rule (a script found no review.json deny rule missing from it) with an enforcer column, and a 'What is neither, and what covers it' section."},
+    {"criterion": "`docs/guide/configuration.md` has a row for each S1 key (default, valid values, variable), describes `vloop fence check` and `vloop fence hook`, the fail-closed rules, K1, what each `run.second-review` mode does and what a dissent is, keeps Copilot review experimental, and no longer says it is unfenced.", "met": true, "evidence": "Rows at lines 24, 30, 36, 57 match internal/config/config.go:91-124 defaults and valid values. The hook and check sections, the fail-closed list, K1, the mode table and the dissent definition were added. The Copilot paragraph still says experimental and now says the sessions run under the hook. The fence check exit codes (1 deny, 0 allow, 2 bad args) were confirmed by running it."},
+    {"criterion": "`docs/domain/domain-model.md` gains second review and dissent in the glossary; `docs/domain/execution/session.md` the second-review kind, the hook and the Copilot denials; `docs/domain/execution/task.md` what the second review's findings do to notes; `docs/domain/measurement/metrics.md` the second review in metrics/v4.", "met": true, "evidence": "The diffs add the glossary entries (second review, dissent, hook), the sixth session kind with the hook and denials, a task.md section on notes, and the metrics/v4 section. schemas/metrics.v4.json exists."},
+    {"criterion": "`plugin/skills/operate/SKILL.md` and `.claude/skills/vloop-operator/SKILL.md` read the dissents at close and record each one that holds as a `verification-finding`.", "met": true, "evidence": "Both diffs add the dissent-reading step at close, with each one that holds recorded as a verification-finding."},
+    {"criterion": "Every sentence about behaviour matches what T1–T6 built; a doc test the repository already has still passes (the `go` check).", "met": true, "evidence": "Spot-checked config keys and fence check behaviour against code and by running it. The go check exited 0 (checks.json)."}
+  ],
+  "findings": [],
+  "notes": "Only docs changed, with no absolute paths in the product files. The reviewer did not check every behaviour sentence of the audit's rule-by-rule table against the judge code."
+}

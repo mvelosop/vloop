@@ -5,9 +5,9 @@
   "base": "b46022366ccd9c1bdde441cefe33a593c9abf0f3",
   "branch": "B20261026-1002-b22-fence-second-review",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-10-26T21:37:24Z",
-  "updated": "2026-10-26T23:19:12Z",
+  "updated": "2026-10-26T23:33:51Z",
   "shell": "sh",
   "checks": [
     {
@@ -289,7 +289,7 @@
         "Every sentence about behaviour matches what T1–T6 built; a doc test the repository already has still passes (the `go` check)."
       ],
       "verify": "sh .vloop/state/gates/T7/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -10,15 +10,24 @@ agent-specific (preflight, the phases it supports, the command and
 environment, whether stdout is a record, its mapping onto the record) is the
 agent's adapter's; claude and, for review sessions only, copilot are the adapters. *Part of [execution](execution-context.md).*
 
-## The five kinds
+## The six kinds
 
 | Kind | Invoked with | Reads | Writes |
 | --- | --- | --- | --- |
 | **plan** | the brief | the brief, its binding references, the repo | the plan |
 | **work** | one task id | the brief, the plan, the task's references and notes | the working tree for that task, then a **proposal** |
 | **review** | one task id | the brief, the task's acceptance, the diff, the checks' results (`.vloop/tmp/checks.json`) | a **verdict** |
+| **second-review** | one task id | what the review reads, never the primary's verdict | a **verdict**, kept apart from the primary's |
 | **gate-review** | none | the brief, the plan, the gates, their logs on the base | a **gate verdict** |
 | **verify** | none | the brief, the plan's base diff and a fresh build of the result | a **verify report** (`.vloop/tmp/verify.json`) |
+
+A **second-review** session is a review session of phase `second-review`, run
+only when `run.second-review` is not `off`, by its own agent and model
+(`agent.second-review`, `model.second-review`), under the review fence. The
+driver keeps the primary's verdict out of `.vloop/tmp/` first, and the same
+guards apply: inputs restored, a changed file reverted, a moved ref halts. Its
+verdict decides nothing except in `both-pass`; a verdict that differs from the
+primary's is a **dissent**, recorded for the operator.
 
 The review sees the diff and the acceptance, not the proposal's summary, so it
 judges the work rather than the claim (S-3).
@@ -58,7 +67,7 @@ ending, exit code or a task; the operator reads them at close.
 ## What a session never does
 
 Commit, set a status, or move a git ref (S-2). The **fence** — the permission
-settings loop sessions run under, one file per phase (plan, work, review, gate-review) — denies
+settings loop sessions run under, one file per phase (plan, work, review, gate-review; second-review runs under the review fence) — denies
 the commands (`git commit`, `push`, `reset`, `clean`, `branch`, `checkout`,
 `switch`, `merge`, `cherry-pick`, `revert`, `am`, `pull`, `fetch`, `config`,
 `reflog`, `gc` and the other mutating git subcommands, `git -C` and `git -c`,
@@ -69,6 +78,18 @@ web access, and reads of the user's global Claude directory. No fence lets a
 session write under `.git/`. Each phase has its own fence. The plan fence allows writing only
 `.vloop/state/state.json`, `.vloop/state/gates/**` and `.vloop/tmp/**`; the work, review, gate-review and verify fences allow
 nothing under `.vloop/` but `.vloop/tmp/**`.
+
+**The Copilot hook.** Copilot reads no fence file, so every Copilot session
+(review or second-review) runs under a `preToolUse` hook, `vloop fence hook`,
+written into the session's own `COPILOT_HOME`. It judges each tool call with the
+review fence's Bash deny rules and the adapter's deny-list stems, looking through
+shell wrappers, and fails closed: what it cannot parse, or any error, is a deny.
+It allows writes only under `.vloop/tmp/`, reads outside the user's global Claude,
+Copilot and GitHub CLI directories, and the `skill` tool only for vloop's own
+skills. The adapter's deny list also stays on Copilot's command line. Copilot's
+denials are parsed from its output into `permission_denials`. The hook adds a
+line in front of the driver; it does not replace it. See
+[the fence audit](../../design-notes/fence-audit.md).
 
 **The fence is advisory.** It is a first line that saves attempts, not a
 boundary: a deny list cannot name every form of a command. The driver's checks
@@ -104,7 +125,7 @@ driver's own measurement around the session process (the wall time, including
 any time the machine slept); `duration_ms` is the agent's own clock (the agent clock, `agent_ms` in the
 metrics), so the two differ. `session/v1` and `session/v2` records, written before agents were
 resolved per phase, mean agent `claude`; they stay readable, with `ended` and
-`wall_ms` optional. A denied Bash call in
+`wall_ms` optional. `second-review` is also a phase of the record (`session/v4`). A denied Bash call in
 `permission_denials` keeps its `command`, masked, redacted and cut to 200
 characters; other tools keep only the tool name and a `file_path`. A missing
 record is reported by the metrics, never silently skipped.

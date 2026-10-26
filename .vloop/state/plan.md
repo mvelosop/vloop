@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/9 done** · iteration 7
+**Status:** running · **7/9 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:19:12Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:33:51Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning · 1 attempt(s)
 - [x] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
 - [x] **T6** — Report the second review in metrics/v4
-- [ ] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
+- [x] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
 - [ ] **T8** — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
 - [ ] **T9** — Close the run: every gate at once, and the worked example line for line
 
@@ -158,7 +158,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
 
-`pending` · depends on: T3, T5, T6
+`done` · depends on: T3, T5, T6
 
 A1. The operator needs to know, rule by rule, who enforces the fence for a Copilot review session; the guide must describe the hook, its fail-closed rules, K1 and what each second-review mode does; the domain gains the second-review kind, dissent and the hook; and the close reads the dissents. Prose task: if it fails review twice on wording, block it and the operator finishes it.
 

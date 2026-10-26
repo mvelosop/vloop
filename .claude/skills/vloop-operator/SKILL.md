@@ -111,6 +111,10 @@ Until B4 ships `vloop brief close`, by hand:
    (the newest `reports/verify.json`; it then refuses and writes nothing);
    record each one you accept with `--finding "<origin>: <summary>"`, previewed
    with `--dry-run` and that flag, then closed.
+   Read the dissents as well (`second review: <n> dissent(s)` at the end of the
+   run, `reports/<iteration>-second-verdict.json`) when `run.second-review` was on;
+   record each dissent that holds the same way, as a `verification-finding`;
+   one that does not hold is not recorded.
 2. Record findings before merge as verification-finding interventions:
    `vloop intervention add "<summary>" --brief <name> --kind
    verification-finding --origin <brief|plan|work|env> --phase verify

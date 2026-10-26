@@ -77,3 +77,10 @@ committing the plan
    review T6 · 0m23s · $0.14 · run $10.82 / $40.00
    review: PASS
    T6 done
+── iteration 8 (8 this run) · T7 · 6/9 done ──
+   Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
+   work T7 · 8m30s · $0.63 · run $11.44 / $40.00
+   check go
+   review T7 · 0m30s · $0.14 · run $11.58 / $40.00
+   review: PASS
+   T7 done
