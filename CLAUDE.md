@@ -50,7 +50,7 @@ Sessions started by the vloop loop (plan, gate review, work, review) follow thes
 
 In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules. If /vloop:operate is not available, the vloop plugin is not loaded: say so, give the user the two ways to load it (claude plugin install vloop@vloop after claude plugin marketplace add mvelosop/vloop, or claude --plugin-dir "$(vloop plugin path)"), and meanwhile work from vloop --help.
 
-Written by vloop 0.12.0.
+Written by vloop 0.13.0.
 <!-- vloop:end -->
 
 <!-- loop:begin -->
