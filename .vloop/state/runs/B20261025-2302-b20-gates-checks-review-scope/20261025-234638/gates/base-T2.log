@@ -1,0 +1,8 @@
+GATE FAIL: A: the finding line 'gate T2 (check-gap): pnpm smoke in a fresh copy: no check runs pnpm smoke' is not printed: checking the gate of T2 on the base
+planned: B20260101-0900-demo — 2 tasks
+reviewing the gates using sonnet (round 2)
+   gate review · 0m00s · $0.10 · run $0.40 / $40.00
+committing the plan
+  the gate review's .vloop/tmp/gate-verdict.json does not follow gate-verdict/v1 — that is a FAIL
+  the gate review's .vloop/tmp/gate-verdict.json does not follow gate-verdict/v1 — that is a FAIL
+vloop: the gate review failed the plan twice — see .vloop/state/runs/B20260101-0900-demo/20261026-000453/reports/gate-review-2.json; amend the gates with vloop task verify, then re-run

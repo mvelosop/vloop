@@ -1,0 +1,27 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "the gate fails on a path typo, not for the missing T1.out",
+          "kind": "wrong-reason"
+        }
+      ]
+    },
+    {
+      "task": "T2",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "pnpm smoke in a fresh copy: no check runs pnpm smoke",
+          "kind": "check-gap"
+        }
+      ]
+    }
+  ],
+  "notes": "Two findings, one a check gap."
+}

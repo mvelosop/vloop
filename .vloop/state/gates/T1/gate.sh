@@ -1,90 +1,58 @@
 #!/bin/sh
-# Gate T1 — the configuration. agent.review accepts claude and copilot; every
-# other agent.<phase> claude only (config set exits 2 with the brief's
-# message and writes nothing; the environment and the file are source errors,
-# exit 1). copilot.credit-usd: default 0.0066667, a positive number,
-# VLOOP_COPILOT_CREDIT_USD, set and read back. The worked example's config
-# lines, in a repository initialised by this tree's binary.
-G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
-. "$G/lib.sh"
-newbin
-S=$t/bin/new
-# x <expected exit> <expected stdout> <expected stderr> <env...> -- <args...>
-x() {
-  ec=$1 eo=$2 ee=$3; shift 3
-  e=""; while [ "$1" != -- ]; do e="$e $1"; shift; done; shift
-  (cd "$t/repo" && venv $e "$S" "$@" >"$t/o" 2>"$t/e"); c=$?
-  [ "$c" = "$ec" ] || fail "${e# } vloop $*: exit $c, want $ec (stdout '$(cat "$t/o")', stderr '$(cat "$t/e")')"
-  [ "$(cat "$t/o")" = "$eo" ] || fail "${e# } vloop $*: stdout '$(cat "$t/o")', want '$eo'"
-  [ "$(cat "$t/e")" = "$ee" ] || fail "${e# } vloop $*: stderr '$(cat "$t/e")', want '$ee'"
+# Gate T1 — P-8 and gate-verdict/v2, by the brief's worked example schema lines.
+# With vloop built from this tree (and, for the comparison, from the plan's
+# base by git archive): gate-verdict/v2 is embedded beside v1; a verdict with
+# uncovered and check-gap validates as v2 and not as v1; every v1 kind is a v2
+# kind and an unknown kind is not; gate-verdict/v1 is byte for byte the base's,
+# and the recorded v1 verdicts (the schema's valid testdata, this folder's copy
+# of it, and every gate-review report committed under .vloop/state/runs/)
+# still validate as v1. Last, docs/domain/domain-model.md states P-8, in the
+# brief's words, under "Plans and tasks".
+set -u
+fail() { echo "GATE FAIL: $*" >&2; exit 1; }
+G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+export LC_ALL=C GOTOOLCHAIN=local GOFLAGS= GOPROXY=off
+BASE=366a250ab0dda1843d922d3bcad388e6fc8b7001
+top=$(pwd -P)
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") || fail mktemp
+trap 'rm -rf "$t"' EXIT
+go build -buildvcs=false -o "$t/new" ./cmd/vloop || fail "go build of this tree"
+# v <want exit> <schema> <file>: vloop schema validate exits as wanted.
+v() {
+  "$t/new" schema validate "$2" "$3" >"$t/o" 2>&1; c=$?
+  [ "$c" = "$1" ] || fail "vloop schema validate $2 $3 exited $c, want $1: $(head -5 "$t/o")"
 }
-# refused <exit> <env...> -- <args...>: exits as given with nothing on stdout
-# and a vloop: message on stderr; the message is in $t/e.
-refused() {
-  ec=$1; shift
-  e=""; while [ "$1" != -- ]; do e="$e $1"; shift; done; shift
-  (cd "$t/repo" && venv $e "$S" "$@" >"$t/o" 2>"$t/e"); c=$?
-  [ "$c" = "$ec" ] || fail "${e# } vloop $*: exit $c, want $ec (stdout '$(cat "$t/o")', stderr '$(cat "$t/e")')"
-  grep -q '^vloop: ' "$t/e" || fail "${e# } vloop $*: no vloop: message on stderr: '$(cat "$t/e")'"
-}
-up() { echo "$1" | tr 'a-z.-' 'A-Z__'; }
 
-fixture
-cp "$t/repo/.vloop/config.toml" "$t/cfg.before"
-# The worked example, line for line.
-x 0 "" "" -- config set agent.review copilot
-x 0 "" "" -- config set model.review "$MODEL"
-x 2 "" 'vloop: invalid value "copilot" for agent.work: want one of claude' -- config set agent.work copilot
-x 0 copilot "" -- config get agent.review
-x 0 '{"key":"agent.review","value":"copilot","source":"file"}' "" -- config get agent.review --json
-x 0 "$MODEL" "" -- config get model.review
-cp "$t/repo/.vloop/config.toml" "$t/cfg.set"
-x 2 "" 'vloop: invalid value "copilot" for agent.work: want one of claude' -- config set agent.work copilot
-cmp -s "$t/cfg.set" "$t/repo/.vloop/config.toml" || fail "a refused config set agent.work changed .vloop/config.toml"
-x 0 "" "" -- config set agent.review claude
-x 0 claude "" -- config get agent.review
+"$t/new" schema list >"$t/list" 2>&1 || fail "vloop schema list failed: $(cat "$t/list")"
+grep -qx 'gate-verdict/v2' "$t/list" || fail "vloop schema list has no gate-verdict/v2: $(tr '\n' ' ' <"$t/list")"
+grep -qx 'gate-verdict/v1' "$t/list" || fail "vloop schema list no longer has gate-verdict/v1"
 
-# Every other phase: claude only, in every place a value can come from.
-cp "$t/cfg.before" "$t/repo/.vloop/config.toml"
-for p in plan work gate-review verify; do
-  k=agent.$p v=VLOOP_AGENT_$(up "$p")
-  x 2 "" "vloop: invalid value \"copilot\" for $k: want one of claude" -- config set "$k" copilot
-  cmp -s "$t/cfg.before" "$t/repo/.vloop/config.toml" || fail "a refused config set $k copilot changed .vloop/config.toml"
-  x 1 "" "vloop: $v: invalid value \"copilot\" for $k: want one of claude" "$v=copilot" -- config get "$k"
-  x 1 "" "vloop: $v: invalid value \"copilot\" for $k: want one of claude" "$v=copilot" -- config list
-  { cat "$t/cfg.before"; printf '\n[agent]\n  %s = "copilot"\n' "$p"; } >"$t/repo/.vloop/config.toml"
-  refused 1 -- config get "$k"
-  grep -q "invalid value \"copilot\" for $k: want one of claude" "$t/e" || fail "with $k = \"copilot\" in the file, config get does not say why: $(cat "$t/e")"
-  (cd "$t/repo" && venv "$S" run "$BRIEF" >"$t/o" 2>&1); c=$?
-  [ "$c" = 1 ] || fail "with $k = \"copilot\" in the file, vloop run exited $c, want 1: $(tail -5 "$t/o")"
-  [ -f "$t/stub/log" ] && grep -q '^arg -p$' "$t/stub/log" && fail "with $k = \"copilot\" in the file, vloop run started a session"
-  cp "$t/cfg.before" "$t/repo/.vloop/config.toml"
-  x 0 claude "" -- config get "$k"
+# The worked example's three lines.
+v 0 gate-verdict/v2 "$G/coverage-v2.json"
+v 1 gate-verdict/v1 "$G/coverage-v2.json"
+v 0 gate-verdict/v1 internal/schema/testdata/gate-verdict.valid.json
+# Planted: a v2 that rejects a v1 verdict's kinds, or accepts any kind.
+v 0 gate-verdict/v2 "$G/all-kinds-v2.json"
+v 1 gate-verdict/v2 "$G/unknown-kind-v2.json"
+
+# gate-verdict/v1 unchanged, and the verdicts already recorded still v1.
+mkdir -p "$t/src" && git -C "$top" archive -o "$t/base.tar" "$BASE" && tar -x -f "$t/base.tar" -C "$t/src" || fail "git archive $BASE"
+(cd "$t/src" && go build -buildvcs=false -o "$t/base" ./cmd/vloop) || fail "build of the base"
+"$t/base" schema show gate-verdict/v1 >"$t/v1.base" 2>&1 || fail "the base's schema show gate-verdict/v1 failed"
+"$t/new" schema show gate-verdict/v1 >"$t/v1.new" 2>&1 || fail "vloop schema show gate-verdict/v1 failed: $(cat "$t/v1.new")"
+cmp -s "$t/v1.base" "$t/v1.new" || fail "gate-verdict/v1 differs from the base's: $(diff "$t/v1.base" "$t/v1.new" | head -10)"
+v 0 gate-verdict/v1 "$G/recorded-v1.json"
+n=0
+for f in $(git -C "$top" ls-files '.vloop/state/runs/*/reports/gate-review-*.json'); do
+  v 0 gate-verdict/v1 "$f"; n=$((n + 1))
 done
-# agent.review: copilot from the environment and from the file; another name refused.
-x 0 '{"key":"agent.review","value":"copilot","source":"env"}' "" VLOOP_AGENT_REVIEW=copilot -- config get agent.review --json
-{ cat "$t/cfg.before"; printf '\n[agent]\n  review = "copilot"\n'; } >"$t/repo/.vloop/config.toml"
-x 0 '{"key":"agent.review","value":"copilot","source":"file"}' "" -- config get agent.review --json
-cp "$t/cfg.before" "$t/repo/.vloop/config.toml"
-refused 2 -- config set agent.review grok
-grep -q 'invalid value "grok" for agent.review' "$t/e" || fail "config set agent.review grok does not say why: $(cat "$t/e")"
-grep -q copilot "$t/e" || fail "the refusal of agent.review grok does not name copilot among the valid values: $(cat "$t/e")"
-cmp -s "$t/cfg.before" "$t/repo/.vloop/config.toml" || fail "a refused config set agent.review changed .vloop/config.toml"
-refused 1 VLOOP_AGENT_REVIEW=grok -- config get agent.review
+[ "$n" -gt 0 ] || fail "no recorded gate-review report under .vloop/state/runs/"
 
-# copilot.credit-usd.
-x 0 0.0066667 "" -- config get copilot.credit-usd
-x 0 '{"key":"copilot.credit-usd","value":"0.0066667","source":"default"}' "" -- config get copilot.credit-usd --json
-(cd "$t/repo" && venv "$S" config list >"$t/list" 2>&1) || fail "config list: $(cat "$t/list")"
-grep -qx 'copilot.credit-usd=0.0066667 (default)' "$t/list" || fail "config list has no line 'copilot.credit-usd=0.0066667 (default)': $(cat "$t/list")"
-grep -qx 'agent.review=claude (default)' "$t/list" || fail "config list has no line 'agent.review=claude (default)'"
-x 0 '{"key":"copilot.credit-usd","value":"0.02","source":"env"}' "" VLOOP_COPILOT_CREDIT_USD=0.02 -- config get copilot.credit-usd --json
-for bad in 0 -1 abc 0.0; do
-  refused 2 -- config set copilot.credit-usd "$bad"
-  cmp -s "$t/cfg.before" "$t/repo/.vloop/config.toml" || fail "a refused config set copilot.credit-usd $bad changed .vloop/config.toml"
-  refused 1 "VLOOP_COPILOT_CREDIT_USD=$bad" -- config get copilot.credit-usd
-  grep -q VLOOP_COPILOT_CREDIT_USD "$t/e" || fail "VLOOP_COPILOT_CREDIT_USD=$bad: the error does not name the variable: $(cat "$t/e")"
-done
-x 0 "" "" -- config set copilot.credit-usd 0.01
-x 0 '{"key":"copilot.credit-usd","value":"0.01","source":"file"}' "" -- config get copilot.credit-usd --json
+# P-8, under "Plans and tasks", in the brief's words (line breaks and emphasis aside).
+want="- P-8 A gate judges the brief's contract from outside the work: it never runs the repository's suite, a check, or a test a task writes. The checks run the tests (P-7). Every acceptance criterion is judged by its task's gate, by a check the plan holds, or by the review."
+sec=$(awk '/^### / { ins = ($0 ~ /^### Plans and tasks/) ; next } ins' docs/domain/domain-model.md | tr '\n' ' ' | tr -d '*' | tr -s ' ')
+case "$sec" in
+  *"$want"*) ;;
+  *) fail "docs/domain/domain-model.md's \"Plans and tasks\" does not state P-8 as the brief words it: want '$want'";;
+esac
 echo "gate T1: ok"

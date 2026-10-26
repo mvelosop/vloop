@@ -1,0 +1,1 @@
+{"schema":"gate-verdict/v1","verdict":"FAIL","tasks":[{"task":"T1","verdict":"FAIL","findings":[{"summary":"s","kind":"wrong-reason"},{"summary":"s","kind":"not-contract"},{"summary":"s","kind":"task-reach"},{"summary":"s","kind":"unpassable"},{"summary":"s","kind":"pins-unnamed"}]},{"task":"T2","verdict":"PASS","findings":[]}],"notes":"none"}

@@ -1,0 +1,22 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "pnpm smoke in a fresh copy: no check runs pnpm smoke",
+          "kind": "check-gap"
+        }
+      ]
+    }
+  ],
+  "notes": "T2 needs a check the plan does not hold."
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "T2.out holds what the operator meant: no gate, check or review can judge it",
+          "kind": "uncovered"
+        }
+      ]
+    }
+  ],
+  "notes": "T2 has a criterion nobody can judge."
+}
