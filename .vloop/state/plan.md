@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/5 done** · iteration 1
+**Status:** running · **2/5 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T01:54:38Z
+**Brief:** `docs/briefs/B20261025-2302-b21-records-and-verify.loop-brief.md` · **Updated:** 2026-10-26T02:06:22Z
 
 ## Progress
 
 - [x] **T1** — Make a nested git repository its own vloop root (C-2) and have verify make its scratches repositories
-- [ ] **T2** — Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
+- [x] **T2** — Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
 - [ ] **T3** — Mask the system temp directory as $TMPDIR in everything the driver masks (#53)
 - [ ] **T4** — Check that a GitHub login reaches Copilot sessions in doctor and the run preflight, and reword the experimental warning
 - [ ] **T5** — Close the run: every gate at once and the worked example line for line
@@ -45,7 +45,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Interventions recorded with a bare brief name vanish from `vloop metrics`, which counts only records whose brief: field is the .loop-brief name. Every command that takes a brief — metrics, defect and intervention add and list, and intervention set brief — must accept the bare name, the .loop-brief name and a path whose base name is &lt;name&gt;.loop-brief.md as one brief; records are always written with the .loop-brief name, and list and metrics match a record written with either the bare or the .loop-brief name so old records count. No record schema or metrics formula changes, and nothing rewrites existing records.
 

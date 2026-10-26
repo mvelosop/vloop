@@ -18,3 +18,10 @@ committing the plan
    review T1 · 0m17s · $0.10 · run $3.33 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/5 done ──
+   Treat a brief's bare name, .loop-brief name and path as one brief, and write the .loop-brief name
+   work T2 · 7m21s · $0.31 · run $3.64 / $40.00
+   check go
+   review T2 · 0m26s · $0.13 · run $3.77 / $40.00
+   review: PASS
+   T2 done

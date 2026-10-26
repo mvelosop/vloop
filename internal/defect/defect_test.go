@@ -261,3 +261,39 @@ func TestSetRefusesRetiredRuleFields(t *testing.T) {
 		t.Fatal("refused set changed the file")
 	}
 }
+
+func TestBriefFormsAreOneBrief(t *testing.T) {
+	const want = "B1-x.loop-brief"
+	for _, f := range []string{"B1-x", "B1-x.loop-brief", "docs/briefs/B1-x.loop-brief.md"} {
+		if got := LoopBriefName(f); got != want {
+			t.Errorf("LoopBriefName(%q) = %q, want %q", f, got, want)
+		}
+		if !SameBrief(f, want) {
+			t.Errorf("%q is not the same brief as %q", f, want)
+		}
+	}
+	if LoopBriefName("") != "" {
+		t.Error("the empty brief must stay empty")
+	}
+}
+
+func TestListMatchesBareAndLoopBriefNames(t *testing.T) {
+	dir := t.TempDir()
+	p, err := Add(dir, NewInput{Summary: "new", FoundBy: "user", Brief: "B1-x.loop-brief"}, at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	old, err := Add(dir, NewInput{Summary: "old", FoundBy: "user", Brief: "B1-x"}, at.Add(time.Minute))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p == old {
+		t.Fatal("same record")
+	}
+	for _, f := range []string{"B1-x", "B1-x.loop-brief", "docs/briefs/B1-x.loop-brief.md"} {
+		ds, err := List(dir, f)
+		if err != nil || len(ds) != 2 {
+			t.Errorf("List(%q) = %d records, %v; want the bare-name and the .loop-brief record", f, len(ds), err)
+		}
+	}
+}

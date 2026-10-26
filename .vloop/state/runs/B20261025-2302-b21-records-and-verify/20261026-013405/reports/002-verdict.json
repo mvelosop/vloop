@@ -1,0 +1,16 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`vloop metrics`, `vloop defect list --brief`, `vloop intervention list --brief`, `vloop defect add --brief` and `vloop intervention add --brief` accept B20261022-1234-x, B20261022-1234-x.loop-brief and docs/briefs/B20261022-1234-x.loop-brief.md (any path whose base name is <name>.loop-brief.md) as the same brief", "met": true, "evidence": "defect.go LoopBriefName/SameBrief normalise all three forms; used in defect.List, intervention.List, metrics.Build, cli/defect.go add and matrix; gate T2 ok; defect_test TestBriefFormsAreOneBrief"},
+    {"criterion": "`defect add`, `intervention add` and `intervention set <id> brief <value>` write brief: <name>.loop-brief whichever form they were given", "met": true, "evidence": "cli/defect.go:83, intervention.go Add and Set use LoopBriefName; intervention_test TestBriefFormsAreOneBrief checks the written file for all three forms and for set"},
+    {"criterion": "Violation, ruled against: a record written with a bare or a path brief name", "met": true, "evidence": "no write path uses BriefName any more; all write .loop-brief name"},
+    {"criterion": "list and metrics match a record whose brief: field is either the bare or the .loop-brief name; on this repository, `vloop metrics` of B20261002-2135-vloop-v1-security in the three forms gives equal \"defects\" and \"interventions\"", "met": true, "evidence": "SameBrief in both List functions; metrics.Build goes through them; gate.sh compares the three forms with planted bare records and logs 'gate T2: ok'"},
+    {"criterion": "A name that is not a loop brief (for example a .architect-brief.md) or a loop brief that does not exist is refused by defect add as today, writing nothing", "met": true, "evidence": "CheckBrief unchanged and still runs after normalisation; a .architect-brief name becomes a non-existent .loop-brief file and is refused; gate checks refusal"},
+    {"criterion": "No record schema, metrics formula or existing record changes; no command renames or rewrites existing records' brief names", "met": true, "evidence": "diff touches only name normalisation and matching; no rewriting code"},
+    {"criterion": "The task leaves committed tests the go check runs: the three forms resolving to one brief, add writing the .loop-brief name, and a planted bare-name defect and intervention counted by list and by the metrics", "met": true, "evidence": "defect_test and intervention_test add tests for the three forms, add/set writing, and planted bare-name records counted by List; metrics counting goes through those Lists and is covered by the gate; go check passed"}
+  ],
+  "findings": [],
+  "notes": "Earlier intervention test expectation changed from Brief B1 to B1.loop-brief; licensed by the contract that add writes the .loop-brief name. No committed test exercises metrics.Build directly with a bare-name record; the gate does."
+}
