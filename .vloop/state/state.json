@@ -5,9 +5,9 @@
   "base": "366a250ab0dda1843d922d3bcad388e6fc8b7001",
   "branch": "B20261025-2302-b20-gates-checks-review-scope",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-10-26T00:10:00Z",
-  "updated": "2026-10-26T00:06:01Z",
+  "updated": "2026-10-26T00:18:03Z",
   "shell": "sh",
   "checks": [
     {
@@ -50,7 +50,7 @@
         "The task leaves committed tests the go check runs: valid and invalid v2 testdata under internal/schema/testdata/ exercised by the schema package's tests (a v2 verdict with the new kinds valid, an unknown kind invalid)"
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

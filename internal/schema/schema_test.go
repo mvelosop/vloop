@@ -19,13 +19,14 @@ var invalidAt = map[string]string{
 	"metrics":      "/tasks/done",
 
 	// The v2 contracts and gate-verdict/v1; a name ending in 2 is the v2 of the part before it.
-	"state2":       "/status",
-	"iteration2":   "/checks/0/exit",
-	"session2":     "",
-	"metrics2":     "/tasks/done",
-	"metrics3":     "/agents/work",
-	"gate-verdict": "/tasks/0/findings/0/kind",
-	"verify":       "/findings/0/kind",
+	"state2":        "/status",
+	"iteration2":    "/checks/0/exit",
+	"session2":      "",
+	"metrics2":      "/tasks/done",
+	"metrics3":      "/agents/work",
+	"gate-verdict":  "/tasks/0/findings/0/kind",
+	"gate-verdict2": "/tasks/0/findings/0/kind",
+	"verify":        "/findings/0/kind",
 
 	// export/v1 has one fixture pair per record type; the name is the part before the dash.
 	"export-brief":        "",
@@ -59,7 +60,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "metrics/v1", "metrics/v2", "metrics/v3", "proposal/v1", "session/v1", "session/v2", "session/v3", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
+	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "gate-verdict/v2", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "metrics/v1", "metrics/v2", "metrics/v3", "proposal/v1", "session/v1", "session/v2", "session/v3", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}

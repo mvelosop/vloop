@@ -12,3 +12,10 @@ planned: B20261025-2302-b20-gates-checks-review-scope — 6 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 1m05s · $0.29 · run $4.11 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/6 done ──
+   State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
+   work T1 · 7m58s · $0.22 · run $4.33 / $40.00
+   check go
+   review T1 · 0m19s · $0.10 · run $4.43 / $40.00
+   review: PASS
+   T1 done

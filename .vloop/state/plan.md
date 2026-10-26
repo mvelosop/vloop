@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **1/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:06:01Z
+**Brief:** `docs/briefs/B20261025-2302-b20-gates-checks-review-scope.loop-brief.md` · **Updated:** 2026-10-26T00:18:03Z
 
 ## Progress
 
-- [ ] **T1** — State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
+- [x] **T1** — State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
 - [ ] **T2** — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
 - [ ] **T3** — Have the gate review rule on every criterion's coverage, and the planner write criteria something can judge
 - [ ] **T4** — Keep vloop's records under .vloop/ out of the review's product constraints
@@ -19,7 +19,7 @@
 
 ### T1 — State P-8 in the domain model and add gate-verdict/v2 beside an unchanged v1
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Every later task cites P-8 and reads gate-verdict/v2, so both must exist first. P-8 makes 'a gate never runs the suite' a domain invariant every session obeys, and v2 is the gate verdict with the two new finding kinds, uncovered and check-gap, that the gate review will use. v1 must stay byte for byte as it is, because verdicts already recorded under .vloop/state/runs/ are validated against it.
 
