@@ -9,7 +9,7 @@ import (
 )
 
 const failingGateReview = `if [ "$PHASE" = gate-review ]; then
-  printf '{"schema":"gate-verdict/v1","verdict":"FAIL","tasks":[{"task":"T1","verdict":"FAIL","findings":[{"summary":"fails for the wrong reason","kind":"wrong-reason"}]}],"notes":"none"}\n' > .vloop/tmp/gate-verdict.json
+  printf '{"schema":"gate-verdict/v2","verdict":"FAIL","tasks":[{"task":"T1","verdict":"FAIL","findings":[{"summary":"fails for the wrong reason","kind":"wrong-reason"}]}],"notes":"none"}\n' > .vloop/tmp/gate-verdict.json
 fi
 `
 
@@ -38,8 +38,8 @@ func (r *runRepo) gateReviewState() string {
 func (r *runRepo) wantReport(name string) {
 	r.t.Helper()
 	f := filepath.Join(r.runFolder(), "reports", name)
-	if v := r.vloop("schema", "validate", "gate-verdict/v1", f); v.code != 0 {
-		r.t.Errorf("%s is not gate-verdict/v1: %+v", name, v)
+	if v := r.vloop("schema", "validate", "gate-verdict/v2", f); v.code != 0 {
+		r.t.Errorf("%s is not gate-verdict/v2: %+v", name, v)
 	}
 }
 

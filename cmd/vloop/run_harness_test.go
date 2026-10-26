@@ -76,7 +76,7 @@ echo "$ATTEMPT" > "$dir/count.$PHASE.$(echo "$ARG" | tr '/ ' '__')"
 STUB_COST=0.10; STUB_EXIT=0; STUB_DURATION=1000; STUB_TURNS=3; STUB_ERROR=false; STUB_SILENT=0; STUB_NOCOST=0; STUB_SLEEP=0; STUB_DENIALS='[]'
 if [ "$PHASE" = gate-review ]; then
   mkdir -p .vloop/tmp
-  echo '{"schema":"gate-verdict/v1","verdict":"PASS","tasks":[],"notes":"none"}' > .vloop/tmp/gate-verdict.json
+  echo '{"schema":"gate-verdict/v2","verdict":"PASS","tasks":[],"notes":"none"}' > .vloop/tmp/gate-verdict.json
 fi
 if [ -f "$dir/script.sh" ]; then . "$dir/script.sh"; fi
 [ "$STUB_SLEEP" != 0 ] && sleep "$STUB_SLEEP"

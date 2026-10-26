@@ -24,3 +24,9 @@ committing the plan
    work T2 · 2m45s · $0.28 · run $4.71 / $40.00
    check go
    CHECK FAIL T2 — check go failed — see .vloop/state/runs/B20261025-2302-b20-gates-checks-review-scope/20261025-234638/checks/002-go.fail.log; review skipped
+── iteration 3 (3 this run) · T2 · 1/6 done ──
+   Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
+   work T2 · 6m08s · $0.13 · run $4.85 / $40.00
+   check go
+   review T2 · 0m29s · $0.13 · run $4.98 / $40.00
+   review: FAIL

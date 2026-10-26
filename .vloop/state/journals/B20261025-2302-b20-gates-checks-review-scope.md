@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The driver now validates the gate verdict as gate-verdict/v2 and halts with exit 2 on any check-gap finding, printing every finding, sending nothing back and leaving no plan, gates or commit.
 - **Files:** internal/driver/gatereview.go, internal/driver/plan.go, internal/driver/gatereview_test.go
 - **Notes for next iteration:** gateReviewRound now returns (problems, check-gap count, err); acceptPlan checks gaps before the planRounds test, so round 1 and 2 behave alike, and removes state.json, gates and plan.md. New unit tests cover counting gaps, uncovered not counting, v1 rejected and the halt line; the round 1/2 halt end to end is in gate.sh only. go test ./internal/cli had 5 TestTaskGate* failures ('plan was changed during this session') inside this session, which looks environmental and was not investigated.
+
+## T2 — Halt the run with exit 2 when the gate verdict holds a check-gap finding, keeping nothing
+
+- **Outcome:** rejected (review: FAIL)
+- **Summary:** The driver validates the gate verdict as gate-verdict/v2 and halts with exit 2 on any check-gap finding (every finding printed, nothing sent back, no work, no commit, no plan left); uncovered and other kinds are sent back as before.
+- **Files:** internal/driver/gatereview.go, internal/driver/plan.go, internal/driver/gatereview_test.go, cmd/vloop/run_gatereview_test.go, cmd/vloop/run_harness_test.go
+- **Notes for next iteration:** The previous attempt failed the go check because cmd/vloop tests (run_gatereview_test.go, run_harness_test.go) wrote gate-verdict/v1 stubs; changed to gate-verdict/v2 since the brief's contract makes the driver read v2 only. gateReviewRound returns (problems, check-gap count, err); acceptPlan checks gaps before the planRounds test. cmd/vloop tests take ~200s.
