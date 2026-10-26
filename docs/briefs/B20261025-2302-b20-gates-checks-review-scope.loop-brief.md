@@ -341,3 +341,19 @@ T6  -     chore    1    0      0      0      0       -          -       0m48s   
 - I20261026-012948-eval-sessions-run-in-don-t-ask-mode-were — verification-finding, env, found by operator: eval sessions run in don't-ask mode were denied the verdict write-and-validate compound command, so verdict-validates failed across cases while the verdicts were right
 - I20261026-012949-calibration-04-unchecked-criterion-named — verification-finding, env, found by operator: calibration 04-unchecked-criterion named its defect in 1 of 3 runs with B20's plugin and 2 of 3 with main's; within run-to-run noise, to watch
 <!-- vloop:run-record:end -->
+
+### J5's evals, run by the operator at close (2026-10-26)
+
+`claude plugin eval plugin`, sonnet, no baseline arm, the B20 build first on
+`PATH`; three runs per case unless said. `verdict-validates` is left out of
+the counts (don't-ask mode denied the session's write-and-validate command;
+the verdicts themselves were right).
+
+| Case | Result |
+| --- | --- |
+| `gate-review-coverage` | `check-gap`, `uncovered` and `unpassable` found 3/3; the covered task passed 2/3 (one false `check-gap`) |
+| `08-vloop-records-out-of-scope` | `PASS` with no finding 3/3; the `notes` line about the records 0/3 |
+| `gate-review-planted-gates` | every planted gate found, the sound gate passed, 3/3 |
+| `gate-review-real-misses` | every real miss found as a finding 3/3 (the v1-as-v2 one twice as `unpassable`, once as `pins-unnamed`); the sound T7 `PASS` with no finding 3/3, though the judge scored it 1/3 |
+| review calibration `01`–`07b` (one run) | `FAIL` with the defect named in all but `03`, `04` and `06` (`06` allowed to miss) |
+| `03`, `04` again, B20 vs `main` | `03` named 3/3 vs 2/3; `04` named 1/3 vs 2/3 |
