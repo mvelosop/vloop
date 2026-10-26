@@ -112,7 +112,7 @@ Then ask the questions the criteria do not:
 - **Are there absolute paths in the files the task changed or the output it
   produced?** An absolute home-directory path there is a finding, whoever the
   user is. The task's own files are not let out of this question; only vloop's
-  records are (see "The product" below).
+  records are (see "The product" above).
 
 ## 3. Verdict
 

@@ -143,9 +143,9 @@ run's grader verdicts; the HTML report shows the same per case and arm.
 
 | Skill | Cases | Asks |
 | --- | --- | --- |
-| `/vloop:review` | `01`–`07b` | nine planted defects in work that passes its gate; the review returns `FAIL` and names each |
+| `/vloop:review` | `01`–`07b`, `08-vloop-records-out-of-scope` | nine planted defects in work that passes its gate, which the review returns `FAIL` on and names; and correct work whose only defects are in vloop's own records, which it passes with a `notes` line |
 | `/vloop:plan` | `plan-valid-state`, `plan-checks-its-gates`, `language-es` | a valid plan, judges in the `verify` or the gate folder and no repository suite in a `verify`, prose in the configured language |
-| `/vloop:gate-review` | `gate-review-planted-gates`, `gate-review-real-misses` | five planted gates, then six gates that fooled the gate review in past runs (macOS hosts) and one sound gate; the typo, the task-written judge, the source grep, the gate that passes on the base and the six real misses are found with the right finding kind, and the sound gates pass |
+| `/vloop:gate-review` | `gate-review-planted-gates`, `gate-review-real-misses`, `gate-review-coverage` | five planted gates, then six gates that fooled the gate review in past runs (macOS hosts) and one sound gate; the typo, the task-written judge, the source grep, the gate that passes on the base and the six real misses are found with the right finding kind, and the sound gates pass; then sound gates whose criteria are a check gap, uncovered and unpassable, each found as that kind, and a fully covered task that passes |
 | `/vloop:work` | `work-disputes-impossible-gate` | a gate no correct implementation passes is disputed, not edited |
 
 `/vloop:operate` has no suite: it is the operator's, interactive.
