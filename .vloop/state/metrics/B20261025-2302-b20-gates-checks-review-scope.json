@@ -2,7 +2,7 @@
   "schema": "metrics/v2",
   "brief": "B20261025-2302-b20-gates-checks-review-scope.loop-brief",
   "run_id": "B20261025-2302-b20-gates-checks-review-scope",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 6,
@@ -50,26 +50,28 @@
     "gates_ms": 70933,
     "checks_ms": 1544141,
     "gate_review_ms": 65456,
-    "wall_ms": null
+    "verify_ms": 58103,
+    "wall_ms": 4382000
   },
   "rate": {
     "code_per_min": 3.0492432176658317,
     "code_test_per_min": 23.81706188933582
   },
   "cost": {
-    "total_usd": 6.634454,
+    "total_usd": 6.8755421,
     "plan_usd": 3.8180663999999997,
     "work_usd": 1.7568851,
     "review_usd": 0.7702491,
     "gate_review_usd": 0.2892534,
-    "per_1000_code_lines_usd": 89.65478378378378
+    "per_1000_code_lines_usd": 92.91273108108108,
+    "verify_usd": 0.24108810000000003
   },
   "tokens": {
-    "input": 402,
-    "output": 128481,
-    "cache_read": 11011108,
-    "cache_creation": 584674,
-    "cache_hit_ratio": 0.9495458161064019
+    "input": 424,
+    "output": 133159,
+    "cache_read": 11403789,
+    "cache_creation": 623423,
+    "cache_hit_ratio": 0.9481322015398537
   },
   "models": {
     "plan": [
@@ -83,29 +85,33 @@
     ],
     "gate-review": [
       "claude-sonnet-5-5"
+    ],
+    "verify": [
+      "claude-sonnet-5-5"
     ]
   },
   "effort": {
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 3,
-    "operator": 0,
+    "operator": 5,
     "escaped": 0,
-    "total": 3,
+    "total": 8,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 3,
+    "total": 8,
     "by_agreement": {
       "recommended": 2,
       "other-option": 0,
       "adjusted": 0,
       "different": 1,
-      "no-options": 0
+      "no-options": 5
     }
   },
   "instructions": {
