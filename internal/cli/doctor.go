@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -222,6 +223,29 @@ func copilotReview(root string) bool {
 	return err == nil && v.Value == driver.AgentCopilot
 }
 
+// skillClash is a project skill directory named exactly like one of vloop's
+// plugin skills, which a copilot session may load instead of it.
+type skillClash struct{ path, name string }
+
+func (c skillClash) message() string {
+	return "has the name of vloop's " + c.name + " skill; a copilot session may load it instead — rename it"
+}
+
+// skillClashes lists the directories under .claude/skills/ and .github/skills/
+// that have the name of a plugin skill, in that order.
+func skillClashes(root string) []skillClash {
+	var out []skillClash
+	for _, dir := range []string{".claude/skills", ".github/skills"} {
+		for _, name := range driver.PluginSkillNames() {
+			rel := dir + "/" + name
+			if fi, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel))); err == nil && fi.IsDir() {
+				out = append(out, skillClash{rel, name})
+			}
+		}
+	}
+	return out
+}
+
 // doctorCopilot adds the checks of a copilot review agent: copilot found and
 // working, the experimental warning, and a warning for each project skill
 // whose name ends in review, which a copilot session may pick instead of
@@ -238,9 +262,13 @@ func doctorCopilot(root string, add func(name, result, msg string)) {
 		add("copilot login", resProblem, copilotNoLogin)
 	}
 	add("agent.review", resWarning, copilotExperimental)
+	clashes := skillClashes(root)
+	for _, c := range clashes {
+		add(c.path, resProblem, c.message())
+	}
 	entries, _ := os.ReadDir(filepath.Join(root, ".claude", "skills"))
 	for _, e := range entries {
-		if e.IsDir() && strings.HasSuffix(e.Name(), "review") {
+		if e.IsDir() && strings.HasSuffix(e.Name(), "review") && !slices.Contains(driver.PluginSkillNames(), e.Name()) {
 			add(".claude/skills/"+e.Name(), resWarning, "may be loaded instead of /vloop:review by a copilot session")
 		}
 	}

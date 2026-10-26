@@ -186,6 +186,7 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		switch {
 		case c.Name == "branch", c.Name == "gate scratch", c.Name == "checks": // the planner refuses these itself, in its own words
 		case c.Name == "copilot login": // refused below, in its own words
+		case c.Result == resProblem && strings.HasPrefix(c.Message, "has the name of vloop's "): // refused below, in its own words
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++
@@ -200,6 +201,9 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		return Problem(fmt.Errorf("preflight failed — %d problem(s), nothing has run", bad))
 	}
 	if copilotReview(root) {
+		if cl := skillClashes(root); len(cl) > 0 {
+			return Problem(fmt.Errorf("%s %s", cl[0].path, cl[0].message()))
+		}
 		if !copilotLoggedIn() {
 			return Problem(errors.New("agent.review is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login"))
 		}

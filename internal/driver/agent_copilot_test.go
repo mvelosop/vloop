@@ -80,8 +80,8 @@ func TestCopilotEnvAndHome(t *testing.T) {
 	if home != p.Home || !strings.HasPrefix(home, filepath.Join(root, ".vloop", "tmp")+string(filepath.Separator)) {
 		t.Errorf("COPILOT_HOME %q", home)
 	}
-	if ents, err := os.ReadDir(home); err != nil || len(ents) != 0 {
-		t.Errorf("COPILOT_HOME not an empty directory: %v %v", ents, err)
+	if ents, err := os.ReadDir(home); err != nil || len(ents) != 1 || ents[0].Name() != "hooks" {
+		t.Errorf("COPILOT_HOME holds more than the hooks directory (H2 adds the fence hook): %v %v", ents, err)
 	}
 	_, env2, _, p2 := copilotCommand(t, root, s, base)
 	if p2.Home == p.Home {

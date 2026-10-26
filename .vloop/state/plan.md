@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/9 done** · iteration 2
+**Status:** running · **3/9 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:09:31Z
+**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T22:20:01Z
 
 ## Progress
 
 - [x] **T1** — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
 - [x] **T2** — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
-- [ ] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
+- [x] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
 - [ ] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
 - [ ] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
 - [ ] **T6** — Report the second review in metrics/v4
@@ -70,7 +70,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 H2 and K1. The judge only fences what it is asked about: this task installs it as the preToolUse hook in each Copilot session's own home, with the running binary and the repository root, so every Copilot tool call passes through it; records Copilot's denials in the session record; and stops a run where a project skill named like one of vloop's could be loaded instead of /vloop:review (the operator saw that happen).
 

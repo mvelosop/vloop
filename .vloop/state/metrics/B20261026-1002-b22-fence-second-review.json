@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 9,
-    "done": 1,
+    "done": 2,
     "blocked": 0,
-    "first_pass": 1,
+    "first_pass": 2,
     "estimate": {
       "min": 7,
       "max": 9
@@ -16,9 +16,9 @@
   },
   "size": {
     "delivered": {
-      "code": 741,
-      "test": 247,
-      "docs": 14,
+      "code": 861,
+      "test": 338,
+      "docs": 21,
       "other": 0,
       "deleted": {
         "code": 0,
@@ -28,9 +28,9 @@
       }
     },
     "churn": {
-      "code": 741,
-      "test": 247,
-      "docs": 14,
+      "code": 861,
+      "test": 338,
+      "docs": 21,
       "other": 0,
       "deleted": {
         "code": 0,
@@ -39,30 +39,30 @@
         "other": 0
       }
     },
-    "test_code_ratio": 0.3333333333333333,
+    "test_code_ratio": 0.39256678281068524,
     "rework": 1
   },
   "time": {
-    "agent_ms": 695607,
-    "work_ms": 645114,
-    "review_ms": 50493,
+    "agent_ms": 1015770,
+    "work_ms": 946177,
+    "review_ms": 69593,
     "plan_ms": 1006464,
-    "gates_ms": 6628,
-    "checks_ms": 228895,
+    "gates_ms": 9537,
+    "checks_ms": 452075,
     "gate_review_ms": 259153,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 63.915400506320374,
-    "code_test_per_min": 85.22053400842717
+    "code_per_min": 50.85796981600165,
+    "code_test_per_min": 70.82311940695236
   },
   "cost": {
-    "total_usd": 7.1192495000000005,
+    "total_usd": 7.4810977,
     "plan_usd": 5.3608422000000004,
-    "work_usd": 0.7729003999999999,
-    "review_usd": 0.16181150000000002,
+    "work_usd": 1.0318443,
+    "review_usd": 0.26471580000000006,
     "gate_review_usd": 0.8236954,
-    "per_1000_code_lines_usd": 9.60762415654521
+    "per_1000_code_lines_usd": 8.6888475029036
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 258,
-    "output": 157164,
-    "cache_read": 11025884,
-    "cache_creation": 441021,
-    "cache_hit_ratio": 0.9615180319665815
+    "input": 290,
+    "output": 167159,
+    "cache_read": 11530386,
+    "cache_creation": 493867,
+    "cache_hit_ratio": 0.9589043009784238
   },
   "models": {
     "plan": [
@@ -144,7 +144,7 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 3,
-  "iterations": 1,
+  "iterations": 2,
   "iterations_per_closed": 1,
   "by_task": [
     {
@@ -176,11 +176,11 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
-        "docs": 0,
+        "code": 120,
+        "test": 91,
+        "docs": 7,
         "other": 0,
         "deleted": {
           "code": 0,
@@ -189,11 +189,13 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "agent_ms": 320163,
+      "cost_usd": 0.3618482,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "test_code_ratio": 0.7583333333333333,
+      "per_1000_code_lines_usd": 3.015401666666667
     },
     {
       "id": "T3",

@@ -44,3 +44,10 @@ committing the plan
    review T2 · 0m19s · $0.10 · run $7.48 / $40.00
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/9 done ──
+   Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
+   work T3 · 5m33s · $0.49 · run $7.98 / $40.00
+   check go
+   review T3 · 0m29s · $0.12 · run $8.10 / $40.00
+   review: PASS
+   T3 done

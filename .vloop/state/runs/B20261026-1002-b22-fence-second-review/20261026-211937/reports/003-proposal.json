@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Each Copilot session's home now holds hooks/vloop-fence.json whose preToolUse entry runs this binary's `fence hook --phase <phase> --root <root>` in bash and powershell forms; the Copilot parser fills permission_denials from denied tool.execution_complete events; vloop run and doctor refuse (copilot reviews only) a .claude/skills or .github/skills directory named like a plugin skill.",
+  "files": ["internal/driver/agent_copilot.go", "internal/driver/agent_copilot_test.go", "internal/driver/agent_copilot_parse_test.go", "internal/cli/doctor.go", "internal/cli/run.go", "internal/cli/doctor_copilot_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; go test ./internal/driver ./internal/cli, go vet, gofmt, go mod tidy -diff and the linux/windows builds are clean.",
+  "notes": "Web access is denied, so Copilot's hooks-file format could not be read from its docs: the file shape {version:1, hooks:{preToolUse:[{type:command,bash,powershell,timeoutSec}]}} is from memory and unconfirmed; T8's real-CLI probe should confirm it. The hook runs with the phase passed to Prepare (review now; second-review once T5 adds it). TestCopilotEnvAndHome pinned an empty COPILOT_HOME; changed to expect only hooks/ (brief H2). Plugin skill names come from the new driver.PluginSkillNames(). The K1 run refusal prints the doctor row as `vloop: <path> has the name of ...` and skips that row in the generic preflight list. K1 is checked for agent.review only; T4 adds agent.second-review once the key exists. Under go test ./..., unset VLOOP_PLAN_SHA256."
+}

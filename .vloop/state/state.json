@@ -5,9 +5,9 @@
   "base": "b46022366ccd9c1bdde441cefe33a593c9abf0f3",
   "branch": "B20261026-1002-b22-fence-second-review",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-26T21:37:24Z",
-  "updated": "2026-10-26T22:09:31Z",
+  "updated": "2026-10-26T22:20:01Z",
   "shell": "sh",
   "checks": [
     {
@@ -135,7 +135,7 @@
         "Committed tests cover the hooks file, the denial parsing (interleaved calls, a non-denied failure, none) and the K1 refusal, extending the existing Copilot adapter and doctor tests, and run in the `go` check."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
