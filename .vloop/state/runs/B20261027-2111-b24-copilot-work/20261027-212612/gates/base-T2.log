@@ -1,0 +1,1 @@
+GATE FAIL: [work] payload {"timestamp":1700000000000,"cwd":"$TMPDIR/gate.cXnLYw/hookroot","toolName":"bash","toolArgs":{"command":"rm src/old.ts","description":"d"}}: want allow and exit 0, got '{"permissionDecision":"deny","permissionDecisionReason":"vloop fence: unknown phase \"work\": want review or second-review"}', exit 2

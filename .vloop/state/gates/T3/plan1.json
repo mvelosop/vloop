@@ -39,22 +39,6 @@
       "status": "pending",
       "attempts": 0,
       "notes": ""
-    },
-    {
-      "id": "T2",
-      "title": "Task T2",
-      "goal": "Do T2.",
-      "kind": "feature",
-      "fixtures": "",
-      "references": [],
-      "depends_on": [],
-      "acceptance": [
-        "T2.out exists"
-      ],
-      "verify": "test -f T2.out",
-      "status": "pending",
-      "attempts": 0,
-      "notes": ""
     }
   ]
 }

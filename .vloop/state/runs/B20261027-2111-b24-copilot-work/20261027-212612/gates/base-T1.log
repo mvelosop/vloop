@@ -1,0 +1,1 @@
+GATE FAIL: [work] bash 'rm src/old.ts': want 'allow' and exit 0, got exit 2, stdout '', stderr 'vloop: unknown phase "work": want review or second-review'

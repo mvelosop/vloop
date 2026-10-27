@@ -1,22 +1,32 @@
 #!/bin/sh
-# Gate T1 — H1, the judge: `vloop fence check`. Every line of the worked
-# example's two tables, then each wrapper, separator, refused form, redirection
-# and path rule of the behaviour contract, judged in a fixture root with a fake
-# HOME. An allow prints exactly "allow" and exits 0; a deny prints a line
-# starting "deny: " and exits 1; bad arguments exit 2. Nothing runs a command
-# under judgment: the gate only asks the judge.
-G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
-. "$G/lib.sh"
-cd "$top" || fail "repo root"
-newbin
+# Gate T1 — W1, the judge's work phase, through `vloop fence check`. Every line
+# of the worked example's two tables in phase work, the review phase's `rm`
+# line unchanged, the unknown phase's message, and the contract's work rules
+# beyond the example (writes, reads, skills, other tools, package installs, the
+# shell syntax that stays denied). `vloop fence check` prints `allow` (exit 0)
+# or `deny: <reason>` (exit 1), where <reason> is what the hook sends after its
+# `vloop fence: ` prefix; bad arguments exit 2. A few review and second-review
+# lines pin that those phases decide and word as before. Nothing runs a command
+# under judgment: the gate only asks the judge, in a fixture root with a fake
+# HOME, never this repository's tree.
+set -u
+fail() { echo "GATE FAIL: $*" >&2; exit 1; }
+for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
+export LC_ALL=C GOTOOLCHAIN=local
+top=$(pwd -P)
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
+trap 'rm -rf "$t"' EXIT
+mkdir -p "$t/bin" && go build -buildvcs=false -o "$t/bin/new" ./cmd/vloop || fail "go build of this tree"
+S=$t/bin/new
 R=$t/repo
-mkdir -p "$R/src" "$R/.vloop/tmp" "$t/home" "$t/tmp" "$t/stub" || fail mkdir
-# chk <phase> <tool> [--path p] [command]: the judge's stdout in $out, exit in $rc.
+mkdir -p "$R/src" "$R/.vloop/tmp" "$t/home" "$t/tmp" || fail mkdir
+cd "$R" || fail "fixture root"
+
+# chk <phase> <tool> [--path p] [command]: stdout in $out, exit in $rc.
 chk() {
   ph=$1 tl=$2; shift 2
-  out=$(cd "$R" && venv "$S" fence check --phase "$ph" --root "$R" --tool "$tl" "$@" 2>"$t/err"); rc=$?
+  out=$(env -i PATH=/usr/bin:/bin HOME="$t/home" TMPDIR="$t/tmp" LC_ALL=C "$S" fence check --phase "$ph" --root "$R" --tool "$tl" "$@" 2>"$t/err"); rc=$?
 }
-# allow/deny <phase> <tool> <label> [args...]
 allow() {
   ph=$1 tl=$2 lb=$3; shift 3; chk "$ph" "$tl" "$@"
   [ "$rc" = 0 ] && [ "$out" = allow ] || fail "[$ph] $tl $lb: want 'allow' and exit 0, got exit $rc, stdout '$out', stderr '$(cat "$t/err")'"
@@ -24,157 +34,144 @@ allow() {
 deny() {
   ph=$1 tl=$2 lb=$3; shift 3; chk "$ph" "$tl" "$@"
   [ "$rc" = 1 ] || fail "[$ph] $tl $lb: want exit 1 (deny), got exit $rc, stdout '$out', stderr '$(cat "$t/err")'"
-  first=$(printf '%s\n' "$out" | head -1)
-  case "$first" in "deny: "?*) ;; *) fail "[$ph] $tl $lb: want a line 'deny: <reason>', got '$out'";; esac
+  case "$out" in "deny: "?*) ;; *) fail "[$ph] $tl $lb: want one line 'deny: <reason>', got '$out'";; esac
 }
-# denyx <phase> <tool> <label> <text the reason must hold> [args...]
+# denyx <phase> <tool> <label> <exact reason> [args...]
 denyx() {
-  ph=$1 tl=$2 lb=$3 want=$4; shift 4
-  deny "$ph" "$tl" "$lb" "$@"
-  printf '%s\n' "$out" | head -1 | grep -qF -- "$want" || fail "[$ph] $tl $lb: the deny reason '$out' does not name '$want'"
+  ph=$1 tl=$2 lb=$3 want=$4; shift 4; deny "$ph" "$tl" "$lb" "$@"
+  [ "$out" = "deny: $want" ] || fail "[$ph] $tl $lb: want 'deny: $want', got '$out'"
 }
-# sh_allow/sh_deny <command> [text]: the bash tool in phase review, and the
-# same command through the powershell tool and in phase second-review.
-sh_allow() { for ph in review second-review; do allow "$ph" bash "'$1'" "$1"; done; allow review powershell "'$1'" "$1"; }
-sh_deny() {
-  for ph in review second-review; do
-    if [ -n "${2:-}" ]; then denyx "$ph" bash "'$1'" "$2" "$1"; else deny "$ph" bash "'$1'" "$1"; fi
-  done
-  deny review powershell "'$1'" "$1"
+# denyp <phase> <tool> <label> <text the reason must hold> [args...]
+denyp() {
+  ph=$1 tl=$2 lb=$3 want=$4; shift 4; deny "$ph" "$tl" "$lb" "$@"
+  printf '%s\n' "$out" | grep -qF -- "$want" || fail "[$ph] $tl $lb: the reason '$out' does not hold '$want'"
 }
+wsh_allow() { allow work bash "'$1'" "$1"; allow work powershell "'$1'" "$1"; }
+wsh_deny() { deny work bash "'$1'" "$1"; deny work powershell "'$1'" "$1"; }
 
-# The worked example, shell table.
-sh_allow 'git diff 1a2b3c..HEAD -- src/'
-sh_allow 'git log --oneline | head -5'
-sh_allow 'vloop task show T3'
-sh_allow 'git diff > .vloop/tmp/diff.txt'
-sh_allow 'ls src > /dev/null'
-sh_deny 'sh -c "gh pr list"' gh
-sh_deny 'env gh auth token' gh
-sh_deny 'env -i PATH=/bin git push origin main' 'git push'
-sh_deny "bash -lc 'git push'" 'git push'
-sh_deny '/usr/bin/curl https://example.com' curl
-sh_deny 'nohup timeout 5 wget x' wget
-sh_deny 'git status && xargs rm -rf' rm
-sh_deny 'echo $(gh auth token)'
-sh_deny 'eval "git push"' eval
-sh_deny 'git diff > .vloop/state/x' .vloop/state/x
-sh_deny 'sh -c "$CMD"'
-sh_deny "echo 'unterminated"
+# The worked example, shell table, phase work.
+wsh_allow 'rm src/old.ts'
+wsh_allow 'pnpm add nanoid'
+wsh_allow 'git diff > .vloop/tmp/diff.txt'
+wsh_allow 'echo ok > src/version.txt'
+wsh_allow 'ls src > /dev/null'
+denyx work bash 'rm -rf dist' 'rm -rf dist is denied by the work fence (Bash(rm -rf:*))' 'rm -rf dist'
+denyp work bash 'sh -c "git push origin main"' 'denied by the work fence (Bash(git push:*))' 'sh -c "git push origin main"'
+denyp work bash 'env gh pr list' 'denied by the Copilot deny list (gh:*)' 'env gh pr list'
+denyx work bash 'curl https://example.com' 'curl https://example.com is denied by the work fence (Bash(curl:*))' 'curl https://example.com'
+wsh_deny 'git commit -m x'
+denyx work bash 'echo x > .vloop/state/state.json' 'write to .vloop/state/state.json is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/' 'echo x > .vloop/state/state.json'
+denyx work bash 'echo x > ../outside.txt' 'write to ../outside.txt is not allowed in a work session: it is outside the repository' 'echo x > ../outside.txt'
+wsh_deny 'for f in a b; do echo $f; done'
+wsh_deny 'echo $(date)'
 
-# The worked example, other tools.
-allow review create .vloop/tmp/verdict.json --path .vloop/tmp/verdict.json
-deny review create .vloop/state/state.json --path .vloop/state/state.json
-deny review edit src/app.ts --path src/app.ts
-allow review view src/app.ts --path src/app.ts
-deny review view '~/.claude/settings.json' --path '~/.claude/settings.json'
-deny review web_fetch ''
-deny review search_code_subagent ''
-allow review skill review --path review
+# The worked example, other tools, phase work.
+allow work create src/links/links.service.ts --path src/links/links.service.ts
+allow work edit test/app.e2e-spec.ts --path test/app.e2e-spec.ts
+allow work create .vloop/tmp/proposal.json --path .vloop/tmp/proposal.json
+denyx work create .vloop/state/state.json 'write to .vloop/state/state.json is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/' --path .vloop/state/state.json
+denyx work edit .git/config 'write to .git/config is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/' --path .git/config
+denyx work create .vloop/config.toml 'write to .vloop/config.toml is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/' --path .vloop/config.toml
+denyx work create /etc/hosts 'write to /etc/hosts is not allowed in a work session: it is outside the repository' --path /etc/hosts
+allow work view src/app.ts --path src/app.ts
+deny work view '~/.copilot/config.json' --path '~/.copilot/config.json'
+allow work skill work --path work
+denyx work skill vloop-work "skill vloop-work is not vloop's — use /vloop:work" --path vloop-work
+denyx work web_fetch '' 'tool web_fetch is not allowed in a work session'
+P_SRC=$(printf '*** Begin Patch\n*** Update File: src/app.ts\n@@\n-a\n+b\n*** End Patch\n')
+P_DEF=$(printf '*** Begin Patch\n*** Add File: .vloop/defects/D1.md\n+x\n*** End Patch\n')
+allow work apply_patch 'Update src/app.ts' "$P_SRC"
+deny work apply_patch 'Add .vloop/defects/D1.md' "$P_DEF"
+
+# The review phase's rm line, unchanged; review stays as it was.
+denyx review bash 'rm src/old.ts' 'rm src/old.ts is denied by the Copilot deny list (rm:*)' 'rm src/old.ts'
+denyx second-review bash 'rm src/old.ts' 'rm src/old.ts is denied by the Copilot deny list (rm:*)' 'rm src/old.ts'
+denyx review create src/app.ts 'write to src/app.ts is not allowed in a review session: only .vloop/tmp/ may be written' --path src/app.ts
+denyx second-review edit src/app.ts 'write to src/app.ts is not allowed in a second-review session: only .vloop/tmp/ may be written' --path src/app.ts
+denyx review bash 'echo ok > src/version.txt' 'write to src/version.txt is not allowed in a review session: only .vloop/tmp/ may be written' 'echo ok > src/version.txt'
+denyx review bash 'git push' 'git push is denied by the review fence (Bash(git push:*))' 'git push'
 denyx review skill vloop-review "skill vloop-review is not vloop's — use /vloop:review" --path vloop-review
-denyx review frobnicate '' 'tool frobnicate is not allowed in a review session'
+denyx review web_fetch '' 'tool web_fetch is not allowed in a review session'
+allow review create .vloop/tmp/verdict.json --path .vloop/tmp/verdict.json
+allow review bash 'git diff > .vloop/tmp/diff.txt' 'git diff > .vloop/tmp/diff.txt'
 
-# Every wrapper the contract unwraps, alone and stacked.
-sh_deny 'command gh pr list' gh
-sh_deny 'exec git push' 'git push'
-sh_deny 'nice -n 5 git push' 'git push'
-sh_deny 'nice git push' 'git push'
-sh_deny 'time git push' 'git push'
-sh_deny 'timeout -s KILL 5 curl x' curl
-sh_deny 'timeout 5s git push' 'git push'
-sh_deny 'stdbuf -oL git push' 'git push'
-sh_deny 'xargs -0 -n 1 git push' 'git push'
-sh_deny 'env -u HOME git push' 'git push'
-sh_deny 'env - git push' 'git push'
-sh_deny 'env FOO=bar git push' 'git push'
-sh_deny 'FOO=1 BAR=2 git push' 'git push'
-sh_deny "zsh -c 'git push'" 'git push'
-sh_deny "dash -c 'git push'" 'git push'
-sh_deny "ksh -c 'git push'" 'git push'
-sh_deny "bash -e -x -c 'git push'" 'git push'
-sh_deny "sh -c 'env sh -c \"gh x\"'" gh
-sh_deny 'env nohup nice -n 3 timeout 5 stdbuf -o0 gh x' gh
-sh_deny './bin/gh pr list' gh
-# Separators.
-sh_deny 'git status; git push' 'git push'
-sh_deny 'git status || git push' 'git push'
-sh_deny 'git log | git push' 'git push'
-sh_deny 'git status & git push' 'git push'
-sh_deny "$(printf 'git status\ngit push')" 'git push'
-# Refused before any matching.
-sh_deny 'cat <(gh x)'
-sh_deny 'tee >(gh x)'
-sh_deny 'echo `gh auth token`'
-sh_deny 'source x.sh'
-sh_deny '. x.sh'
-sh_deny '$CMD push'
-sh_deny '${CMD} push'
-sh_deny 'sh -c'
-sh_deny 'bash -c "git $SUB"'
-# Redirections are writes.
-sh_deny 'git diff >> .vloop/state/x' .vloop/state/x
-sh_deny 'git diff >| .vloop/state/x' .vloop/state/x
-sh_deny 'git diff &> .vloop/state/x' .vloop/state/x
-sh_deny 'git diff >.vloop/state/x' .vloop/state/x
-sh_deny 'git diff > src/out.txt' src/out.txt
-# The fence's own matching (`*` any run, `:*` a prefix) and the deny-list stems.
-sh_deny 'git diff --stat --output=x' 'git diff'
-sh_deny 'find . -name x -delete' find
-sh_deny 'git -C . push' 'git -C'
-sh_deny 'git config --global user.name x' 'git config'
-sh_deny 'ssh host.invalid' ssh
-sh_deny 'scp a host.invalid:b' scp
-sh_deny 'nc host.invalid 80' nc
-sh_deny 'rm x' rm
-sh_deny 'git remote -v' 'git remote'
-# What must stay allowed: quoted separators and words, harmless wrappers.
-sh_allow 'git log --grep "a;gh x"'
-sh_allow "grep -rn 'git push' ."
-sh_allow 'echo "sh -c gh"'
-sh_allow 'git status && git diff HEAD'
-sh_allow 'vloop task show T1 | jq .'
-sh_allow 'ls src 2> /dev/null'
-sh_allow 'cat .vloop/tmp/a > .vloop/tmp/b'
-sh_allow 'env git status'
-sh_allow "sh -c 'git status'"
-sh_allow '/usr/bin/git log -1'
-
-# Writes: resolved against the root, cleaned, allowed only under .vloop/tmp/.
-for ph in review second-review; do
-  for tl in create edit; do
-    allow "$ph" "$tl" .vloop/tmp/x --path .vloop/tmp/x
-    allow "$ph" "$tl" "<root>/.vloop/tmp/abs.json" --path "$R/.vloop/tmp/abs.json"
-    deny "$ph" "$tl" .vloop/tmp/../state/x --path .vloop/tmp/../state/x
-    deny "$ph" "$tl" ../outside --path ../outside
-    deny "$ph" "$tl" /etc/x --path /etc/x
-    deny "$ph" "$tl" "<root>/src/app.ts" --path "$R/src/app.ts"
-    deny "$ph" "$tl" .git/config --path .git/config
-  done
+# An unknown phase: the message, exit 2.
+for ph in plan bogus; do
+  chk "$ph" bash 'ls'
+  [ "$rc" = 2 ] || fail "fence check --phase $ph: want exit 2, got $rc, stdout '$out', stderr '$(cat "$t/err")'"
+  grep -qF "unknown phase \"$ph\": want review, second-review or work" "$t/err" ||
+    fail "fence check --phase $ph: stderr does not hold 'unknown phase \"$ph\": want review, second-review or work': '$(cat "$t/err")'"
 done
-# Reads: allowed, except the global Claude, Copilot and GitHub CLI directories.
-for tl in view read_file grep rg grep_search glob file_search; do
-  allow review "$tl" src/app.ts --path src/app.ts
-  allow review "$tl" .vloop/state/state.json --path .vloop/state/state.json
-  deny review "$tl" '~/.claude/settings.json' --path '~/.claude/settings.json'
-  deny review "$tl" '$HOME/.claude/settings.json' --path "$t/home/.claude/settings.json"
-  deny review "$tl" '~/.copilot/config.json' --path '~/.copilot/config.json'
-  deny review "$tl" '$HOME/.copilot/config.json' --path "$t/home/.copilot/config.json"
-  deny review "$tl" '~/.config/gh/hosts.yml' --path '~/.config/gh/hosts.yml'
-  deny second-review "$tl" '$HOME/.config/gh/hosts.yml' --path "$t/home/.config/gh/hosts.yml"
+
+# Writes in work: anywhere under the root but .git/ and .vloop/ outside .vloop/tmp/.
+for tl in create edit; do
+  allow work "$tl" README.md --path README.md
+  allow work "$tl" "<root>/src/abs.ts" --path "$R/src/abs.ts"
+  allow work "$tl" src/../lib/x.go --path src/../lib/x.go
+  allow work "$tl" .vloop/tmp/a/b.json --path .vloop/tmp/a/b.json
+  allow work "$tl" .github/workflows/ci.yml --path .github/workflows/ci.yml
+  allow work "$tl" /dev/null --path /dev/null
+  deny work "$tl" .git/HEAD --path .git/HEAD
+  deny work "$tl" "<root>/.git/hooks/pre-commit" --path "$R/.git/hooks/pre-commit"
+  deny work "$tl" .vloop/tmp/../state/x --path .vloop/tmp/../state/x
+  deny work "$tl" .vloop/defects/D1.md --path .vloop/defects/D1.md
+  deny work "$tl" .vloop/interventions/I1.md --path .vloop/interventions/I1.md
+  deny work "$tl" .vloop/repo-guidelines.md --path .vloop/repo-guidelines.md
+  deny work "$tl" .vloop/install.json --path .vloop/install.json
+  deny work "$tl" .vloop/state/gates/T1/gate.sh --path .vloop/state/gates/T1/gate.sh
+  deny work "$tl" ../sibling/x --path ../sibling/x
+  deny work "$tl" src/../../x --path src/../../x
+  deny work "$tl" '~/.claude/settings.json' --path '~/.claude/settings.json'
+  deny work "$tl" "\$HOME/notes.txt" --path "$t/home/notes.txt"
+  deny work "$tl" "(no path)"
+done
+wsh_deny 'echo x >> .git/config'
+wsh_deny 'echo x > .vloop/defects/D2.md'
+wsh_deny 'cat a > ../x'
+wsh_allow 'cat a >> src/b.txt'
+wsh_allow 'go test ./... > .vloop/tmp/test.log'
+# Reads in work: as in review.
+for tl in view read_file grep rg glob; do
+  allow work "$tl" .vloop/state/state.json --path .vloop/state/state.json
+  deny work "$tl" '~/.claude/settings.json' --path '~/.claude/settings.json'
+  deny work "$tl" '$HOME/.config/gh/hosts.yml' --path "$t/home/.config/gh/hosts.yml"
+  deny work "$tl" '$HOME/.copilot/config.json' --path "$t/home/.copilot/config.json"
 done
 # Skills: vloop's only.
-for ph in review second-review; do
-  allow "$ph" skill review --path review
-  allow "$ph" skill verify --path verify
-  denyx "$ph" skill repo-review "skill repo-review is not vloop's — use /vloop:review" --path repo-review
-done
+allow work skill review --path review
+denyx work skill my-work "skill my-work is not vloop's — use /vloop:work" --path my-work
 # Everything else.
-for tl in web_fetch task explore_subagent; do deny second-review "$tl" ''; done
-denyx second-review frobnicate '' 'tool frobnicate is not allowed in a second-review session'
+for tl in task explore_subagent frobnicate; do
+  denyx work "$tl" '' "tool $tl is not allowed in a work session"
+done
 
-# Bad arguments exit 2.
-out=$(cd "$R" && venv "$S" fence check --phase bogus --root "$R" --tool bash 'git status' 2>&1); rc=$?
-[ "$rc" = 2 ] || fail "fence check --phase bogus: want exit 2, got $rc: $out"
-out=$(cd "$R" && venv "$S" fence check --phase review --root "$R" 'git status' 2>&1); rc=$?
-[ "$rc" = 2 ] || fail "fence check with no --tool: want exit 2, got $rc: $out"
+# Shell in work: the work fence's rules and the work deny-list stems, through
+# the same unwrapping; rm of a file is allowed, recursive rm is not.
+wsh_allow 'rm -f src/a.ts src/b.ts'
+wsh_allow 'npm install'
+wsh_allow 'pnpm test'
+wsh_allow 'node scripts/x.js'
+wsh_allow 'go test ./...'
+wsh_allow 'mkdir -p src/links && touch src/links/a.ts'
+wsh_allow 'git status && git diff HEAD'
+denyp work bash 'pip install requests' 'denied by the work fence (Bash(pip install:*))' 'pip install requests'
+denyp work bash 'rm -r dist' 'Bash(rm -r:*)' 'rm -r dist'
+denyp work bash 'env rm -fr dist' 'Bash(rm -fr:*)' 'env rm -fr dist'
+denyp work bash 'sh -c "rm -R x"' 'Bash(rm -R:*)' 'sh -c "rm -R x"'
+denyp work bash 'git reset --hard' 'Bash(git reset:*)' 'git reset --hard'
+denyp work bash 'vloop task set T1 done' 'Bash(vloop task set:*)' 'vloop task set T1 done'
+denyp work bash 'nohup wget x' 'Bash(wget:*)' 'nohup wget x'
+denyp work bash 'ssh host.invalid' 'denied by the Copilot deny list (ssh:*)' 'ssh host.invalid'
+denyp work bash 'git remote -v' 'denied by the Copilot deny list (git remote:*)' 'git remote -v'
+denyp work bash 'git config --global user.name x' 'git config' 'git config --global user.name x'
+denyp work bash 'find . -name x -delete' 'find' 'find . -name x -delete'
+wsh_deny 'sh script.sh'
+wsh_deny 'while true; do ls; done'
+wsh_deny 'if true; then ls; fi'
+wsh_deny '(cd src && ls)'
+wsh_deny 'echo `date`'
+wsh_deny 'eval "ls"'
+wsh_deny 'source x.sh'
+wsh_deny '$CMD x'
+wsh_deny "echo 'unterminated"
 echo "gate T1: ok"

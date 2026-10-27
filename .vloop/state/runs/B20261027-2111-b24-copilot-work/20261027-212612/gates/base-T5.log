@@ -1,0 +1,1 @@
+GATE FAIL: no script in tools/copilot-acceptance sets agent.work = copilot and model.work and runs the fixture brief (greet.loop-brief.md)

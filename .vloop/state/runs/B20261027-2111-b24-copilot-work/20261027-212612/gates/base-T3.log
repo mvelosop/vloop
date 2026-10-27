@@ -1,0 +1,1 @@
+GATE FAIL: vloop config set agent.work copilot: vloop: invalid value "copilot" for agent.work: want one of claude
