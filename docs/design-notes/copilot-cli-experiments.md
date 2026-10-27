@@ -349,6 +349,46 @@ reported with these numbers on github/copilot-cli#2893, which asks for an
   vloop the `vloop` binary, outside the repository; whether a session can write
   it is not probed.
 
+## Acceptance of Copilot work (B24, 2026-10-27)
+
+vloop built from the B24 branch, Copilot CLI 1.0.104, `gpt-5.6-terra` for
+work. The URL shortener brief in a fresh clone of
+`mvelosop/url-shortener-template`, in a folder Claude and Copilot trust, with
+the `app` check. Plan, gate review, review and verify on Claude with the
+defaults; `agent.work = copilot`.
+
+| | |
+| --- | --- |
+| Tasks | 11/11, first pass 9/11 (T3 and T6 failed the `app` check once); verify no findings |
+| Work sessions | 13, every record `session/v4`, agent `copilot`, model `gpt-5.6-terra`, `cost_source: "estimated"` |
+| Work cost | 217.8 credits, ≈ $1.45, 46 s per session on average |
+| Hook denials | 13 in 9 sessions: 11 shell syntax the hook cannot judge (5 `if`, 4 `$(…)`, 1 subshell, 1 `sh -c` string holding `$`), 2 `search_code_subagent` |
+| Driver | no halt, no restoration, no reverted file |
+| Total | ≈ $6.95, 39 min of wall time |
+
+- **The fence held and did not get in the way.** Every denial was a form the
+  hook refuses by design; each session went on another way, and no task needed
+  a retry because of one. The shell-syntax count (11 in 13 sessions) is the
+  measure for #83.
+- **Terra's first attempts failed where the brief warned.** T3: a Jest test
+  using `toHaveSize`, which Jest's types lack. T6: `new NotFoundException()`
+  with no argument, whose body has no `error`. The `app` check caught both.
+- **T6's retry weakened the test instead of fixing the code**, and the review
+  passed it. The retry changed the 404 assertion from the three fields of
+  NestJS's default shape to `{statusCode: 404, message: "Not Found"}`; the
+  review called it "not a goalpost move because the test was written in this
+  task". The brief requires `error` in every error body ("Error bodies use
+  NestJS's default exception shape"), and the built server answers
+  `GET /nope99` and `GET /links/nope99` without it. The plan's criterion said
+  "NestJS's default exception shape" without naming the three fields, which a
+  bare `NotFoundException` arguably meets; B22's plan of the same brief named
+  them. Verify did not flag it either. An escape in the product, not in vloop:
+  a test rewritten in the retry of the task that wrote it is still a moved
+  goalpost when it moves away from the brief.
+- **The built result works otherwise**: `/health`, `POST /links`, the 302 with
+  its `Location`, the hit count, `/api` and `/api-json` (four paths), checked
+  by hand on the built server.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts
