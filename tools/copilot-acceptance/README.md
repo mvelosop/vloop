@@ -76,3 +76,25 @@ Record the summaries (`b22-hook-summary.md`, `b22-second-summary.md`) in
 `docs/design-notes/copilot-cli-experiments.md` before the brief is closed. The
 hooks-file shape vloop writes is unconfirmed against Copilot's docs: if the
 failure probes find no hook file to edit, that is the first thing to check.
+
+## B22.3: getting past the hook
+
+Two standalone scripts, outside vloop: each case its own scratch repository
+and `COPILOT_HOME` with one `preToolUse` hook, under `--allow-all-tools`. They
+need `copilot` and a logged-in `gh`, spend Copilot credits, and print their
+results (`fail-open.sh` also writes `<workdir>/summary.md`).
+
+```
+tools/copilot-acceptance/fail-open.sh <copilot model id> [workdir]
+tools/copilot-acceptance/bypass.sh <copilot model id> [workdir]
+```
+
+- **`fail-open.sh`** — does a hook that means deny stop the call when it
+  prints deny JSON, exits 2 or 1, prints a log line before its JSON, prints
+  text that is not JSON, or answers after `timeoutSec`?
+- **`bypass.sh`** — ten parallel calls under a fast and a slow hook (are hooks
+  queued, and does a queued call time out open?), and the hooks file
+  overwritten or deleted mid-session (is it re-read?).
+
+Re-run both when Copilot updates; the results are in
+`docs/design-notes/copilot-cli-experiments.md` → B22.3.

@@ -303,6 +303,52 @@ recorded by the `git` shim) under a hook command replaced by a failing one:
 - The session's `COPILOT_HOME` is under `.vloop/tmp/`, emptied after every
   session, so the kit rebuilds the hooks file before each probe.
 
+### B22.3 — getting past the hook without touching it
+
+Standalone, outside vloop (`tools/copilot-acceptance/fail-open.sh` and
+`bypass.sh`): a scratch repository and `COPILOT_HOME` per case, one `preToolUse`
+hook, `--allow-all-tools`, `gpt-5.6-terra`. A call ran when the file it touches
+exists afterwards.
+
+**What a deny-meaning hook lets through** (`fail-open.sh`, Copilot 1.0.103),
+asked for one `touch marker`:
+
+| Hook | The call |
+|---|---|
+| prints the deny JSON | denied: `Denied by preToolUse hook: blocked by test` |
+| exits 2 | denied: `… hook exited with code 2` |
+| exits 1 | denied: `… (hook errored)` |
+| prints a log line, then the deny JSON | **ran** |
+| prints `deny` (not JSON) | **ran** |
+| sleeps 8 s then denies, `timeoutSec` 2 | **ran** |
+
+A single stray line on stdout turns a deny into an allow. All three are
+documented ("always fail-open" on timeout; unparseable output "falls through to
+default behavior") in the
+[hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference);
+reported with these numbers on github/copilot-cli#2893, which asks for an
+`onTimeout` policy.
+
+**What the agent could do about it** (`bypass.sh`, Copilot 1.0.104):
+
+| Probe | Result |
+|---|---|
+| 10 calls in one batch (started within 8 ms), hook denies at once, `timeoutSec` 5 | hooks run one at a time, ≈ 25 ms apart; all 10 denied |
+| the same, hook sleeps 2 s then denies | one at a time, 2 s each (≈ 20 s in all); **all 10 denied**, the last after waiting ≈ 18 s |
+| hooks file overwritten with no hooks, between a denied and a second call | the second call **denied** |
+| hooks file deleted, the same | the second call **denied** |
+
+- **The timeout runs per hook, from its start, not from the call.** Queued
+  behind others, a call is not failed open: #2893's mechanism (1.0.35, Windows)
+  does not reproduce here, nor its 1.5–4 s gaps between hooks.
+- **The hooks file is read at session start.** vloop writes a fresh
+  `COPILOT_HOME` per session and empties it after, so an edit reaches no later
+  session either.
+- **What remains:** a hook slow on its own (a stalled machine past
+  `timeoutSec` 30), and the hook's program, which runs anew on every call: for
+  vloop the `vloop` binary, outside the repository; whether a session can write
+  it is not probed.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts

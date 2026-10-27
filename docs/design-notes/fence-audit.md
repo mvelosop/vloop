@@ -28,6 +28,8 @@ rule by rule, who enforces it there.
   non-zero, but runs the call when the hook prints output that is not JSON or
   exceeds its timeout (`docs/design-notes/copilot-cli-experiments.md` → B22.2);
   the hook always prints its answer and is fast, and the deny list stays behind it.
+  Neither parallel tool calls nor editing the hooks file mid-session gets a call
+  past the hook (B22.3): the timeout runs per hook, and the file is read once.
 - **driver** — what the driver checks after the session, whatever the session
   did: it restores the plan, the brief's status, the gate fixtures, `.vloop/config.toml`,
   the guidelines file, `.vloop/defects/`, `.vloop/interventions/` and the run
