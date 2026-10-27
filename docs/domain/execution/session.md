@@ -8,7 +8,7 @@ A fresh process of its phase's agent — Claude Code by default — with one job
 no memory of any other; sessions share nothing but files (S-1). Everything
 agent-specific (preflight, the phases it supports, the command and
 environment, whether stdout is a record, its mapping onto the record) is the
-agent's adapter's; claude and, for review sessions only, copilot are the adapters. *Part of [execution](execution-context.md).*
+agent's adapter's; claude and copilot are the adapters; copilot runs work, review and second-review sessions. *Part of [execution](execution-context.md).*
 
 ## The six kinds
 
@@ -80,11 +80,11 @@ session write under `.git/`. Each phase has its own fence. The plan fence allows
 nothing under `.vloop/` but `.vloop/tmp/**`.
 
 **The Copilot hook.** Copilot reads no fence file, so every Copilot session
-(review or second-review) runs under a `preToolUse` hook, `vloop fence hook`,
+(work, review or second-review) runs under a `preToolUse` hook, `vloop fence hook`,
 written into the session's own `COPILOT_HOME`. It judges each tool call with the
-review fence's Bash deny rules and the adapter's deny-list stems, looking through
+phase's fence (the work fence, `fence/work.json`, for a work session, the review fence otherwise) Bash deny rules and the adapter's deny-list stems (without `rm:*` in the work phase), looking through
 shell wrappers, and fails closed: what it cannot parse, or any error, is a deny.
-It allows writes only under `.vloop/tmp/`, reads outside the user's global Claude,
+It allows writes only under `.vloop/tmp/` in a review session, and anywhere in the repository but `.git/` and `.vloop/` (bar `.vloop/tmp/`) in a work session; reads outside the user's global Claude,
 Copilot and GitHub CLI directories, and the `skill` tool only for vloop's own
 skills. The adapter's deny list also stays on Copilot's command line. Copilot's
 denials are parsed from its output into `permission_denials`. The hook adds a

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "The fence audit gains a work part (every fence/work.json deny rule and work deny-list pattern classified, plus what is neither); the configuration guide offers agent.work = copilot (experimental) and covers the work phase of the hook; session.md and the glossary say copilot runs work sessions under the work fence.",
+  "files": ["docs/design-notes/fence-audit.md", "docs/guide/configuration.md", "docs/domain/execution/session.md", "docs/domain/domain-model.md"],
+  "verified": "sh .vloop/state/gates/T4/gate.sh printed gate T4: ok; go vet and gofmt clean.",
+  "notes": "fence/work.json has the same 102 deny rules as fence/review.json; the audit's work part lists them again with work-specific notes. Messages quoted from internal/fence/judge.go and internal/cli/run.go."
+}

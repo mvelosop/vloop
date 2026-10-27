@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 3
+**Status:** running · **4/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:09:29Z
+**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:15:51Z
 
 ## Progress
 
 - [x] **T1** — Add the work phase to the fence judge and to vloop fence check
 - [x] **T2** — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
 - [x] **T3** — Check agent.work = copilot in the run preflight and doctor
-- [ ] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
+- [x] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a work run on the real CLI
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
 
@@ -92,7 +92,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
 
-`pending` · depends on: T1, T2, T3
+`done` · depends on: T1, T2, T3
 
 A1's prose. The fence audit, the guide and the domain pages say what a Copilot work session may do and who enforces each rule: the operator reads these to decide whether to trust `agent.work = copilot`, so every sentence must match what T1–T3 built. Prose task: if it fails review twice on wording, it is blocked and the operator finishes it.
 
