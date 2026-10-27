@@ -1,0 +1,1 @@
+{"schema":"proposal/v1","task":"T6","outcome":"done","summary":"Nothing new built; every gate T1-T5 re-ran on the final tree and passed, as did the T6 close gate.","files":[],"verified":"vloop task gate T6 exited 0 and printed gate T6: ok; go vet, gofmt, go mod tidy -diff and linux/windows builds clean.","notes":"none"}

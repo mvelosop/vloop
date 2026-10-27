@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 6
+**Status:** running · **6/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:26:57Z
+**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:32:53Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Check agent.work = copilot in the run preflight and doctor
 - [x] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
 - [x] **T5** — Extend the Copilot acceptance kit with a work run on the real CLI · 1 attempt(s)
-- [ ] **T6** — Close the run: every gate at once, and the worked example line for line
+- [x] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
@@ -133,7 +133,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Close the run: every gate at once, and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 The brief's close. Every earlier gate re-runs on the final tree, and the review holds the brief's worked example against the built binary line for line, so nothing a later task changed has broken an earlier one's contract. It builds nothing new unless a gate or a worked-example line fails, and then fixes only that.
 

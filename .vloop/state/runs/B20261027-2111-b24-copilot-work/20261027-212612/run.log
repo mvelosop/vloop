@@ -54,3 +54,10 @@ vloop: the review session changed tools/copilot-acceptance/__pycache__/report.cp
    review T5 · 0m36s · $0.14 · run $6.44 / $40.00
    review: PASS
    T5 done
+── iteration 7 (7 this run) · T6 · 5/6 done ──
+   Close the run: every gate at once, and the worked example line for line
+   work T6 · 0m38s · $0.06 · run $6.51 / $40.00
+   check go
+   review T6 · 0m47s · $0.10 · run $6.61 / $40.00
+   review: PASS
+   T6 done
