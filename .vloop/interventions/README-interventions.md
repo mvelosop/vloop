@@ -168,6 +168,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261026-023244-r2-confirmed-on-real-records-the-url-sho](I20261026-023244-r2-confirmed-on-real-records-the-url-sho.md) |
 | verify | verification-finding | no | no-options | [I20261027-004737-copilot-runs-the-call-when-a-pretooluse](I20261027-004737-copilot-runs-the-call-when-a-pretooluse.md) |
 | verify | verification-finding | partly | no-options | [I20261027-004745-verify-s-one-finding-rejected-the-second](I20261027-004745-verify-s-one-finding-rejected-the-second.md) |
+| verify | verification-finding | partly | no-options | [I20261027-004807-metrics-left-the-second-reviews-cost-cre](I20261027-004807-metrics-left-the-second-reviews-cost-cre.md) |
+| verify | verification-finding | partly | no-options | [I20261027-004808-the-acceptance-kit-s-hook-probe-read-a-h](I20261027-004808-the-acceptance-kit-s-hook-probe-read-a-h.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

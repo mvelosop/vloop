@@ -407,3 +407,38 @@ T9  -     chore    1    0      0      0      0       -          -       2m24s   
 - I20261027-004807-metrics-left-the-second-reviews-cost-cre — verification-finding, work, found by operator: metrics left the second reviews' cost, credits and time out of the totals and agent time, against docs/domain/measurement/metrics.md; fixed at close
 - I20261027-004808-the-acceptance-kit-s-hook-probe-read-a-h — verification-finding, work, found by operator: the acceptance kit's hook probe read a hooks file from a session home already emptied, and its failure call was on Copilot's deny list; fixed at close
 <!-- vloop:run-record:end -->
+
+### Operator notes
+
+- **Run.** `vloop run` 0.13.0, one run (`20261026-211937`), 9/9 done, 8 first
+  pass (T4 failed the `go` check once). $12.50, 153.5 min of wall time; no
+  halt, no ref moved, no permission denial.
+- **Verified.** Refs; the full toolchain checks; the worked example's 17 shell
+  lines and 10 other-tool lines by hand with a fresh build (every exit code as
+  written), the non-JSON payload (exit 2) and the `apply_patch` to
+  `.git/config` (deny); the second-review modes by
+  `cmd/vloop/run_second_review_test.go` and gate T5. The verify session's one
+  finding (no driver test of the modes) was wrong: it searched
+  `internal/driver` only; rejected, not a close finding.
+- **Acceptance on the real CLI** (`docs/design-notes/copilot-cli-experiments.md`
+  → B22.0–B22.2): the URL shortener brief from `mvelosop/url-shortener-template`,
+  `run.second-review = feedback` on Copilot `gpt-5.6-terra`: 11/11, 11 second
+  reviews (`session/v4`, ≈ $0.89), 2 dissents, 2 hook denials parsed into
+  `permission_denials`. Every probe form Copilot attempted was denied by the
+  hook, the non-vloop skill with K1's message. Copilot denies when the hook is
+  missing or exits 1, and **runs the call when the hook prints non-JSON or
+  times out**: recorded in the fence audit; the deny list stays behind it.
+- **Changed by hand** (`cbcdc91`): `vloop metrics` counted second-review
+  sessions but not their cost, credits or time ($5.22 reported against $6.11
+  spent), against `docs/domain/measurement/metrics.md`; now in the totals, in
+  agent time, and in `second_review` (`cost_usd`, `time_ms`, `credits`), test
+  first. The kit's `hook.py` rebuilds the hooks file (the session home is
+  emptied after each session) and no longer probes with `rm`, which Copilot's
+  deny list refused first.
+- **Incident.** The kit's fresh scratch folders stop at Claude's folder-trust
+  check; the acceptance ran in B19's already-trusted folder on a new branch
+  (`b22-acceptance`), B19's branch untouched.
+- **Still open.** Copilot's fail-open on a non-JSON or late hook answer (not
+  vloop's to fix); the fence's denial of harmless compound forms (`if`,
+  subshells) costs a reviewer a retry of its own; `gpt-5.6-terra` retires on
+  2026-11-16.
