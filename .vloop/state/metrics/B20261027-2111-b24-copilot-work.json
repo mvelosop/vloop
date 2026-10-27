@@ -1,8 +1,8 @@
 {
-  "schema": "metrics/v3",
+  "schema": "metrics/v4",
   "brief": "B20261027-2111-b24-copilot-work.loop-brief",
   "run_id": "B20261027-2111-b24-copilot-work",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 6,
@@ -50,19 +50,21 @@
     "gates_ms": 53635,
     "checks_ms": 1533091,
     "gate_review_ms": 83120,
-    "wall_ms": null
+    "verify_ms": 111031,
+    "wall_ms": 4113000
   },
   "rate": {
     "code_per_min": 3.4260830103849385,
     "code_test_per_min": 12.757651209722864
   },
   "cost": {
-    "total_usd": 6.610579200000001,
+    "total_usd": 6.859757900000001,
     "plan_usd": 3.6529080000000005,
     "work_usd": 1.6385378000000002,
     "review_usd": 0.9597962000000001,
     "gate_review_usd": 0.35933719999999997,
-    "per_1000_code_lines_usd": 86.9813052631579
+    "per_1000_code_lines_usd": 90.25997236842106,
+    "verify_usd": 0.24917870000000003
   },
   "credits": {
     "total": 0,
@@ -72,11 +74,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 420,
-    "output": 121943,
-    "cache_read": 11334392,
-    "cache_creation": 607604,
-    "cache_hit_ratio": 0.9490870189080668
+    "input": 450,
+    "output": 128629,
+    "cache_read": 11838979,
+    "cache_creation": 640554,
+    "cache_hit_ratio": 0.9486374300349608
   },
   "models": {
     "plan": [
@@ -90,6 +92,9 @@
     ],
     "gate-review": [
       "claude-sonnet-5-5"
+    ],
+    "verify": [
+      "claude-sonnet-5-5"
     ]
   },
   "agents": {
@@ -102,31 +107,44 @@
     "review": [
       "claude"
     ],
+    "second-review": [],
     "gate-review": [
       "claude"
+    ],
+    "verify": [
+      "claude"
     ]
+  },
+  "second_review": {
+    "mode": "off",
+    "sessions": 0,
+    "dissents": 0,
+    "dissent_tasks": [],
+    "cost_usd": 0,
+    "time_ms": 0
   },
   "effort": {
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 1,
-    "operator": 0,
+    "operator": 5,
     "escaped": 0,
-    "total": 1,
+    "total": 6,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 0,
+    "total": 5,
     "by_agreement": {
       "recommended": 0,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 5
     }
   },
   "instructions": {
@@ -143,7 +161,7 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 7,
+  "permission_denials": 9,
   "iterations": 7,
   "iterations_per_closed": 1.1666666666666667,
   "by_task": [
