@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "The acceptance kit has work.sh, which runs the fixture brief with agent.work = copilot and model.work given (plan and review on Claude), and report.py work, which summarises each work session record and each task's outcome; the README has its B24 section.",
+  "files": ["tools/copilot-acceptance/work.sh", "tools/copilot-acceptance/report.py", "tools/copilot-acceptance/README.md"],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: ok.",
+  "notes": "Resumed after a rejection whose review verdict was PASS (rejected because the review session changed files, likely a __pycache__ from compiling the Python); the work was already in the tree and unchanged. Not run: it needs real copilot, claude, gh and the network. Reviewers: do not byte-compile into the kit's directory."
+}

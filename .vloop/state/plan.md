@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 5
+**Status:** running · **5/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:21:28Z
+**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:26:57Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
 - [x] **T3** — Check agent.work = copilot in the run preflight and doctor
 - [x] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
-- [ ] **T5** — Extend the Copilot acceptance kit with a work run on the real CLI · 1 attempt(s)
+- [x] **T5** — Extend the Copilot acceptance kit with a work run on the real CLI · 1 attempt(s)
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -113,7 +113,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Extend the Copilot acceptance kit with a work run on the real CLI
 
-`pending` · 1 attempt(s) · depends on: T2, T3
+`done` · 1 attempt(s) · depends on: T2, T3
 
 A1's operator tool. Gates use a stub copilot; only a run on the real CLI proves a Copilot work session works. This task gives the operator a script that runs the fixture brief with `agent.work = copilot` and a given model, plan and review on Claude, and summarises each work session and each task's outcome, so the acceptance at close can be recorded. No gate or check runs it.
 
@@ -122,8 +122,6 @@ A1's operator tool. Gates use a stub copilot; only a run on the real CLI proves 
 - `tools/copilot-acceptance/` gains a script that runs `greet.loop-brief.md` in a scratch repository with a vloop built from this tree, `agent.work = copilot` and `model.work` the model given, plan and review on Claude, and writes a summary listing each work session record (agent, model, credits, estimated cost, `session/v4` validity, its `permission_denials`) and each task's outcome.
 - The README gains its section: how to run it, what it needs (copilot, a logged-in gh, claude), what it spends, what the summary holds, and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close.
 - The kit's scripts pass `sh -n` and its Python parses; flags, keys and messages of existing vloop commands the script uses are taken from running them, not memory; no gate or check runs the kit, copilot, gh or the network.
-
-**From the last attempt:** the review session changed files
 
 <details><summary>verify command</summary>
 

@@ -47,3 +47,10 @@ committing the plan
    review T5 · 0m38s · $0.10 · run $6.13 / $40.00
 vloop: the review session changed tools/copilot-acceptance/__pycache__/report.cpython-39.pyc — reverted
    review: FAIL
+── iteration 6 (6 this run) · T5 · 4/6 done ──
+   Extend the Copilot acceptance kit with a work run on the real CLI
+   work T5 · 0m45s · $0.17 · run $6.30 / $40.00
+   check go
+   review T5 · 0m36s · $0.14 · run $6.44 / $40.00
+   review: PASS
+   T5 done
