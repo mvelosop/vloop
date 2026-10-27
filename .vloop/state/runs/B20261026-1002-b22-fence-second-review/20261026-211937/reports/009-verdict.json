@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T8",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`tools/copilot-acceptance/` gains a probe of the review session under the hook asking for each deny form of the worked example's shell table (verbatim) and a skill other than vloop's, recording per form whether Copilot ran it.", "met": true, "evidence": "hook.py FORMS holds the 12 forms verbatim plus SKILL=vloop-review; forms() prompts for each call, and outcome()/summary() record ran/denied/failed per call from the tool.execution events."},
+    {"criterion": "It probes the hook's failure modes — its command missing, exit 1, output not JSON, a timeout — and records whether Copilot then runs the call.", "met": true, "evidence": "hook.py MODES covers missing, exit1, notjson and timeout. start() rewrites bash, powershell and timeoutSec in hooks/vloop-fence.json, which matches the shape written at internal/driver/agent_copilot.go:146-165. summary() records the per-mode result."},
+    {"criterion": "It runs a fixture brief with `run.second-review = feedback` and `agent.second-review = copilot`, and its summary reports the second-review records and dissents.", "met": true, "evidence": "second.sh sets run.second-review=feedback, agent.second-review=copilot and model.second-review in a scratch repo, then runs vloop run. report.py second_report lists the session/v4 records (validated), the run-log second-review lines and the dissents."},
+    {"criterion": "The README says how to run each part and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close; no gate or check runs the kit, copilot, gh or the network.", "met": true, "evidence": "README section 'B22' gives the invocations and says to record the summaries in copilot-cli-experiments.md. The gate only runs sh -n, an AST parse and greps; the kit is not wired into any check."},
+    {"criterion": "The kit's scripts pass `sh -n` and its Python parses; flags and messages of existing commands are taken from running them.", "met": true, "evidence": "The gate passed (sh -n plus ast.parse). The vloop commands used (init, config set, doctor, schema validate session/v4, run) are the existing ones."}
+  ],
+  "findings": [],
+  "notes": "Minor: the 'shim hit' column of the failure-mode table greps probe-hits.log, which accumulates across the four modes, so a later mode can show 'yes' because of an earlier one. The ran/denied column comes from the per-session events and is correct. The kit has no committed test, which is expected for an operator kit that cannot run without the real copilot. The kit assumes the hooks file name and shape that vloop writes, as the README says."
+}

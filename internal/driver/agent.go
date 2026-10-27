@@ -107,7 +107,7 @@ func (claudeAdapter) Name() string { return AgentClaude }
 
 func (claudeAdapter) Supports(phase string) bool {
 	switch phase {
-	case PhasePlan, PhaseWork, PhaseReview, PhaseGateReview, PhaseVerify:
+	case PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseGateReview, PhaseVerify:
 		return true
 	}
 	return false
@@ -128,7 +128,11 @@ func (claudeAdapter) Prepare(root, version, phase string) (Prepared, error) {
 	if err != nil {
 		return Prepared{}, err
 	}
-	fence, err := ExtractFence(root, version, phase)
+	fencePhase := phase
+	if phase == PhaseSecondReview {
+		fencePhase = PhaseReview
+	}
+	fence, err := ExtractFence(root, version, fencePhase)
 	if err != nil {
 		return Prepared{}, err
 	}

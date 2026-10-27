@@ -188,6 +188,7 @@ Start with vloop init in your repository, then vloop brief new to draft a brief.
 	root.AddCommand(newUpgrade(b, g))
 	root.AddCommand(newDoctor(b, g))
 	root.AddCommand(newRun(b, g))
+	root.AddCommand(newFence(g))
 	markRan(root, g)
 	return root, g
 }

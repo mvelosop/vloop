@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.4049276,
+  "duration_ms": 409473,
+  "effort": null,
+  "ended": "2026-10-26T22:26:52Z",
+  "is_error": false,
+  "iteration": 4,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 49422,
+      "cache_read_input_tokens": 838796,
+      "cost_usd": 0.4049276,
+      "input_tokens": 40,
+      "output_tokens": 12328
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261026-1002-b22-fence-second-review",
+  "schema": "session/v3",
+  "started": "2026-10-26T22:20:02Z",
+  "task": "T4",
+  "turns": 20,
+  "wall_ms": 410020
+}

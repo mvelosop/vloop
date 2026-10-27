@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "The optional second review session runs after the primary in record, feedback, on-pass and both-pass, with session/v4 and iteration/v3 records, a kept second verdict, run-log lines and the end-of-run dissent list.",
+  "files": ["internal/driver/iterate.go", "internal/driver/session.go", "internal/driver/agent.go", "internal/driver/agent_copilot.go", "internal/driver/cost.go", "internal/driver/resolve.go", "schemas/session.v4.json", "schemas/iteration.v3.json", "cmd/vloop/run_second_review_test.go"],
+  "verified": "vloop task gate T5 exited 0 and printed ok; go test ./..., go vet, gofmt, go mod tidy -diff and the linux/windows builds pass.",
+  "notes": "reviewSession is now reviewRun (shared guards, phase-parametrised) plus a thin wrapper; the second review is secondReviewStep. The primary verdict is copied to reports right after the primary review, then removed from .vloop/tmp/ before the second session. session/v4 is written only for second-review sessions and iteration/v3 only when a second review ran; every other record stays v3/v2 so existing readers and tests are unchanged. Existing tests changed: wantIterations accepts iteration/v3 for iterations with a second review; schema list/count tests (schema_test.go, cli/schema_test.go, b2_e2e_test.go, embed_test.go) list the two new schemas (T5 acceptance 6). metrics/v4 is T6's. Under go test ./..., unset VLOOP_PLAN_SHA256."
+}

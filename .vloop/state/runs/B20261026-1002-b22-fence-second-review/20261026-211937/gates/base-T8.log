@@ -1,0 +1,1 @@
+GATE FAIL: the kit does not probe the worked example's deny form: sh -c "gh pr list"

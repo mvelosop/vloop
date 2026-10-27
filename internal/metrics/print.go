@@ -111,8 +111,13 @@ func PrintSummary(out io.Writer, r *Report) {
 		grCost += fmt.Sprintf(" · verify %.2f", *r.Cost.VerifyUSD)
 		grModels += " · verify " + joinModels(*r.Models.Verify)
 	}
-	fmt.Fprintf(out, " time      agent %s min (work %s · review %s) · plan %s min%s · gates %s · wall %s min\n",
-		minutes(t.AgentMS), minutes(t.WorkMS), minutes(t.ReviewMS), minutes(t.PlanMS), grTime, optMinutes(t.GatesMS), optMinutes(t.WallMS))
+	second, secondCost := "", ""
+	if r.SecondReview.Sessions > 0 {
+		second = " · second review " + minutes(r.SecondReview.TimeMS)
+		secondCost = fmt.Sprintf(" · second review %.2f", r.SecondReview.CostUSD)
+	}
+	fmt.Fprintf(out, " time      agent %s min (work %s · review %s%s) · plan %s min%s · gates %s · wall %s min\n",
+		minutes(t.AgentMS), minutes(t.WorkMS), minutes(t.ReviewMS), second, minutes(t.PlanMS), grTime, optMinutes(t.GatesMS), optMinutes(t.WallMS))
 	fmt.Fprintf(out, " rate      %s code lines/min · %s incl. tests\n",
 		optFloat(r.Rate.CodePerMin, "%.1f"), optFloat(r.Rate.CodeTestPerMin, "%.1f"))
 	per1k := "n/a"
@@ -124,8 +129,8 @@ func PrintSummary(out io.Writer, r *Report) {
 	if r.Credits.Total > 0 {
 		approx = "≈"
 	}
-	fmt.Fprintf(out, " cost      %s$%.2f · plan %.2f · work %.2f · review %.2f%s · %s/kloc\n",
-		approx, r.Cost.Total, r.Cost.Plan, r.Cost.Work, r.Cost.Review, grCost, per1k)
+	fmt.Fprintf(out, " cost      %s$%.2f · plan %.2f · work %.2f · review %.2f%s%s · %s/kloc\n",
+		approx, r.Cost.Total, r.Cost.Plan, r.Cost.Work, r.Cost.Review, secondCost, grCost, per1k)
 	fmt.Fprintf(out, " models    plan %s · work %s · review %s%s\n",
 		joinModels(r.Models.Plan), joinModels(r.Models.Work), joinModels(r.Models.Review), grModels)
 	fmt.Fprintf(out, " defects   in-loop %d · operator %d · escaped %d · removal efficiency %s\n",

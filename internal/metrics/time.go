@@ -3,6 +3,7 @@ package metrics
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -13,11 +14,12 @@ import (
 
 // Phases are the session phases metrics report on.
 const (
-	PhasePlan       = "plan"
-	PhaseWork       = "work"
-	PhaseReview     = "review"
-	PhaseGateReview = "gate-review"
-	PhaseVerify     = "verify"
+	PhasePlan         = "plan"
+	PhaseWork         = "work"
+	PhaseReview       = "review"
+	PhaseSecondReview = "second-review"
+	PhaseGateReview   = "gate-review"
+	PhaseVerify       = "verify"
 )
 
 // Time is where a brief's time went, in milliseconds. Agent time is work plus
@@ -32,7 +34,9 @@ type Time struct {
 	ChecksMS     *int64 `json:"checks_ms"`
 	GateReviewMS int64  `json:"gate_review_ms"`
 	VerifyMS     int64  `json:"verify_ms"`
-	WallMS       *int64 `json:"wall_ms"`
+	// SecondReviewMS is the second review sessions' time; AgentMS includes it.
+	SecondReviewMS int64  `json:"second_review_ms"`
+	WallMS         *int64 `json:"wall_ms"`
 }
 
 // Rate is delivered lines per minute of agent time; nil when there is no agent
@@ -44,14 +48,16 @@ type Rate struct {
 
 // Cost is the sum of unrounded session costs in USD. Rounding is for display.
 type Cost struct {
-	Total       float64  `json:"total"`
-	Plan        float64  `json:"plan"`
-	Work        float64  `json:"work"`
-	Review      float64  `json:"review"`
-	GateReview  float64  `json:"gate_review"`
-	Verify      float64  `json:"verify"`
-	Per1kCode   *float64 `json:"per_1k_code_lines"`
-	PerPhase1kC struct {
+	Total      float64 `json:"total"`
+	Plan       float64 `json:"plan"`
+	Work       float64 `json:"work"`
+	Review     float64 `json:"review"`
+	GateReview float64 `json:"gate_review"`
+	Verify     float64 `json:"verify"`
+	// SecondReview is the second review sessions' cost; Total includes it.
+	SecondReview float64  `json:"second_review"`
+	Per1kCode    *float64 `json:"per_1k_code_lines"`
+	PerPhase1kC  struct {
 		Plan   *float64 `json:"plan"`
 		Work   *float64 `json:"work"`
 		Review *float64 `json:"review"`
@@ -66,6 +72,8 @@ type Credits struct {
 	Review     float64 `json:"review"`
 	GateReview float64 `json:"gate_review"`
 	Verify     float64 `json:"verify,omitempty"` // present when the verify session reported credits
+	// SecondReview is the second review sessions' credits; Total includes them.
+	SecondReview float64 `json:"second_review,omitempty"`
 }
 
 // TokenTotals are token counts summed over every counted session.
@@ -88,7 +96,12 @@ type Usage struct {
 	Agents  map[string]string // phase -> sorted, comma-joined agents
 	Effort  map[string]string // phase -> sorted, comma-joined efforts, where recorded
 	Denials int
-	Missing []string // `<task> <phase> (iteration <i>)`
+	// SecondSessions counts the second-review sessions; DissentTasks lists the
+	// distinct tasks whose second review dissented, and Dissents the iterations.
+	SecondSessions int
+	Dissents       int
+	DissentTasks   []string
+	Missing        []string // `<task> <phase> (iteration <i>)`
 }
 
 // reviewRan is the set of iteration outcomes that mean a review session ran.
@@ -150,6 +163,12 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	for _, f := range m.Folders {
 		for _, it := range f.Iterations {
 			iterations++
+			if it.Dissent {
+				u.Dissents++
+				if !slices.Contains(u.DissentTasks, it.Task) {
+					u.DissentTasks = append(u.DissentTasks, it.Task)
+				}
+			}
 			if it.GateMS != nil {
 				gate += *it.GateMS
 				gateKnown = true
@@ -184,6 +203,11 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 				u.Time.VerifyMS += s.TimeMS()
 				u.Cost.Verify += s.CostUSD
 				u.Credits.Verify += s.Credits
+			case PhaseSecondReview:
+				u.SecondSessions++
+				u.Time.SecondReviewMS += s.TimeMS()
+				u.Cost.SecondReview += s.CostUSD
+				u.Credits.SecondReview += s.Credits
 			default:
 				continue
 			}
@@ -230,7 +254,7 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 		u.Effort[p] = joinSet(set)
 	}
 
-	u.Time.AgentMS = u.Time.WorkMS + u.Time.ReviewMS
+	u.Time.AgentMS = u.Time.WorkMS + u.Time.ReviewMS + u.Time.SecondReviewMS
 	if gateKnown {
 		u.Time.GateMS = &gate
 	}
@@ -250,8 +274,8 @@ func Aggregate(m *runs.Model, delivered Counts) Usage {
 	u.Rate.CodePerMin = fratio(float64(delivered.Code), minutes)
 	u.Rate.CodeTestPerMin = fratio(float64(delivered.Code+delivered.Test), minutes)
 
-	u.Cost.Total = u.Cost.Plan + u.Cost.Work + u.Cost.Review + u.Cost.GateReview + u.Cost.Verify
-	u.Credits.Total = u.Credits.Plan + u.Credits.Work + u.Credits.Review + u.Credits.GateReview + u.Credits.Verify
+	u.Cost.Total = u.Cost.Plan + u.Cost.Work + u.Cost.Review + u.Cost.GateReview + u.Cost.Verify + u.Cost.SecondReview
+	u.Credits.Total = u.Credits.Plan + u.Credits.Work + u.Credits.Review + u.Credits.GateReview + u.Credits.Verify + u.Credits.SecondReview
 	kc := float64(delivered.Code) / 1000
 	u.Cost.Per1kCode = fratio(u.Cost.Total, kc)
 	u.Cost.PerPhase1kC.Plan = fratio(u.Cost.Plan, kc)

@@ -73,7 +73,7 @@ type Resolved struct {
 // ResolveRun resolves the work and review defaults.
 func ResolveRun(root string) (*Resolved, error) {
 	r := &Resolved{model: map[string]string{}, effort: map[string]string{}, agent: map[string]string{}}
-	for _, phase := range []string{PhaseWork, PhaseReview, PhaseVerify} {
+	for _, phase := range []string{PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify} {
 		var err error
 		if r.model[phase], _, err = ResolveSession(root, "model", phase, ""); err != nil {
 			return nil, err

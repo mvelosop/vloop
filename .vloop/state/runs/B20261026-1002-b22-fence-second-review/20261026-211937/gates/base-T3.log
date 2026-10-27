@@ -1,0 +1,2 @@
+GATE FAIL: not every copilot session found a preToolUse hook with both the bash and powershell forms in COPILOT_HOME/hooks/: hooks 0 bash=no powershell=no
+hooks 0 bash=no powershell=no

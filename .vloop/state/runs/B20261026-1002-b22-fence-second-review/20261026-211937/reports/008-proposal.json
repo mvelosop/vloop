@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T7",
+  "outcome": "done",
+  "summary": "Wrote docs/design-notes/fence-audit.md (every review-fence deny rule and adapter stem classified hook/driver/neither); the configuration guide now describes the hook, fence check, fail-closed rules, K1 and each second-review mode and dissent; domain pages and both operator playbooks updated.",
+  "files": ["docs/design-notes/fence-audit.md", "docs/guide/configuration.md", "docs/domain/domain-model.md", "docs/domain/execution/session.md", "docs/domain/execution/task.md", "docs/domain/measurement/metrics.md", "plugin/skills/operate/SKILL.md", ".claude/skills/vloop-operator/SKILL.md"],
+  "verified": "vloop task gate T7 exited 0 (gate T7: ok); go test ./... passes with VLOOP_PLAN_SHA256 unset (inside the session the inherited plan hash makes internal/cli task_gate tests fail); gofmt -l . empty.",
+  "notes": "plugin/skills/operate/SKILL.md is word-budgeted (internal/budget ceiling 1750): the dissent paragraph is kept short for that reason. The configuration guide's new second-review mode table must not use run.second-review as a first-column cell, because the gate's row matcher takes the first match. The audit's 'neither' entries are shell programs that write or read outside redirections (tee, cp, cat ~/.claude/...) which the judge does not read; the driver's guards cover the writes."
+}

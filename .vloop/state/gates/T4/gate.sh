@@ -1,138 +1,122 @@
 #!/bin/sh
-# Gate T4 — R4: Copilot's login, checked, and the experimental warning's new
-# text. In a scratch vloop repository with agent.review = copilot, a
-# model.review set, a stub copilot and a stub gh first on PATH, and an
-# environment holding no token variable (env -i):
-#   - gh exits 1: doctor's `copilot login` row is ✗ with the brief's message,
-#     doctor exits 1; `vloop run` exits 1 with the brief's line on stderr
-#     before any session (the stub claude sees no -p) and leaves no plan;
-#   - an empty GH_TOKEN, or a gh that exits 0 printing nothing: still ✗;
-#   - gh prints a token, or COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN is
-#     set with the failing gh: ✓ copilot login;
-#   - no token value appears in doctor's output (text or JSON), in the run's
-#     output or anywhere under the fixture's .vloop/;
-#   - doctor and the run preflight give the warning's new text;
-#   - with agent.review = claude, doctor has no copilot login row.
-# Then the text: the old warning wording is gone from what a session or the
-# operator reads, and docs/guide/configuration.md's Copilot paragraph says
-# "experimental until the fence lands" and how a session logs in.
-# No gate runs the real copilot, gh or the network.
-set -u
-H=.vloop/state/gates/T4
-fail() { echo "GATE FAIL: $*" >&2; exit 1; }
-for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
-unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GOFLAGS GOBIN
-export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GOTOOLCHAIN=local
-top=$(pwd -P)
-JQ=$(command -v jq) || fail "jq is not on PATH"
-GITBIN=$(command -v git) || fail "git is not on PATH"
-t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
-trap 'chmod -R u+w "$t" 2>/dev/null; rm -rf "$t"' EXIT
-GOMODCACHE=$(go env GOMODCACHE) && GOCACHE=$(go env GOCACHE) && GOPATH=$(go env GOPATH) || fail "go env"
-export GOMODCACHE GOCACHE GOPATH GOPROXY=off
-mkdir -p "$t/bin" && go build -buildvcs=false -o "$t/bin/new" ./cmd/vloop || fail "go build of this tree"
-pv=$("$JQ" -r .version "$top/plugin/.claude-plugin/plugin.json") || fail "plugin version"
-BRIEF=docs/briefs/B20260101-0900-demo.loop-brief.md
-TOKEN=gho_GATEstubTOKEN0123456789abcdef
-ENVTOKEN=gate-env-token-9876543210
-MSG='no GitHub login reaches Copilot sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login'
-RUNLINE='vloop: agent.review is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login'
-WARN='! agent.review is copilot: experimental — review sessions are not fenced yet (docs/guide/configuration.md)'
+# Gate T4 — S1's keys and doctor, and the reworded Copilot warning.
+# run.second-review (off, record, feedback, on-pass, both-pass; default off),
+# agent.second-review (claude, copilot; default claude), model.second-review
+# (default sonnet), effort.second-review: each read from the file and from its
+# VLOOP_ variable, and an invalid value refused with exit 2. Doctor: nothing of
+# the second review when off; when on, a row naming mode, agent and model, the
+# no-independence warning when agent and model match the primary's, and the
+# copilot checks for a copilot second reviewer. The experimental warning in
+# its new words, for agent.review and agent.second-review. A copilot second
+# review with the default model is refused before any session, and K1's
+# refusal applies to agent.second-review when the second review is in use.
+G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
+. "$G/lib.sh"
+cd "$top" || fail "repo root"
+newbin
+get() { k=$1; shift; (cd "$t/repo" && venv "$@" "$S" config get "$k" 2>&1); }
+set_() { (cd "$t/repo" && venv "$S" config set "$1" "$2" >"$t/set.out" 2>&1); }
+doc() { o=$1; shift; (cd "$t/repo" && venv "$@" "$S" doctor >"$o" 2>&1); rc=$?; }
+nosession() { [ -s "$1.ev" ] && fail "$2: a session was started: $(head -3 "$1.ev")"; return 0; }
+SAME="! run.second-review: the second reviewer is the primary's agent and model — it adds no independence"
 
-# The stubs: claude, copilot (exits 0), git, and gh, set by gh <exit> [<printed>].
-mkdir -p "$t/stub" "$t/home" "$t/tmp" "$t/repo/docs/briefs" || fail mkdir
-ln -s "$GITBIN" "$t/stub/git" && sed "s/@PLUGIN_VERSION@/$pv/" "$H/stub-claude.sh" >"$t/stub/claude" && chmod +x "$t/stub/claude" || fail stub
-printf '#!/bin/sh\necho "copilot 1.0.0"\nexit 0\n' >"$t/stub/copilot" && chmod +x "$t/stub/copilot" || fail stub
-gh() { printf '#!/bin/sh\n[ -n "%s" ] && echo "%s"\nexit %s\n' "$2" "$2" "$1" >"$t/stub/gh" && chmod +x "$t/stub/gh" || fail "stub gh"; }
-printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$t/repo" >"$t/home/.claude.json"
-# venv [VAR=value...] cmd...: cmd in an environment with no token variable.
-venv() {
-  env -i PATH="$t/stub:/usr/bin:/bin" HOME="$t/home" USER=gateuser LOGNAME=gateuser TMPDIR="$t/tmp" LC_ALL=C \
-    GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 "$@"
-}
-R="$t/repo"
-venv git -C "$R" init -q -b main && venv git -C "$R" config user.name Gate &&
-  venv git -C "$R" config user.email gate@example.invalid && venv git -C "$R" config commit.gpgsign false || fail "git init"
-echo x >"$R/docs/x.md"
-(cd "$R" && venv "$t/bin/new" init >"$t/init.out" 2>&1) || fail "vloop init: $(cat "$t/init.out")"
-cfg() { printf '[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n[agent]\nreview = "%s"\n[model]\nreview = "gpt-x"\n' "$1" >"$R/.vloop/config.toml"; }
-cfg copilot
-cp "$H/brief.md" "$R/$BRIEF" || fail brief
-venv git -C "$R" add -A && venv git -C "$R" commit -q -m "gate fixture" || fail "fixture commit"
-
-# doctor <label> [VAR=value...]: doctor's text in $t/d.txt ($drc its exit) and
-# its JSON in $t/d.json; $row is the copilot login row as result<TAB>message.
-doctor() {
-  l=$1; shift
-  (cd "$R" && venv "$@" "$t/bin/new" doctor >"$t/d.txt" 2>&1); drc=$?
-  (cd "$R" && venv "$@" "$t/bin/new" doctor --json >"$t/d.json" 2>"$t/d.err")
-  "$JQ" -e . "$t/d.json" >/dev/null 2>&1 || fail "$l: doctor --json is not JSON: $(head -3 "$t/d.json" "$t/d.err")"
-  row=$("$JQ" -r '[.checks[] | select(.name == "copilot login")] | if length == 1 then "\(.[0].result)\t\(.[0].message)" else "rows: \(length)" end' "$t/d.json")
-  for v in "$TOKEN" "$ENVTOKEN"; do
-    grep -qF -- "$v" "$t/d.txt" "$t/d.json" "$t/d.err" && fail "$l: doctor prints a token"
-  done
-  return 0
-}
-# textrow <file>: the copilot login line of doctor's text output, its spaces squeezed.
-textrow() { grep -E '^[^ ]+ +copilot login( |$)' "$1" | tr -s ' '; }
-want_problem() {
-  doctor "$@"
-  [ "$row" = "problem	$MSG" ] || fail "$1: doctor's copilot login row is '$row', want a problem with: $MSG"
-  [ "$(textrow "$t/d.txt")" = "✗ copilot login $MSG" ] || fail "$1: doctor prints '$(textrow "$t/d.txt")', want '✗ copilot login  $MSG'"
-  [ "$drc" = 1 ] || fail "$1: doctor exits $drc with copilot login ✗, want 1"
-}
-want_pass() {
-  doctor "$@"
-  [ "$row" = "pass	" ] || fail "$1: doctor's copilot login row is '$row', want pass"
-  [ "$(textrow "$t/d.txt")" = "✓ copilot login" ] || fail "$1: doctor prints '$(textrow "$t/d.txt")', want '✓ copilot login'"
-}
-
-# No login anywhere.
-gh 1 ""
-want_problem "no token, gh exits 1"
-grep -qxF -- "$WARN" "$t/d.txt" || fail "doctor does not print the warning: $WARN"
-grep -qF 'until B20' "$t/d.txt" && fail "doctor still prints the old warning: $(grep -F 'until B20' "$t/d.txt")"
-want_problem "GH_TOKEN empty, gh exits 1" GH_TOKEN=
-gh 0 ""
-want_problem "no token, gh exits 0 and prints nothing"
-
-# The run refuses before planning.
-gh 1 ""
-: >"$t/stub/sessions.log"
-(cd "$R" && venv "$t/bin/new" run "$BRIEF" >"$t/r.out" 2>"$t/r.err"); rc=$?
-[ "$rc" = 1 ] || fail "vloop run with no login exits $rc, want 1: $(tail -5 "$t/r.err")"
-sed 's/^[[:space:]]*//' "$t/r.err" | grep -qxF -- "$RUNLINE" || fail "vloop run with no login does not print: $RUNLINE — stderr: $(tail -5 "$t/r.err")"
-[ ! -s "$t/stub/sessions.log" ] || fail "vloop run with no login started a session: $(cat "$t/stub/sessions.log")"
-[ ! -e "$R/.vloop/state/state.json" ] || fail "vloop run with no login left .vloop/state/state.json"
-
-# A login: gh, then each variable with the failing gh.
-gh 0 "$TOKEN"
-want_pass "gh prints a token"
-: >"$t/stub/sessions.log"
-(cd "$R" && venv "$t/bin/new" run "$BRIEF" >"$t/r.out" 2>"$t/r.err")
-sed 's/^[[:space:]]*//' "$t/r.err" | grep -qxF -- "$WARN" || fail "the run preflight does not print the warning: $WARN — stderr: $(head -5 "$t/r.err")"
-grep -qF 'until B20' "$t/r.err" && fail "the run preflight still prints the old warning"
-grep -qF -- "$RUNLINE" "$t/r.err" && fail "vloop run refuses with a gh that prints a token"
-grep -qF -- "$TOKEN" "$t/r.out" "$t/r.err" && fail "vloop run prints gh's token"
-grep -rqF -- "$TOKEN" "$R/.vloop" && fail "gh's token is kept under .vloop/: $(grep -rlF -- "$TOKEN" "$R/.vloop" | sed "s#^$R/##")"
-gh 1 ""
-for v in COPILOT_GITHUB_TOKEN GH_TOKEN GITHUB_TOKEN; do
-  want_pass "$v set, gh exits 1" "$v=$ENVTOKEN"
+# The keys.
+CFG=; fixture
+[ "$(get run.second-review)" = off ] || fail "run.second-review defaults to '$(get run.second-review)', want off"
+[ "$(get agent.second-review)" = claude ] || fail "agent.second-review defaults to '$(get agent.second-review)', want claude"
+[ "$(get model.second-review)" = sonnet ] || fail "model.second-review defaults to '$(get model.second-review)', want sonnet"
+[ -z "$(get effort.second-review)" ] || fail "effort.second-review has a default: '$(get effort.second-review)'"
+for m in record feedback on-pass both-pass off; do
+  set_ run.second-review "$m" || fail "vloop config set run.second-review $m failed: $(cat "$t/set.out")"
+  [ "$(get run.second-review)" = "$m" ] || fail "run.second-review set to $m reads '$(get run.second-review)'"
 done
-grep -rqF -- "$ENVTOKEN" "$R/.vloop" && fail "a token variable's value is kept under .vloop/"
+set_ run.second-review always; c=$?
+[ "$c" = 2 ] || fail "vloop config set run.second-review always exited $c, want 2"
+set_ agent.second-review copilot || fail "vloop config set agent.second-review copilot failed: $(cat "$t/set.out")"
+set_ agent.second-review codex; c=$?
+[ "$c" = 2 ] || fail "vloop config set agent.second-review codex exited $c, want 2"
+set_ effort.second-review high || fail "vloop config set effort.second-review high failed: $(cat "$t/set.out")"
+set_ effort.second-review extreme; c=$?
+[ "$c" = 2 ] || fail "vloop config set effort.second-review extreme exited $c, want 2"
+set_ model.second-review some-model || fail "vloop config set model.second-review failed: $(cat "$t/set.out")"
+[ "$(get run.second-review VLOOP_RUN_SECOND_REVIEW=both-pass)" = both-pass ] || fail "VLOOP_RUN_SECOND_REVIEW does not set run.second-review"
+[ "$(get agent.second-review VLOOP_AGENT_SECOND_REVIEW=claude)" = claude ] || fail "VLOOP_AGENT_SECOND_REVIEW does not set agent.second-review"
+[ "$(get model.second-review VLOOP_MODEL_SECOND_REVIEW=env-model)" = env-model ] || fail "VLOOP_MODEL_SECOND_REVIEW does not set model.second-review"
+[ "$(get effort.second-review VLOOP_EFFORT_SECOND_REVIEW=low)" = low ] || fail "VLOOP_EFFORT_SECOND_REVIEW does not set effort.second-review"
 
-# claude reviews: no copilot login row.
-cfg claude
-doctor "agent.review = claude"
-[ "$row" = "rows: 0" ] || fail "with agent.review = claude doctor has a copilot login row ($row)"
+# Doctor, second review off: nothing of it.
+CFG=; fixture
+doc "$t/d0"
+[ "$rc" = 0 ] || fail "doctor in a plain fixture exited $rc: $(cat "$t/d0")"
+grep -qiE 'second[- ]review' "$t/d0" && fail "doctor with run.second-review off speaks of the second review: $(grep -iE 'second[- ]review' "$t/d0")"
+# On, with a model of its own: a row naming mode, agent and model; no warning.
+CFG="run.second-review feedback
+model.second-review $SECOND"; fixture
+doc "$t/d1"
+[ "$rc" = 0 ] || fail "doctor with a second reviewer exited $rc: $(cat "$t/d1")"
+grep -F 'second-review' "$t/d1" | grep -F feedback | grep -F claude | grep -qF "$SECOND" ||
+  fail "doctor has no row naming the second review's mode (feedback), agent (claude) and model ($SECOND): $(cat "$t/d1")"
+grep -qxF "$SAME" "$t/d1" && fail "doctor warns of no independence for a second reviewer with its own model"
+# On, matching the primary: the warning.
+CFG="run.second-review on-pass"; fixture
+doc "$t/d2"
+[ "$rc" = 0 ] || fail "doctor with a second reviewer matching the primary exited $rc: $(cat "$t/d2")"
+grep -qxF "$SAME" "$t/d2" || fail "doctor does not print '$SAME': $(cat "$t/d2")"
+CFG="agent.review copilot
+model.review $MODEL
+run.second-review record
+agent.second-review copilot
+model.second-review $MODEL"; fixture
+doc "$t/d3"
+grep -qxF "$SAME" "$t/d3" || fail "doctor does not warn when both reviewers are copilot $MODEL: $(cat "$t/d3")"
 
-# The text.
-G=docs/guide/configuration.md
-old=$(grep -rnF -e 'not fenced until B20' -e 'experimental until B20' plugin internal cmd docs/guide docs/domain README.md 2>/dev/null)
-[ -z "$old" ] || fail "the old warning text is still there: $old"
-para=$(grep -F 'experimental until the fence lands' "$G")
-[ -n "$para" ] || fail "$G does not say the Copilot review sessions are experimental until the fence lands"
-for w in COPILOT_GITHUB_TOKEN GH_TOKEN GITHUB_TOKEN 'gh auth'; do
-  case "$para" in *"$w"*) ;; *) fail "$G's Copilot paragraph does not say how a session logs in: no $w";; esac
-done
+# The experimental warning, new words; copilot checks for the second reviewer.
+CFG="agent.review copilot
+model.review $MODEL"; fixture
+doc "$t/d4"
+[ "$rc" = 0 ] || fail "doctor with copilot reviews exited $rc: $(cat "$t/d4")"
+grep -qxF '! agent.review is copilot: experimental (docs/guide/configuration.md)' "$t/d4" ||
+  fail "doctor does not print '! agent.review is copilot: experimental (docs/guide/configuration.md)': $(cat "$t/d4")"
+grep -qi 'not fenced' "$t/d4" && fail "doctor still says copilot reviews are not fenced"
+runfix "$t/r4"
+[ "$rc" = 0 ] || fail "a run with copilot reviews exited $rc: $(tail -8 "$t/r4")"
+sed 's/^[[:space:]]*//' "$t/r4" | grep -qxF '! agent.review is copilot: experimental (docs/guide/configuration.md)' ||
+  fail "the run preflight does not print the new experimental warning: $(head -15 "$t/r4")"
+grep -qi 'not fenced' "$t/r4" && fail "the run still says copilot reviews are not fenced"
+CFG="run.second-review record
+agent.second-review copilot
+model.second-review $MODEL"; fixture
+doc "$t/d5"
+[ "$rc" = 0 ] || fail "doctor with a copilot second reviewer exited $rc: $(cat "$t/d5")"
+grep -qxF '! agent.second-review is copilot: experimental (docs/guide/configuration.md)' "$t/d5" ||
+  fail "doctor does not print '! agent.second-review is copilot: experimental (docs/guide/configuration.md)': $(cat "$t/d5")"
+rm -f "$t/stub/copilot"
+doc "$t/d6"
+[ "$rc" = 1 ] || fail "doctor with a copilot second reviewer and no copilot on PATH exited $rc, want 1: $(cat "$t/d6")"
+grep '^✗' "$t/d6" | grep -q copilot || fail "doctor with a copilot second reviewer and no copilot names no copilot problem: $(cat "$t/d6")"
+
+# A copilot second review with the default model: refused before any session.
+CFG="run.second-review feedback
+agent.second-review copilot"; fixture
+runfix "$t/r7"
+[ "$rc" = 1 ] || fail "a copilot second review with the default model.second-review: vloop run exited $rc, want 1: $(tail -5 "$t/r7")"
+grep -qF model.second-review "$t/r7" || fail "the refusal does not name model.second-review: $(cat "$t/r7")"
+nosession "$t/r7" "the refused run"
+
+# K1 for the second reviewer: in use, refused; off, it starts.
+skill() { mkdir -p "$t/repo/$1" && printf -- '---\nname: %s\ndescription: a project skill\n---\nBody.\n' "$(basename "$1")" >"$t/repo/$1/SKILL.md"; }
+CFG="run.second-review record
+agent.second-review copilot
+model.second-review $MODEL"; fixture
+skill .claude/skills/review; commitfix
+runfix "$t/r8"
+[ "$rc" = 1 ] || fail "a copilot second reviewer with .claude/skills/review: vloop run exited $rc, want 1: $(tail -5 "$t/r8")"
+grep -qxF "vloop: .claude/skills/review has the name of vloop's review skill; a copilot session may load it instead — rename it" "$t/r8" ||
+  fail "a copilot second reviewer with .claude/skills/review: no K1 message: $(cat "$t/r8")"
+nosession "$t/r8" "the refused run"
+CFG="agent.second-review copilot
+model.second-review $MODEL"; fixture
+skill .claude/skills/review; commitfix
+runfix "$t/r9"
+[ "$rc" = 0 ] || fail "run.second-review off with agent.second-review copilot and .claude/skills/review: vloop run exited $rc, want 0: $(tail -5 "$t/r9")"
 echo "gate T4: ok"

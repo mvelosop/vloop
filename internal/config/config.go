@@ -35,6 +35,10 @@ var agents = []string{"claude"}
 // reviewAgents are the agents a review session may run on.
 var reviewAgents = []string{"claude", "copilot"}
 
+// SecondReviewModes are the values of run.second-review: off, or what the
+// second reviewer's verdict does.
+var SecondReviewModes = []string{"off", "record", "feedback", "on-pass", "both-pass"}
+
 var efforts = []string{"low", "medium", "high", "xhigh", "max"}
 
 // Key describes one configuration key. Valid is nil when any non-empty string
@@ -84,16 +88,19 @@ var Keys = []Key{
 	{Name: "model.plan", Default: "opus"},
 	{Name: "model.work", Default: "sonnet"},
 	{Name: "model.review", Default: "sonnet"},
+	{Name: "model.second-review", Default: "sonnet"},
 	{Name: "model.gate-review", Default: "sonnet"},
 	{Name: "model.verify", Default: "sonnet"},
 	{Name: "effort.plan", Valid: efforts},
 	{Name: "effort.work", Valid: efforts},
 	{Name: "effort.review", Valid: efforts},
+	{Name: "effort.second-review", Valid: efforts},
 	{Name: "effort.gate-review", Valid: efforts},
 	{Name: "effort.verify", Valid: efforts},
 	{Name: "agent.plan", Default: "claude", Valid: agents},
 	{Name: "agent.work", Default: "claude", Valid: agents},
 	{Name: "agent.review", Default: "claude", Valid: reviewAgents},
+	{Name: "agent.second-review", Default: "claude", Valid: reviewAgents},
 	{Name: "agent.gate-review", Default: "claude", Valid: agents},
 	{Name: "agent.verify", Default: "claude", Valid: agents},
 	{Name: "copilot.credit-usd", Default: "0.0066667", Num: true, MinOpen: true},
@@ -114,6 +121,7 @@ var Keys = []Key{
 	{Name: "run.gate-scratch", List: true, Glob: true},
 	{Name: "run.git-config-ignore", List: true, Glob: true, GitKeys: true},
 	{Name: BudgetKeys.SessionTimeout, Default: "60", Int: true, Min: 1},
+	{Name: "run.second-review", Default: "off", Valid: SecondReviewModes},
 	{Name: "run.verify", Default: "true", Valid: []string{"true", "false"}},
 	{Name: BudgetKeys.KeepAwake, Default: "on", Valid: []string{"on", "off"}},
 }

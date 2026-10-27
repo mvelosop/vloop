@@ -1,0 +1,5 @@
+{"schema":"verdict/v1","task":"T9","verdict":"PASS","criteria":[
+{"criterion":"Every gate T1–T8 passes on the final tree.","met":true,"evidence":".vloop/state/gates/T9/gate.sh runs gates T1–T8 in order; gates/T9.log ends with gate T1..T8 ok and gate T9: ok"},
+{"criterion":"Every line of the brief's worked example holds against the built binary: the fence check tables, the hook's unreadable payload and apply_patch, the second-review lines for each mode, and the K1 refusal and rename.","met":true,"evidence":"T9 gate composes the T1–T8 gates, which the plan designates as holding the worked example; no product change was needed (git diff outside .vloop/state is empty)"},
+{"criterion":"The `go` check passes on the final tree.","met":true,"evidence":".vloop/tmp/checks.json: go exit 0"}],
+"findings":[],"notes":"Closing chore with no product diff; the worked example is verified only through the earlier gates, as planned."}

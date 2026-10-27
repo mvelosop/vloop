@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Metrics reports are now metrics/v4: agents gains second-review and a second_review object (mode, sessions, dissents, dissent_tasks); schemas/metrics.v4.json is embedded and validates; v3 and earlier stay readable.",
+  "files": ["schemas/metrics.v4.json", "internal/metrics/metrics.go", "internal/metrics/time.go", "internal/metrics/time_test.go", "internal/runs/runs.go", "internal/schema/testdata/metrics4.valid.json", "internal/schema/testdata/metrics4.invalid.json", "docs/guide/metrics.md"],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: ok; go test on metrics, closing, cli, schema, root and cmd/vloop passed.",
+  "notes": "second_review.mode is run.second-review read from config when the report is built, not recorded per run, so a later config change shows in a rebuilt report (the committed snapshot is frozen). Dissents come from iterations.jsonl second_review.dissent; dissent_tasks is distinct tasks in first-dissent order. Second-review sessions are counted and their agents listed, but their time and cost are not added to existing totals (cost/time meanings unchanged). Existing tests changed to metrics/v4: schema lists/counts (embed_test, cli/schema_test, b2_e2e), the schema-name assertions in close/metrics/closing/b4/b14/run_snapshot tests, and closing fixtureReport now reads metrics4.valid.json. Under go test ./..., unset VLOOP_PLAN_SHA256."
+}

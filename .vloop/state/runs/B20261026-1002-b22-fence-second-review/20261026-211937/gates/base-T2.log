@@ -1,0 +1,1 @@
+GATE FAIL: [review] payload {"timestamp":1700000000000,"cwd":"$TMPDIR/gate.NsLxk6/repo","toolName":"bash","toolArgs":{"command":"git diff HEAD","description":"d"}}: want one line on stdout, got 0: ''

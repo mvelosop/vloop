@@ -351,8 +351,8 @@ func TestWorkedExampleB14Instructions(t *testing.T) {
 	if err := os.WriteFile(file, []byte(js.out), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if v := r.vloop("schema", "validate", "metrics/v3", file); v.code != 0 {
-		t.Fatalf("metrics --json is not metrics/v3: %+v", v)
+	if v := r.vloop("schema", "validate", "metrics/v4", file); v.code != 0 {
+		t.Fatalf("metrics --json is not metrics/v4: %+v", v)
 	}
 }
 

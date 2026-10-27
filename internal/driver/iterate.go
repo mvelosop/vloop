@@ -80,6 +80,7 @@ type Iterator struct {
 	spent      float64                // what this run's sessions cost, summed as they finish
 	noProposal []string               // tasks whose session died after changing files, with the account
 	gatePasses []string               // tasks reported blocked whose own gate passes
+	dissents   []dissentRecord        // second reviews that differed from the primary, this run
 	blockedAt  map[string]blockedMark // per task, the last iteration it ended blocked in
 	r          *Runner
 	log        *lazyLog
@@ -494,6 +495,7 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 	// 4. review
 	verdict := "skipped"
 	var findings []string
+	var second *secondReview
 	gatePassed := outcome == OutBlocked && w.dispute == "" && own != nil && own.exit == 0
 	switch {
 	case w.dispute != "":
@@ -517,6 +519,24 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		outcome, verdict, findings, err = it.reviewSession(task, iter, outcome, checkRuns)
 		if err != nil {
 			return iterResult{}, err
+		}
+		it.copyReport("verdict.json", fmt.Sprintf("%03d-verdict.json", iter))
+		mode := it.secondReviewMode()
+		if second, err = it.secondReviewStep(task, iter, mode, verdict); err != nil {
+			return iterResult{}, err
+		}
+		if second != nil {
+			switch {
+			case mode == "feedback" && verdict != "PASS":
+				findings = append(findings, second.findings...)
+			case mode == "both-pass" && second.verdict != "PASS":
+				outcome = OutRejected
+				findings = second.findings
+				if len(findings) == 0 {
+					findings = []string{"second review: the second review failed the task"}
+				}
+				verdict += ", second review: " + second.verdict
+			}
 		}
 	}
 
@@ -542,6 +562,10 @@ func (it *Iterator) iterate(task *state.Task, runIters, done, total int) (iterRe
 		"schema": "iteration/v2", "run_id": plan.RunID, "iteration": iter, "task": id, "attempt": attempt,
 		"outcome": outcome, "gate": gateRecord(own), "checks": checksRecord(checkRuns),
 		"started": started.Format(time.RFC3339), "ended": it.now().UTC().Format(time.RFC3339),
+	}
+	if second != nil {
+		rec["schema"] = "iteration/v3"
+		rec["second_review"] = map[string]any{"verdict": second.verdict, "dissent": second.dissent}
 	}
 	if err := it.record(rec, task, iter, outcome, verdict, w); err != nil {
 		return iterResult{}, err
@@ -605,7 +629,6 @@ func (it *Iterator) record(rec map[string]any, task *state.Task, iter int, outco
 		return err
 	}
 	it.copyReport("proposal.json", fmt.Sprintf("%03d-proposal.json", iter))
-	it.copyReport("verdict.json", fmt.Sprintf("%03d-verdict.json", iter))
 	if err := it.appendJournal(task, outcome, verdict, w.summary, w.notes, w.files); err != nil {
 		return err
 	}
@@ -731,60 +754,68 @@ func (it *Iterator) runGates(iter int, id string, withOwn bool) (*gateResult, ma
 	return own, failed, nil
 }
 
-// reviewSession runs the review of a task whose gates and checks passed and
-// returns the outcome it leads to, the verdict and the findings.
-func (it *Iterator) reviewSession(task *state.Task, iter int, outcome string, checkRuns []checkRun) (string, string, []string, error) {
+// reviewResult is what a review session of either kind came to: its verdict
+// and findings after the guards, or that it timed out.
+type reviewResult struct {
+	verdict  string
+	findings []string
+	timedOut bool
+}
+
+// reviewRun runs one review session of the phase (review or second-review) and
+// applies the guards to it: inputs restored, a moved ref or git setting halts,
+// changed files reverted, tampering with the plan restored. A session that
+// left no valid verdict, changed a file or tampered is FAIL, with the finding.
+// An error is a session that could not run or a halt.
+func (it *Iterator) reviewRun(task *state.Task, iter int, phase string) (reviewResult, error) {
 	root := it.Root
 	id := task.ID
-	verdict := "skipped"
-	var findings []string
-	if err := it.writeChecksFile(checkRuns); err != nil {
-		return outcome, verdict, nil, err
-	}
-	model, effort := it.resolved.For(task, PhaseReview)
+	model, effort := it.resolved.For(task, phase)
 	before := refsState(root)
 	guard := snapshotState(root)
 	gguard := snapshotGit(root)
 	inputs := snapshotInputs(root, it.RunDir)
 	tree := snapshotTree(root)
 	_ = os.Remove(filepath.Join(root, filepath.FromSlash(GateRefusedFile)))
-	rres, err := it.r.Run(Spec{Agent: it.resolved.Agent(PhaseReview), Phase: PhaseReview, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
+	rres, err := it.r.Run(Spec{Agent: it.resolved.Agent(phase), Phase: phase, Iteration: iter, Arg: id, Model: model, Effort: effort, PlanSHA: guard.hash()})
 	it.spent += rres.Cost
 	if err == nil {
-		it.sessionDone(Spec{Phase: PhaseReview, Arg: id}, rres)
+		it.sessionDone(Spec{Phase: phase, Arg: id}, rres)
 	}
 	if err != nil {
-		return outcome, verdict, nil, err
+		return reviewResult{}, err
 	}
-	inputsChanged, err := it.restoreInputs(inputs, PhaseReview, rres.Path)
+	inputsChanged, err := it.restoreInputs(inputs, phase, rres.Path)
 	if err != nil {
-		return outcome, verdict, nil, err
+		return reviewResult{}, err
 	}
-	if err := it.gitChanged(gguard, PhaseReview); err != nil {
-		return outcome, verdict, nil, err
+	if err := it.gitChanged(gguard, phase); err != nil {
+		return reviewResult{}, err
 	}
-	if err := it.gitRefsMoved(before, id, PhaseReview); err != nil {
-		return outcome, verdict, nil, err
+	if err := it.gitRefsMoved(before, id, phase); err != nil {
+		return reviewResult{}, err
 	}
 	treeChanged, treeFailed := tree.revert()
 	if len(treeFailed) > 0 {
-		return outcome, verdict, nil, halt(ExitPreflight, "the review session changed files the driver could not revert: %s", strings.Join(treeFailed, "; "))
+		return reviewResult{}, halt(ExitPreflight, "the %s session changed files the driver could not revert: %s", phase, strings.Join(treeFailed, "; "))
 	}
 	for _, p := range treeChanged {
-		it.warn("vloop: the review session changed %s — reverted", p)
+		it.warn("vloop: the %s session changed %s — reverted", phase, p)
 	}
-	reviewTouched := guard.restoreTouched()
-	reviewTampered := len(reviewTouched) > 0
-	if reviewTampered {
-		it.warn("   STATE TAMPERING %s — review session modified %s; restored", id, strings.Join(reviewTouched, ", "))
+	touched := guard.restoreTouched()
+	if len(touched) > 0 {
+		it.warn("   STATE TAMPERING %s — %s session modified %s; restored", id, phase, strings.Join(touched, ", "))
 	}
 	if rres.TimedOut {
-		it.warn("   the review session for %s timed out after %s", id, it.sessionTimeout())
-		return outcome, verdict, nil, errSessionError
+		return reviewResult{timedOut: true}, nil
 	}
+	res := reviewResult{}
 	if data, ok := it.readReport("verdict.json", "verdict/v1"); !ok {
-		it.warn("   review session left no valid verdict — treating as FAIL")
-		verdict = "FAIL"
+		it.warn("   %s session left no valid verdict — treating as FAIL", phase)
+		res.verdict = "FAIL"
+		if phase == PhaseSecondReview {
+			res.findings = append(res.findings, "the second review left no valid verdict")
+		}
 	} else {
 		var v struct {
 			Verdict  string `json:"verdict"`
@@ -793,28 +824,113 @@ func (it *Iterator) reviewSession(task *state.Task, iter int, outcome string, ch
 			} `json:"findings"`
 		}
 		_ = json.Unmarshal(data, &v)
-		verdict = v.Verdict
+		res.verdict = v.Verdict
 		for _, f := range v.Findings {
-			findings = append(findings, f.Summary)
+			res.findings = append(res.findings, f.Summary)
 		}
 	}
-	if verdict != "PASS" {
-		outcome = OutRejected
-	}
-	if reviewTampered {
-		outcome, verdict = OutRejected, "FAIL"
-		findings = append(findings, it.r.Mask(tamperNote(PhaseReview)))
+	if len(touched) > 0 {
+		res.verdict = "FAIL"
+		res.findings = append(res.findings, it.r.Mask(tamperNote(phase)))
 	}
 	if inputsChanged {
-		outcome, verdict = OutRejected, "FAIL"
-		findings = append(findings, "review session changed the driver's inputs — restored by the driver; a review judges the work and changes nothing else")
+		res.verdict = "FAIL"
+		res.findings = append(res.findings, phase+" session changed the driver's inputs — restored by the driver; a review judges the work and changes nothing else")
 	}
 	if len(treeChanged) > 0 {
-		outcome, verdict = OutRejected, "FAIL"
-		findings = append(findings, "the review session changed files")
+		res.verdict = "FAIL"
+		res.findings = append(res.findings, "the "+phase+" session changed files")
 	}
-	it.say("   review: %s", verdict)
-	return outcome, verdict, findings, nil
+	return res, nil
+}
+
+// reviewSession runs the review of a task whose gates and checks passed and
+// returns the outcome it leads to, the verdict and the findings.
+func (it *Iterator) reviewSession(task *state.Task, iter int, outcome string, checkRuns []checkRun) (string, string, []string, error) {
+	if err := it.writeChecksFile(checkRuns); err != nil {
+		return outcome, "skipped", nil, err
+	}
+	res, err := it.reviewRun(task, iter, PhaseReview)
+	if err != nil {
+		return outcome, "skipped", nil, err
+	}
+	if res.timedOut {
+		it.warn("   the review session for %s timed out after %s", task.ID, it.sessionTimeout())
+		return outcome, "skipped", nil, errSessionError
+	}
+	if res.verdict != "PASS" {
+		outcome = OutRejected
+	}
+	it.say("   review: %s", res.verdict)
+	return outcome, res.verdict, res.findings, nil
+}
+
+// secondReviewMode is run.second-review: off, record, feedback, on-pass or
+// both-pass.
+func (it *Iterator) secondReviewMode() string {
+	if v, err := config.Get(it.Root, "run.second-review"); err == nil {
+		return v.Value
+	}
+	return "off"
+}
+
+// secondReview is what a second review came to: its verdict, its findings
+// (each prefixed "second review: ") and whether it differs from the primary's.
+type secondReview struct {
+	verdict  string
+	findings []string
+	dissent  bool
+}
+
+// dissentRecord is one dissent of the run, for the list at its end.
+type dissentRecord struct{ task, primary, second string }
+
+// secondReviewStep runs the second review that follows a primary review that
+// ran, when run.second-review asks for one after this primary verdict. The
+// primary's verdict is removed from .vloop/tmp/ first, so the second session
+// cannot see it; the caller has already kept it. It returns nil when none ran; a
+// session error or timeout is a warning, except in both-pass, where it ends
+// the iteration as the primary's would.
+func (it *Iterator) secondReviewStep(task *state.Task, iter int, mode, primary string) (*secondReview, error) {
+	switch {
+	case mode == "off", mode == "":
+		return nil, nil
+	case (mode == "on-pass" || mode == "both-pass") && primary != "PASS":
+		return nil, nil
+	}
+	_ = os.Remove(filepath.Join(it.Root, filepath.FromSlash(tmpDir), "verdict.json"))
+	res, err := it.reviewRun(task, iter, PhaseSecondReview)
+	if err == nil && res.timedOut {
+		it.warn("   the second review session for %s timed out after %s", task.ID, it.sessionTimeout())
+		err = errSessionError
+	}
+	if err != nil {
+		if halted(err) || mode == "both-pass" {
+			return nil, err
+		}
+		it.warn("   the second review for %s did not run: %v", task.ID, err)
+		return nil, nil
+	}
+	it.copyReport("verdict.json", fmt.Sprintf("%03d-second-verdict.json", iter))
+	_ = os.Remove(filepath.Join(it.Root, filepath.FromSlash(tmpDir), "verdict.json"))
+	sr := &secondReview{verdict: res.verdict, dissent: res.verdict != primary}
+	for _, f := range res.findings {
+		sr.findings = append(sr.findings, "second review: "+it.r.Mask(f))
+	}
+	line := "   second review: " + sr.verdict
+	if sr.dissent {
+		line += " (dissent)"
+		it.dissents = append(it.dissents, dissentRecord{task.ID, primary, sr.verdict})
+	}
+	it.say("%s", line)
+	return sr, nil
+}
+
+// halted reports whether err ends the run with a halt rather than being a
+// session that failed to run.
+func halted(err error) bool {
+	var h *Halt
+	return errors.As(err, &h)
 }
 
 // verifySession runs the one verification session of a complete run, when
@@ -1214,6 +1330,14 @@ func (it *Iterator) finish(end Ending, runIters int) error {
 		case ExitRepeatBlocked:
 			it.say("%s", end.Note)
 		}
+	}
+	if len(it.dissents) > 0 {
+		var parts []string
+		for _, d := range it.dissents {
+			parts = append(parts, fmt.Sprintf("%s (primary %s, second %s)", d.task, d.primary, d.second))
+		}
+		it.say("")
+		it.say("second review: %d dissent(s): %s", len(it.dissents), strings.Join(parts, ", "))
 	}
 	if len(it.gatePasses) > 0 {
 		it.say("")

@@ -3,9 +3,13 @@ package driver
 import (
 	"bytes"
 	"encoding/json"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+
+	vloop "github.com/mvelosop/vloop"
 )
 
 // AgentCopilot is the GitHub Copilot CLI, which can run review sessions only.
@@ -25,6 +29,34 @@ var copilotDenials = []string{
 	"url",
 }
 
+// CopilotDenyStems are the shell stems of the deny list in the fence's Bash
+// matching form (`git push:*`), for the judge behind the Copilot hook.
+func CopilotDenyStems() []string {
+	var out []string
+	for _, d := range copilotDenials {
+		if s, ok := strings.CutPrefix(d, "shell("); ok {
+			out = append(out, strings.TrimSuffix(s, ")"))
+		}
+	}
+	return out
+}
+
+// PluginSkillNames are the names of the embedded plugin's skills, the only
+// ones a Copilot session may load and the ones a project skill may not share.
+func PluginSkillNames() []string {
+	ents, err := fs.ReadDir(vloop.Plugin, "plugin/skills")
+	if err != nil {
+		return nil
+	}
+	var out []string
+	for _, e := range ents {
+		if e.IsDir() {
+			out = append(out, e.Name())
+		}
+	}
+	return out
+}
+
 // copilotGuidelinesName is the file Copilot reads from a custom instructions
 // directory.
 const copilotGuidelinesName = "AGENTS.md"
@@ -37,7 +69,9 @@ type copilotAdapter struct {
 
 func (copilotAdapter) Name() string { return AgentCopilot }
 
-func (copilotAdapter) Supports(phase string) bool { return phase == PhaseReview }
+func (copilotAdapter) Supports(phase string) bool {
+	return phase == PhaseReview || phase == PhaseSecondReview
+}
 
 func (a copilotAdapter) command() string {
 	if a.bin != "" {
@@ -73,6 +107,9 @@ func (copilotAdapter) Prepare(root, version, phase string) (Prepared, error) {
 		return Prepared{}, err
 	}
 	p := Prepared{Plugin: plugin, Home: home}
+	if err := writeCopilotHooks(home, root, phase); err != nil {
+		return Prepared{}, err
+	}
 	src := filepath.Join(root, filepath.FromSlash(GuidelinesFile))
 	if fi, err := os.Stat(src); err != nil || !fi.Mode().IsRegular() || fi.Size() == 0 {
 		return p, nil
@@ -90,6 +127,42 @@ func (copilotAdapter) Prepare(root, version, phase string) (Prepared, error) {
 	}
 	p.Guidelines = dir
 	return p, nil
+}
+
+// writeCopilotHooks puts in the session's home the hooks file that runs this
+// binary's `fence hook` before every tool call, in both command forms.
+func writeCopilotHooks(home, root, phase string) error {
+	exe, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return err
+	}
+	sq := func(s string) string { return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'" }
+	ps := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "''") + "'" }
+	tail := " fence hook --phase " + phase + " --root "
+	doc := map[string]any{
+		"version": 1,
+		"hooks": map[string]any{
+			"preToolUse": []map[string]any{{
+				"type":       "command",
+				"bash":       sq(exe) + tail + sq(absRoot),
+				"powershell": "& " + ps(exe) + tail + ps(absRoot),
+				"timeoutSec": 30,
+			}},
+		},
+	}
+	data, err := json.MarshalIndent(doc, "", "  ")
+	if err != nil {
+		return err
+	}
+	dir := filepath.Join(home, "hooks")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(dir, "vloop-fence.json"), append(data, '\n'), 0o644)
 }
 
 func (a copilotAdapter) Command(s Spec, root string, env []string, p Prepared) *exec.Cmd {
@@ -134,13 +207,21 @@ func (a copilotAdapter) Parse(stdout []byte, mask func(string) string) (Output, 
 		o          Output
 		nano       float64
 		checkpoint bool
+		names      = map[string]string{} // toolCallId -> toolName
 	)
+	denials := []json.RawMessage{}
 	for _, line := range bytes.Split(stdout, []byte("\n")) {
 		var ev struct {
 			Type     string `json:"type"`
 			ExitCode int    `json:"exitCode"`
 			Data     struct {
-				NanoAIU *float64 `json:"totalNanoAiu"`
+				NanoAIU    *float64 `json:"totalNanoAiu"`
+				ToolCallID string   `json:"toolCallId"`
+				ToolName   string   `json:"toolName"`
+				Error      *struct {
+					Code    string `json:"code"`
+					Message string `json:"message"`
+				} `json:"error"`
 			} `json:"data"`
 			Usage struct {
 				SessionDurationMS float64 `json:"sessionDurationMs"`
@@ -152,6 +233,19 @@ func (a copilotAdapter) Parse(stdout []byte, mask func(string) string) (Output, 
 		switch ev.Type {
 		case "assistant.turn_start":
 			o.Turns++
+		case "tool.execution_start":
+			names[ev.Data.ToolCallID] = ev.Data.ToolName
+		case "tool.execution_complete":
+			if e := ev.Data.Error; e != nil && e.Code == "denied" {
+				b, err := json.Marshal(struct {
+					ToolName  string `json:"tool_name"`
+					ToolUseID string `json:"tool_use_id"`
+					Message   string `json:"message"`
+				}{names[ev.Data.ToolCallID], ev.Data.ToolCallID, mask(e.Message)})
+				if err == nil {
+					denials = append(denials, b)
+				}
+			}
 		case "session.usage_checkpoint":
 			if ev.Data.NanoAIU != nil {
 				nano, checkpoint = *ev.Data.NanoAIU, true
@@ -172,7 +266,7 @@ func (a copilotAdapter) Parse(stdout []byte, mask func(string) string) (Output, 
 		o.CostSource = CostEstimated
 		o.Cost = credits * a.creditUSD
 	}
-	o.Denials = []json.RawMessage{}
+	o.Denials = denials
 	o.ModelsUsed = map[string]usage{a.model: {Cost: o.Cost}}
 	return o, true
 }

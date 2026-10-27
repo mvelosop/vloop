@@ -20,11 +20,12 @@ import (
 
 // Session kinds.
 const (
-	PhasePlan       = "plan"
-	PhaseWork       = "work"
-	PhaseReview     = "review"
-	PhaseGateReview = "gate-review"
-	PhaseVerify     = "verify"
+	PhasePlan         = "plan"
+	PhaseWork         = "work"
+	PhaseReview       = "review"
+	PhaseSecondReview = "second-review"
+	PhaseGateReview   = "gate-review"
+	PhaseVerify       = "verify"
 )
 
 // Runner starts the sessions of one run. The zero value of the optional fields
@@ -76,6 +77,9 @@ type Result struct {
 
 // Prompt is the slash command a session of the phase starts with.
 func Prompt(phase, arg string) string {
+	if phase == PhaseSecondReview {
+		phase = PhaseReview
+	}
 	if arg == "" {
 		return "/vloop:" + phase
 	}
@@ -371,7 +375,7 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		return Result{}, err
 	}
 	task := ""
-	if s.Phase == PhaseWork || s.Phase == PhaseReview {
+	if s.Phase == PhaseWork || s.Phase == PhaseReview || s.Phase == PhaseSecondReview {
 		task = s.Arg
 	}
 	if err := os.MkdirAll(filepath.Join(r.RunDir, "sessions"), 0o755); err != nil {
@@ -456,8 +460,12 @@ func (r *Runner) record(s Spec, agent, task string, started, ended time.Time, o 
 	if s.Effort != "" {
 		effort = s.Effort
 	}
+	schemaName := "session/v3"
+	if s.Phase == PhaseSecondReview {
+		schemaName = "session/v4"
+	}
 	rec := map[string]any{
-		"schema":             "session/v3",
+		"schema":             schemaName,
 		"run_id":             r.RunID,
 		"iteration":          s.Iteration,
 		"phase":              s.Phase,

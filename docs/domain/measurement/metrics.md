@@ -5,7 +5,7 @@ description: Binds the Metrics entity — what is measured per brief and per tas
 # Metrics
 
 A brief's numbers, recomputed on every call from raw sources (M-1), frozen once
-at close as a snapshot (`metrics/v3`; v1 and v2 snapshots stay readable). *Part of
+at close as a snapshot (`metrics/v4`; v1 to v3 snapshots stay readable). *Part of
 [measurement](measurement-context.md).* Every field and formula:
 [`docs/guide/metrics.md`](../../guide/metrics.md).
 
@@ -102,3 +102,14 @@ on the instructions line when the tree holds the verify skill. The total cost
 includes it; `agent` does not. `--json` gains the optional `time.verify_ms`,
 `cost.verify_usd`, `models.verify`, `agents.verify`, `effort.verify` and `instructions.verify`.
 A brief with no verify session prints as before.
+
+## The second review and metrics/v4
+
+`--json` is `metrics/v4`: everything `metrics/v3` had, plus a `second_review`
+object (`mode`, the configured `run.second-review`; `sessions`, how many second
+reviews ran; `dissents`, how many differed from the primary's verdict;
+`dissent_tasks`, their task ids) and `second-review` among the `agents`. A
+second review is a session like any other, so its cost counts in the total and in
+`agent`'s time, and it changes no other number. Saved `metrics/v3` snapshots stay
+valid against `schemas/metrics.v3.json` and keep reading; new snapshots are
+`metrics/v4`.

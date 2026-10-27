@@ -1,0 +1,44 @@
+{
+ "schema": "verdict/v1",
+ "task": "T5",
+ "verdict": "PASS",
+ "criteria": [
+  {
+   "criterion": "When the mode is not off, a second review runs after the primary review of an iteration \u2014 after every primary review for `record` and `feedback`, only after a primary PASS for `on-pass` and `both-pass`, never when the primary did not run or ended the run \u2014 as `/vloop:review <task>` in a fresh session of phase `second-review`, under the review fence (the hook's `second-review` phase for copilot), with its model and effort from `model/effort.second-review`, never from the task's own model or effort.",
+   "met": true,
+   "evidence": "iterate.go secondReviewStep gates on mode/primary verdict; Prompt/agent.go map second-review to /vloop:review and the review fence; copilot Supports+hook phase; resolve.go resolves model/effort per second-review; tests cover record/on-pass."
+  },
+  {
+   "criterion": "Before it starts the driver removes the primary's verdict from `.vloop/tmp/`; the guards are the primary's: inputs restored, a moved ref or git setting halts with exit 9, changed files reverted; no valid verdict, a changed file or tampering make it FAIL with the finding.",
+   "met": true,
+   "evidence": "secondReviewStep removes verdict.json; reviewRun shares the primary's guards (restoreInputs, gitChanged/gitRefsMoved halts, tree.revert, tamper, no-verdict FAIL); TestRunSecondReviewChangedFileIsFailAndReverted. Halt path untested for the second."
+  },
+  {
+   "criterion": "In `record`, `feedback` and `on-pass` the second review never changes the task's outcome, status or attempts, and its session error or timeout is a warning; in `both-pass` a task is done only when both PASS, a second FAIL rejects the iteration as a primary FAIL does with its findings as notes prefixed `second review: `, and its session error or timeout is treated as the primary's would be.",
+   "met": true,
+   "evidence": "iterate.go: only both-pass changes outcome and prefixes findings; errors are warnings otherwise, returned in both-pass; TestRunSecondReviewBothPassVeto, RecordFail keeps done."
+  },
+  {
+   "criterion": "In `feedback`, when the primary did not PASS, the second's findings join the notes after the primary's, each prefixed `second review: `; in `record` and `on-pass` nothing reaches the notes.",
+   "met": true,
+   "evidence": "iterate.go: feedback appends second.findings when primary != PASS; TestRunSecondReviewFeedbackJoinsNotes asserts the retry's notes; on-pass test asserts empty notes."
+  },
+  {
+   "criterion": "The run log says `   second review: <PASS|FAIL>`, with ` (dissent)` when it differs from the primary's verdict; the verdict is kept as `reports/<iter>-second-verdict.json`; the run's end lists `second review: <n> dissent(s): <task> (primary <v>, second <v>), \u2026` when there are any; with the mode off none of this appears.",
+   "met": true,
+   "evidence": "say line with (dissent), copy to NNN-second-verdict.json, finish() prints list; TestRunSecondReviewRecord and Off assert these."
+  },
+  {
+   "criterion": "Records: `session/v4` (session/v3 with `second-review` among the phases), `iteration/v3` adding `second_review` (`verdict`, `dissent`), absent when none ran; both schemas embedded and known to `vloop schema validate`; readers keep accepting v3, v2 and earlier; the second session's cost counts toward the cost ceiling.",
+   "met": true,
+   "evidence": "schemas/iteration.v3.json, session.v4.json with fixtures and updated lists/counts; iteration emits v3 only when second ran; reviewRun adds rres.Cost to it.spent."
+  },
+  {
+   "criterion": "Committed tests with a stub agent cover each mode, the guards and the records, extending the existing run tests, and run in the `go` check.",
+   "met": true,
+   "evidence": "run_second_review_test.go covers off, record, on-pass, feedback, both-pass veto, changed-file guard, records; gaps: no both-pass success, no halt (exit 9) or session-error/timeout case for the second."
+  }
+ ],
+ "findings": [],
+ "notes": "Test gaps (not blocking, guards share reviewRun with the primary): no both-pass double-PASS case, no exit-9 halt or session error/timeout test for the second review."
+}

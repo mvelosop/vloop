@@ -85,6 +85,7 @@ type Iteration struct {
 	GateMS    *int64 // nil when the record carries no gate duration
 	ChecksMS  *int64 // sum of the checks' durations; nil when the record lists none
 	Flaky     bool   // the gate failed, then passed on an immediate re-run
+	Dissent   bool   // a second review ran and its verdict differed from the primary's
 	Started   time.Time
 	Ended     time.Time
 }
@@ -487,6 +488,9 @@ func readIterations(p string) ([]Iteration, error) {
 			Checks []struct {
 				DurationMS int64 `json:"duration_ms"`
 			} `json:"checks"`
+			SecondReview *struct {
+				Dissent bool `json:"dissent"`
+			} `json:"second_review"`
 			Started string `json:"started"`
 			Ended   string `json:"ended"`
 		}
@@ -495,6 +499,9 @@ func readIterations(p string) ([]Iteration, error) {
 		}
 		it := Iteration{Iteration: r.Iteration, Task: r.Task, Attempt: r.Attempt, Outcome: r.Outcome,
 			Started: parseTime(r.Started), Ended: parseTime(r.Ended)}
+		if r.SecondReview != nil {
+			it.Dissent = r.SecondReview.Dissent
+		}
 		if r.Gate != nil {
 			it.GateMS = r.Gate.DurationMS
 			it.Flaky = r.Gate.Flaky

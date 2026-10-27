@@ -15,9 +15,9 @@ import (
 )
 
 // Schema is the name of the document Report marshals to.
-const Schema = "metrics/v3"
+const Schema = "metrics/v4"
 
-// JSONLines is Lines as metrics/v2 and v3 spell it: added counts, deleted apart.
+// JSONLines is Lines as metrics/v2 to v4 spell it: added counts, deleted apart.
 type JSONLines struct {
 	Code    int    `json:"code"`
 	Test    int    `json:"test"`
@@ -71,6 +71,29 @@ type PerPhase[T any] struct {
 	Verify     *T `json:"verify,omitempty"`
 }
 
+// PerAgents is Agents' per-phase value: PerPhase plus the second review.
+type PerAgents struct {
+	Plan         []string  `json:"plan"`
+	Work         []string  `json:"work"`
+	Review       []string  `json:"review"`
+	SecondReview []string  `json:"second-review"`
+	GateReview   []string  `json:"gate-review"`
+	Verify       *[]string `json:"verify,omitempty"`
+}
+
+// ReportSecondReview is the `second_review` object.
+type ReportSecondReview struct {
+	Mode         string   `json:"mode"`
+	Sessions     int      `json:"sessions"`
+	Dissents     int      `json:"dissents"`
+	DissentTasks []string `json:"dissent_tasks"`
+	// CostUSD and TimeMS are the second review sessions' share of cost.total_usd
+	// and time.agent_ms; Credits, of credits.total.
+	CostUSD float64 `json:"cost_usd"`
+	TimeMS  int64   `json:"time_ms"`
+	Credits float64 `json:"credits,omitempty"`
+}
+
 // ReportDefects is the `defects` object.
 type ReportDefects struct {
 	InLoop            int      `json:"in_loop"`
@@ -115,7 +138,7 @@ type ReportTask struct {
 	Per1000CodeUSD *float64 `json:"per_1000_code_lines_usd"`
 }
 
-// Report is the metrics/v3 document for one brief.
+// Report is the metrics/v4 document for one brief.
 type Report struct {
 	Schema  string             `json:"schema"`
 	Brief   string             `json:"brief"`
@@ -130,9 +153,12 @@ type Report struct {
 	Credits Credits            `json:"credits"`
 	Tokens  TokenTotals        `json:"tokens"`
 	Models  PerPhase[[]string] `json:"models"`
-	Agents  PerPhase[[]string] `json:"agents"`
-	Effort  PerPhase[*string]  `json:"effort"`
-	Defects ReportDefects      `json:"defects"`
+	Agents  PerAgents          `json:"agents"`
+	// SecondReview is the second review of the run: the configured mode, the
+	// sessions it ran and where it dissented.
+	SecondReview ReportSecondReview `json:"second_review"`
+	Effort       PerPhase[*string]  `json:"effort"`
+	Defects      ReportDefects      `json:"defects"`
 	// Interventions counts the brief's intervention records by agreement.
 	Interventions ReportInterventions `json:"interventions"`
 	// Instructions is the words each session kind starts with, at the commit
@@ -157,6 +183,14 @@ type ReportTasks struct {
 	Blocked   int       `json:"blocked"`
 	FirstPass int       `json:"first_pass"`
 	Estimate  *Estimate `json:"estimate"`
+}
+
+// secondReviewMode is run.second-review as configured now; off when unreadable.
+func secondReviewMode(root string) string {
+	if v, err := config.Get(root, "run.second-review"); err == nil {
+		return v.Value
+	}
+	return "off"
 }
 
 func splitList(s string) []string {
@@ -229,7 +263,8 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	r.Credits = u.Credits
 	r.Tokens = u.Tokens
 	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview]), splitList(u.Models[PhaseGateReview]), nil}
-	r.Agents = PerPhase[[]string]{splitList(u.Agents[PhasePlan]), splitList(u.Agents[PhaseWork]), splitList(u.Agents[PhaseReview]), splitList(u.Agents[PhaseGateReview]), nil}
+	r.Agents = PerAgents{splitList(u.Agents[PhasePlan]), splitList(u.Agents[PhaseWork]), splitList(u.Agents[PhaseReview]), splitList(u.Agents[PhaseSecondReview]), splitList(u.Agents[PhaseGateReview]), nil}
+	r.SecondReview = ReportSecondReview{Mode: secondReviewMode(root), Sessions: u.SecondSessions, Dissents: u.Dissents, DissentTasks: append([]string{}, u.DissentTasks...), CostUSD: u.Cost.SecondReview, TimeMS: u.Time.SecondReviewMS, Credits: u.Credits.SecondReview}
 	r.Effort = PerPhase[*string]{strp(u.Effort[PhasePlan]), strp(u.Effort[PhaseWork]), strp(u.Effort[PhaseReview]), strp(u.Effort[PhaseGateReview]), nil}
 	if u.Time.VerifyMS != 0 || u.Cost.Verify != 0 || u.Models[PhaseVerify] != "" || u.Agents[PhaseVerify] != "" || u.Effort[PhaseVerify] != "" {
 		r.Time.VerifyMS = &u.Time.VerifyMS

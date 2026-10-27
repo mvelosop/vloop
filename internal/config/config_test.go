@@ -43,13 +43,13 @@ func TestDefaultsEveryRow(t *testing.T) {
 		set      bool
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
-		{"model.review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"copilot.credit-usd", "0.0066667", true}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"model.review", "sonnet", true}, {"model.second-review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
+		{"effort.review", "", false}, {"effort.second-review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.second-review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"copilot.credit-usd", "0.0066667", true}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
 		{"run.stall-limit", "2", true}, {"run.convergence-max", "3.0", true}, {"run.convergence-min", "6", true},
-		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.git-config-ignore", "", false}, {"run.session-timeout", "60", true}, {"run.verify", "true", true}, {"run.keep-awake", "on", true},
+		{"run.gate-timeout", "15", true}, {"run.gate-scratch", "", false}, {"run.git-config-ignore", "", false}, {"run.session-timeout", "60", true}, {"run.second-review", "off", true}, {"run.verify", "true", true}, {"run.keep-awake", "on", true},
 	}
 	vals, err := List(root)
 	if err != nil {
@@ -800,5 +800,20 @@ func TestCopilotCreditKey(t *testing.T) {
 	var se *SourceError
 	if _, err := Get(root, k); !errors.As(err, &se) {
 		t.Errorf("bad file: %v", err)
+	}
+}
+
+func TestSecondReviewKeys(t *testing.T) {
+	root := t.TempDir()
+	for k, want := range map[string]string{"run.second-review": "off", "agent.second-review": "claude", "model.second-review": "sonnet", "effort.second-review": ""} {
+		if v, err := Get(root, k); err != nil || v.Value != want {
+			t.Errorf("%s = %q, %v; want %q", k, v.Value, err, want)
+		}
+	}
+	if err := Set(root, "run.second-review", "always"); err == nil {
+		t.Error("run.second-review always accepted")
+	}
+	if err := Set(root, "agent.second-review", "codex"); err == nil {
+		t.Error("agent.second-review codex accepted")
 	}
 }

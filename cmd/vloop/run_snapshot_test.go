@@ -42,7 +42,7 @@ func TestRunSnapshot(t *testing.T) {
 		t.Errorf("T2's commit does not include the snapshot")
 	}
 	final := r.snapshotAt("HEAD")
-	if tasksDone(final) != 2 || final["schema"] != "metrics/v3" || final["run_id"] != runID {
+	if tasksDone(final) != 2 || final["schema"] != "metrics/v4" || final["run_id"] != runID {
 		t.Errorf("the closing snapshot = %v", final)
 	}
 	r.wantClean()

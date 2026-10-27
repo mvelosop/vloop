@@ -95,9 +95,12 @@ classDiagram
 | **attempt** | one failed try at a task; `attempts` counts them |
 | **iteration** | one pass of the driver: pick a task, work, gate, review, commit |
 | **run** | one driver invocation; its telemetry is a run folder |
-| **session** | a fresh process of its phase's agent (Claude Code by default): `plan`, `gate-review`, `work`, `review` or `verify`; sessions share nothing but files |
+| **session** | a fresh process of its phase's agent (Claude Code by default): `plan`, `gate-review`, `work`, `review`, `second-review` or `verify`; sessions share nothing but files |
 | **proposal** | the work session's report on its task |
 | **verdict** | the review session's independent `PASS` or `FAIL`, with findings |
+| **second review** | an optional review session by a second reviewer (any agent and model) of the same task, after the primary (`run.second-review`); it decides nothing unless the mode is `both-pass` |
+| **dissent** | a second review's verdict that differs from the primary's; the end of the run lists them and the operator reads them at close |
+| **hook** | `vloop fence hook`, the `preToolUse` command every Copilot session runs: it judges each tool call against the review fence and fails closed; a line before the driver's checks, not a replacement |
 | **finding** | one problem a verdict names, with a kind |
 | **journal** | the append-only per-brief log of iterations, one entry each |
 | **driver** | the program that owns status, runs gates and commits (`.loop/run.sh`; `vloop run`); see [the driver](../guide/concepts.md#the-driver) |

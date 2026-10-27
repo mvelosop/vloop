@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Added `vloop fence hook --phase --root`: reads a Copilot preToolUse payload on stdin, judges it with T1's judge and prints one allow/deny JSON line; unreadable payloads, unknown phases (including work) and internal errors print the deny line and exit 2.",
+  "files": ["internal/cli/fence.go", "internal/cli/fence_hook_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T2 exited 0 and printed ok; go test ./internal/cli (with VLOOP_PLAN_SHA256 unset), go vet, gofmt, go mod tidy -diff and linux/windows builds pass.",
+  "notes": "Web access is denied, so Copilot's docs could not be read: the toolArgs form is unconfirmed. The experiments note shows toolArgs.command as an object; the hook accepts an object or a JSON string holding one. apply_patch's patch is read from a raw string toolArgs, or the input/patch/command keys; any other shape yields no paths and is denied. A shell tool with no readable command is denied by the hook itself (the judge would allow an empty command). Skill name read from toolArgs skill/name (unconfirmed key; a missing one is denied). Cobra flag-parse errors (e.g. an unknown flag) exit 2 without the deny line. Under go test ./..., unset VLOOP_PLAN_SHA256 or the task_gate tests fail."
+}

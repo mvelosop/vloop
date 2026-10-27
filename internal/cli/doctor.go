@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -109,8 +110,11 @@ func runDoctor(b Build, root string) []doctorCheck {
 
 	hasClaude := doctorClaude(add)
 
-	if cerr == nil && copilotReview(root) {
-		doctorCopilot(root, add)
+	if cerr == nil {
+		doctorSecondReview(root, add)
+		if keys := copilotKeys(root); len(keys) > 0 {
+			doctorCopilot(root, keys, add)
+		}
 	}
 
 	if doctorTrusted(root) {
@@ -197,7 +201,7 @@ func doctorClaude(add func(name, result, msg string)) bool {
 
 // copilotExperimental is the warning every place that chooses copilot for the
 // review sessions gives.
-const copilotExperimental = "is copilot: experimental — review sessions are not fenced yet (docs/guide/configuration.md)"
+const copilotExperimental = "is copilot: experimental (docs/guide/configuration.md)"
 
 // copilotNoLogin says what is missing when no GitHub login reaches a Copilot
 // session; the run preflight's refusal builds on the same words.
@@ -222,11 +226,78 @@ func copilotReview(root string) bool {
 	return err == nil && v.Value == driver.AgentCopilot
 }
 
+// secondReviewMode is run.second-review, "off" when it cannot be read.
+func secondReviewMode(root string) string {
+	v, err := config.Get(root, "run.second-review")
+	if err != nil {
+		return "off"
+	}
+	return v.Value
+}
+
+// copilotSecond reports whether the second review is in use and runs on copilot.
+func copilotSecond(root string) bool {
+	v, err := config.Get(root, "agent.second-review")
+	return secondReviewMode(root) != "off" && err == nil && v.Value == driver.AgentCopilot
+}
+
+// copilotKeys names the agent keys that choose copilot, for the reviews in use.
+func copilotKeys(root string) []string {
+	var keys []string
+	if copilotReview(root) {
+		keys = append(keys, "agent.review")
+	}
+	if copilotSecond(root) {
+		keys = append(keys, "agent.second-review")
+	}
+	return keys
+}
+
+// doctorSecondReview adds the second review's rows; with run.second-review off
+// it says nothing.
+func doctorSecondReview(root string, add func(name, result, msg string)) {
+	mode := secondReviewMode(root)
+	if mode == "off" {
+		return
+	}
+	get := func(k string) string {
+		v, _ := config.Get(root, k)
+		return v.Value
+	}
+	add("run.second-review:", resPass, fmt.Sprintf("%s, agent %s, model %s", mode, get("agent.second-review"), get("model.second-review")))
+	if get("agent.review") == get("agent.second-review") && get("model.review") == get("model.second-review") {
+		add("run.second-review:", resWarning, "the second reviewer is the primary's agent and model — it adds no independence")
+	}
+}
+
+// skillClash is a project skill directory named exactly like one of vloop's
+// plugin skills, which a copilot session may load instead of it.
+type skillClash struct{ path, name string }
+
+func (c skillClash) message() string {
+	return "has the name of vloop's " + c.name + " skill; a copilot session may load it instead — rename it"
+}
+
+// skillClashes lists the directories under .claude/skills/ and .github/skills/
+// that have the name of a plugin skill, in that order.
+func skillClashes(root string) []skillClash {
+	var out []skillClash
+	for _, dir := range []string{".claude/skills", ".github/skills"} {
+		for _, name := range driver.PluginSkillNames() {
+			rel := dir + "/" + name
+			if fi, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel))); err == nil && fi.IsDir() {
+				out = append(out, skillClash{rel, name})
+			}
+		}
+	}
+	return out
+}
+
 // doctorCopilot adds the checks of a copilot review agent: copilot found and
 // working, the experimental warning, and a warning for each project skill
 // whose name ends in review, which a copilot session may pick instead of
 // /vloop:review.
-func doctorCopilot(root string, add func(name, result, msg string)) {
+func doctorCopilot(root string, keys []string, add func(name, result, msg string)) {
 	if _, problem := driver.AgentPreflight(driver.AgentCopilot); problem != "" {
 		add("copilot", resProblem, problem)
 	} else {
@@ -237,10 +308,16 @@ func doctorCopilot(root string, add func(name, result, msg string)) {
 	} else {
 		add("copilot login", resProblem, copilotNoLogin)
 	}
-	add("agent.review", resWarning, copilotExperimental)
+	for _, k := range keys {
+		add(k, resWarning, copilotExperimental)
+	}
+	clashes := skillClashes(root)
+	for _, c := range clashes {
+		add(c.path, resProblem, c.message())
+	}
 	entries, _ := os.ReadDir(filepath.Join(root, ".claude", "skills"))
 	for _, e := range entries {
-		if e.IsDir() && strings.HasSuffix(e.Name(), "review") {
+		if e.IsDir() && strings.HasSuffix(e.Name(), "review") && !slices.Contains(driver.PluginSkillNames(), e.Name()) {
 			add(".claude/skills/"+e.Name(), resWarning, "may be loaded instead of /vloop:review by a copilot session")
 		}
 	}

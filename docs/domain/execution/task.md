@@ -74,6 +74,17 @@ stateDiagram-v2
 - Gates must run on the host's tools. On macOS that means BSD `grep`, `sed`,
   `awk`, `date` — B2 stalled on a GNU-only pattern.
 
+## The second review
+
+When `run.second-review` is on, a second review of the task's iteration may add
+to the task's `notes`, and only there: in `feedback`, when the primary did not
+pass, the second review's findings join the notes after the primary's, each
+prefixed `second review: `; in `both-pass`, a second FAIL rejects the iteration
+like a primary FAIL, so the attempt counts and its findings become the notes.
+In `record` and `on-pass`, and in `feedback` after a primary PASS, nothing reaches
+the notes. Outside `both-pass` the second review never changes a task's status or
+attempts; it can never mark a task done.
+
 ## Model and effort
 
 For the task's session of kind `k` (`work` or `review`): the task's own

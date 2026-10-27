@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const copilotWarning = "agent.review is copilot: experimental — review sessions are not fenced yet (docs/guide/configuration.md)"
+const copilotWarning = "agent.review is copilot: experimental (docs/guide/configuration.md)"
 
 // copilot installs a stub copilot beside the stub claude; versionOK false makes
 // its --version fail.
@@ -205,5 +205,31 @@ func TestDoctorClaudeReviewHasNoCopilotLogin(t *testing.T) {
 	e.gh("exit 1")
 	if out, _ := e.run("doctor"); strings.Contains(out, "copilot login") {
 		t.Errorf("doctor shows a copilot login row:\n%s", out)
+	}
+}
+
+func TestCopilotSkillWithPluginNameStopsTheRun(t *testing.T) {
+	e := newDoctorEnv(t)
+	e.write(".vloop/config.toml", doctorCheckConfig+"[agent]\nreview = \"copilot\"\n[model]\nreview = \"gpt-x\"\n")
+	e.copilot(true)
+	e.skill("review")
+	e.write(".github/skills/plan/SKILL.md", "---\nname: plan\n---\n")
+	out, code := e.run("doctor")
+	if code != 1 || !strings.Contains(out, "✗ .claude/skills/review has the name of vloop's review skill; a copilot session may load it instead — rename it\n") ||
+		!strings.Contains(out, "✗ .github/skills/plan has the name of vloop's plan skill") {
+		t.Errorf("doctor exit %d:\n%s", code, out)
+	}
+	_, err := e.preflight()
+	want := ".claude/skills/review has the name of vloop's review skill; a copilot session may load it instead — rename it"
+	if err == nil || err.Error() != want {
+		t.Errorf("preflight error = %v, want %q", err, want)
+	}
+}
+
+func TestClaudeReviewIgnoresPluginNamedSkill(t *testing.T) {
+	e := newDoctorEnv(t)
+	e.skill("review")
+	if errOut, err := e.preflight(); err != nil || strings.Contains(errOut, "skills/") {
+		t.Errorf("preflight = %v:\n%s", err, errOut)
 	}
 }

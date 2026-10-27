@@ -1,0 +1,23 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {
+      "task": "T2",
+      "verdict": "FAIL",
+      "findings": [
+        {"summary": "patch_() in gate.sh sends apply_patch as toolArgs {\"input\": <patch>}; neither the brief nor docs/design-notes/copilot-cli-experiments.md names that key or that shape (Copilot may send the raw patch string), so a correct hook that reads the patch another way fails the apply_patch rows", "kind": "pins-unnamed"}
+      ]
+    },
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []},
+    {"task": "T7", "verdict": "PASS", "findings": []},
+    {"task": "T8", "verdict": "PASS", "findings": []},
+    {"task": "T9", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "I ran every gate on the base. Each fails for the missing behaviour: unknown command fence (T1, T2, T9), no hooks file (T3), unknown key run.second-review (T4, T5, T6), no fence-audit.md (T7), no kit probe (T8). No gate takes more than 7 s. I also ran T4's doctor and run sections apart from its key checks: the fixture builds and doctor exits 0 with the old 'not fenced yet' warning, so T4 fails there on the new wording. Fix for T2: have patch_() send apply_patch in the way the brief supports, or make the gate send the patch both as an object field and as a raw string and require deny for each. Brief and docs do not say which one Copilot sends."
+}
+
