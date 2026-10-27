@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.2070518,
+  "duration_ms": 54089,
+  "effort": null,
+  "ended": "2026-10-27T22:16:46Z",
+  "is_error": false,
+  "iteration": 5,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 30725,
+      "cache_read_input_tokens": 327518,
+      "cost_usd": 0.2070518,
+      "input_tokens": 20,
+      "output_tokens": 5136
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261027-2111-b24-copilot-work",
+  "schema": "session/v3",
+  "started": "2026-10-27T22:15:51Z",
+  "task": "T5",
+  "turns": 10,
+  "wall_ms": 54668
+}

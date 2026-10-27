@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "The acceptance kit gains work.sh, which runs the fixture brief with agent.work = copilot and model.work given (plan and review on Claude), and a report.py work subcommand summarising each work session record and each task's outcome; the README gains its B24 section.",
+  "files": ["tools/copilot-acceptance/work.sh", "tools/copilot-acceptance/report.py", "tools/copilot-acceptance/README.md"],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: ok.",
+  "notes": "Not run: it needs real copilot, claude, gh and the network. Config keys (agent.work, model.work) were checked against vloop config list; session record fields (phase, task, credits, cost_usd, cost_source, permission_denials) and iterations.jsonl fields (iteration, task, attempt, outcome) come from internal/driver/session.go and a real iterations.jsonl. Scratch repo is <dir>/repo-work."
+}

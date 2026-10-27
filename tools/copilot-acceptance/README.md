@@ -98,3 +98,30 @@ tools/copilot-acceptance/bypass.sh <copilot model id> [workdir]
 
 Re-run both when Copilot updates; the results are in
 `docs/design-notes/copilot-cli-experiments.md` → B22.3.
+
+## B24: Copilot work sessions
+
+`work.sh` is the operator's acceptance of `agent.work = copilot` on the real
+Copilot CLI. Gates use a stub `copilot`; only a run on the real one proves a
+Copilot work session works. It is run by no gate or check.
+
+```
+tools/copilot-acceptance/work.sh <copilot model id> [dir]
+```
+
+It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
+(logged in, with folder trust accepted for `<dir>/repo-work`), `go` and
+`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+repository with `agent.work = copilot` and `model.work` the model given; plan
+and review stay on Claude. A first run may stop at `vloop doctor`, as above.
+
+It spends Copilot credits for the work sessions and Claude money for the plan
+and the reviews.
+
+It writes `<dir>/b24-work-summary.md` (`report.py work`): one row per work
+session record with agent, model, credits, estimated cost, `session/v4` validity
+and its `permission_denials`; then each task's outcome from the run's
+iteration records and the review verdicts.
+
+Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
+brief is closed.
