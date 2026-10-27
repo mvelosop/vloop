@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **1/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T21:41:55Z
+**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T21:48:51Z
 
 ## Progress
 
-- [ ] **T1** — Add the work phase to the fence judge and to vloop fence check
+- [x] **T1** — Add the work phase to the fence judge and to vloop fence check
 - [ ] **T2** — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
 - [ ] **T3** — Check agent.work = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
@@ -19,7 +19,7 @@
 
 ### T1 — Add the work phase to the fence judge and to vloop fence check
 
-`pending` · depends on: none
+`done` · depends on: none
 
 W1's core. The judge behind `vloop fence check` and the Copilot hook knows only the review phases, so a Copilot work session cannot be fenced. This task gives it a `work` phase that enforces `fence/work.json` — the same rule set Claude's work sessions run under — plus the adapter's work deny-list stems (the review stems without `rm:*`), and lets work sessions write anywhere in the repository except where S-4 forbids. T2 puts it behind the hook; the review phases must not change by a byte.
 

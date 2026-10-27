@@ -1,6 +1,7 @@
 package fence
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -250,8 +251,106 @@ func TestApplyPatch(t *testing.T) {
 	}
 }
 
+// W1: the work phase is served; any other name is not.
 func TestUnknownPhase(t *testing.T) {
-	if _, err := New("work", t.TempDir(), ""); err == nil {
-		t.Error("New accepted the work phase")
+	_, err := New("plan", t.TempDir(), "")
+	if err == nil || err.Error() != `unknown phase "plan": want review, second-review or work` {
+		t.Errorf("New(plan) error = %v", err)
+	}
+}
+
+func TestWorkShell(t *testing.T) {
+	j, _, _ := newJudge(t, PhaseWork)
+	cases := []struct{ cmd, deny string }{
+		{"rm src/old.ts", ""},
+		{"pnpm add nanoid", ""},
+		{"npm install", ""},
+		{"node x.js", ""},
+		{"git diff > .vloop/tmp/diff.txt", ""},
+		{"echo ok > src/version.txt", ""},
+		{"ls src > /dev/null", ""},
+		{"rm -rf dist", "rm -rf dist is denied by the work fence (Bash(rm -rf:*))"},
+		{"rm -r dist", "(Bash(rm -r:*))"},
+		{"rm -R dist", "(Bash(rm -R:*))"},
+		{"rm -fr dist", "(Bash(rm -fr:*))"},
+		{`sh -c "git push origin main"`, "git push origin main is denied by the work fence (Bash(git push:*))"},
+		{"env gh pr list", "gh pr list is denied by the Copilot deny list (gh:*)"},
+		{"curl https://example.com", "curl https://example.com is denied by the work fence (Bash(curl:*))"},
+		{"git commit -m x", "denied by the work fence (Bash(git commit:*))"},
+		{"pip install x", "(Bash(pip install:*))"},
+		{"sh script.sh", "*"},
+		{"echo x > .vloop/state/state.json", "write to .vloop/state/state.json is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/"},
+		{"echo x > .git/config", "nothing under .git/ or .vloop/ but .vloop/tmp/"},
+		{"echo x > ../outside.txt", "write to ../outside.txt is not allowed in a work session: it is outside the repository"},
+		{"for f in a b; do echo $f; done", "*"},
+		{"echo $(date)", "*"},
+		{"echo `date`", "*"},
+		{"eval ls", "*"},
+	}
+	for _, c := range cases {
+		d := j.Decide("bash", "", c.cmd)
+		switch {
+		case c.deny == "" && !d.Allow:
+			t.Errorf("%q: denied: %s", c.cmd, d.Reason)
+		case c.deny != "" && d.Allow:
+			t.Errorf("%q: allowed", c.cmd)
+		case c.deny != "" && c.deny != "*" && !strings.Contains(d.Reason, c.deny):
+			t.Errorf("%q: reason %q does not hold %q", c.cmd, d.Reason, c.deny)
+		}
+	}
+}
+
+func TestWorkOtherTools(t *testing.T) {
+	j, root, _ := newJudge(t, PhaseWork)
+	const dotDirs = "write to %s is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/"
+	calls := []struct {
+		tool, path string
+		want       bool
+		reason     string
+	}{
+		{"create", "src/links/links.service.ts", true, ""},
+		{"edit", "test/app.e2e-spec.ts", true, ""},
+		{"create", ".vloop/tmp/proposal.json", true, ""},
+		{"edit", filepath.Join(root, "src", "app.ts"), true, ""},
+		{"create", "/dev/null", true, ""},
+		{"create", ".vloop/state/state.json", false, fmt.Sprintf(dotDirs, ".vloop/state/state.json")},
+		{"edit", ".git/config", false, fmt.Sprintf(dotDirs, ".git/config")},
+		{"create", ".vloop/config.toml", false, fmt.Sprintf(dotDirs, ".vloop/config.toml")},
+		{"edit", ".vloop/tmp/../state/x", false, fmt.Sprintf(dotDirs, ".vloop/tmp/../state/x")},
+		{"create", "/etc/hosts", false, "write to /etc/hosts is not allowed in a work session: it is outside the repository"},
+		{"edit", "../outside", false, "write to ../outside is not allowed in a work session: it is outside the repository"},
+		{"view", "src/app.ts", true, ""},
+		{"view", "~/.copilot/config.json", false, ""},
+		{"skill", "work", true, ""},
+		{"skill", "vloop-work", false, "skill vloop-work is not vloop's — use /vloop:work"},
+		{"web_fetch", "", false, "tool web_fetch is not allowed in a work session"},
+		{"task", "", false, "tool task is not allowed in a work session"},
+		{"explore_subagent", "", false, "tool explore_subagent is not allowed in a work session"},
+	}
+	for _, c := range calls {
+		d := j.Decide(c.tool, c.path, "")
+		if d.Allow != c.want {
+			t.Errorf("%s %q: allow = %v (%s), want %v", c.tool, c.path, d.Allow, d.Reason, c.want)
+		}
+		if c.reason != "" && d.Reason != c.reason {
+			t.Errorf("%s %q: reason %q, want %q", c.tool, c.path, d.Reason, c.reason)
+		}
+	}
+	if d := j.Decide("apply_patch", "", "*** Begin Patch\n*** Update File: src/app.ts\n*** End Patch"); !d.Allow {
+		t.Errorf("patch of src/app.ts denied: %s", d.Reason)
+	}
+	if d := j.Decide("apply_patch", "", "*** Begin Patch\n*** Add File: .vloop/defects/D1.md\n*** End Patch"); d.Allow {
+		t.Error("patch adding .vloop/defects/D1.md allowed")
+	}
+}
+
+// The review phases keep denying rm: only the work phase drops that stem.
+func TestReviewStillDeniesRm(t *testing.T) {
+	for _, phase := range []string{PhaseReview, PhaseSecondReview} {
+		j, _, _ := newJudge(t, phase)
+		d := j.Decide("bash", "", "rm src/old.ts")
+		if d.Allow || d.Reason != "rm src/old.ts is denied by the Copilot deny list (rm:*)" {
+			t.Errorf("[%s] rm src/old.ts: %+v", phase, d)
+		}
 	}
 }

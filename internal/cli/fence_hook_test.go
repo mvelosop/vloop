@@ -83,7 +83,7 @@ func TestFenceHookFailsClosed(t *testing.T) {
 		{"empty", "review", ""},
 		{"no toolName", "review", `{"toolArgs":{"command":"git status"}}`},
 		{"empty object", "second-review", `{}`},
-		{"work phase", "work", ok},
+		{"plan phase", "plan", ok},
 		{"unknown phase", "bogus", ok},
 		{"no phase", "", ok},
 	} {
