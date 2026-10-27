@@ -19,3 +19,10 @@ committing the plan
    review T1 · 0m39s · $0.16 · run $4.45 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/6 done ──
+   Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
+   work T2 · 9m55s · $0.37 · run $4.82 / $40.00
+   check go
+   review T2 · 0m52s · $0.16 · run $4.98 / $40.00
+   review: PASS
+   T2 done

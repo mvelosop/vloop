@@ -120,17 +120,45 @@ func TestCopilotGuidelines(t *testing.T) {
 	}
 }
 
-func TestCopilotSupportsReviewOnly(t *testing.T) {
+func TestCopilotSupportsWorkAndReview(t *testing.T) {
 	a, err := adapterFor(AgentCopilot, "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, ph := range []string{PhasePlan, PhaseWork, PhaseGateReview, PhaseVerify} {
+	for _, ph := range []string{PhasePlan, PhaseGateReview, PhaseVerify} {
 		if a.Supports(ph) {
 			t.Errorf("copilot supports %s", ph)
 		}
 	}
-	if !a.Supports(PhaseReview) {
-		t.Error("copilot does not support review")
+	for _, ph := range []string{PhaseWork, PhaseReview, PhaseSecondReview} {
+		if !a.Supports(ph) {
+			t.Errorf("copilot does not support %s", ph)
+		}
+	}
+}
+
+func TestCopilotWorkArgvAndHooks(t *testing.T) {
+	root := t.TempDir()
+	a := copilotAdapter{}
+	p, err := a.Prepare(root, "9.9.9", PhaseWork)
+	if err != nil {
+		t.Fatal(err)
+	}
+	args := a.Command(Spec{Phase: PhaseWork, Arg: "T3", Model: "m1", Agent: AgentCopilot}, root, nil, p).Args[1:]
+	line := " " + strings.Join(args, " ") + " "
+	if !strings.Contains(line, "-p /vloop:work T3 ") {
+		t.Errorf("argv lacks the work prompt: %v", args)
+	}
+	if strings.Contains(line, " --deny-tool=shell(rm:*) ") {
+		t.Errorf("work argv holds shell(rm:*): %v", args)
+	}
+	for _, d := range copilotDenials {
+		if d != "shell(rm:*)" && !strings.Contains(line, " --deny-tool="+d+" ") {
+			t.Errorf("no denial %q", d)
+		}
+	}
+	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if err != nil || !strings.Contains(string(data), " fence hook --phase work --root ") || strings.Contains(string(data), "--phase review") {
+		t.Errorf("hooks file %s: %v", data, err)
 	}
 }

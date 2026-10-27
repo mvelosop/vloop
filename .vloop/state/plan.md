@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 1
+**Status:** running · **2/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T21:48:51Z
+**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:03:34Z
 
 ## Progress
 
 - [x] **T1** — Add the work phase to the fence judge and to vloop fence check
-- [ ] **T2** — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
+- [x] **T2** — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
 - [ ] **T3** — Check agent.work = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a work run on the real CLI
@@ -45,7 +45,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 W1's hook half and W2's core. With T1's judge, `vloop fence hook --phase work` can fence a Copilot work session; this task lets the Copilot adapter run `/vloop:work <task>` exactly as it runs a review — same plugin, fresh home, guidelines, JSON Lines parsed into session/v4 — with only two differences: its hooks file runs the hook with `--phase work`, and its argv omits `--deny-tool=shell(rm:*)`. `agent.work` then accepts `copilot`. Everything the driver does around the work session stays as it is: the checks after the session are the boundary (S-2, S-4).
 

@@ -25,7 +25,7 @@ func TestResolveAgent(t *testing.T) {
 			t.Errorf("session agent %s: %q %v", p, got, err)
 		}
 	}
-	t.Setenv("VLOOP_AGENT_WORK", "copilot")
+	t.Setenv("VLOOP_AGENT_WORK", "codex")
 	if _, err := ResolveRun(root); err == nil {
 		t.Error("ResolveRun accepted an invalid agent")
 	}

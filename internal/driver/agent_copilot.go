@@ -12,7 +12,7 @@ import (
 	vloop "github.com/mvelosop/vloop"
 )
 
-// AgentCopilot is the GitHub Copilot CLI, which can run review sessions only.
+// AgentCopilot is the GitHub Copilot CLI, which can run work and review sessions only.
 const AgentCopilot = "copilot"
 
 // copilotDenials are the stems a copilot session may not run: Copilot's
@@ -70,7 +70,7 @@ type copilotAdapter struct {
 func (copilotAdapter) Name() string { return AgentCopilot }
 
 func (copilotAdapter) Supports(phase string) bool {
-	return phase == PhaseReview || phase == PhaseSecondReview
+	return phase == PhaseWork || phase == PhaseReview || phase == PhaseSecondReview
 }
 
 func (a copilotAdapter) command() string {
@@ -176,6 +176,9 @@ func (a copilotAdapter) Command(s Spec, root string, env []string, p Prepared) *
 		"--output-format", "json",
 		"--allow-all-tools")
 	for _, d := range copilotDenials {
+		if s.Phase == PhaseWork && d == "shell(rm:*)" {
+			continue // a work session may delete files; the work fence judges rm
+		}
 		args = append(args, "--deny-tool="+d)
 	}
 	args = append(args, "--disable-builtin-mcps")

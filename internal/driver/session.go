@@ -461,7 +461,7 @@ func (r *Runner) record(s Spec, agent, task string, started, ended time.Time, o 
 		effort = s.Effort
 	}
 	schemaName := "session/v3"
-	if s.Phase == PhaseSecondReview {
+	if s.Phase == PhaseSecondReview || (s.Phase == PhaseWork && agent == AgentCopilot) {
 		schemaName = "session/v4"
 	}
 	rec := map[string]any{

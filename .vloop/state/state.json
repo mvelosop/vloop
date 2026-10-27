@@ -5,9 +5,9 @@
   "base": "12abccffa81caaab6acf2808e73b11b3194d791b",
   "branch": "B20261027-2111-b24-copilot-work",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-27T21:39:11Z",
-  "updated": "2026-10-27T21:48:51Z",
+  "updated": "2026-10-27T22:03:34Z",
   "shell": "sh",
   "checks": [
     {
@@ -102,7 +102,7 @@
         "Committed Go tests cover the adapter's work-phase argv (no `shell(rm:*)`, the rest of the list present), its hooks file's `--phase work`, `Supports(work)`, the hook's work phase and `agent.work` accepting copilot; tests that pinned work as unsupported or `work` as an unknown hook phase change only to the new behaviour, and the work notes name the contract item (W1, W2)."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
