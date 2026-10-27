@@ -126,6 +126,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
+| verify | decision | no | no-options | [I20261027-004744-acceptance-run-in-b19-s-already-trusted](I20261027-004744-acceptance-run-in-b19-s-already-trusted.md) |
 | verify | direction | no | no-options | [I20261015-151133-operator-fix-the-three-problems-found-in](I20261015-151133-operator-fix-the-three-problems-found-in.md) |
 | verify | halt | partly | no-options | [I20261001-2020-eval-probe-blocked-by-docker-store](I20261001-2020-eval-probe-blocked-by-docker-store.md) |
 | verify | repair | partly | no-options | [I20260930-0805-the-planning-session-moved-this-repo-s-r](I20260930-0805-the-planning-session-moved-this-repo-s-r.md) |
@@ -133,6 +134,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | repair | partly | no-options | [I20261001-1415-eval-port-fixed-by-hand](I20261001-1415-eval-port-fixed-by-hand.md) |
 | verify | repair | partly | no-options | [I20261001-2035-llm-grader-focus-fixed](I20261001-2035-llm-grader-focus-fixed.md) |
 | verify | repair | partly | no-options | [I20261004-1143-b9-verified-the-worked-example-held-by-h](I20261004-1143-b9-verified-the-worked-example-held-by-h.md) |
+| verify | repair | partly | no-options | [I20261027-004743-acceptance-kit-s-hook-probe-could-not-ru](I20261027-004743-acceptance-kit-s-hook-probe-could-not-ru.md) |
 | verify | verification-finding | yes | no-options | [I20260929-2010-go-mod-not-tidy](I20260929-2010-go-mod-not-tidy.md) |
 | verify | verification-finding | partly | no-options | [I20260929-2012-brief-check-and-brief-list-started-a-rep](I20260929-2012-brief-check-and-brief-list-started-a-rep.md) |
 | verify | verification-finding | yes | no-options | [I20260929-2245-one-review-session-s-telemetry-record-wa](I20260929-2245-one-review-session-s-telemetry-record-wa.md) |
@@ -165,6 +167,9 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261026-012949-calibration-04-unchecked-criterion-named](I20261026-012949-calibration-04-unchecked-criterion-named.md) |
 | verify | verification-finding | partly | no-options | [I20261026-023243-the-verify-session-left-no-verify-json-f](I20261026-023243-the-verify-session-left-no-verify-json-f.md) |
 | verify | verification-finding | partly | no-options | [I20261026-023244-r2-confirmed-on-real-records-the-url-sho](I20261026-023244-r2-confirmed-on-real-records-the-url-sho.md) |
+| verify | verification-finding | partly | no-options | [I20261027-004736-metrics-left-the-second-reviews-cost-and](I20261027-004736-metrics-left-the-second-reviews-cost-and.md) |
+| verify | verification-finding | no | no-options | [I20261027-004737-copilot-runs-the-call-when-a-pretooluse](I20261027-004737-copilot-runs-the-call-when-a-pretooluse.md) |
+| verify | verification-finding | partly | no-options | [I20261027-004745-verify-s-one-finding-rejected-the-second](I20261027-004745-verify-s-one-finding-rejected-the-second.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
