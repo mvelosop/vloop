@@ -26,3 +26,10 @@ committing the plan
    review T2 · 0m52s · $0.16 · run $4.98 / $40.00
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/6 done ──
+   Check agent.work = copilot in the run preflight and doctor
+   work T3 · 1m23s · $0.21 · run $5.19 / $40.00
+   check go
+   review T3 · 0m26s · $0.11 · run $5.30 / $40.00
+   review: PASS
+   T3 done

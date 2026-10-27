@@ -5,9 +5,9 @@
   "base": "12abccffa81caaab6acf2808e73b11b3194d791b",
   "branch": "B20261027-2111-b24-copilot-work",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-10-27T21:39:11Z",
-  "updated": "2026-10-27T22:03:34Z",
+  "updated": "2026-10-27T22:09:29Z",
   "shell": "sh",
   "checks": [
     {
@@ -134,7 +134,7 @@
         "Committed tests cover the warning, the model.work refusal, K1 and the login refusal for agent.work (extending the existing doctor and run preflight tests)."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 2
+**Status:** running · **3/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:03:34Z
+**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:09:29Z
 
 ## Progress
 
 - [x] **T1** — Add the work phase to the fence judge and to vloop fence check
 - [x] **T2** — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
-- [ ] **T3** — Check agent.work = copilot in the run preflight and doctor
+- [x] **T3** — Check agent.work = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a work run on the real CLI
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
@@ -69,7 +69,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Check agent.work = copilot in the run preflight and doctor
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 W2's guard rails. An operator who sets `agent.work = copilot` gets what Copilot review already gives: the experimental warning, a refusal while `model.work` is still the Claude default, and the copilot checks — copilot on PATH and runnable, a GitHub login reaching its sessions, K1's refusal of a project skill named like one of vloop's — in `vloop run` and as `vloop doctor` rows. Without these, a run would hand a Claude alias to Copilot or let a project skill shadow `/vloop:work`.
 

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "agent.work = copilot now gets the experimental warning, the default-model.work refusal, K1's skill refusal, the login refusal and the copilot doctor rows, in vloop run and vloop doctor; agent.work = claude shows none of it.",
+  "files": ["internal/cli/doctor.go", "internal/cli/run.go", "internal/cli/doctor_copilot_work_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok; go test ./internal/cli -run Copilot|Doctor|Preflight passed.",
+  "notes": "The generic copilot checks already keyed off copilotKeys; the change adds agent.work (first in the list) there, a copilotWork helper, and agent.work in the run preflight's warning pass-through. New tests are in a new file, doctor_copilot_work_test.go; no existing test changed."
+}

@@ -190,7 +190,7 @@ func runPreflight(b Build, root string, cmd *cobra.Command) error {
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++
-		case c.Result == resWarning && (c.Name == "agent.review" || c.Name == "agent.second-review" || c.Name == "run.second-review:" && c.Result == resWarning || strings.HasPrefix(c.Name, ".claude/skills/")):
+		case c.Result == resWarning && (c.Name == "agent.work" || c.Name == "agent.review" || c.Name == "agent.second-review" || c.Name == "run.second-review:" && c.Result == resWarning || strings.HasPrefix(c.Name, ".claude/skills/")):
 			fmt.Fprintf(errOut, "  ! %s %s\n", c.Name, c.Message)
 		}
 	}
