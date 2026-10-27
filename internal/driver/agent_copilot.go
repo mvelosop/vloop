@@ -12,7 +12,8 @@ import (
 	vloop "github.com/mvelosop/vloop"
 )
 
-// AgentCopilot is the GitHub Copilot CLI, which can run work and review sessions only.
+// AgentCopilot is the GitHub Copilot CLI, which can run work, review and second-review
+// sessions only.
 const AgentCopilot = "copilot"
 
 // copilotDenials are the stems a copilot session may not run: Copilot's

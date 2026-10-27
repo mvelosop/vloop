@@ -36,7 +36,7 @@ environment and in `config set`.
 | `agent.second-review` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_SECOND_REVIEW` | agent CLI of the second review session (`copilot` is experimental) |
 | `agent.gate-review` | `claude` | `claude` | `VLOOP_AGENT_GATE_REVIEW` | agent CLI of the gate-review session |
 | `agent.verify` | `claude` | `claude` | `VLOOP_AGENT_VERIFY` | agent CLI of the verify session |
-| `copilot.credit-usd` | `0.0066667` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot credit, for the estimated cost of a copilot review session |
+| `copilot.credit-usd` | `0.0066667` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot credit, for the estimated cost of a copilot session |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
 | `metrics.stacks` | unset | a list of preset names (below) | `VLOOP_METRICS_STACKS` | presets that classify changed lines as code, test, docs or excluded |

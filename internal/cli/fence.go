@@ -74,7 +74,8 @@ bad arguments exit 2.`,
 	hook := &cobra.Command{
 		Use:   "hook --phase <review|second-review|work> --root <dir>",
 		Short: "Answer one Copilot preToolUse payload from stdin with an allow or deny line",
-		Long: `The command Copilot runs before every tool call of a review session. It reads
+		Long: `The command Copilot runs before every tool call of a work, review or second-review
+session. It reads
 one payload ({"toolName", "toolArgs", "cwd"}) on stdin and prints one line of
 JSON: {"permissionDecision":"allow"}, or {"permissionDecision":"deny",
 "permissionDecisionReason":"vloop fence: ..."}, and exits 0. toolArgs may be an
