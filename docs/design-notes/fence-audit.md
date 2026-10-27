@@ -24,7 +24,10 @@ rule by rule, who enforces it there.
   and a shell redirection may write only under `.vloop/tmp/`; reads may not touch
   `~/.claude`, `~/.copilot` or `~/.config/gh`; a `skill` call must name one of
   vloop's skills (K1); every other tool is denied. It fails closed: an error
-  answers deny.
+  answers deny. Copilot itself denies when the hook command is missing or exits
+  non-zero, but runs the call when the hook prints output that is not JSON or
+  exceeds its timeout (`docs/design-notes/copilot-cli-experiments.md` → B22.2);
+  the hook always prints its answer and is fast, and the deny list stays behind it.
 - **driver** — what the driver checks after the session, whatever the session
   did: it restores the plan, the brief's status, the gate fixtures, `.vloop/config.toml`,
   the guidelines file, `.vloop/defects/`, `.vloop/interventions/` and the run

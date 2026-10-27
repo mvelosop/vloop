@@ -34,7 +34,9 @@ MODES = {  # the hook command replaced by one that fails, and the timeout it is 
     "notjson": ("sh -c 'echo this is not JSON'", 30),
     "timeout": ("sh -c 'sleep 60'", 3),
 }
-FAIL_CALL = "rm -f c5-hook-failure"  # the shim records it if Copilot ran it
+# The shim records it if Copilot ran it. Not `rm`: Copilot's own deny list holds rm,
+# and would deny the call before the hook's failure mattered.
+FAIL_CALL = "git log -1 --oneline c5-hook-failure"
 
 
 def logged_review(d):
@@ -50,18 +52,31 @@ def logged_review(d):
     return args, cwd, env
 
 
+def hooks_file(d, cwd, hook):
+    """The hooks file vloop writes (agent_copilot.go, writeCopilotHooks), rebuilt: the
+    session's home lives under .vloop/tmp/, which the driver empties after every session.
+    The phase is VLOOP_HOOK_PHASE (default review); hook replaces the command."""
+    phase = os.environ.get("VLOOP_HOOK_PHASE", "review")
+    sq = lambda s: "'" + s.replace("'", "'\\''") + "'"
+    cmd = sq(os.path.join(d, "bin", "vloop")) + " fence hook --phase " + phase + " --root " + sq(cwd)
+    entry = {"type": "command", "bash": cmd, "powershell": cmd, "timeoutSec": 30}
+    if hook:
+        entry["bash"] = entry["powershell"] = hook[0]
+        entry["timeoutSec"] = hook[1]
+    return {"version": 1, "hooks": {"preToolUse": [entry]}}
+
+
 def start(d, copilot, name, prompt, hook=None):
     args, cwd, env = logged_review(d)
     args[args.index("-p") + 1] = prompt
     home = env.get("COPILOT_HOME")
-    if home and hook:
-        path = os.path.join(home, "hooks", "vloop-fence.json")
-        doc = json.load(open(path))
-        entry = doc["hooks"]["preToolUse"][0]
-        entry["bash"] = entry["powershell"] = hook[0]
-        entry["timeoutSec"] = hook[1]
-        with open(path, "w") as f:
-            json.dump(doc, f, indent=2)
+    if home:
+        os.makedirs(os.path.join(home, "hooks"), exist_ok=True)
+        with open(os.path.join(home, "hooks", "vloop-fence.json"), "w") as f:
+            json.dump(hooks_file(d, cwd, hook), f, indent=2)
+    for k in ("COPILOT_CUSTOM_INSTRUCTIONS_DIRS",):
+        if env.get(k):
+            os.makedirs(env[k], exist_ok=True)
     with open(os.path.join(d, name + ".argv"), "w") as f:
         f.write("\n".join(args) + "\n")
     with open(os.path.join(d, name + ".jsonl"), "w") as o, open(os.path.join(d, name + ".stderr"), "w") as e:

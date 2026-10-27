@@ -164,7 +164,7 @@ sessions' model usage, sorted. `effort` gives each phase's effort level when the
 records carry it (`session/v1` and later do, the legacy shell loop's do not), else `null`.
 
 `agents` (`metrics/v4`) lists, per phase and sorted, the agents that ran the sessions. Records written
-before `session/v3` carry none and count as `claude`. `agents["second-review"]` lists the agents of the second review sessions (`[]` when none ran), and `second_review` holds `mode` (`run.second-review` as configured when the report is built), `sessions`, `dissents` and `dissent_tasks`.
+before `session/v3` carry none and count as `claude`. `agents["second-review"]` lists the agents of the second review sessions (`[]` when none ran), and `second_review` holds `mode` (`run.second-review` as configured when the report is built), `sessions`, `dissents` and `dissent_tasks`, and the second review sessions' `cost_usd`, `time_ms` and `credits` (absent when none), each already counted in `cost.total_usd`, `time.agent_ms` and `credits.total`. The text adds `second review` to the time and cost lines when one ran.
 
 ## Tasks and iterations
 

@@ -67,6 +67,11 @@ tools/copilot-acceptance/second.sh <copilot model id> [dir]  # the feedback-mode
    The summary lists the second-review session records (`session/v4` validity,
    credits, model), the run log's second-review lines and the dissents.
 
+The probes rebuild the hooks file each time, since the session's `COPILOT_HOME`
+lies under `.vloop/tmp/`, emptied after every session; `VLOOP_HOOK_PHASE`
+(`review` by default) sets its phase, `second-review` when the logged session
+was a second review.
+
 Record the summaries (`b22-hook-summary.md`, `b22-second-summary.md`) in
 `docs/design-notes/copilot-cli-experiments.md` before the brief is closed. The
 hooks-file shape vloop writes is unconfirmed against Copilot's docs: if the

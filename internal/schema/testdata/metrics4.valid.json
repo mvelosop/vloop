@@ -151,6 +151,9 @@
     "dissents": 1,
     "dissent_tasks": [
       "T1"
-    ]
+    ],
+    "cost_usd": 0.2,
+    "time_ms": 60000,
+    "credits": 28.5
   }
 }

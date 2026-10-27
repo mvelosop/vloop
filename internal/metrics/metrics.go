@@ -87,6 +87,11 @@ type ReportSecondReview struct {
 	Sessions     int      `json:"sessions"`
 	Dissents     int      `json:"dissents"`
 	DissentTasks []string `json:"dissent_tasks"`
+	// CostUSD and TimeMS are the second review sessions' share of cost.total_usd
+	// and time.agent_ms; Credits, of credits.total.
+	CostUSD float64 `json:"cost_usd"`
+	TimeMS  int64   `json:"time_ms"`
+	Credits float64 `json:"credits,omitempty"`
 }
 
 // ReportDefects is the `defects` object.
@@ -259,7 +264,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	r.Tokens = u.Tokens
 	r.Models = PerPhase[[]string]{splitList(u.Models[PhasePlan]), splitList(u.Models[PhaseWork]), splitList(u.Models[PhaseReview]), splitList(u.Models[PhaseGateReview]), nil}
 	r.Agents = PerAgents{splitList(u.Agents[PhasePlan]), splitList(u.Agents[PhaseWork]), splitList(u.Agents[PhaseReview]), splitList(u.Agents[PhaseSecondReview]), splitList(u.Agents[PhaseGateReview]), nil}
-	r.SecondReview = ReportSecondReview{Mode: secondReviewMode(root), Sessions: u.SecondSessions, Dissents: u.Dissents, DissentTasks: append([]string{}, u.DissentTasks...)}
+	r.SecondReview = ReportSecondReview{Mode: secondReviewMode(root), Sessions: u.SecondSessions, Dissents: u.Dissents, DissentTasks: append([]string{}, u.DissentTasks...), CostUSD: u.Cost.SecondReview, TimeMS: u.Time.SecondReviewMS, Credits: u.Credits.SecondReview}
 	r.Effort = PerPhase[*string]{strp(u.Effort[PhasePlan]), strp(u.Effort[PhaseWork]), strp(u.Effort[PhaseReview]), strp(u.Effort[PhaseGateReview]), nil}
 	if u.Time.VerifyMS != 0 || u.Cost.Verify != 0 || u.Models[PhaseVerify] != "" || u.Agents[PhaseVerify] != "" || u.Effort[PhaseVerify] != "" {
 		r.Time.VerifyMS = &u.Time.VerifyMS

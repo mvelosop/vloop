@@ -113,7 +113,10 @@
         "mode": { "enum": ["off", "record", "feedback", "on-pass", "both-pass"] },
         "sessions": { "type": "integer", "minimum": 0 },
         "dissents": { "type": "integer", "minimum": 0 },
-        "dissent_tasks": { "type": "array", "items": { "type": "string" }, "description": "the distinct tasks with a dissent, in the order they first dissented" }
+        "dissent_tasks": { "type": "array", "items": { "type": "string" }, "description": "the distinct tasks with a dissent, in the order they first dissented" },
+        "cost_usd": { "type": "number", "minimum": 0, "description": "the second review sessions' cost, included in cost.total_usd" },
+        "time_ms": { "type": "integer", "minimum": 0, "description": "the second review sessions' time, included in time.agent_ms" },
+        "credits": { "type": "number", "minimum": 0, "description": "the second review sessions' Copilot credits, included in credits.total; absent when none" }
       }
     },
     "effort": {

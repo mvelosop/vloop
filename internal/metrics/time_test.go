@@ -383,8 +383,8 @@ func TestSecondReviewAggregate(t *testing.T) {
 `, map[string]string{
 			"001-work.json":          sess("work", 1, 1, 0.1, "m", 1, 1, 0, 0),
 			"002-review.json":        sess("review", 1, 1, 0.1, "m", 1, 1, 0, 0),
-			"003-second-review.json": sess("second-review", 1, 1, 0.1, "m", 1, 1, 0, 0),
-			"004-second-review.json": sess("second-review", 3, 1, 0.1, "m", 1, 1, 0, 0),
+			"003-second-review.json": sess("second-review", 1, 60000, 0.25, "m", 1, 1, 0, 0),
+			"004-second-review.json": sess("second-review", 3, 30000, 0.5, "m", 1, 1, 0, 0),
 		})
 	m, err := runs.Load(f.root, "B20260101-0900-a.loop-brief")
 	if err != nil {
@@ -396,6 +396,16 @@ func TestSecondReviewAggregate(t *testing.T) {
 	}
 	if u.Agents["second-review"] != "claude" {
 		t.Errorf("agents = %v", u.Agents)
+	}
+	// The second review's spend is the run's spend: in its own bucket and in the total.
+	if u.Cost.SecondReview != 0.75 || u.Time.SecondReviewMS != 90000 {
+		t.Errorf("second review cost %v, time %d; want 0.75 and 90000", u.Cost.SecondReview, u.Time.SecondReviewMS)
+	}
+	if want := 0.1 + 0.1 + 0.75; u.Cost.Total < want-1e-9 || u.Cost.Total > want+1e-9 {
+		t.Errorf("total cost %v, want %v with the second review", u.Cost.Total, want)
+	}
+	if u.Time.AgentMS != 1+1+90000 {
+		t.Errorf("agent time %d, want work, review and the second review's 90000", u.Time.AgentMS)
 	}
 	none := Aggregate(workedRun(t), Counts{})
 	if none.SecondSessions != 0 || none.Dissents != 0 || len(none.DissentTasks) != 0 || none.Agents["second-review"] != "" {
