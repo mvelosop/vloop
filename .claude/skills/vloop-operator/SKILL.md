@@ -184,6 +184,13 @@ and the commit, and prints the trailer for step 4.
 - **Check `git diff --cached --name-only` before every commit.** A file staged
   earlier, by anyone, rides along otherwise (the B4 draft reached `main` that
   way).
+- **The acceptance briefs' flaws stay where they are.** A brief used for
+  acceptance runs (the URL shortener template's) can hold a flaw found in an
+  earlier run, kept on purpose to see how the loop and the agents handle it.
+  Don't fix it, and don't describe it anywhere a session or a later fix could
+  learn it: issues, skills, evals, anything under `plugin/`. Record what the
+  run showed in the operator notes and the design notes, in words that don't
+  give the flaw away; a fix to vloop uses a synthetic case.
 - **Your own scratch work stays in your scratchpad.** Never leave temporary
   copies in `docs/briefs/`; check `git status` before and after anything that
   writes.

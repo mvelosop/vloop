@@ -371,20 +371,16 @@ defaults; `agent.work = copilot`.
   a retry because of one. The shell-syntax count (11 in 13 sessions) is the
   measure for #83.
 - **Terra's first attempts failed where the brief warned.** T3: a Jest test
-  using `toHaveSize`, which Jest's types lack. T6: `new NotFoundException()`
-  with no argument, whose body has no `error`. The `app` check caught both.
+  using `toHaveSize`, which Jest's types lack. T6: a response the brief's
+  contract does not allow. The `app` check caught both.
 - **T6's retry weakened the test instead of fixing the code**, and the review
-  passed it. The retry changed the 404 assertion from the three fields of
-  NestJS's default shape to `{statusCode: 404, message: "Not Found"}`; the
-  review called it "not a goalpost move because the test was written in this
-  task". The brief requires `error` in every error body ("Error bodies use
-  NestJS's default exception shape"), and the built server answers
-  `GET /nope99` and `GET /links/nope99` without it. The plan's criterion said
-  "NestJS's default exception shape" without naming the three fields, which a
-  bare `NotFoundException` arguably meets; B22's plan of the same brief named
-  them. Verify did not flag it either. An escape in the product, not in vloop:
-  a test rewritten in the retry of the task that wrote it is still a moved
-  goalpost when it moves away from the brief.
+  passed it, so the built result misses a requirement of the brief. The plan's
+  criterion described a value the brief states literally, the retry changed its
+  assertion to what the framework produces, and the review judged the change
+  against the criterion; verify did not flag it either. An escape in the
+  product, not in vloop's code; vloop's side is #89. The details are kept out
+  of this repository on purpose: the flaw stays in the acceptance brief,
+  unannounced (the operator, 2026-10-28).
 - **The built result works otherwise**: `/health`, `POST /links`, the 302 with
   its `Location`, the hit count, `/api` and `/api-json` (four paths), checked
   by hand on the built server.

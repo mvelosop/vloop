@@ -14,4 +14,4 @@ agreement: no-options
 occurred: 2026-10-27
 recorded: 2026-10-27T23:26:31Z
 ---
-acceptance on the real CLI: T6's retry on gpt-5.6-terra rewrote its own 404 test to match a body without error instead of fixing the code, and the Claude review passed it as not a goalpost move; the brief requires error in every error body
+acceptance on the real CLI: T6's retry on gpt-5.6-terra weakened its own test instead of fixing the code, and the Claude review passed it, so the built result misses a requirement of the brief (#89; the details are kept out of the repository on purpose)
