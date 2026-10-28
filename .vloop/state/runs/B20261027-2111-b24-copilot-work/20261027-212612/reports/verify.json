@@ -1,0 +1,32 @@
+{
+  "schema": "verify/v1",
+  "findings": [
+    {
+      "kind": "example",
+      "claim": "The same `rm src/old.ts` with `--phase review`: `deny: vloop fence: rm src/old.ts is denied by the Copilot deny list (rm:*)`, exit 1; and the work table: `deny    rm -rf dist -> vloop fence: rm -rf dist is denied by the work fence (Bash(rm -rf:*))`",
+      "observed": "`vloop fence check` prints `deny: rm src/old.ts is denied by the Copilot deny list (rm:*)` and `deny: rm -rf dist is denied by the work fence (Bash(rm -rf:*))`, with no `vloop fence: ` prefix. The prefix appears only in `vloop fence hook` output (`permissionDecisionReason`). The exit codes (1) match. The review line is the same as before the run, so the brief's text is probably what is imprecise.",
+      "where": "Worked example, the `fence check` rows and the review `rm` line; run: vloop fence check --phase work --root . --tool bash \"rm -rf dist\""
+    },
+    {
+      "kind": "surface",
+      "claim": "internal/cli/fence.go:77: \"The command Copilot runs before every tool call of a review session.\"",
+      "observed": "`vloop fence hook --help` still says review session only. The hook now also serves work sessions (--phase work).",
+      "where": "W1; internal/cli/fence.go:77"
+    },
+    {
+      "kind": "surface",
+      "claim": "docs/guide/configuration.md:39: \"dollars per GitHub Copilot credit, for the estimated cost of a copilot review session\"",
+      "observed": "Work sessions on copilot now record credits and an estimated cost (session/v4), but the description names review sessions only.",
+      "where": "W2; docs/guide/configuration.md:39"
+    },
+    {
+      "kind": "surface",
+      "claim": "internal/driver/agent_copilot.go:15: \"which can run work and review sessions only\"",
+      "observed": "The adapter's Supports() also accepts PhaseSecondReview, and the comment omits second review. Minor, and a comment only.",
+      "where": "W2; internal/driver/agent_copilot.go:15 and :73"
+    }
+  ],
+  "checked": { "example_lines": 38, "sentences": 14, "surfaces": 9 },
+  "notes": "Not run: the full `vloop run` with a stub copilot (the warning line, the argv check, the hooks-file content, `session/v4` validity, the exit-9 halt), the K1 refusal for a `.claude/skills/work/` project skill, and the `model.work` default refusal. I checked these by reading the code (internal/cli/run.go:215 has the contract's message wording; internal/driver/agent_copilot.go drops `shell(rm:*)` only for the work phase; internal/driver/session.go picks session/v4 for work on copilot). `vloop config set agent.plan copilot` is refused (`want one of claude`), and `vloop doctor` printed the experimental warning for agent.work. The `apply_patch` row was only exercised through internal/fence/judge_test.go:339-342, not through the hook CLI, because my hand-made hook payload was rejected as not JSON. A Bash call that chained the whole example was denied once, so I ran the lines in pieces from a script under .vloop/tmp/vs. The build and scratch repository are under .vloop/tmp/vs."
+}
+

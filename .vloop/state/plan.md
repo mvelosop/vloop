@@ -1,41 +1,39 @@
-# Plan — B20261026-1002-b22-fence-second-review
+# Plan — B20261027-2111-b24-copilot-work
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **9/9 done** · iteration 10
+**Status:** complete · **6/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261026-1002-b22-fence-second-review.loop-brief.md` · **Updated:** 2026-10-26T23:56:41Z
+**Brief:** `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` · **Updated:** 2026-10-27T22:38:24Z
 
 ## Progress
 
-- [x] **T1** — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
-- [x] **T2** — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
-- [x] **T3** — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
-- [x] **T4** — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning · 1 attempt(s)
-- [x] **T5** — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
-- [x] **T6** — Report the second review in metrics/v4
-- [x] **T7** — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
-- [x] **T8** — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
-- [x] **T9** — Close the run: every gate at once, and the worked example line for line
+- [x] **T1** — Add the work phase to the fence judge and to vloop fence check
+- [x] **T2** — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
+- [x] **T3** — Check agent.work = copilot in the run preflight and doctor
+- [x] **T4** — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
+- [x] **T5** — Extend the Copilot acceptance kit with a work run on the real CLI · 1 attempt(s)
+- [x] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
-### T1 — Add vloop fence check: the judge that decides a tool call against a phase's fence, looking through shell wrappers
+### T1 — Add the work phase to the fence judge and to vloop fence check
 
 `done` · depends on: none
 
-H1's core. Copilot review sessions today run with every tool allowed and a deny list that `sh -c` and `env` walk past (B19's C5.2). This task builds the one judge — a pure splitter, unwrapper, matcher and path rule set over the embedded review fence plus the adapter's deny-list stems — exposed as `vloop fence check` for the operator and the gates; T2 puts the same judge behind the Copilot hook. Fail closed: what the judge cannot parse it denies.
+W1's core. The judge behind `vloop fence check` and the Copilot hook knows only the review phases, so a Copilot work session cannot be fenced. This task gives it a `work` phase that enforces `fence/work.json` — the same rule set Claude's work sessions run under — plus the adapter's work deny-list stems (the review stems without `rm:*`), and lets work sessions write anywhere in the repository except where S-4 forbids. T2 puts it behind the hook; the review phases must not change by a byte.
 
 **Acceptance**
 
-- `vloop fence check --phase <review|second-review> --root <dir> --tool <name> [--path <p>] ["<command>"]` prints `allow` and exits 0, or prints `deny: <reason>` and exits 1; bad arguments (unknown phase, no --tool) exit 2. A file or read tool's path, and a skill's name, are given with `--path`, as the worked example's second table (`--tool`, `--path`) shows.
-- Every line of the worked example's two tables gives the decision the brief shows, `skill vloop-review` with the reason `skill vloop-review is not vloop's — use /vloop:review` and `frobnicate` with `tool frobnicate is not allowed in a review session`.
-- Shell (`bash`, `powershell`): the command string is split at `;`, `&&`, `||`, `|`, `&` and newlines outside quotes; each simple command loses leading NAME=value assignments and is unwrapped repeatedly through env (-i, -u NAME, -, assignments), command, exec, nohup, time, nice (-n N), timeout (options and duration), stdbuf, xargs (options) and sh/bash/zsh/dash/ksh -c (options before -c allowed), whose literal string is judged in turn; a command word with a directory is judged by its base name.
-- A simple command is denied when it matches a `Bash(…)` deny rule of the embedded review fence with the fence's matching (`:*` a prefix, `*` any run) or one of the adapter's deny-list stems; the rules are read from the embedded fence and the adapter's list, not a hand-copied second list — a duplicated rule list in the judge is a violation.
-- Denied before any matching: a backtick, `$(`, `<(`, `>(`, `eval`, `source`, `.` as a command, an unterminated quote, a -c string that is missing or holds `$`, and a command word starting with `$`. A redirection (`>`, `>>`, `>|`, `&>`) to a file is a write judged by the path rules; `/dev/null` is allowed.
-- Writes (`create`, `edit`, a redirection) resolve against --root (absolute taken as given, then cleaned) and are allowed only under `.vloop/tmp/`; reads (`view`, `read_file`, `grep`, `rg`, `grep_search`, `glob`, `file_search`) are allowed except under `~/.claude`, `~/.copilot` or `~/.config/gh` (a leading `~` expands to HOME); `skill` is allowed only for the name of one of the embedded plugin's skills; every other tool, `web_fetch`, `task` and names ending in `_subagent` are denied.
-- The splitter, the unwrapping and the path rules are pure functions with committed Go table tests that run on every OS in the `go` check, covering every deny line of the worked example and each wrapper; a judge with no committed tests is a violation.
-- No Claude session's argv, fence file or settings change.
+- `vloop fence check --phase work --root <dir> --tool <name> [--path <p>] ["<command>"]` gives every decision of the brief's two worked-example tables and its apply_patch lines; where the brief shows a message, the deny line is `deny: ` followed by that message without its `vloop fence: ` prefix (the prefix is the hook's, as for review).
+- Shell in work: the same splitting, unwrapping and outright denials as review (backtick, `$(`, `<(`, `>(`, `eval`, `source`, `.`, unterminated quote, non-literal `-c` string, command word starting with `$`, the shell keywords, subshells); a simple command is denied by a `Bash(…)` deny rule of the embedded `fence/work.json` (`<command> is denied by the work fence (Bash(<rule>))`) or a work deny-list stem (`<command> is denied by the Copilot deny list (<stem>)`). The rules and stems are read from the embedded fence and the adapter's list; a second hand-copied rule list is a violation.
+- Writes in work (`create`, `edit`, `apply_patch`, a redirection) resolve against --root as in review and are allowed anywhere under the root except under `.git/` or under `.vloop/` outside `.vloop/tmp/` (`write to <path> is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/`) and outside the root (`write to <path> is not allowed in a work session: it is outside the repository`); `/dev/null` is allowed.
+- Reads in work as in review; `skill` only for one of the embedded plugin's skills, else `skill <name> is not vloop's — use /vloop:work`; every other tool, `web_fetch`, `task` and names ending in `_subagent`: `tool <name> is not allowed in a work session`.
+- `rm` of a file is allowed in work; `rm -rf`, `rm -r`, `rm -R`, `rm -fr` and the rest of the work fence's recursive rules deny; `pnpm add`, `npm install` and `node x.js` are allowed and `pip install` and `sh script.sh` are denied, as the brief decides.
+- An unknown phase is a usage error, exit 2, with `unknown phase "<p>": want review, second-review or work`.
+- The review and second-review phases decide and word every call exactly as before — `rm src/old.ts` with `--phase review` is still `deny: rm src/old.ts is denied by the Copilot deny list (rm:*)`, exit 1. The existing judge tests that pin `work` as an unknown phase change only to the new behaviour, and the work notes name the contract item (W1).
+- The work phase's rules are covered by committed Go table tests in `internal/fence` that run on every OS in the `go` check, covering every line of the worked example's two tables and the path rules; a work phase with no committed tests is a violation.
+- No Claude session's argv, fence file or settings changes, and `fence/work.json` and `fence/review.json` are unchanged.
 
 <details><summary>verify command</summary>
 
@@ -45,20 +43,21 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Add vloop fence hook: read one Copilot preToolUse payload and answer allow or deny as JSON, failing closed
+### T2 — Run work sessions on Copilot: the hook's work phase, the adapter and agent.work = copilot
 
 `done` · depends on: T1
 
-H1's second half: the command Copilot runs before every tool call. It wraps T1's judge around Copilot's payload so a Copilot review session can do only what the review fence allows. It must never answer allow on an error — that is the violation the review is told to rule on.
+W1's hook half and W2's core. With T1's judge, `vloop fence hook --phase work` can fence a Copilot work session; this task lets the Copilot adapter run `/vloop:work <task>` exactly as it runs a review — same plugin, fresh home, guidelines, JSON Lines parsed into session/v4 — with only two differences: its hooks file runs the hook with `--phase work`, and its argv omits `--deny-tool=shell(rm:*)`. `agent.work` then accepts `copilot`. Everything the driver does around the work session stays as it is: the checks after the session are the boundary (S-2, S-4).
 
 **Acceptance**
 
-- `vloop fence hook --phase <phase> --root <dir>` reads one payload (camelCase `toolName`, `toolArgs`, `cwd`) on stdin and prints exactly one line: `{"permissionDecision":"allow"}` or `{"permissionDecision":"deny","permissionDecisionReason":"vloop fence: <reason>"}`, exit 0; phases are `review` and `second-review`, sharing the review fence.
-- A payload that is not JSON or has no `toolName`, an unknown phase (including `work`), or any internal error prints the deny line and exits 2 — never allow.
-- The hook judges with T1's judge: a shell tool's `toolArgs.command`, a file tool's `toolArgs.path`, and for `apply_patch` the paths of its `*** Add File:`, `*** Update File:`, `*** Delete File:` and `*** Move to:` lines (a patch with none is denied, and so is an `apply_patch` whose `toolArgs` hold the patch in a shape the hook does not read — the brief does not say whether Copilot sends it as a raw string or an object field, so the hook fails closed on the one it cannot read); the worked example's `apply_patch` with `*** Update File: .git/config` is denied.
-- `toolArgs` is accepted both as an object and as a JSON string holding one, so the hook does not deny every call if Copilot sends the string form; which form Copilot sends is taken from its docs, and the work session says in its notes what it found.
-- The hook reads nothing but the payload and its embedded fences, writes nothing and never runs a command.
-- Committed Go tests cover the payload forms, the JSON answer and every exit-2 case, and run in the `go` check.
+- `vloop fence hook --phase work --root <dir>` answers each payload with T1's work decision, the reason being `vloop fence: ` and T1's message, exit 0; an unknown phase is the deny line with `unknown phase "<p>": want review, second-review or work` and exit 2; the review and second-review phases answer exactly as before.
+- `agent.work` accepts `claude` (default) and `copilot`, from the file and from `VLOOP_AGENT_WORK`; `agent.plan`, `agent.gate-review` and `agent.verify` still refuse `copilot` (config set exits 2; a run with their variable set to copilot starts no session).
+- With `agent.work = copilot`, the work session runs `copilot -p "/vloop:work <task>"` with the model and effort P-6 resolves, the plugin by `--plugin-dir`, a fresh home under `.vloop/tmp/` holding a hooks file that runs `fence hook --phase work` in both command forms, the guidelines as custom instructions, and every review deny-list entry on the argv except `--deny-tool=shell(rm:*)`.
+- A Copilot work session's JSON Lines become a `session/v4` record with phase `work`, agent `copilot`, the model, credits, estimated cost, `cost_source` and `permission_denials`.
+- A Copilot review or second-review session's argv and hooks file are unchanged (`shell(rm:*)` on the argv, `--phase review`/`second-review` in the hooks file); a Claude session's argv, fence and settings are unchanged.
+- Everything around the work session is unchanged whatever the agent: the gate, the checks, the guards (a moved ref halts with exit 9; inputs restored), the proposal read from `.vloop/tmp/`, the review and the one commit.
+- Committed Go tests cover the adapter's work-phase argv (no `shell(rm:*)`, the rest of the list present), its hooks file's `--phase work`, `Supports(work)`, the hook's work phase and `agent.work` accepting copilot; tests that pinned work as unsupported or `work` as an unknown hook phase change only to the new behaviour, and the work notes name the contract item (W1, W2).
 
 <details><summary>verify command</summary>
 
@@ -68,19 +67,20 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Run every Copilot session under the hook, parse its denials into permission_denials, and keep Copilot on vloop's skills (K1)
+### T3 — Check agent.work = copilot in the run preflight and doctor
 
 `done` · depends on: T2
 
-H2 and K1. The judge only fences what it is asked about: this task installs it as the preToolUse hook in each Copilot session's own home, with the running binary and the repository root, so every Copilot tool call passes through it; records Copilot's denials in the session record; and stops a run where a project skill named like one of vloop's could be loaded instead of /vloop:review (the operator saw that happen).
+W2's guard rails. An operator who sets `agent.work = copilot` gets what Copilot review already gives: the experimental warning, a refusal while `model.work` is still the Claude default, and the copilot checks — copilot on PATH and runnable, a GitHub login reaching its sessions, K1's refusal of a project skill named like one of vloop's — in `vloop run` and as `vloop doctor` rows. Without these, a run would hand a Claude alias to Copilot or let a project skill shadow `/vloop:work`.
 
 **Acceptance**
 
-- Each Copilot session's own `COPILOT_HOME` holds, under `hooks/`, a hooks file in the format Copilot's docs give, whose `preToolUse` entry runs `<the running binary> fence hook --phase <phase> --root <the repository root>` in both the `bash` and `powershell` command forms; the `--deny-tool` list stays on the argv unchanged.
-- A Copilot session record's `permission_denials` lists every `tool.execution_complete` event whose `error.code` is `denied`, in order, as `{"tool_name", "tool_use_id", "message"}` — the tool name from the `tool.execution_start` with the same `toolCallId`, the message masked as the driver masks text; `[]` when there are none.
-- The hook allows `skill` only for the embedded plugin's skill names (from T1's judge); `vloop run`, when `agent.review` is `copilot`, refuses to start while `.claude/skills/<name>/` or `.github/skills/<name>/` has exactly a plugin skill's name: `vloop: <path> has the name of vloop's <name> skill; a copilot session may load it instead — rename it`, exit 1, before any session; `vloop doctor` shows the same as an error row; the warning for other names ending in `review` stays.
-- With `agent.review = claude`, such a skill stops nothing, and Claude sessions' argv, fence and settings are unchanged.
-- Committed tests cover the hooks file, the denial parsing (interleaved calls, a non-denied failure, none) and the K1 refusal, extending the existing Copilot adapter and doctor tests, and run in the `go` check.
+- `vloop run` with `agent.work = copilot` prints `  ! agent.work is copilot: experimental (docs/guide/configuration.md)` and goes ahead; `vloop doctor` prints `! agent.work is copilot: experimental (docs/guide/configuration.md)` and the copilot and copilot login rows.
+- `vloop run` with `agent.work = copilot` (from the file or `VLOOP_AGENT_WORK`) and `model.work` at its default refuses before any session, exit 1: `vloop: agent.work is copilot but model.work is the default "sonnet", a Claude alias: set model.work to a Copilot model id`.
+- With `agent.work = copilot`, a project skill directory under `.claude/skills/` or `.github/skills/` named like one of vloop's skills stops `vloop run` with K1's message (`vloop: .claude/skills/work has the name of vloop's work skill; a copilot session may load it instead — rename it`), exit 1, no session, and is an error row in doctor.
+- With `agent.work = copilot`, no GitHub login reaching the sessions refuses the run naming `agent.work` (`vloop: agent.work is copilot but no GitHub login reaches its sessions: …`), exit 1, and is doctor's copilot login error row; copilot missing or `copilot --version` failing is doctor's copilot error row and stops the run.
+- With `agent.work = claude`, none of this appears and a project skill named `work` stops nothing; the checks for agent.review and agent.second-review keep their words and behaviour.
+- Committed tests cover the warning, the model.work refusal, K1 and the login refusal for agent.work (extending the existing doctor and run preflight tests).
 
 <details><summary>verify command</summary>
 
@@ -90,19 +90,18 @@ sh .vloop/state/gates/T3/gate.sh
 
 </details>
 
-### T4 — Add the second reviewer's keys, its doctor rows, and the reworded Copilot experimental warning
+### T4 — Document Copilot work sessions in the fence audit, the configuration guide and the domain pages
 
-`done` · 1 attempt(s) · depends on: T3
+`done` · depends on: T1, T2, T3
 
-S1's configuration, before the session exists: `run.second-review` says what a second reviewer's verdict does, `agent/model/effort.second-review` say who it is. Doctor tells the operator what is configured and warns when the second reviewer adds no independence. The Copilot warning drops "not fenced": after T3, Copilot reviews run under the hook.
+A1's prose. The fence audit, the guide and the domain pages say what a Copilot work session may do and who enforces each rule: the operator reads these to decide whether to trust `agent.work = copilot`, so every sentence must match what T1–T3 built. Prose task: if it fails review twice on wording, it is blocked and the operator finishes it.
 
 **Acceptance**
 
-- Keys: `run.second-review` (`off` default, `record`, `feedback`, `on-pass`, `both-pass`), `agent.second-review` (`claude` default, `copilot`), `model.second-review` (default `sonnet`), `effort.second-review` (the effort values, unset by default), each with its `VLOOP_` variable; an invalid value exits 2.
-- `vloop doctor` with `run.second-review` off says nothing of the second review; otherwise a row names the mode, agent and model, and `! run.second-review: the second reviewer is the primary's agent and model — it adds no independence` appears when both match the primary's configured agent and model.
-- The Copilot warning reads `! agent.review is copilot: experimental (docs/guide/configuration.md)` in doctor and the run preflight, and `! agent.second-review is copilot: experimental (docs/guide/configuration.md)` for a copilot second reviewer, whose doctor rows include the copilot checks (on PATH, --version, login).
-- A copilot second review in use with the default `model.second-review` is refused before any session, naming `model.second-review`, as `agent.review` is; K1's skill refusal also applies when `agent.second-review` is copilot and the second review is in use, and not when `run.second-review` is off.
-- Committed tests cover the keys, the doctor rows and the refusals, and run in the `go` check.
+- `docs/design-notes/fence-audit.md` gains a part for the work fence, under a heading naming it, that classifies every deny rule of `fence/work.json` and every work deny-list pattern (the review list without `shell(rm:*)`) by who enforces it in a Copilot work session — the driver after the session, the hook, or neither — and says, for each `neither`, what covers it; it says `rm` of a file is allowed and why.
+- `docs/guide/configuration.md`: the `agent.work` row offers `claude` and `copilot` (experimental); `agent.plan`, `agent.gate-review` and `agent.verify` still offer `claude` alone; the Copilot section covers work sessions — the hook judges them against the work fence, what it allows them, that shell syntax it cannot judge (`if`, `for`, `while`, `$(…)`, subshells) is denied, the model.work refusal and the experimental warning.
+- `docs/domain/execution/session.md` and the glossary of `docs/domain/domain-model.md` say copilot runs work, review and second-review sessions and the hook serves the work phase with the work fence; nothing still says copilot runs review sessions only.
+- Every sentence about behaviour matches what T1–T3 built (messages quoted as the code prints them); the `go` check still passes.
 
 <details><summary>verify command</summary>
 
@@ -112,21 +111,17 @@ sh .vloop/state/gates/T4/gate.sh
 
 </details>
 
-### T5 — Run the optional second review session after the primary, in each mode, with its records and the end-of-run dissent list
+### T5 — Extend the Copilot acceptance kit with a work run on the real CLI
 
-`done` · depends on: T4
+`done` · 1 attempt(s) · depends on: T2, T3
 
-S1's behaviour. A second review session from any agent and model judges the same task as a fresh /vloop:review, blind to the primary's verdict, under the same guards; the mode decides whether its verdict is only recorded, fed to the retry, asked only after a pass, or a veto (both-pass, the only mode that can fail a task). Dissents are what the operator reads at close.
+A1's operator tool. Gates use a stub copilot; only a run on the real CLI proves a Copilot work session works. This task gives the operator a script that runs the fixture brief with `agent.work = copilot` and a given model, plan and review on Claude, and summarises each work session and each task's outcome, so the acceptance at close can be recorded. No gate or check runs it.
 
 **Acceptance**
 
-- When the mode is not off, a second review runs after the primary review of an iteration — after every primary review for `record` and `feedback`, only after a primary PASS for `on-pass` and `both-pass`, never when the primary did not run or ended the run — as `/vloop:review <task>` in a fresh session of phase `second-review`, under the review fence (the hook's `second-review` phase for copilot), with its model and effort from `model/effort.second-review`, never from the task's own model or effort.
-- Before it starts the driver removes the primary's verdict from `.vloop/tmp/`; the guards are the primary's: inputs restored, a moved ref or git setting halts with exit 9, changed files reverted; no valid verdict, a changed file or tampering make it FAIL with the finding.
-- In `record`, `feedback` and `on-pass` the second review never changes the task's outcome, status or attempts, and its session error or timeout is a warning; in `both-pass` a task is done only when both PASS, a second FAIL rejects the iteration as a primary FAIL does with its findings as notes prefixed `second review: `, and its session error or timeout is treated as the primary's would be.
-- In `feedback`, when the primary did not PASS, the second's findings join the notes after the primary's, each prefixed `second review: `; in `record` and `on-pass` nothing reaches the notes.
-- The run log says `   second review: <PASS|FAIL>`, with ` (dissent)` when it differs from the primary's verdict; the verdict is kept as `reports/<iter>-second-verdict.json`; the run's end lists `second review: <n> dissent(s): <task> (primary <v>, second <v>), …` when there are any; with the mode off none of this appears.
-- Records: `session/v4` (session/v3 with `second-review` among the phases), `iteration/v3` adding `second_review` (`verdict`, `dissent`), absent when none ran; both schemas embedded and known to `vloop schema validate`; readers keep accepting v3, v2 and earlier; the second session's cost counts toward the cost ceiling.
-- Committed tests with a stub agent cover each mode, the guards and the records, extending the existing run tests, and run in the `go` check.
+- `tools/copilot-acceptance/` gains a script that runs `greet.loop-brief.md` in a scratch repository with a vloop built from this tree, `agent.work = copilot` and `model.work` the model given, plan and review on Claude, and writes a summary listing each work session record (agent, model, credits, estimated cost, `session/v4` validity, its `permission_denials`) and each task's outcome.
+- The README gains its section: how to run it, what it needs (copilot, a logged-in gh, claude), what it spends, what the summary holds, and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close.
+- The kit's scripts pass `sh -n` and its Python parses; flags, keys and messages of existing vloop commands the script uses are taken from running them, not memory; no gate or check runs the kit, copilot, gh or the network.
 
 <details><summary>verify command</summary>
 
@@ -136,86 +131,22 @@ sh .vloop/state/gates/T5/gate.sh
 
 </details>
 
-### T6 — Report the second review in metrics/v4
+### T6 — Close the run: every gate at once, and the worked example line for line
 
-`done` · depends on: T5
+`done` · depends on: T1, T2, T3, T4, T5
 
-S1's measurement: the operator compares runs with and without a second reviewer, so the metrics a run commits must say which agents ran it, how many second sessions there were and where they dissented.
-
-**Acceptance**
-
-- The metrics a run reports are `metrics/v4`: `metrics/v3` with `second-review` in `agents` (the sorted distinct agents of its sessions, `[]` when none ran) and a `second_review` object holding `mode`, `sessions`, `dissents` and `dissent_tasks`; the schema is embedded and `vloop schema validate metrics/v4` knows it.
-- Readers keep accepting metrics/v3 and earlier snapshots; nothing else in the metrics changes meaning.
-- Committed tests cover the new fields for a run with and without a second review, and run in the `go` check.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T6/gate.sh
-```
-
-</details>
-
-### T7 — Write the fence audit and update the configuration guide, the domain pages and both operator playbooks
-
-`done` · depends on: T3, T5, T6
-
-A1. The operator needs to know, rule by rule, who enforces the fence for a Copilot review session; the guide must describe the hook, its fail-closed rules, K1 and what each second-review mode does; the domain gains the second-review kind, dissent and the hook; and the close reads the dissents. Prose task: if it fails review twice on wording, block it and the operator finishes it.
+The brief's close. Every earlier gate re-runs on the final tree, and the review holds the brief's worked example against the built binary line for line, so nothing a later task changed has broken an earlier one's contract. It builds nothing new unless a gate or a worked-example line fails, and then fixes only that.
 
 **Acceptance**
 
-- `docs/design-notes/fence-audit.md` classifies every deny rule of `fence/review.json` and every deny-list pattern of the adapter by who enforces it for a Copilot review session — the driver after the session, the hook, or neither — and says, for each `neither`, what covers it.
-- `docs/guide/configuration.md` has a row for each S1 key (default, valid values, variable), describes `vloop fence check` and `vloop fence hook`, the fail-closed rules, K1, what each `run.second-review` mode does and what a dissent is, keeps Copilot review experimental, and no longer says it is unfenced.
-- `docs/domain/domain-model.md` gains second review and dissent in the glossary; `docs/domain/execution/session.md` the second-review kind, the hook and the Copilot denials; `docs/domain/execution/task.md` what the second review's findings do to notes; `docs/domain/measurement/metrics.md` the second review in metrics/v4.
-- `plugin/skills/operate/SKILL.md` and `.claude/skills/vloop-operator/SKILL.md` read the dissents at close and record each one that holds as a `verification-finding`.
-- Every sentence about behaviour matches what T1–T6 built; a doc test the repository already has still passes (the `go` check).
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T7/gate.sh
-```
-
-</details>
-
-### T8 — Extend the Copilot acceptance kit with the hook probe, the hook's failure modes and a run with a copilot second reviewer
-
-`done` · depends on: T2, T5
-
-The binary never calls the network, so acceptance on the real Copilot CLI is the operator's, at close. This kit is how the operator measures what no gate can: that Copilot denies each worked-example form under the hook, refuses a skill other than vloop's, what Copilot does when the hook itself fails, and a real feedback-mode run with a copilot second reviewer.
-
-**Acceptance**
-
-- `tools/copilot-acceptance/` gains a probe of the review session under the hook asking for each deny form of the worked example's shell table (verbatim) and a skill other than vloop's, recording per form whether Copilot ran it.
-- It probes the hook's failure modes — its command missing, exit 1, output not JSON, a timeout — and records whether Copilot then runs the call.
-- It runs a fixture brief with `run.second-review = feedback` and `agent.second-review = copilot`, and its summary reports the second-review records and dissents.
-- The README says how to run each part and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close; no gate or check runs the kit, copilot, gh or the network.
-- The kit's scripts pass `sh -n` and its Python parses; flags and messages of existing commands are taken from running them.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T8/gate.sh
-```
-
-</details>
-
-### T9 — Close the run: every gate at once, and the worked example line for line
-
-`done` · depends on: T1, T2, T3, T4, T5, T6, T7, T8
-
-The last check before the operator's acceptance: every gate of this plan passes on the same tree, which together hold the worked example line for line. Any gap found here is fixed in the code it belongs to, not in a gate.
-
-**Acceptance**
-
-- Every gate T1–T8 passes on the final tree.
-- Every line of the brief's worked example holds against the built binary: the fence check tables, the hook's unreadable payload and apply_patch, the second-review lines for each mode, and the K1 refusal and rename.
+- Every gate T1–T5 passes on the final tree.
+- Every line of the brief's worked example holds against the built binary: the two `fence check --phase work` tables and the apply_patch lines, the review phase's `rm` line, the unknown phase, the stub run's warning, record, argv and hooks file, and each planted failure.
 - The `go` check passes on the final tree.
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T9/gate.sh
+sh .vloop/state/gates/T6/gate.sh
 ```
 
 </details>

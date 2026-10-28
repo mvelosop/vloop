@@ -32,7 +32,7 @@ const (
 // agents are the registered agent CLIs.
 var agents = []string{"claude"}
 
-// reviewAgents are the agents a review session may run on.
+// reviewAgents are the agents a work or review session may run on.
 var reviewAgents = []string{"claude", "copilot"}
 
 // SecondReviewModes are the values of run.second-review: off, or what the
@@ -98,7 +98,7 @@ var Keys = []Key{
 	{Name: "effort.gate-review", Valid: efforts},
 	{Name: "effort.verify", Valid: efforts},
 	{Name: "agent.plan", Default: "claude", Valid: agents},
-	{Name: "agent.work", Default: "claude", Valid: agents},
+	{Name: "agent.work", Default: "claude", Valid: reviewAgents},
 	{Name: "agent.review", Default: "claude", Valid: reviewAgents},
 	{Name: "agent.second-review", Default: "claude", Valid: reviewAgents},
 	{Name: "agent.gate-review", Default: "claude", Valid: agents},

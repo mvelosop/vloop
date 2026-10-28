@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`tools/copilot-acceptance/` gains a script that runs `greet.loop-brief.md` in a scratch repository with a vloop built from this tree, `agent.work = copilot` and `model.work` the model given, plan and review on Claude, and writes a summary listing each work session record (agent, model, credits, estimated cost, `session/v4` validity, its `permission_denials`) and each task's outcome.", "met": true, "evidence": "work.sh builds vloop from the tree, sets agent.work=copilot and model.work=$model, leaves plan and review at their defaults, and runs the fixture brief. report.py work_report prints one row per work session record: agent, model, credits, cost_usd, cost_source, session/v4 validity via vloop schema validate, permission_denials. It also prints iterations.jsonl outcomes and the verdicts. The field names match a real record (permission_denials, cost_source, cost_usd) and driver/session.go:487 (credits)."},
+    {"criterion": "The README gains its section: how to run it, what it needs (copilot, a logged-in gh, claude), what it spends, what the summary holds, and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close.", "met": true, "evidence": "README.md '## B24: Copilot work sessions' gives the command, the needs, the spend, the summary contents, and the recording before close."},
+    {"criterion": "The kit's scripts pass `sh -n` and its Python parses; flags, keys and messages of existing vloop commands the script uses are taken from running them, not memory; no gate or check runs the kit, copilot, gh or the network.", "met": true, "evidence": "sh -n work.sh is ok and report.py parses. The vloop commands used (init, config set, doctor, run, schema validate) are the ones the sibling scripts already use. The gate only checks syntax and greps."}
+  ],
+  "findings": [],
+  "notes": "The work is in the 'T5: rejected' commit, and the tree has no product change now. The earlier rejection was because a review session changed files (proposal.json says __pycache__). The cause is a vloop-side concern. Not run for real, as the brief intends. docs/design-notes/copilot-cli-experiments.md is not in this checkout; the README only names it, so it needs no change."
+}

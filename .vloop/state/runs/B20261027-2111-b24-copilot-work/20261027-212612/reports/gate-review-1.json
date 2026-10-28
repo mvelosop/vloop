@@ -1,0 +1,14 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Every gate fails on the base at the missing behaviour: unknown phase work (T1, T2, T6 via T1), agent.work refusing copilot (T3), no work-fence heading in the audit (T4), no kit script (T5). Fixtures and messages match the brief and the existing code. The gates are fast (about 1s each) and run no suite, no copilot and no network."
+}
+

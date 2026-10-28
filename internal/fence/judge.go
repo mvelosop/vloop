@@ -12,10 +12,11 @@ import (
 	"github.com/mvelosop/vloop/internal/driver"
 )
 
-// The phases a judge serves; both share the review fence.
+// The phases a judge serves; the two review phases share the review fence.
 const (
 	PhaseReview       = "review"
 	PhaseSecondReview = "second-review"
+	PhaseWork         = "work"
 )
 
 // maxDepth bounds how many sh -c layers are looked through.
@@ -26,7 +27,7 @@ type Judge struct {
 	phase  string
 	root   string
 	home   string
-	fence  []string // Bash(…) deny rule bodies of the embedded review fence
+	fence  []string // Bash(…) deny rule bodies of the phase's embedded fence
 	stems  []string // the adapter's deny-list stems
 	skills map[string]bool
 }
@@ -43,14 +44,18 @@ func deny(format string, a ...any) Decision {
 	return Decision{Reason: fmt.Sprintf(format, a...)}
 }
 
-// New reads the embedded review fence, the adapter's deny-list stems and the
+// New reads the phase's embedded fence, the adapter's deny-list stems and the
 // embedded plugin's skill names. Relative paths resolve against root; home is
 // what a leading ~ expands to ("" leaves it unexpanded).
 func New(phase, root, home string) (*Judge, error) {
-	if phase != PhaseReview && phase != PhaseSecondReview {
-		return nil, fmt.Errorf("unknown phase %q: want review or second-review", phase)
+	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork {
+		return nil, fmt.Errorf("unknown phase %q: want review, second-review or work", phase)
 	}
-	raw, err := vloop.Fence(PhaseReview)
+	fenceName := PhaseReview
+	if phase == PhaseWork {
+		fenceName = PhaseWork
+	}
+	raw, err := vloop.Fence(fenceName)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +68,15 @@ func New(phase, root, home string) (*Judge, error) {
 		return nil, err
 	}
 	j := &Judge{phase: phase, root: filepath.Clean(root), home: home, stems: driver.CopilotDenyStems(), skills: map[string]bool{}}
+	if phase == PhaseWork { // the work session may remove files: the review list without rm:*
+		var stems []string
+		for _, st := range j.stems {
+			if st != "rm:*" {
+				stems = append(stems, st)
+			}
+		}
+		j.stems = stems
+	}
 	for _, r := range f.Permissions.Deny {
 		if b, ok := strings.CutPrefix(r, "Bash("); ok && strings.HasSuffix(b, ")") {
 			j.fence = append(j.fence, strings.TrimSuffix(b, ")"))
@@ -113,7 +127,7 @@ func (j *Judge) Decide(tool, path, cmd string) Decision {
 		return allow()
 	case "skill":
 		if !j.skills[path] {
-			return deny("skill %s is not vloop's — use /vloop:review", path)
+			return deny("skill %s is not vloop's — use /vloop:%s", path, j.skillPhase())
 		}
 		return allow()
 	}
@@ -150,16 +164,42 @@ func under(dir, p string) bool {
 	return err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
 }
 
+// skillPhase is the plugin skill a session of this phase runs.
+func (j *Judge) skillPhase() string {
+	if j.phase == PhaseWork {
+		return PhaseWork
+	}
+	return PhaseReview
+}
+
 func (j *Judge) write(p string) Decision {
 	if p == "/dev/null" {
 		return allow()
 	}
 	r := j.expand(p)
+	if j.phase == PhaseWork {
+		return j.workWrite(p, r)
+	}
 	if rel, err := filepath.Rel(filepath.Join(j.root, ".vloop", "tmp"), r); err == nil && rel != "." &&
 		rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		return allow()
 	}
 	return deny("write to %s is not allowed in a %s session: only .vloop/tmp/ may be written", p, j.phase)
+}
+
+// workWrite decides a write of a work session (S-4): anywhere under the root
+// but .git/ and .vloop/ outside .vloop/tmp/.
+func (j *Judge) workWrite(p, r string) Decision {
+	if !under(j.root, r) {
+		return deny("write to %s is not allowed in a work session: it is outside the repository", p)
+	}
+	if !under(filepath.Join(j.root, ".vloop", "tmp"), r) || r == filepath.Join(j.root, ".vloop", "tmp") {
+		if r == filepath.Join(j.root, ".git") || under(filepath.Join(j.root, ".git"), r) ||
+			r == filepath.Join(j.root, ".vloop") || under(filepath.Join(j.root, ".vloop"), r) {
+			return deny("write to %s is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/", p)
+		}
+	}
+	return allow()
 }
 
 // sensitive reports whether a read of p is refused: p is under the user's
@@ -280,13 +320,20 @@ func (j *Judge) words(ws []string, depth int) string {
 	}
 }
 
+func (j *Judge) fenceLabel() string {
+	if j.phase == PhaseWork {
+		return PhaseWork
+	}
+	return PhaseReview
+}
+
 // match denies a simple command that a deny rule of the review fence or one of
 // the adapter's stems covers.
 func (j *Judge) match(ws []string) string {
 	text := strings.Join(ws, " ")
 	for _, p := range j.fence {
 		if patternMatch(p, text) {
-			return fmt.Sprintf("%s is denied by the review fence (Bash(%s))", text, p)
+			return fmt.Sprintf("%s is denied by the %s fence (Bash(%s))", text, j.fenceLabel(), p)
 		}
 	}
 	for _, p := range j.stems {

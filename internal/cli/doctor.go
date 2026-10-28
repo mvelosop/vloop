@@ -220,6 +220,12 @@ func copilotLoggedIn() bool {
 	return err == nil && strings.TrimSpace(string(out)) != ""
 }
 
+// copilotWork reports whether agent.work is copilot.
+func copilotWork(root string) bool {
+	v, err := config.Get(root, "agent.work")
+	return err == nil && v.Value == driver.AgentCopilot
+}
+
 // copilotReview reports whether agent.review is copilot.
 func copilotReview(root string) bool {
 	v, err := config.Get(root, "agent.review")
@@ -241,9 +247,13 @@ func copilotSecond(root string) bool {
 	return secondReviewMode(root) != "off" && err == nil && v.Value == driver.AgentCopilot
 }
 
-// copilotKeys names the agent keys that choose copilot, for the reviews in use.
+// copilotKeys names the agent keys that choose copilot, for the work sessions
+// and the reviews in use.
 func copilotKeys(root string) []string {
 	var keys []string
+	if copilotWork(root) {
+		keys = append(keys, "agent.work")
+	}
 	if copilotReview(root) {
 		keys = append(keys, "agent.review")
 	}

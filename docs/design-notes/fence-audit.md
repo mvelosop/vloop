@@ -199,3 +199,191 @@ or followed by a space, so another form of the command can pass it.
   denied; nothing stops a program from opening its own connection. Neither; the
   review fence's allow rules name few programs, and the session timeout bounds
   how long one can run.
+
+# Fence audit: who enforces each rule in a Copilot work session
+
+*Written for B24. It covers `fence/work.json`, the fence a work session runs
+under, and the Copilot adapter's deny list for work sessions: the review list
+without `shell(rm:*)`.*
+
+A Copilot work session runs under the same `preToolUse` hook, `vloop fence hook
+--phase work`. The judge reads `fence/work.json` instead of `fence/review.json`
+(its 102 deny rules are the same ones) and the adapter's deny-list stems without
+`rm:*`. The three enforcers are the ones above; they differ for work sessions in
+three ways:
+
+- **Writes.** A work session edits the repository. The hook allows a file tool or
+  a redirection to write anywhere under the repository root except `.git/` and
+  `.vloop/`, where only `.vloop/tmp/` may be written. A write outside the
+  repository is denied, and so is the same write by a relative path that leaves it.
+  `/dev/null` is allowed.
+- **`rm`.** `rm` of a file is allowed in a work session: deleting and renaming
+  files is part of the work, and the review session's blanket `rm` deny would stop
+  it. The recursive forms (`rm -r`, `-R`, `-rf`, `-fr`, `-fR`, `--recursive`) stay
+  denied by the fence rules below. `shell(rm:*)` is not on a work session's
+  command line either.
+- **The skill.** The `skill` tool is allowed only for the names of vloop's
+  skills, and a refusal reads `vloop fence: skill <name> is not vloop's — use
+  /vloop:work`.
+
+Shell syntax the judge cannot read is denied in a work session as in a review one:
+a backtick, `$(`, `<(`, `>(`, `eval`, `source`, `.`, and a compound command,
+`if`, `for`, `while`, `until`, `case`, `select`, `function`, `{`, `[[` or a
+subshell, answers `shell syntax … cannot be judged`. The hook fails open on the
+two limits above (B22.2, B22.3), for work sessions too: it always prints its
+answer and is fast, and the deny list stays behind it.
+
+## The work fence's deny rules
+
+| Rule | Enforced by | Note |
+| --- | --- | --- |
+| `Bash(git push:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git commit:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git reset:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git clean:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git branch:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git checkout:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git switch:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote add:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote set-url:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote remove:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote rm:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote rename:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote set-head:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote set-branches:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote prune:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git remote update:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git update-ref:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git symbolic-ref:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git tag:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git stash:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git rebase:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(rm -rf:*)` | hook | hook matches the recursive form; plain `rm` of a file is allowed (see below); a recursive delete spelled another way is neither |
+| `Bash(sudo:*)` | hook | hook matches it; driver sees only its effects in the tree |
+| `Bash(curl:*)` | hook, driver | hook matches it, and the adapter's argv denies it too; neither limits a network tool the lists do not name |
+| `Bash(wget:*)` | hook, driver | hook matches it, and the adapter's argv denies it too; neither limits a network tool the lists do not name |
+| `Bash(pip install:*)` | hook | hook matches it; driver sees only its effects in the tree |
+| `Bash(claude:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop run:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop init:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop upgrade:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop brief close:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop task verify:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop task reset:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop task note:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop task drop:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop task set:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop defect add:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop defect set:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop intervention add:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop intervention set:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop config set:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(.loop/run.sh:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Edit(.git/**)` | hook, driver | hook: a work session may write under the repository except `.git/` and `.vloop/` (but `.vloop/tmp/`); driver halts the run (exit 9) on a moved ref or a changed `.git/config` or hook |
+| `Write(.git/**)` | hook, driver | hook: a work session may write under the repository except `.git/` and `.vloop/` (but `.vloop/tmp/`); driver halts the run (exit 9) on a moved ref or a changed `.git/config` or hook |
+| `Edit(.vloop/state/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/state/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/config.toml)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/config.toml)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/defects/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/defects/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/interventions/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/interventions/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/repo-guidelines.md)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/repo-guidelines.md)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/install.json)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/install.json)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Read(~/.claude/**)` | hook, neither | hook: a read tool of a path there is denied, as is a redirection from it; neither for `cat ~/.claude/...` run as a command, which the hook does not read as a read |
+| `Edit(~/.claude/**)` | hook | hook: a write outside the repository is denied; a shell program that writes there is neither (see below) |
+| `Write(~/.claude/**)` | hook | hook: a write outside the repository is denied; a shell program that writes there is neither (see below) |
+| `WebFetch` | hook | hook denies every tool not listed, `web_fetch` among them; the adapter's `url` deny stands in |
+| `WebSearch` | hook | hook denies every tool not listed, `web_fetch` among them; the adapter's `url` deny stands in |
+| `Bash(git -C:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git -c:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git --git-dir:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git --work-tree:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git --exec-path:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git merge:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git cherry-pick:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git revert:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git am:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git pull:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git fetch:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git notes:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git replace:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git filter-branch:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git worktree:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git reflog:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git gc:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git config:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git read-tree:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git submodule:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git prune:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git repack:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git hash-object:*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(git fast-import:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(git format-patch:*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(git diff*--output*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(git log*--output*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(git show*--output*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(find*-delete*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(find*-exec*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(find*-ok*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(find*-fprint*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(find*-fls*)` | hook | hook matches it, by the fence's own `*` matching; a repository file written or removed by another program is neither (see below) |
+| `Bash(rm -r:*)` | hook | hook matches the recursive form; plain `rm` of a file is allowed (see below); a recursive delete spelled another way is neither |
+| `Bash(rm -R:*)` | hook | hook matches the recursive form; plain `rm` of a file is allowed (see below); a recursive delete spelled another way is neither |
+| `Bash(rm -fr:*)` | hook | hook matches the recursive form; plain `rm` of a file is allowed (see below); a recursive delete spelled another way is neither |
+| `Bash(rm -fR:*)` | hook | hook matches the recursive form; plain `rm` of a file is allowed (see below); a recursive delete spelled another way is neither |
+| `Bash(rm --recursive:*)` | hook | hook matches the recursive form; plain `rm` of a file is allowed (see below); a recursive delete spelled another way is neither |
+| `Bash(vloop -C:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop --chdir:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+| `Bash(vloop brief new:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
+
+## The work adapter's deny list
+
+The work deny list is `copilotDenials` without `shell(rm:*)`: it goes to Copilot
+as `--deny-tool` on the argv, and the judge reads its `shell(…)` stems as further
+Bash deny rules. `rm` is the one pattern a work session does not carry.
+
+| Pattern | Enforced by | Note |
+| --- | --- | --- |
+| `shell(gh:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git push:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git remote:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --global:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --system:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --file:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(curl:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(wget:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(ssh:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(scp:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(nc:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git commit:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git reset:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git checkout:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git switch:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git stash:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git branch:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git tag:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `url` | hook | Copilot's own URL tool is refused on the argv; the hook denies `web_fetch` and every tool it does not list |
+
+## What is neither in a work session, and what covers it
+
+- **A shell program that writes outside what the hook reads** (`tee`, `cp`,
+  `sed -i`, `python -c`): the judge reads redirections and file tools, not what a
+  program does. For `.git/`, `.vloop/state/` and the files the driver guards, the
+  driver restores them after the session and halts on a moved ref or a changed
+  `.git/config` or hook. Inside the repository's source the write is the work
+  itself; the gate and the review judge it.
+- **A recursive delete spelled another way** (`find … -delete` is denied, but a
+  program that removes a tree is not): `rm` of a file is allowed because deleting
+  files is work; the review and the gate judge the result. Nothing undoes it.
+- **A read of `~/.claude` by a program** (`cat ~/.claude/…`): as in a review
+  session, nothing covers it beyond the session's `COPILOT_HOME` being its own
+  empty folder.
+- **A command no list names**: both lists are denylists; the hook denies every
+  tool it does not list, and the driver's checks are the boundary.
+- **Network from an allowed program**: `curl`, `wget`, `ssh`, `scp`, `nc` are
+  denied; nothing stops a program from opening its own connection. Neither; the
+  session timeout bounds how long one can run.

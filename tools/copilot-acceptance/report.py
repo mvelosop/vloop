@@ -4,6 +4,7 @@
     report.py probe <dir> <copilot>            start the probe session from the logged review argv
     report.py summary <dir>                    the probe's results, as Markdown
     report.py second <repo> <vloop> <exit code>  the second-review records and dissents of a run, as Markdown
+    report.py work <repo> <vloop> <exit code>    the work session records and each task's outcome of a run, as Markdown
 """
 import glob
 import json
@@ -135,6 +136,34 @@ def second_report(repo, vloop, rc):
     print("\n".join(out) + "\n")
 
 
+def work_report(repo, vloop, rc):
+    out = ["## A1 — a real run with Copilot work sessions", "", f"`vloop run` exit {rc}.", "",
+           "| record | phase | task | agent | model | credits | cost_usd | cost_source | turns | session/v4 | permission_denials |",
+           "|---|---|---|---|---|---|---|---|---|---|---|"]
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/sessions/*.json"))):
+        r = json.load(open(f))
+        if r.get("phase") != "work":
+            continue
+        ok = subprocess.run([vloop, "schema", "validate", "session/v4", f], cwd=repo,
+                            capture_output=True).returncode == 0
+        out.append(f"| {os.path.basename(f)} | {r.get('phase')} | {r.get('task')} | {r.get('agent')} "
+                   f"| {r.get('model')} | {r.get('credits')} | {r.get('cost_usd')} | {r.get('cost_source')} "
+                   f"| {r.get('turns')} | {'ok' if ok else 'INVALID'} "
+                   f"| {json.dumps(r.get('permission_denials'))} |")
+    out += ["", "Task outcomes (iterations.jsonl):", "", "| iteration | task | attempt | outcome |", "|---|---|---|---|"]
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/iterations.jsonl"))):
+        for line in open(f):
+            try:
+                it = json.loads(line)
+            except ValueError:
+                continue
+            out.append(f"| {it.get('iteration')} | {it.get('task')} | {it.get('attempt')} | {it.get('outcome')} |")
+    out.append("")
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/reports/*-verdict.json"))):
+        out.append(f"- {os.path.basename(f)}: {json.load(open(f)).get('verdict')}")
+    print("\n".join(out) + "\n")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "run":
@@ -143,6 +172,8 @@ if __name__ == "__main__":
         probe(*sys.argv[2:4])
     elif cmd == "summary":
         summary(sys.argv[2])
+    elif cmd == "work":
+        work_report(*sys.argv[2:5])
     elif cmd == "second":
         second_report(*sys.argv[2:5])
     else:

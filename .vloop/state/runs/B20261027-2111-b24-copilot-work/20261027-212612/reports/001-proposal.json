@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The fence judge and `vloop fence check` now serve a `work` phase: the work fence's Bash deny rules, the review stems without rm:*, S-4 write rules and work-worded messages. Review phases are unchanged.",
+  "files": ["internal/fence/judge.go", "internal/fence/judge_test.go", "internal/cli/fence.go", "internal/cli/fence_hook_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T1 exited 0 and printed ok; go test ./internal/fence and the cli fence/commands tests pass.",
+  "notes": "The work stems are filtered from driver.CopilotDenyStems() (drops rm:*) inside fence.New, so T2 must keep the work argv's own deny list in step with that. fence.New is shared by the hook, so `fence hook --phase work` already answers; T2 wires the hooks file. Contract item W1: TestFenceHookFailsClosed pinned phase work as unknown; it now uses phase plan, and TestUnknownPhase in internal/fence pins the new message. docs/guide/commands.md was regenerated with go generate."
+}

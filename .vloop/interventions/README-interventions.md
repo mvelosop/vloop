@@ -170,6 +170,11 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261027-004745-verify-s-one-finding-rejected-the-second](I20261027-004745-verify-s-one-finding-rejected-the-second.md) |
 | verify | verification-finding | partly | no-options | [I20261027-004807-metrics-left-the-second-reviews-cost-cre](I20261027-004807-metrics-left-the-second-reviews-cost-cre.md) |
 | verify | verification-finding | partly | no-options | [I20261027-004808-the-acceptance-kit-s-hook-probe-read-a-h](I20261027-004808-the-acceptance-kit-s-hook-probe-read-a-h.md) |
+| verify | verification-finding | partly | no-options | [I20261027-232631-the-hook-s-help-the-copilot-credit-usd-d](I20261027-232631-the-hook-s-help-the-copilot-credit-usd-d.md) |
+| verify | verification-finding | partly | no-options | [I20261027-232632-the-worked-example-wrote-fence-check-s-d](I20261027-232632-the-worked-example-wrote-fence-check-s-d.md) |
+| verify | verification-finding | partly | no-options | [I20261027-232633-a-review-session-ran-python-and-left-too](I20261027-232633-a-review-session-ran-python-and-left-too.md) |
+| verify | verification-finding | partly | no-options | [I20261027-232634-acceptance-on-the-real-cli-t6-s-retry-on](I20261027-232634-acceptance-on-the-real-cli-t6-s-retry-on.md) |
+| verify | verification-finding | partly | no-options | [I20261027-232635-vloop-doctor-and-the-run-preflight-refus](I20261027-232635-vloop-doctor-and-the-run-preflight-refus.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

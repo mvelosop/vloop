@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The Copilot adapter now supports the work phase (argv without shell(rm:*), hooks file with --phase work), agent.work accepts copilot, and a Copilot work session is recorded as session/v4.",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/driver/agent_copilot.go", "internal/driver/agent_copilot_test.go", "internal/driver/resolve_test.go", "internal/driver/session.go"],
+  "verified": "vloop task gate T2 exited 0 and printed ok; go vet, gofmt, and go test for driver, config, schema and cmd pass.",
+  "notes": "The hook's work phase already existed from T1. Session record schema is session/v4 for second-review and for a copilot work session; copilot review stays v3. Contract items W1/W2: TestCopilotSupportsReviewOnly became TestCopilotSupportsWorkAndReview; the resolve test's invalid agent value is now codex (copilot is valid for work); the config agent test treats work like review. internal/cli tests that call task gate fail inside a work session (plan-hash env is set), not because of this change."
+}

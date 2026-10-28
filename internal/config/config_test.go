@@ -703,14 +703,14 @@ func TestAgentKeys(t *testing.T) {
 		}
 		before := readCfg(t, root)
 		var iv *InvalidValueError
-		if p == "review" {
+		if p == "review" || p == "work" {
 			if err := Set(root, k, "copilot"); err != nil {
 				t.Errorf("%s set copilot: %v", k, err)
 			}
 			if v, _ := Get(root, k); v.Value != "copilot" || v.Source != SourceFile {
 				t.Errorf("%s copilot: %+v", k, v)
 			}
-			if err := Set(root, k, "grok"); !errors.As(err, &iv) || err.Error() != "invalid value \"grok\" for agent.review: want one of claude, copilot" {
+			if err := Set(root, k, "grok"); !errors.As(err, &iv) || err.Error() != "invalid value \"grok\" for "+k+": want one of claude, copilot" {
 				t.Errorf("%s set grok: %v", k, err)
 			}
 			if err := Set(root, k, "claude"); err != nil {
@@ -722,7 +722,7 @@ func TestAgentKeys(t *testing.T) {
 				t.Errorf("%s env copilot: %+v %v", k, v, err)
 			}
 			t.Setenv(EnvVar(k), "")
-			writeCfg(t, root, "[agent]\nreview = \"copilot\"\n")
+			writeCfg(t, root, "[agent]\n"+p+" = \"copilot\"\n")
 			if v, err := Get(root, k); err != nil || v.Value != "copilot" {
 				t.Errorf("%s file copilot: %+v %v", k, v, err)
 			}
