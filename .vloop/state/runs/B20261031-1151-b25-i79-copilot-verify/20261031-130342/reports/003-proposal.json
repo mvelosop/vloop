@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "agent.verify = copilot (with run.verify not false) now counts in copilotKeys, so vloop run and vloop doctor give the experimental warning, the default-model.verify refusal, the copilot/login rows and K1's skill refusal; run.verify = false silences all of it.",
+  "files": ["internal/cli/doctor.go", "internal/cli/run.go", "internal/cli/doctor_copilot_verify_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; env -i go test ./internal/cli passed; gofmt and go vet clean.",
+  "notes": "New copilotVerify(root) in doctor.go checks run.verify != false then agent.verify; run.go only gained agent.verify in the warning-print case. Tests are in the new doctor_copilot_verify_test.go (no earlier test changed). Run go test ./internal/cli with env -i inside a loop session."
+}

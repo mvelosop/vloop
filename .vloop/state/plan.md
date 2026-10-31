@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 2
+**Status:** running · **3/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:36:33Z
+**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:45:37Z
 
 ## Progress
 
 - [x] **T1** — Add the verify phase to the fence judge and to vloop fence check
 - [x] **T2** — Run verify sessions on Copilot: the hook's verify phase, the adapter and agent.verify = copilot
-- [ ] **T3** — Check agent.verify = copilot in the run preflight and doctor
+- [x] **T3** — Check agent.verify = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot verify sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a verify run on the real CLI
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
@@ -67,7 +67,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Check agent.verify = copilot in the run preflight and doctor
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 V2's guard rails. An operator who sets `agent.verify = copilot` gets what the other Copilot phases already give: the experimental warning, a refusal while `model.verify` is still the Claude default, and the copilot checks — copilot on PATH and runnable, a GitHub login reaching its sessions, K1's refusal of a project skill named like one of vloop's — in `vloop run` and as `vloop doctor` rows. None of it applies when `run.verify = false`, since no verify session will run, just as the second review's key adds nothing while `run.second-review` is off.
 
