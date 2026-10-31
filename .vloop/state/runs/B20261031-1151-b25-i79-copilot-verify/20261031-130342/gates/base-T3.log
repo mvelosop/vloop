@@ -1,0 +1,1 @@
+GATE FAIL: vloop config set agent.verify copilot: vloop: invalid value "copilot" for agent.verify: want one of claude

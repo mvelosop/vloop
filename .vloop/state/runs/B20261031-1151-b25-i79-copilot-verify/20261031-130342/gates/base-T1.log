@@ -1,0 +1,1 @@
+GATE FAIL: [verify] bash 'go build -o .vloop/tmp/v/vloop ./cmd/vloop': want 'allow' and exit 0, got exit 2, stdout '', stderr 'vloop: unknown phase "verify": want review, second-review or work'

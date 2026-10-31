@@ -1,0 +1,1 @@
+GATE FAIL: [verify] payload {"timestamp":1700000000000,"cwd":"$TMPDIR/gate.OJDagh/hookroot","toolName":"bash","toolArgs":{"command":"go build -o .vloop/tmp/v/vloop ./cmd/vloop","description":"d"}}: want allow and exit 0, got '{"permissionDecision":"deny","permissionDecisionReason":"vloop fence: unknown phase \"verify\": want review, second-review or work"}', exit 2
