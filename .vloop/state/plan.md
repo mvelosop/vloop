@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 4
+**Status:** running · **5/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:52:48Z
+**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:58:40Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Run verify sessions on Copilot: the hook's verify phase, the adapter and agent.verify = copilot
 - [x] **T3** — Check agent.verify = copilot in the run preflight and doctor
 - [x] **T4** — Document Copilot verify sessions in the fence audit, the configuration guide and the domain pages
-- [ ] **T5** — Extend the Copilot acceptance kit with a verify run on the real CLI
+- [x] **T5** — Extend the Copilot acceptance kit with a verify run on the real CLI
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -112,7 +112,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Extend the Copilot acceptance kit with a verify run on the real CLI
 
-`pending` · depends on: T2, T3
+`done` · depends on: T2, T3
 
 A1's operator tool. Gates use a stub copilot; only a run on the real CLI proves a Copilot verify session works and keeps a valid report. This task gives the operator a script that runs the fixture brief with `agent.verify = copilot` and a given model, plan, work and review on Claude, and summarises the verify session's record and the kept report, so the acceptance at close can be recorded. No gate or check runs it.
 

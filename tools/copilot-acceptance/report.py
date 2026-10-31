@@ -4,6 +4,7 @@
     report.py probe <dir> <copilot>            start the probe session from the logged review argv
     report.py summary <dir>                    the probe's results, as Markdown
     report.py second <repo> <vloop> <exit code>  the second-review records and dissents of a run, as Markdown
+    report.py verify <repo> <vloop> <exit code>  the verify session record and the kept report of a run, as Markdown
     report.py work <repo> <vloop> <exit code>    the work session records and each task's outcome of a run, as Markdown
 """
 import glob
@@ -164,6 +165,35 @@ def work_report(repo, vloop, rc):
     print("\n".join(out) + "\n")
 
 
+def verify_report(repo, vloop, rc):
+    out = ["## A1 — a real run with a Copilot verify session", "", f"`vloop run` exit {rc}.", "",
+           "| record | phase | agent | model | credits | cost_usd | cost_source | turns | session/v4 | permission_denials |",
+           "|---|---|---|---|---|---|---|---|---|---|"]
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/sessions/*.json"))):
+        r = json.load(open(f))
+        if r.get("phase") != "verify":
+            continue
+        ok = subprocess.run([vloop, "schema", "validate", "session/v4", f], cwd=repo,
+                            capture_output=True).returncode == 0
+        out.append(f"| {os.path.basename(f)} | {r.get('phase')} | {r.get('agent')} "
+                   f"| {r.get('model')} | {r.get('credits')} | {r.get('cost_usd')} | {r.get('cost_source')} "
+                   f"| {r.get('turns')} | {'ok' if ok else 'INVALID'} "
+                   f"| {json.dumps(r.get('permission_denials'))} |")
+    out += ["", "Kept report:", ""]
+    reports = sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/reports/verify.json")))
+    if not reports:
+        out.append("- verify.json: not present")
+    for f in reports:
+        ok = subprocess.run([vloop, "schema", "validate", "verify/v1", f], cwd=repo,
+                            capture_output=True).returncode == 0
+        try:
+            n = len(json.load(open(f)).get("findings") or [])
+        except ValueError:
+            n = "unreadable"
+        out.append(f"- verify.json: present, verify/v1 {'ok' if ok else 'INVALID'}, {n} finding(s)")
+    print("\n".join(out) + "\n")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "run":
@@ -172,6 +202,8 @@ if __name__ == "__main__":
         probe(*sys.argv[2:4])
     elif cmd == "summary":
         summary(sys.argv[2])
+    elif cmd == "verify":
+        verify_report(*sys.argv[2:5])
     elif cmd == "work":
         work_report(*sys.argv[2:5])
     elif cmd == "second":
