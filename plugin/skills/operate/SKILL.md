@@ -14,7 +14,8 @@ go-ahead, every time.** An earlier yes does not carry to the next one.
 You start from a brief that is `ready`. You never write one: when a run or a
 verification raises a question the brief does not answer, find the rule that
 applies, say what you found, and bring the operator a proposal. A design decision
-goes back to the operator even when you could guess.
+goes back to the operator even when you could guess. The recorded defects and
+interventions and the earlier run records may already hold the answer.
 
 ## 1. Before the run
 
@@ -23,10 +24,13 @@ goes back to the operator even when you could guess.
 2. Create the work branch **before anything else**: `git switch -c <run id>`,
    named for the brief (its file name minus `.loop-brief`), and commit the brief
    there. A plan commit made on the default branch is a defect.
-3. `vloop run <brief>` on that branch. It can take a long time: run it in the
-   background, send its output to a log outside the repository, and wait for the
-   notification rather than polling. `--plan-only` first when the operator wants
-   to see the task split before anything is built.
+3. `vloop run <brief>` on that branch. It can outlast your session's background
+   tasks, so start it **detached** (`nohup`; `caffeinate -i` keeps a Mac awake),
+   log outside the repository, and **watch it by the process id it prints**,
+   never by a `pgrep -f` pattern, which can match your watcher and hide a halt.
+   `--plan-only` first when the operator wants to see the task split. **Ask the
+   operator to close any editor open on the repository**: a key it writes into
+   `.git/config` halts the run with exit 9.
 4. Resuming is `vloop run` again on the work branch. Resuming from another branch
    than the one that planned needs the brief path again.
 
@@ -46,7 +50,7 @@ and the blocked task's `notes` (`vloop task show <id>`).
 | 6 | cost ceiling | resumable with a higher ceiling; the operator sets it |
 | 7 | session error | report; do not retry blindly |
 | 8 | repeat blocked | report; the same block twice with nothing changed needs a human |
-| 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog` and `git show-ref` with what the log says; nothing was committed; restore the refs and tell the operator |
+| 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog` and `git show-ref` with what the log says; nothing was committed; restore the refs and tell the operator. An editor's key alone in `.git/config` means no session moved anything. A halt during plan acceptance drops that session's cost from `vloop metrics`: note it from the log |
 
 ### 2a. A disputed gate
 
@@ -63,7 +67,8 @@ vloop task reset <id>
 ```
 
 Run the new gate once by hand (`vloop task gate <id>`), then resume. Record it as
-a defect (`--origin plan --kind gate`) and an intervention.
+an intervention, `--kind verification-finding --origin plan`: it was found before
+the merge, so it is a finding, not a defect (step 4).
 
 ## 3. Verifying — never trust a clean run
 
@@ -89,8 +94,8 @@ before closing anything.
 
 ## 4. Recording as it happens
 
-The patterns only show in the data, so record each thing when it happens, not at
-the end.
+Record each thing when it happens, not at the end: the patterns only show in the
+data.
 
 A **defect** is an escape: something found after the brief merged. Before the
 merge, a finding is an intervention (`--kind verification-finding --origin <…>`).
@@ -127,15 +132,12 @@ column is what shows what to build next.
 Whenever you bring the operator a decision, propose up to three real options.
 Three is a ceiling, not a target: if the situation offers one or two, propose one
 or two, and never invent a straw option, one nobody would pick, to reach three.
-Recommend one and say why. Then stop and wait: the operator decides.
+Recommend one, say why, and wait: the operator decides.
 
-After the operator decides, record the intervention with what you proposed and
-what they chose:
+After the operator decides, record the intervention as above, plus what you
+proposed and what they chose:
 
 ```
-vloop intervention add "<summary>" --brief <name> --phase <phase> --kind <kind> \
-  --automatable <yes|partly|no> --by <operator|assistant|both> \
-  --trigger '<...>' --done '<...>' --automation '<...>' \
   --option '<first option you proposed>' --option '<second>' \
   --recommended <which option you recommended> --why '<why you recommended it>' \
   --decided-option <the option they took> --decided '<what they decided, in their terms>' \
@@ -155,11 +157,9 @@ intervention migrate` brings older records to the current version.
 1. Fix what the operator agrees to fix, on the work branch, test first.
 2. Read the verify findings: `vloop brief close <brief>` with no flag prints them
    (the newest run's `reports/verify.json`, or `no verify report — verify by
-   hand`), then refuses and writes nothing. Judge each one; close records nothing
-   from it. Each one you accept is passed as `--finding "<origin>: <summary>"`.
-   Read the dissents too (`second review: <n> dissent(s)` ends the run;
-   `reports/<iteration>-second-verdict.json`): pass each one that holds as a
-   `--finding`, recorded as a `verification-finding`.
+   hand`) and writes nothing. Read the dissents too (`second review: <n>
+   dissent(s)` ends the run; `reports/<iteration>-second-verdict.json`). Judge
+   each one: close records only the findings you pass it.
 3. Close: `vloop brief close <brief> --finding "<brief|plan|work|env>: <what you found>"`
    (repeatable; the origin is whose defect it is),
    or `--no-findings` when you found nothing — state it, do not skip it.
@@ -179,11 +179,9 @@ intervention migrate` brings older records to the current version.
 - **Gates run in whatever shell the repository configures**, often a different
   one from yours. A gate that passes in your shell and fails there is a gate
   defect.
-- **Sessions must not move refs.** The fence denies the commands and the driver
-  halts with exit 9, but check the refs after every run anyway.
-- **Try risky commits in a throwaway clone first.** A clone's default branch is
-  whatever the source had checked out; one made while on a work branch makes
-  `vloop brief close` refuse until `git remote set-head origin <default>`.
+- **Try risky commits in a throwaway clone first**, after `git remote set-head
+  origin <default>` in it: a clone made while on a work branch takes that branch
+  as its default, and `vloop brief close` refuses.
 - **Check `git diff --cached --name-only` before every commit.** A file staged
   earlier, by anyone, rides along otherwise.
 - **Your scratch work stays outside the repository.** Check `git status` before
