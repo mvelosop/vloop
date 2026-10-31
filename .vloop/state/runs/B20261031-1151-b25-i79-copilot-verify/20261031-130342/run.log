@@ -19,3 +19,10 @@ committing the plan
    review T1 · 0m28s · $0.14 · run $4.86 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/6 done ──
+   Run verify sessions on Copilot: the hook's verify phase, the adapter and agent.verify = copilot
+   work T2 · 2m38s · $0.29 · run $5.15 / $40.00
+   check go
+   review T2 · 0m49s · $0.16 · run $5.31 / $40.00
+   review: PASS
+   T2 done

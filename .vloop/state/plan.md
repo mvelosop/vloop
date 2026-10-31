@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 1
+**Status:** running · **2/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:28:48Z
+**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:36:33Z
 
 ## Progress
 
 - [x] **T1** — Add the verify phase to the fence judge and to vloop fence check
-- [ ] **T2** — Run verify sessions on Copilot: the hook's verify phase, the adapter and agent.verify = copilot
+- [x] **T2** — Run verify sessions on Copilot: the hook's verify phase, the adapter and agent.verify = copilot
 - [ ] **T3** — Check agent.verify = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot verify sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a verify run on the real CLI
@@ -43,7 +43,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Run verify sessions on Copilot: the hook's verify phase, the adapter and agent.verify = copilot
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 V1's hook half and V2's core. With T1's judge, `vloop fence hook --phase verify` can fence a Copilot verify session; this task lets the Copilot adapter run `/vloop:verify` exactly as it runs a review — same plugin, fresh home, guidelines, the whole deny list on the argv, JSON Lines parsed into a session/v4 record — with one difference: its hooks file runs the hook with `--phase verify`. `agent.verify` then accepts `copilot`. Everything the driver does around the verify session stays as it is for any agent: it is a report, not a gate, so a finding, a failed session or a missing report never halts the run.
 

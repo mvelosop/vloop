@@ -5,9 +5,9 @@
   "base": "96cfb48fa3aa7137ef852f50897545773f1c91e7",
   "branch": "B20261031-1151-b25-i79-copilot-verify",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-10-31T13:18:14Z",
-  "updated": "2026-10-31T13:28:48Z",
+  "updated": "2026-10-31T13:36:33Z",
   "shell": "sh",
   "checks": [
     {
@@ -96,7 +96,7 @@
         "Committed Go tests cover the adapter's verify-phase argv (the whole deny list, `shell(rm:*)` included), its hooks file's `--phase verify`, `Supports(verify)`, the verify record's schema, the hook's verify phase and `agent.verify` accepting copilot while `agent.plan` and `agent.gate-review` do not; tests that pinned verify as unsupported or `agent.verify` as claude-only change only to the new behaviour, and the work notes name the contract item (V1, V2)."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
