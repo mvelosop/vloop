@@ -251,10 +251,10 @@ func TestApplyPatch(t *testing.T) {
 	}
 }
 
-// W1: the work phase is served; any other name is not.
+// W1, V1: the work and verify phases are served; any other name is not.
 func TestUnknownPhase(t *testing.T) {
 	_, err := New("plan", t.TempDir(), "")
-	if err == nil || err.Error() != `unknown phase "plan": want review, second-review or work` {
+	if err == nil || err.Error() != `unknown phase "plan": want review, second-review, work or verify` {
 		t.Errorf("New(plan) error = %v", err)
 	}
 }
@@ -352,5 +352,57 @@ func TestReviewStillDeniesRm(t *testing.T) {
 		if d.Allow || d.Reason != "rm src/old.ts is denied by the Copilot deny list (rm:*)" {
 			t.Errorf("[%s] rm src/old.ts: %+v", phase, d)
 		}
+	}
+}
+
+// V1: the verify phase decides as review, reads fence/verify.json and names
+// verify in its messages.
+func TestVerifyPhase(t *testing.T) {
+	j, root, _ := newJudge(t, PhaseVerify)
+	const vw = " is not allowed in a verify session: only .vloop/tmp/ may be written"
+	patchAdd := "*** Begin Patch\n*** Add File: .vloop/tmp/v/x.txt\n+x\n*** End Patch\n"
+	patchSrc := "*** Begin Patch\n*** Update File: src/app.go\n@@\n-a\n+b\n*** End Patch\n"
+	cases := []struct {
+		tool, path, cmd string
+		want            string // "" allows
+	}{
+		{"bash", "", "go build -o .vloop/tmp/v/vloop ./cmd/vloop", ""},
+		{"powershell", "", "go build -o .vloop/tmp/v/vloop ./cmd/vloop", ""},
+		{"bash", "", "git init .vloop/tmp/v/ex1", ""},
+		{"bash", "", "./.vloop/tmp/v/vloop --version > .vloop/tmp/v/out.txt", ""},
+		{"bash", "", "vloop schema validate verify/v1 .vloop/tmp/verify.json", ""},
+		{"bash", "", "cd .vloop/tmp/v && ./vloop status > out.txt", "write to out.txt" + vw},
+		{"bash", "", "echo x > README.md", "write to README.md" + vw},
+		{"bash", "", "rm .vloop/tmp/v/out.txt", "rm .vloop/tmp/v/out.txt is denied by the Copilot deny list (rm:*)"},
+		{"bash", "", "git -C .vloop/tmp/v/ex1 status", "git -C .vloop/tmp/v/ex1 status is denied by the verify fence (Bash(git -C:*))"},
+		{"bash", "", "vloop run", "vloop run is denied by the verify fence (Bash(vloop run:*))"},
+		{"bash", "", `sh -c "git push origin main"`, "git push origin main is denied by the verify fence (Bash(git push:*))"},
+		{"bash", "", "env gh pr list", "gh pr list is denied by the Copilot deny list (gh:*)"},
+		{"bash", "", "echo $(date)", "command substitution cannot be judged"},
+		{"create", ".vloop/tmp/verify.json", "", ""},
+		{"edit", "internal/x.go", "", "write to internal/x.go" + vw},
+		{"create", ".vloop/state/state.json", "", "write to .vloop/state/state.json" + vw},
+		{"view", "src/app.go", "", ""},
+		{"view", "~/.copilot/config.json", "", "read of ~/.copilot/config.json is not allowed: it is under ~/.claude, ~/.copilot or ~/.config/gh"},
+		{"skill", "verify", "", ""},
+		{"skill", "vloop-verify", "", "skill vloop-verify is not vloop's — use /vloop:verify"},
+		{"web_fetch", "", "", "tool web_fetch is not allowed in a verify session"},
+		{"apply_patch", "", patchAdd, ""},
+		{"apply_patch", "", patchSrc, "write to src/app.go" + vw},
+	}
+	for _, c := range cases {
+		d := j.Decide(c.tool, c.path, c.cmd)
+		if c.want == "" {
+			if !d.Allow {
+				t.Errorf("%s %q %q denied: %s", c.tool, c.path, c.cmd, d.Reason)
+			}
+			continue
+		}
+		if d.Allow || d.Reason != c.want {
+			t.Errorf("%s %q %q = allow %v, %q; want deny %q", c.tool, c.path, c.cmd, d.Allow, d.Reason, c.want)
+		}
+	}
+	if d := j.Decide("create", filepath.Join(root, ".vloop", "tmp", "a.json"), ""); !d.Allow {
+		t.Errorf("absolute path under .vloop/tmp denied: %s", d.Reason)
 	}
 }

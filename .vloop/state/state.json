@@ -5,9 +5,9 @@
   "base": "96cfb48fa3aa7137ef852f50897545773f1c91e7",
   "branch": "B20261031-1151-b25-i79-copilot-verify",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-10-31T13:18:14Z",
-  "updated": "2026-10-31T13:21:38Z",
+  "updated": "2026-10-31T13:28:48Z",
   "shell": "sh",
   "checks": [
     {
@@ -55,7 +55,7 @@
         "`fence/verify.json`, `fence/review.json` and `fence/work.json` are unchanged, and no Claude session's argv, fence or settings changes."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

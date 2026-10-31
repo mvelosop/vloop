@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":216728,"exit":0,"name":"go"}],"ended":"2026-10-31T13:28:48Z","gate":{"duration_ms":1822,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261031-1151-b25-i79-copilot-verify","schema":"iteration/v2","started":"2026-10-31T13:21:38Z","task":"T1"}

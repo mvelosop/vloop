@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **1/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:21:38Z
+**Brief:** `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` · **Updated:** 2026-10-31T13:28:48Z
 
 ## Progress
 
-- [ ] **T1** — Add the verify phase to the fence judge and to vloop fence check
+- [x] **T1** — Add the verify phase to the fence judge and to vloop fence check
 - [ ] **T2** — Run verify sessions on Copilot: the hook's verify phase, the adapter and agent.verify = copilot
 - [ ] **T3** — Check agent.verify = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot verify sessions in the fence audit, the configuration guide and the domain pages
@@ -19,7 +19,7 @@
 
 ### T1 — Add the verify phase to the fence judge and to vloop fence check
 
-`pending` · depends on: none
+`done` · depends on: none
 
 V1's core. The judge behind `vloop fence check` and the Copilot hook knows review, second-review and work, so a Copilot verify session cannot be fenced. This task gives it a `verify` phase decided exactly as review — writes only under `.vloop/tmp/`, the adapter's whole deny list with `rm:*` — but reading `fence/verify.json`'s rules and naming verify in its messages, so that a later change to either fence moves only its own phase. T2 puts it behind the hook; the other phases must not change by a byte, bar the unknown-phase message.
 

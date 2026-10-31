@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The fence judge now serves a verify phase (reads fence/verify.json, names verify in its fence label, skill hint and write/tool denials, keeps rm:*); vloop fence check/hook help names verify and docs/guide/commands.md is regenerated.",
+  "files": ["internal/fence/judge.go", "internal/fence/judge_test.go", "internal/cli/fence.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T1 exited 0 (gate T1: ok); go test ./internal/fence passes; go test ./internal/cli passes with the session's VLOOP_* env cleared.",
+  "notes": "Contract item V1: TestUnknownPhase (internal/fence/judge_test.go) changed only to the new unknown-phase message. The hook shares fence.New, so its unknown-phase error wording changed too. go test ./internal/cli run inside a loop session fails the task-gate tests because of inherited VLOOP_* env vars; run it with env -i to check. The hook is not yet wired to verify sessions (T2)."
+}

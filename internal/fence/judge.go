@@ -12,11 +12,13 @@ import (
 	"github.com/mvelosop/vloop/internal/driver"
 )
 
-// The phases a judge serves; the two review phases share the review fence.
+// The phases a judge serves; the two review phases share the review fence,
+// verify reads its own.
 const (
 	PhaseReview       = "review"
 	PhaseSecondReview = "second-review"
 	PhaseWork         = "work"
+	PhaseVerify       = "verify"
 )
 
 // maxDepth bounds how many sh -c layers are looked through.
@@ -48,12 +50,12 @@ func deny(format string, a ...any) Decision {
 // embedded plugin's skill names. Relative paths resolve against root; home is
 // what a leading ~ expands to ("" leaves it unexpanded).
 func New(phase, root, home string) (*Judge, error) {
-	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork {
-		return nil, fmt.Errorf("unknown phase %q: want review, second-review or work", phase)
+	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork && phase != PhaseVerify {
+		return nil, fmt.Errorf("unknown phase %q: want review, second-review, work or verify", phase)
 	}
 	fenceName := PhaseReview
-	if phase == PhaseWork {
-		fenceName = PhaseWork
+	if phase == PhaseWork || phase == PhaseVerify {
+		fenceName = phase
 	}
 	raw, err := vloop.Fence(fenceName)
 	if err != nil {
@@ -166,8 +168,8 @@ func under(dir, p string) bool {
 
 // skillPhase is the plugin skill a session of this phase runs.
 func (j *Judge) skillPhase() string {
-	if j.phase == PhaseWork {
-		return PhaseWork
+	if j.phase == PhaseWork || j.phase == PhaseVerify {
+		return j.phase
 	}
 	return PhaseReview
 }
@@ -321,8 +323,8 @@ func (j *Judge) words(ws []string, depth int) string {
 }
 
 func (j *Judge) fenceLabel() string {
-	if j.phase == PhaseWork {
-		return PhaseWork
+	if j.phase == PhaseWork || j.phase == PhaseVerify {
+		return j.phase
 	}
 	return PhaseReview
 }
