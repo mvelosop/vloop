@@ -1,0 +1,5 @@
+{"schema":"verdict/v1","task":"T6","verdict":"PASS","criteria":[
+{"criterion":"Every gate T1–T5 passes on the final tree.","met":true,"evidence":"gates/T6.log shows gate T2..T5 ok and gate T6: ok; the T6 gate runs T1–T5 in order."},
+{"criterion":"Every line of the brief's worked example holds against the built binary: the two `fence check --phase verify` tables and the apply_patch lines, the three unchanged lines, the changed unknown-phase line, the stub run's warning, record, argv, hooks file and kept report, and each planted failure.","met":true,"evidence":"I built the binary and ran the bash-table lines, the skill, view and web_fetch lines, the unknown-phase line and the gate-review line in a fresh git repo. Messages and exit codes match the brief. The stub run, apply_patch and planted failures are covered by the T1–T3 gates, which pass."},
+{"criterion":"The `go` check passes on the final tree.","met":true,"evidence":".vloop/tmp/checks.json: go exit 0."}],
+"findings":[],"notes":"No product changes, as expected for a close task."}

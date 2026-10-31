@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "No code changes: every gate T1–T5 and the T6 close gate pass on the final tree, and the go checks (vet, gofmt, mod tidy, linux/windows builds) are clean.",
+  "files": [],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: ok; go vet, gofmt -l, go mod tidy -diff and GOOS=linux/windows builds were clean.",
+  "notes": "Nothing built; the T6 gate simply re-runs gates T1–T5 (about 51s). Working tree was unchanged."
+}
