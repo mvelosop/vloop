@@ -1,99 +1,39 @@
 ---
 name: vloop-architect
-description: The design act for this repo — turn the operator's intent into a loop brief that passes both checkers, citing exactly the documents and invariants that bind its tasks. Use in an interactive session when the operator asks to write, draft, revise or scope the next brief. Upstream of vloop; running, verifying and closing briefs belong to the vloop-operator skill.
+description: The design act for this repo — the vloop-create-brief skill, plus what this repository adds to it (the roadmap row, the domain's invariants cited by ID, the constraints every brief here carries). Use in an interactive session when the operator asks to write, draft, revise or scope the next brief. Running, verifying and closing briefs belong to the vloop-operator skill.
 ---
 
-# The design act
+# The design act here
 
-You turn the operator's intent into a **loop brief**: the contract a run
-executes. This is upstream of vloop — vloop starts at a `ready` brief — and it
-is where the operator's direction and decisions happen, so it is interactive by
-nature: you survey and propose, the operator decides.
+**Follow the `vloop-create-brief` skill** for the whole act: find the
+documentation, survey, settle forks with the operator, write from the template,
+check it, have it reviewed with `vloop-review-brief`, hand over at `draft`. This
+skill only adds what is particular to this repository.
 
-The planner downstream is **mechanical**: it decomposes the brief and
-*distributes* its binding references to tasks. It does not discover anything
-the brief left out. Whatever binds a task must be in the brief.
+## Scope comes from the roadmap
 
-## 1. Survey before you ask
+The brief's row in `docs/design-notes/vloop-roadmap.md` says what it owns; the
+rows after it are its out-of-scope list. At hand-over, point the row at the
+brief.
 
-- The roadmap row (`docs/design-notes/vloop-roadmap.md`) — what the brief owns;
-  the rows after it are its out-of-scope list.
-- The previous briefs' run records, "Still open", and the recorded defects and
-  interventions (`.vloop/defects/`, `.vloop/interventions/README-interventions.md`)
-  — what must be carried forward.
-- **The domain** (`docs/domain/README-domain.md`): walk from the whole
-  (`domain-model.md`) to the context and entity pages each part of the brief
-  touches. Note the invariants that apply, by ID.
-- The code the brief will touch, and any format it reads (`.vloop/state/runs/`;
-  for B1–B7, the shell loop's `.loop/state/runs/`). Measure real numbers from the telemetry
-  or `vloop metrics`, never from hand-rounded run records.
+## Bind by invariant
 
-## 2. Settle forks with the operator
-
-Few at a time, each with a recommendation. What you decide yourself goes in your
-reply as "choices to review".
-
-## 3. Write the brief
-
-From `vloop brief new <slug>`, which writes
-`docs/briefs/B<YYYYMMDD-HHMM>-<slug>.loop-brief.md` from the template, frontmatter `status: draft`
-and `depends-on:` the previous brief's name. Pin decisions, leave mechanics
-open.
-
-**Start with an executive summary**, right after the header bullets, short
-enough to grasp the brief's goal in a minute: one or two sentences on the
-problem, a bold **The goal:** line saying in plain words what changes for the
-user, then one bullet per item (requirement or defect) —
-`**<id> — <what it achieves>.**` and one or two sentences on why it matters —
-and a closing line on what does not change. Outcomes, not mechanisms; the
-summary restates the contract and never adds to it.
-
-Details come when the operator asks for them, in the conversation, not in the
-brief. Explain an item as a short block: one sentence on what it does;
-**Today:** what is wrong, with the evidence (the run, the number, the message
-the user sees); **After:** what changes, as bullets quoting the exact messages
-or output the contract pins; and, only where they apply, one line each of
-**Safety:**, **Unchanged:**, **Side effect:**, **Limit:**, **Not included:**.
-
-(Set by the operator on 2026-10-11: B13's one-line form, then B14's per-item
-blocks, which were too long to grasp the goal quickly; the short form stays in
-the brief and the blocks are given on request.)
-
-Every brief so far also carried:
-
-- a worked example with exact values, **plus** planted failures;
-- a real-data check where the slice can read this repo's history;
-- the lessons as constraints, verbatim where they apply (gates on macOS's BSD
-  tools; sessions never move refs; tests build fixtures in temporary
-  directories and address them with `git -C`);
-- the rule for earlier tests: one changes only where it pins behaviour the
-  contract changes, and only to the new behaviour; the work session names the
-  contract item in its notes and the review cites it. No list is needed.
-
-**Binding references — precise, never a folder.** Cite entity pages, or
-`docs/domain/domain-model.md` with the invariant IDs that apply, one path per
-entry, each with the reason it binds:
+Walk the domain (`docs/domain/README-domain.md` → `domain-model.md` → the
+context and entity pages each part of the brief touches) and cite the
+invariants that apply by ID, one path per entry:
 
 ```
 - `docs/domain/domain-model.md` — B-4 and M-2: where the estimate is read; what counts as a line
 - `docs/domain/execution/task.md` — the gate and gate history, for the task verify changes
 ```
 
-Cite a rule instead of restating it: a restated rule drifts, and three of the
-six defects recorded for B1–B3 were exactly that. Every cited document is re-read
-by every session, every iteration — cite what binds, not what is related. A
-folder is citable only when it is a bundle whose whole binds (a design handoff),
-and then through its index file.
+## What every brief here carries
 
-## 4. Check it twice
-
-`vloop brief check` on a copy with `status: ready` (one path per binding
-reference); `vloop run` plans from it. The shell loop's checker checked B1–B7. Aim for 0 problems and 0 warnings; un-backtick paths that exist only
-after the run. Look for sentences two sessions could read two ways — the review
-of the brief is the cheapest place to find the next spec gap.
-
-## 5. Hand over
-
-Point the roadmap row at the brief and stop for the operator's review. From
-`ready` on, the brief is the operator's: running, verifying and closing it are
-the `vloop-operator` skill's.
+- Real numbers from the telemetry (`.vloop/state/runs/`, `vloop metrics`), never
+  from hand-rounded run records. B1–B7's history is the shell loop's, under
+  `.loop/state/runs/`.
+- A real-data check where the slice can read this repository's own history.
+- These lessons as constraints, verbatim where they apply: gates run on macOS's
+  BSD tools; sessions never move refs; tests build their fixtures in temporary
+  directories and address them with `git -C`.
+- In `vloop brief check`, un-backtick paths that exist only after the run.

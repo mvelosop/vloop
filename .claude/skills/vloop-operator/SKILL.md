@@ -1,196 +1,63 @@
 ---
 name: vloop-operator
-description: The operator's playbook for this repo — from a ready loop brief, run it with `vloop run` on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief, and merge; and use the docs to resolve what comes up. Use in an interactive session whenever the operator asks to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is the vloop-architect skill's.
+description: The operator's playbook for this repo — /vloop:operate, plus what this repository adds to it (where its rules live, its checks, the roadmap row at close, the release, the acceptance briefs). Use in an interactive session whenever the operator asks to run, resume, verify, close or merge a brief, cut a release, or what to do about a halt or a finding. Writing briefs is the vloop-architect skill's.
 ---
 
-# Operating the loop
+# Operating the loop here
 
-You are the operator's hands in an interactive session — not a loop session.
-The loop's sessions do one task and never commit; you drive whole briefs, and
-you commit on work branches. Merging, pushing, opening PRs and anything else
-outward-facing wait for the operator's explicit go-ahead, every time.
+**Follow `/vloop:operate`** — the plugin's playbook — for everything: before the
+run, halts, verifying, recording, closing and merging. If it is not loaded, read
+`plugin/skills/operate/SKILL.md`, which is the same text. This skill only adds
+what is particular to this repository; where the two seem to disagree, say so to
+the operator rather than picking one.
 
-The brief is the contract; the roadmap (`docs/design-notes/vloop-roadmap.md`) is
-the runbook: its rows say what each brief owns, and the next row's out-of-scope
-list is the rows after it. Read the roadmap and the last consumed brief's
-`## Run record` before anything else.
+## Where the rules live
 
-## 1. Where briefs come from, and where rules live
+`CLAUDE.md` points to them. When a failure needs the rule it breaks, walk the
+domain (`docs/domain/README-domain.md` → `domain-model.md` → the context and
+entity page) and **cite the invariant by ID** (`B-4`, `P-4`, `S-2`, `M-5`…) in
+what you report and record. If the domain is silent, propose the rule to the
+operator; it may belong in `domain-model.md`.
 
-Briefs are written by the design act — the `vloop-architect` skill, or the
-operator — and reach you `ready`. You do not design; when a run or a
-verification raises a question the brief does not answer, you **find the rule**
-and bring the operator a proposal:
+## Running
 
-- **Which rule does a failure break?** Walk the domain
-  (`docs/domain/README-domain.md` → `domain-model.md` → the context and entity
-  page) to the invariant that applies. Cite it by ID in what you report
-  (`B-4`, `P-4`, `S-2`, `M-5`…).
-- **Whose defect is it?** If the brief pinned the rule and the work broke it:
-  `origin: work`. If the brief was silent or ambiguous where the domain is clear:
-  `origin: brief`, a spec gap — the fix belongs in the next brief's references,
-  not only in the code. If the domain itself is silent: propose the rule to the
-  operator; it may belong in `domain-model.md`.
-- **Is it a gate problem?** `docs/domain/execution/task.md` → "The gate": a gate
-  that cannot pass for a reason outside the task is a plan defect, and
-  `vloop task verify <id> '<cmd>' --reason '…'` is the remedy.
-- **What has happened before?** `.vloop/defects/`, the interventions index
-  (`.vloop/interventions/README-interventions.md`) and the run records — the
-  same problem may already have a recorded answer.
+- The run id is the brief's file name minus `.loop-brief`; the work branch is
+  named for it.
+- Gates run on macOS's BSD tools: no empty alternatives in `grep -E`, no
+  `sed -i` without a suffix, no `\+`/`\|` in basic regexes, no `date -d`. A
+  gate that breaks one of these is a gate defect.
+- VS Code's `branch.*.vscode-merge-base` and its pull-request extension's
+  `branch.*.github-pr-*` keys are ignored by the guard; any other editor key
+  still halts with exit 9.
 
-## 2. Running
+## Verifying
 
-1. The operator says go: set `status: ready`, then **create the work branch before
-   anything else** — named for the run id (the brief name minus `.loop-brief`):
-   `git switch -c <run id>`, commit the brief there. B1's plan commit landed on
-   `main` because the branch came after the planning preview.
-2. Run it **detached**, so it outlives your session's background-task limit
-   (2 hours; a killed driver leaves a `.vloop/tmp/.running` lock), and keep the
-   Mac awake (an idle-sleeping Mac stalled B7's acceptance run for over an hour):
-   `nohup caffeinate -i vloop run <brief path> > <scratchpad>/run.log 2>&1 & echo $!`.
-   Then wait in the background for the log's end, without polling in the
-   foreground. **Watch the driver by the process id printed**, never by a
-   `pgrep -f` pattern: in B10–B11 the pattern matched the watcher itself and hid
-   a halt.
-   **Ask the operator to close VS Code (or any editor open on the repository)
-   for the run.** VS Code writes `branch.*.vscode-merge-base` into `.git/config`
-   when a branch is created, and its GitHub Pull Requests extension
-   `branch.*.github-pr-*`; the guard ignores both (B12, B16), but any other
-   editor key halts the run with exit 9, as `vscode-merge-base` halted B11's
-   acceptance and a visum-monorepo plan. `vloop status` shows progress. `--plan-only` first when the
-   operator wants to see the task split. B1–B7 ran under the shell loop.
-3. Resuming on another branch than the one that planned needs the brief path
-   again; the driver refuses without it (exit 1) and says so.
+- The repository's checks are the ones in `CLAUDE.md` → Toolchain, all of them,
+  run by you.
+- Before trying `vloop brief close` or `vloop defect add` for real in a
+  throwaway clone of this repo, run `git remote set-head origin main` in the
+  clone: a local clone takes whatever branch was checked out as its default.
 
-## 3. When it halts
+## Closing
 
-Read the log's end, the journal (`.vloop/state/journals/<run id>.md`) and the
-blocked task's `notes` (`vloop task show <id>`). Exit codes:
-`docs/guide/concepts.md#exit-codes`; resuming is `vloop run` again on the work
-branch.
+- Besides what `vloop brief close` does, mark the brief's row in
+  `docs/design-notes/vloop-roadmap.md` consumed.
+- After recording interventions, refresh their index:
+  `tools/interventions-index.sh --write` (`--check` when verifying).
 
-| Exit | Meaning | What you do |
-| --- | --- | --- |
-| 0 | complete | verify (step 4) |
-| 1 | preflight: refused before anything ran | fix the cause it names, re-run |
-| 2 | blocked; or a **check-gap halt**: a criterion needs a check no gate may hold; nothing was kept. Add the named check to `.vloop/config.toml`, commit it, re-run (P-8) | read the notes; usually a design question → the operator |
-| 3 | stalled | read the notes. A **gate defect** the work session diagnosed, whose fix keeps the gate's intent and never adds the suite, a check or a task's test to it (P-8; a criterion that needs a test run is a check you add to `.vloop/config.toml`), you may fix: `vloop task verify <id> '<cmd>' --reason '…'`, then `vloop task reset <id>`, `vloop task gate <id>` once by hand, resume. Record it later as a `plan`/`gate` defect |
-| 4, 6 | budget | resumable; tell the operator |
-| 5, 7, 8 | needs a human | report, don't retry blindly |
-| 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog`, `git show-ref` against what the log lists; restore refs (nothing was committed); tell the operator. If the only change is an editor's key in `.git/config` (`vscode-merge-base`), it is the guard defect, not a session: say so, and record it as a recurrence. A halt during plan acceptance discards the plan and its run folder; note the lost session's cost from the log before cleaning, since `vloop metrics` will not have it |
+## Releasing
 
-Anything that is a design decision rather than a mechanical defect goes back to
-the operator, even when you could guess.
+Only when the operator asks for one: `go run ./tools/release prepare <version>`
+opens the release PR; merge it on the operator's go-ahead; then
+`go run ./tools/release publish <version>` tags, releases and proves the public
+install. Record a `ceremony` intervention for it. Then install the release and
+`vloop upgrade` in each repository that uses vloop. See `tools/release/README.md`.
 
-## 4. Verifying — never trust a clean run
+## The acceptance briefs' flaws stay where they are
 
-B1 closed 9/9 first-pass and still had an untidy `go.mod`; B3 closed 10/10 and
-reported its own estimate wrong and its branches renamed. So, every time:
-
-1. **Refs first**: `git status -sb`, `git branch -vv`, `git symbolic-ref
-   refs/remotes/origin/HEAD`. The run's commits must be on the work branch, and
-   `main` must still be `main`.
-2. The full suite and checks (`CLAUDE.md` → Toolchain).
-3. **The worked example by hand**, in a scratch repo, with a freshly built
-   binary — every line and exit code, and the planted failures.
-4. The real-data check if the brief has one, and `vloop metrics <brief>` — read
-   it critically: the estimate, the records line, the merged state.
-5. Which earlier tests changed (`git diff <base> HEAD -- <test files>`) and
-   whether each change is one the brief required.
-6. Permission denials and missing session records in the log — explain each.
-
-Report to the operator: what passed, what you found, and what you recommend,
-before closing anything.
-
-## 5. Closing and merging
-
-Until B4 ships `vloop brief close`, by hand:
-
-1. Fix what the operator agrees to fix, on the work branch, test first.
-   First read the verify findings `vloop brief close <brief>` prints with no flag
-   (the newest `reports/verify.json`; it then refuses and writes nothing);
-   record each one you accept with `--finding "<origin>: <summary>"`, previewed
-   with `--dry-run` and that flag, then closed.
-   Read the dissents as well (`second review: <n> dissent(s)` at the end of the
-   run, `reports/<iteration>-second-verdict.json`) when `run.second-review` was on;
-   record each dissent that holds the same way, as a `verification-finding`;
-   one that does not hold is not recorded.
-2. Record findings before merge as verification-finding interventions:
-   `vloop intervention add "<summary>" --brief <name> --kind
-   verification-finding --origin <brief|plan|work|env> --phase verify
-   --automatable partly --by operator`. Record defects only for escapes, found
-   after the merge: `vloop defect add "<summary>" --brief <name> --task <id>
-   --origin <brief|plan|work|env> --found-by <…> --kind <…>`, then `vloop
-   defect set <id> status fixed` (and `fixed-by`).
-3. Mark the brief consumed: frontmatter `status: consumed`, the body
-   `**Status:**` line to "consumed — … **Do not re-plan from this brief.**",
-   and a `## Run record` — outcome, spend (from `vloop metrics`), what was
-   verified, what was changed by hand, incidents, still open. Roadmap row:
-   consumed.
-4. Commit, push the branch, `gh pr create`, and — with the operator's go-ahead —
-   `gh pr merge <n> --squash` with a body ending in
-   `Vloop-Brief: <brief name>`. **Never delete the work branch**: its
-   per-iteration commits are the evidence of the run.
-5. `git fetch`, `git switch main`, `git reset --hard origin/main` — after
-   checking nothing on local `main` is missing from `origin/main`.
-
-Since B4: `vloop brief close <brief> --finding "…"` / `--no-findings` does 2–3
-and the commit, and prints the trailer for step 4.
-
-6. **Record the interventions** — everything you or the operator did around the
-   run besides testing — with `vloop intervention add "<summary>" --brief
-   <name> --phase <setup|design|run|halt|verify|close|next> --kind <direction|
-   decision|context-supply|halt|verification-finding|repair|carry-forward|
-   ceremony> --automatable <yes|partly|no> --by <operator|assistant|both>
-   --trigger … --done … --automation …`, when they happen. When you brought the
-   operator a decision, you proposed up to three real options (never a straw
-   option to reach three), recommended one and said why; after they decide,
-   record `--option` (once per option, only what you proposed before they
-   decided), `--recommended`, `--why`, the decided choice (`--decided-option`,
-   with `--adjusted` if they changed it, or `--decided-other`) and `--decided`,
-   and `--context` (the run, iteration and task; the commit or files; the
-   triggering output quoted briefly; what changed because of it). Correct a
-   record with `vloop intervention set`. Records written before intervention/v2
-   are brought forward with `vloop intervention migrate`, where the index is
-   refreshed: `tools/interventions-index.sh --write` (`--check` in
-   verification). Why: `docs/design-notes/vloop-interventions-b1-b4.md`.
-
-7. **Release**, when the operator asks for one: `go run ./tools/release prepare
-   <version>` opens the release PR; merge it on the operator's go-ahead; then
-   `go run ./tools/release publish <version>` tags, releases and proves the
-   public install. Record a `ceremony` intervention for the release with
-   `vloop intervention add`. Then install and `vloop upgrade` in each
-   repository. See `tools/release/README.md`.
-
-## Lessons, where they bite
-
-- **Gates run on macOS's BSD tools.** No empty alternatives in `grep -E`, no
-  `sed -i` without a suffix, no `\+`/`\|` in basic regexes, no `date -d`. (B2
-  stalled twice on `(|/)`.)
-- **Sessions must not move refs.** The fence denies the commands and the driver
-  halts with exit 9, but check refs after every run anyway. (B3's planner
-  renamed `main`, created `work`, planted `origin/trunk`.)
-- **A session record can go missing** (B2's T2 review printed nothing): the
-  metrics say so on a `records` line; mention it in the run record.
-- **Sum unrounded values**; quote `vloop metrics`, not your own arithmetic.
-- **An estimate or phrase in a worked example is read as the brief's own** by
-  naive parsers (B3). Say which section a rule reads.
-- **Try commits in a throwaway clone first.** `git clone` of this repo into your
-  scratchpad lets you run `vloop brief close` or `defect add` for real without
-  touching the repo. But a clone's `origin/HEAD` is whatever branch the source
-  had checked out: cloned while on a work branch, vloop takes that branch as the
-  default and `close` refuses. Run `git remote set-head origin main` in the
-  clone first — a clone from GitHub already has it.
-- **Check `git diff --cached --name-only` before every commit.** A file staged
-  earlier, by anyone, rides along otherwise (the B4 draft reached `main` that
-  way).
-- **The acceptance briefs' flaws stay where they are.** A brief used for
-  acceptance runs (the URL shortener template's) can hold a flaw found in an
-  earlier run, kept on purpose to see how the loop and the agents handle it.
-  Don't fix it, and don't describe it anywhere a session or a later fix could
-  learn it: issues, skills, evals, anything under `plugin/`. Record what the
-  run showed in the operator notes and the design notes, in words that don't
-  give the flaw away; a fix to vloop uses a synthetic case.
-- **Your own scratch work stays in your scratchpad.** Never leave temporary
-  copies in `docs/briefs/`; check `git status` before and after anything that
-  writes.
+A brief used for acceptance runs (the URL shortener template's) can hold a flaw
+found in an earlier run, kept on purpose to see how the loop and the agents
+handle it. Don't fix it, and don't describe it anywhere a session or a later fix
+could learn it: issues, skills, evals, anything under `plugin/`. Record what the
+run showed in the operator notes and the design notes, in words that don't give
+the flaw away; a fix to vloop uses a synthetic case.
