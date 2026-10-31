@@ -5,9 +5,9 @@
   "base": "96cfb48fa3aa7137ef852f50897545773f1c91e7",
   "branch": "B20261031-1151-b25-i79-copilot-verify",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-10-31T13:18:14Z",
-  "updated": "2026-10-31T13:45:37Z",
+  "updated": "2026-10-31T13:52:48Z",
   "shell": "sh",
   "checks": [
     {
@@ -173,7 +173,7 @@
         "Every sentence about behaviour matches what T1–T3 built (messages quoted as the code prints them); `fence/*.json` is unchanged; the `go` check still passes."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
