@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 6
+**Status:** running · **6/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:51:09Z
+**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:57:38Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Check agent.gate-review = copilot in the run preflight and doctor
 - [x] **T4** — Document Copilot gate-review sessions in the fence audit, the configuration guide and the domain pages
 - [x] **T5** — Extend the Copilot acceptance kit with a gate-review run on the real CLI
-- [ ] **T6** — Close the run: every gate at once, and the worked example line for line
+- [x] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
@@ -131,7 +131,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Close the run: every gate at once, and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 The run is done only when every gate holds together on the final tree and the brief's worked example holds line for line. This task changes nothing unless a gate or a line of the example fails, in which case it fixes the cause within the brief's scope.
 

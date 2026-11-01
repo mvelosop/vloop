@@ -48,3 +48,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** tools/copilot-acceptance/gatereview.sh runs the fixture brief with agent.gate-review = copilot and model.gate-review; report.py gate-review summarises sessions and kept verdicts by round; README gains the B26 section.
 - **Files:** tools/copilot-acceptance/gatereview.sh, tools/copilot-acceptance/report.py, tools/copilot-acceptance/README.md
 - **Notes for next iteration:** Session records carry no round, so report.py takes the nth gate-review record of a run folder as round n; verdicts are read from reports/gate-review-<round>.json. Schema names session/v4 and gate-verdict/v2 checked via vloop schema validate. The script was not run (needs real copilot).
+
+## T6 — Close the run: every gate at once, and the worked example line for line
+
+- **Outcome:** done (review: PASS)
+- **Summary:** No change needed: gates T1–T5 and T6 all pass on the final tree.
+- **Files:** none
+- **Notes for next iteration:** none

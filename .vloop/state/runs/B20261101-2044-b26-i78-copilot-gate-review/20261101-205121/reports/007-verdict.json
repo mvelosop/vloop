@@ -1,0 +1,5 @@
+{"schema":"verdict/v1","task":"T6","verdict":"PASS","criteria":[
+{"criterion":"Every gate T1–T5 passes on the final tree.","met":true,"evidence":"gates/T6.log shows gate T1–T5 ok; T6 gate runs each of them"},
+{"criterion":"Every line of the brief's worked example holds against the built binary: the two `fence check --phase gate-review` tables and the apply_patch lines, the four unchanged lines, the changed unknown-phase line, the stub run's warning, round line, record, argv, hooks file and kept verdict, and each planted failure.","met":true,"evidence":"T6 gate.sh chains T1–T5 gates, whose header maps them to the example's lines and planted failures; all pass in the log. No product diff, so nothing was loosened."},
+{"criterion":"The `go` check passes on the final tree.","met":true,"evidence":".vloop/tmp/checks.json: go exit 0"}
+],"findings":[],"notes":"none"}
