@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** agent.gate-review = copilot now gets the experimental warning, the default-model refusal, K1, the login refusal and doctor's copilot rows, whatever run.verify says; claude behaviour is unchanged.
 - **Files:** internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_copilot_gatereview_test.go
 - **Notes for next iteration:** Added copilotGateReview (no run.verify switch) to copilotKeys; run.go's warning filter lists agent.gate-review. The review look-alike warning is unchanged and now shows with only the gate review on copilot. Internal/cli task_gate tests fail inside a work session only because the plan guard sees a changed plan; unrelated.
+
+## T4 — Document Copilot gate-review sessions in the fence audit, the configuration guide and the domain pages
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The fence audit gains a gate-review part classifying every gate-review fence rule and adapter deny pattern; the configuration guide, session page and glossary now cover Copilot gate-review sessions.
+- **Files:** docs/design-notes/fence-audit.md, docs/guide/configuration.md, docs/domain/execution/session.md, docs/domain/domain-model.md
+- **Notes for next iteration:** The audit says the driver after a gate-review session checks only git (moved ref, exit 9; changed .git/config or hooks) and does not revert files outside .vloop/tmp/, so file-write rules are classified hook. Code comments (adapter, hook, doctor) already named gate-review from T1-T3. The model.gate-review refusal is quoted from internal/cli/run.go.
