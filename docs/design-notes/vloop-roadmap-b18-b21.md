@@ -1,11 +1,11 @@
 ---
 name: vloop-roadmap-b18-b21
-description: The briefs after v0.12.0 — the agent per phase, the GitHub Copilot CLI adapter, two hardening briefs, the fence for non-Claude agents with a second reviewer, reporting vloop defects upstream, and Copilot for work, verify and gate-review sessions — what each owns and depends on. Read before writing any of them.
+description: The briefs after v0.12.0 — the agent per phase, the GitHub Copilot CLI adapter, two hardening briefs, the fence for non-Claude agents with a second reviewer, reporting vloop defects upstream, and Copilot for work, verify, gate-review and plan sessions — what each owns and depends on. Read before writing any of them.
 kind: design-note
 status: draft
 created: 2026-10-25
 ---
-# vloop — the roadmap after v0.12.0 (B18–B26)
+# vloop — the roadmap after v0.12.0 (B18–B27)
 
 v0.12.0 (tag `v0.12.0`) is B1–B17; B12–B17 are
 `docs/design-notes/vloop-roadmap-b12-b17.md`. This series starts with the
@@ -31,6 +31,7 @@ in `depends-on:`. Candidates not yet placed are GitHub issues (for example
 | B24 | `docs/briefs/B20261027-2111-b24-copilot-work.loop-brief.md` — **consumed** (issue #76) | **Copilot for work sessions**: `agent.work = copilot`, experimental; `vloop fence hook --phase work` judging against the work fence (writes anywhere but `.git/` and `.vloop/` outside `.vloop/tmp/`, `rm` of a file allowed); the preflight and doctor checks of Copilot review; accepted on the real CLI with `gpt-5.6-terra`. For the operator's presentation on 2026-11-07; tracked in GitHub project 5 under #69 | B22 |
 | B25 | `docs/briefs/B20261031-1151-b25-i79-copilot-verify.loop-brief.md` — **consumed** (issue #79) | **Copilot for verify sessions**: `agent.verify = copilot`, experimental; `vloop fence hook --phase verify` judging with the review phase's rules against the verify fence (writes only under `.vloop/tmp/`, `rm` denied); the preflight and doctor checks of the other Copilot phases; verify stays a report. Accepted on the real CLI with `gpt-5.6-terra`; tracked in GitHub project 5 under #75 | B24 |
 | B26 | `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` — **consumed** (issue #78) | **Copilot for gate-review sessions**: `agent.gate-review = copilot`, experimental; `vloop fence hook --phase gate-review` judging with the review phase's rules against the gate-review fence (writes only under `.vloop/tmp/`, `rm` denied); the preflight and doctor checks of the other Copilot phases; the verdict read as for any agent. Accepted on the real CLI with `gpt-5.6-terra`; tracked in GitHub project 5 under #75 | B25 |
+| B27 | `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` — **ready** (issue #77) | **Copilot for plan sessions**: `agent.plan = copilot`, experimental; `vloop fence hook --phase plan` judging with the review phase's rules against the plan fence, writes only to the plan, its gate folders and `.vloop/tmp/`, `rm` denied; the preflight and doctor checks of the other Copilot phases; the plan checked as for any agent. Accepted on the real CLI with `gpt-5.6-terra`; tracked in GitHub project 5 under #75 | B26 |
 
 **Before the fence: hardening (decided by the operator on 2026-10-25).** B19's
 acceptance on the real CLI (`docs/design-notes/copilot-cli-experiments.md` →
