@@ -1,7 +1,8 @@
 #!/bin/sh
 # The gates' stub copilot. It never touches the network. It answers
-# --version. For a -p prompt it accepts /vloop:work <task> (role work) and
-# /vloop:review <task> (role review), and appends to events:
+# --version. For a -p prompt it accepts /vloop:work <task> (role work),
+# /vloop:review <task> (role review) and /vloop:verify (role verify, task -),
+# and appends to events:
 #
 #   session copilot-<role> <task> model=<model>
 #   deny-tool <role> <pattern>   every --deny-tool pattern (--deny-tool=P form,
@@ -10,9 +11,9 @@
 #                                n: the preToolUse entries found in the JSON
 #                                files of $COPILOT_HOME/hooks/; bash and
 #                                powershell: whether every entry has that form
-#   hookfile <role> work=<yes|no> review=<yes|no>
-#                                whether a file in $COPILOT_HOME/hooks/ holds
-#                                "fence hook --phase work" / "--phase review"
+#   hookfile <role> <phases>     the phases named after "fence hook --phase "
+#                                in those files, sorted, space-separated
+#                                ("none" when there is none)
 #   hook-phase <role> <phase>    the word after --phase in the bash form
 #   hook <role> <label> <decision> <exit>
 #                                the bash form of the first entry, run as
@@ -22,10 +23,17 @@
 #                                its stdout, "none" when there is none
 #
 # A work session then writes <task>.out and a done proposal under .vloop/tmp/;
-# with the file copilot.moveref beside it, it first makes a commit (HEAD
-# moves). A review session writes a passing verdict. Both print JSON Lines
-# like Copilot's: turns, usage checkpoints, one tool call denied by the hook
-# (c1, bash) and one completed (c2, view), and a result event.
+# a review session writes a passing verdict; a verify session writes a valid
+# verify/v1 report with no findings to .vloop/tmp/verify.json. Files beside
+# the stub change what a verify session does:
+#   copilot.verify-moveref    it first makes a commit (HEAD moves)
+#   copilot.verify-readme     it also appends a line to README.md
+#   copilot.verify-finding    its report holds one finding
+#   copilot.verify-noreport   it writes no report
+#   copilot.verify-fail       it exits 1 after its output
+# All roles print JSON Lines like Copilot's: turns, usage checkpoints, one
+# tool call denied by the hook (c1, bash) and one completed (c2, view), and a
+# result event.
 dir=$(dirname "$0")
 case "${1:-}" in
   --version) echo "GitHub Copilot CLI 1.0.103"; exit 0;;
@@ -46,12 +54,18 @@ while [ $# -gt 0 ]; do
   esac
 done
 cmd="${prompt%% *}" TASK="${prompt#* }"
+[ "$TASK" = "$prompt" ] && TASK=-
 case "$cmd" in
   /vloop:work) ROLE=work;;
   /vloop:review) ROLE=review;;
+  /vloop:verify) ROLE=verify;;
   *) ROLE="";;
 esac
-if [ -z "$ROLE" ] || [ -z "$TASK" ] || [ "$TASK" = "$prompt" ]; then
+ok=yes
+[ -n "$ROLE" ] || ok=no
+[ "$ROLE" = verify ] && [ "$TASK" != - ] && ok=no
+[ "$ROLE" != verify ] && [ "$TASK" = - ] && ok=no
+if [ "$ok" = no ]; then
   echo "stub copilot: unrecognised prompt: $prompt" >&2; rm -f "$tmpev"; exit 64
 fi
 here=$(pwd -P)
@@ -61,9 +75,7 @@ here=$(pwd -P)
 } >>"$dir/events"
 rm -f "$tmpev"
 
-hw=no; hr=no
-grep -qF 'fence hook --phase work' "${COPILOT_HOME:-/nonexistent}"/hooks/*.json 2>/dev/null && hw=yes
-grep -qF 'fence hook --phase review' "${COPILOT_HOME:-/nonexistent}"/hooks/*.json 2>/dev/null && hr=yes
+phases=$(cat "${COPILOT_HOME:-/nonexistent}"/hooks/*.json 2>/dev/null | grep -oE 'fence hook --phase [a-z-]+' | sed 's/^fence hook --phase //' | LC_ALL=C sort -u | tr '\n' ' ' | sed 's/ $//')
 entries=$(cat "${COPILOT_HOME:-/nonexistent}"/hooks/*.json 2>/dev/null |
   jq -c '.. | objects | select(has("preToolUse")) | .preToolUse | if type == "array" then .[] else . end | objects' 2>/dev/null)
 n=0; [ -n "$entries" ] && n=$(printf '%s\n' "$entries" | grep -c .)
@@ -74,7 +86,7 @@ if [ "$n" -gt 0 ]; then
 fi
 {
   echo "hooks $ROLE $n bash=$hb powershell=$hp"
-  echo "hookfile $ROLE work=$hw review=$hr"
+  echo "hookfile $ROLE ${phases:-none}"
 } >>"$dir/events"
 hookcmd=$(printf '%s\n' "$entries" | head -1 | jq -r '.bash // empty' 2>/dev/null)
 if [ -n "$hookcmd" ]; then
@@ -88,37 +100,66 @@ if [ -n "$hookcmd" ]; then
   }
   bashargs() { jq -cn --arg c "$1" '{command: $c, description: "d"}'; }
   fileargs() { jq -cn --arg p "$1" '{path: $p, file_text: "x"}'; }
-  if [ "$ROLE" = work ]; then
-    hook rmfile bash "$(bashargs 'rm src/old.ts')"
-    hook rmrf bash "$(bashargs 'rm -rf dist')"
-    hook shpush bash "$(bashargs 'sh -c "git push origin main"')"
-    hook envgh bash "$(bashargs 'env gh pr list')"
-    hook srcrel create "$(fileargs src/a.ts)"
-    hook srcabs create "$(fileargs "$here/src/b.ts")"
-    hook tmprel create "$(fileargs .vloop/tmp/y.json)"
-    hook stateabs create "$(fileargs "$here/.vloop/state/x.json")"
-    hook gitcfg edit "$(fileargs .git/config)"
-    hook outside create "$(fileargs "$here/../outside.txt")"
-    hook webfetch web_fetch '{"url":"https://example.invalid"}'
-  else
-    hook shgh bash "$(bashargs 'sh -c "gh pr list"')"
-    hook diff bash "$(bashargs 'git diff HEAD')"
-    hook rmfile bash "$(bashargs 'rm src/old.ts')"
-    hook srcrel create "$(fileargs src/a.ts)"
-    hook tmprel create "$(fileargs .vloop/tmp/y.json)"
-  fi
+  case "$ROLE" in
+    work)
+      hook rmfile bash "$(bashargs 'rm src/old.ts')"
+      hook rmrf bash "$(bashargs 'rm -rf dist')"
+      hook srcrel create "$(fileargs src/a.ts)"
+      hook stateabs create "$(fileargs "$here/.vloop/state/x.json")"
+      ;;
+    review)
+      hook shgh bash "$(bashargs 'sh -c "gh pr list"')"
+      hook diff bash "$(bashargs 'git diff HEAD')"
+      hook rmfile bash "$(bashargs 'rm src/old.ts')"
+      hook srcrel create "$(fileargs src/a.ts)"
+      hook tmprel create "$(fileargs .vloop/tmp/y.json)"
+      ;;
+    verify)
+      hook build bash "$(bashargs 'go build -o .vloop/tmp/v/vloop ./cmd/vloop')"
+      hook cdout bash "$(bashargs 'cd .vloop/tmp/v && ./vloop status > out.txt')"
+      hook rmtmp bash "$(bashargs 'rm .vloop/tmp/v/out.txt')"
+      hook gitc bash "$(bashargs 'git -C .vloop/tmp/v/ex1 status')"
+      hook shpush bash "$(bashargs 'sh -c "git push origin main"')"
+      hook envgh bash "$(bashargs 'env gh pr list')"
+      hook srcrel edit "$(fileargs internal/x.go)"
+      hook readme bash "$(bashargs 'echo x > README.md')"
+      hook tmprel create "$(fileargs .vloop/tmp/verify.json)"
+      hook tmpabs create "$(fileargs "$here/.vloop/tmp/v/x.txt")"
+      hook staterel create "$(fileargs .vloop/state/state.json)"
+      hook viewsrc view "$(fileargs src/app.go)"
+      hook skillv skill '{"skill":"verify"}'
+      hook skillother skill '{"skill":"vloop-verify"}'
+      hook webfetch web_fetch '{"url":"https://example.invalid"}'
+      ;;
+  esac
 fi
 
 mkdir -p .vloop/tmp
-if [ "$ROLE" = work ]; then
-  [ -f "$dir/copilot.moveref" ] && git commit -q --allow-empty -m "moved by the stub work session"
-  echo "$TASK by copilot" >>"$TASK.out"
-  printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$TASK" "$TASK" >.vloop/tmp/proposal.json
-  denied="rm -rf dist is denied by the work fence (Bash(rm -rf:*))"
-else
-  printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"copilot"}\n' "$TASK" >.vloop/tmp/verdict.json
-  denied="gh pr list is denied by the Copilot deny list (gh:*)"
-fi
+xit=0
+case "$ROLE" in
+  work)
+    echo "$TASK by copilot" >>"$TASK.out"
+    printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$TASK" "$TASK" >.vloop/tmp/proposal.json
+    denied="rm -rf dist is denied by the work fence (Bash(rm -rf:*))"
+    ;;
+  review)
+    printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"copilot"}\n' "$TASK" >.vloop/tmp/verdict.json
+    denied="gh pr list is denied by the Copilot deny list (gh:*)"
+    ;;
+  verify)
+    [ -f "$dir/copilot.verify-moveref" ] && git commit -q --allow-empty -m "moved by the stub verify session"
+    [ -f "$dir/copilot.verify-readme" ] && echo "written by the stub verify session" >>README.md
+    if [ ! -f "$dir/copilot.verify-noreport" ]; then
+      if [ -f "$dir/copilot.verify-finding" ]; then
+        echo '{"schema":"verify/v1","findings":[{"kind":"example","claim":"demo prints ok","observed":"demo printed nothing","where":"Worked example, line 1"}],"checked":{"example_lines":1,"sentences":0,"surfaces":0},"notes":"copilot"}' >.vloop/tmp/verify.json
+      else
+        echo '{"schema":"verify/v1","findings":[],"checked":{"example_lines":1,"sentences":0,"surfaces":0},"notes":"copilot"}' >.vloop/tmp/verify.json
+      fi
+    fi
+    [ -f "$dir/copilot.verify-fail" ] && xit=1
+    denied="rm .vloop/tmp/v/out.txt is denied by the Copilot deny list (rm:*)"
+    ;;
+esac
 echo "stub copilot $ROLE session" >&2
 printf '{"type":"session.start","data":{"sessionId":"stub-session"}}\n'
 printf '{"type":"assistant.turn_start","data":{"turnId":"1"}}\n'
@@ -129,5 +170,5 @@ printf '{"type":"tool.execution_start","data":{"toolCallId":"c2","toolName":"vie
 printf '{"type":"tool.execution_complete","data":{"toolCallId":"c2","success":true}}\n'
 printf '{"type":"assistant.turn_start","data":{"turnId":"2"}}\n'
 printf '{"type":"session.usage_checkpoint","data":{"totalNanoAiu":8400000000}}\n'
-printf '{"type":"result","sessionId":"stub-session","exitCode":0,"usage":{"premiumRequests":1,"totalApiDurationMs":12000,"sessionDurationMs":18000}}\n'
-exit 0
+printf '{"type":"result","sessionId":"stub-session","exitCode":%d,"usage":{"premiumRequests":1,"totalApiDurationMs":12000,"sessionDurationMs":18000}}\n' "$xit"
+exit "$xit"

@@ -46,8 +46,10 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | Phase | Kind | Automatable | Agreement | Id |
 | --- | --- | --- | --- | --- |
 | setup | ceremony | partly | no-options | [I20261012-0235-the-operator-s-uncommitted-plugin-settin](I20261012-0235-the-operator-s-uncommitted-plugin-settin.md) |
+| setup | context-supply | no | no-options | [I20261031-144253-claude-trust-accepted-for-the-acceptance](I20261031-144253-claude-trust-accepted-for-the-acceptance.md) |
 | setup | decision | partly | no-options | [I20261011-2233-b13-ran-from-the-unmerged-design-branch](I20261011-2233-b13-ran-from-the-unmerged-design-branch.md) |
 | setup | repair | yes | no-options | [I20260928-2215-the-loop-s-install-proof-failed-in-every](I20260928-2215-the-loop-s-install-proof-failed-in-every.md) |
+| setup | repair | partly | no-options | [I20261031-144252-the-default-node-had-no-pnpm-pnpm-10-33](I20261031-144252-the-default-node-had-no-pnpm-pnpm-10-33.md) |
 | design | carry-forward | yes | no-options | [I20260929-2150-b1-s-open-items-carried-into-b2](I20260929-2150-b1-s-open-items-carried-into-b2.md) |
 | design | context-supply | partly | no-options | [I20260929-1222-the-design-conversation-was-reachable-on](I20260929-1222-the-design-conversation-was-reachable-on.md) |
 | design | decision | partly | no-options | [I20260929-1804-seven-forks-settled-for-the-first-brief](I20260929-1804-seven-forks-settled-for-the-first-brief.md) |
@@ -123,6 +125,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | partly | no-options | [I20261014-1823-t13-s-disputed-gate-fixed-bsd-awk-consum](I20261014-1823-t13-s-disputed-gate-fixed-bsd-awk-consum.md) |
 | halt | repair | yes | no-options | [I20261015-151132-base-check-halted-on-a-github-pr-extensi](I20261015-151132-base-check-halted-on-a-github-pr-extensi.md) |
 | halt | repair | partly | no-options | [I20261015-215305-t9-stalled-on-a-check-the-fence-forbids](I20261015-215305-t9-stalled-on-a-check-the-fence-forbids.md) |
+| verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |

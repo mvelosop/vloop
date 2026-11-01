@@ -1,4 +1,4 @@
-# Shared harness for B24's run gates (the same file in T2 and T3). The sourcing
+# Shared harness for B25's run gates (the same file in T2 and T3). The sourcing
 # gate sets G, its own folder. Every repository, binary, stub and HOME a gate
 # makes lives under $t, a temporary directory removed on exit. Nothing touches
 # this repository's tree or refs, the network or the real HOME: runs happen in
@@ -19,22 +19,26 @@ export GOMODCACHE GOCACHE GOPATH GOPROXY=off
 BRIEF=docs/briefs/B20260101-0900-demo.loop-brief.md
 # The Copilot model id of the fixtures.
 MODEL=gpt-5.6-terra
-# What a gate expects from every stub copilot work session's hook, one
+# What a gate expects from every stub copilot verify session's hook, one
 # "<label> <decision> <exit>" per line (see stub-copilot.sh).
-WORKHOOK='rmfile allow 0
-rmrf deny 0
+VERIFYHOOK='build allow 0
+cdout deny 0
+rmtmp deny 0
+gitc deny 0
 shpush deny 0
 envgh deny 0
-srcrel allow 0
-srcabs allow 0
+srcrel deny 0
+readme deny 0
 tmprel allow 0
-stateabs deny 0
-gitcfg deny 0
-outside deny 0
+tmpabs allow 0
+staterel deny 0
+viewsrc allow 0
+skillv allow 0
+skillother deny 0
 webfetch deny 0'
 
 # The fences as they stood when this plan was written: no task changes them.
-for f in work review; do
+for f in verify work review; do
   cmp -s "$G/$f.json" "$top/fence/$f.json" || fail "fence/$f.json differs from the fence this plan was written against: no task may change a fence's rules"
 done
 
@@ -54,22 +58,25 @@ venvnl() {
     GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 "$@"
 }
 # fixture: $t/repo afresh at the same path — git on main, `vloop init` by this
-# tree's binary, one check, the harness brief, all committed — with fresh stubs
-# handing out plan1.json (one task, T1) and a fake home trusting the
-# repository. $CFG, when set, is lines of `vloop config set` arguments run
-# before the commit (one key and value per line); it is spent here.
+# tree's binary, one check, the harness brief, a README.md, all committed —
+# with fresh stubs handing out plan1.json (one task, T1) and a fake home
+# trusting the repository. $CFG, when set, is lines of `vloop config set`
+# arguments run before the commit (one key and value per line); it is spent
+# here.
 fixture() {
   chmod -R u+w "$t/repo" "$t/home" 2>/dev/null; rm -rf "$t/repo" "$t/home" "$t/tmp" "$t/stub"
   mkdir -p "$t/repo/docs/briefs" "$t/home" "$t/tmp" "$t/stub" || fail mkdir
   pv=$("$JQ" -r .version "$top/plugin/.claude-plugin/plugin.json") || fail "plugin version"
   cp "$G/plan1.json" "$t/stub/plan.json" && ln -s "$GITBIN" "$t/stub/git" && ln -s "$JQ" "$t/stub/jq" &&
     cp "$G/review.json" "$t/stub/review-fence.json" && cp "$G/work.json" "$t/stub/work-fence.json" &&
+    cp "$G/verify.json" "$t/stub/verify-fence.json" &&
     sed "s/@PLUGIN_VERSION@/$pv/" "$G/stub-claude.sh" >"$t/stub/claude" && cp "$G/stub-copilot.sh" "$t/stub/copilot" &&
     chmod +x "$t/stub/claude" "$t/stub/copilot" || fail "stub"
   printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$t/repo" >"$t/home/.claude.json"
   venv git -C "$t/repo" init -q -b main && venv git -C "$t/repo" config user.name Gate &&
     venv git -C "$t/repo" config user.email gate@example.invalid && venv git -C "$t/repo" config commit.gpgsign false || fail "git init"
   echo x >"$t/repo/docs/x.md"
+  echo "the fixture's readme" >"$t/repo/README.md"
   (cd "$t/repo" && venv "$S" init >"$t/init.out" 2>&1) || fail "vloop init: $(cat "$t/init.out")"
   printf '[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' >"$t/repo/.vloop/config.toml"
   cp "$G/brief.md" "$t/repo/$BRIEF" || fail brief
@@ -86,7 +93,8 @@ fixture() {
 commitfix() { venv git -C "$t/repo" add -A && venv git -C "$t/repo" commit -q -m "gate fixture change" || fail "fixture commit"; }
 # runfix <out> [env...]: this tree's `vloop run` of the brief in the fixture
 # with the extra environment; $rc is its exit code, <out> its stdout and
-# stderr, <out>.ev the stubs' events, <out>.sessions the session records.
+# stderr, <out>.ev the stubs' events, <out>.sessions the session records,
+# <out>.report the run folder's reports/verify.json when there is one.
 # runfixnl: the same with no GitHub token.
 runfix() {
   o=$1; shift
@@ -100,10 +108,11 @@ runfixnl() {
 }
 collect() {
   if [ -f "$t/stub/events" ]; then mv "$t/stub/events" "$1.ev"; else : >"$1.ev"; fi
-  rm -rf "$1.sessions" && mkdir -p "$1.sessions"
+  rm -rf "$1.sessions" "$1.report" && mkdir -p "$1.sessions"
   for d in "$t/repo"/.vloop/state/runs/*/*/; do
     [ -d "$d" ] || continue
     cp "$d"sessions/*.json "$1.sessions/" 2>/dev/null
+    [ -f "$d"reports/verify.json ] && cp "$d"reports/verify.json "$1.report"
   done
   return 0
 }
@@ -121,5 +130,10 @@ ev() { grep -E -- "$2" "$1.ev"; }
 nosession() { [ -s "$1.ev" ] && fail "$2: a session was started: $(head -3 "$1.ev")"; return 0; }
 # task <field> <id>: the field of a task in the fixture's plan.
 task() { "$JQ" -r --arg id "$2" ".tasks[] | select(.id == \$id) | .$1" "$t/repo/.vloop/state/state.json"; }
+# onecommit <what>: exactly one commit, on any ref, carries T1.out.
+onecommit() {
+  [ "$(venv git -C "$t/repo" log --all --format=%H -- T1.out | wc -l | tr -d ' ')" = 1 ] ||
+    fail "$1: want one commit carrying T1.out, got: $(venv git -C "$t/repo" log --all --oneline -- T1.out)"
+}
 # skill <dir>: a project skill directory in the fixture.
 skill() { mkdir -p "$t/repo/$1" && printf -- '---\nname: %s\ndescription: a project skill\n---\nBody.\n' "$(basename "$1")" >"$t/repo/$1/SKILL.md"; }

@@ -1,0 +1,7 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": { "example_lines": 35, "sentences": 14, "surfaces": 14 },
+  "notes": "Fence-check lines (12 bash, 7 other-tool, unchanged and changed lines) run as written against a fresh build in .vloop/tmp/vf/ex; apply_patch lines read from internal/fence/judge_test.go, not run. Stub-copilot run and planted failures (model.verify default, skill clash, run.verify=false, reverted file, REFS MOVED exit 9) were checked by reading internal/cli/run.go, doctor.go, iterate.go and agent_copilot.go, not by an end-to-end stub run; the repository's suite was not re-run."
+}
+

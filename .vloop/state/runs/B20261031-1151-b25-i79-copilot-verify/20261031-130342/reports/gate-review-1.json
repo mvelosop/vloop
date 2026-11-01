@@ -1,0 +1,14 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Each gate run on the base fails at the missing verify behaviour (unknown phase verify, agent.verify rejecting copilot, no verify heading in the audit, no verify kit script), none on a typo or missing tool, and each finishes in under 1s on the base. T1's matchers were probed against the review phase's real output (create with no path, /dev/null, ssh, git remote, vloop task set, skill hint), and the fence copies in the gate folders match fence/*.json. T4's anchor lines (agent.verify row, 'one file per phase', 'Copilot runs', hook glossary row, the --phase lists) exist on the base. Remaining criteria (Go table tests, code comments, the go check, the 'unchanged' list) go to the review or the go check."
+}
+

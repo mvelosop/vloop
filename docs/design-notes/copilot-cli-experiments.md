@@ -385,6 +385,36 @@ defaults; `agent.work = copilot`.
   its `Location`, the hit count, `/api` and `/api-json` (four paths), checked
   by hand on the built server.
 
+## Acceptance of Copilot verify (B25, 2026-10-31)
+
+vloop built from the B25 branch, Copilot CLI 1.0.105, `gpt-5.6-terra` for
+verify. The URL shortener brief in a fresh clone of
+`mvelosop/url-shortener-template`, in a folder Claude and Copilot trust, with
+the `app` check. Plan, gate review, work and review on Claude with the
+defaults; `agent.verify = copilot`.
+
+| | |
+| --- | --- |
+| Tasks | 10/10, first pass 10/10 |
+| Verify session | 1, record `session/v4`, agent `copilot`, model `gpt-5.6-terra`, `cost_source: "estimated"`, 66 s |
+| Verify cost | 26.5 credits, ≈ $0.18 |
+| Report | kept as `reports/verify.json`, `verify/v1` valid; checked 11 example lines, 32 sentences, 12 surfaces; 1 finding (`contract`) |
+| Hook denials | 3: `rm -rf` of its own scratch (verify fence), a `$(…)` (shell syntax the hook cannot judge), `git -C` into its scratch repository (verify fence); none for a path after a `cd` |
+| Driver | no halt, no restoration, no reverted file |
+| Total | ≈ $4.31, 25.5 min of wall time |
+
+- **The fence held and did not get in the way.** Each denial was a form the
+  hook refuses by design; the session went on another way and ran the worked
+  example line by line on an artifact it built under `.vloop/tmp/`, plus a
+  restart check of its own.
+- **Its one finding is about the product**, a contract sentence the built
+  result does not meet, quoted on both sides as the skill asks; the operator
+  judges it at close. A Claude verify (Sonnet) of another run of this brief the
+  same day reported the same finding.
+- **Setup:** the default Node of nvm (v24.22.1) had no `pnpm`, so the `app`
+  check could not have passed after the first task; pnpm 10.33.0, the version
+  B24 used, was installed for it before the run.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts

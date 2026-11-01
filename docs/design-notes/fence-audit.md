@@ -387,3 +387,182 @@ Bash deny rules. `rm` is the one pattern a work session does not carry.
 - **Network from an allowed program**: `curl`, `wget`, `ssh`, `scp`, `nc` are
   denied; nothing stops a program from opening its own connection. Neither; the
   session timeout bounds how long one can run.
+
+# Fence audit: who enforces each rule in a Copilot verify session
+
+*Written for B25. It covers `fence/verify.json`, the fence a verify session runs
+under, and the Copilot adapter's deny list for verify sessions: the whole review
+list, `shell(rm:*)` included.*
+
+A Copilot verify session (`agent.verify = copilot`) runs under the same
+`preToolUse` hook, `vloop fence hook --phase verify`. The judge reads
+`fence/verify.json` instead of `fence/review.json` (its 102 deny rules are the
+same ones, so a change to either fence moves only its own phase) and every
+`shell(…)` stem of the adapter's deny list. The three enforcers are the ones
+above; a verify session decides like a review session:
+
+- **Writes.** A verify session reports findings; it builds nothing. The hook
+  allows a file tool or a redirection to write only under `.vloop/tmp/`, where
+  the session writes its report. `/dev/null` is allowed, and a write outside the
+  repository is denied.
+- **`rm`.** Every `rm` is denied, `shell(rm:*)` among the stems, as in a review
+  session: there is nothing for a verify session to delete.
+- **The skill.** The `skill` tool is allowed only for the names of vloop's
+  skills, and a refusal reads `vloop fence: skill <name> is not vloop's — use
+  /vloop:verify`.
+
+Shell syntax the judge cannot read is denied as in the other phases. The hook
+fails open on the two limits above (B22.2, B22.3) for verify sessions too: it
+always prints its answer and is fast, and the deny list stays behind it.
+
+## The verify fence's deny rules
+
+| Rule | Enforced by | Note |
+| --- | --- | --- |
+| `Bash(git push:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git commit:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git reset:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git clean:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git branch:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git checkout:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git switch:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote add:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote set-url:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote remove:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote rm:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote rename:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote set-head:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote set-branches:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote prune:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote update:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git update-ref:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git symbolic-ref:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git tag:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git stash:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git rebase:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(rm -rf:*)` | hook, driver | hook matches it (the adapter's `rm` stem denies every `rm`); driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(sudo:*)` | hook, driver | hook matches it; driver sees only its effects in the tree |
+| `Bash(curl:*)` | hook, driver | hook matches it, and the adapter's argv denies it too; neither limits a network tool the lists do not name |
+| `Bash(wget:*)` | hook, driver | hook matches it, and the adapter's argv denies it too; neither limits a network tool the lists do not name |
+| `Bash(pip install:*)` | hook, driver | hook matches it; driver sees only its effects in the tree |
+| `Bash(claude:*)` | hook, driver | hook matches it; driver restores the plan and halts on a moved ref |
+| `Bash(vloop run:*)` | hook, driver | hook matches it; driver restores the plan and halts on a moved ref |
+| `Bash(vloop init:*)` | hook, driver | hook matches it; driver restores the plan and halts on a moved ref |
+| `Bash(vloop upgrade:*)` | hook, driver | hook matches it; driver restores the plan and halts on a moved ref |
+| `Bash(vloop brief close:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop task verify:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop task reset:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop task note:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop task drop:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop task set:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop defect add:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop defect set:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop intervention add:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop intervention set:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(vloop config set:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+| `Bash(.loop/run.sh:*)` | hook, driver | hook matches it; driver restores the plan and halts on a moved ref |
+| `Edit(.git/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; a shell program that writes (`tee`, `cp`, `sed -i`) is not seen by the hook, so for those neither, and the driver halts on a moved ref or a changed `.git/config` or hook |
+| `Write(.git/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; a shell program that writes (`tee`, `cp`, `sed -i`) is not seen by the hook, so for those neither, and the driver halts on a moved ref or a changed `.git/config` or hook |
+| `Edit(.vloop/state/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the plan and the gate fixtures after the session |
+| `Write(.vloop/state/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the plan and the gate fixtures after the session |
+| `Edit(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/interventions/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/interventions/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/repo-guidelines.md)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/repo-guidelines.md)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/install.json)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/install.json)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Read(~/.claude/**)` | hook | hook: a read tool of a path there is denied, as is a redirection from it; neither for `cat ~/.claude/...` run as a command, which the hook does not read as a read — the session's `COPILOT_HOME` is empty and the hook denies `~/.copilot` and `~/.config/gh`, so what a session can reach is what the user's Claude directory holds |
+| `Edit(~/.claude/**)` | hook | hook: writes outside `.vloop/tmp/` are denied; a shell program that writes there is neither (the driver checks only the repository) |
+| `Write(~/.claude/**)` | hook | hook: writes outside `.vloop/tmp/` are denied; a shell program that writes there is neither (the driver checks only the repository) |
+| `WebFetch` | hook | hook denies every tool not listed, `web_fetch` among them; the adapter's `url` deny stands in |
+| `WebSearch` | hook | hook denies every tool not listed, `web_fetch` among them; the adapter's `url` deny stands in |
+| `Bash(git -C:*)` | hook, driver | hook matches it; driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git -c:*)` | hook, driver | hook matches it; driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git --git-dir:*)` | hook, driver | hook matches it; driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git --work-tree:*)` | hook, driver | hook matches it; driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git --exec-path:*)` | hook, driver | hook matches it; driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git merge:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git cherry-pick:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git revert:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git am:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git pull:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git fetch:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git notes:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git replace:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git filter-branch:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git worktree:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git reflog:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git gc:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git config:*)` | hook, driver | hook matches it; driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git read-tree:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git submodule:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git prune:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git repack:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git hash-object:*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(git fast-import:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
+| `Bash(git format-patch:*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(git diff*--output*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(git log*--output*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(git show*--output*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(find*-delete*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(find*-exec*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(find*-ok*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(find*-fprint*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(find*-fls*)` | hook, driver | hook matches it, by the fence's own `*` matching; driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(rm -r:*)` | hook, driver | hook matches it (the adapter's `rm` stem denies every `rm`); driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(rm -R:*)` | hook, driver | hook matches it (the adapter's `rm` stem denies every `rm`); driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(rm -fr:*)` | hook, driver | hook matches it (the adapter's `rm` stem denies every `rm`); driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(rm -fR:*)` | hook, driver | hook matches it (the adapter's `rm` stem denies every `rm`); driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(rm --recursive:*)` | hook, driver | hook matches it (the adapter's `rm` stem denies every `rm`); driver reverts a file the session changed and warns `the verify session changed <path> — reverted` |
+| `Bash(vloop -C:*)` | hook, driver | hook matches it; driver restores the plan and halts on a moved ref |
+| `Bash(vloop --chdir:*)` | hook, driver | hook matches it; driver restores the plan and halts on a moved ref |
+| `Bash(vloop brief new:*)` | hook, driver | hook matches it; driver restores the plan, defects, interventions and config it guards |
+
+## The verify adapter's deny list
+
+The verify deny list is `copilotDenials` whole, `shell(rm:*)` included: it goes
+to Copilot as `--deny-tool` on the argv, and the judge reads its `shell(…)` stems
+as further Bash deny rules.
+
+| Pattern | Enforced by | Note |
+| --- | --- | --- |
+| `shell(gh:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git push:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git remote:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --global:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --system:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --file:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(curl:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(wget:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(ssh:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(scp:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(nc:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(rm:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git commit:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git reset:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git checkout:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git switch:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git stash:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git branch:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git tag:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `url` | hook | Copilot's own URL tool is refused on the argv; the hook denies `web_fetch` and every tool it does not list |
+
+## What is neither in a verify session, and what covers it
+
+- **A write by a shell program other than a redirection** (`tee`, `cp`, `mv`,
+  `sed -i`, `python -c`): the judge reads redirections and file tools, not what a
+  program does. Covered by the driver: after the session it restores the plan,
+  the gates and the files it guards, reverts any other file the session changed
+  with a warning, and halts on a moved ref or a changed `.git/config` or hook.
+- **A read of `~/.claude` by a program** (`cat ~/.claude/…`): neither. The hook
+  denies a read tool and a redirection from there, not a program's argument;
+  nothing covers it beyond the session's `COPILOT_HOME` being its own empty folder.
+- **A command no list names**: both lists are denylists; the hook denies every
+  tool it does not list, and the driver's checks are the boundary.
+- **Network from an allowed program**: `curl`, `wget`, `ssh`, `scp`, `nc` are
+  denied; nothing stops a program from opening its own connection. Neither; the
+  session timeout bounds how long one can run.

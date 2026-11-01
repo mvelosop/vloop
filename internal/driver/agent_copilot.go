@@ -12,7 +12,7 @@ import (
 	vloop "github.com/mvelosop/vloop"
 )
 
-// AgentCopilot is the GitHub Copilot CLI, which can run work, review and second-review
+// AgentCopilot is the GitHub Copilot CLI, which can run work, review, second-review and verify
 // sessions only.
 const AgentCopilot = "copilot"
 
@@ -71,7 +71,7 @@ type copilotAdapter struct {
 func (copilotAdapter) Name() string { return AgentCopilot }
 
 func (copilotAdapter) Supports(phase string) bool {
-	return phase == PhaseWork || phase == PhaseReview || phase == PhaseSecondReview
+	return phase == PhaseWork || phase == PhaseReview || phase == PhaseSecondReview || phase == PhaseVerify
 }
 
 func (a copilotAdapter) command() string {

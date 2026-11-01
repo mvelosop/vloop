@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "agent.verify accepts copilot; the Copilot adapter supports the verify phase (same argv and deny list as review, hooks file with --phase verify) and its verify record is session/v4.",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/driver/agent_copilot.go", "internal/driver/agent_copilot_test.go", "internal/driver/session.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok.",
+  "notes": "The hook's verify phase already came with T1. Contract items V1, V2: TestAgentKeys (config) now treats agent.verify like work/review (copilot accepted); TestCopilotSupports... (driver) now expects verify supported. The run preflight and doctor do not yet count agent.verify = copilot (copilotKeys in internal/cli/doctor.go) - that is T3. go test ./internal/cli fails task-gate tests inside a loop session due to inherited VLOOP_* env (known, see T1)."
+}

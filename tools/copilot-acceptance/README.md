@@ -125,3 +125,32 @@ iteration records and the review verdicts.
 
 Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
 brief is closed.
+
+## B25: Copilot verify sessions
+
+`verify.sh` is the operator's acceptance of `agent.verify = copilot` on the real
+Copilot CLI. Gates use a stub `copilot`; only a run on the real one proves a
+Copilot verify session works and keeps a valid report. It is run by no gate or
+check.
+
+```
+tools/copilot-acceptance/verify.sh <copilot model id> [dir]
+```
+
+It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
+(logged in, with folder trust accepted for `<dir>/repo-verify`), `go` and
+`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+repository with `agent.verify = copilot` and `model.verify` the model given,
+`run.verify` on; plan, work and review stay on Claude. A first run may stop at
+`vloop doctor`, as above.
+
+It spends Claude money for the plan, work and review sessions and Copilot
+credits for the one verify session.
+
+It writes `<dir>/b25-verify-summary.md` (`report.py verify`): the verify session
+record with agent, model, credits, estimated cost, `session/v4` validity and its
+`permission_denials`; then the kept report: present or not, `verify/v1`
+validity and its number of findings.
+
+Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
+brief is closed.

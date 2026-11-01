@@ -4,12 +4,13 @@
 #
 #   session <role> <task|-> model=<model>    role: plan, gate-review, work,
 #                                            review or verify
-#   fence <role> <task> ok|bad|none          for a work or review session:
-#                                            whether --settings names a file
-#                                            whose JSON equals the work fence
-#                                            (work) or the review fence (review)
+#   fence <role> <task|-> ok|bad|none        for a work, review or verify
+#                                            session: whether --settings names
+#                                            a file whose JSON equals that
+#                                            phase's fence
 #
-# A work session writes <task>.out and a done proposal; a review passes.
+# A work session writes <task>.out and a done proposal; a review passes; a
+# verify session writes a valid verify/v1 report with no findings.
 dir=$(dirname "$0")
 case "${1:-}" in
   --version) echo "2.0.0 (Claude Code)"; exit 0;;
@@ -43,8 +44,8 @@ case "$cmd" in
     printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$ARG" "$ARG" >.vloop/tmp/proposal.json;;
   /vloop:review) ROLE=review; fence review
     printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"claude"}\n' "$ARG" >.vloop/tmp/verdict.json;;
-  /vloop:verify) ROLE=verify
-    echo '{"schema":"verify/v1","findings":[],"checked":{"example_lines":0,"sentences":0,"surfaces":0},"notes":"none"}' >.vloop/tmp/verify.json;;
+  /vloop:verify) ROLE=verify; fence verify
+    echo '{"schema":"verify/v1","findings":[],"checked":{"example_lines":0,"sentences":0,"surfaces":0},"notes":"claude"}' >.vloop/tmp/verify.json;;
   *) echo "stub claude: unrecognised prompt: $prompt" >&2; exit 64;;
 esac
 echo "session $ROLE $ARG model=$MODEL" >>"$dir/events"
