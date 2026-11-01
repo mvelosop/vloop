@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.39176789999999995,
+  "duration_ms": 89537,
+  "effort": null,
+  "ended": "2026-11-01T21:39:55Z",
+  "is_error": false,
+  "iteration": 5,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 51565,
+      "cache_read_input_tokens": 841259,
+      "cost_usd": 0.39176789999999995,
+      "input_tokens": 36,
+      "output_tokens": 10131
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261101-2044-b26-i78-copilot-gate-review",
+  "schema": "session/v3",
+  "started": "2026-11-01T21:38:25Z",
+  "task": "T4",
+  "turns": 18,
+  "wall_ms": 90105
+}

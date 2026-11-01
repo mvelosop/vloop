@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The Copilot adapter supports the gate-review phase (same deny list incl. shell(rm:*), hooks file with --phase gate-review), its record is session/v4, and agent.gate-review accepts copilot while agent.plan still does not.",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/driver/agent_copilot.go", "internal/driver/agent_copilot_test.go", "internal/driver/session.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go test ./internal/config ./internal/driver passed.",
+  "notes": "Contract item G2: TestCopilotSupportsWorkReviewAndVerify now expects gate-review supported (plan still not) and TestAgentKeys treats agent.gate-review like work/review/verify (accepts copilot). Added TestCopilotGateReviewArgvAndHooks and gate-review cases in TestCopilotVerifyRecordIsSessionV4. gatereview.go untouched. Docs (config guide wording of agent.gate-review) left to T4; preflight/doctor to T3."
+}

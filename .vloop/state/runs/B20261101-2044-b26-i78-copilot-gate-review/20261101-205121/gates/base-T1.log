@@ -1,0 +1,1 @@
+GATE FAIL: [gate-review] bash 'vloop task gate T1': want 'allow' and exit 0, got exit 2, stdout '', stderr 'vloop: unknown phase "gate-review": want review, second-review, work or verify'

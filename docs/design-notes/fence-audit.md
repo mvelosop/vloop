@@ -566,3 +566,194 @@ as further Bash deny rules.
 - **Network from an allowed program**: `curl`, `wget`, `ssh`, `scp`, `nc` are
   denied; nothing stops a program from opening its own connection. Neither; the
   session timeout bounds how long one can run.
+
+# Fence audit: who enforces each rule in a Copilot gate-review session
+
+*Written for B26. It covers `fence/gate-review.json`, the fence a gate-review
+session runs under, and the Copilot adapter's deny list for gate-review
+sessions: the whole review list, `shell(rm:*)` included.*
+
+A Copilot gate-review session (`agent.gate-review = copilot`) runs under the same
+`preToolUse` hook, `vloop fence hook --phase gate-review`. The judge reads
+`fence/gate-review.json` (its 102 deny rules are the same ones as the review
+fence's, so a change to either fence moves only its own phase) and every
+`shell(…)` stem of the adapter's deny list. The enforcers are the ones above, but
+the driver's part is smaller here:
+
+- **Writes.** A gate-review session reports a verdict; it builds nothing. The hook
+  allows a file tool or a redirection to write only under `.vloop/tmp/`, where the
+  session writes `gate-verdict.json`. `/dev/null` is allowed, and a write outside
+  the repository is denied.
+- **What the driver checks after the session.** Only git: it halts the run with
+  exit 9 if a ref moved (`REFS MOVED gate-review`) or if `.git/config` or a git
+  hook changed (`the gate review changed .git/config (…)` or `… the git hooks`).
+  It does **not** revert a file the session changed outside `.vloop/tmp/`: the
+  plan commit stages the whole tree, so such a change would be committed. The hook
+  is the line for every file write (out of scope to change); the rows below say
+  *hook*, not *driver*, for them.
+- **`rm`.** Every `rm` is denied, `shell(rm:*)` among the stems, as in a review
+  session: there is nothing for a gate-review session to delete.
+- **The skill.** The `skill` tool is allowed only for the names of vloop's
+  skills, and a refusal reads `vloop fence: skill <name> is not vloop's — use
+  /vloop:gate-review`.
+
+Shell syntax the judge cannot read is denied as in the other phases. The hook
+fails open on the two limits above (B22.2, B22.3) for gate-review sessions too: it
+always prints its answer and is fast, and the deny list stays behind it.
+
+## The gate-review fence's deny rules
+
+| Rule | Enforced by | Note |
+| --- | --- | --- |
+| `Bash(git push:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git commit:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git reset:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git clean:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git branch:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git checkout:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git switch:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote add:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote set-url:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote remove:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote rm:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote rename:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote set-head:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote set-branches:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote prune:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git remote update:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git update-ref:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git symbolic-ref:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git tag:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git stash:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git rebase:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(rm -rf:*)` | hook | hook matches it (the adapter's `rm` stem denies every `rm`); the driver does not revert files after a gate-review session |
+| `Bash(sudo:*)` | hook | hook |
+| `Bash(curl:*)` | hook | hook |
+| `Bash(wget:*)` | hook | hook |
+| `Bash(pip install:*)` | hook | hook |
+| `Bash(claude:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop run:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop init:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop upgrade:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop brief close:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop task verify:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop task reset:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop task note:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop task drop:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop task set:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop defect add:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop defect set:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop intervention add:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop intervention set:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop config set:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(.loop/run.sh:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Edit(.git/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; a shell program that writes there is neither (see below), though the driver halts on a changed `.git/config` or hook |
+| `Write(.git/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; a shell program that writes there is neither (see below), though the driver halts on a changed `.git/config` or hook |
+| `Edit(.vloop/state/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Write(.vloop/state/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Edit(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Write(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Edit(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Write(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Edit(.vloop/interventions/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Write(.vloop/interventions/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Edit(.vloop/repo-guidelines.md)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Write(.vloop/repo-guidelines.md)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Edit(.vloop/install.json)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Write(.vloop/install.json)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Read(~/.claude/**)` | hook | hook: a read tool of a path there is denied, as is a redirection from it; neither for `cat ~/.claude/...` run as a command, and for a write there by a shell program (the driver checks only the repository) |
+| `Edit(~/.claude/**)` | hook | hook |
+| `Write(~/.claude/**)` | hook | hook |
+| `WebFetch` | hook | hook denies every tool not listed, `web_fetch` among them; the adapter's `url` deny stands in |
+| `WebSearch` | hook | hook denies every tool not listed, `web_fetch` among them; the adapter's `url` deny stands in |
+| `Bash(git -C:*)` | hook, driver | hook matches it; the driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git -c:*)` | hook, driver | hook matches it; the driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git --git-dir:*)` | hook, driver | hook matches it; the driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git --work-tree:*)` | hook, driver | hook matches it; the driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git --exec-path:*)` | hook, driver | hook matches it; the driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git merge:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git cherry-pick:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git revert:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git am:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git pull:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git fetch:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git notes:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git replace:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git filter-branch:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git worktree:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git reflog:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git gc:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git config:*)` | hook, driver | hook matches it; the driver halts the run (exit 9) if `.git/config` or a hook changed |
+| `Bash(git read-tree:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git submodule:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git prune:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git repack:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git hash-object:*)` | hook | hook matches it, by the fence's own `*` matching; the driver does not revert the file it writes (see what is neither, below) |
+| `Bash(git fast-import:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
+| `Bash(git format-patch:*)` | hook | hook matches it, by the fence's own `*` matching; the driver does not revert the file it writes (see what is neither, below) |
+| `Bash(git diff*--output*)` | hook | hook matches it, by the fence's own `*` matching; the driver does not revert the file it writes (see what is neither, below) |
+| `Bash(git log*--output*)` | hook | hook matches it, by the fence's own `*` matching; the driver does not revert the file it writes (see what is neither, below) |
+| `Bash(git show*--output*)` | hook | hook matches it, by the fence's own `*` matching; the driver does not revert the file it writes (see what is neither, below) |
+| `Bash(find*-delete*)` | hook | hook |
+| `Bash(find*-exec*)` | hook | hook |
+| `Bash(find*-ok*)` | hook | hook |
+| `Bash(find*-fprint*)` | hook | hook |
+| `Bash(find*-fls*)` | hook | hook |
+| `Bash(rm -r:*)` | hook | hook matches it (the adapter's `rm` stem denies every `rm`); the driver does not revert files after a gate-review session |
+| `Bash(rm -R:*)` | hook | hook matches it (the adapter's `rm` stem denies every `rm`); the driver does not revert files after a gate-review session |
+| `Bash(rm -fr:*)` | hook | hook matches it (the adapter's `rm` stem denies every `rm`); the driver does not revert files after a gate-review session |
+| `Bash(rm -fR:*)` | hook | hook matches it (the adapter's `rm` stem denies every `rm`); the driver does not revert files after a gate-review session |
+| `Bash(rm --recursive:*)` | hook | hook matches it (the adapter's `rm` stem denies every `rm`); the driver does not revert files after a gate-review session |
+| `Bash(vloop -C:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop --chdir:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+| `Bash(vloop brief new:*)` | hook | hook matches it; the driver does not restore the plan, defects, interventions or config after a gate-review session, so the hook is the line |
+
+## The gate-review adapter's deny list
+
+`copilotDenials` goes to Copilot as `--deny-tool` on the argv for a gate-review
+session as for a review session, `shell(rm:*)` included, and the judge reads the
+`shell(…)` stems as further Bash deny rules. Copilot's own matching is not
+vloop's: it is the stem alone or followed by a space, so another form of the
+command can pass it. The hook is the line for each; the driver halts the run only
+on a moved ref or a changed `.git/config` or hook.
+
+| Pattern | Enforced by | Note |
+| --- | --- | --- |
+| `shell(gh:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git push:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git remote:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --global:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --system:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git config --file:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(curl:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(wget:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(ssh:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(scp:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(nc:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(rm:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git commit:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git reset:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git checkout:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git switch:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git stash:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git branch:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `shell(git tag:*)` | hook | the judge matches the stem through wrappers; Copilot refuses the plain form too |
+| `url` | hook | Copilot's own URL tool is refused on the argv; the hook denies `web_fetch` and every tool it does not list |
+
+## What is neither in a gate-review session, and what covers it
+
+- **A write by a shell program other than a redirection** (`tee`, `cp`, `mv`,
+  `sed -i`, `python -c`): the judge reads redirections and file tools, not what a
+  program does. Neither: the driver does not revert files after a gate-review
+  session, and the plan commit stages the whole tree. What covers it is the
+  hook's other lines (the `rm`, `git` and wrapper denials), the review of the
+  commit by the operator, and the driver's halt on a moved ref or a changed
+  `.git/config` or hook.
+- **A read of `~/.claude` by a program** (`cat ~/.claude/…`): neither. The hook
+  denies a read tool and a redirection from there, not a program's argument;
+  nothing covers it beyond the session's `COPILOT_HOME` being its own empty folder.
+- **A command no list names**: both lists are denylists; the hook denies every
+  tool it does not list, and the driver's git checks are the boundary.
+- **Network from an allowed program**: `curl`, `wget`, `ssh`, `scp`, `nc` are
+  denied; nothing stops a program from opening its own connection. Neither; the
+  session timeout bounds how long one can run.

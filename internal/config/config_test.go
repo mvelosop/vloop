@@ -703,7 +703,7 @@ func TestAgentKeys(t *testing.T) {
 		}
 		before := readCfg(t, root)
 		var iv *InvalidValueError
-		if p == "review" || p == "work" || p == "verify" {
+		if p == "review" || p == "work" || p == "verify" || p == "gate-review" {
 			if err := Set(root, k, "copilot"); err != nil {
 				t.Errorf("%s set copilot: %v", k, err)
 			}

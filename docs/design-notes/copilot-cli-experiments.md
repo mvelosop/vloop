@@ -415,6 +415,50 @@ defaults; `agent.verify = copilot`.
   check could not have passed after the first task; pnpm 10.33.0, the version
   B24 used, was installed for it before the run.
 
+## Acceptance of Copilot gate review (B26, 2026-11-01)
+
+vloop built from the B26 branch, Copilot CLI 1.0.105, `gpt-5.6-terra` for
+the gate review. The URL shortener brief in a fresh clone of
+`mvelosop/url-shortener-template`, in a folder Claude and Copilot trust, with
+the `app` check. Plan, work, review and verify on Claude with the defaults;
+`agent.gate-review = copilot`. Operated from a Claude Code session.
+
+| | |
+| --- | --- |
+| Runs | 3: two halted on a check gap (exit 2, nothing kept), the third complete |
+| Tasks (run 3) | 10/10, first pass 10/10; verify no findings |
+| Gate-review sessions | 4 (one per round: 1, 1, 2), every record `session/v4`, agent `copilot`, model `gpt-5.6-terra`, `cost_source: "estimated"`, 54–74 s |
+| Gate-review cost | 142.6 credits, ≈ $0.95 over the three runs |
+| Verdicts | run 1: FAIL, 5 findings (2 `pins-unnamed`, 1 `not-contract`, 1 `task-reach`, 1 `check-gap`); run 2: FAIL, 1 `check-gap`; run 3: round 1 FAIL, 3 findings (1 `unpassable`, 1 `task-reach`, 1 `pins-unnamed`), round 2 PASS |
+| Hook denials | 5, all shell syntax the hook cannot judge (4 `for`, 1 `$(…)`); none for a path after a `cd` |
+| Driver | no halt but the two check gaps, no restoration; the plan commit took nothing outside `.vloop/` |
+| Total | ≈ $10.92 over the three runs (≈ $7.50 of it planning), 56.7 min of wall time for the third |
+
+- **Terra is a stricter gate reviewer than Sonnet.** Claude's gate reviews of
+  the same brief (B24, two rounds; B25, one) never raised a check gap; Terra
+  raised one in each of its first two runs. Each named a command the brief
+  requires that no configured check runs, and the operator's remedy, a check
+  added to the clone's config and committed (a `smoke` check, then a `clean`
+  check: a fresh install, build, tests, e2e and smoke), closed it. The brief
+  was not changed. Each check gap cost a whole planning round (≈ $2.30), since
+  a check-gap halt keeps nothing.
+- **Most findings were fair**, by the gate-review skill's kinds: gates pinning
+  a class name the brief leaves open, a distribution threshold the brief does
+  not contract, a gate whose judge is a script its own task writes. They went
+  back to the planner, whose second plan passed.
+- **One finding was false**: run 3's `unpassable` on T4 held that
+  `new URL('https://example.com:8443/a')` throws on the host's Node 24; it does
+  not (`node -e` prints the URL). The kept verdict shows `https://` as
+  `******` in both places, and vloop's own redaction writes `<redacted:NAME>`,
+  so the masking is Copilot's. Unconfirmed: whether Copilot masked the URL in
+  the command Terra ran, which would make the false finding Copilot's and not
+  Terra's. A probe running that one command through Copilot with and without
+  `--deny-tool=url` would settle it; it needs the operator's go-ahead.
+- **The fence held and did not get in the way**: every denial was a form the
+  hook refuses by design, and each session went on another way.
+- **Setup:** Claude's folder trust accepted through tmux; Copilot asked for
+  none there.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts

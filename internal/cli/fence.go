@@ -24,12 +24,12 @@ func newFence(g *Globals) *cobra.Command {
 
 	var phase, root, tool, path string
 	check := &cobra.Command{
-		Use:   "check --phase <review|second-review|work|verify> --root <dir> --tool <name> [--path <p>] [\"<command>\"]",
+		Use:   "check --phase <review|second-review|work|verify|gate-review> --root <dir> --tool <name> [--path <p>] [\"<command>\"]",
 		Short: "Print allow or deny: <reason> for one tool call; exit 1 on deny",
 		Long: `Judge one tool call the way the Copilot hook does, without running anything.
 A shell tool's command string is split at ; && || | & and newlines outside
 quotes, looked through env, command, exec, nohup, time, nice, timeout, stdbuf,
-xargs and sh -c, and matched against the phase's fence (review, work or verify) Bash deny rules and the
+xargs and sh -c, and matched against the phase's fence (review, work, verify or gate-review) Bash deny rules and the
 Copilot adapter's deny list. A file tool's path, and a skill's name, are given
 with --path. Exits 0 and prints allow, or exits 1 and prints deny: <reason>;
 bad arguments exit 2.`,
@@ -64,7 +64,7 @@ bad arguments exit 2.`,
 			return &ExitError{Code: ExitProblems, Err: errors.New("")}
 		},
 	}
-	check.Flags().StringVar(&phase, "phase", "", "the session phase: review, second-review, work or verify")
+	check.Flags().StringVar(&phase, "phase", "", "the session phase: review, second-review, work, verify or gate-review")
 	check.Flags().StringVar(&root, "root", "", "the repository root relative paths resolve against")
 	check.Flags().StringVar(&tool, "tool", "", "the tool's name, as Copilot spells it")
 	check.Flags().StringVar(&path, "path", "", "the file path a file tool names, or the skill's name")
@@ -72,9 +72,9 @@ bad arguments exit 2.`,
 
 	var hphase, hroot string
 	hook := &cobra.Command{
-		Use:   "hook --phase <review|second-review|work|verify> --root <dir>",
+		Use:   "hook --phase <review|second-review|work|verify|gate-review> --root <dir>",
 		Short: "Answer one Copilot preToolUse payload from stdin with an allow or deny line",
-		Long: `The command Copilot runs before every tool call of a work, review, second-review or verify
+		Long: `The command Copilot runs before every tool call of a work, review, second-review, verify or gate-review
 session. It reads
 one payload ({"toolName", "toolArgs", "cwd"}) on stdin and prints one line of
 JSON: {"permissionDecision":"allow"}, or {"permissionDecision":"deny",
@@ -123,7 +123,7 @@ error. It reads nothing but the payload and writes nothing.`,
 			return nil
 		},
 	}
-	hook.Flags().StringVar(&hphase, "phase", "", "the session phase: review, second-review, work or verify")
+	hook.Flags().StringVar(&hphase, "phase", "", "the session phase: review, second-review, work, verify or gate-review")
 	hook.Flags().StringVar(&hroot, "root", "", "the repository root relative paths resolve against")
 	cmd.AddCommand(hook)
 	return cmd

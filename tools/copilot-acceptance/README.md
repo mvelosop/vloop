@@ -154,3 +154,33 @@ validity and its number of findings.
 
 Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
 brief is closed.
+
+## B26: Copilot gate-review sessions
+
+`gatereview.sh` is the operator's acceptance of `agent.gate-review = copilot` on
+the real Copilot CLI. Gates use a stub `copilot`; only a run on the real one
+proves a Copilot gate review works and leaves a valid verdict. It is run by no
+gate or check.
+
+```
+tools/copilot-acceptance/gatereview.sh <copilot model id> [dir]
+```
+
+It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
+(logged in, with folder trust accepted for `<dir>/repo-gatereview`), `go` and
+`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+repository with `agent.gate-review = copilot` and `model.gate-review` the model
+given; plan, work, review and verify stay on Claude. A first run may stop at
+`vloop doctor`, as above.
+
+It spends Claude money for the plan, work, review and verify sessions and
+Copilot credits for the gate-review session of each round.
+
+It writes `<dir>/b26-gatereview-summary.md` (`report.py gate-review`): one row
+per gate-review session record, by round, with agent, model, credits, estimated
+cost, `session/v4` validity and its `permission_denials`; then each kept
+verdict by round: present or not, `gate-verdict/v2` validity, the verdict and
+its number of findings by kind.
+
+Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
+brief is closed.

@@ -4,13 +4,18 @@
 #
 #   session <role> <task|-> model=<model>    role: plan, gate-review, work,
 #                                            review or verify
-#   fence <role> <task|-> ok|bad|none        for a work, review or verify
-#                                            session: whether --settings names
-#                                            a file whose JSON equals that
-#                                            phase's fence
+#   fence <role> <task|-> ok|bad|none        for a work, review, verify or
+#                                            gate-review session: whether
+#                                            --settings names a file whose JSON
+#                                            equals that phase's fence
 #
-# A work session writes <task>.out and a done proposal; a review passes; a
-# verify session writes a valid verify/v1 report with no findings.
+# A plan session copies plan.json to the plan file; when the driver sent the
+# plan back (.vloop/tmp/plan-problems.md exists), it appends that file to
+# problems beside the stub, after a line "--- plan session".
+#
+# A gate-review session writes a valid gate-verdict/v2 PASS; a work session
+# writes <task>.out and a done proposal; a review passes; a verify session
+# writes a valid verify/v1 report with no findings.
 dir=$(dirname "$0")
 case "${1:-}" in
   --version) echo "2.0.0 (Claude Code)"; exit 0;;
@@ -37,8 +42,9 @@ fence() {
   echo "fence $1 $ARG $r" >>"$dir/events"
 }
 case "$cmd" in
-  /vloop:plan) ROLE=plan; mkdir -p .vloop/state && cp "$dir/plan.json" .vloop/state/state.json;;
-  /vloop:gate-review) ROLE=gate-review
+  /vloop:plan) ROLE=plan; mkdir -p .vloop/state && cp "$dir/plan.json" .vloop/state/state.json
+    if [ -f .vloop/tmp/plan-problems.md ]; then echo "--- plan session" >>"$dir/problems"; cat .vloop/tmp/plan-problems.md >>"$dir/problems"; fi;;
+  /vloop:gate-review) ROLE=gate-review; fence gate-review
     echo '{"schema":"gate-verdict/v2","verdict":"PASS","tasks":[],"notes":"none"}' >.vloop/tmp/gate-verdict.json;;
   /vloop:work) ROLE=work; fence work; echo "$ARG by claude" >>"$ARG.out"
     printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$ARG" "$ARG" >.vloop/tmp/proposal.json;;

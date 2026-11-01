@@ -1,0 +1,33 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.1398762,
+  "duration_ms": 45081,
+  "effort": null,
+  "ended": "2026-11-01T21:51:09Z",
+  "is_error": false,
+  "iteration": 6,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 21276,
+      "cache_read_input_tokens": 251862,
+      "cost_usd": 0.1398762,
+      "input_tokens": 18,
+      "output_tokens": 2955
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd tools/copilot-acceptance; ls; diff \u003c(sed -n 1,80p run.sh) \u003c(sed -n 1,80p gatereview.sh) | head -80; sh -n gatereview.sh \u0026\u0026 python3 -I -c \"import ast;ast.parse(open('report.py').read())\" \u0026\u0026 echo ok;…",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review",
+  "run_id": "B20261101-2044-b26-i78-copilot-gate-review",
+  "schema": "session/v3",
+  "started": "2026-11-01T21:50:24Z",
+  "task": "T5",
+  "turns": 12,
+  "wall_ms": 45619
+}

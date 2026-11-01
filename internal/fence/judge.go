@@ -13,12 +13,13 @@ import (
 )
 
 // The phases a judge serves; the two review phases share the review fence,
-// verify reads its own.
+// work, verify and gate-review read their own.
 const (
 	PhaseReview       = "review"
 	PhaseSecondReview = "second-review"
 	PhaseWork         = "work"
 	PhaseVerify       = "verify"
+	PhaseGateReview   = "gate-review"
 )
 
 // maxDepth bounds how many sh -c layers are looked through.
@@ -50,11 +51,11 @@ func deny(format string, a ...any) Decision {
 // embedded plugin's skill names. Relative paths resolve against root; home is
 // what a leading ~ expands to ("" leaves it unexpanded).
 func New(phase, root, home string) (*Judge, error) {
-	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork && phase != PhaseVerify {
-		return nil, fmt.Errorf("unknown phase %q: want review, second-review, work or verify", phase)
+	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork && phase != PhaseVerify && phase != PhaseGateReview {
+		return nil, fmt.Errorf("unknown phase %q: want review, second-review, work, verify or gate-review", phase)
 	}
 	fenceName := PhaseReview
-	if phase == PhaseWork || phase == PhaseVerify {
+	if phase == PhaseWork || phase == PhaseVerify || phase == PhaseGateReview {
 		fenceName = phase
 	}
 	raw, err := vloop.Fence(fenceName)
@@ -168,7 +169,7 @@ func under(dir, p string) bool {
 
 // skillPhase is the plugin skill a session of this phase runs.
 func (j *Judge) skillPhase() string {
-	if j.phase == PhaseWork || j.phase == PhaseVerify {
+	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview {
 		return j.phase
 	}
 	return PhaseReview
@@ -323,7 +324,7 @@ func (j *Judge) words(ws []string, depth int) string {
 }
 
 func (j *Judge) fenceLabel() string {
-	if j.phase == PhaseWork || j.phase == PhaseVerify {
+	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview {
 		return j.phase
 	}
 	return PhaseReview
