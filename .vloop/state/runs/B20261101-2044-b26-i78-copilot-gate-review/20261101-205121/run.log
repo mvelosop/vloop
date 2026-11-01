@@ -25,3 +25,10 @@ committing the plan
    review T1 · 0m36s · $0.17 · run $5.17 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/6 done ──
+   Run gate-review sessions on Copilot: the adapter, its record and agent.gate-review = copilot
+   work T2 · 1m22s · $0.27 · run $5.44 / $40.00
+   check go
+   review T2 · 0m26s · $0.13 · run $5.57 / $40.00
+   review: PASS
+   T2 done

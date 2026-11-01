@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 2
+**Status:** running · **2/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:25:18Z
+**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:31:13Z
 
 ## Progress
 
 - [x] **T1** — Add the gate-review phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
-- [ ] **T2** — Run gate-review sessions on Copilot: the adapter, its record and agent.gate-review = copilot
+- [x] **T2** — Run gate-review sessions on Copilot: the adapter, its record and agent.gate-review = copilot
 - [ ] **T3** — Check agent.gate-review = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot gate-review sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a gate-review run on the real CLI
@@ -43,7 +43,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Run gate-review sessions on Copilot: the adapter, its record and agent.gate-review = copilot
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 With the judge's gate-review phase in place (T1), the Copilot adapter can run the gate-review session exactly as it runs a verify session, under a hooks file whose phase is gate-review. This task makes the adapter support the phase, gives the session its session/v4 record and lets `agent.gate-review` take `copilot`; it does not touch what the driver does with the verdict, which must stay the same whatever the agent. The preflight and doctor checks are T3's.
 

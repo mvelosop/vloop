@@ -126,12 +126,12 @@ func TestCopilotSupportsWorkReviewAndVerify(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, ph := range []string{PhasePlan, PhaseGateReview} {
+	for _, ph := range []string{PhasePlan} {
 		if a.Supports(ph) {
 			t.Errorf("copilot supports %s", ph)
 		}
 	}
-	for _, ph := range []string{PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify} {
+	for _, ph := range []string{PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify, PhaseGateReview} {
 		if !a.Supports(ph) {
 			t.Errorf("copilot does not support %s", ph)
 		}
@@ -196,10 +196,38 @@ func TestCopilotVerifyRecordIsSessionV4(t *testing.T) {
 		{PhaseVerify, AgentCopilot, "session/v4"},
 		{PhaseVerify, "claude", "session/v3"},
 		{PhaseReview, AgentCopilot, "session/v3"},
+		{PhaseGateReview, AgentCopilot, "session/v4"},
+		{PhaseGateReview, "claude", "session/v3"},
 	} {
 		rec := r.record(Spec{Phase: c.phase, Model: "m"}, c.agent, "", time.Now(), time.Now(), Output{})
 		if rec["schema"] != c.want || rec["phase"] != c.phase || rec["agent"] != c.agent {
 			t.Errorf("%s/%s: schema %v, want %s", c.phase, c.agent, rec["schema"], c.want)
 		}
+	}
+}
+
+func TestCopilotGateReviewArgvAndHooks(t *testing.T) {
+	root := t.TempDir()
+	a := copilotAdapter{}
+	p, err := a.Prepare(root, "9.9.9", PhaseGateReview)
+	if err != nil {
+		t.Fatal(err)
+	}
+	args := a.Command(Spec{Phase: PhaseGateReview, Model: "m1", Agent: AgentCopilot}, root, nil, p).Args[1:]
+	line := " " + strings.Join(args, " ") + " "
+	if !strings.Contains(line, "-p /vloop:gate-review ") {
+		t.Errorf("argv lacks the gate-review prompt: %v", args)
+	}
+	for _, d := range copilotDenials {
+		if !strings.Contains(line, " --deny-tool="+d+" ") {
+			t.Errorf("no denial %q", d)
+		}
+	}
+	if !strings.Contains(line, " --deny-tool=shell(rm:*) ") || !strings.Contains(line, " --deny-tool=shell(git push:*) ") {
+		t.Errorf("gate-review argv lacks shell(rm:*) or shell(git push:*): %v", args)
+	}
+	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if err != nil || !strings.Contains(string(data), " fence hook --phase gate-review --root ") || strings.Contains(string(data), "--phase review") {
+		t.Errorf("hooks file %s: %v", data, err)
 	}
 }

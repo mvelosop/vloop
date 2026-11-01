@@ -71,7 +71,7 @@ type copilotAdapter struct {
 func (copilotAdapter) Name() string { return AgentCopilot }
 
 func (copilotAdapter) Supports(phase string) bool {
-	return phase == PhaseWork || phase == PhaseReview || phase == PhaseSecondReview || phase == PhaseVerify
+	return phase == PhaseWork || phase == PhaseReview || phase == PhaseSecondReview || phase == PhaseVerify || phase == PhaseGateReview
 }
 
 func (a copilotAdapter) command() string {

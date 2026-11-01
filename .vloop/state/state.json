@@ -5,9 +5,9 @@
   "base": "d0d3f92f683753c73aa8a46a23d7585abc159616",
   "branch": "B20261101-2044-b26-i78-copilot-gate-review",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-01T21:05:32Z",
-  "updated": "2026-11-01T21:25:18Z",
+  "updated": "2026-11-01T21:31:13Z",
   "shell": "sh",
   "checks": [
     {
@@ -99,7 +99,7 @@
         "Committed Go tests cover the adapter's gate-review argv (the whole deny list, `shell(rm:*)` included), its hooks file's `--phase gate-review`, `Supports(gate-review)` (with `Supports(plan)` still false), the gate-review record's schema and `agent.gate-review` accepting copilot while `agent.plan` does not; tests that pinned gate-review as unsupported or `agent.gate-review` as claude-only (`TestCopilotSupportsWorkReviewAndVerify` among them) change only to the new behaviour, and the work notes name the contract item (G2)."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
