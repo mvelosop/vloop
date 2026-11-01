@@ -1,0 +1,32 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.3672195,
+  "duration_ms": 56019,
+  "effort": null,
+  "ended": "2026-11-01T23:25:37Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 66310,
+      "cache_read_input_tokens": 597475,
+      "cost_usd": 0.3672195,
+      "input_tokens": 26,
+      "output_tokens": 4218
+    }
+  },
+  "permission_denials": [
+    {
+      "file_path": "~/.claude/projects/-Users-USER-source-personal-vloop/b67037b7-6fc8-4ccb-9cf0-a59d3311aa25/tool-results/bqtrdlajf.txt",
+      "tool_name": "Read"
+    }
+  ],
+  "phase": "gate-review",
+  "run_id": "B20261101-2305-b27-i77-copilot-plan",
+  "schema": "session/v3",
+  "started": "2026-11-01T23:24:40Z",
+  "turns": 14,
+  "wall_ms": 56581
+}

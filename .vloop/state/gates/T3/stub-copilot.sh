@@ -1,6 +1,7 @@
 #!/bin/sh
 # The gates' stub copilot. It never touches the network. It answers
-# --version. For a -p prompt it accepts /vloop:work <task> (role work),
+# --version. For a -p prompt it accepts /vloop:plan <brief> (role plan, the
+# brief path in the task's place), /vloop:work <task> (role work),
 # /vloop:review <task> (role review), /vloop:verify (role verify, task -) and
 # /vloop:gate-review (role gate-review, task -), and appends to events:
 #
@@ -22,7 +23,10 @@
 #                                stdin; decision is the permissionDecision of
 #                                its stdout, "none" when there is none
 #
-# A work session then writes <task>.out and a done proposal under .vloop/tmp/;
+# A plan session then copies plan.json beside the stub to the plan file and,
+# when the driver sent the plan back (.vloop/tmp/plan-problems.md exists),
+# appends that file to problems beside the stub after a line
+# "--- plan session"; a work session writes <task>.out and a done proposal under .vloop/tmp/;
 # a review session writes a passing verdict; a verify session writes a valid
 # verify/v1 report with no findings to .vloop/tmp/verify.json; a gate-review
 # session writes a valid gate-verdict/v2 PASS with no findings to
@@ -33,6 +37,10 @@
 #   copilot.verify-finding    its report holds one finding
 #   copilot.verify-noreport   it writes no report
 #   copilot.verify-fail       it exits 1 after its output
+# what a plan session does:
+#   copilot.plan-moveref      it first makes a commit (HEAD moves)
+#   copilot.plan-noplan       it writes no plan
+#   copilot.plan-exit3        it exits 3 after its output
 # and what a gate-review session does:
 #   copilot.gr-moveref        it first makes a commit (HEAD moves)
 #   copilot.gr-noverdict      it writes no verdict
@@ -66,6 +74,7 @@ done
 cmd="${prompt%% *}" TASK="${prompt#* }"
 [ "$TASK" = "$prompt" ] && TASK=-
 case "$cmd" in
+  /vloop:plan) ROLE=plan;;
   /vloop:work) ROLE=work;;
   /vloop:review) ROLE=review;;
   /vloop:verify) ROLE=verify;;
@@ -141,6 +150,33 @@ if [ -n "$hookcmd" ]; then
       hook skillother skill '{"skill":"vloop-verify"}'
       hook webfetch web_fetch '{"url":"https://example.invalid"}'
       ;;
+    plan)
+      hook gate bash "$(bashargs 'vloop task gate T1')"
+      hook validate bash "$(bashargs 'vloop schema validate state/v2 .vloop/state/state.json')"
+      hook statewrite bash "$(bashargs "printf '{}' > .vloop/state/state.json")"
+      hook gatewrite bash "$(bashargs "echo 'exit 1' > .vloop/state/gates/T1/gate.sh")"
+      hook tmpwrite bash "$(bashargs 'echo x > .vloop/tmp/p/out.txt')"
+      hook journal bash "$(bashargs 'echo x > .vloop/state/journals/a.md')"
+      hook srcwrite bash "$(bashargs 'echo x > src/app.go')"
+      hook cdf bash "$(bashargs 'cd .vloop/state/gates/T1 && echo x > f')"
+      hook rmgate bash "$(bashargs 'rm .vloop/state/gates/T1/old.sh')"
+      hook shgate bash "$(bashargs 'sh .vloop/state/gates/T1/gate.sh')"
+      hook taskdrop bash "$(bashargs 'vloop task drop T2')"
+      hook shpush bash "$(bashargs 'sh -c "git push origin main"')"
+      hook envgh bash "$(bashargs 'env gh pr list')"
+      hook subst bash "$(bashargs 'echo $(date)')"
+      hook staterel create "$(fileargs .vloop/state/state.json)"
+      hook oracle create "$(fileargs .vloop/state/gates/T1/oracle.test.ts)"
+      hook gateabs create "$(fileargs "$here/.vloop/state/gates/T1/x.sh")"
+      hook notes create "$(fileargs .vloop/tmp/notes.md)"
+      hook planmd edit "$(fileargs .vloop/state/plan.md)"
+      hook config create "$(fileargs .vloop/config.toml)"
+      hook gatesdir create "$(fileargs .vloop/state/gates)"
+      hook viewbrief view "$(fileargs docs/briefs/b.loop-brief.md)"
+      hook skillp skill '{"skill":"plan"}'
+      hook skillother skill '{"skill":"vloop-plan"}'
+      hook webfetch web_fetch '{"url":"https://example.invalid"}'
+      ;;
     gate-review)
       hook gate bash "$(bashargs 'vloop task gate T1')"
       hook show bash "$(bashargs 'vloop task show T1 --json')"
@@ -166,6 +202,13 @@ fi
 mkdir -p .vloop/tmp
 xit=0
 case "$ROLE" in
+  plan)
+    [ -f "$dir/copilot.plan-moveref" ] && git commit -q --allow-empty -m "moved by the stub plan session"
+    if [ ! -f "$dir/copilot.plan-noplan" ]; then mkdir -p .vloop/state && cp "$dir/plan.json" .vloop/state/state.json; fi
+    if [ -f .vloop/tmp/plan-problems.md ]; then echo "--- plan session" >>"$dir/problems"; cat .vloop/tmp/plan-problems.md >>"$dir/problems"; fi
+    [ -f "$dir/copilot.plan-exit3" ] && xit=3
+    denied="vloop task drop T2 is denied by the plan fence (Bash(vloop task drop:*))"
+    ;;
   work)
     echo "$TASK by copilot" >>"$TASK.out"
     printf '{"schema":"proposal/v1","task":"%s","outcome":"done","summary":"made %s","files":[],"verified":"ok","notes":"none"}\n' "$TASK" "$TASK" >.vloop/tmp/proposal.json

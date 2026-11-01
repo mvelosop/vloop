@@ -4,14 +4,15 @@
 #
 #   session <role> <task|-> model=<model>    role: plan, gate-review, work,
 #                                            review or verify
-#   fence <role> <task|-> ok|bad|none        for a work, review, verify or
-#                                            gate-review session: whether
+#   fence <role> <task|-> ok|bad|none        for a plan, work, review, verify
+#                                            or gate-review session: whether
 #                                            --settings names a file whose JSON
 #                                            equals that phase's fence
 #
 # A plan session copies plan.json to the plan file; when the driver sent the
 # plan back (.vloop/tmp/plan-problems.md exists), it appends that file to
-# problems beside the stub, after a line "--- plan session".
+# problems beside the stub, after a line "--- plan session". With a file
+# claude.plan-exit3 beside the stub, a plan session writes no plan and exits 3.
 #
 # A gate-review session writes a valid gate-verdict/v2 PASS; a work session
 # writes <task>.out and a done proposal; a review passes; a verify session
@@ -42,7 +43,9 @@ fence() {
   echo "fence $1 $ARG $r" >>"$dir/events"
 }
 case "$cmd" in
-  /vloop:plan) ROLE=plan; mkdir -p .vloop/state && cp "$dir/plan.json" .vloop/state/state.json
+  /vloop:plan) ROLE=plan; fence plan
+    if [ -f "$dir/claude.plan-exit3" ]; then echo "session plan $ARG model=$MODEL" >>"$dir/events"; exit 3; fi
+    mkdir -p .vloop/state && cp "$dir/plan.json" .vloop/state/state.json
     if [ -f .vloop/tmp/plan-problems.md ]; then echo "--- plan session" >>"$dir/problems"; cat .vloop/tmp/plan-problems.md >>"$dir/problems"; fi;;
   /vloop:gate-review) ROLE=gate-review; fence gate-review
     echo '{"schema":"gate-verdict/v2","verdict":"PASS","tasks":[],"notes":"none"}' >.vloop/tmp/gate-verdict.json;;
