@@ -5,9 +5,9 @@
   "base": "432365fd0fdfd121665ced1c61b23db67c306719",
   "branch": "B20261101-2305-b27-i77-copilot-plan",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-01T23:23:21Z",
-  "updated": "2026-11-01T23:53:00Z",
+  "updated": "2026-11-01T23:59:08Z",
   "shell": "sh",
   "checks": [
     {
@@ -139,7 +139,7 @@
         "Committed tests cover the warning, the model.plan refusal, K1, the login refusal, the resume and the claude case for agent.plan (extending the existing doctor and run preflight tests); a code comment that lists the Copilot phases or keys (doctor's experimental warning and copilotKeys included) names plan too."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

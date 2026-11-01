@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 3
+**Status:** running · **3/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-01T23:53:00Z
+**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-01T23:59:08Z
 
 ## Progress
 
 - [x] **T1** — Add the plan phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
 - [x] **T2** — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
-- [ ] **T3** — Check agent.plan = copilot in the run preflight and doctor
+- [x] **T3** — Check agent.plan = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a plan run on the real CLI
 - [ ] **T6** — Close the run: every gate and the worked example on the final tree
@@ -66,7 +66,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Check agent.plan = copilot in the run preflight and doctor
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 An operator who puts the plan session on Copilot must be warned it is experimental and stopped before any session when the setup cannot work, as for the other Copilot phases. This task adds agent.plan to the keys the preflight and doctor check; planning has no switch, so the key is in use whenever it is copilot, also on a resume that will not plan, as B26 decided for the gate review.
 
