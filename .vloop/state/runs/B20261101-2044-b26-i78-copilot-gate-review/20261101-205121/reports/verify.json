@@ -1,0 +1,7 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": { "example_lines": 31, "sentences": 8, "surfaces": 9 },
+  "notes": "Ran every fence check line of the worked example (13 shell lines, 8 other-tool lines, 2 apply_patch payloads, 4 unchanged lines, the changed unknown-phase line, plus --help of fence check and fence hook) on a binary built under .vloop/tmp/: all outputs and exit codes agree with the brief. NOT run: the stub-agent `vloop run` example and the four planted run failures (they need a stub copilot/claude harness; left to the task tests and the operator). The acceptance kit (tools/copilot-acceptance/gatereview.sh) was read, not run. Surfaces read: fence help x2, config.go, agent_copilot.go and doctor.go comments, run.go, configuration.md (rows, Copilot paragraph, hook section, K1), session.md, domain-model glossary, metrics.md, acceptance README. The scratch directory .vloop/tmp/vs could not be removed (permission denied); it holds only the built binary and an empty git repo."
+}
+

@@ -55,3 +55,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** No change needed: gates T1–T5 and T6 all pass on the final tree.
 - **Files:** none
 - **Notes for next iteration:** none
+
+## Run ended — complete
+
+- **Run:** `B20261101-2044-b26-i78-copilot-gate-review` · 7 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked
