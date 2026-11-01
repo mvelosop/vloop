@@ -5,9 +5,9 @@
   "base": "432365fd0fdfd121665ced1c61b23db67c306719",
   "branch": "B20261101-2305-b27-i77-copilot-plan",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-01T23:23:21Z",
-  "updated": "2026-11-01T23:42:29Z",
+  "updated": "2026-11-01T23:53:00Z",
   "shell": "sh",
   "checks": [
     {
@@ -107,7 +107,7 @@
         "Committed Go tests cover the adapter's plan argv (the whole deny list, `shell(rm:*)` included), its hooks file's `--phase plan`, `Supports(plan)`, the plan record's schema, `agent.plan` accepting copilot and the exit line for each agent; tests that pinned plan as unsupported or `agent.plan` as claude-only (`TestCopilotSupportsWorkReviewAndVerify` among them) or the old exit line change only to the new behaviour, and the work notes name the contract item (P2)."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

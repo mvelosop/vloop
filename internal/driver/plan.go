@@ -524,6 +524,12 @@ func (t term) planOnlyReport(runID string, plan *state.Plan) {
 	t.show("run it: vloop run")
 }
 
+// planFailure is the halt line of a plan session that exited non-zero; it
+// names the agent that ran the session.
+func planFailure(agent string, code int, runDir string) string {
+	return fmt.Sprintf("planning session failed (%s exited %d) — see %s", agent, code, runDir)
+}
+
 // planSession runs one plan session and refuses what it moved or how it ended.
 func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effort string) error {
 	root := p.Root
@@ -553,7 +559,7 @@ func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effor
 		return halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
 	}
 	if res.ExitCode != 0 {
-		return halt(ExitPreflight, "planning session failed (claude exited %d) — see %s", res.ExitCode, relRunDir(root, runDir))
+		return halt(ExitPreflight, "%s", planFailure(agent, res.ExitCode, relRunDir(root, runDir)))
 	}
 	return nil
 }

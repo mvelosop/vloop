@@ -164,3 +164,12 @@ func TestNewRunDirIsNamedInUTC(t *testing.T) {
 		t.Errorf("folder %s, want the UTC stamp 20260102-030405", got)
 	}
 }
+
+func TestPlanFailureNamesTheAgent(t *testing.T) {
+	for _, a := range []string{AgentClaude, AgentCopilot} {
+		want := "planning session failed (" + a + " exited 3) — see .vloop/runs/r"
+		if got := planFailure(a, 3, ".vloop/runs/r"); got != want {
+			t.Errorf("%s: %q, want %q", a, got, want)
+		}
+	}
+}

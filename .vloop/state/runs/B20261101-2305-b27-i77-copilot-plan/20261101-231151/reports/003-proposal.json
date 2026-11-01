@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Copilot plan sessions: the adapter supports plan, its record is session/v4, agent.plan accepts copilot, and the plan failure line names the agent.",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/driver/agent_copilot.go", "internal/driver/agent_copilot_test.go", "internal/driver/session.go", "internal/driver/plan.go", "internal/driver/plan_test.go"],
+  "verified": "vloop task gate T2 style run: sh .vloop/state/gates/T2/gate.sh exited 0 and printed 'gate T2: ok'; go test ./internal/driver ./internal/config pass.",
+  "notes": "Contract item P2: TestCopilotSupportsWorkReviewAndVerify no longer pins plan as unsupported; TestAgentKeys now treats agent.plan like the other agent keys (copilot accepted). The config 'agents' list is now claude,copilot and the separate reviewAgents list was removed. New: TestCopilotPlanArgvAndHooks, plan cases in TestCopilotVerifyRecordIsSessionV4, TestPlanFailureNamesTheAgent (planFailure helper in plan.go). internal/cli TestTaskGate* fail inside a driver session (plan-held env), not from this change."
+}

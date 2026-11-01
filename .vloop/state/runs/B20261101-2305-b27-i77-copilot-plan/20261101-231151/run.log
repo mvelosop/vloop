@@ -37,3 +37,10 @@ committing the plan
    review T1 · 0m31s · $0.16 · run $5.17 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/6 done ──
+   Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
+   work T2 · 5m54s · $0.32 · run $5.48 / $40.00
+   check go
+   review T2 · 0m27s · $0.13 · run $5.62 / $40.00
+   review: PASS
+   T2 done

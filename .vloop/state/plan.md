@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 2
+**Status:** running · **2/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-01T23:42:29Z
+**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-01T23:53:00Z
 
 ## Progress
 
 - [x] **T1** — Add the plan phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
-- [ ] **T2** — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
+- [x] **T2** — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
 - [ ] **T3** — Check agent.plan = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a plan run on the real CLI
@@ -43,7 +43,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 With the judge's plan phase in place (T1), the Copilot adapter can run the plan session exactly as it runs a gate-review session, under a hooks file whose phase is plan. This task makes the adapter support the phase, gives the session its session/v4 record, lets `agent.plan` take `copilot` and makes the driver's failure line name the agent; everything else the driver does with a plan must stay the same whatever the agent. The preflight and doctor checks are T3's.
 
