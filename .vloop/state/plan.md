@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 5
+**Status:** running · **5/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:44:56Z
+**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:51:09Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Run gate-review sessions on Copilot: the adapter, its record and agent.gate-review = copilot
 - [x] **T3** — Check agent.gate-review = copilot in the run preflight and doctor
 - [x] **T4** — Document Copilot gate-review sessions in the fence audit, the configuration guide and the domain pages
-- [ ] **T5** — Extend the Copilot acceptance kit with a gate-review run on the real CLI
+- [x] **T5** — Extend the Copilot acceptance kit with a gate-review run on the real CLI
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -111,7 +111,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Extend the Copilot acceptance kit with a gate-review run on the real CLI
 
-`pending` · depends on: T2, T3
+`done` · depends on: T2, T3
 
 Gates use a stub copilot; only a run on the real CLI proves a Copilot gate review works and leaves a valid verdict. This task gives the operator a script for that acceptance at close and documents it; no gate or check runs it.
 

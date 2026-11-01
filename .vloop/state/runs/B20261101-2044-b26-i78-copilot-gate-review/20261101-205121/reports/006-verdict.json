@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`tools/copilot-acceptance/` gains a script that runs `greet.loop-brief.md` in a scratch repository with a vloop built from this tree, `agent.gate-review = copilot` and `model.gate-review` the model given, plan, work, review and verify on Claude, and writes a summary of each gate-review session's record (round, agent, model, credits, estimated cost, `session/v4` validity, its `permission_denials`) and of each kept verdict (round, present or not, `gate-verdict/v2` validity, the verdict, its number of findings by kind).", "met": true, "evidence": "gatereview.sh builds vloop from the tree, sets agent.gate-review=copilot and model.gate-review=$model (both keys exist in internal/config/config.go), runs the fixture brief; report.py gate_review_report lists round/agent/model/credits/cost/session/v4 validity/permission_denials and per verdict round, present or not, gate-verdict/v2 validity, verdict, findings by kind. The reports/gate-review-<round>.json path matches internal/driver/gatereview.go:66."},
+    {"criterion": "The README gains its section, under a heading naming gate review, how to run the script, what it needs (copilot, a logged-in gh, claude), what it spends, what the summary holds, and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close.", "met": true, "evidence": "README.md new section '## B26: Copilot gate-review sessions' covers usage, needs, spend, summary contents and the record in docs/design-notes/copilot-cli-experiments.md."},
+    {"criterion": "The kit's scripts pass `sh -n` and its Python parses; flags, keys and messages of existing vloop commands the script uses are taken from running them, not memory; no gate or check runs the kit, copilot, gh or the network.", "met": true, "evidence": "sh -n gatereview.sh and ast.parse of report.py both succeed. The vloop commands used (init, config set, doctor, run, schema validate session/v4 and gate-verdict/v2) exist; the schema names are in `vloop schema list`. Gate T5 only does static checks."}
+  ],
+  "findings": [],
+  "notes": "The round in the session table is inferred as the nth gate-review session of a run folder, since a session record has no round field. The report.py comment states this. The kit has no committed test, which is expected: the task makes an operator script that is not run by any check."
+}

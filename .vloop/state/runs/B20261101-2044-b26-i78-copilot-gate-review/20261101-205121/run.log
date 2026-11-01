@@ -46,3 +46,10 @@ committing the plan
    review T4 · 0m37s · $0.19 · run $6.51 / $40.00
    review: PASS
    T4 done
+── iteration 6 (6 this run) · T5 · 4/6 done ──
+   Extend the Copilot acceptance kit with a gate-review run on the real CLI
+   work T5 · 1m00s · $0.24 · run $6.75 / $40.00
+   check go
+   review T5 · 0m46s · $0.14 · run $6.89 / $40.00
+   review: PASS
+   T5 done

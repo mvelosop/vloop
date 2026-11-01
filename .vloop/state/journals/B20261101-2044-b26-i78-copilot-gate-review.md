@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The fence audit gains a gate-review part classifying every gate-review fence rule and adapter deny pattern; the configuration guide, session page and glossary now cover Copilot gate-review sessions.
 - **Files:** docs/design-notes/fence-audit.md, docs/guide/configuration.md, docs/domain/execution/session.md, docs/domain/domain-model.md
 - **Notes for next iteration:** The audit says the driver after a gate-review session checks only git (moved ref, exit 9; changed .git/config or hooks) and does not revert files outside .vloop/tmp/, so file-write rules are classified hook. Code comments (adapter, hook, doctor) already named gate-review from T1-T3. The model.gate-review refusal is quoted from internal/cli/run.go.
+
+## T5 — Extend the Copilot acceptance kit with a gate-review run on the real CLI
+
+- **Outcome:** done (review: PASS)
+- **Summary:** tools/copilot-acceptance/gatereview.sh runs the fixture brief with agent.gate-review = copilot and model.gate-review; report.py gate-review summarises sessions and kept verdicts by round; README gains the B26 section.
+- **Files:** tools/copilot-acceptance/gatereview.sh, tools/copilot-acceptance/report.py, tools/copilot-acceptance/README.md
+- **Notes for next iteration:** Session records carry no round, so report.py takes the nth gate-review record of a run folder as round n; verdicts are read from reports/gate-review-<round>.json. Schema names session/v4 and gate-verdict/v2 checked via vloop schema validate. The script was not run (needs real copilot).

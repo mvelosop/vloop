@@ -5,6 +5,7 @@
     report.py summary <dir>                    the probe's results, as Markdown
     report.py second <repo> <vloop> <exit code>  the second-review records and dissents of a run, as Markdown
     report.py verify <repo> <vloop> <exit code>  the verify session record and the kept report of a run, as Markdown
+    report.py gate-review <repo> <vloop> <exit code>  the gate-review session records and kept verdicts of a run, as Markdown
     report.py work <repo> <vloop> <exit code>    the work session records and each task's outcome of a run, as Markdown
 """
 import glob
@@ -194,6 +195,46 @@ def verify_report(repo, vloop, rc):
     print("\n".join(out) + "\n")
 
 
+def gate_review_report(repo, vloop, rc):
+    out = ["## A1 — a real run with Copilot gate-review sessions", "", f"`vloop run` exit {rc}.", "",
+           "| round | record | agent | model | credits | cost_usd | cost_source | turns | session/v4 | permission_denials |",
+           "|---|---|---|---|---|---|---|---|---|---|"]
+    # A session record does not carry its round: the nth gate-review session of a run folder is round n.
+    for d in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*"))):
+        n = 0
+        for f in sorted(glob.glob(os.path.join(d, "sessions", "*.json"))):
+            r = json.load(open(f))
+            if r.get("phase") != "gate-review":
+                continue
+            n += 1
+            ok = subprocess.run([vloop, "schema", "validate", "session/v4", f], cwd=repo,
+                                capture_output=True).returncode == 0
+            out.append(f"| {n} | {os.path.basename(f)} | {r.get('agent')} | {r.get('model')} | {r.get('credits')} "
+                       f"| {r.get('cost_usd')} | {r.get('cost_source')} | {r.get('turns')} "
+                       f"| {'ok' if ok else 'INVALID'} | {json.dumps(r.get('permission_denials'))} |")
+    out += ["", "Kept verdicts (reports/gate-review-<round>.json):", "",
+            "| round | verdict | gate-verdict/v2 | findings by kind |", "|---|---|---|---|"]
+    found = False
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/reports/gate-review-*.json"))):
+        found = True
+        rnd = os.path.basename(f)[len("gate-review-"):-len(".json")]
+        ok = subprocess.run([vloop, "schema", "validate", "gate-verdict/v2", f], cwd=repo,
+                            capture_output=True).returncode == 0
+        try:
+            v = json.load(open(f))
+            kinds = {}
+            for t in v.get("tasks") or []:
+                for x in t.get("findings") or []:
+                    kinds[x.get("kind")] = kinds.get(x.get("kind"), 0) + 1
+            verdict = v.get("verdict")
+        except ValueError:
+            kinds, verdict = "unreadable", "unreadable"
+        out.append(f"| {rnd} | present: {verdict} | {'ok' if ok else 'INVALID'} | {json.dumps(kinds, sort_keys=True)} |")
+    if not found:
+        out.append("| - | not present | - | - |")
+    print("\n".join(out) + "\n")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "run":
@@ -204,6 +245,8 @@ if __name__ == "__main__":
         summary(sys.argv[2])
     elif cmd == "verify":
         verify_report(*sys.argv[2:5])
+    elif cmd == "gate-review":
+        gate_review_report(*sys.argv[2:5])
     elif cmd == "work":
         work_report(*sys.argv[2:5])
     elif cmd == "second":
