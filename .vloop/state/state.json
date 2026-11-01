@@ -5,9 +5,9 @@
   "base": "d0d3f92f683753c73aa8a46a23d7585abc159616",
   "branch": "B20261101-2044-b26-i78-copilot-gate-review",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-01T21:05:32Z",
-  "updated": "2026-11-01T21:19:25Z",
+  "updated": "2026-11-01T21:25:18Z",
   "shell": "sh",
   "checks": [
     {
@@ -55,9 +55,9 @@
         "`fence/*.json` is unchanged, and no Claude session's argv, fence or settings changes."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "No committed hook test exercises --phase gate-review: fence_hook_test.go still loops only review and second-review"
+      "notes": ""
     },
     {
       "id": "T2",

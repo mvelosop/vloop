@@ -62,7 +62,7 @@ func TestFenceHookAnswers(t *testing.T) {
 		{"patch without paths", enc(map[string]any{"toolName": "apply_patch", "toolArgs": "nothing"}), "deny"},
 		{"patch allowed paths", enc(map[string]any{"toolName": "apply_patch", "toolArgs": "*** Add File: .vloop/tmp/a.txt\n+a\n"}), "allow"},
 	}
-	for _, ph := range []string{"review", "second-review"} {
+	for _, ph := range []string{"review", "second-review", "gate-review"} {
 		for _, c := range cases {
 			code, out := runHook(t, ph, c.payload)
 			d, why := decision(t, out)
@@ -91,6 +91,23 @@ func TestFenceHookFailsClosed(t *testing.T) {
 		d, why := decision(t, out)
 		if code != ExitUsage || d != "deny" || !strings.HasPrefix(why, "vloop fence: ") {
 			t.Errorf("%s: exit %d, %q", c.name, code, out)
+		}
+	}
+}
+
+func TestFenceHookGateReviewDecisions(t *testing.T) {
+	for _, c := range []struct{ name, payload, want, reason string }{
+		{"write outside tmp", `{"toolName":"create","toolArgs":{"path":"src/app.ts"}}`, "deny", "write to src/app.ts is not allowed in a gate-review session: only .vloop/tmp/ may be written"},
+		{"unknown tool", `{"toolName":"frobnicate","toolArgs":{}}`, "deny", "tool frobnicate is not allowed in a gate-review session"},
+		{"write in tmp", `{"toolName":"create","toolArgs":{"path":".vloop/tmp/v.json"}}`, "allow", ""},
+	} {
+		code, out := runHook(t, "gate-review", c.payload)
+		d, why := decision(t, out)
+		if code != 0 || d != c.want {
+			t.Errorf("%s: exit %d, %q", c.name, code, out)
+		}
+		if c.want == "deny" && why != "vloop fence: "+c.reason {
+			t.Errorf("%s: reason %q", c.name, why)
 		}
 	}
 }

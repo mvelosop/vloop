@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 1
+**Status:** running · **1/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:19:25Z
+**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:25:18Z
 
 ## Progress
 
-- [ ] **T1** — Add the gate-review phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
+- [x] **T1** — Add the gate-review phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
 - [ ] **T2** — Run gate-review sessions on Copilot: the adapter, its record and agent.gate-review = copilot
 - [ ] **T3** — Check agent.gate-review = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot gate-review sessions in the fence audit, the configuration guide and the domain pages
@@ -19,7 +19,7 @@
 
 ### T1 — Add the gate-review phase to the fence judge, vloop fence check and vloop fence hook
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 A Copilot gate-review session needs a hook that judges each tool call against the gate-review fence, and the hook and `vloop fence check` share one judge. This task gives the judge a `gate-review` phase that decides exactly as review does, with the gate-review fence's rules and the phase's own name and skill hint, and makes both commands accept it. Everything T2 builds runs under this phase, so the other phases must not move by a word.
 
@@ -32,8 +32,6 @@ A Copilot gate-review session needs a hook that judges each tool call against th
 - The review, second-review, work and verify phases decide and word every call exactly as before, bar the unknown-phase message (the unchanged lines: `--phase review --tool skill --path vloop-gate-review` is `deny: skill vloop-gate-review is not vloop's — use /vloop:review`; `--phase verify` denies `rm x` with `rm x is denied by the Copilot deny list (rm:*)`; `--phase work` allows `rm src/old.go`; `vloop config set agent.plan copilot` exits 2 with `vloop: invalid value "copilot" for agent.plan: want one of claude`). Existing tests that pin `gate-review` as an unknown phase or the old unknown-phase message change only to the new behaviour, and the work notes name the contract item (G1).
 - The gate-review phase is covered by committed Go table tests in `internal/fence` (and the hook's in its own test) that run on every OS in the `go` check, covering every line of the worked example's two tables, the apply_patch lines and the unknown-phase message; a gate-review phase that leaves no committed test behind is a violation.
 - `fence/*.json` is unchanged, and no Claude session's argv, fence or settings changes.
-
-**From the last attempt:** No committed hook test exercises --phase gate-review: fence_hook_test.go still loops only review and second-review
 
 <details><summary>verify command</summary>
 
