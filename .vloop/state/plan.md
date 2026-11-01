@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 1
+**Status:** running · **1/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-01T23:37:31Z
+**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-01T23:42:29Z
 
 ## Progress
 
-- [ ] **T1** — Add the plan phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
+- [x] **T1** — Add the plan phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
 - [ ] **T2** — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
 - [ ] **T3** — Check agent.plan = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
@@ -19,7 +19,7 @@
 
 ### T1 — Add the plan phase to the fence judge, vloop fence check and vloop fence hook
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 A Copilot plan session needs a hook that judges each tool call against the plan fence, and the hook and `vloop fence check` share one judge. This task gives the judge a `plan` phase that decides exactly as review does, with the plan fence's rules, the plan's own write rule (the plan file, its gate folders and .vloop/tmp/), and the phase's own name and skill hint, and makes both commands accept it. Everything T2 builds runs under this phase, so the other phases must not move by a word.
 
@@ -32,8 +32,6 @@ A Copilot plan session needs a hook that judges each tool call against the plan 
 - The review, second-review, work, verify and gate-review phases decide and word every call exactly as before, bar the unknown-phase message (the brief's unchanged lines: gate-review denies a write to `.vloop/state/state.json` with its own message; review's skill hint for `vloop-plan` is `/vloop:review`; work allows `rm src/old.go`). Existing tests that pin `plan` as an unknown phase or the old unknown-phase message (`TestUnknownPhase`, `TestFenceHookFailsClosed`'s `plan phase` case) change only to the new behaviour — the unknown name moves to another — and the work notes name the contract item (P1).
 - The plan phase is covered by committed Go table tests in `internal/fence` (and the hook's in its own test) that run on every OS in the `go` check, covering every line of the worked example's two tables, the apply_patch lines, the write rule's edges (the two directories themselves, a path after `..`, an absolute path under the root) and the unknown-phase message; a plan phase that leaves no committed test behind is a violation.
 - `fence/*.json` is unchanged, and no Claude session's argv, fence or settings changes.
-
-**From the last attempt:** No committed test runs `vloop fence hook --phase plan`: TestFenceHookAnswers should include plan, and the hook's unknown-phase deny line and exit 2 should be asserted with the new message.
 
 <details><summary>verify command</summary>
 

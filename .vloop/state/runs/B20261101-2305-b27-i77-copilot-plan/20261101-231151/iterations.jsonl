@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":212817,"exit":0,"name":"go"}],"ended":"2026-11-01T23:37:31Z","gate":{"duration_ms":3336,"exit":0},"iteration":1,"outcome":"rejected","run_id":"B20261101-2305-b27-i77-copilot-plan","schema":"iteration/v2","started":"2026-11-01T23:27:26Z","task":"T1"}
+{"attempt":2,"checks":[{"duration_ms":214695,"exit":0,"name":"go"}],"ended":"2026-11-01T23:42:29Z","gate":{"duration_ms":3401,"exit":0},"iteration":2,"outcome":"done","run_id":"B20261101-2305-b27-i77-copilot-plan","schema":"iteration/v2","started":"2026-11-01T23:37:31Z","task":"T1"}

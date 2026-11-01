@@ -30,3 +30,10 @@ committing the plan
    check go
    review T1 · 0m46s · $0.17 · run $4.86 / $40.00
    review: FAIL
+── iteration 2 (2 this run) · T1 · 0/6 done ──
+   Add the plan phase to the fence judge, vloop fence check and vloop fence hook
+   work T1 · 0m48s · $0.15 · run $5.01 / $40.00
+   check go
+   review T1 · 0m31s · $0.16 · run $5.17 / $40.00
+   review: PASS
+   T1 done

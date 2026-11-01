@@ -62,7 +62,7 @@ func TestFenceHookAnswers(t *testing.T) {
 		{"patch without paths", enc(map[string]any{"toolName": "apply_patch", "toolArgs": "nothing"}), "deny"},
 		{"patch allowed paths", enc(map[string]any{"toolName": "apply_patch", "toolArgs": "*** Add File: .vloop/tmp/a.txt\n+a\n"}), "allow"},
 	}
-	for _, ph := range []string{"review", "second-review", "gate-review"} {
+	for _, ph := range []string{"review", "second-review", "gate-review", "plan"} {
 		for _, c := range cases {
 			code, out := runHook(t, ph, c.payload)
 			d, why := decision(t, out)
@@ -92,6 +92,9 @@ func TestFenceHookFailsClosed(t *testing.T) {
 		if code != ExitUsage || d != "deny" || !strings.HasPrefix(why, "vloop fence: ") {
 			t.Errorf("%s: exit %d, %q", c.name, code, out)
 		}
+		if c.name == "unknown phase" && why != `vloop fence: unknown phase "bogus": want review, second-review, work, verify, gate-review or plan` {
+			t.Errorf("%s: reason %q", c.name, why)
+		}
 	}
 }
 
@@ -102,6 +105,25 @@ func TestFenceHookGateReviewDecisions(t *testing.T) {
 		{"write in tmp", `{"toolName":"create","toolArgs":{"path":".vloop/tmp/v.json"}}`, "allow", ""},
 	} {
 		code, out := runHook(t, "gate-review", c.payload)
+		d, why := decision(t, out)
+		if code != 0 || d != c.want {
+			t.Errorf("%s: exit %d, %q", c.name, code, out)
+		}
+		if c.want == "deny" && why != "vloop fence: "+c.reason {
+			t.Errorf("%s: reason %q", c.name, why)
+		}
+	}
+}
+
+func TestFenceHookPlanDecisions(t *testing.T) {
+	for _, c := range []struct{ name, payload, want, reason string }{
+		{"write outside the plan's folders", `{"toolName":"create","toolArgs":{"path":"src/app.ts"}}`, "deny", "write to src/app.ts is not allowed in a plan session: only .vloop/state/state.json, .vloop/state/gates/ and .vloop/tmp/ may be written"},
+		{"unknown tool", `{"toolName":"frobnicate","toolArgs":{}}`, "deny", "tool frobnicate is not allowed in a plan session"},
+		{"write the plan file", `{"toolName":"create","toolArgs":{"path":".vloop/state/state.json"}}`, "allow", ""},
+		{"write a gate", `{"toolName":"create","toolArgs":{"path":".vloop/state/gates/T1/gate.sh"}}`, "allow", ""},
+		{"write the gates directory itself", `{"toolName":"create","toolArgs":{"path":".vloop/state/gates"}}`, "deny", "write to .vloop/state/gates is not allowed in a plan session: only .vloop/state/state.json, .vloop/state/gates/ and .vloop/tmp/ may be written"},
+	} {
+		code, out := runHook(t, "plan", c.payload)
 		d, why := decision(t, out)
 		if code != 0 || d != c.want {
 			t.Errorf("%s: exit %d, %q", c.name, code, out)

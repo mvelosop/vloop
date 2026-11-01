@@ -5,9 +5,9 @@
   "base": "432365fd0fdfd121665ced1c61b23db67c306719",
   "branch": "B20261101-2305-b27-i77-copilot-plan",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-01T23:23:21Z",
-  "updated": "2026-11-01T23:37:31Z",
+  "updated": "2026-11-01T23:42:29Z",
   "shell": "sh",
   "checks": [
     {
@@ -59,9 +59,9 @@
         "`fence/*.json` is unchanged, and no Claude session's argv, fence or settings changes."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "No committed test runs `vloop fence hook --phase plan`: TestFenceHookAnswers should include plan, and the hook's unknown-phase deny line and exit 2 should be asserted with the new message."
+      "notes": ""
     },
     {
       "id": "T2",
