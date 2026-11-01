@@ -83,8 +83,8 @@ func TestFenceHookFailsClosed(t *testing.T) {
 		{"empty", "review", ""},
 		{"no toolName", "review", `{"toolArgs":{"command":"git status"}}`},
 		{"empty object", "second-review", `{}`},
-		{"plan phase", "plan", ok},
 		{"unknown phase", "bogus", ok},
+		{"old plan name", "plans", ok},
 		{"no phase", "", ok},
 	} {
 		code, out := runHook(t, c.phase, c.payload)

@@ -5,9 +5,9 @@
   "base": "432365fd0fdfd121665ced1c61b23db67c306719",
   "branch": "B20261101-2305-b27-i77-copilot-plan",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-01T23:23:21Z",
-  "updated": "2026-11-01T23:27:25Z",
+  "updated": "2026-11-01T23:37:31Z",
   "shell": "sh",
   "checks": [
     {
@@ -60,8 +60,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "No committed test runs `vloop fence hook --phase plan`: TestFenceHookAnswers should include plan, and the hook's unknown-phase deny line and exit 2 should be asserted with the new message."
     },
     {
       "id": "T2",

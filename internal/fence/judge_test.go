@@ -253,9 +253,9 @@ func TestApplyPatch(t *testing.T) {
 
 // W1, V1: the work and verify phases are served; any other name is not.
 func TestUnknownPhase(t *testing.T) {
-	_, err := New("plan", t.TempDir(), "")
-	if err == nil || err.Error() != `unknown phase "plan": want review, second-review, work, verify or gate-review` {
-		t.Errorf("New(plan) error = %v", err)
+	_, err := New("deploy", t.TempDir(), "")
+	if err == nil || err.Error() != `unknown phase "deploy": want review, second-review, work, verify, gate-review or plan` {
+		t.Errorf("New(deploy) error = %v", err)
 	}
 }
 
@@ -456,5 +456,63 @@ func TestGateReviewPhase(t *testing.T) {
 	}
 	if d := j.Decide("create", filepath.Join(root, ".vloop", "tmp", "a.json"), ""); !d.Allow {
 		t.Errorf("absolute path under .vloop/tmp denied: %s", d.Reason)
+	}
+}
+
+// P1: the plan phase decides as review, with the plan fence and the plan's own
+// write rule.
+func TestPlanPhase(t *testing.T) {
+	root := t.TempDir()
+	j, err := New(PhasePlan, root, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	const pw = "is not allowed in a plan session: only .vloop/state/state.json, .vloop/state/gates/ and .vloop/tmp/ may be written"
+	patch := func(f string) string { return "*** Begin Patch\n*** Add File: " + f + "\n+x\n*** End Patch\n" }
+	for _, c := range []struct {
+		name, tool, path, cmd, want string // want "" = allow
+	}{
+		{"task gate", "bash", "", "vloop task gate T1", ""},
+		{"state write", "bash", "", "printf '{}' > .vloop/state/state.json", ""},
+		{"gate write", "bash", "", "echo 'exit 1' > .vloop/state/gates/T1/gate.sh", ""},
+		{"tmp write", "powershell", "", "echo x > .vloop/tmp/p/out.txt", ""},
+		{"journal", "bash", "", "echo x > .vloop/state/journals/a.md", "write to .vloop/state/journals/a.md " + pw},
+		{"src", "bash", "", "echo x > src/app.go", "write to src/app.go " + pw},
+		{"cd gates", "bash", "", "cd .vloop/state/gates/T1 && echo x > f", "write to f " + pw},
+		{"rm", "bash", "", "rm .vloop/state/gates/T1/old.sh", "rm .vloop/state/gates/T1/old.sh is denied by the Copilot deny list (rm:*)"},
+		{"sh script", "bash", "", "sh .vloop/state/gates/T1/gate.sh", "sh: runs a script or stdin, not a literal -c string"},
+		{"task drop", "bash", "", "vloop task drop T2", "vloop task drop T2 is denied by the plan fence (Bash(vloop task drop:*))"},
+		{"sh -c push", "bash", "", `sh -c "git push origin main"`, "git push origin main is denied by the plan fence (Bash(git push:*))"},
+		{"env gh", "bash", "", "env gh pr list", "gh pr list is denied by the Copilot deny list (gh:*)"},
+		{"subst", "bash", "", "echo $(date)", "command substitution cannot be judged"},
+		{"state file", "create", ".vloop/state/state.json", "", ""},
+		{"gate file", "edit", ".vloop/state/gates/T1/oracle.test.ts", "", ""},
+		{"tmp file", "create", ".vloop/tmp/notes.md", "", ""},
+		{"abs under root", "create", filepath.Join(root, ".vloop", "state", "gates", "T2", "x.sh"), "", ""},
+		{"dev null", "create", "/dev/null", "", ""},
+		{"plan.md", "edit", ".vloop/state/plan.md", "", "write to .vloop/state/plan.md " + pw},
+		{"config", "create", ".vloop/config.toml", "", "write to .vloop/config.toml " + pw},
+		{"gates dir", "create", ".vloop/state/gates", "", "write to .vloop/state/gates " + pw},
+		{"gates dir slash", "create", ".vloop/state/gates/", "", "write to .vloop/state/gates/ " + pw},
+		{"tmp dir", "create", ".vloop/tmp", "", "write to .vloop/tmp " + pw},
+		{"dotdot", "create", ".vloop/state/gates/../plan.md", "", "write to .vloop/state/gates/../plan.md " + pw},
+		{"state sibling", "create", ".vloop/state/state.json.bak", "", "write to .vloop/state/state.json.bak " + pw},
+		{"outside root", "create", "../x/.vloop/state/state.json", "", "write to ../x/.vloop/state/state.json " + pw},
+		{"abs outside", "create", filepath.Join(root, "src", "a.go"), "", "write to " + filepath.Join(root, "src", "a.go") + " " + pw},
+		{"view", "view", "docs/briefs/b.md", "", ""},
+		{"skill", "skill", "plan", "", ""},
+		{"skill hint", "skill", "vloop-plan", "", "skill vloop-plan is not vloop's — use /vloop:plan"},
+		{"tool", "web_fetch", "", "", "tool web_fetch is not allowed in a plan session"},
+		{"patch add", "apply_patch", "", patch(".vloop/state/gates/T1/gate.sh"), ""},
+		{"patch readme", "apply_patch", "", patch("README.md"), "write to README.md " + pw},
+	} {
+		d := j.Decide(c.tool, c.path, c.cmd)
+		if c.want == "" {
+			if !d.Allow {
+				t.Errorf("%s: denied: %s", c.name, d.Reason)
+			}
+		} else if d.Allow || d.Reason != c.want {
+			t.Errorf("%s: got allow=%v %q, want deny %q", c.name, d.Allow, d.Reason, c.want)
+		}
 	}
 }
