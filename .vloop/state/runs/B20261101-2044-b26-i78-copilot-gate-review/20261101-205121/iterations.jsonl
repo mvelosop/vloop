@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":215353,"exit":0,"name":"go"}],"ended":"2026-11-01T21:19:25Z","gate":{"duration_ms":2842,"exit":0},"iteration":1,"outcome":"rejected","run_id":"B20261101-2044-b26-i78-copilot-gate-review","schema":"iteration/v2","started":"2026-11-01T21:08:53Z","task":"T1"}

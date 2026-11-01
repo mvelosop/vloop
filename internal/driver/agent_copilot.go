@@ -12,7 +12,7 @@ import (
 	vloop "github.com/mvelosop/vloop"
 )
 
-// AgentCopilot is the GitHub Copilot CLI, which can run work, review, second-review and verify
+// AgentCopilot is the GitHub Copilot CLI, which can run work, review, second-review, verify and gate-review
 // sessions only.
 const AgentCopilot = "copilot"
 

@@ -12,3 +12,9 @@ planned: B20261101-2044-b26-i78-copilot-gate-review — 6 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 0m52s · $0.36 · run $4.43 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/6 done ──
+   Add the gate-review phase to the fence judge, vloop fence check and vloop fence hook
+   work T1 · 6m21s · $0.27 · run $4.70 / $40.00
+   check go
+   review T1 · 0m32s · $0.17 · run $4.87 / $40.00
+   review: FAIL

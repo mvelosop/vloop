@@ -62,9 +62,9 @@ environment and in `config set`.
 
 ### The fence hook
 
-Copilot does not read the review, work or verify fence, so each Copilot session has its own home (`COPILOT_HOME`, under `.vloop/tmp/`, emptied between sessions) holding a hooks file whose `preToolUse` entry runs `vloop fence hook --phase <review|second-review|work|verify> --root <repository root>` before every tool call. The hook reads one payload on stdin and prints one line, `{"permissionDecision":"allow"}` or `{"permissionDecision":"deny","permissionDecisionReason":"vloop fence: …"}`. It reads the phase's fence (`fence/review.json`, `fence/work.json` for a work session, or `fence/verify.json` for a verify session): its own Bash deny rules and the adapter's deny-list stems, not a copy, with the fence's matching (`pre:*` is the prefix alone or followed by a space, `*` elsewhere any run of characters).
+Copilot does not read the review, work or verify fence, so each Copilot session has its own home (`COPILOT_HOME`, under `.vloop/tmp/`, emptied between sessions) holding a hooks file whose `preToolUse` entry runs `vloop fence hook --phase <review|second-review|work|verify|gate-review> --root <repository root>` before every tool call. The hook reads one payload on stdin and prints one line, `{"permissionDecision":"allow"}` or `{"permissionDecision":"deny","permissionDecisionReason":"vloop fence: …"}`. It reads the phase's fence (`fence/review.json`, `fence/work.json` for a work session, or `fence/verify.json` for a verify session): its own Bash deny rules and the adapter's deny-list stems, not a copy, with the fence's matching (`pre:*` is the prefix alone or followed by a space, `*` elsewhere any run of characters).
 
-`vloop fence check --phase <review|second-review|work|verify> --root <dir> --tool <name> [--path <p>] ["<command>"]` runs the same judge without running anything: it prints `allow` (exit 0) or `deny: <reason>` (exit 1); bad arguments are exit 2. Use it to see what the hook would say to a command.
+`vloop fence check --phase <review|second-review|work|verify|gate-review> --root <dir> --tool <name> [--path <p>] ["<command>"]` runs the same judge without running anything: it prints `allow` (exit 0) or `deny: <reason>` (exit 1); bad arguments are exit 2. Use it to see what the hook would say to a command.
 
 What the judge does:
 

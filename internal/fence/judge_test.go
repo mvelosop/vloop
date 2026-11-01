@@ -254,7 +254,7 @@ func TestApplyPatch(t *testing.T) {
 // W1, V1: the work and verify phases are served; any other name is not.
 func TestUnknownPhase(t *testing.T) {
 	_, err := New("plan", t.TempDir(), "")
-	if err == nil || err.Error() != `unknown phase "plan": want review, second-review, work or verify` {
+	if err == nil || err.Error() != `unknown phase "plan": want review, second-review, work, verify or gate-review` {
 		t.Errorf("New(plan) error = %v", err)
 	}
 }
@@ -389,6 +389,58 @@ func TestVerifyPhase(t *testing.T) {
 		{"web_fetch", "", "", "tool web_fetch is not allowed in a verify session"},
 		{"apply_patch", "", patchAdd, ""},
 		{"apply_patch", "", patchSrc, "write to src/app.go" + vw},
+	}
+	for _, c := range cases {
+		d := j.Decide(c.tool, c.path, c.cmd)
+		if c.want == "" {
+			if !d.Allow {
+				t.Errorf("%s %q %q denied: %s", c.tool, c.path, c.cmd, d.Reason)
+			}
+			continue
+		}
+		if d.Allow || d.Reason != c.want {
+			t.Errorf("%s %q %q = allow %v, %q; want deny %q", c.tool, c.path, c.cmd, d.Allow, d.Reason, c.want)
+		}
+	}
+	if d := j.Decide("create", filepath.Join(root, ".vloop", "tmp", "a.json"), ""); !d.Allow {
+		t.Errorf("absolute path under .vloop/tmp denied: %s", d.Reason)
+	}
+}
+
+// G1: the gate-review phase decides as review, reads fence/gate-review.json and
+// names gate-review in its messages and skill hint.
+func TestGateReviewPhase(t *testing.T) {
+	j, root, _ := newJudge(t, PhaseGateReview)
+	const gw = " is not allowed in a gate-review session: only .vloop/tmp/ may be written"
+	patchAdd := "*** Begin Patch\n*** Add File: .vloop/tmp/gate-verdict.json\n+x\n*** End Patch\n"
+	patchGate := "*** Begin Patch\n*** Update File: .vloop/state/gates/T1/check.sh\n@@\n-a\n+b\n*** End Patch\n"
+	cases := []struct {
+		tool, path, cmd string
+		want            string // "" allows
+	}{
+		{"bash", "", "vloop task gate T1", ""},
+		{"bash", "", "vloop task show T1 --json", ""},
+		{"bash", "", "cat .vloop/state/gates/T1/check.sh", ""},
+		{"bash", "", "printf 'hello\\n' | grep -E '^hello$'", ""},
+		{"bash", "", "vloop schema validate gate-verdict/v2 .vloop/tmp/gate-verdict.json", ""},
+		{"bash", "", "cd .vloop/tmp/g && ls > out.txt", "write to out.txt" + gw},
+		{"bash", "", "echo x > .vloop/state/gates/T1/check.sh", "write to .vloop/state/gates/T1/check.sh" + gw},
+		{"bash", "", "rm .vloop/tmp/g/out.txt", "rm .vloop/tmp/g/out.txt is denied by the Copilot deny list (rm:*)"},
+		{"bash", "", "vloop task verify T1 'true' --reason x", "vloop task verify T1 true --reason x is denied by the gate-review fence (Bash(vloop task verify:*))"},
+		{"bash", "", "git -C .vloop/tmp/g status", "git -C .vloop/tmp/g status is denied by the gate-review fence (Bash(git -C:*))"},
+		{"bash", "", `sh -c "git push origin main"`, "git push origin main is denied by the gate-review fence (Bash(git push:*))"},
+		{"bash", "", "env gh pr list", "gh pr list is denied by the Copilot deny list (gh:*)"},
+		{"bash", "", "echo $(date)", "command substitution cannot be judged"},
+		{"create", ".vloop/tmp/gate-verdict.json", "", ""},
+		{"edit", ".vloop/state/state.json", "", "write to .vloop/state/state.json" + gw},
+		{"create", "src/app.go", "", "write to src/app.go" + gw},
+		{"view", ".vloop/state/gates/T1/check.sh", "", ""},
+		{"view", "~/.copilot/config.json", "", "read of ~/.copilot/config.json is not allowed: it is under ~/.claude, ~/.copilot or ~/.config/gh"},
+		{"skill", "gate-review", "", ""},
+		{"skill", "vloop-gate-review", "", "skill vloop-gate-review is not vloop's — use /vloop:gate-review"},
+		{"web_fetch", "", "", "tool web_fetch is not allowed in a gate-review session"},
+		{"apply_patch", "", patchAdd, ""},
+		{"apply_patch", "", patchGate, "write to .vloop/state/gates/T1/check.sh" + gw},
 	}
 	for _, c := range cases {
 		d := j.Decide(c.tool, c.path, c.cmd)

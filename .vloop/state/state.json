@@ -5,9 +5,9 @@
   "base": "d0d3f92f683753c73aa8a46a23d7585abc159616",
   "branch": "B20261101-2044-b26-i78-copilot-gate-review",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-01T21:05:32Z",
-  "updated": "2026-11-01T21:08:53Z",
+  "updated": "2026-11-01T21:19:25Z",
   "shell": "sh",
   "checks": [
     {
@@ -56,8 +56,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "No committed hook test exercises --phase gate-review: fence_hook_test.go still loops only review and second-review"
     },
     {
       "id": "T2",
