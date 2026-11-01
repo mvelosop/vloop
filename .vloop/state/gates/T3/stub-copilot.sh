@@ -1,8 +1,8 @@
 #!/bin/sh
 # The gates' stub copilot. It never touches the network. It answers
 # --version. For a -p prompt it accepts /vloop:work <task> (role work),
-# /vloop:review <task> (role review) and /vloop:verify (role verify, task -),
-# and appends to events:
+# /vloop:review <task> (role review), /vloop:verify (role verify, task -) and
+# /vloop:gate-review (role gate-review, task -), and appends to events:
 #
 #   session copilot-<role> <task> model=<model>
 #   deny-tool <role> <pattern>   every --deny-tool pattern (--deny-tool=P form,
@@ -24,13 +24,23 @@
 #
 # A work session then writes <task>.out and a done proposal under .vloop/tmp/;
 # a review session writes a passing verdict; a verify session writes a valid
-# verify/v1 report with no findings to .vloop/tmp/verify.json. Files beside
-# the stub change what a verify session does:
+# verify/v1 report with no findings to .vloop/tmp/verify.json; a gate-review
+# session writes a valid gate-verdict/v2 PASS with no findings to
+# .vloop/tmp/gate-verdict.json. Files beside the stub change what a verify
+# session does:
 #   copilot.verify-moveref    it first makes a commit (HEAD moves)
 #   copilot.verify-readme     it also appends a line to README.md
 #   copilot.verify-finding    its report holds one finding
 #   copilot.verify-noreport   it writes no report
 #   copilot.verify-fail       it exits 1 after its output
+# and what a gate-review session does:
+#   copilot.gr-moveref        it first makes a commit (HEAD moves)
+#   copilot.gr-noverdict      it writes no verdict
+#   copilot.gr-invalid        its verdict does not follow gate-verdict/v2
+#   copilot.gr-fail-once      its first session writes a valid FAIL verdict
+#                             with one wrong-reason finding on T1, later
+#                             ones the PASS (gr-count beside the stub counts)
+#   copilot.gr-checkgap       its verdict is a FAIL with one check-gap finding
 # All roles print JSON Lines like Copilot's: turns, usage checkpoints, one
 # tool call denied by the hook (c1, bash) and one completed (c2, view), and a
 # result event.
@@ -59,12 +69,12 @@ case "$cmd" in
   /vloop:work) ROLE=work;;
   /vloop:review) ROLE=review;;
   /vloop:verify) ROLE=verify;;
+  /vloop:gate-review) ROLE=gate-review;;
   *) ROLE="";;
 esac
 ok=yes
 [ -n "$ROLE" ] || ok=no
-[ "$ROLE" = verify ] && [ "$TASK" != - ] && ok=no
-[ "$ROLE" != verify ] && [ "$TASK" = - ] && ok=no
+case "$ROLE" in verify|gate-review) [ "$TASK" != - ] && ok=no;; *) [ "$TASK" = - ] && ok=no;; esac
 if [ "$ok" = no ]; then
   echo "stub copilot: unrecognised prompt: $prompt" >&2; rm -f "$tmpev"; exit 64
 fi
@@ -131,6 +141,25 @@ if [ -n "$hookcmd" ]; then
       hook skillother skill '{"skill":"vloop-verify"}'
       hook webfetch web_fetch '{"url":"https://example.invalid"}'
       ;;
+    gate-review)
+      hook gate bash "$(bashargs 'vloop task gate T1')"
+      hook show bash "$(bashargs 'vloop task show T1 --json')"
+      hook cdout bash "$(bashargs 'cd .vloop/tmp/g && ls > out.txt')"
+      hook gateedit bash "$(bashargs 'echo x > .vloop/state/gates/T1/check.sh')"
+      hook rmtmp bash "$(bashargs 'rm .vloop/tmp/g/out.txt')"
+      hook taskverify bash "$(bashargs "vloop task verify T1 'true' --reason x")"
+      hook gitc bash "$(bashargs 'git -C .vloop/tmp/g status')"
+      hook shpush bash "$(bashargs 'sh -c "git push origin main"')"
+      hook envgh bash "$(bashargs 'env gh pr list')"
+      hook verdictrel create "$(fileargs .vloop/tmp/gate-verdict.json)"
+      hook verdictabs create "$(fileargs "$here/.vloop/tmp/g/x.txt")"
+      hook staterel edit "$(fileargs .vloop/state/state.json)"
+      hook srcrel create "$(fileargs src/app.go)"
+      hook viewgate view "$(fileargs .vloop/state/gates/T1/check.sh)"
+      hook skillg skill '{"skill":"gate-review"}'
+      hook skillother skill '{"skill":"vloop-gate-review"}'
+      hook webfetch web_fetch '{"url":"https://example.invalid"}'
+      ;;
   esac
 fi
 
@@ -158,6 +187,18 @@ case "$ROLE" in
     fi
     [ -f "$dir/copilot.verify-fail" ] && xit=1
     denied="rm .vloop/tmp/v/out.txt is denied by the Copilot deny list (rm:*)"
+    ;;
+  gate-review)
+    [ -f "$dir/copilot.gr-moveref" ] && git commit -q --allow-empty -m "moved by the stub gate-review session"
+    n=$(( $(cat "$dir/gr-count" 2>/dev/null || echo 0) + 1 )); echo "$n" >"$dir/gr-count"
+    v='{"schema":"gate-verdict/v2","verdict":"PASS","tasks":[{"task":"T1","verdict":"PASS","findings":[]}],"notes":"copilot"}'
+    [ -f "$dir/copilot.gr-fail-once" ] && [ "$n" = 1 ] &&
+      v='{"schema":"gate-verdict/v2","verdict":"FAIL","tasks":[{"task":"T1","verdict":"FAIL","findings":[{"summary":"the gate passes on a stub","kind":"wrong-reason"}]}],"notes":"copilot round one"}'
+    [ -f "$dir/copilot.gr-checkgap" ] &&
+      v='{"schema":"gate-verdict/v2","verdict":"FAIL","tasks":[{"task":"T1","verdict":"FAIL","findings":[{"summary":"no check runs the tests","kind":"check-gap"}]}],"notes":"copilot"}'
+    [ -f "$dir/copilot.gr-invalid" ] && v='{"schema":"gate-verdict/v2","verdict":"MAYBE","notes":"copilot"}'
+    [ -f "$dir/copilot.gr-noverdict" ] || printf '%s\n' "$v" >.vloop/tmp/gate-verdict.json
+    denied="vloop task verify T1 true --reason x is denied by the gate-review fence (Bash(vloop task verify:*))"
     ;;
 esac
 echo "stub copilot $ROLE session" >&2

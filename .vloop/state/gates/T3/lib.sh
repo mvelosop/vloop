@@ -1,4 +1,4 @@
-# Shared harness for B25's run gates (the same file in T2 and T3). The sourcing
+# Shared harness for B26's run gates (the same file in T2 and T3). The sourcing
 # gate sets G, its own folder. Every repository, binary, stub and HOME a gate
 # makes lives under $t, a temporary directory removed on exit. Nothing touches
 # this repository's tree or refs, the network or the real HOME: runs happen in
@@ -19,26 +19,29 @@ export GOMODCACHE GOCACHE GOPATH GOPROXY=off
 BRIEF=docs/briefs/B20260101-0900-demo.loop-brief.md
 # The Copilot model id of the fixtures.
 MODEL=gpt-5.6-terra
-# What a gate expects from every stub copilot verify session's hook, one
-# "<label> <decision> <exit>" per line (see stub-copilot.sh).
-VERIFYHOOK='build allow 0
+# What a gate expects from every stub copilot gate-review session's hook, one
+# "<label> <decision> <exit>" per line (see stub-copilot.sh): the worked
+# example's gate-review decisions, as Copilot's payloads.
+GRHOOK='gate allow 0
+show allow 0
 cdout deny 0
+gateedit deny 0
 rmtmp deny 0
+taskverify deny 0
 gitc deny 0
 shpush deny 0
 envgh deny 0
-srcrel deny 0
-readme deny 0
-tmprel allow 0
-tmpabs allow 0
+verdictrel allow 0
+verdictabs allow 0
 staterel deny 0
-viewsrc allow 0
-skillv allow 0
+srcrel deny 0
+viewgate allow 0
+skillg allow 0
 skillother deny 0
 webfetch deny 0'
 
 # The fences as they stood when this plan was written: no task changes them.
-for f in verify work review; do
+for f in gate-review verify work review; do
   cmp -s "$G/$f.json" "$top/fence/$f.json" || fail "fence/$f.json differs from the fence this plan was written against: no task may change a fence's rules"
 done
 
@@ -69,7 +72,7 @@ fixture() {
   pv=$("$JQ" -r .version "$top/plugin/.claude-plugin/plugin.json") || fail "plugin version"
   cp "$G/plan1.json" "$t/stub/plan.json" && ln -s "$GITBIN" "$t/stub/git" && ln -s "$JQ" "$t/stub/jq" &&
     cp "$G/review.json" "$t/stub/review-fence.json" && cp "$G/work.json" "$t/stub/work-fence.json" &&
-    cp "$G/verify.json" "$t/stub/verify-fence.json" &&
+    cp "$G/verify.json" "$t/stub/verify-fence.json" && cp "$G/gate-review.json" "$t/stub/gate-review-fence.json" &&
     sed "s/@PLUGIN_VERSION@/$pv/" "$G/stub-claude.sh" >"$t/stub/claude" && cp "$G/stub-copilot.sh" "$t/stub/copilot" &&
     chmod +x "$t/stub/claude" "$t/stub/copilot" || fail "stub"
   printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$t/repo" >"$t/home/.claude.json"
@@ -94,7 +97,10 @@ commitfix() { venv git -C "$t/repo" add -A && venv git -C "$t/repo" commit -q -m
 # runfix <out> [env...]: this tree's `vloop run` of the brief in the fixture
 # with the extra environment; $rc is its exit code, <out> its stdout and
 # stderr, <out>.ev the stubs' events, <out>.sessions the session records,
-# <out>.report the run folder's reports/verify.json when there is one.
+# <out>.report the run folder's reports/verify.json when there is one,
+# <out>.gr1 and <out>.gr2 its reports/gate-review-1.json and -2.json when
+# there are, <out>.state the plan file when there is one, <out>.problems what
+# the plan sessions were sent back (see stub-claude.sh).
 # runfixnl: the same with no GitHub token.
 runfix() {
   o=$1; shift
@@ -108,11 +114,15 @@ runfixnl() {
 }
 collect() {
   if [ -f "$t/stub/events" ]; then mv "$t/stub/events" "$1.ev"; else : >"$1.ev"; fi
-  rm -rf "$1.sessions" "$1.report" && mkdir -p "$1.sessions"
+  rm -rf "$1.sessions" "$1.report" "$1.gr1" "$1.gr2" "$1.state" "$1.problems" && mkdir -p "$1.sessions"
+  [ -f "$t/repo/.vloop/state/state.json" ] && cp "$t/repo/.vloop/state/state.json" "$1.state"
+  if [ -f "$t/stub/problems" ]; then mv "$t/stub/problems" "$1.problems"; else : >"$1.problems"; fi
   for d in "$t/repo"/.vloop/state/runs/*/*/; do
     [ -d "$d" ] || continue
     cp "$d"sessions/*.json "$1.sessions/" 2>/dev/null
     [ -f "$d"reports/verify.json ] && cp "$d"reports/verify.json "$1.report"
+    [ -f "$d"reports/gate-review-1.json ] && cp "$d"reports/gate-review-1.json "$1.gr1"
+    [ -f "$d"reports/gate-review-2.json ] && cp "$d"reports/gate-review-2.json "$1.gr2"
   done
   return 0
 }
@@ -130,6 +140,8 @@ ev() { grep -E -- "$2" "$1.ev"; }
 nosession() { [ -s "$1.ev" ] && fail "$2: a session was started: $(head -3 "$1.ev")"; return 0; }
 # task <field> <id>: the field of a task in the fixture's plan.
 task() { "$JQ" -r --arg id "$2" ".tasks[] | select(.id == \$id) | .$1" "$t/repo/.vloop/state/state.json"; }
+# rundir: the one run folder of the fixture, repo-relative, with its slash.
+rundir() { (cd "$t/repo" && ls -d .vloop/state/runs/*/*/ 2>/dev/null | head -1); }
 # onecommit <what>: exactly one commit, on any ref, carries T1.out.
 onecommit() {
   [ "$(venv git -C "$t/repo" log --all --format=%H -- T1.out | wc -l | tr -d ' ')" = 1 ] ||
