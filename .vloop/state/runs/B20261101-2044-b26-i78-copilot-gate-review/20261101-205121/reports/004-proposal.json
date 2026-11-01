@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "agent.gate-review = copilot now gets the experimental warning, the default-model refusal, K1, the login refusal and doctor's copilot rows, whatever run.verify says; claude behaviour is unchanged.",
+  "files": ["internal/cli/doctor.go", "internal/cli/run.go", "internal/cli/doctor_copilot_gatereview_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok.",
+  "notes": "Added copilotGateReview (no run.verify switch) to copilotKeys; run.go's warning filter lists agent.gate-review. The review look-alike warning is unchanged and now shows with only the gate review on copilot. Internal/cli task_gate tests fail inside a work session only because the plan guard sees a changed plan; unrelated."
+}

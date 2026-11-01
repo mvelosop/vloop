@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The Copilot adapter supports the gate-review phase (same deny list incl. shell(rm:*), hooks file with --phase gate-review), its record is session/v4, and agent.gate-review accepts copilot while agent.plan still does not.
 - **Files:** internal/config/config.go, internal/config/config_test.go, internal/driver/agent_copilot.go, internal/driver/agent_copilot_test.go, internal/driver/session.go
 - **Notes for next iteration:** Contract item G2: TestCopilotSupportsWorkReviewAndVerify now expects gate-review supported (plan still not) and TestAgentKeys treats agent.gate-review like work/review/verify (accepts copilot). Added TestCopilotGateReviewArgvAndHooks and gate-review cases in TestCopilotVerifyRecordIsSessionV4. gatereview.go untouched. Docs (config guide wording of agent.gate-review) left to T4; preflight/doctor to T3.
+
+## T3 — Check agent.gate-review = copilot in the run preflight and doctor
+
+- **Outcome:** done (review: PASS)
+- **Summary:** agent.gate-review = copilot now gets the experimental warning, the default-model refusal, K1, the login refusal and doctor's copilot rows, whatever run.verify says; claude behaviour is unchanged.
+- **Files:** internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_copilot_gatereview_test.go
+- **Notes for next iteration:** Added copilotGateReview (no run.verify switch) to copilotKeys; run.go's warning filter lists agent.gate-review. The review look-alike warning is unchanged and now shows with only the gate review on copilot. Internal/cli task_gate tests fail inside a work session only because the plan guard sees a changed plan; unrelated.

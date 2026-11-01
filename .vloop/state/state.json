@@ -5,9 +5,9 @@
   "base": "d0d3f92f683753c73aa8a46a23d7585abc159616",
   "branch": "B20261101-2044-b26-i78-copilot-gate-review",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-01T21:05:32Z",
-  "updated": "2026-11-01T21:31:13Z",
+  "updated": "2026-11-01T21:38:24Z",
   "shell": "sh",
   "checks": [
     {
@@ -131,7 +131,7 @@
         "Committed tests cover the warning, the model.gate-review refusal, K1, the login refusal and the claude case for agent.gate-review (extending the existing doctor and run preflight tests); a code comment that lists the Copilot phases or keys (doctor's experimental warning and copilotKeys included) names gate-review too."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

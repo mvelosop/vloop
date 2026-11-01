@@ -200,7 +200,7 @@ func doctorClaude(add func(name, result, msg string)) bool {
 }
 
 // copilotExperimental is the warning every place that chooses copilot for the
-// work, review or verify sessions gives.
+// work, review, gate-review or verify sessions gives.
 const copilotExperimental = "is copilot: experimental (docs/guide/configuration.md)"
 
 // copilotNoLogin says what is missing when no GitHub login reaches a Copilot
@@ -232,6 +232,13 @@ func copilotReview(root string) bool {
 	return err == nil && v.Value == driver.AgentCopilot
 }
 
+// copilotGateReview reports whether agent.gate-review is copilot. The gate
+// review has no switch, so the key is in use whenever it is copilot.
+func copilotGateReview(root string) bool {
+	v, err := config.Get(root, "agent.gate-review")
+	return err == nil && v.Value == driver.AgentCopilot
+}
+
 // copilotVerify reports whether the verify session is in use (run.verify not
 // false) and agent.verify is copilot.
 func copilotVerify(root string) bool {
@@ -258,11 +265,14 @@ func copilotSecond(root string) bool {
 }
 
 // copilotKeys names the agent keys that choose copilot, for the work sessions,
-// the reviews and the verify session in use.
+// the gate review, the reviews and the verify session in use.
 func copilotKeys(root string) []string {
 	var keys []string
 	if copilotWork(root) {
 		keys = append(keys, "agent.work")
+	}
+	if copilotGateReview(root) {
+		keys = append(keys, "agent.gate-review")
 	}
 	if copilotReview(root) {
 		keys = append(keys, "agent.review")
@@ -316,7 +326,7 @@ func skillClashes(root string) []skillClash {
 	return out
 }
 
-// doctorCopilot adds the checks of a copilot work, review or verify agent: copilot found and
+// doctorCopilot adds the checks of a copilot work, gate-review, review or verify agent: copilot found and
 // working, the experimental warning, and a warning for each project skill
 // whose name ends in review, which a copilot session may pick instead of
 // /vloop:review.

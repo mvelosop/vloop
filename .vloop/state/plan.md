@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 3
+**Status:** running · **3/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:31:13Z
+**Brief:** `docs/briefs/B20261101-2044-b26-i78-copilot-gate-review.loop-brief.md` · **Updated:** 2026-11-01T21:38:24Z
 
 ## Progress
 
 - [x] **T1** — Add the gate-review phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
 - [x] **T2** — Run gate-review sessions on Copilot: the adapter, its record and agent.gate-review = copilot
-- [ ] **T3** — Check agent.gate-review = copilot in the run preflight and doctor
+- [x] **T3** — Check agent.gate-review = copilot in the run preflight and doctor
 - [ ] **T4** — Document Copilot gate-review sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a gate-review run on the real CLI
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
@@ -66,7 +66,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Check agent.gate-review = copilot in the run preflight and doctor
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 An operator who puts the gate review on Copilot must be warned it is experimental and stopped before any session when the setup cannot work, as for the other Copilot phases. This task adds agent.gate-review to the keys the preflight and doctor check; the gate review has no switch, so the key is in use whenever it is copilot, also on a resume past the gate review.
 
