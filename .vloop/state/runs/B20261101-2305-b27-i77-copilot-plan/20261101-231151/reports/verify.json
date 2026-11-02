@@ -1,0 +1,7 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": { "example_lines": 41, "sentences": 14, "surfaces": 14 },
+  "notes": "Pass 1: all 15 shell lines and 11 other-tool lines of the fence tables, both apply_patch cases, the 3 unchanged lines and the changed unknown-phase line were run as written with a freshly built binary in a scratch git repository (.vloop/tmp/vs/); each decision, reason and exit code matched. The stub-copilot vloop run and the five planted failures were not re-run end to end (they need a stub harness); I read run.go and plan.go for their messages and ran the driver and cli tests matching Plan|Copilot, which passed. Surfaces read: fence check/hook help, commands.md, configuration.md (agent.plan row, Copilot paragraph, hook section), session.md, domain-model glossary hook entry, fence-audit, adapter and doctor comments, config.go, acceptance README. Doubt, not a finding: the domain-model.md glossary hook entry names the plan fence but not the plan write rule that the brief's A1 mentions; session.md and configuration.md state it."
+}
+
