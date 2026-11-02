@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 4
+**Status:** running · **4/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-01T23:59:08Z
+**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-02T00:05:43Z
 
 ## Progress
 
 - [x] **T1** — Add the plan phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
 - [x] **T2** — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
 - [x] **T3** — Check agent.plan = copilot in the run preflight and doctor
-- [ ] **T4** — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
+- [x] **T4** — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
 - [ ] **T5** — Extend the Copilot acceptance kit with a plan run on the real CLI
 - [ ] **T6** — Close the run: every gate and the worked example on the final tree
 
@@ -89,7 +89,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
 
-`pending` · depends on: T1, T2, T3
+`done` · depends on: T1, T2, T3
 
 Operators and later briefs learn what a Copilot plan session may do from the fence audit, the configuration guide and the domain pages, which today keep the plan on Claude. This task brings every surface that names the Copilot phases up to what T1–T3 built, in the code's own words. It is prose: if it fails review twice on wording, it is blocked and the operator finishes it.
 

@@ -51,3 +51,10 @@ committing the plan
    review T3 · 0m22s · $0.13 · run $5.95 / $40.00
    review: PASS
    T3 done
+── iteration 5 (5 this run) · T4 · 3/6 done ──
+   Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
+   work T4 · 1m31s · $0.40 · run $6.35 / $40.00
+   check go
+   review T4 · 0m42s · $0.21 · run $6.56 / $40.00
+   review: PASS
+   T4 done
