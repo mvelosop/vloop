@@ -58,4 +58,8 @@ the only thing that stops it.
 | `review-brief-planted-faults` | `/vloop:review-brief` | a draft brief with three planted faults (a claim about the code that the code contradicts, a usage message the Behaviour contract and the Worked example state differently, a configured check that is red after the first task until the last): the verdict is not `PASS`, each fault is named and the brief is not edited |
 | `create-brief-drafts-checked` | `/vloop:create-brief` | a request that settles every fork and states every literal value becomes a draft written with `vloop brief new` and checked with `vloop brief check` to `0 warning(s)`; graded from the trace, because the brief's file name is only known at run time |
 
+`review-brief-planted-faults` and `create-brief-drafts-checked` were first run
+when the skills joined the plugin (2026-11-02, B28): one run each, with the
+plugin and the default model, both scored 1.0 (≈ $0.84 together).
+
 `gate-review-real-misses` is for macOS hosts: its first gate's `grep -P` is a defect only where `grep` is BSD grep, which rejects the option. Its scaffold exits non-zero on a host whose `grep` accepts `-P`, and on any host where a planted gate does not fail for its recorded reason. The scaffold needs `vloop` on `PATH`.

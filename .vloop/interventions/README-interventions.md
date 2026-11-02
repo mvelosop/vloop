@@ -133,6 +133,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261101-230340-acceptance-on-the-real-cli-the-url-short](I20261101-230340-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261102-004526-acceptance-on-the-real-cli-the-url-short](I20261102-004526-acceptance-on-the-real-cli-the-url-short.md) |
+| verify | ceremony | partly | no-options | [I20261102-091452-acceptance-the-two-new-eval-cases-run-on](I20261102-091452-acceptance-the-two-new-eval-cases-run-on.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
@@ -198,6 +199,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | close | ceremony | yes | no-options | [I20261015-161603-v0-11-0-released-so-b17-runs-on-b16-s-ve](I20261015-161603-v0-11-0-released-so-b17-runs-on-b16-s-ve.md) |
 | close | ceremony | partly | no-options | [I20261026-092947-v0-13-0-released-after-the-two-hardening](I20261026-092947-v0-13-0-released-after-the-two-hardening.md) |
 | close | ceremony | partly | no-options | [I20261028-115709-v0-14-0-released-after-b24](I20261028-115709-v0-14-0-released-after-b24.md) |
+| close | ceremony | no | no-options | [I20261102-091451-the-brief-s-close-edits-this-repository](I20261102-091451-the-brief-s-close-edits-this-repository.md) |
 | close | repair | yes | no-options | [I20260929-2048-local-main-reset-to-the-pre-merge-commit](I20260929-2048-local-main-reset-to-the-pre-merge-commit.md) |
 | next | carry-forward | no | no-options | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | no-options | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |
