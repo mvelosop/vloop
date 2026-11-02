@@ -80,12 +80,13 @@ if it is still a draft, under the same file name) and keep its output; you do no
 Write the report as `brief-review/v1` to `.vloop/tmp/brief-review.json`, then
 validate it with `vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json`
 and fix it until it passes. Also answer in prose, whether a command started you
-or you run interactively. The file has `schema`, `brief` (the path),
+or you run interactively. The file has `schema`, `brief` (the brief's name:
+its file name without `.md`),
 `verdict`, `findings` (each `{kind, section, summary, evidence, fix}`; `FIX` and
 `ASK` need at least one), `decisions`, `checked` and `header`:
 
 ```json
-{"schema": "brief-review/v1", "brief": "docs/briefs/B1-x.loop-brief.md", "verdict": "PASS",
+{"schema": "brief-review/v1", "brief": "B1-x.loop-brief", "verdict": "PASS",
  "findings": [], "decisions": [], "checked": "facts, consistency, rules, runnability",
  "header": "Reviewed 2026-11-02: PASS, 0 findings"}
 ```
