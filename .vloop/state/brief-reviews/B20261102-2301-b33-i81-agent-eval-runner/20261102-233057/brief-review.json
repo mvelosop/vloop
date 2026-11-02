@@ -1,0 +1,31 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2301-b33-i81-agent-eval-runner.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A2",
+      "summary": "Low severity. The brief has the tool start sessions through internal/driver, but it never says where that Runner's run folder goes or which version it extracts under. Both values end up in the layout under --out and in the workspace. Runner.Run writes <RunDir>/<phase>-<iteration>.stderr and <RunDir>/sessions/NNN-<phase>.json. ExtractPlugin and ExtractFence refuse an empty version and use it to name .vloop/tmp/plugin/<version>/ and .vloop/tmp/fence/<version>/ inside the workspace. A2 and A5 pin only repo/, transcript.jsonl, trace.jsonl and report.json literally, yet A6's README must document 'the layout under --out'. If the run folder were placed inside repo/, the record and stderr would land in the workspace that file-target graders read.",
+      "evidence": "internal/driver/session.go:38 (RunDir 'the run folder (absolute); records go in its sessions/'), :404 (stderr file in RunDir), :420 (record in RunDir/sessions); internal/driver/extract.go:42 and :149 (empty version refused; version names the extraction folders); the brief's A2 names only repo/ and transcript.jsonl, A3 trace.jsonl, A5 report.json.",
+      "fix": "In A2, add one sentence: the session's run folder is <out>/<case>/run-<k>/, outside repo/, so its stderr and session record sit beside transcript.jsonl. Name the version string the plugin and fence are extracted under, for example the vloop version compiled into the tool, or a literal such as agent-eval. A6's README then lists both."
+    }
+  ],
+  "decisions": [
+    "A repository tool (go run ./tools/agent-eval), not a vloop subcommand. Sound: vloop plugin path never extracts plugin/evals/ (extract.go skips evals/).",
+    "Sessions start under the phase's fence. The case's allowed_tools and max_turns are ignored, so scores are not comparable with claude plugin eval's. The brief says this. Agreed.",
+    "No effort is set. This matches vloop's default: every effort.<phase> key is unset unless configured (config.go:92-98). But a repo that configures effort will run differently from what was qualified.",
+    "--vloop names the binary the Copilot fence hook runs (default: vloop on PATH). The acceptance depends on a branch-built vloop being installed. Agreed: one copy of the judge.",
+    "Claude switches to --output-format stream-json --verbose only inside this tool. The default stays unchanged, pinned by TestSessionArgs and TestRunClaudeInvocations.",
+    "The judge is always Claude: three votes, majority decides, default model sonnet, run in an empty temporary directory. A failed judge call is a run error, not a FAIL. Three votes triples the judge cost per llm grader; that is acceptable.",
+    "One arm only, with no without-plugin baseline. tool_order and baseline graders are out of scope; any other type scores 0 as unsupported.",
+    "Cases whose skill vloop does not start (operate, create-brief) are skipped, not failed, and a skipped case does not make the exit code 1.",
+    "The qualifying rule written into docs/guide/evals.md: at 3 runs, every case of the phase scores a mean at least as high as the phase's default Claude model scores on this tool. This is strict: with a noisy llm judge, a single miss disqualifies. The operator should consciously accept it, since it becomes the documented bar.",
+    "The tool takes no lock, does not clear .vloop/tmp/, and does not restore a brief a review-brief session edits. Whatever the session does is left for the graders to see.",
+    "Transcripts and trace.jsonl are written as printed, with no masking of $HOME. They may hold absolute paths, which is acceptable only because --out is a scratch directory and is never committed. Only scores reach the repo, at acceptance.",
+    "--case uses path.Match globs; --timeout defaults to 20m; --judge-model defaults to sonnet."
+  ],
+  "checked": "facts (Runner/Spec/Prompt/Args/Run, the adapters, writeCopilotHooks with os.Executable, PlanDigest/GateFiles and the phases that receive PlanSHA, the brief review's start, the fence's Copilot tool names, tools/release's run shape, S-1/S-2/S-4, the design-note sentence and the evals.md headings, the two test names, the observed samples' shapes and their result line); the frontmatter subset against all 23 cases' prompt.md and 98 graders (0 errors); the worked example's arithmetic (4/6) and NOTES; the refusal order; config.Get without a config file; task order against the go check; the verify fence for the close task; vloop brief check (ok, 0 warnings)",
+  "header": "Reviewed 2026-11-02 (round 6): FIX, 1 finding (low)"
+}
+

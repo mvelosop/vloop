@@ -1,0 +1,67 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2301-b33-i81-agent-eval-runner.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Shape",
+      "summary": "Tasks 1-3 cannot be gated through the only surface the brief names, the command. Task 1's second gate ('reading every case of plugin/evals/ without an error') has no command output that shows it, and the trace (T2) and graders (T3) only become visible through the command once T4 runs a session. The planner would have to pin internal package or function names, or gate on a test the task writes, which P-8 forbids.",
+      "evidence": "plugin/skills/plan/SKILL.md:169-181 (every gate judges through the named surface; pin only where no named surface reaches a criterion); docs/domain/domain-model.md:210 (P-8); A1 has no flag that reads cases without starting sessions.",
+      "fix": "Order the Shape along the command: T1 A1's refusals; T2 one Copilot run end to end with a fake copilot (scaffold, transcript, Copilot trace, regex/tool_used/file_exists graders, report.json, skip, scaffold error: lines o1-o5); T3 Claude stream-json plus the driver options (o6, the argv line); T4 the llm judge and the table; T5 docs; T6 close. Drop 'reading every case without an error' as a gate, or, as a contract addition, give it a surface such as a --list flag that prints each selected case, its phase and its grader types without running anything."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A4 llm; Worked example o6",
+      "summary": "The contract does not say where the judge's answer and cost are read. It names `claude -p --output-format json` and 'PASS or FAIL on its last line', but not which field holds the text or where judge_cost_usd comes from. In o6 the same fake `claude` on PATH is both the agent under test (stream-json) and the judge (json), and nothing says how the fake tells the two calls apart.",
+      "evidence": "A4 llm bullet; A5 judge_cost_usd; worked example line o6 ('a fake claude streaming the same session') and the fixture's 'a fake claude judge answers PASS'.",
+      "fix": "State that the verdict is the last non-empty line of the JSON's `result` field and that its `total_cost_usd` is added to judge_cost_usd. In the worked example, say the fake claude answers as the judge when its argv has `--output-format json` and streams the session when it has `stream-json`."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A4 tool_used",
+      "summary": "`input_match` is not stated to be a regular expression. The real cases write it as one (`vloop\\s+brief\\s+check`, `state\\.json|\\.gitignore`), but the worked example's `vloop schema validate` also passes as a substring. A substring implementation would pass every gate and still score those real cases wrong.",
+      "evidence": "plugin/evals/create-brief-drafts-checked/graders/brief-check.md, work-disputes-impossible-gate/graders/gate-untouched.md; A4 says 'pattern is a Go regular expression' only for regex.",
+      "fix": "In A4: '`input_match` is a Go regular expression searched in `input`'. Give the fixture's c grader a regex that a substring match fails, e.g. `vloop\\s+schema\\s+validate`."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A2, A5",
+      "summary": "Three values a gate will compare are not written literally: (1) the `phase` of a skipped case in report.json and in the PHASE column (fixture-operate has no phase); (2) which graders NOTES names when --runs > 1; (3) the form of <d> in `timed out after <d>` (as given, or Go's Duration.String, e.g. `20m0s`).",
+      "evidence": "A2 'Any other skill skips the case with the reason `no phase`'; A5 schema `\"phase\": \"...\"` and table NOTES; worked example o4 pins only status and reason.",
+      "fix": "Pin each: e.g. phase is the skill name (`operate`) for a skipped case; NOTES names the graders below 1 in any run, in name order; <d> is the --timeout value as Go's Duration.String prints it. Add the skipped case's phase to o4."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A2",
+      "summary": "'Started as vloop starts that phase' is not quite true and the brief does not say so: `vloop run` gives work, review and verify sessions VLOOP_PLAN_SHA256 (Spec.PlanSHA), and it sets effort from config. The tool has no plan hash held by a driver, so `vloop task gate` in its sessions runs any plan.",
+      "evidence": "internal/driver/iterate.go:650, 780, 956 (PlanSHA: guard.hash()); internal/cli/task_gate.go:30; internal/driver/agent.go:149-152.",
+      "fix": "Add to A2: the tool passes no plan hash and no effort (the config default)."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example (last line)",
+      "summary": "The line 'a vloop run session's Claude argv ends in --output-format json' needs `vloop run`, which the verify session cannot run. The brief does not say so or name the tests that cover the line, as guidelines.md asks.",
+      "evidence": "plugin/skills/create-brief/guidelines.md ('Say which worked-example lines the verify session cannot run'); the covering tests exist: internal/driver/session_test.go:21, cmd/vloop/run_agent_test.go:48.",
+      "fix": "Mark the line as judged by internal/driver/session_test.go and cmd/vloop/run_agent_test.go, unchanged."
+    }
+  ],
+  "decisions": [
+    "A repository tool, not `vloop eval`: sound, since the evals are never extracted (internal/driver/extract.go:62).",
+    "Sessions run under the phase's fence and ignore a case's allowed_tools/max_turns: right for qualification, but scores are not comparable with `claude plugin eval`'s; the brief says so.",
+    "Copilot's fence hook runs an installed `vloop` (--vloop, default PATH): the judge is the installed binary's, so the acceptance must install the branch's build first; it does.",
+    "Claude streams stream-json only in this tool, through a driver option that defaults off.",
+    "The judge is always Claude, `sonnet` by default, three votes, majority wins; an unparseable answer counts as FAIL.",
+    "One arm, no without-plugin baseline.",
+    "Cases of skills vloop does not start (operate, create-brief) are skipped, not failed.",
+    "--case is repeatable and selects the union (path.Match); `claude plugin eval` keeps only the last --case (plugin/evals/README.md), so this deliberately differs.",
+    "--out must be absent or empty.",
+    "Copilot tool names are mapped to Claude's (table in A3); unknown names pass unchanged.",
+    "Unsupported grader types (tool_order, baseline) score 0; no current case uses them.",
+    "Exit 1 only for errored cases; a low score exits 0. Fine for a bench: the qualifying rule is the operator's judgement.",
+    "Qualifying rule: at 3 runs, every case of the phase has a mean no lower than the phase's default Claude model on the same tool. It is strict: where Claude scores 1.0, one llm-judge flake disqualifies. Consider whether a tolerance is wanted."
+  ],
+  "checked": "facts (session.go Runner/Spec/Prompt/Args/Run; agent.go adapters and Supports; agent_copilot.go command, Parse, writeCopilotHooks using os.Executable; fence/judge.go tool names vs A3's table; briefreview.go; tools/release run() shape; evals not extracted; design-note paragraph and sections; S-1/S-2/S-4; every grader's frontmatter keys vs A4; every prompt.md skill; worked-example arithmetic 4/6), consistency, rules (P-8, named-surface rule), runnability against the single `go` check; vloop brief check: ok, 0 warning(s). Not verified: the `claude plugin eval --help` glob claim and the observed stream-json/Copilot event shapes (no CLI or model call was allowed).",
+  "header": "Reviewed 2026-11-02: FIX, 6 findings"
+}
+

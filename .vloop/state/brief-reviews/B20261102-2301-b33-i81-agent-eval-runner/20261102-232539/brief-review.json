@@ -1,0 +1,53 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2301-b33-i81-agent-eval-runner.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A4 (llm)",
+      "summary": "The brief does not say what happens when the judge itself fails: `claude` is missing, it exits non-zero, or it prints no JSON with a `result`. The only rule that comes close is 'an answer whose last line is neither counts as FAIL'. Under that rule, a judge that cannot run scores every llm grader 0 with no error, and the report shows it as the model failing. That is the exact misreading this tool exists to prevent.",
+      "evidence": "llm graders make up most of the cases: 50 of the 98 grader files are `type: llm` (`grep -h '^type:' plugin/evals/*/graders/*.md | sort | uniq -c`). In gate-review-real-misses, the case the acceptance runs, 7 of its 9 graders are llm. A Copilot run on a machine where `claude` is not installed or not logged in would come back `scored`, exit 0, with every finds-* grader at 0. The A1 refusal table has no row for a missing judge.",
+      "fix": "Add to A4: a judge call that cannot start, exits non-zero, or prints no JSON with a string `result` makes the run an error, with the reason `judge failed for <grader>: <cause>`. A run that errors this way is reported like any other errored run (score null, the case `error`, exit 1). Optionally, add an A1 refusal `agent-eval: no claude for the llm judge` when a selected case has an llm grader and `claude` is not on PATH. Add a test line where the fake judge exits 1."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A2",
+      "summary": "The two error reasons overlap and the brief does not say which one wins. A session killed at the timeout normally leaves no result as well, so both 'no session result' and 'timed out after <d>' apply.",
+      "evidence": "internal/driver/session.go:400-431: when a session times out, Run sets res.TimedOut and then still calls Parse. A killed Claude session prints no JSON, and a killed Copilot session prints no `result` line, so `Recorded` is false as well as `TimedOut` being true.",
+      "fix": "State the precedence: 'a session killed at the timeout is an error with the reason `timed out after <d>`, whether or not it left a result; otherwise one that leaves no result, `no session result`.'"
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A5",
+      "summary": "In the stdout table template, `<n>` stands for two different things: the RUNS column and the total's case count. The RUNS and COST values for a skipped case are not written down either.",
+      "evidence": "The row template reads `<name> <phase> <n> 0.67 $0.12 ...` and the total line `<n> case(s) · ...`, followed by '`<n>` counts every selected case'. A skipped case has no runs, so RUNS could be 0 or the `--runs` value, and COST could be `$0.00` or `-`.",
+      "fix": "Write the RUNS column as `<runs>` ('the runs made: 0 for a skipped case') and pin a skipped case's COST as `$0.00`. Keep `<n>` for the total line only."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A3",
+      "summary": "Unsure, low severity. 'input as compact JSON' leaves HTML escaping open. Go's json.Marshal writes <, > and & as \\u003c, \\u003e and \\u0026, so an `input_match` such as `2>&1`, or a trace-target regex, would not match the command as the agent wrote it.",
+      "evidence": "None of today's input_match or trace regexes contains <, > or & (the `tool_used` input_match values across plugin/evals/*/graders/*.md are `vloop\\s+brief\\s+check`, `state\\.json`, `vloop\\s+task\\s+(verify|reset)`, `git\\s+commit`, `state\\.json|\\.gitignore` and `loop-brief`), so no current case fails. It would bite the first case that greps a redirection.",
+      "fix": "Say 'compact JSON without HTML escaping (json.Encoder with SetEscapeHTML(false))', or leave it as written and accept the limit."
+    }
+  ],
+  "decisions": [
+    "A repository tool, not a `vloop eval` subcommand. Sound: vloop plugin path drops evals/ (internal/driver/extract.go:62).",
+    "Sessions run under the phase's fence, not the case's allowed_tools and max_turns. A session therefore has no turn cap, and --timeout (20m) is the only bound on cost per run.",
+    "Copilot's fence hook runs an installed vloop (--vloop), so the qualified fence is that binary's, not the branch's. The acceptance covers this by installing the branch's build.",
+    "Claude streams stream-json only inside this tool, through a driver option whose default changes nothing.",
+    "The llm judge is always Claude, `sonnet` by default, three votes, majority wins. The 'as claude plugin eval's reports show' basis could not be checked from the repository.",
+    "One arm: no without-plugin baseline.",
+    "Cases of skills vloop does not start (operate, create-brief) are skipped, not failed.",
+    "Exit 1 means only that a run errored. Low scores still exit 0. The verdict is left to the reader of the report.",
+    "No effort is set. That matches vloop's default, since no effort.* key has a default (internal/config/config.go:92-98), but the tool cannot qualify a model at a configured effort.",
+    "No run lock and no clearing of .vloop/tmp/, so cases that stage files there (08) work.",
+    "Unknown grader types score 0 with a reason rather than erroring. Today's cases use only llm, regex and tool_used, so file_exists is implemented but nothing uses it yet.",
+    "The qualifying rule: at 3 runs, every case of the phase scores a mean no lower than the phase's default Claude model on the same tool. Opinion: with 3 runs and mostly 0/1 graders this is noisy, and a single unlucky run sinks a case. Consider a tolerance, or more runs for close calls. Acceptable as the first rule.",
+    "--case uses path.Match."
+  ],
+  "checked": "facts (driver Runner/Spec/Args/Run, both adapters, writeCopilotHooks' os.Executable, PlanDigest and which phases get PlanSHA, ExtractPlugin dropping evals, updateLock never creating a lock, the fence's Copilot tool names against A3's table, the cited test names and the json pin, tools/release's run shape, S-1/S-2/S-4/P-8, the cited design-note section and sentence, evals.md section order), consistency (worked-example arithmetic, --list counts, the refusal order, the task gates against the example lines), rules (repo-relative paths, the BSD constraints, no real agent in tests), runnability (the go check after each task, the base failing task 1's gate, every plugin/evals frontmatter inside the A1 subset, all 23 cases having prompt.md, the scaffolds' BASH_SOURCE and require_empty, the observed samples matching A3's shapes and free of absolute paths), decisions",
+  "header": "Reviewed 2026-11-02 (round 5): FIX, 4 findings"
+}
+
