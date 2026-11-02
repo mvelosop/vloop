@@ -43,26 +43,26 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 520815,
-    "work_ms": 485630,
-    "review_ms": 35185,
+    "agent_ms": 645326,
+    "work_ms": 579511,
+    "review_ms": 65815,
     "plan_ms": 921636,
-    "gates_ms": 1794,
-    "checks_ms": 430450,
+    "gates_ms": 3179,
+    "checks_ms": 648915,
     "gate_review_ms": 168198,
-    "wall_ms": null
+    "wall_ms": 2050000
   },
   "rate": {
-    "code_per_min": 25.114484029837854,
-    "code_test_per_min": 37.67172604475678
+    "code_per_min": 20.268825368883327,
+    "code_test_per_min": 30.403238053324987
   },
   "cost": {
-    "total_usd": 6.676569800000003,
+    "total_usd": 6.952937400000002,
     "plan_usd": 5.360202800000002,
-    "work_usd": 0.5785167999999999,
-    "review_usd": 0.11184870000000002,
+    "work_usd": 0.715158,
+    "review_usd": 0.25157510000000005,
     "gate_review_usd": 0.6260015,
-    "per_1000_code_lines_usd": 30.62646697247708
+    "per_1000_code_lines_usd": 31.894208256880745
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 270,
-    "output": 116302,
-    "cache_read": 12712884,
-    "cache_creation": 390405,
-    "cache_hit_ratio": 0.97018558087921
+    "input": 290,
+    "output": 120206,
+    "cache_read": 12981440,
+    "cache_creation": 443013,
+    "cache_hit_ratio": 0.9669786602246315
   },
   "models": {
     "plan": [
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 3,
-  "iterations_per_closed": 3,
+  "iterations": 4,
+  "iterations_per_closed": 4,
   "by_task": [
     {
       "id": "T1",
@@ -185,7 +185,7 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
         "code": 13,
         "test": 54,
@@ -198,13 +198,13 @@
           "other": 5
         }
       },
-      "agent_ms": 152759,
-      "cost_usd": 0.2620572,
+      "agent_ms": 277270,
+      "cost_usd": 0.5384248,
       "models": [
         "claude-sonnet-5-5"
       ],
       "test_code_ratio": 4.153846153846154,
-      "per_1000_code_lines_usd": 20.15824615384615
+      "per_1000_code_lines_usd": 41.41729230769231
     },
     {
       "id": "T3",

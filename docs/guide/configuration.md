@@ -24,18 +24,21 @@ environment and in `config set`.
 | `model.second-review` | `sonnet` | any model name | `VLOOP_MODEL_SECOND_REVIEW` | model of the second review session |
 | `model.gate-review` | `sonnet` | any model name | `VLOOP_MODEL_GATE_REVIEW` | model of the gate-review session |
 | `model.verify` | `sonnet` | any model name | `VLOOP_MODEL_VERIFY` | model of the verify session |
+| `model.review-brief` | `opus` | any model name | `VLOOP_MODEL_REVIEW_BRIEF` | model of the session `vloop brief review` runs |
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` | effort of the plan session |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` | effort of the work sessions |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` | effort of the review sessions |
 | `effort.second-review` | unset | same | `VLOOP_EFFORT_SECOND_REVIEW` | effort of the second review session |
 | `effort.gate-review` | unset | same | `VLOOP_EFFORT_GATE_REVIEW` | effort of the gate-review session |
 | `effort.verify` | unset | same | `VLOOP_EFFORT_VERIFY` | effort of the verify session |
+| `effort.review-brief` | unset | same | `VLOOP_EFFORT_REVIEW_BRIEF` | effort of the session `vloop brief review` runs |
 | `agent.plan` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_PLAN` | agent CLI of the plan session (`copilot` is experimental) |
 | `agent.work` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_WORK` | agent CLI of the work sessions (`copilot` is experimental) |
 | `agent.review` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_REVIEW` | agent CLI of the review sessions (`copilot` is experimental) |
 | `agent.second-review` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_SECOND_REVIEW` | agent CLI of the second review session (`copilot` is experimental) |
 | `agent.gate-review` | `claude` | `claude`, `copilot` (experimental) | `VLOOP_AGENT_GATE_REVIEW` | agent CLI of the gate-review session |
 | `agent.verify` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_VERIFY` | agent CLI of the verify session (`copilot` is experimental) |
+| `agent.review-brief` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_REVIEW_BRIEF` | agent CLI of the session `vloop brief review` runs |
 | `copilot.credit-usd` | `0.0066667` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot credit, for the estimated cost of a copilot session |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |

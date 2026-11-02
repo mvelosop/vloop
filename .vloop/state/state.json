@@ -5,9 +5,9 @@
   "base": "7a09ce6182ea6b80134ecc06e92ec3dbaeb7172e",
   "branch": "B20261102-0920-b29-i94-copilot-review-brief",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-02T09:52:00Z",
-  "updated": "2026-11-02T10:20:39Z",
+  "updated": "2026-11-02T10:35:02Z",
   "shell": "sh",
   "checks": [
     {
@@ -161,8 +161,8 @@
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "The preflight refusals (briefReviewPreflight: claude not on PATH, folder not trusted, exit 1, no session or folder) have no committed test, though the criterion lists them"
     },
     {
       "id": "T4",

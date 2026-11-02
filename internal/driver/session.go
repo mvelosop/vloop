@@ -26,6 +26,7 @@ const (
 	PhaseSecondReview = "second-review"
 	PhaseGateReview   = "gate-review"
 	PhaseVerify       = "verify"
+	PhaseReviewBrief  = "review-brief"
 )
 
 // Runner starts the sessions of one run. The zero value of the optional fields
@@ -461,7 +462,10 @@ func (r *Runner) record(s Spec, agent, task string, started, ended time.Time, o 
 		effort = s.Effort
 	}
 	schemaName := "session/v3"
-	if s.Phase == PhaseSecondReview || ((s.Phase == PhaseWork || s.Phase == PhaseVerify || s.Phase == PhaseGateReview || s.Phase == PhasePlan) && agent == AgentCopilot) {
+	switch {
+	case s.Phase == PhaseReviewBrief:
+		schemaName = "session/v5"
+	case s.Phase == PhaseSecondReview || ((s.Phase == PhaseWork || s.Phase == PhaseVerify || s.Phase == PhaseGateReview || s.Phase == PhasePlan) && agent == AgentCopilot):
 		schemaName = "session/v4"
 	}
 	rec := map[string]any{

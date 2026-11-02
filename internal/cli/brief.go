@@ -15,7 +15,7 @@ import (
 	"github.com/mvelosop/vloop/internal/config"
 )
 
-func newBrief(g *Globals) *cobra.Command {
+func newBrief(b Build, g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "brief",
 		Short: "Write, check, list and close loop briefs",
@@ -35,6 +35,7 @@ findings and mark it consumed with vloop brief close.`,
 	cmd.AddCommand(newBriefList(g))
 	cmd.AddCommand(newBriefNew(g))
 	cmd.AddCommand(newBriefClose(g))
+	cmd.AddCommand(newBriefReview(b, g))
 	return cmd
 }
 

@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 4
+**Status:** running · **2/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:20:39Z
+**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:35:02Z
 
 ## Progress
 
 - [x] **T1** — Add the brief-review/v1 report schema and the session/v5 record schema · 1 attempt(s)
 - [x] **T2** — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
-- [ ] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
+- [ ] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict · 1 attempt(s)
 - [ ] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
 - [ ] **T5** — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
 - [ ] **T6** — Close the run: every gate and the worked example on the final tree
@@ -65,7 +65,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
 
-`pending` · depends on: T1, T2
+`pending` · 1 attempt(s) · depends on: T1, T2
 
 This is the command the brief exists for: it runs /vloop:review-brief as one fresh session on the configured agent, fenced like a review session, keeps its record and validated report under .vloop/state/brief-reviews/&lt;run id&gt;/&lt;stamp&gt;/, prints the verdict and exits by it. This task builds it for Claude, the default agent, with the three config keys, the lock and .vloop/tmp/ clearing of vloop run, the preflight, the git, refs and brief guards, and every message and exit code of R1; T4 adds Copilot on top.
 
@@ -79,6 +79,8 @@ This is the command the brief exists for: it runs /vloop:review-brief as one fre
 - The command commits nothing, moves no ref, touches no plan or run state, and writes only its folder, .vloop/tmp/ and (when restoring) the brief. vloop run and every loop session, record and message are unchanged; loop sessions keep session/v3 and session/v4, and a session/v5 record for any other phase, or a v3/v4 one for review-brief, is a violation.
 - The three keys are documented in docs/guide/configuration.md and docs/guide/commands.md is regenerated in this task; `vloop config set agent.review-brief` accepts claude and copilot and refuses anything else with exit 2.
 - Committed Go tests, with a stub claude and fixtures in temporary directories addressed with git -C, cover the FIX and PASS runs (output, exit, record, argv, fence), the lock refusal, the preflight refusals and every planted failure of the worked example (no report, verdict OK, FIX with no findings, another brief's name, exit 3, git config, moved HEAD, a changed brief) and the timeout; the config keys' list test changes only to add the three keys (work notes name R1). No test or gate runs claude, copilot, gh or the network.
+
+**From the last attempt:** The preflight refusals (briefReviewPreflight: claude not on PATH, folder not trusted, exit 1, no session or folder) have no committed test, though the criterion lists them
 
 <details><summary>verify command</summary>
 

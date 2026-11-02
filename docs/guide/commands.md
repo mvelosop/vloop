@@ -60,6 +60,14 @@ vloop brief new <slug> [flags]
 
 - `--dry-run`: print the path and write nothing
 
+## vloop brief review
+
+Review a brief in a fresh session and print the verdict
+
+```
+vloop brief review <path>
+```
+
 ## vloop config
 
 Read and write repo-local configuration

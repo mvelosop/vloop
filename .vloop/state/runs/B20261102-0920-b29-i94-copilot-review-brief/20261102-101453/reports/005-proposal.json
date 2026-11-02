@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Added vloop brief review: one fenced, recorded review-brief session on Claude with the three config keys, lock, tmp clearing, preflight, git/refs/brief guards, session/v5 record and the validated kept report.",
+  "files": ["internal/driver/briefreview.go", "internal/driver/briefreview_test.go", "internal/cli/brief_review.go", "internal/cli/brief_review_test.go", "internal/cli/brief.go", "internal/cli/root.go", "internal/driver/session.go", "internal/driver/agent.go", "internal/config/config.go", "internal/config/config_test.go", "internal/cli/config_test.go", "cmd/vloop/e2e_test.go", "docs/guide/configuration.md", "docs/guide/commands.md"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok; go vet, gofmt, go mod tidy -diff and linux/windows builds are clean.",
+  "notes": "R1: the command creates .vloop/tmp/ right after the vloop-repository check because the gate writes a lock file there before any session has run. Copilot is not handled: agent.review-brief=copilot skips the Claude preflight and the session fails as unsupported; T4 adds the adapter and preflight. R1: config list tests in internal/cli, internal/config and cmd/vloop changed only to add the three keys. TestTaskGate* in internal/cli fail when go test runs inside a loop session (plan-changed guard), unrelated."
+}

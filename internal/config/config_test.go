@@ -43,8 +43,8 @@ func TestDefaultsEveryRow(t *testing.T) {
 		set      bool
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
-		{"model.review", "sonnet", true}, {"model.second-review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.second-review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.second-review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"copilot.credit-usd", "0.0066667", true}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"model.review", "sonnet", true}, {"model.second-review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"model.review-brief", "opus", true}, {"effort.plan", "", false}, {"effort.work", "", false},
+		{"effort.review", "", false}, {"effort.second-review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"effort.review-brief", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.second-review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"agent.review-brief", "claude", true}, {"copilot.credit-usd", "0.0066667", true}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
