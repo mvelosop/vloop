@@ -1,0 +1,1 @@
+{"schema":"verify/v2","complete":true,"findings":[],"not_run":[{"line":"vloop init","reason":""}],"checked":{"example_lines":2,"sentences":3,"surfaces":1},"notes":"none"}

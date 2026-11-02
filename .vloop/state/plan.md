@@ -1,35 +1,35 @@
-# Plan — B20261102-0920-b29-i94-copilot-review-brief
+# Plan — B20261102-1332-b30-i113-verify-unrunnable-lines
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **6/6 done** · iteration 9
+**Status:** running · **0/5 done** · iteration 0
 
-**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T11:14:34Z
+**Brief:** `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` · **Updated:** 2026-11-02T14:04:04Z
 
 ## Progress
 
-- [x] **T1** — Add the brief-review/v1 report schema and the session/v5 record schema · 1 attempt(s)
-- [x] **T2** — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
-- [x] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict · 1 attempt(s)
-- [x] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
-- [x] **T5** — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
-- [x] **T6** — Close the run: every gate and the worked example on the final tree
+- [ ] **T1** — Add the verify/v2 report schema, embedded and listed
+- [ ] **T2** — Read verify/v2 in the driver's verify step and print not_run and complete at close
+- [ ] **T3** — Make the verify skill write verify/v2 from the start and list the lines it does not run
+- [ ] **T4** — Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
+- [ ] **T5** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
 
-### T1 — Add the brief-review/v1 report schema and the session/v5 record schema
+### T1 — Add the verify/v2 report schema, embedded and listed
 
-`done` · 1 attempt(s) · depends on: none
+`pending` · depends on: none
 
-The brief review ends in a report the driver must validate before it prints or keeps it, and its session needs a record schema whose phase enum holds review-brief, because session/v4 is published and does not change. This task adds both schemas, embedded and listed by vloop schema, so the command (T3) and the skill (T5) have something to validate against.
+The verify session needs a report that says whether it finished its three passes and which worked-example lines it did not run, and a published schema never changes, so this adds verify/v2 beside verify/v1. Everything after it — the driver reading the report, the skill writing it, the docs naming it — depends on this schema existing and on its exact shape.
 
 **Acceptance**
 
-- schemas/brief-review.v1.json exists, is embedded and is listed by `vloop schema list` and shown by `vloop schema show brief-review/v1`. It requires `schema` (const "brief-review/v1"), `brief` (string), `verdict` (PASS, FIX or ASK) and `findings` (array); each finding requires non-empty string `kind` (fact, consistency, rule, runnability or decision), `section` and `summary`, and may have string `evidence` and `fix`; optional top-level keys are `decisions` (array of strings), `checked` (string) and `header` (string); FIX and ASK require at least one finding, PASS any number; any other top-level key is refused.
-- schemas/session.v5.json exists, is embedded and listed: it is session/v4 with `schema` const "session/v5" and `review-brief` added to the phase enum; a review-brief record, like a plan, gate-review or verify one, carries no `task`; every other v4 rule (the claude cost_source rule, the task rule for work and review phases, models_used) holds unchanged.
-- schemas/session.v4.json is unchanged and still refuses a record with phase review-brief; no other existing schema changes.
-- `vloop schema validate` accepts every fixture in the gate's valid/ folder and refuses every one in invalid/ with exit 1.
-- Committed Go tests cover both schemas with valid and invalid documents (in internal/schema or beside the existing schema tests); the schema lists pinned by internal/cli/schema_test.go and internal/schema/schema_test.go gain exactly brief-review/v1 and session/v5 and nothing else changes in them (the work notes name the contract item, R2). A schema shipped with no committed test is a violation.
+- schemas/verify.v2.json exists and is embedded like the others; `vloop schema list` names both verify/v1 and verify/v2.
+- verify/v2 has verify/v1's properties and constraints, `schema`'s const is `verify/v2`, and it requires two more properties: `complete`, a boolean, and `not_run`, an array (empty allowed) of objects with required `line` and `reason`, both non-empty strings.
+- `vloop schema validate verify/v2` exits 0 on each worked-example stub report and 1 on a verify/v1 report, on a report without `complete`, and on a `not_run` entry missing `reason`.
+- schemas/verify.v1.json is byte for byte as at the base.
+- The schema lists pinned in internal/cli/schema_test.go, internal/schema/schema_test.go and cmd/vloop/b2_e2e_test.go gain verify/v2 and change in nothing else; the work session names the contract item (V1, the new schema listed) in its notes.
+- Committed tests run by the go check cover verify/v2: at least one valid report and the three planted invalid ones (a verify/v1 report, no `complete`, a `not_run` entry without `reason`). A task that adds the schema and leaves no such test fails this criterion.
 
 <details><summary>verify command</summary>
 
@@ -39,21 +39,22 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
+### T2 — Read verify/v2 in the driver's verify step and print not_run and complete at close
 
-`done` · depends on: none
+`pending` · depends on: T1
 
-A review-brief session must be fenced like a review session: it reads anything and writes only under .vloop/tmp/, and no session of any phase may start a nested brief review, since the command starts an agent and writes under .vloop/state/ (S-4). This task gives vloop fence check and vloop fence hook the review-brief phase (which the Copilot adapter of T4 and the Claude fence of T3 both rely on), creates fence/review-brief.json and adds Bash(vloop brief review:*) to every fence.
+B29's verify session stopped early and left no report, so nothing it checked was kept. The driver now reads the report as verify/v2 even after a session that failed, timed out or left no record, prints how many example lines were not run, and warns when the session did not finish; `vloop brief close` shows the lines not run and the unfinished session to the operator. None of this may change how a run ends.
 
 **Acceptance**
 
-- fence/review-brief.json holds exactly fence/gate-review.json's keys and rules plus `Bash(vloop brief check:*)` in its allow list and `Bash(vloop brief review:*)` in its deny list; fence/plan.json, work.json, review.json, gate-review.json and verify.json each gain exactly the deny rule `Bash(vloop brief review:*)` and nothing else.
-- `vloop fence check --phase review-brief --root . --tool <tool> ...` gives every line of the brief's worked-example table with exactly the reasons shown (`deny: ` plus the message), exit 0 on allow and 1 on deny; in phase work, `vloop brief review <brief>` is denied with `... is denied by the work fence (Bash(vloop brief review:*))`, and every other phase denies it through its own fence's name (second-review through the review fence).
-- In review-brief a call is decided exactly as in gate-review: the review-brief fence's deny rules, the whole Copilot deny list (rm:* included), writes only under .vloop/tmp/ (`write to <path> is not allowed in a review-brief session: only .vloop/tmp/ may be written`), `tool <name> is not allowed in a review-brief session`, and the skill hint `use /vloop:review-brief`. The rules are read from the embedded fence/review-brief.json; a hand-copied second list is a violation.
-- `vloop fence hook --phase review-brief --root <dir>` answers each Copilot payload with the same decision, the reason being `vloop fence: ` and the message. The unknown-phase message is `unknown phase "<p>": want review, second-review, work, verify, gate-review, plan or review-brief` (fence check: `vloop: ` + message on stderr, exit 2; fence hook: the deny line holding it, exit 2).
-- `vloop fence check --help` and `vloop fence hook --help` name review-brief in the usage line, the --phase flag and the long help; docs/guide/commands.md is regenerated in this task so TestCommandsReferenceIsCurrent stays green in the go check.
-- The other phases decide and word every call as before, bar the unknown-phase message and the one new deny rule (unchanged: `vloop fence check --phase gate-review --root . --tool skill --path vloop-review-brief` → `deny: skill vloop-review-brief is not vloop's — use /vloop:gate-review`, exit 1). TestUnknownPhase and TestFenceHookFailsClosed change only their expected message (their unknown names stay); fencePhases and the write table of internal/cli/fence_test.go gain review-brief with the gate-review row's expectations; the work notes name the contract item (R3).
-- Committed Go tests cover the review-brief phase in internal/fence (every line of the worked example's table, the write rule, the skill hint, the nested-review denial in every phase and the unknown-phase message) and the hook's review-brief phase; a phase that leaves no committed test behind is a violation. No Claude session's argv or settings change other than through the fence files themselves.
+- The verify step reads .vloop/tmp/verify.json as verify/v2 only, after a session that exited 0 and also after one that timed out, exited non-zero or left no record; a session that failed to start leaves nothing to read, as at the base. Accepting a verify/v1 report from a session is a violation.
+- A valid report is kept as `<run dir>reports/verify.json` (masked, trailing newline) and the driver prints on stdout exactly one of `verify: no findings`, `verify: <N> finding(s) — see <run dir>reports/verify.json` (when not_run is empty), `verify: no findings; <M> example line(s) not run — see <run dir>reports/verify.json` or `verify: <N> finding(s); <M> example line(s) not run — see <run dir>reports/verify.json` (when not_run has M ≥ 1 entries); `<run dir>` is repo-relative with a trailing `/`; `example line(s)` is used even for one.
+- When `complete` is false and the session exited 0, the driver then warns on the warning stream `vloop: the verify session stopped before its last pass — verify the rest by hand; see <run dir>reports/verify.json`. After a session that timed out, exited non-zero or left no record, the line is followed by the base's `vloop: the verify session failed to run — verify by hand; see <run dir>run.log` and not by the stopped-early warning.
+- A report that does not validate as verify/v2 (a verify/v1 report included) is kept by no one: after a session that exited 0 the driver prints the base's `vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand`; after a failed session only the base's failed-to-run warning.
+- Neither `complete` nor `not_run` changes the run's ending, its exit code or any task.
+- A bare `vloop brief close` on a kept verify/v2 report prints the header `verify of <run id>/<stamp>: ` followed by `no findings` or `<N> finding(s)`, then `; <M> example line(s) not run` when not_run is not empty; the findings as at the base; one line `  not run: <line> — <reason>` per entry; and `  the session stopped before its last pass` when complete is false. A kept verify/v1 report prints exactly the base's lines.
+- The base's stub verify reports in cmd/vloop/run_verify_test.go, cmd/vloop/run_iterate_test.go and cmd/vloop/b16_e2e_test.go become verify/v2 and nothing else in those tests weakens; internal/cli/close_test.go keeps its verify/v1 reports and gains verify/v2 siblings; the work session names the contract item in its notes.
+- Committed tests run by the go check cover every worked-example line and planted failure: in cmd/vloop/run_verify_test.go for the run lines, in internal/cli/close_test.go for the close lines, and in internal/driver/ with a stub runner whose result says the session timed out and one that left no record (the same two lines, the report kept). A case of the worked example with no test behind it fails this criterion.
 
 <details><summary>verify command</summary>
 
@@ -63,22 +64,21 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
+### T3 — Make the verify skill write verify/v2 from the start and list the lines it does not run
 
-`done` · 1 attempt(s) · depends on: T1, T2
+`pending` · depends on: T1
 
-This is the command the brief exists for: it runs /vloop:review-brief as one fresh session on the configured agent, fenced like a review session, keeps its record and validated report under .vloop/state/brief-reviews/&lt;run id&gt;/&lt;stamp&gt;/, prints the verdict and exits by it. This task builds it for Claude, the default agent, with the three config keys, the lock and .vloop/tmp/ clearing of vloop run, the preflight, the git, refs and brief guards, and every message and exit code of R1; T4 adds Copilot on top.
+The verify skill had only two outcomes, a full report or none, so a session that hit a denied command or ran out of time left nothing. It now writes and validates the report as soon as it has read the brief and after each pass, lists each worked-example line it cannot or does not run instead of stopping, keeps command output short, and makes its scratch repositories in a form no fence denies.
 
 **Acceptance**
 
-- `vloop brief review <path>` takes exactly one argument (otherwise exit 2), a loop brief at any status; it refuses an existing non-brief path with `vloop: not a loop brief: <path>` (exit 2), a missing one with `vloop: no such file: <path>` (exit 1), and outside a vloop repository `vloop: not in a vloop repository — run vloop init first` (exit 1), each before any session or folder.
-- It takes the working tree's lock as vloop run does — a live loop refused with vloop run's `vloop: a loop is already running in this working tree (pid …` message, exit 1, its lock untouched — holds it during the session and releases it at the end; it then clears .vloop/tmp/ as vloop run does at start. Its preflight checks only what one session of its agent needs: for Claude, claude on PATH and the trust check, printed as `  ✗ <name> <message>` then `vloop: preflight failed — <n> problem(s), nothing has run`, exit 1, with no session and no folder.
-- It prints `reviewing <path> using <model> (agent <agent>)` on stderr and runs one session, phase review-brief, prompt `/vloop:review-brief <path>`, with the model and effort P-6 resolves (config file and VLOOP_MODEL_REVIEW_BRIEF / VLOOP_EFFORT_REVIEW_BRIEF), the run.session-timeout timeout and, for Claude, fence/review-brief.json as its settings. Its folder is .vloop/state/brief-reviews/&lt;run id&gt;/&lt;YYYYMMDD-HHMMSS&gt;/ with sessions/001-review-brief.json: session/v5, run_id the brief's run id, iteration 0, phase review-brief. A session that cannot start is `vloop: brief review session failed: <error>`, exit 7.
-- After the session the brief is restored first if its bytes changed; then, in this order and with these exact lines (folder repo-relative, no trailing slash): git config or hooks changed → `vloop: the brief review changed <what> — nothing was committed; restore it, then re-run` (exit 9, &lt;what&gt; as the gate review names it); refs moved → `vloop: REFS MOVED review-brief — the brief review changed git refs; nothing was committed` (exit 9); brief changed → `vloop: the brief review changed <path>; it was restored` (exit 9); timed out → `vloop: brief review session timed out after <timeout> — see <folder>` (exit 7); non-zero exit → `vloop: brief review session failed (<agent> exited <n>) — see <folder>` (exit 7); no report → `vloop: the brief review left no .vloop/tmp/brief-review.json — see <folder>` (exit 7); a report failing brief-review/v1 or naming another brief → `vloop: the brief review's .vloop/tmp/brief-review.json does not follow brief-review/v1 — see <folder>` (exit 7), with nothing kept as brief-review.json.
-- A valid report is kept masked as &lt;folder&gt;/brief-review.json and printed on stdout as `verdict: <V> — <n> finding(s)`, one `  <kind padded to 12>  <section>: <summary>` line per finding in order, and `kept: <folder>/brief-review.json`; exit 0 on PASS, 1 on FIX or ASK, with no `vloop:` line. A report printed or kept without validating it is a violation.
-- The command commits nothing, moves no ref, touches no plan or run state, and writes only its folder, .vloop/tmp/ and (when restoring) the brief. vloop run and every loop session, record and message are unchanged; loop sessions keep session/v3 and session/v4, and a session/v5 record for any other phase, or a v3/v4 one for review-brief, is a violation.
-- The three keys are documented in docs/guide/configuration.md and docs/guide/commands.md is regenerated in this task; `vloop config set agent.review-brief` accepts claude and copilot and refuses anything else with exit 2.
-- Committed Go tests, with a stub claude and fixtures in temporary directories addressed with git -C, cover the FIX and PASS runs (output, exit, record, argv, fence), the lock refusal, the preflight refusals and every planted failure of the worked example (no report, verdict OK, FIX with no findings, another brief's name, exit 3, git config, moved HEAD, a changed brief) and the timeout; the config keys' list test changes only to add the three keys (work notes name R1). No test or gate runs claude, copilot, gh or the network.
+- The skill writes .vloop/tmp/verify.json as verify/v2 and validates it with `vloop schema validate verify/v2 .vloop/tmp/verify.json` as soon as it has read the brief and again after pass 1, pass 2 and pass 3, each time with every finding, count and line not run so far; `complete` is false in every write but the last, which sets it true, and `notes` says which passes remain while it is false.
+- A worked-example line is not run when the brief keeps it for the operator's acceptance, when its command is one the verify fence denies (the skill names at least `vloop init`, `vloop run`, `vloop brief review`, `vloop brief close` and `claude`), when it needs a live model (Claude or Copilot), the network or credentials, or when a command it needs was denied. Each is one `not_run` entry: `line` quoted as the brief writes it, `reason` in a few words (the denied rule, `needs a live model`, `the operator's, at close`, `covered by <test>`).
+- The skill does not retry a denied command in another form (the denial goes into the reason), does not count a line not run in `example_lines`, and does not make it a finding — any of these is a violation.
+- Scratch set-up is one command per tool call; a scratch repository is made with `git init -q <dir>`, never `git -C <dir> init` and never chained after `mkdir`. Each command's output is cut to what the session needs (through `head` or `tail`).
+- The skill's report example is a valid verify/v2 report with one `not_run` entry; every mention of verify/v1 in the skill (its description included) becomes verify/v2; the skill cites no `fence/` path.
+- The skill is at most 1500 words and the verify ceiling in internal/budget/budget.go stays 1500; no ceiling changes in this task.
+- The skills test (go check: `go test ./internal/cli/`) and the budget test (`go test ./internal/budget/`) pass on the changed skill; they are the committed tests that keep the example valid and the skill under its ceiling.
 
 <details><summary>verify command</summary>
 
@@ -88,19 +88,24 @@ sh .vloop/state/gates/T3/gate.sh
 
 </details>
 
-### T4 — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
+### T4 — Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
 
-`done` · depends on: T3
+`pending` · depends on: T2, T3
 
-The point of the brief is that a model of another vendor can review a brief Claude wrote. This task lets agent.review-brief = copilot run the review-brief session through the Copilot adapter, fenced by the hook's review-brief phase (T2), with the command's Copilot preflight and doctor's rows, while vloop run keeps ignoring the key.
+The knowledge of which worked-example lines a verify session cannot run moves upstream to the brief's author and reviewer, and the operator is told to run what the session left; the docs, the Copilot acceptance kit and the verify evals follow verify/v2. This is mostly prose: if the review fails it twice on wording, the task is blocked and the operator finishes it.
 
 **Acceptance**
 
-- With agent.review-brief = copilot and a Copilot model, `vloop brief review` prints `  ! agent.review-brief is copilot: experimental (docs/guide/configuration.md)` and `reviewing <path> using <model> (agent copilot)` on stderr, runs one `copilot -p "/vloop:review-brief <path>"` session with the gate-review session's argv (the whole deny list, `--deny-tool=shell(rm:*)` included) and a hooks file running `fence hook --phase review-brief` alone, and records it as session/v5 with agent copilot, its credits, estimated cost and permission_denials; output, guards and exit codes are T3's.
-- Its Copilot preflight refuses, in this order, each exit 1 with no session and no folder: copilot missing (`  ✗ copilot …` then `vloop: preflight failed — 1 problem(s), nothing has run`); a project skill clash (`vloop: <path> has the name of vloop's <skill> skill; a copilot session may load it instead — rename it`); no login (`vloop: agent.review-brief is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login`); the default model (`vloop: agent.review-brief is copilot but model.review-brief is the default "opus", a Claude alias: set model.review-brief to a Copilot model id`). With agent.review-brief = claude none applies and a skill named review-brief stops nothing.
-- `vloop doctor` lists agent.review-brief with the other Copilot keys: the experimental warning, the copilot row, the copilot login row and the clash rows. `vloop run`'s preflight ignores agent.review-brief: a repository whose only Copilot key is agent.review-brief runs as at the base, with no Copilot warning, row or refusal.
-- Copilot sessions of every other phase keep their argv and hooks file; Claude sessions are unchanged. TestCopilotSupportsWorkReviewAndVerify changes only to add review-brief (work notes name R3).
-- Committed Go tests cover the adapter's review-brief argv and hooks file, Supports(review-brief), the record's schema and agent, each preflight refusal and the warning, doctor's rows, and vloop run ignoring the key; comments that list the Copilot phases or keys name review-brief too. No test or gate runs copilot, gh or the network.
+- plugin/skills/create-brief/guidelines.md carries, in the section on what sessions cannot do, the brief's rule: **Say which worked-example lines the verify session cannot run.** — no `vloop init`, `vloop run`, `vloop brief review` or `claude`, no live model (Claude or Copilot), no network, no credentials; cover such a line with an end-to-end test the plan writes with stub agents, named beside the line, or move it to `## Acceptance, at close (the operator's)`.
+- Both plugin templates and both binary templates gain, between the Worked example and Out of scope, the optional section `## Acceptance, at close (the operator's)` (English pair) / `## Aceptación, al cierre (del operador)` (Spanish pair), with a placeholder in the template's language saying what goes there, identical within each pair so internal/cli/plugin_templates_test.go stays green; `vloop brief new` writes it.
+- review-brief's check 4 (Runnability) asks whether a worked-example line needs what the verify session cannot do (a command the verify fence denies, a live model, the network, credentials) with no named test covering it and outside the acceptance section — such a line is a `runnability` finding; the commands are named in plain words, not as code, and no fence/ path is cited.
+- operate's close step 2 gains one sentence: run each line the verify report lists as not run, and the brief's acceptance section, before stating findings. internal/budget/budget.go sets operate's ceiling to 1800 with a comment naming B30 (#113); every other ceiling is unchanged, the verify ceiling included.
+- docs/domain/execution/session.md's verify report section becomes verify/v2's, naming `complete`, `not_run` and the driver's stopped-early warning; docs/domain/execution/run.md and docs/guide/concepts.md name verify/v2 where they name the report the session writes.
+- tools/copilot-acceptance/report.py validates each kept verify report against the schema its own `schema` field names (verify/v1 or verify/v2) and its report line says which; tools/copilot-acceptance/README.md and verify.sh's header comment say so.
+- plugin/evals/verify-planted-mismatches/graders/report-validates.md's pattern is `vloop schema validate verify/v2`.
+- A new eval case plugin/evals/verify-unrunnable-line/, built like verify-planted-mismatches (prompt.md, case.yaml, a scaffold.sh that exits non-zero when its built result does not hold), whose brief's worked example holds one sound line and one line running `claude -p "say hi"`; its graders: a `regex` on the trace for `vloop schema validate verify/v2`, a `regex` on the file .vloop/tmp/verify.json for `"complete": *true`, and an `llm` grader focused on that file asking that the claude line is the one not_run entry and that no finding names it. It joins the catalogue in plugin/evals/README.md.
+- The skills test's eval and fenced-skill checks (go check: `go test ./internal/cli/`, among them TestPluginSkills and TestEvalGrantsCoverFence) and the budget test pass: the new case's grants cover the work fence and appear in docs/guide/evals.md's --allow-tools, as verify-planted-mismatches' do. These and the eval case itself are the committed tests this task leaves.
+- No fence file and not docs/design-notes/fence-audit.md change.
 
 <details><summary>verify command</summary>
 
@@ -110,45 +115,23 @@ sh .vloop/state/gates/T4/gate.sh
 
 </details>
 
-### T5 — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
+### T5 — Close the run: every gate and the worked example on the final tree
 
-`done` · depends on: T4
+`pending` · depends on: T1, T2, T3, T4
 
-The command is only used if the design act calls it and the skill writes the report it reads. This task makes /vloop:create-brief ask for the review with vloop brief review, gives /vloop:review-brief its report step, raises its word ceiling, puts the skill under the fenced-skills check, and documents the new session in the fence audit, the domain pages and the configuration guide. Prose: if it fails review twice on wording, it is blocked and the operator finishes it.
+The last task proves the whole brief holds at once on the final tree: every earlier gate passes together, no fence or the fence audit changed, and the worked example holds line for line. It exists so a regression one task caused in another's surface is found before the run's verify session, not after.
 
 **Acceptance**
 
-- plugin/skills/create-brief/SKILL.md's step 5.3 asks for the review with `vloop brief review <brief>` (a fresh session on the configured agent) instead of a subagent, and still fixes the FIX findings and brings ASK ones to the operator; no other part of the skill changes.
-- plugin/skills/review-brief/SKILL.md's report step writes the report as brief-review/v1 to .vloop/tmp/brief-review.json, validates it with `vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json`, and also answers in prose, whether started by the command or interactively; its structure check uses a copy under .vloop/tmp/; any example report in it validates against brief-review/v1; the five checks it makes are unchanged.
-- internal/budget/budget.go: review-brief's ceiling is 1100 with the comment `// 2026-11-02, B29 (#94): 1000 (B28) plus the report step`, and the skill fits it; fencedSkills in internal/cli/skills_test.go gains review-brief and the skill passes the structural checks (the go check).
-- docs/design-notes/fence-audit.md gains a part for a Copilot review-brief session that classifies every deny rule of fence/review-brief.json, its allowed writes (.vloop/tmp/) and every deny-list pattern by who enforces it, and each of the five loop fences' parts gains its row for `Bash(vloop brief review:*)`.
-- docs/domain/execution/session.md gains the review-brief kind, started by `vloop brief review`, not by `vloop run`; docs/domain/domain-model.md's on-disk layout gains `.vloop/state/brief-reviews/<run id>/<folder>/` and `.vloop/tmp/brief-review.json`; docs/guide/configuration.md's Copilot section says `vloop brief review`, not `vloop run`, warns and refuses for agent.review-brief.
-- Every sentence about behaviour matches what T1–T4 built, messages quoted as the code prints them; fence/*.json is not changed by this task; the go check passes.
+- Gates T1 to T4 all pass on the final tree, run together by this task's gate.
+- fence/*.json and docs/design-notes/fence-audit.md are byte for byte as at the base, with no fence file added or removed.
+- The work session's notes walk the brief's worked example line for line (each stub report, each planted failure, the close lines, the schema lines, the skills lines) and name the committed test or gate that covers each; a line no test covers is fixed in this task or reported, not skipped.
+- Any fix this task makes is to the contract as the brief states it, leaves a committed test where it changes behaviour, and weakens no check.
 
 <details><summary>verify command</summary>
 
 ```sh
 sh .vloop/state/gates/T5/gate.sh
-```
-
-</details>
-
-### T6 — Close the run: every gate and the worked example on the final tree
-
-`done` · depends on: T1, T2, T3, T4, T5
-
-The last task proves the whole brief at once on the final tree: every earlier gate passes together, which holds the worked example line for line, and the go check is green. It exists so a later task cannot have silently broken an earlier one's contract.
-
-**Acceptance**
-
-- Every gate T1–T5 passes on the final tree.
-- Every line of the brief's worked example holds against the built binary: the stub Claude FIX and PASS runs (output, exit, record, argv, fence), the stub Copilot run (warning, model line, record, deny list, hooks file), every planted failure, the review-brief fence-check table, the work line, the changed unknown-phase line and the unchanged gate-review line.
-- The go check passes on the final tree.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T6/gate.sh
 ```
 
 </details>

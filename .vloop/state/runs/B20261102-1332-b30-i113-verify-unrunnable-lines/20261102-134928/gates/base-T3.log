@@ -1,0 +1,4 @@
+GATE FAIL: plugin/skills/verify/SKILL.md still names verify/v1: 3:description: Verify the built result of a whole run against its brief, in three passes, and report findings as verify/v1. Invoked once per complete run by the driver as /vloop:verify, in a session separate from the work and the reviews.
+98:Write `.vloop/tmp/verify.json` as `verify/v1`:
+102:  "schema": "verify/v1",
+119:vloop schema validate verify/v1 .vloop/tmp/verify.json

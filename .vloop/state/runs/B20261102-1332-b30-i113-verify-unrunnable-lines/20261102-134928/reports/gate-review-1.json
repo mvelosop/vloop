@@ -1,0 +1,2 @@
+{"schema":"gate-verdict/v2","verdict":"PASS","tasks":[{"task":"T1","verdict":"PASS","findings":[]},{"task":"T2","verdict":"PASS","findings":[]},{"task":"T3","verdict":"PASS","findings":[]},{"task":"T4","verdict":"PASS","findings":[]},{"task":"T5","verdict":"PASS","findings":[]}],"notes":"Each gate fails on the base at the missing behaviour (verify/v2 not listed, no verify line from a v2 report, SKILL.md still names verify/v1, guideline rule absent). The kit fixture layout matches report.py's glob and arguments. Test-coverage criteria are judged by the review."}
+
