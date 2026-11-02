@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Driver verify step reads verify/v2 only, keeps it after a failed/timed-out/silent session, prints not_run counts and the stopped-early warning; brief close prints not_run lines and the unfinished session. This attempt added the missing timed-out and invalid-report-after-failed-session driver tests.
 - **Files:** internal/driver/iterate.go, internal/cli/close.go, internal/driver/verify_v2_test.go, internal/cli/close_test.go, cmd/vloop/run_verify_test.go, cmd/vloop/run_iterate_test.go, cmd/vloop/b16_e2e_test.go
 - **Notes for next iteration:** Contract item (stub verify reports become verify/v2): stub reports in cmd/vloop/run_verify_test.go, run_iterate_test.go, b16_e2e_test.go moved v1 to v2 (complete true, not_run empty), nothing else weakened; internal/cli/close_test.go keeps verify/v1 cases and gains TestCloseVerifyBlockV2. internal/driver/verify_v2_test.go uses a stub claude script; code 'timeout' makes it exec sleep with a 1s runner Timeout, covering the timed-out case, plus invalid/v1 report after a failed session.
+
+## T3 — Make the verify skill write verify/v2 from the start and list the lines it does not run
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The verify skill now writes and validates a verify/v2 report after reading the brief and after each pass, lists lines it does not run in not_run, keeps output short and makes scratch repos with git init -q.
+- **Files:** plugin/skills/verify/SKILL.md
+- **Notes for next iteration:** Skill avoids the literal 'git -C' (gate greps for it) and uses <scratch>/ex1 in its git init example because TestPluginSkills rejects unlisted .vloop/tmp paths. Other internal/cli task_gate tests fail only inside a driver-held session.

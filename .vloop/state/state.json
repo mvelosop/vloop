@@ -5,9 +5,9 @@
   "base": "28f49ae8009ed10d3ee753520bdee280fe780a4d",
   "branch": "B20261102-1332-b30-i113-verify-unrunnable-lines",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-02T14:02:09Z",
-  "updated": "2026-11-02T14:37:08Z",
+  "updated": "2026-11-02T14:44:59Z",
   "shell": "sh",
   "checks": [
     {
@@ -133,7 +133,7 @@
         "The skills test (go check: `go test ./internal/cli/`) and the budget test (`go test ./internal/budget/`) pass on the changed skill; they are the committed tests that keep the example valid and the skill under its ceiling."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

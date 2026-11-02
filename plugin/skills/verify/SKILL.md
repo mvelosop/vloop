@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Verify the built result of a whole run against its brief, in three passes, and report findings as verify/v1. Invoked once per complete run by the driver as /vloop:verify, in a session separate from the work and the reviews.
+description: Verify the built result of a whole run against its brief, in three passes, and report findings as verify/v2. Invoked once per complete run by the driver as /vloop:verify, in a session separate from the work and the reviews.
 ---
 
 # Verify a built run
@@ -31,11 +31,25 @@ The operator reads your report at close and decides.
 Build the result fresh, into a scratch directory you create under
 `.vloop/tmp/` — never into the tree, never a global location. Use the repository's own build command with its output pointed there (for a Go
 module, `go build -o <scratch>/<name> ./cmd/<name>`). Run every
-example in a scratch directory of its own, created under
-`<scratch>`, so no run touches the repository. A scratch directory in which an
-example runs vloop or git is made a repository first (`git init`), so it is its
-own root (C-2) and nothing it runs reaches this repository. Put the built
-binary first on `PATH` for those runs.
+example in a scratch directory of its own under `<scratch>`, so no run touches
+the repository. A scratch directory in which an example runs vloop or git is
+made a repository first with `git init -q <dir>` (for example
+`git init -q <scratch>/ex1`), so it is its own root (C-2). Never
+point git at the directory from outside it, and never chain it after `mkdir`. Put the built binary first on
+`PATH` for those runs.
+
+Set up scratch one command per tool call. Cut each command's output to what you
+need, through `head` or `tail`.
+
+## Write the report early
+
+As soon as you have read the brief, write `.vloop/tmp/verify.json` as verify/v2
+(section 5) with no findings, zero counts, `complete` false and `notes` saying
+all three passes remain, and validate it. Write and validate it again after pass
+1, after pass 2 and after pass 3, each time with every finding, count and line
+not run so far. `complete` is false in every write but the last, which sets it
+true; while it is false, `notes` says which passes remain. A session that is
+stopped leaves the last report, not nothing.
 
 ## 3. The three passes
 
@@ -46,6 +60,14 @@ in a scratch directory set up as the example says. Compare the output and the
 exit code with the brief's. A line the brief gives with an output and exit code
 is a claim; a line with no stated output is checked for its exit code only if
 the brief says one.
+
+A line is **not run**, and goes in `not_run`, when the brief keeps it for the
+operator's acceptance; when its command is one the verify fence denies (at
+least `vloop init`, `vloop run`, `vloop brief review`, `vloop brief close` and
+`claude`); when it needs a live model (Claude or Copilot), the network or
+credentials; or when a command it needs was denied. Do not retry a denied
+command in another form: the denial goes into the reason. A line not run is not
+counted in `example_lines` and is not a finding.
 
 Do not correct a line to make it work. A line that does not run as written is a
 finding: quote it, say what happened. Count every line you ran in
@@ -95,11 +117,12 @@ Say nothing about style, naming or code quality: those belong to the reviews.
 
 ## 5. Report
 
-Write `.vloop/tmp/verify.json` as `verify/v1`:
+Write `.vloop/tmp/verify.json` as `verify/v2`:
 
 ```json
 {
-  "schema": "verify/v1",
+  "schema": "verify/v2",
+  "complete": true,
   "findings": [
     {
       "kind": "surface",
@@ -108,15 +131,24 @@ Write `.vloop/tmp/verify.json` as `verify/v1`:
       "where": "brief V2 Required; README.md:123"
     }
   ],
+  "not_run": [
+    {
+      "line": "vloop run docs/briefs/b1.loop-brief.md",
+      "reason": "the operator's, at close"
+    }
+  ],
   "checked": { "example_lines": 6, "sentences": 9, "surfaces": 4 },
   "notes": "What a reader of the report cannot see from the findings, or none."
 }
 ```
 
-`findings` is `[]` when everything agrees. Then check it:
+`findings` is `[]` when everything agrees. Each `not_run` entry has the `line`
+quoted as the brief writes it and a `reason` in a few words: the denied rule,
+`needs a live model`, `the operator's, at close`, `covered by <test>`. Then
+check it:
 
 ```
-vloop schema validate verify/v1 .vloop/tmp/verify.json
+vloop schema validate verify/v2 .vloop/tmp/verify.json
 ```
 
 It must pass; a report that fails the schema counts as absent.
