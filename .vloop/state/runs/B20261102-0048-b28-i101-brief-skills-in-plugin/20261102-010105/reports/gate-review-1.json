@@ -1,0 +1,18 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "FAIL", "findings": [
+      {"summary": "the gate runs only tests matched by `go test -run Template` in packages under ./internal/...; K2 names neither a test name nor a package, so a correct test named e.g. TestPluginBriefTemplatesMatch... passes only by luck, and one named TestBriefSkillCopies is never run and the gate then fails its planted-failure checks with 'the Template tests pass'", "kind": "pins-unnamed"}
+    ]},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "FAIL", "findings": [
+      {"summary": "TestGateT4ReviewBriefGraders requires at least 3 graders of type llm in review-brief-planted-faults; the brief only says the verdict is not PASS, each planted fault is named (one grader each) and the brief is not edited, so a regex/trace grader naming a planted literal value is a correct implementation that fails", "kind": "pins-unnamed"}
+    ]},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "All five gates fail on the base for the expected reason (T1: ls plugin/skills lacks the two skills; T2: the plugin templates are not in place, the dependency on T1 reported plainly; T3: the old interactive-session paragraph survives; T4: no eval case; T5: README Skills section does not name /vloop:create-brief). T5 sections and T4 doc rows match the current docs' structure. T2 note: the gate judges a test the task itself writes (P-8), unavoidable for a test deliverable, but it is only sound if the test name/package are fixed by the brief or the gate finds the test by behaviour. T4 note: the regex probe uses 'B...md: ok, 0 warning(s)', but the real `vloop brief check` prints a separate line '  ok, 0 warning(s)'; a pattern anchored to line start would fail it. T6 has no gate folder; its verify runs T1-T5 gates."
+}
+

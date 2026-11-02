@@ -1,37 +1,41 @@
-# Plan — B20261101-2305-b27-i77-copilot-plan
+# Plan — B20261102-0048-b28-i101-brief-skills-in-plugin
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **6/6 done** · iteration 7
+**Status:** running · **0/6 done** · iteration 0
 
-**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-02T00:28:28Z
+**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:26:14Z
 
 ## Progress
 
-- [x] **T1** — Add the plan phase to the fence judge, vloop fence check and vloop fence hook · 1 attempt(s)
-- [x] **T2** — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
-- [x] **T3** — Check agent.plan = copilot in the run preflight and doctor
-- [x] **T4** — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
-- [x] **T5** — Extend the Copilot acceptance kit with a plan run on the real CLI
-- [x] **T6** — Close the run: every gate and the worked example on the final tree
+- [ ] **T1** — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
+- [ ] **T2** — Add the Go test that holds each plugin brief template to the binary's
+- [ ] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
+- [ ] **T4** — Add an eval case for each brief skill and update the evals README and guide
+- [ ] **T5** — Name the two brief skills in the README, the concepts guide and the domain pages
+- [ ] **T6** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
-### T1 — Add the plan phase to the fence judge, vloop fence check and vloop fence hook
+### T1 — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
 
-`done` · 1 attempt(s) · depends on: none
+`pending` · depends on: none
 
-A Copilot plan session needs a hook that judges each tool call against the plan fence, and the hook and `vloop fence check` share one judge. This task gives the judge a `plan` phase that decides exactly as review does, with the plan fence's rules, the plan's own write rule (the plan file, its gate folders and .vloop/tmp/), and the phase's own name and skill hint, and makes both commands accept it. Everything T2 builds runs under this phase, so the other phases must not move by a word.
+Every repository that loads the vloop plugin should be able to write a brief with /vloop:create-brief and have it reviewed with /vloop:review-brief; today the two skills live only in this repository's .claude/skills/, labelled experimental. This task copies them into plugin/skills/ under their plugin names, drops the experimental label, points them at each other and at /vloop:operate, fixes create-brief's structure-check step, changes /vloop:operate's description to name /vloop:create-brief, and gives the two skills word ceilings of their own. The move is a move: the skills' instructions stay as they are beyond these changes, and the project copies under .claude/skills/ stay where they are (removing them is the operator's, at close).
 
 **Acceptance**
 
-- `vloop fence check --phase plan --root <dir> --tool <name> [--path <p>] ["<command>"]` gives every decision of the brief's two worked-example tables (with `--root .`) and its two apply_patch lines, with exactly the reasons shown there (`deny: ` followed by the message), exit 0 for allow and 1 for deny.
-- In plan a call is decided exactly as in review, with four differences only: shell denials by a fence rule read `<command> is denied by the plan fence (Bash(<rule>))`; a write is allowed when its path, resolved against `--root`, is `.vloop/state/state.json` or lies under `.vloop/state/gates/` or `.vloop/tmp/` (the two directories themselves are not writable targets; `/dev/null` stays allowed as in review), any other write being denied with `write to <path> is not allowed in a plan session: only .vloop/state/state.json, .vloop/state/gates/ and .vloop/tmp/ may be written`; the tool denial is `tool <name> is not allowed in a plan session`; the skill hint is `skill <name> is not vloop's — use /vloop:plan`. Deny-list denials keep `<command> is denied by the Copilot deny list (<stem>)`, `rm:*` included; `sh <script>` stays denied. The rules are read from the embedded `fence/plan.json`; reading `fence/review.json` for this phase, or a second hand-copied list or path list, is a violation.
-- `vloop fence hook --phase plan --root <dir>` answers each Copilot payload with the same decision, the reason being `vloop fence: ` and the message, exit 0. An unknown phase is, for `fence check`, exit 2 with `vloop: unknown phase "<p>": want review, second-review, work, verify, gate-review or plan` on stderr, and for `fence hook` the deny line holding that message and exit 2.
-- `vloop fence check --help` and `vloop fence hook --help` name `plan` among the phases in their usage line, their `--phase` flag and their long help; `docs/guide/commands.md` is regenerated with `go generate ./...` in this task, so `TestCommandsReferenceIsCurrent` stays green in the `go` check.
-- The review, second-review, work, verify and gate-review phases decide and word every call exactly as before, bar the unknown-phase message (the brief's unchanged lines: gate-review denies a write to `.vloop/state/state.json` with its own message; review's skill hint for `vloop-plan` is `/vloop:review`; work allows `rm src/old.go`). Existing tests that pin `plan` as an unknown phase or the old unknown-phase message (`TestUnknownPhase`, `TestFenceHookFailsClosed`'s `plan phase` case) change only to the new behaviour — the unknown name moves to another — and the work notes name the contract item (P1).
-- The plan phase is covered by committed Go table tests in `internal/fence` (and the hook's in its own test) that run on every OS in the `go` check, covering every line of the worked example's two tables, the apply_patch lines, the write rule's edges (the two directories themselves, a path after `..`, an absolute path under the root) and the unknown-phase message; a plan phase that leaves no committed test behind is a violation.
-- `fence/*.json` is unchanged, and no Claude session's argv, fence or settings changes.
+- plugin/skills/ holds exactly eight skill folders: create-brief, gate-review, operate, plan, review, review-brief, verify, work. plugin/skills/create-brief/ holds exactly SKILL.md, guidelines.md and templates/ (with brief-en.md and brief-es.md); plugin/skills/review-brief/ holds exactly SKILL.md.
+- plugin/skills/create-brief/guidelines.md, templates/brief-en.md and templates/brief-es.md are byte for byte the files under .claude/skills/vloop-create-brief/; the .claude/skills/ project copies are left in place, unchanged.
+- Line 2 of the two SKILL.md files is `name: create-brief` and `name: review-brief`; each `description` is the original one with its leading "Experimental, not yet in the plugin — " dropped and the rest kept. No file under plugin/skills/ contains vloop-create-brief, vloop-review-brief, "experimental" or "not yet in the plugin" (case-insensitive).
+- create-brief's SKILL.md names /vloop:review-brief for the independent review (its step 5) and /vloop:operate for marking ready and running (its step 6). review-brief's SKILL.md names /vloop:create-brief as the skill briefs are written with, and its standard as the guidelines.md beside /vloop:create-brief's SKILL.md (../create-brief/guidelines.md from its folder).
+- create-brief's step 5.1 says to copy the brief, under the same file name, into a temporary directory outside docs/briefs/, because vloop brief check compares the file name with the brief's name. A violation the review must rule on: any other change to either skill's instructions beyond the name, the description's prefix, the skill pointers and this step — the move is a move.
+- plugin/skills/operate/SKILL.md's frontmatter description ends `Writing briefs is /vloop:create-brief's.` in place of `Writing briefs is not this skill's job.`; nothing else in that file changes, and no other existing skill's file changes.
+- internal/budget/budget.go: Skills is plan, gate-review, work, review, operate, verify, create-brief, review-brief, in that order; Ceilings gains "create-brief": 1200 and "review-brief": 1000, each with the comment `// 2026-11-02, B28 (#101): its size when it joined the plugin, plus headroom`; the other ceilings are unchanged. budget.Check on a plugin whose create-brief SKILL.md is padded to 1201 words reports `create-brief: 1,201 words, over its ceiling of 1,200`.
+- With a binary built from the tree: `vloop fence check --phase review --root . --tool skill --path review-brief` prints allow and exits 0; with `--path vloop-review-brief` it prints `deny: skill vloop-review-brief is not vloop's — use /vloop:review` and exits 1; `vloop plugin path` in a freshly initialised repository extracts a plugin whose skills/create-brief/templates holds brief-en.md and brief-es.md. These follow from the embedded plugin's skill list: no change to internal/fence, internal/driver, the fences or vloop brief new/check.
+- vloop doctor in a repository with agent.review = copilot, a stub copilot and a .claude/skills/review-brief/ folder exits 1 and prints `✗ .claude/skills/review-brief has the name of vloop's review-brief skill; a copilot session may load it instead — rename it`.
+- Committed tests, run by the `go` check, cover the new behaviour: a budget test that pads create-brief past 1,200 words and expects the message above, and a doctor test in internal/cli (as internal/cli/doctor_copilot_plan_test.go) for the review-brief clash line. A task that leaves neither behind is a violation. TestPluginSkills passes on the plugin with the two new skills, no structural check weakened.
+- TestWorkedExampleB7PluginPath in cmd/vloop/b7_e2e_test.go is changed to the eight skill names and nothing else; the work notes name the contract item (K1, the eight folders) and that this is the only earlier test changed.
 
 <details><summary>verify command</summary>
 
@@ -41,20 +45,20 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
+### T2 — Add the Go test that holds each plugin brief template to the binary's
 
-`done` · depends on: T1
+`pending` · depends on: T1
 
-With the judge's plan phase in place (T1), the Copilot adapter can run the plan session exactly as it runs a gate-review session, under a hooks file whose phase is plan. This task makes the adapter support the phase, gives the session its session/v4 record, lets `agent.plan` take `copilot` and makes the driver's failure line name the agent; everything else the driver does with a plan must stay the same whatever the agent. The preflight and doctor checks are T3's.
+The plugin's brief templates are a copy of the binary's templates (internal/brief/templates/&lt;language&gt;.md) with an executive-summary section added, and nothing generates them, so they can drift. This task adds a Go test that fails when a plugin template, with its executive-summary section removed, differs from the binary's template of the same language, or has no executive-summary heading at all. It reads the repository's own plugin and templates by relative path, as TestPluginSkills reads ../../plugin, and proves its failures with fixtures on copies in temporary directories. Neither the templates nor the binary's templates are edited to make it pass.
 
 **Acceptance**
 
-- `agent.plan` accepts `claude` (default) and `copilot`, from the file and from `VLOOP_AGENT_PLAN`, and refuses any other value with exit 2.
-- With `agent.plan = copilot`, each plan session — the first and the revision a failed gate-review round asks for — runs `copilot -p "/vloop:plan <brief path>"` with the model and effort P-6 resolves, the plugin by `--plugin-dir`, a fresh home under `.vloop/tmp/` holding a hooks file that runs `fence hook --phase plan` in both command forms, the guidelines as custom instructions, and the same `--deny-tool` list as a Copilot review session — `--deny-tool=shell(rm:*)` and `--deny-tool=shell(git push:*)` included. A plan session started without the hooks file, with another phase in it, or without `shell(rm:*)` is a violation.
-- A Copilot plan session's JSON Lines become a `session/v4` record with phase `plan`, agent `copilot`, the model, credits, estimated cost, `cost_source` and `permission_denials`; it validates as session/v4. A Claude plan record keeps its schema as at the base.
-- Everything around the plan session is unchanged whatever the agent: `planning from <brief> using <model>`; a moved ref halts with exit 9 (`vloop: REFS MOVED plan — the planning session changed git refs; nothing was committed`); a timeout halts with exit 7; no plan halts with exit 1 (`vloop: planning produced no .vloop/state/state.json`), as do a plan failing `state/v2` or the gate-shape checks; the base gates, the gate review and its two rounds; the plan commit. The one change: a plan session that exits non-zero halts with `vloop: planning session failed (<agent> exited <n>) — see <run folder>`, `copilot` for a Copilot session and `claude`, as at the base, for a Claude one. Planner code that otherwise branches on the agent, or a fallback to Claude when a Copilot plan session fails, is a violation.
-- A Copilot work, review, second-review, verify or gate-review session's argv and hooks file are unchanged (work without `shell(rm:*)` and `--phase work`; the others with it and their own phase); a Claude session's argv, fence and settings are unchanged — a Claude plan session still runs under the plan fence.
-- Committed Go tests cover the adapter's plan argv (the whole deny list, `shell(rm:*)` included), its hooks file's `--phase plan`, `Supports(plan)`, the plan record's schema, `agent.plan` accepting copilot and the exit line for each agent; tests that pinned plan as unsupported or `agent.plan` as claude-only (`TestCopilotSupportsWorkReviewAndVerify` among them) or the old exit line change only to the new behaviour, and the work notes name the contract item (P2).
+- A committed Go test — a new top-level test function, in any package and under any name, not a case added inside a test that exists at the base — compares each of plugin/skills/create-brief/templates/brief-en.md and brief-es.md, minus the lines from its executive-summary heading (`## Executive summary`, `## Resumen ejecutivo`) up to but not including the next line starting `## `, with internal/brief/templates/en.md and es.md byte for byte, and passes on the repository as it is.
+- The comparison is a function of the plugin directory and the binary's template directory; the test runs it on the repository's own (by relative path, as TestPluginSkills reads ../../plugin) and committed fixture tests run it on copies in temporary directories, covering each planted failure below. A test that only reads the repository's files and has no fixture proving it fails is a violation.
+- A heading of brief-en.md changed outside the executive summary makes the test fail with `plugin/skills/create-brief/templates/brief-en.md differs from internal/brief/templates/en.md outside its executive summary`; a change to internal/brief/templates/es.md makes it fail with the brief-es.md / es.md form of that message.
+- brief-es.md without its `## Resumen ejecutivo` heading makes the test fail with `plugin/skills/create-brief/templates/brief-es.md has no executive summary` (and likewise for brief-en.md without `## Executive summary`).
+- A line changed or added inside a template's executive summary is not a difference: the test passes. The messages name both files as paths under the repository root, with forward slashes on every OS.
+- No template, plugin or binary, is edited, and vloop brief new/check are unchanged.
 
 <details><summary>verify command</summary>
 
@@ -64,20 +68,18 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Check agent.plan = copilot in the run preflight and doctor
+### T3 — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
 
-`done` · depends on: T2
+`pending` · depends on: none
 
-An operator who puts the plan session on Copilot must be warned it is experimental and stopped before any session when the setup cannot work, as for the other Copilot phases. This task adds agent.plan to the keys the preflight and doctor check; planning has no switch, so the key is in use whenever it is copilot, also on a resume that will not plan, as B26 decided for the gate review.
+The CLAUDE.md section that vloop init writes and vloop upgrade refreshes is how an interactive session in any repository learns which vloop skill to follow. This task changes its interactive-session paragraph so it also sends a session to /vloop:create-brief to write a brief and to /vloop:review-brief to review one in a separate session. Every other line of the section stays as it is; upgrade replaces an older section between the markers with no change to its logic.
 
 **Acceptance**
 
-- With `agent.plan = copilot`: `vloop run` prints `  ! agent.plan is copilot: experimental (docs/guide/configuration.md)` and goes ahead; `vloop doctor` prints `! agent.plan is copilot: experimental (docs/guide/configuration.md)` and the copilot and copilot login rows. This holds also on a resume that will not plan (after `vloop run --plan-only`).
-- `vloop run` with `agent.plan = copilot` (from the file or `VLOOP_AGENT_PLAN`) and `model.plan` at its default refuses before any session, exit 1: `vloop: agent.plan is copilot but model.plan is the default "opus", a Claude alias: set model.plan to a Copilot model id` — on a resume too.
-- With `agent.plan = copilot`, a project skill directory under `.claude/skills/` or `.github/skills/` named like one of vloop's skills stops `vloop run` with K1's message (`vloop: .claude/skills/plan has the name of vloop's plan skill; a copilot session may load it instead — rename it`), exit 1, no session, and is an error row in doctor.
-- With `agent.plan = copilot`, no GitHub login reaching the sessions refuses the run naming `agent.plan` (`vloop: agent.plan is copilot but no GitHub login reaches its sessions: …`), exit 1, and is doctor's copilot login error row; copilot missing or `copilot --version` failing is doctor's copilot error row and stops the run.
-- With `agent.plan = claude` none of this appears, and a project skill named `plan` stops nothing. The checks for agent.work, agent.review, agent.second-review, agent.verify and agent.gate-review keep their words and behaviour.
-- Committed tests cover the warning, the model.plan refusal, K1, the login refusal, the resume and the claude case for agent.plan (extending the existing doctor and run preflight tests); a code comment that lists the Copilot phases or keys (doctor's experimental warning and copilotKeys included) names plan too.
+- install.Section's interactive-session paragraph is, as one line and verbatim: `In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules. To write a brief, follow /vloop:create-brief; to review one, run /vloop:review-brief in a separate session. If /vloop:operate is not available, the vloop plugin is not loaded: say so, give the user the two ways to load it (claude plugin install vloop@vloop after claude plugin marketplace add mvelosop/vloop, or claude --plugin-dir "$(vloop plugin path)"), and meanwhile work from vloop --help.` Every other line of the section is unchanged.
+- `vloop init` in a fresh git repository writes a CLAUDE.md that is the section, in which `grep -c '/vloop:create-brief' CLAUDE.md` prints 1; install.MergeClaudeMD on a CLAUDE.md holding an older section between the markers replaces it with the new one and keeps everything outside the markers byte for byte.
+- The existing tests that pin the section's text (internal/install/install_test.go) change only to the new paragraph, and the work notes name the contract item (K3); a committed test asserts the new paragraph, run by the `go` check. A section change with no test pinning the new line is a violation.
+- This repository's own CLAUDE.md is not edited (the operator's, at close), and vloop init's output gains no hint.
 
 <details><summary>verify command</summary>
 
@@ -87,19 +89,19 @@ sh .vloop/state/gates/T3/gate.sh
 
 </details>
 
-### T4 — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
+### T4 — Add an eval case for each brief skill and update the evals README and guide
 
-`done` · depends on: T1, T2, T3
+`pending` · depends on: T1
 
-Operators and later briefs learn what a Copilot plan session may do from the fence audit, the configuration guide and the domain pages, which today keep the plan on Claude. This task brings every surface that names the Copilot phases up to what T1–T3 built, in the code's own words. It is prose: if it fails review twice on wording, it is blocked and the operator finishes it.
+Each plugin skill's behaviour is checked by eval cases that the operator runs with claude plugin eval; the two new skills need one each. This task adds review-brief-planted-faults, a draft brief with three planted faults that /vloop:review-brief must name without editing the brief, and create-brief-drafts-checked, a settled request that /vloop:create-brief must turn into a checked draft, graded from the trace because the brief's file name is only known at run time. It also lists both in plugin/evals/README.md and fixes the evals guide's stale case count and suites table. No gate or task runs an eval: the run is the operator's, at close.
 
 **Acceptance**
 
-- `docs/design-notes/fence-audit.md` gains a part for a Copilot plan session, under a heading naming the plan session or the plan fence, that classifies every deny rule of `fence/plan.json`, its allowed writes (`.vloop/state/state.json`, `.vloop/state/gates/`, `.vloop/tmp/`) and every deny-list pattern (the whole review list, `shell(rm:*)` included) by who enforces it in a Copilot plan session — the driver after the session, the hook, or neither — and says, for each `neither`, what covers it. It must not claim the driver reverts a file a plan session changed outside the files it may write: the plan commit stages the whole tree, so the hook is the line (out of scope to change).
-- `docs/guide/configuration.md`: the `agent.plan` row offers `claude` and `copilot` and says `copilot` is experimental; the Copilot paragraph covers plan sessions, the `agent.plan` warning and the `model.plan` refusal (default `"opus"`), and no longer says `agent.plan` stays on `claude`; the fence hook section's `--phase` lists name plan, it says a plan session is judged against the plan fence and may write only `.vloop/state/state.json`, under `.vloop/state/gates/` and under `.vloop/tmp/`, and K1's hint names `/vloop:plan` in a plan session.
-- `docs/domain/execution/session.md` says copilot runs every session kind, plan included; its Copilot hook paragraph says the hook serves the plan phase with the plan fence and allows writes only to the plan, its gate folders and `.vloop/tmp/` in it. The glossary's hook entry in `docs/domain/domain-model.md` covers the plan phase.
-- Every other surface that names the Copilot phases names plan too, the code comments that list them (the adapter's `AgentCopilot` comment, the hook's, doctor's experimental warning) included; a surface still listing only work, review, second-review, verify and gate-review is a violation.
-- Every sentence about behaviour matches what T1–T3 built (messages quoted as the code prints them); `fence/*.json` is unchanged; the `go` check still passes.
+- plugin/evals/review-brief-planted-faults/ invokes /vloop:review-brief on a scaffolded repository holding a draft brief that plants three faults: a fact about the code that the scaffolded code contradicts, a literal value the Behaviour contract and the Worked example state differently, and a configured check that fails after the first task and stays red until the last. Its graders, of any documented type: one that the verdict is not PASS; one per planted fault that it is named (three); one that the brief is not edited. Graders that could all pass with a planted fault missed, or with the brief edited, are a violation.
+- plugin/evals/create-brief-drafts-checked/ invokes /vloop:create-brief on a scaffolded repository with a request that settles every fork, states every literal value, and says the independent review is out of the case. Its graders read the trace, not a file: a tool_used Bash grader for `vloop brief new` and one for `vloop brief check`, each min 1; a regex grader on the trace for the check's `0 warning(s)` (vloop brief check prints it on its own line, `  ok, 0 warning(s)`, after the per-check lines); an llm grader with `focus: trace` that the brief written has `status: draft`, an executive summary, and the request's literal values verbatim. Graders that could pass with no brief written are a violation.
+- Both cases follow plugin/evals/README.md and docs/guide/evals.md: case.yaml declaring the scaffold, prompt.md with max_turns and allowed_tools holding at least the work fence's grants, graders of the documented types; every Bash grant either case names is in the guide's --allow-tools list. TestPluginSkills and TestEvalGrantsCoverFence pass in the `go` check with the two cases, no check weakened.
+- plugin/evals/README.md's table of other cases gains a row for each: `| `review-brief-planted-faults` | `/vloop:review-brief` | … |` and `| `create-brief-drafts-checked` | `/vloop:create-brief` | … |`.
+- docs/guide/evals.md says the full suite is `21 cases × 3 runs × 2 arms`; its "vloop's suites" table gains a row each for /vloop:create-brief (create-brief-drafts-checked), /vloop:review-brief (review-brief-planted-faults), /vloop:verify (verify-planted-mismatches) and /vloop:operate (operate-proposes-options); the line "`/vloop:operate` has no suite: it is the operator's, interactive." is removed. No other existing case changes.
 
 <details><summary>verify command</summary>
 
@@ -109,17 +111,19 @@ sh .vloop/state/gates/T4/gate.sh
 
 </details>
 
-### T5 — Extend the Copilot acceptance kit with a plan run on the real CLI
+### T5 — Name the two brief skills in the README, the concepts guide and the domain pages
 
-`done` · depends on: T2, T3
+`pending` · depends on: T1
 
-Gates use a stub copilot; only a run on the real CLI proves a Copilot plan session works and leaves a plan the driver accepts. This task gives the operator a script for that acceptance at close and documents it; no gate or check runs it.
+The documentation still describes six plugin skills and a design act wholly outside vloop. This task makes the README's and the concepts guide's Skills sections list all eight skills, the two new ones described as the operator's, interactive, like /vloop:operate; says in the session page that they are the operator's, not sessions; and says in the domain model that the plugin offers /vloop:create-brief and /vloop:review-brief for the design act while the brief stays vloop's only input (B-1 stands). It is a prose task: if it fails review twice on wording alone, block it and the operator finishes it.
 
 **Acceptance**
 
-- `tools/copilot-acceptance/` gains a script that runs `greet.loop-brief.md` in a scratch repository with a vloop built from this tree, `agent.plan = copilot` and `model.plan` the model given, gate review, work, review and verify on Claude, and writes a summary of each plan session's record (agent, model, credits, estimated cost, `session/v4` validity, its `permission_denials`), of the plan (its tasks, `state/v2` validity) and of the gate review's verdict per round.
-- The README gains its section, under a heading naming plan sessions: how to run the script, what it needs (copilot, a logged-in gh, claude), what it spends, what the summary holds, and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close.
-- The kit's scripts pass `sh -n` and its Python parses; flags, keys and messages of existing vloop commands the script uses are taken from running them, not memory; no gate or check runs the kit, copilot, gh or the network.
+- README.md's `### Skills` section names all eight skills (/vloop:plan, /vloop:gate-review, /vloop:work, /vloop:review, /vloop:verify, /vloop:operate, /vloop:create-brief, /vloop:review-brief), the two new ones as the operator's, used in an interactive session; it no longer says the plugin has six skills.
+- TestReadmeNamesTheSkills in internal/cli/readme_test.go checks /vloop:create-brief and /vloop:review-brief as well; its list gains those two and nothing else changes, and the work notes name the contract item (K4). It runs in the `go` check.
+- docs/guide/concepts.md's `## Skills` section lists the eight skills, with /vloop:create-brief and /vloop:review-brief described as the operator's, like /vloop:operate; it no longer says the plugin ships five skills.
+- docs/domain/execution/session.md's "Skills, as built" names /vloop:create-brief and /vloop:review-brief as the operator's skills, not sessions.
+- docs/domain/domain-model.md's `- A **Brief**` paragraph and the glossary's **design act** row each say the plugin offers /vloop:create-brief and /vloop:review-brief for the design act, and that the brief stays vloop's only input; invariant B-1 is unchanged. A wording that makes the design act vloop's, or makes vloop start these skills, is a violation.
 
 <details><summary>verify command</summary>
 
@@ -129,22 +133,22 @@ sh .vloop/state/gates/T5/gate.sh
 
 </details>
 
-### T6 — Close the run: every gate and the worked example on the final tree
+### T6 — Close the run: every gate at once and the worked example line for line
 
-`done` · depends on: T1, T2, T3, T4, T5
+`pending` · depends on: T1, T2, T3, T4, T5
 
-The run is done only when every gate holds together on the final tree and the brief's worked example holds line for line. This task changes nothing unless a gate or a line of the example fails, in which case it fixes the cause within the brief's scope.
+The earlier tasks each prove one item; this one proves they hold together on the finished tree. It runs every gate of the run at once and walks the brief's worked example line for line, fixing whatever no longer agrees — a stale count, a pointer, a test left on the old list — without widening any task's scope. If nothing needs fixing, the task is done with no change and says so.
 
 **Acceptance**
 
-- Every gate T1–T5 passes on the final tree.
-- Every line of the brief's worked example holds against the built binary: the two `fence check --phase plan` tables and the apply_patch lines, the three unchanged lines, the changed unknown-phase line, the stub run's line, record, argv and hooks file, and each planted failure (model.plan unset, `.claude/skills/plan`, exit 3 for each agent, no plan, moved HEAD).
-- The `go` check passes on the final tree.
+- The gates of T1 to T5 pass together on the finished tree, and the `go` check passes in full.
+- Every line of the brief's worked example holds on the built tree, including each planted failure (the template test's two messages, the padded create-brief's budget message, doctor's review-brief clash line), each proven by a committed test.
+- Any fix this task makes is confined to what an earlier task's acceptance already required; it changes no other skill's instructions, no fence, the driver, or vloop brief new/check, and its notes list each fix and the contract item it serves.
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T6/gate.sh
+sh .vloop/state/gates/T1/gate.sh && sh .vloop/state/gates/T2/gate.sh && sh .vloop/state/gates/T3/gate.sh && sh .vloop/state/gates/T4/gate.sh && sh .vloop/state/gates/T5/gate.sh
 ```
 
 </details>

@@ -1,0 +1,41 @@
+GATE FAIL: the section oracle failed:
+        2. A work session does one task and stops; it does not start the next one.
+        3. Sessions never commit, set a task status or move git refs; the driver does.
+        4. A task is done only when its gate passes and the review passes it.
+        5. Halting cleanly with an account of what blocked you is a success; faking progress is the only failure.
+        
+        In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules. If /vloop:operate is not available, the vloop plugin is not loaded: say so, give the user the two ways to load it (claude plugin install vloop@vloop after claude plugin marketplace add mvelosop/vloop, or claude --plugin-dir "$(vloop plugin path)"), and meanwhile work from vloop --help.
+        
+        Written by vloop 9.9.9.
+        <!-- vloop:end -->
+        ## Mine
+        
+        And this one.
+        
+        want
+        # My project
+        
+        Keep this line.
+        
+        <!-- vloop:begin -->
+        ## vloop
+        
+        Sessions started by the vloop loop (plan, gate review, work, review) follow these rules:
+        
+        1. Use repo-relative paths only, in files, logs and commit messages.
+        2. A work session does one task and stops; it does not start the next one.
+        3. Sessions never commit, set a task status or move git refs; the driver does.
+        4. A task is done only when its gate passes and the review passes it.
+        5. Halting cleanly with an account of what blocked you is a success; faking progress is the only failure.
+        
+        In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules. To write a brief, follow /vloop:create-brief; to review one, run /vloop:review-brief in a separate session. If /vloop:operate is not available, the vloop plugin is not loaded: say so, give the user the two ways to load it (claude plugin install vloop@vloop after claude plugin marketplace add mvelosop/vloop, or claude --plugin-dir "$(vloop plugin path)"), and meanwhile work from vloop --help.
+        
+        Written by vloop 9.9.9.
+        <!-- vloop:end -->
+        ## Mine
+        
+        And this one.
+    zz_gate_t3_section_test.go:47: the old interactive-session paragraph survives the merge
+FAIL
+FAIL	github.com/mvelosop/vloop/internal/install	0.364s
+FAIL

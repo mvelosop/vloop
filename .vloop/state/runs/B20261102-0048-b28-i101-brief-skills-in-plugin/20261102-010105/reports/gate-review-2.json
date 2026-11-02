@@ -1,0 +1,14 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Every gate fails on the base at its first behavioural assertion (missing skill folders, no templates, old CLAUDE.md paragraph, no eval cases, README not naming the skills). The check output the T4 oracle assumes ('  ok, 0 warning(s)') matches internal/brief/check.go and internal/cli/brief_test.go. The T1 doctor oracle mirrors the existing TestCopilotSkillWithPluginNameStopsTheRun. T6 composes the five gates and runs no suite. I could not run the later parts of T1, T2 and T4 (the oracles and the fence) because the earlier assertions fail first on the base; I read them instead."
+}
+
