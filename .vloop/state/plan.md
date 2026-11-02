@@ -2,7 +2,7 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 3
+**Status:** blocked · **1/6 done** · iteration 3
 
 **Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:11:30Z
 

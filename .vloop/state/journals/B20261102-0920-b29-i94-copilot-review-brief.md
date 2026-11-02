@@ -27,3 +27,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Implemented the review-brief phase in the judge, fence/review-brief.json, the nested-review deny rule in the five loop fences, help text, regenerated commands.md and committed tests. The gate fails only on a defect in its own nested-review loop.
 - **Files:** fence/review-brief.json, fence/plan.json, fence/work.json, fence/review.json, fence/gate-review.json, fence/verify.json, internal/fence/judge.go, internal/fence/judge_test.go, internal/fence/review_brief_test.go, internal/cli/fence.go, internal/cli/fence_test.go, internal/cli/fence_hook_test.go, docs/guide/commands.md, embed.go
 - **Notes for next iteration:** R3: TestUnknownPhase-equivalent (internal/fence/judge_test.go) and TestFenceHookFailsClosed (internal/cli/fence_hook_test.go) changed only their expected unknown-phase message; fencePhases and the write table in internal/cli/fence_test.go gained review-brief with the gate-review row's expectations. TestTaskGate* in internal/cli fail when go test runs inside a loop session (plan-changed guard), unrelated. Gate defect: in the nested-review loop `denyx` assigns the global `ph`, so on the second denyx per iteration `${ph#*:}` is the clobbered phase name, not the fence name; for second-review it expects 'second-review fence' while the acceptance (and the existing judge) say second-review is worded through the review fence. Fix: use a different variable in denyx/the loop, or expect 'review' for second-review.
+
+## Run ended — blocked
+
+- **Run:** `B20261102-0920-b29-i94-copilot-review-brief` · 3 iteration(s) this run
+- **Plan:** 1/6 done, 1 blocked
