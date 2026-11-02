@@ -16,3 +16,10 @@ committing the plan
    work T1 · 4m04s · $0.19 · run $3.94 / $40.00
    check go
    CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261102-1332-b30-i113-verify-unrunnable-lines/20261102-134928/checks/001-go.fail.log; review skipped
+── iteration 2 (2 this run) · T1 · 0/5 done ──
+   Add the verify/v2 report schema, embedded and listed
+   work T1 · 0m20s · $0.09 · run $4.04 / $40.00
+   check go
+   review T1 · 0m20s · $0.11 · run $4.14 / $40.00
+   review: PASS
+   T1 done
