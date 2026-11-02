@@ -1,0 +1,56 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Binding references (internal/cli/run.go) / Behaviour contract, V1",
+      "summary": "One parameter has to carry three cases, but the brief gives it only two values. The bare doctor 'passes none' and must exempt a complete plan. A vloop run that names no brief is a resume and must validate it. Both pass an empty brief, so runDoctor cannot tell them apart.",
+      "evidence": "Binding references: 'runPreflight and runDoctor gain it as a parameter; the bare doctor passes none'. V1: 'Validated as today: … a complete plan when vloop run names no brief'. internal/cli/run.go:77-83: briefPath stays \"\" when no argument is given, then runPreflight is called. The existing callers (internal/cli/doctor_copilot_test.go:48 runPreflight, internal/cli/doctor_second_review_test.go:13,24,38 runDoctor) are told to pass 'no brief', which means a resume in one and the bare doctor in the other.",
+      "fix": "Pin the form of the parameter. For example: runDoctor gains a planFor func(state brief) bool, or a mode (bare doctor / run naming brief X / run naming none). Or say that runPreflight passes the brief named, with \"\" for none, and the bare doctor passes a distinct value. Then state what the two existing test callers pass so that their assertions keep today's meaning."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract, V2 (order after a session)",
+      "summary": "The contract says a gate-review session that 'exited non-zero' halts. Today it does not: gateReviewRound halts only on a timeout and goes on to read the verdict. A planner could read this sentence as a new halt, which would contradict 'every other … exit code unchanged'.",
+      "evidence": "internal/driver/gatereview.go:56-66: refs and git-config checks, then only `if res.TimedOut` halts. There is no res.ExitCode check. The plan session checks both (internal/driver/plan.go:558-563).",
+      "fix": "Write: 'a plan session that timed out or exited non-zero, or a gate-review session that timed out, has its stray changes reverted (and warned) before its halt; a gate-review session's exit code is judged as today (not at all)'."
+    },
+    {
+      "kind": "fact",
+      "section": "Worked example, V1 (fixture and reset line)",
+      "summary": "A run id has no stamp. The fixture's run id 'B20260101-0900-a/<stamp>' fails state/v2's run_id pattern and CheckRunID. It would also make the expected reset line read 'the plan B20260101-0900-a/<stamp> was for …'.",
+      "evidence": "schemas/state.v2.json:9 run_id pattern ^[A-Za-z0-9._-]*$. internal/driver/safety.go:203-210 requires run_id == brief.RunID(plan.Brief). internal/brief/brief.go:26-28 gives 'B20260101-0900-a'. The existing fixtures use run_id 'B20260101-0900-a' (internal/cli/doctor_test.go:162, cmd/vloop/b2_e2e_test.go:12). The stamp names only the run folder.",
+      "fix": "Make the run id `B20260101-0900-a`, and make the expected line 'the plan B20260101-0900-a was for docs/briefs/B20260101-0900-a.loop-brief.md — you asked for docs/briefs/B20260101-0910-b.loop-brief.md: resetting and planning fresh'."
+    },
+    {
+      "kind": "consistency",
+      "section": "Docs / Shape (task 4)",
+      "summary": "The Shape's docs task names only 'the configuration guide's sentence and the session page'. The contract also changes docs/domain/execution/plan.md. The session page's review-brief sentence is conditional ('if it does not already') and not literal, so a 'grep per sentence' gate has no string to grep for. It does not already say it: session.md:23-31 never says that brief is the name. Also, inserting the plan.md sentence 'after a complete one is replaced by the next brief's plan' puts it inside a parenthesis.",
+      "evidence": "docs/domain/execution/session.md:23-31 (no mention of the name). docs/domain/execution/plan.md:7: '(`state/v2`; … a complete one is replaced by the next brief's plan). *Part of …'. The Shape, task 4 text.",
+      "fix": "List plan.md in task 4. Write the review-brief sentence literally, for example: 'Its `brief` is the brief's name, its file name without `.md`.' Place the plan.md sentence after the closing parenthesis, or rewrite the parenthesis."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract, V3",
+      "summary": "Minor: vloop brief check warns 'path does not resolve: .loop-brief.md' on the V3 parenthesis that explains why '.loop-brief' alone passes.",
+      "evidence": "vloop brief check on a ready copy under .vloop/tmp/bc/: '! path does not resolve: .loop-brief.md', 'ok, 1 warning(s)'.",
+      "fix": "Reword so that no backticked token looks like a path, for example 'a brief file whose name is only the suffix passes the command's suffix check'. Or accept the warning knowingly."
+    }
+  ],
+  "decisions": [
+    "One brief for #110–#112: sound. The files are disjoint and each task leaves the go check green.",
+    "Only a complete state/v2 plan of another brief is exempt, and a resume is still validated: agree. It matches the planner's own 'resuming' (internal/driver/plan.go:432) and CheckRunID (safety.go:197).",
+    "The bare vloop doctor passes a complete plan and names the plan's brief field: agree. No existing test pins the bare '✓ plan' line for a complete v2 plan.",
+    "The guard wraps each plan and gate-review session, not the commit: agree. The base gates run in the working tree right after the plan session (acceptPlan → baseGates).",
+    "Planning may write under .vloop/state/ and .vloop/tmp/ (reviewMayWrite), wider than S-4: acceptable. Copilot's per-session files also live under .vloop/tmp/ (agent_copilot.go).",
+    "Revert and warn rather than halt on #111: the operator's decision. A revert that fails halts with exit 1 and is not gated: acceptable.",
+    "brief-review/v1 tightened in place: the operator's decision. It is a stated exception to B29's 'a published schema does not change', which lives only in B29's rejected alternatives, so no document needs amending. Every kept report (3, 2 of them committed) matches the pattern.",
+    "The pattern also rejects '\\' and accepts the bare '.loop-brief': agree.",
+    "No patterns on the task fields of the other reports: agree."
+  ],
+  "checked": "facts (doctor plan check and doctorPlanInfo, runPreflight and its callers, runBriefPath, planner preflight/reset/resume and CheckRunID, state.Check references, treeGuard/reviewMayWrite/revert, reviewRun order, planSession and gateReviewRound, exit codes, copilot adapter writes, schema and its tests, driver brief check and refusal line, kept brief reviews, doc anchors in plan.md/session.md/configuration.md, R-4/S-4/C-3), consistency, rules, runnability against the go check",
+  "header": "Reviewed 2026-11-02: FIX, 5 findings"
+}
+

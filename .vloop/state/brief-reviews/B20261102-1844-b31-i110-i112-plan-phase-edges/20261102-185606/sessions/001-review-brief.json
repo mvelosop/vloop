@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 1.5925,
+  "duration_ms": 254927,
+  "effort": null,
+  "ended": "2026-11-02T19:00:21Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 72914,
+      "cache_read_input_tokens": 2743960,
+      "cost_usd": 1.5925,
+      "input_tokens": 84,
+      "output_tokens": 23003
+    }
+  },
+  "permission_denials": [],
+  "phase": "review-brief",
+  "run_id": "B20261102-1844-b31-i110-i112-plan-phase-edges",
+  "schema": "session/v5",
+  "started": "2026-11-02T18:56:06Z",
+  "turns": 45,
+  "wall_ms": 255474
+}
