@@ -113,7 +113,7 @@ claude plugin eval plugin \
     'Bash(vloop config get:*)' 'Bash(vloop status:*)' 'Bash(vloop task:*)' \
     'Bash(vloop task list:*)' 'Bash(vloop task show:*)' \
     'Bash(vloop task validate:*)' 'Bash(vloop task gate:*)' \
-    'Bash(vloop schema validate:*)'
+    'Bash(vloop schema validate:*)' 'Bash(vloop brief:*)'
 ```
 
 - `--scaffold` runs each case's `scaffold.sh`; the tool does not run scaffolds
@@ -130,7 +130,7 @@ claude plugin eval plugin \
   `TestEvalGrantsCoverFence` holds the cases to the fence and the list above to
   the cases.
 - `--max-cost-usd` is a hard ceiling, checked before each run. The full suite
-  is 16 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
+  is 21 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
 - `--keep-temp` keeps each run's sandbox and `trace.jsonl`, the only way to see
   what a session ran and which commands were denied; read them before
   re-running a case that scores low.
@@ -147,8 +147,11 @@ run's grader verdicts; the HTML report shows the same per case and arm.
 | `/vloop:plan` | `plan-valid-state`, `plan-checks-its-gates`, `language-es` | a valid plan, judges in the `verify` or the gate folder and no repository suite in a `verify`, prose in the configured language |
 | `/vloop:gate-review` | `gate-review-planted-gates`, `gate-review-real-misses`, `gate-review-coverage` | five planted gates, then six gates that fooled the gate review in past runs (macOS hosts) and one sound gate; the typo, the task-written judge, the source grep, the gate that passes on the base and the six real misses are found with the right finding kind, and the sound gates pass; then sound gates whose criteria are a check gap, uncovered and unpassable, each found as that kind, and a fully covered task that passes |
 | `/vloop:work` | `work-disputes-impossible-gate` | a gate no correct implementation passes is disputed, not edited |
+| `/vloop:create-brief` | `create-brief-drafts-checked` | a request that settles every fork becomes a draft written with `vloop brief new` and checked to `0 warning(s)`, graded from the trace |
+| `/vloop:review-brief` | `review-brief-planted-faults` | a draft brief with three planted faults (a claim the code contradicts, a value stated twice differently, a check red from the first task to the last): the verdict is not `PASS`, each fault is named, the brief is not edited |
+| `/vloop:verify` | `verify-planted-mismatches` | a built result with one sound worked-example line and three planted mismatches: one finding of each matching kind and none on the sound line |
+| `/vloop:operate` | `operate-proposes-options` | a run halted on a gate dispute: one to three real options, one recommended and why, no gate amended before the operator answers |
 
-`/vloop:operate` has no suite: it is the operator's, interactive.
 [plugin/evals/README.md](../../plugin/evals/README.md) lists every case.
 
 ## The reviewer calibration

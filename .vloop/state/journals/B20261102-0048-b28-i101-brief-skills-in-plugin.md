@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** install.Section's interactive-session paragraph now also sends a session to /vloop:create-brief to write a brief and /vloop:review-brief to review one in a separate session; the pinning test asserts the new paragraph.
 - **Files:** internal/install/section.go, internal/install/install_test.go
 - **Notes for next iteration:** internal/install/install_test.go line 108 changed only to the new paragraph (contract item K3). go test ./internal/cli had one failure, TestTaskGateUnknownTask ('plan was changed during this session'), which comes from running inside a driver session; not touched by this task.
+
+## T4 — Add an eval case for each brief skill and update the evals README and guide
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added the eval cases review-brief-planted-faults and create-brief-drafts-checked (case.yaml, prompt.md, scaffold.sh, graders), their rows in plugin/evals/README.md, and updated docs/guide/evals.md (21 cases, suites table, operate line removed).
+- **Files:** plugin/evals/review-brief-planted-faults/case.yaml, plugin/evals/review-brief-planted-faults/prompt.md, plugin/evals/review-brief-planted-faults/scaffold.sh, plugin/evals/review-brief-planted-faults/graders, plugin/evals/create-brief-drafts-checked/case.yaml, plugin/evals/create-brief-drafts-checked/prompt.md, plugin/evals/create-brief-drafts-checked/scaffold.sh, plugin/evals/create-brief-drafts-checked/graders, plugin/evals/README.md, docs/guide/evals.md
+- **Notes for next iteration:** create-brief-drafts-checked grants Bash(vloop brief:*) beyond the fence; added 'Bash(vloop brief:*)' to the guide's --allow-tools list so TestEvalGrantsCoverFence holds. The planted brief passes vloop brief check once status is ready; its plant: GREET_NAME claim, usage message differing between contract and worked example, tests/golden.sh red after task 1 (usage.txt regenerated only in task 2). No eval was run.

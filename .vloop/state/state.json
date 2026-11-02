@@ -5,9 +5,9 @@
   "base": "3655c351a577ef4925612aa4b5aba230c1b0fd80",
   "branch": "B20261102-0048-b28-i101-brief-skills-in-plugin",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-02T01:13:33Z",
-  "updated": "2026-11-02T01:48:53Z",
+  "updated": "2026-11-02T01:56:07Z",
   "shell": "sh",
   "checks": [
     {
@@ -166,7 +166,7 @@
         "docs/guide/evals.md says the full suite is `21 cases × 3 runs × 2 arms`; its \"vloop's suites\" table gains a row each for /vloop:create-brief (create-brief-drafts-checked), /vloop:review-brief (review-brief-planted-faults), /vloop:verify (verify-planted-mismatches) and /vloop:operate (operate-proposes-options); the line \"`/vloop:operate` has no suite: it is the operator's, interactive.\" is removed. No other existing case changes."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 3
+**Status:** running · **4/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:48:53Z
+**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:56:07Z
 
 ## Progress
 
 - [x] **T1** — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
 - [x] **T2** — Add the Go test that holds each plugin brief template to the binary's
 - [x] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
-- [ ] **T4** — Add an eval case for each brief skill and update the evals README and guide
+- [x] **T4** — Add an eval case for each brief skill and update the evals README and guide
 - [ ] **T5** — Name the two brief skills in the README, the concepts guide and the domain pages
 - [ ] **T6** — Close the run: every gate at once and the worked example line for line
 
@@ -91,7 +91,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Add an eval case for each brief skill and update the evals README and guide
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Each plugin skill's behaviour is checked by eval cases that the operator runs with claude plugin eval; the two new skills need one each. This task adds review-brief-planted-faults, a draft brief with three planted faults that /vloop:review-brief must name without editing the brief, and create-brief-drafts-checked, a settled request that /vloop:create-brief must turn into a checked draft, graded from the trace because the brief's file name is only known at run time. It also lists both in plugin/evals/README.md and fixes the evals guide's stale case count and suites table. No gate or task runs an eval: the run is the operator's, at close.
 
