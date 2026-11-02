@@ -53,6 +53,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | setup | repair | partly | no-options | [I20261101-222016-claude-trust-accepted-for-the-acceptance](I20261101-222016-claude-trust-accepted-for-the-acceptance.md) |
 | setup | repair | partly | no-options | [I20261102-004524-claude-trust-accepted-for-the-acceptance](I20261102-004524-claude-trust-accepted-for-the-acceptance.md) |
 | setup | repair | partly | no-options | [I20261102-202423-claude-trust-accepted-for-the-acceptance](I20261102-202423-claude-trust-accepted-for-the-acceptance.md) |
+| setup | repair | partly | no-options | [I20261102-230008-claude-trust-accepted-for-the-two-accept](I20261102-230008-claude-trust-accepted-for-the-two-accept.md) |
 | design | carry-forward | yes | no-options | [I20260929-2150-b1-s-open-items-carried-into-b2](I20260929-2150-b1-s-open-items-carried-into-b2.md) |
 | design | context-supply | partly | no-options | [I20260929-1222-the-design-conversation-was-reachable-on](I20260929-1222-the-design-conversation-was-reachable-on.md) |
 | design | decision | partly | no-options | [I20260929-1804-seven-forks-settled-for-the-first-brief](I20260929-1804-seven-forks-settled-for-the-first-brief.md) |
@@ -141,6 +142,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | ceremony | partly | no-options | [I20261102-112838-acceptance-on-the-real-cli-vloop-brief-r](I20261102-112838-acceptance-on-the-real-cli-vloop-brief-r.md) |
 | verify | ceremony | partly | no-options | [I20261102-151340-acceptance-the-two-verify-evals-on-a-bin](I20261102-151340-acceptance-the-two-verify-evals-on-a-bin.md) |
 | verify | ceremony | partly | no-options | [I20261102-203254-acceptance-the-plan-phase-s-edges-on-a-f](I20261102-203254-acceptance-the-plan-phase-s-edges-on-a-f.md) |
+| verify | ceremony | partly | no-options | [I20261102-230009-acceptance-the-plan-and-gate-review-eval](I20261102-230009-acceptance-the-plan-and-gate-review-eval.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
