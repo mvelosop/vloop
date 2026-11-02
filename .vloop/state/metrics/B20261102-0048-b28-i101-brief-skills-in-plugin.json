@@ -2,7 +2,7 @@
   "schema": "metrics/v4",
   "brief": "B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief",
   "run_id": "B20261102-0048-b28-i101-brief-skills-in-plugin",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 6,
@@ -50,19 +50,21 @@
     "gates_ms": 50312,
     "checks_ms": 1298621,
     "gate_review_ms": 198373,
-    "wall_ms": null
+    "verify_ms": 303089,
+    "wall_ms": 4668000
   },
   "rate": {
     "code_per_min": 0.4277141671763594,
     "code_test_per_min": 18.306166355148182
   },
   "cost": {
-    "total_usd": 7.457338000000001,
+    "total_usd": 7.688467100000001,
     "plan_usd": 4.750182800000001,
     "work_usd": 1.3362428,
     "review_usd": 0.6525190000000001,
     "gate_review_usd": 0.7183934000000001,
-    "per_1000_code_lines_usd": 745.7338000000001
+    "per_1000_code_lines_usd": 768.8467100000001,
+    "verify_usd": 0.23112910000000003
   },
   "credits": {
     "total": 0,
@@ -72,11 +74,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 440,
-    "output": 149026,
-    "cache_read": 12190786,
-    "cache_creation": 593007,
-    "cache_hit_ratio": 0.9535797728342404
+    "input": 476,
+    "output": 154178,
+    "cache_read": 12757677,
+    "cache_creation": 623719,
+    "cache_hit_ratio": 0.9533551807998164
   },
   "models": {
     "plan": [
@@ -89,6 +91,9 @@
       "claude-sonnet-5-5"
     ],
     "gate-review": [
+      "claude-sonnet-5-5"
+    ],
+    "verify": [
       "claude-sonnet-5-5"
     ]
   },
@@ -105,6 +110,9 @@
     "second-review": [],
     "gate-review": [
       "claude"
+    ],
+    "verify": [
+      "claude"
     ]
   },
   "second_review": {
@@ -119,7 +127,8 @@
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 0,
@@ -129,13 +138,13 @@
     "removal_efficiency": null
   },
   "interventions": {
-    "total": 0,
+    "total": 2,
     "by_agreement": {
       "recommended": 0,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 2
     }
   },
   "instructions": {
