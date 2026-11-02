@@ -1,0 +1,19 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20990101-0000-x.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Why this shape",
+      "summary": "the default model was not approved",
+      "evidence": "no operator decision names it",
+      "fix": "ask the operator"
+    }
+  ],
+  "decisions": [
+    "the model default"
+  ],
+  "checked": "every binding reference",
+  "header": "**Review:** ASK — 1 finding (decision)"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20990101-0000-x.loop-brief",
+  "verdict": "PASS",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "R1",
+      "summary": "a nit",
+      "evidence": "line 3"
+    },
+    {
+      "kind": "rule",
+      "section": "Constraints",
+      "summary": "another",
+      "fix": "say so"
+    }
+  ]
+}

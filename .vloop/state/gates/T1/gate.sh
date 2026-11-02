@@ -1,76 +1,46 @@
-# T1 (K1): the two brief skills in the plugin — the worked example's first
-# table, the moved files, /vloop:operate's description, the budget's list and
-# ceilings with the padded-skill failure, the fence's decisions on the two names,
-# the extracted plugin's templates and doctor's clash line for review-brief.
-G=.vloop/state/gates/T1
-. "$G/lib.sh"
-cd "$top" || fail cd
+#!/bin/sh
+# Gate T1 — R2: the brief-review/v1 report schema and the session/v5 record,
+# embedded and served by `vloop schema` like the others. Built from this tree;
+# every fixture is this folder's: valid/ must validate (exit 0), invalid/ must
+# be refused (exit 1, not 2: the schema is known). br-* fixtures are checked
+# against brief-review/v1, session-v5-* against session/v5. session/v4 is a
+# published schema and must not change: its embedded document equals the copy
+# taken when this plan was written, and it still refuses a review-brief record.
+set -u
+fail() { echo "GATE FAIL: $*" >&2; exit 1; }
+for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
+export LC_ALL=C GOTOOLCHAIN=local
+G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+JQ=$(command -v jq) || fail "jq is not on PATH"
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
+trap 'rm -rf "$t"' EXIT
+go build -buildvcs=false -o "$t/vloop" ./cmd/vloop || fail "go build of this tree"
+S=$t/vloop
+mkdir -p "$t/work" || fail mkdir
+cd "$t/work" || fail cd
 
-# The worked example's first table, on the tree.
-got=$(listing plugin/skills)
-[ "$got" = "create-brief gate-review operate plan review review-brief verify work" ] ||
-  fail "ls plugin/skills: '$got', want 'create-brief gate-review operate plan review review-brief verify work'"
-[ -d plugin/skills/create-brief ] || fail "plugin/skills/create-brief is not a folder"
-got=$(listing plugin/skills/create-brief)
-[ "$got" = "SKILL.md guidelines.md templates" ] || fail "ls plugin/skills/create-brief: '$got', want 'SKILL.md guidelines.md templates'"
-got=$(listing plugin/skills/create-brief/templates)
-[ "$got" = "brief-en.md brief-es.md" ] || fail "ls plugin/skills/create-brief/templates: '$got', want 'brief-en.md brief-es.md'"
-got=$(listing plugin/skills/review-brief)
-[ "$got" = "SKILL.md" ] || fail "ls plugin/skills/review-brief: '$got', want 'SKILL.md'"
-if hits=$(grep -rliE 'vloop-(create|review)-brief|experimental|not yet in the plugin' plugin/skills); then
-  fail "files under plugin/skills still name the project skills or the experimental label: $hits"
-fi
-grep -q '/vloop:review-brief' plugin/skills/create-brief/SKILL.md || fail "create-brief's SKILL.md does not name /vloop:review-brief"
-grep -q '/vloop:operate' plugin/skills/create-brief/SKILL.md || fail "create-brief's SKILL.md does not name /vloop:operate"
-grep -q '/vloop:create-brief' plugin/skills/review-brief/SKILL.md || fail "review-brief's SKILL.md does not name /vloop:create-brief"
-grep -qF '../create-brief/guidelines.md' plugin/skills/review-brief/SKILL.md ||
-  fail "review-brief's SKILL.md does not point at ../create-brief/guidelines.md"
-[ "$(sed -n 2p plugin/skills/create-brief/SKILL.md)" = "name: create-brief" ] || fail "line 2 of create-brief's SKILL.md is not 'name: create-brief'"
-[ "$(sed -n 2p plugin/skills/review-brief/SKILL.md)" = "name: review-brief" ] || fail "line 2 of review-brief's SKILL.md is not 'name: review-brief'"
-
-# Each description is the original's, its experimental prefix dropped (the
-# first letter of what is left may be capitalised).
-for s in create review; do
-  want=$(git -C "$top" show "$BASE:.claude/skills/vloop-$s-brief/SKILL.md" | sed -n 3p |
-    sed 's/^description: Experimental, not yet in the plugin — /description: /' | tr 'A-Z' 'a-z') || fail "git show of the original $s-brief"
-  case $want in "description: experimental"*) fail "the original $s-brief description did not drop its prefix" ;; esac
-  got=$(sed -n 3p "plugin/skills/$s-brief/SKILL.md" | tr 'A-Z' 'a-z')
-  [ "$got" = "$want" ] || fail "line 3 of $s-brief's SKILL.md is not the original description without its experimental prefix: $(sed -n 3p "plugin/skills/$s-brief/SKILL.md")"
+"$S" schema list >"$t/list" 2>&1 || fail "vloop schema list failed: $(cat "$t/list")"
+for n in brief-review/v1 session/v5 session/v4 session/v3 gate-verdict/v2 verify/v1; do
+  grep -qxF "$n" "$t/list" || fail "vloop schema list does not list $n: $(tr '\n' ' ' <"$t/list")"
 done
+"$S" schema show brief-review/v1 >"$t/br.json" 2>&1 || fail "vloop schema show brief-review/v1 failed: $(cat "$t/br.json")"
+"$JQ" -e 'type == "object"' "$t/br.json" >/dev/null 2>&1 || fail "vloop schema show brief-review/v1 is not a JSON document"
 
-# guidelines.md and the templates move byte for byte.
-for f in guidelines.md templates/brief-en.md templates/brief-es.md; do
-  git -C "$top" show "$BASE:.claude/skills/vloop-create-brief/$f" >"$t/orig" || fail "git show of the original $f"
-  cmp -s "$t/orig" "plugin/skills/create-brief/$f" || fail "plugin/skills/create-brief/$f is not .claude/skills/vloop-create-brief/$f byte for byte"
+# session/v4 is unchanged.
+"$S" schema show session/v4 >"$t/s4.json" 2>&1 || fail "vloop schema show session/v4 failed"
+[ "$("$JQ" -S . "$t/s4.json")" = "$("$JQ" -S . "$G/session.v4.json")" ] || fail "session/v4 changed: a published schema does not change"
+"$S" schema validate session/v4 "$G/s4-review-brief.json" >"$t/out" 2>&1; rc=$?
+[ "$rc" = 1 ] || fail "session/v4 accepted (exit $rc) a record with phase review-brief: $(cat "$t/out")"
+
+sch() { case "$(basename "$1")" in br-*) echo brief-review/v1;; session-v5-*) echo session/v5;; *) fail "fixture $1 has no schema";; esac; }
+for f in "$G"/valid/*.json; do
+  n=$(sch "$f")
+  "$S" schema validate "$n" "$f" >"$t/out" 2>&1; rc=$?
+  [ "$rc" = 0 ] || fail "valid/$(basename "$f") must validate against $n, got exit $rc: $(cat "$t/out")"
 done
-
-# /vloop:operate: its description's last sentence, and nothing else.
-git -C "$top" show "$BASE:plugin/skills/operate/SKILL.md" |
-  sed "s|Writing briefs is not this skill's job\.\$|Writing briefs is /vloop:create-brief's.|" >"$t/operate.want" || fail "git show of operate"
-grep -qF "Writing briefs is /vloop:create-brief's." "$t/operate.want" || fail "the gate's expected operate SKILL.md was not built"
-cmp -s "$t/operate.want" plugin/skills/operate/SKILL.md ||
-  fail "plugin/skills/operate/SKILL.md is not the base's with its description ending \"Writing briefs is /vloop:create-brief's.\" and nothing else changed"
-
-# The budget (the padded-skill failure) and doctor's clash line, by the gate's
-# oracles in a copy of the tree.
-srccopy
-oracle zz_gate_t1_budget_test.go internal/budget
-oracle zz_gate_t1_doctor_test.go internal/cli
-(cd "$t/src" && go test -count=1 -run '^TestGateT1' ./internal/budget ./internal/cli >"$t/oracle.out" 2>&1) ||
-  fail "the budget or doctor oracle failed:
-$(tail -40 "$t/oracle.out")"
-
-# The fence's decisions on the two names.
-newbin
-out=$("$S" fence check --phase review --root . --tool skill --path review-brief 2>&1); rc=$?
-[ "$rc" = 0 ] && [ "$out" = "allow" ] || fail "fence check review-brief: exit $rc, '$out', want allow, exit 0"
-out=$("$S" fence check --phase review --root . --tool skill --path vloop-review-brief 2>&1); rc=$?
-[ "$rc" = 1 ] && [ "$out" = "deny: skill vloop-review-brief is not vloop's — use /vloop:review" ] ||
-  fail "fence check vloop-review-brief: exit $rc, '$out', want the deny line, exit 1"
-
-# The extracted plugin holds create-brief's templates.
-freshrepo
-p=$(cd "$t/repo" && venv "$S" plugin path 2>"$t/pp.err") || fail "vloop plugin path: $(cat "$t/pp.err")"
-got=$(cd "$t/repo" && listing "$p/skills/create-brief/templates")
-[ "$got" = "brief-en.md brief-es.md" ] || fail "the extracted plugin's create-brief/templates: '$got', want 'brief-en.md brief-es.md'"
-echo "T1 gate: ok"
+for f in "$G"/invalid/*.json; do
+  n=$(sch "$f")
+  "$S" schema validate "$n" "$f" >"$t/out" 2>&1; rc=$?
+  [ "$rc" = 1 ] || fail "invalid/$(basename "$f") must be refused by $n with exit 1, got exit $rc: $(cat "$t/out")"
+done
+echo "gate T1: ok"

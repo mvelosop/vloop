@@ -1,0 +1,1 @@
+GATE FAIL: fence/plan.json is not its base rules plus the one deny rule Bash(vloop brief review:*): allow +[] -[], deny +[] -["Bash(vloop brief review:*)"]

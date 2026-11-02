@@ -1,123 +1,172 @@
-# T2 (K2): the test that holds each plugin template to the binary's. Judged by
-# planting the brief's failures in copies of the tree. K2 names neither the
-# test nor its package, so the gate pins neither: it runs every test function
-# the tree has that the base did not (found with `go test -list`, in any
-# package), and the template test is whichever of them reports K2's messages.
-# Each plant outside an executive summary must fail with the brief's message;
-# on the unplanted copy and with a change inside an executive summary, every
-# test that reported a K2 message passes and none reports one.
-G=.vloop/state/gates/T2
-. "$G/lib.sh"
-cd "$top" || fail cd
+#!/bin/sh
+# Gate T2 — R3's judge: the review-brief phase of `vloop fence check` and
+# `vloop fence hook`, fence/review-brief.json, and the one deny rule every
+# fence gains. The fences are judged as parsed JSON against the copies of the
+# base fences in this folder: each of the five loop fences is its base copy
+# plus the deny rule Bash(vloop brief review:*) and nothing else; the new
+# fence is gate-review's plus Bash(vloop brief check:*) in its allow list and
+# Bash(vloop brief review:*) in its deny list (rules compared as sets). Then
+# every line of the brief's fence-check worked example, the work line, the
+# changed unknown-phase message, the unchanged gate-review skill line, the
+# review-brief rules beyond the example, every phase denying a nested brief
+# review, the hook answering review-brief payloads, and both commands' help.
+# Nothing runs a command under judgment: the gate only asks the judge, in a
+# fixture root with a fake HOME, never this repository's tree.
+set -u
+fail() { echo "GATE FAIL: $*" >&2; exit 1; }
+for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
+export LC_ALL=C GOTOOLCHAIN=local
+G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+top=$(pwd -P)
+JQ=$(command -v jq) || fail "jq is not on PATH"
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
+trap 'rm -rf "$t"' EXIT
 
-EN=plugin/skills/create-brief/templates/brief-en.md
-ES=plugin/skills/create-brief/templates/brief-es.md
-[ -f "$EN" ] && [ -f "$ES" ] || fail "the plugin templates are not in place (T1)"
-MEN="plugin/skills/create-brief/templates/brief-en.md differs from internal/brief/templates/en.md outside its executive summary"
-MES="plugin/skills/create-brief/templates/brief-es.md differs from internal/brief/templates/es.md outside its executive summary"
-NES="plugin/skills/create-brief/templates/brief-es.md has no executive summary"
-
-srccopy
-mkdir -p "$t/keep" "$t/base" || fail mkdir
-for f in "$EN" "$ES" internal/brief/templates/en.md internal/brief/templates/es.md; do
-  cp "$t/src/$f" "$t/keep/$(echo "$f" | tr / _)" || fail keep
+# The fences, as parsed JSON.
+NR='Bash(vloop brief review:*)'
+# same <file> <expected file>: equal but for rule order.
+same() {
+  "$JQ" -e -n --slurpfile a "$1" --slurpfile b "$2" '
+    def norm: (.permissions.allow |= sort) | (.permissions.deny |= sort);
+    ($a[0] | norm) == ($b[0] | norm)' >/dev/null 2>&1
+}
+for f in plan work review gate-review verify; do
+  [ -f "$top/fence/$f.json" ] || fail "fence/$f.json is missing"
+  "$JQ" --arg r "$NR" '.permissions.deny += [$r]' "$G/$f.json" >"$t/want-$f.json" || fail "jq"
+  same "$top/fence/$f.json" "$t/want-$f.json" ||
+    fail "fence/$f.json is not its base rules plus the one deny rule $NR: allow +$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($a[0].permissions.allow - $b[0].permissions.allow)') -$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($b[0].permissions.allow - $a[0].permissions.allow)'), deny +$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($a[0].permissions.deny - $b[0].permissions.deny)') -$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($b[0].permissions.deny - $a[0].permissions.deny)')"
 done
-restore() {
-  for f in "$EN" "$ES" internal/brief/templates/en.md internal/brief/templates/es.md; do
-    cp "$t/keep/$(echo "$f" | tr / _)" "$t/src/$f" || fail restore
-  done
+[ -f "$top/fence/review-brief.json" ] || fail "fence/review-brief.json is missing"
+"$JQ" --arg r "$NR" '.permissions.deny += [$r] | .permissions.allow += ["Bash(vloop brief check:*)"]' "$G/gate-review.json" >"$t/want-rb.json" || fail "jq"
+same "$top/fence/review-brief.json" "$t/want-rb.json" ||
+  fail "fence/review-brief.json is not the gate-review fence plus Bash(vloop brief check:*) allowed and $NR denied"
+
+go build -buildvcs=false -o "$t/vloop" ./cmd/vloop || fail "go build of this tree"
+S=$t/vloop
+R=$t/repo
+mkdir -p "$R/docs/briefs" "$t/home" "$t/tmp" || fail mkdir
+git -C "$R" init -q || fail "git init of the fixture root"
+B=docs/briefs/B20990101-0000-x.loop-brief.md
+printf -- '---\nstatus: draft\n---\n# Brief\n' >"$R/$B"
+cd "$R" || fail "fixture root"
+
+ROOTARG=.
+chk() {
+  ph=$1 tl=$2; shift 2
+  out=$(env -i PATH=/usr/bin:/bin HOME="$t/home" TMPDIR="$t/tmp" LC_ALL=C "$S" fence check --phase "$ph" --root "$ROOTARG" --tool "$tl" "$@" 2>"$t/err"); rc=$?
 }
-
-# tests <dir> <out>: "<package> <test>" for every top-level test function of
-# the module in <dir>, as `go test -list` reports them.
-tests() {
-  (cd "$1" && go test -list . ./... >"$t/list.out" 2>&1) || fail "go test -list in $1:
-$(tail -30 "$t/list.out")"
-  awk '/^Test/ { n[++k] = $1; next }
-       /^ok[ \t]/ { for (i = 1; i <= k; i++) print $2 " " n[i]; k = 0; next }
-       { k = 0 }' "$t/list.out" | sort -u >"$2"
+allow() {
+  ph=$1 tl=$2; shift 2; chk "$ph" "$tl" "$@"
+  [ "$rc" = 0 ] && [ "$out" = allow ] || fail "[$ph] $tl $*: want 'allow' and exit 0, got exit $rc, stdout '$out', stderr '$(cat "$t/err")'"
 }
-git -C "$top" archive "$BASE" | tar -xf - -C "$t/base" || fail "the base's tree"
-tests "$t/base" "$t/tests.base"
-tests "$t/src" "$t/tests.src"
-comm -13 "$t/tests.base" "$t/tests.src" >"$t/tests.new"
-[ -s "$t/tests.new" ] || fail "the tree has no test function the base does not: no template test"
-
-# runtests <label>: the new tests of the copy, package by package, as JSON;
-# $rc is non-zero when any failed, the stream is $t/<label>.json.
-runtests() {
-  : >"$t/$1.json"
-  rc=0
-  for p in $(cut -d' ' -f1 "$t/tests.new" | sort -u); do
-    re=$(awk -v p="$p" '$1 == p { s = s (s == "" ? "" : "|") $2 } END { print s }' "$t/tests.new")
-    (cd "$t/src" && go test -count=1 -json -run "^($re)\$" "$p" >>"$t/$1.json" 2>&1) || rc=1
-  done
+# denyx <phase> <tool> <exact reason> [args...]
+denyx() {
+  ph=$1 tl=$2 want=$3; shift 3; chk "$ph" "$tl" "$@"
+  [ "$rc" = 1 ] && [ "$out" = "deny: $want" ] || fail "[$ph] $tl $*: want 'deny: $want' and exit 1, got exit $rc, stdout '$out', stderr '$(cat "$t/err")'"
 }
-# plant <file> <command>: <file> of the copy rewritten by <command> (reading
-# stdin), which must change it.
-plant() {
-  sh -c "$2" <"$t/src/$1" >"$t/planted" || fail "plant in $1"
-  cmp -s "$t/planted" "$t/src/$1" && fail "the plant in $1 changed nothing"
-  cp "$t/planted" "$t/src/$1" || fail "plant in $1"
+P=review-brief
+OW="is not allowed in a review-brief session: only .vloop/tmp/ may be written"
+
+# The worked example, line for line.
+allow $P bash 'vloop brief check .vloop/tmp/rb/B20990101-0000-x.loop-brief.md'
+allow $P bash "cat $B"
+allow $P create --path .vloop/tmp/brief-review.json
+denyx $P create "write to $B $OW" --path "$B"
+denyx $P bash 'git commit -m x is denied by the review-brief fence (Bash(git commit:*))' 'git commit -m x'
+denyx $P bash "rm $B is denied by the Copilot deny list (rm:*)" "rm $B"
+allow $P skill --path review-brief
+denyx $P skill "skill vloop-review-brief is not vloop's — use /vloop:review-brief" --path vloop-review-brief
+denyx $P bash "vloop brief review $B is denied by the review-brief fence (Bash(vloop brief review:*))" "vloop brief review $B"
+denyx work bash "vloop brief review $B is denied by the work fence (Bash(vloop brief review:*))" "vloop brief review $B"
+# The changed unknown-phase message.
+chk deploy bash ls
+[ "$rc" = 2 ] || fail "fence check --phase deploy: want exit 2, got $rc ('$out')"
+grep -qxF 'vloop: unknown phase "deploy": want review, second-review, work, verify, gate-review, plan or review-brief' "$t/err" ||
+  fail "fence check --phase deploy: want 'vloop: unknown phase \"deploy\": want review, second-review, work, verify, gate-review, plan or review-brief' on stderr, got '$(cat "$t/err")'"
+# Unchanged.
+denyx gate-review skill "skill vloop-review-brief is not vloop's — use /vloop:gate-review" --path vloop-review-brief
+
+# Every phase denies a nested brief review through its own fence.
+for ph in plan:plan review:review second-review:review verify:verify gate-review:gate-review work:work review-brief:review-brief; do
+  denyx "${ph%%:*}" bash "vloop brief review x.loop-brief.md is denied by the ${ph#*:} fence (Bash(vloop brief review:*))" 'vloop brief review x.loop-brief.md'
+  denyx "${ph%%:*}" bash "vloop brief review $B is denied by the ${ph#*:} fence (Bash(vloop brief review:*))" "env vloop brief review $B"
+done
+
+# review-brief beyond the example: decided as gate-review, with its own name.
+allow $P bash 'vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json'
+allow $P bash "mkdir -p .vloop/tmp/rb && cp $B .vloop/tmp/rb/B20990101-0000-x.loop-brief.md"
+allow $P bash 'git log --oneline -5'
+allow $P bash 'vloop brief check docs/briefs/B20990101-0000-x.loop-brief.md'
+allow $P view --path internal/x.go
+denyx $P bash 'vloop run is denied by the review-brief fence (Bash(vloop run:*))' 'vloop run'
+denyx $P bash 'vloop task verify T1 is denied by the review-brief fence (Bash(vloop task verify:*))' 'vloop task verify T1'
+denyx $P bash 'vloop brief close x is denied by the review-brief fence (Bash(vloop brief close:*))' 'vloop brief close x'
+denyx $P bash 'vloop brief new x is denied by the review-brief fence (Bash(vloop brief new:*))' 'vloop brief new x'
+denyx $P bash 'gh pr list is denied by the Copilot deny list (gh:*)' 'sh -c "gh pr list"'
+denyx $P bash 'rm .vloop/tmp/rb/x.md is denied by the Copilot deny list (rm:*)' 'rm .vloop/tmp/rb/x.md'
+denyx $P bash "write to $B $OW" "echo x >> $B"
+denyx $P create "write to src/a.go $OW" --path src/a.go
+denyx $P edit "write to .vloop/state/state.json $OW" --path .vloop/state/state.json
+denyx $P create "write to .vloop/state/brief-reviews/x.json $OW" --path .vloop/state/brief-reviews/x.json
+denyx $P web_fetch 'tool web_fetch is not allowed in a review-brief session'
+# Other phases word as before.
+denyx gate-review create "write to $B is not allowed in a gate-review session: only .vloop/tmp/ may be written" --path "$B"
+denyx review skill "skill vloop-plan is not vloop's — use /vloop:review" --path vloop-plan
+allow work bash 'rm src/old.go'
+denyx verify bash 'vloop run is denied by the verify fence (Bash(vloop run:*))' 'vloop run'
+
+# The hook, phase review-brief.
+H=$t/hookroot
+mkdir -p "$H/docs/briefs" "$H/.vloop/tmp" || fail mkdir
+cp "$R/$B" "$H/$B" || fail cp
+snap() { (cd "$t" && find hookroot home -print | LC_ALL=C sort && cat "hookroot/$B"); }
+before=$(snap)
+hookrun() {
+  hout=$(printf '%s' "$2" | (cd "$H" && env -i PATH=/usr/bin:/bin HOME="$t/home" TMPDIR="$t/tmp" LC_ALL=C "$S" fence hook --phase "$1" --root "$H") 2>"$t/err"); rc=$?
+  [ "$(printf '%s\n' "$hout" | grep -c .)" = 1 ] || fail "[hook $1] payload $2: want one line on stdout, got '$hout'"
+  dec=$(printf '%s\n' "$hout" | "$JQ" -r '.permissionDecision // "none"' 2>/dev/null) || fail "[hook $1] payload $2: stdout is not JSON: '$hout'"
+  why=$(printf '%s\n' "$hout" | "$JQ" -r '.permissionDecisionReason // ""')
 }
-# planted <label> <what> <message>: the run failed and some test said <message>.
-planted() {
-  [ "$rc" != 0 ] || fail "$2: the tests new since the base all pass"
-  grep -F "$3" "$t/$1.json" | grep -qF '"Action":"output"' || fail "$2: no test new since the base says '$3':
-$(grep -F '"Action":"output"' "$t/$1.json" | sed -En 's/.*"Output":"(([^"\\]|\\.)*)".*/\1/p' | tail -30)"
-  : >"$t/said"
-  grep -F "$3" "$t/$1.json" | grep -F '"Action":"output"' |
-    sed -n 's/.*"Package":"\([^"]*\)","Test":"\([^"/]*\).*/\1 \2/p' | sort -u >"$t/said"
-  ok=
-  while read -r p n; do
-    grep -qF "\"Action\":\"fail\",\"Package\":\"$p\",\"Test\":\"$n\"," "$t/$1.json" && ok=1
-  done <"$t/said"
-  [ -n "$ok" ] || fail "$2: the tests that say '$3' do not fail"
-  cat "$t/said" >>"$t/judges"
+payload() { "$JQ" -cn --arg n "$1" --argjson a "$2" --arg c "$H" '{timestamp: 1700000000000, cwd: $c, toolName: $n, toolArgs: $a}'; }
+bash_() { payload bash "$("$JQ" -cn --arg c "$1" '{command: $c, description: "d"}')"; }
+file_() { payload "$1" "$("$JQ" -cn --arg p "$2" '{path: $p, file_text: "x"}')"; }
+ok() {
+  hookrun "$1" "$2"
+  [ "$rc" = 0 ] && [ "$dec" = allow ] || fail "[hook $1] payload $2: want allow and exit 0, got '$hout', exit $rc"
 }
-: >"$t/judges"
-
-# A heading of brief-en.md changed outside the executive summary.
-plant "$EN" "sed 's/^## Out of scope\$/## Out of scope, planted/'"
-runtests en
-planted en "a heading of brief-en.md changed" "$MEN"
-restore
-
-# brief-es.md without its "## Resumen ejecutivo" heading.
-plant "$ES" "grep -v '^## Resumen ejecutivo\$'"
-runtests nosum
-planted nosum "brief-es.md without ## Resumen ejecutivo" "$NES"
-restore
-
-# The binary's Spanish template changed: the plugin's no longer matches it.
-plant internal/brief/templates/es.md "sed 's/^## Fuera de alcance\$/## Fuera de alcance, plantado/'"
-runtests bin
-planted bin "a heading of internal/brief/templates/es.md changed" "$MES"
-restore
-sort -u "$t/judges" >"$t/judges.u"
-
-# passes <label> <what>: every test that reported a K2 message passed in run
-# <label>, and no test reported one.
-passes() {
-  while read -r p n; do
-    grep -qF "\"Action\":\"pass\",\"Package\":\"$p\",\"Test\":\"$n\"," "$t/$1.json" ||
-      fail "$2: the template test $n ($p) does not pass:
-$(grep -F "\"Test\":\"$n" "$t/$1.json" | grep -F '"Action":"output"' | sed -En 's/.*"Output":"(([^"\\]|\\.)*)".*/\1/p' | tail -30)"
-  done <"$t/judges.u"
-  for m in "outside its executive summary" "has no executive summary"; do
-    grep -F "$m" "$t/$1.json" | grep -qF '"Action":"output"' && fail "$2: a test reported '$m':
-$(grep -F "$m" "$t/$1.json" | sed -En 's/.*"Output":"(([^"\\]|\\.)*)".*/\1/p' | head -5)"
-  done
-  return 0
+no() {
+  hookrun "$1" "$2"
+  [ "$rc" = 0 ] && [ "$dec" = deny ] && [ "$why" = "$3" ] || fail "[hook $1] payload $2: want deny '$3' and exit 0, got '$hout', exit $rc"
 }
+ok $P "$(bash_ 'vloop brief check .vloop/tmp/rb/B20990101-0000-x.loop-brief.md')"
+ok $P "$(bash_ "cat $B")"
+ok $P "$(file_ create .vloop/tmp/brief-review.json)"
+ok $P "$(file_ create "$H/.vloop/tmp/rb/x.md")"
+no $P "$(file_ create "$B")" "vloop fence: write to $B $OW"
+hookrun $P "$(file_ edit "$H/$B")"
+[ "$rc" = 0 ] && [ "$dec" = deny ] || fail "[hook $P] an edit of the brief by its absolute path: want deny and exit 0, got '$hout', exit $rc"
+no $P "$(bash_ 'git commit -m x')" 'vloop fence: git commit -m x is denied by the review-brief fence (Bash(git commit:*))'
+no $P "$(bash_ "rm $B")" "vloop fence: rm $B is denied by the Copilot deny list (rm:*)"
+no $P "$(bash_ "vloop brief review $B")" "vloop fence: vloop brief review $B is denied by the review-brief fence (Bash(vloop brief review:*))"
+ok $P "$(payload skill '{"skill":"review-brief"}')"
+no $P "$(payload skill '{"skill":"vloop-review-brief"}')" "vloop fence: skill vloop-review-brief is not vloop's — use /vloop:review-brief"
+no $P "$(payload web_fetch '{"url":"https://example.invalid"}')" 'vloop fence: tool web_fetch is not allowed in a review-brief session'
+no work "$(bash_ "vloop brief review $B")" "vloop fence: vloop brief review $B is denied by the work fence (Bash(vloop brief review:*))"
+no gate-review "$(payload skill '{"skill":"vloop-review-brief"}')" "vloop fence: skill vloop-review-brief is not vloop's — use /vloop:gate-review"
+for ph in deploy bogus; do
+  hookrun "$ph" "$(bash_ 'ls')"
+  [ "$rc" = 2 ] && [ "$dec" = deny ] || fail "fence hook --phase $ph: want the deny line and exit 2, got '$hout', exit $rc"
+  printf '%s' "$why" | grep -qF "unknown phase \"$ph\": want review, second-review, work, verify, gate-review, plan or review-brief" ||
+    fail "fence hook --phase $ph: the reason '$why' does not hold the new unknown-phase message"
+done
+[ "$(snap)" = "$before" ] || fail "the hook changed the fixture root or the HOME"
 
-# The tree as it is: the templates match.
-runtests clean
-passes clean "the unplanted tree"
-
-# A line added inside brief-en.md's executive summary is not a difference.
-plant "$EN" "awk '{ print } /^## Executive summary\$/ { print \"\"; print \"A line planted inside the executive summary.\" }'"
-runtests inside
-passes inside "a line added inside brief-en.md's executive summary"
-restore
-echo "T2 gate: ok"
+# Both commands' help name the phase: usage line and --phase flag.
+for c in check hook; do
+  "$S" fence "$c" --help >"$t/help" 2>&1 || fail "vloop fence $c --help failed"
+  grep -E "^[[:space:]]*vloop fence $c --phase <[^>]*>" "$t/help" | grep -qF 'review-brief' ||
+    fail "vloop fence $c --help: the usage line does not name review-brief: $(grep -F "vloop fence $c --phase" "$t/help")"
+  grep -E '^[[:space:]]*--phase ' "$t/help" | grep -qF 'review-brief' ||
+    fail "vloop fence $c --help: the --phase flag does not name review-brief: $(grep -F -- '--phase ' "$t/help")"
+done
+echo "gate T2: ok"
