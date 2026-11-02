@@ -13,16 +13,17 @@ command that keeps a running total in a file.
 
 ## Behaviour contract
 
-- `bin/tally add <n>` adds `<n>` to the total kept in `tally.txt` in the
-  directory it is run from (created when missing), prints the new total on
-  stdout and exits 0.
+- `bin/tally add <n>`, `<n>` an integer, adds `<n>` to the total kept in
+  `tally.txt` in the directory it is run from (created when missing), prints
+  the new total on stdout and exits 0.
 - `bin/tally total` prints the total, `0` when `tally.txt` is missing, and
   exits 0.
 - `bin/tally add x` prints `tally: not a number: x` on stderr, exits 2 and
   leaves `tally.txt` as it was.
 - The arithmetic and file handling may live in a shell library that `bin/tally`
-  sources; whether it exists, its file name and its function names are the
-  implementer's.
+  sources, so other scripts can source it too; whether there is one, its file
+  name and its function names are the implementer's. Only `bin/tally`'s
+  behaviour above is the contract.
 
 ## Acceptance
 
