@@ -150,8 +150,8 @@ still on you.
 
 Known trap: a test runner that exits non-zero when it collects zero tests (`uv
 run pytest` exits **5**) can never pass a scaffolding task's gate. Assert on the
-thing the task actually produces (an import, a file's contents, a `--help` exit
-code) rather than on an empty suite. Do **not** solve this by adding a hook that
+thing the task actually produces (a file's contents, a `--help` exit
+code, an import of a module the brief names) rather than on an empty suite. Do **not** solve this by adding a hook that
 remaps the exit code; that puts a workaround for the loop inside the product.
 
 ## The repository's guidelines
@@ -167,11 +167,18 @@ a domain invariant.
 output labels — if it is written down, it is already decided and is not yours to
 improve on.
 
-**Where the brief is silent, you may pin what a gate needs.** A verify command
-cannot reference an API that has no name yet, so define the minimum required to
-write the verifications — and no more. Do not pin a name that no gate uses.
-Report every name you pinned this way. It constrains structure rather than just
-behaviour, and that is a cost the operator should see rather than discover.
+**Where the brief is silent, judge through what it names.** When the
+brief names a surface the behaviour shows through (a command and its
+output, an HTTP route and its responses, a file and its contents), every
+gate judges through that surface, fixtures included: it runs the
+command, calls the route or reads the file, and imports, calls or reads
+no module, function, file or label of the implementation that the brief
+leaves open (the gate's own folder and temporary files are yours, not
+the implementation's). Only where no
+surface the brief names reaches a criterion may you pin the minimum a
+gate needs, and no more; state each pinned name in its task's acceptance
+criteria and report it. A pin constrains structure rather than just
+behaviour, a cost the operator should see rather than discover.
 
 ## Task shape
 
@@ -398,7 +405,7 @@ passes, or that changes the tree, comes back to you. An independent
 `/vloop:gate-review` session then judges each gate: that it fails for the right
 reason, judges the contract rather than how the code is written, cannot be
 reached by a task, can be passed by a correct implementation, and pins no name
-the brief does not. You may run `vloop task gate <id>` to see a gate's own
+the brief does not, beyond a pin "Naming" allows. You may run `vloop task gate <id>` to see a gate's own
 failure while you write it; the verdict is not yours.
 
 What neither can see is a gate that **contradicts its own acceptance** — one
@@ -416,7 +423,9 @@ with its task and kind. **Read it first, then revise the plan and its gate
 folders in place.** Do not start over: keep every task and gate it does not
 name, change what it does name, and fix the cause rather than the symptom — a
 gate that fails for the wrong reason is rewritten around the missing behaviour,
-not patched until it fails. You get one revision round; a second failure stops
+not patched until it fails. Each finding names a task: change that task's gate, or the task itself
+when the finding is about a criterion, until the finding no longer
+holds. A gate you leave as it was gets the same finding again. You get one revision round; a second failure stops
 the run for the operator.
 
 ## Before you finish

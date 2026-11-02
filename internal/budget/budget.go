@@ -19,7 +19,7 @@ var Skills = []string{"plan", "gate-review", "work", "review", "operate", "verif
 // comment, which says when and why the ceiling was last set.
 var Ceilings = map[string]int{
 	"plan":         4100, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
-	"gate-review":  1550, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
+	"gate-review":  1600, // 2026-11-02, B32 (#84): 1550 (B14) plus the sound-pin sentence of pins-unnamed and its reference in not-contract
 	"work":         1800, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
 	"review":       1820, // 2026-10-26, B20 (J4): 1650 (2026-10-12, B14, L10) plus the 166 words of "The product" section and the reworded path question
 	"operate":      1800, // 2026-11-02, B30 (#113): 1750 (B14) plus the close-step sentence on lines the verify session did not run

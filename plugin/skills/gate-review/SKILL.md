@@ -93,7 +93,7 @@ Each problem is one finding with a one-line `summary` and a `kind`:
   behaviour: a typo, a missing file or tool, a malformed command, a fixture that
   never built.
 - `not-contract` — it judges how the code is written (a grep over source text, a
-  re-serialised parse matched as text) or internals the brief does not name,
+  re-serialised parse matched as text) or internals the brief does not name (beyond a sound pin, as below),
   rather than what the product does. A UI oracle that asserts appearance, or
   selects by class name or test id the brief never named, is this kind: it
   should assert through roles and visible text.
@@ -109,6 +109,8 @@ Each problem is one finding with a one-line `summary` and a `kind`:
   criterion no session can meet, as in section 2b.
 - `pins-unnamed` — it pins a name (a function, file, flag, output label) the
   brief does not, so a correct implementation that chose another name fails.
+  A pin is sound only where no surface the brief names (a command, a route, a
+  file) could judge the same criterion, and its task's acceptance states the name.
 - `uncovered` — a criterion nothing could judge (section 2b).
 - `check-gap` — a criterion only a check could judge, which no check the plan
   holds runs (section 2b).

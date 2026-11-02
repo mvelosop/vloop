@@ -660,6 +660,43 @@ The list on 2026-11-02, picker models only:
 There is no `gpt-6-terra`, which is why that id failed: the Terra after 5.6
 is 6.1.
 
+## `gpt-6.1-terra` on every phase (B32, 2026-11-02)
+
+B32's acceptance: can `gpt-6.1-terra` replace `gpt-5.6-terra` (#84)? Copilot
+CLI 1.0.105, vloop built from B32's branch, so the plan and gate-review skills
+judge through the surface the brief names. Fresh clones of
+`mvelosop/url-shortener-template`, the URL shortener brief, the `app` and
+`clean` checks.
+
+| Attempt | Set-up | Outcome |
+| --- | --- | --- |
+| 1 (`b32-terra61`) | every phase on Copilot, `gpt-6.1-terra` | exit 2 at the gate review, no task run; ≈ $0.34 |
+| 2 (`b32-terra61-work`) | plan and gate review on Claude (defaults); work, review and verify on Copilot, `gpt-6.1-terra` | stalled at T6 after 5 of 9 tasks; ≈ $2.52, of which work $0.45 and review $0.34 on Copilot |
+| brief review (`b32-terra61`) | `agent.review-brief = "copilot"`, `gpt-6.1-terra` | a valid `brief-review/v1` report, verdict `ASK`, 9 findings |
+
+- **Plan: not qualified.** The plan session had the new "Naming" rule, and 8
+  of its 10 gates still `require("./src/app")` and the like, names the brief
+  leaves open. Inline `node -e` judges again, no gate folder.
+- **Gate review: not qualified.** It missed every one of those pins. Round 1
+  sent back 9 gates, 8 for a loader the gates assumed and 1 `uncovered`; round
+  2 failed nearly every gate as `wrong-reason` because it fails on the base
+  before an earlier task's scaffold exists, which is how a dependent gate is
+  meant to fail. The revised plan did change what round 1 named.
+- **Work: qualified.** Five tasks done, three of them at the first attempt.
+  At T6 the session reported `blocked` twice, with the gate passing, on a
+  conflict between two of the brief's requirements, stated exactly and
+  with the inputs that show it. A sound halt, not a fault.
+- **Review: qualified.** Three `FAIL` verdicts on T2 and T4, each naming a
+  real gap; every other verdict `PASS` on work that passed its gate.
+- **Verify: not reached** (the run stalled before it). Still to try, on a
+  completed build, as B25 did.
+- **Brief review: qualified.** The report validates and names the brief
+  correctly; its findings are substantive.
+- **Credits:** about a third of 5.6's per session, as in the planning test.
+- **Verdict for #84:** `gpt-6.1-terra` replaces `gpt-5.6-terra` for work,
+  review, the second review and brief review. Plan and gate review stay on
+  Claude; verify is still to qualify.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts

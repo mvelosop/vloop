@@ -1,144 +1,94 @@
 #!/bin/sh
-# Gate T3 — V2, the plan phase reverts what its sessions change elsewhere.
-# This tree's binary, built into a temporary directory, runs `vloop run
-# <brief>` in fixture repositories under $t with the stub claude
-# (stub-claude.sh) first on PATH and a fake HOME trusting the fixture; nothing
-# of this repository's tree, refs or HOME is touched.
-#   main: the plan session appends to README.md and creates notes.txt, the
-#     gate-review session creates scratch.txt and appends to README.md → the
-#     four warnings in order on stderr and in run.log, exit 0, the plan commit
-#     holds the plan and none of the three, README.md as at the start,
-#     notes.txt and scratch.txt gone.
-#   planted, exit 3: the plan session appends to README.md and exits 3 → the
-#     warning, then the planning-failure halt, exit 1; README.md as at the
-#     start; git status lists nothing outside .vloop/.
-#   planted, plan-line: T1's gate is `grep -q plan-line README.md` and the
-#     plan session appends plan-line → reverted before the gates are checked
-#     on the base, so the plan is accepted in one plan session; the work
-#     session appends plan-line and the run completes, plan-line in README.md
-#     once.
-#   clean: a plan session writing only under .vloop/state/ and .vloop/tmp/ →
-#     no "session changed" line, and its gate folder is in the plan commit.
+# Gate T3 — the eval case plan-judges-through-named-surface and the catalogues
+# (G4). The case's files hold what the brief fixes; its scaffold, run with bash
+# in an empty temporary directory, builds the brief's baseline (bin/tally
+# failing with "tally: not implemented", three tracked files, one commit, a
+# clean tree, no .vloop/) and refuses a second run; the two catalogues name the
+# case. Text of the brief and the catalogues is joined (newlines to spaces,
+# whitespace collapsed) before it is searched, except the README's table row,
+# which is one line.
 set -u
 fail() { echo "GATE FAIL: $*" >&2; exit 1; }
-for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p; s/^\(COPILOT_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
-unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT GOFLAGS GOBIN GH_TOKEN GITHUB_TOKEN
-export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GOTOOLCHAIN=local
-G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+export LC_ALL=C
 top=$(pwd -P)
-JQ=$(command -v jq) || fail "jq is not on PATH"
-GITBIN=$(command -v git) || fail "git is not on PATH"
-t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
-trap 'chmod -R u+w "$t" 2>/dev/null; rm -rf "$t"' EXIT
-GOMODCACHE=$(go env GOMODCACHE) && GOCACHE=$(go env GOCACHE) && GOPATH=$(go env GOPATH) || fail "go env"
-export GOMODCACHE GOCACHE GOPATH GOPROXY=off
-mkdir -p "$t/bin" && go build -buildvcs=false -o "$t/bin/vloop" ./cmd/vloop || fail "go build of this tree"
-S=$t/bin/vloop
-RID=B20260101-0900-demo
-BRIEF=docs/briefs/$RID.loop-brief.md
-README="the fixture's readme"
-venv() {
-  env -i PATH="$t/stub:/usr/bin:/bin" HOME="$t/home" USER=gateuser LOGNAME=gateuser TMPDIR="$t/tmp" LC_ALL=C \
-    GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 "$@"
-}
-g() { venv git -C "$t/repo" "$@"; }
-# runcase <name> <plan json> [stub flag file...]: a fresh fixture — git on
-# main, `vloop init`, one check, the brief, README.md, all committed — then
-# this tree's `vloop run` of the brief. $rc; $t/<name>.out, .err, .ev; $RD
-# the run folder, repo-relative with its trailing slash.
-runcase() {
-  n=$1; pj=$2; shift 2
-  chmod -R u+w "$t/repo" "$t/home" 2>/dev/null; rm -rf "$t/repo" "$t/home" "$t/tmp" "$t/stub"
-  mkdir -p "$t/repo/docs/briefs" "$t/home" "$t/tmp" "$t/stub" || fail mkdir
-  pv=$("$JQ" -r .version "$top/plugin/.claude-plugin/plugin.json") || fail "plugin version"
-  cp "$G/$pj" "$t/stub/plan.json" && ln -s "$GITBIN" "$t/stub/git" && ln -s "$JQ" "$t/stub/jq" &&
-    sed "s/@PLUGIN_VERSION@/$pv/" "$G/stub-claude.sh" >"$t/stub/claude" && chmod +x "$t/stub/claude" || fail "stub"
-  printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$t/repo" >"$t/home/.claude.json"
-  g init -q -b main && g config user.name Gate && g config user.email gate@example.invalid && g config commit.gpgsign false || fail "git init"
-  echo x >"$t/repo/docs/x.md"
-  echo "$README" >"$t/repo/README.md"
-  (cd "$t/repo" && venv "$S" init >"$t/init.out" 2>&1) || fail "vloop init: $(cat "$t/init.out")"
-  printf '[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' >"$t/repo/.vloop/config.toml"
-  cp "$G/brief.md" "$t/repo/$BRIEF" || fail brief
-  g add -A && g commit -q -m "gate fixture" || fail "fixture commit"
-  for f in "$@"; do : >"$t/stub/$f"; done
-  (cd "$t/repo" && venv "$S" run "$BRIEF" >"$t/$n.out" 2>"$t/$n.err"); rc=$?
-  if [ -f "$t/stub/events" ]; then mv "$t/stub/events" "$t/$n.ev"; else : >"$t/$n.ev"; fi
-  RD=$(cd "$t/repo" && ls -d .vloop/state/runs/*/*/ 2>/dev/null)
-  [ "$(printf '%s\n' "$RD" | grep -c .)" = 1 ] || fail "$n: want one run folder, found: $RD"
-  return 0
-}
-# completed <name>: exit 0, the plan complete, T1 done.
-completed() {
-  [ "$rc" = 0 ] || fail "$1: vloop run exited $rc, want 0: $(tail -8 "$t/$1.err")"
-  st=$("$JQ" -r '.status + " " + ([.tasks[].status] | join(","))' "$t/repo/.vloop/state/state.json" 2>/dev/null)
-  [ "$st" = "complete done" ] || fail "$1: the plan reads '$st', want 'complete done'"
-}
-# planfiles <name>: $t/<name>.pf, the files of the [vloop] plan <run id> commit.
-planfiles() {
-  h=$(g log --format='%H %s' | sed -n "s/^\([0-9a-f]*\) \[vloop\] plan $RID\$/\1/p" | head -1)
-  [ -n "$h" ] || fail "$1: no '[vloop] plan $RID' commit: $(g log --format=%s | tr '\n' ';')"
-  g show --name-only --format= "$h" >"$t/$1.pf" || fail "$1: git show"
-}
-# warnings <name>: $t/<name>.w, the "session changed … — reverted" lines on stderr.
-warnings() { grep -E '^vloop: the (plan|gate-review) session changed ' "$t/$1.err" >"$t/$1.w"; }
-readme_is_base() { [ "$(cat "$t/repo/README.md")" = "$README" ] || fail "$1: README.md is not as at the start: $(cat "$t/repo/README.md")"; }
-
-# main
-runcase main plan.json plan.readme plan.notes gr.dirty
-completed main
-warnings main
-printf '%s\n' \
-  'vloop: the plan session changed README.md — reverted' \
-  'vloop: the plan session changed notes.txt — reverted' \
-  'vloop: the gate-review session changed README.md — reverted' \
-  'vloop: the gate-review session changed scratch.txt — reverted' >"$t/want.w"
-cmp -s "$t/want.w" "$t/main.w" || fail "main: the revert warnings on stderr are:
-$(cat "$t/main.w")
---- want
-$(cat "$t/want.w")"
-while IFS= read -r l; do
-  grep -qF -- "$l" "$t/repo/${RD}run.log" || fail "main: ${RD}run.log does not hold '$l'"
-done <"$t/want.w"
-planfiles main
-grep -qxF .vloop/state/state.json "$t/main.pf" || fail "main: the plan commit does not hold .vloop/state/state.json: $(tr '\n' ' ' <"$t/main.pf")"
-for f in README.md notes.txt scratch.txt; do
-  grep -qxF "$f" "$t/main.pf" && fail "main: the plan commit holds $f, a plan-phase session's stray change"
+C=plugin/evals/plan-judges-through-named-surface
+M=plugin/evals/plan-checks-its-gates
+[ -d "$C" ] || fail "$C/ is missing"
+for f in prompt.md case.yaml scaffold.sh brief.md graders/state-validates.md graders/judges-through-the-command.md; do
+  [ -f "$C/$f" ] || fail "$C/$f is missing"
 done
-readme_is_base main
-[ "$(g show HEAD:README.md)" = "$README" ] || fail "main: README.md at HEAD is not as at the start"
-for f in notes.txt scratch.txt; do
-  [ -e "$t/repo/$f" ] && fail "main: $f exists after the run"
-  g cat-file -e "HEAD:$f" 2>/dev/null && fail "main: $f is committed"
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") || fail mktemp
+trap 'rm -rf "$t"' EXIT
+joined() { tr -s ' \t\n' '   ' <"$1" | sed -e 's/^ //' -e 's/ $//'; }
+# front <file>: the frontmatter, both --- lines included; body <file>: the rest.
+front() { awk 'NR == 1 && $0 != "---" { exit } { print } NR > 1 && $0 == "---" { exit }' "$1"; }
+body() { awk 'n >= 2 { print; next } $0 == "---" { n++ }' "$1"; }
+
+# prompt.md
+[ "$(front "$C/prompt.md")" = "$(front "$M/prompt.md")" ] || fail "$C/prompt.md's frontmatter is not $M/prompt.md's"
+[ "$(body "$C/prompt.md" | grep -v '^[[:space:]]*$')" = "/vloop:plan docs/briefs/tally.loop-brief.md" ] ||
+  fail "$C/prompt.md's body is not: /vloop:plan docs/briefs/tally.loop-brief.md"
+
+# case.yaml
+grep -qx 'schema_version: "1.1"' "$C/case.yaml" || fail "$C/case.yaml: no schema_version: \"1.1\""
+grep -qx 'name: plan-judges-through-named-surface' "$C/case.yaml" || fail "$C/case.yaml: no name: plan-judges-through-named-surface"
+awk '/^context:[[:space:]]*$/ { f = 1; next } /^[^[:space:]]/ { f = 0 } f && /^[[:space:]]+scaffold_script:[[:space:]]*scaffold\.sh[[:space:]]*$/ { ok = 1 } END { exit !ok }' "$C/case.yaml" ||
+  fail "$C/case.yaml: no context.scaffold_script: scaffold.sh"
+
+# graders
+cmp -s "$C/graders/state-validates.md" "$M/graders/state-validates.md" || fail "$C/graders/state-validates.md is not a copy of $M's"
+J=$C/graders/judges-through-the-command.md
+front "$J" >"$t/jf"
+grep -qx 'type: llm' "$t/jf" || fail "$J: frontmatter has no type: llm"
+grep -qx 'weight: 3' "$t/jf" || fail "$J: frontmatter has no weight: 3"
+grep -qE '^[[:space:]]*path:[[:space:]]*\.vloop/state/state\.json[[:space:]]*$' "$t/jf" || fail "$J: its focus is not .vloop/state/state.json"
+grep -qE '^[[:space:]]*source:[[:space:]]*file[[:space:]]*$' "$t/jf" || fail "$J: its focus is not a file"
+
+# brief.md
+Bf=$C/brief.md
+front "$Bf" >"$t/bf"
+for l in 'name: tally' 'kind: brief' 'status: ready'; do grep -qx "$l" "$t/bf" || fail "$Bf: frontmatter has no $l"; done
+grep -qE '^description: *[^ ]' "$t/bf" || fail "$Bf: frontmatter has no description"
+joined "$Bf" >"$t/brief"
+for s in 'bin/tally add x' 'tally: not a number: x' "are the implementer's"; do
+  grep -qF -- "$s" "$t/brief" || fail "$Bf does not say: $s"
 done
+grep -qF 'lib/' "$t/brief" && fail "$Bf names a lib/ path: the library's file names are the implementer's"
+grep -rqi 'shortener' "$C" && fail "$C/ mentions the URL shortener"
 
-# planted: the plan session changes README.md and exits 3.
-runcase exit3 plan.json plan.readme plan.exit3
-[ "$rc" = 1 ] || fail "exit3: vloop run exited $rc, want 1: $(tail -5 "$t/exit3.err")"
-wl=$(grep -nxF 'vloop: the plan session changed README.md — reverted' "$t/exit3.err" | head -1 | cut -d: -f1)
-hl=$(grep -nF 'planning session failed (claude exited 3)' "$t/exit3.err" | head -1 | cut -d: -f1)
-[ -n "$wl" ] || fail "exit3: no 'vloop: the plan session changed README.md — reverted' on stderr: $(cat "$t/exit3.err")"
-[ -n "$hl" ] || fail "exit3: no planning-failure halt on stderr: $(cat "$t/exit3.err")"
-[ "$wl" -lt "$hl" ] || fail "exit3: the revert warning does not come before the halt: $(cat "$t/exit3.err")"
-readme_is_base exit3
-out=$(g status --porcelain --untracked-files=all | grep -v '^.. \.vloop/')
-[ -z "$out" ] || fail "exit3: git status lists paths outside .vloop/: $out"
+# scaffold
+d="$t/sandbox"; mkdir "$d" || fail mkdir
+(cd "$d" && bash "$top/$C/scaffold.sh") >"$t/s.out" 2>&1 || fail "the scaffold exits non-zero in an empty directory:
+$(cat "$t/s.out")"
+[ -f "$d/bin/tally" ] || fail "the scaffold wrote no bin/tally"
+[ "$(ls -l "$d/bin/tally" | cut -c1-10)" = "-rwxr-xr-x" ] || fail "bin/tally's mode is not 755: $(ls -l "$d/bin/tally" | cut -c1-10)"
+[ "$(head -n 1 "$d/bin/tally")" = "#!/bin/sh" ] || fail "bin/tally does not start #!/bin/sh"
+(cd "$d" && ./bin/tally total) >"$t/o" 2>"$t/e"; rc=$?
+[ "$rc" = 1 ] || fail "bin/tally total exits $rc, want 1"
+[ "$(cat "$t/e")" = "tally: not implemented" ] || fail "bin/tally total's stderr is not 'tally: not implemented': $(cat "$t/e")"
+[ -s "$t/o" ] && fail "bin/tally total prints on stdout: $(cat "$t/o")"
+[ -z "$(git -C "$d" status --porcelain)" ] || fail "the scaffold leaves the tree dirty: $(git -C "$d" status --porcelain)"
+[ "$(git -C "$d" ls-files | sort | tr '\n' ' ')" = "CLAUDE.md bin/tally docs/briefs/tally.loop-brief.md " ] ||
+  fail "tracked files are not CLAUDE.md, bin/tally, docs/briefs/tally.loop-brief.md: $(git -C "$d" ls-files | tr '\n' ' ')"
+[ "$(git -C "$d" log --format=%s)" = "baseline" ] || fail "the scaffold's history is not one commit \"baseline\""
+[ "$(git -C "$d" ls-files -s bin/tally | cut -c1-6)" = "100755" ] || fail "bin/tally is not committed executable"
+[ "$(wc -l <"$d/CLAUDE.md" | tr -d ' ')" = 1 ] || fail "CLAUDE.md is not one line"
+cmp -s "$d/docs/briefs/tally.loop-brief.md" "$Bf" || fail "docs/briefs/tally.loop-brief.md is not a copy of $Bf"
+[ -e "$d/.vloop" ] && fail "the scaffold writes .vloop/"
+(cd "$d" && bash "$top/$C/scaffold.sh") >/dev/null 2>&1 && fail "a second scaffold run in the same directory exits 0"
 
-# planted: the plan session's line would pass T1's gate on the base.
-runcase planline plan-planline.json plan.readme work.planline
-completed planline
-[ "$(grep -c '^session plan ' "$t/planline.ev")" = 1 ] || fail "planline: want one plan session (the gate fails on the base after the revert), got: $(grep '^session ' "$t/planline.ev" | tr '\n' ';')"
-grep -qxF 'vloop: the plan session changed README.md — reverted' "$t/planline.err" || fail "planline: no revert warning: $(tail -5 "$t/planline.err")"
-planfiles planline
-grep -qxF README.md "$t/planline.pf" && fail "planline: the plan commit holds README.md"
-[ "$(grep -c '^plan-line$' "$t/repo/README.md")" = 1 ] || fail "planline: README.md should hold plan-line once, the work session's: $(cat "$t/repo/README.md")"
-
-# clean: nothing outside .vloop/state/ and .vloop/tmp/.
-runcase clean plan.json
-completed clean
-grep -qF 'session changed' "$t/clean.err" "$t/clean.out" && fail "clean: a 'session changed' line with nothing changed: $(grep -F 'session changed' "$t/clean.err" "$t/clean.out")"
-planfiles clean
-for f in .vloop/state/state.json .vloop/state/gates/T1/gate.sh; do
-  grep -qxF "$f" "$t/clean.pf" || fail "clean: the plan commit does not hold $f: $(tr '\n' ' ' <"$t/clean.pf")"
-done
+# catalogues
+R=plugin/evals/README.md
+row='| `plan-judges-through-named-surface` | `/vloop:plan` | a brief that names a command and leaves its library'"'"'s file and function names open: the plan validates, and every gate judges through the command, naming no library file or function |'
+awk '/^## The other cases/ { f = 1; next } /^## / { f = 0 } f' "$R" | grep -qxF -- "$row" || fail "$R's \"The other cases\" table lacks the row: $row"
+E=docs/guide/evals.md
+r=$(grep -E '^\| `/vloop:plan` \|' "$E")
+[ "$(printf '%s\n' "$r" | grep -c .)" = 1 ] || fail "$E: want one /vloop:plan row"
+printf '%s\n' "$r" | awk -F'|' '{ exit !(index($3, "`plan-judges-through-named-surface`") && index($3, "`plan-valid-state`") && index($3, "`plan-checks-its-gates`") && index($3, "`language-es`")) }' ||
+  fail "$E: the /vloop:plan row's cases cell does not add plan-judges-through-named-surface to its three cases"
+printf '%s\n' "$r" | awk -F'|' '{ s = $4; sub(/[ ]+$/, "", s); w = "prose in the configured language, gates through the surface the brief names"; exit !(substr(s, length(s) - length(w) + 1) == w) }' ||
+  fail "$E: the /vloop:plan row's last cell does not end ', gates through the surface the brief names'"
+joined "$E" >"$t/guide"
+grep -qF 'is 23 cases × 3 runs × 2 arms' "$t/guide" || fail "$E does not say: is 23 cases × 3 runs × 2 arms"
+grep -qF '21 cases ×' "$t/guide" && fail "$E still says 21 cases"
 echo "gate T3: ok"

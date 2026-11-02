@@ -1,1 +1,0 @@
-A complete `state/v2` plan of another brief does not block the next brief either: `vloop run` naming another brief does not validate it, and `vloop doctor` run on its own reports every complete `state/v2` plan as a pass; a resumed plan, or one not complete, is validated.

@@ -1,1 +1,0 @@
-Its report's `brief` is the brief's name, its file name without `.md`; the schema rejects a path.

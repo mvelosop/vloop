@@ -1,0 +1,8 @@
+{"schema":"verdict/v1","task":"T4","verdict":"PASS",
+"criteria":[
+{"criterion":"Gates T1 to T3 all pass on the final tree, run together by this task's gate.","met":true,"evidence":".vloop/state/gates/T4/gate.sh loops over T1, T2, T3 and fails if any fails; the driver re-ran it and it passed."},
+{"criterion":"schemas/*.json are byte for byte as at the base with none added or removed, and the work, review, verify, operate, create-brief and review-brief skills are unchanged.","met":true,"evidence":"gate.sh cmp's schemas and the six skills against base copies; git diff main --stat shows only plugin/skills/plan and gate-review changed."},
+{"criterion":"The work session's notes walk the brief's worked example line for line (the plan skill's five phrases and the absent one, the gate review's two phrases, its word count, the ceiling, the configured go check, the scaffold run, `bin/tally total`, the clean status, the three tracked files, the refused second run, brief.md's strings and the catalogues) and name the gate or committed test that covers each; a line nothing covers is fixed in this task or reported, not skipped.","met":true,"evidence":"proposal notes map each line to gates T1-T4; the go check is covered by checks/go.log (exit 0), and the TestTaskGate* env caveat is reported."},
+{"criterion":"No task runs `claude`, `copilot` or any eval; any fix this task makes is to the contract as the brief states it and weakens no check.","met":true,"evidence":"No product files changed in the diff; no eval was run per the notes."}],
+"findings":[],
+"notes":"TestTaskGate* fails inside a driver session only because VLOOP_PLAN_SHA256 is set, as the work session reported; the go check passed outside it."}

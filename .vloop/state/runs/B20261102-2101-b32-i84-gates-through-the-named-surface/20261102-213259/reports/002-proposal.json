@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The gate-review skill's pins-unnamed bullet now has the sound-pin sentence and not-contract names the sound-pin exception. The gate-review ceiling in internal/budget/budget.go is 1600 with the dated comment.",
+  "files": ["plugin/skills/gate-review/SKILL.md", "internal/budget/budget.go"],
+  "verified": "vloop task gate T2 exited 0 (gate T2: ok); go test ./internal/budget/ passed; the skill is 1527 words.",
+  "notes": "Only the two brief edits were made; no test was changed. I started the full go test ./... once and stopped it before it finished, so the driver's gate pass is the full-suite check."
+}

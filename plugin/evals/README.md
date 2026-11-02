@@ -48,6 +48,7 @@ the only thing that stops it.
 | --- | --- | --- |
 | `plan-valid-state` | `/vloop:plan` | a plan for a small brief validates and every task has a `kind` |
 | `plan-checks-its-gates` | `/vloop:plan` | the planner's judges are assertions in the `verify` or files in the gate folder, never the test a task writes, no `verify` runs a repository suite, and a gate's TOML fixture sets its key at the top level |
+| `plan-judges-through-named-surface` | `/vloop:plan` | a brief that names a command and leaves its library's file and function names open: the plan validates, and every gate judges through the command, naming no library file or function |
 | `gate-review-planted-gates` | `/vloop:gate-review` | five planted gates (a path typo, a judge the task writes, a grep of source text, one that passes on the base, one sound): the four defects are found with the right finding kind and the sound gate passes |
 | `gate-review-real-misses` | `/vloop:gate-review` | six gates that fooled the gate review in past runs (a GNU-only `grep -P`, a TOML key appended after a table, a session required to write under `.vloop/`, a pattern with a trailing space, a `session/v1` record validated against `session/v2`, a `*-review.json` glob that also matches `*-gate-review.json`) and one sound gate: each defect is found as `unpassable` and the sound gate passes |
 | `gate-review-coverage` | `/vloop:gate-review` | four tasks whose gates are all sound but for their criteria: one only a check could judge, with no check that runs it (`check-gap`), one nothing could judge (`uncovered`), one requiring a change to `.vloop/state/plan.md` (`unpassable`), and one fully covered, which passes with no finding |
@@ -67,5 +68,17 @@ plugin and the default model, both scored 1.0 (≈ $0.84 together).
 run when the verify skill moved to `verify/v2` (2026-11-02, B30): one run each,
 with the default model and the no-plugin baseline arm, both scored 1.0 with the
 plugin and 0.0 without (≈ $0.79 together, both arms).
+
+The plan and gate-review cases were run when the plan skill learned to judge
+through the surface a brief names (2026-11-02, B32): one run each, with the
+default model and the no-plugin baseline arm. With the plugin,
+`plan-judges-through-named-surface`, `plan-checks-its-gates`, `language-es`,
+`gate-review-coverage`, `gate-review-planted-gates` and
+`gate-review-real-misses` scored 1.0, and `plan-valid-state` 0.8; without it,
+`plan-checks-its-gates` scored 0.33 and the rest 0.0 (≈ $3.78, both arms).
+`plan-valid-state` loses its `plan-quality` grader, which still asks for a task
+listing its test in `files` and a `verify` that runs it (P-3 and P-8 forbid
+both); run from `main` at `7de2855`, it scored the same 0.8 ($0.40). Repeated
+`--case` flags select only the last one: run each pattern on its own.
 
 `gate-review-real-misses` is for macOS hosts: its first gate's `grep -P` is a defect only where `grep` is BSD grep, which rejects the option. Its scaffold exits non-zero on a host whose `grep` accepts `-P`, and on any host where a planted gate does not fail for its recorded reason. The scaffold needs `vloop` on `PATH`.
