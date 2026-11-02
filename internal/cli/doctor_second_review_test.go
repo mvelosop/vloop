@@ -10,7 +10,7 @@ const noIndependence = "the second reviewer is the primary's agent and model —
 func TestDoctorSecondReviewOffSaysNothing(t *testing.T) {
 	e := newDoctorEnv(t)
 	e.write(".vloop/config.toml", doctorCheckConfig+"[agent]\nsecond-review = \"copilot\"\n")
-	for _, c := range runDoctor(e.build, e.repo) {
+	for _, c := range runDoctor(e.build, e.repo, nil) {
 		if strings.Contains(c.Name+c.Message, "second") {
 			t.Errorf("doctor speaks of the second review with it off: %s %s", c.Name, c.Message)
 		}
@@ -21,7 +21,7 @@ func TestDoctorSecondReviewRowAndIndependence(t *testing.T) {
 	e := newDoctorEnv(t)
 	e.write(".vloop/config.toml", doctorCheckConfig+"[run]\nsecond-review = \"feedback\"\n[model]\nsecond-review = \"opus\"\n")
 	var row, warn bool
-	for _, c := range runDoctor(e.build, e.repo) {
+	for _, c := range runDoctor(e.build, e.repo, nil) {
 		if c.Name == "run.second-review:" {
 			if c.Result == resWarning {
 				warn = true
@@ -35,7 +35,7 @@ func TestDoctorSecondReviewRowAndIndependence(t *testing.T) {
 	}
 	e.write(".vloop/config.toml", doctorCheckConfig+"[run]\nsecond-review = \"record\"\n")
 	var got bool
-	for _, c := range runDoctor(e.build, e.repo) {
+	for _, c := range runDoctor(e.build, e.repo, nil) {
 		if c.Name == "run.second-review:" && c.Result == resWarning && c.Message == noIndependence {
 			got = true
 		}
@@ -71,5 +71,39 @@ func TestRunPreflightCopilotSecondReview(t *testing.T) {
 	e.write(".vloop/config.toml", doctorCheckConfig+"[agent]\nsecond-review = \"copilot\"\n")
 	if _, err := e.preflight(); err != nil {
 		t.Errorf("second review off: err = %v", err)
+	}
+}
+
+// V1: the plan check tells the bare doctor, a run naming another brief and a
+// run naming none or the plan's own apart for a complete state/v2 plan.
+func TestDoctorCompletePlanOfAnotherBrief(t *testing.T) {
+	e := newDoctorEnv(t)
+	e.write(".vloop/config.toml", doctorCheckConfig)
+	e.write(".vloop/state/state.json", `{"schema":"state/v2","run_id":"r","brief":"docs/briefs/a.md","status":"complete","shell":"sh","tasks":[]}`)
+	plan := func(run *string) doctorCheck {
+		for _, c := range runDoctor(e.build, e.repo, run) {
+			if c.Name == "plan" {
+				return c
+			}
+		}
+		t.Fatal("no plan check")
+		return doctorCheck{}
+	}
+	pass := "a complete plan of docs/briefs/a.md — the next brief's plan replaces it"
+	other, same, none := "docs/briefs/b.md", "docs/briefs/a.md", ""
+	if c := plan(nil); c.Result != resPass || c.Message != pass {
+		t.Errorf("bare doctor: %s %q, want pass %q", c.Result, c.Message, pass)
+	}
+	if c := plan(&other); c.Result != resPass || c.Message != pass {
+		t.Errorf("run naming another brief: %s %q, want pass %q", c.Result, c.Message, pass)
+	}
+	for _, r := range []*string{&same, &none} {
+		if c := plan(r); c.Message == pass {
+			t.Errorf("run naming %q: the complete plan was not validated", *r)
+		}
+	}
+	e.write(".vloop/state/state.json", `{"schema":"state/v2","run_id":"r","brief":"docs/briefs/a.md","status":"running","shell":"sh","tasks":[]}`)
+	if c := plan(nil); c.Message == pass {
+		t.Error("a running plan passed as complete")
 	}
 }

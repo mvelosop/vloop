@@ -18,3 +18,10 @@ committing the plan
    review T1 · 0m33s · $0.10 · run $3.03 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/5 done ──
+   Let a complete plan of another brief pass vloop run's preflight and the bare vloop doctor
+   work T2 · 4m29s · $0.30 · run $3.33 / $40.00
+   check go
+   review T2 · 0m25s · $0.11 · run $3.45 / $40.00
+   review: PASS
+   T2 done

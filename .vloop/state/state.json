@@ -5,9 +5,9 @@
   "base": "a30ab36ac4c5e5050c6d3222b5eaa0adeca02995",
   "branch": "B20261102-1844-b31-i110-i112-plan-phase-edges",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-02T19:28:53Z",
-  "updated": "2026-11-02T19:36:15Z",
+  "updated": "2026-11-02T19:44:58Z",
   "shell": "sh",
   "checks": [
     {
@@ -103,7 +103,7 @@
         "Committed tests run by the go check cover every V1 line of the worked example with stub sessions in a fixture repository, as cmd/vloop's run tests do — the bare doctor's pass (text and --json), `vloop run <b>` resetting and completing, `vloop run <a>` and a bare `vloop run` refused, and the planted running plan refused — plus the doctor's three cases in internal/cli. A task that changes this behaviour and leaves no such test fails this criterion."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

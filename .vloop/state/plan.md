@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/5 done** · iteration 1
+**Status:** running · **2/5 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T19:36:15Z
+**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T19:44:58Z
 
 ## Progress
 
 - [x] **T1** — Tighten brief-review/v1's brief to a brief's name, in place
-- [ ] **T2** — Let a complete plan of another brief pass vloop run's preflight and the bare vloop doctor
+- [x] **T2** — Let a complete plan of another brief pass vloop run's preflight and the bare vloop doctor
 - [ ] **T3** — Revert and warn what each plan and gate-review session changes outside .vloop/state/ and .vloop/tmp/
 - [ ] **T4** — Write V1, V2 and V3 into the configuration guide, the plan and session pages and the fence audit
 - [ ] **T5** — Close the run: every gate and the worked example on the final tree
@@ -41,7 +41,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Let a complete plan of another brief pass vloop run's preflight and the bare vloop doctor
 
-`pending` · depends on: none
+`done` · depends on: none
 
 B29 could not start because B28's finished plan referenced files B28 had moved, and the preflight validates whatever plan is on disk, so the operator deleted it by hand (#110). The planner resets another brief's plan anyway, so validating a complete one protects nothing; a resume, or a plan not complete, is the plan the run goes on with and stays validated. The doctor's plan check has to tell three cases apart — the bare `vloop doctor`, a run naming a brief, a run naming none — so `runPreflight` and `runDoctor` gain what that takes, in a form this task chooses.
 
