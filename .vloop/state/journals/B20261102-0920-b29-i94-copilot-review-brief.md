@@ -67,3 +67,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** create-brief step 5.3 now asks for vloop brief review; review-brief gained its report step (brief-review/v1 to .vloop/tmp/brief-review.json, validated, plus prose), ceiling 1100, and is under the fenced-skills check. Fence audit, session.md, domain-model.md and configuration.md document the review-brief session.
 - **Files:** plugin/skills/create-brief/SKILL.md, plugin/skills/review-brief/SKILL.md, internal/budget/budget.go, internal/cli/skills_test.go, docs/design-notes/fence-audit.md, docs/domain/execution/session.md, docs/domain/domain-model.md, docs/guide/configuration.md
 - **Notes for next iteration:** review-brief SKILL.md must not name `vloop brief review` in backticks: its own fence denies it and TestPluginSkills fails. skills_test.go changed only by adding review-brief to fencedSkills (the brief's own item). Full go test: only TestTaskGate* in internal/cli fail inside a loop session (plan-changed guard), unrelated.
+
+## T6 — Close the run: every gate and the worked example on the final tree
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Closed the run: every gate T1–T5 and T6 passes together on the final tree, and the go check is green. No code changes.
+- **Files:** none
+- **Notes for next iteration:** Inside a vloop session VLOOP_PLAN_SHA256 is set and makes internal/cli TestTaskGate* fail ('plan was changed during this session'); run go test with `env -u VLOOP_PLAN_SHA256`. Without it the whole suite passes. Not caused by this brief.

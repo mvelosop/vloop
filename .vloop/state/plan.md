@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 8
+**Status:** running · **6/6 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:58:32Z
+**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T11:10:03Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict · 1 attempt(s)
 - [x] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
 - [x] **T5** — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
-- [ ] **T6** — Close the run: every gate and the worked example on the final tree
+- [x] **T6** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
 
@@ -135,7 +135,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Close the run: every gate and the worked example on the final tree
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 The last task proves the whole brief at once on the final tree: every earlier gate passes together, which holds the worked example line for line, and the go check is green. It exists so a later task cannot have silently broken an earlier one's contract.
 

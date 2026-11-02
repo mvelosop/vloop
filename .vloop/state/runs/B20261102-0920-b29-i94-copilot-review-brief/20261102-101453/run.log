@@ -32,3 +32,10 @@
    review T5 · 0m39s · $0.15 · run $2.87 / $40.00
    review: PASS
    T5 done
+── iteration 9 (6 this run) · T6 · 5/6 done ──
+   Close the run: every gate and the worked example on the final tree
+   work T6 · 6m57s · $0.10 · run $2.96 / $40.00
+   check go
+   review T6 · 0m20s · $0.07 · run $3.04 / $40.00
+   review: PASS
+   T6 done
