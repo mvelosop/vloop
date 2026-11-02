@@ -1,0 +1,5 @@
+{"schema":"verdict/v1","task":"T6","verdict":"PASS","criteria":[
+{"criterion":"Every gate T1–T5 passes on the final tree.","met":true,"evidence":"gates/T6.log shows gate T1..T5 ok; gate T6 runs each of them in order."},
+{"criterion":"Every line of the brief's worked example holds against the built binary: the two `fence check --phase plan` tables and the apply_patch lines, the three unchanged lines, the changed unknown-phase line, the stub run's line, record, argv and hooks file, and each planted failure (model.plan unset, `.claude/skills/plan`, exit 3 for each agent, no plan, moved HEAD).","met":true,"evidence":"The T6 gate chains T1-T5 gates, whose comments assign each worked-example line to a gate; all pass. No product change was needed (git status shows only .vloop records)."},
+{"criterion":"The `go` check passes on the final tree.","met":true,"evidence":".vloop/tmp/checks.json: go exit 0."}],
+"findings":[],"notes":"No product diff, as the task allows. The work session reports that inside a session the exported VLOOP_PLAN_SHA256 makes 5 internal/cli task-gate tests fail unless unset; the driver's go check passed, so this is an environment note only."}

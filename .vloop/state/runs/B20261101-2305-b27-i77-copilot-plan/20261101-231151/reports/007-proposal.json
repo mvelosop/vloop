@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Closed the run with no code change: gates T1-T5 and T6 pass on the final tree, and the go checks pass.",
+  "files": [],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: ok; go vet, gofmt, go mod tidy -diff and linux/windows builds are clean; go test ./... passes with VLOOP_PLAN_SHA256 unset.",
+  "notes": "Inside a work session VLOOP_PLAN_SHA256 is exported, so go test ./internal/cli fails 5 task-gate tests with 'plan was changed during this session'. Run it with env -u VLOOP_PLAN_SHA256 and it passes. No product defect."
+}

@@ -5,9 +5,9 @@
   "base": "432365fd0fdfd121665ced1c61b23db67c306719",
   "branch": "B20261101-2305-b27-i77-copilot-plan",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-11-01T23:23:21Z",
-  "updated": "2026-11-02T00:11:05Z",
+  "updated": "2026-11-02T00:23:29Z",
   "shell": "sh",
   "checks": [
     {
@@ -234,7 +234,7 @@
         "The `go` check passes on the final tree."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }
