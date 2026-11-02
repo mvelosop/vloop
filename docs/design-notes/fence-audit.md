@@ -572,6 +572,8 @@ as further Bash deny rules.
 
 # Fence audit: who enforces each rule in a Copilot gate-review session
 
+*Since B31 the driver reverts a file a gate-review or plan session changed outside `.vloop/state/` and `.vloop/tmp/`, with a warning, before the plan commit: where this audit says the driver does not revert files after such a session, or that the plan commit would commit the change, that predates it.*
+
 *Written for B26. It covers `fence/gate-review.json`, the fence a gate-review
 session runs under, and the Copilot adapter's deny list for gate-review
 sessions: the whole review list, `shell(rm:*)` included.*
@@ -763,6 +765,8 @@ on a moved ref or a changed `.git/config` or hook.
   session timeout bounds how long one can run.
 
 # Fence audit: who enforces each rule in a Copilot plan session
+
+*Since B31 the driver reverts a file a gate-review or plan session changed outside `.vloop/state/` and `.vloop/tmp/`, with a warning, before the plan commit: where this audit says the driver does not revert files after such a session, or that the plan commit would commit the change, that predates it.*
 
 *Written for B27. It covers `fence/plan.json`, the fence a plan session runs
 under, and the Copilot adapter's deny list for plan sessions: the whole review

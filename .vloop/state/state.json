@@ -5,9 +5,9 @@
   "base": "a30ab36ac4c5e5050c6d3222b5eaa0adeca02995",
   "branch": "B20261102-1844-b31-i110-i112-plan-phase-edges",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-02T19:28:53Z",
-  "updated": "2026-11-02T19:59:05Z",
+  "updated": "2026-11-02T20:04:08Z",
   "shell": "sh",
   "checks": [
     {
@@ -182,7 +182,7 @@
         "Every text is word for word as above; only its line wrapping (and, for the audit's note, italics matching the audit's own first paragraphs) follows the file's style. No other doc changes; docs carry no behaviour, so no test is owed beyond the gate."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

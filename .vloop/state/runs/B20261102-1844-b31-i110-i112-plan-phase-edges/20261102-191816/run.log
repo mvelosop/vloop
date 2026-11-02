@@ -32,3 +32,10 @@ committing the plan
    review T3 · 0m29s · $0.13 · run $3.95 / $40.00
    review: PASS
    T3 done
+── iteration 4 (4 this run) · T4 · 3/5 done ──
+   Write V1, V2 and V3 into the configuration guide, the plan and session pages and the fence audit
+   work T4 · 0m34s · $0.11 · run $4.05 / $40.00
+   check go
+   review T4 · 0m20s · $0.09 · run $4.15 / $40.00
+   review: PASS
+   T4 done
