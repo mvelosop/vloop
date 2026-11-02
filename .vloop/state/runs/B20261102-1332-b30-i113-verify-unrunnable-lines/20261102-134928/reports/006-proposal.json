@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "create-brief guideline rule, the optional acceptance section in the four templates, review-brief check 4, operate close step 2 (ceiling 1800), verify/v2 in the domain pages, concepts guide, Copilot kit and report-validates grader, plus the new verify-unrunnable-line eval case and catalogue rows.",
+  "files": ["plugin/skills/create-brief/guidelines.md", "plugin/skills/create-brief/templates/brief-en.md", "plugin/skills/create-brief/templates/brief-es.md", "internal/brief/templates/en.md", "internal/brief/templates/es.md", "plugin/skills/review-brief/SKILL.md", "plugin/skills/operate/SKILL.md", "internal/budget/budget.go", "docs/domain/execution/session.md", "docs/domain/execution/run.md", "docs/guide/concepts.md", "docs/guide/evals.md", "tools/copilot-acceptance/report.py", "tools/copilot-acceptance/README.md", "tools/copilot-acceptance/verify.sh", "plugin/evals/verify-planted-mismatches/graders/report-validates.md", "plugin/evals/verify-unrunnable-line/case.yaml", "plugin/evals/verify-unrunnable-line/prompt.md", "plugin/evals/verify-unrunnable-line/scaffold.sh", "plugin/evals/verify-unrunnable-line/graders/validates-v2.md", "plugin/evals/verify-unrunnable-line/graders/report-complete.md", "plugin/evals/verify-unrunnable-line/graders/claude-line-not-run.md", "plugin/evals/README.md"],
+  "verified": "sh .vloop/state/gates/T4/gate.sh exited 0 and printed 'gate T4: ok'; go test ./internal/budget ./internal/brief pass.",
+  "notes": "The new case copies verify-planted-mismatches' allowed_tools, so the existing --allow-tools grant covers it. Its scaffold builds a correct result, so the expected report has no findings and one not_run entry. In go test ./internal/cli only the TestTaskGate* tests fail, because the driver holds the plan during a session."
+}

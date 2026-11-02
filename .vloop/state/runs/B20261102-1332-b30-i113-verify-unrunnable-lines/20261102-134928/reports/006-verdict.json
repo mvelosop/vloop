@@ -1,0 +1,59 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "plugin/skills/create-brief/guidelines.md carries, in the section on what sessions cannot do, the brief's rule: **Say which worked-example lines the verify session cannot run.** \u2014 no `vloop init`, `vloop run`, `vloop brief review` or `claude`, no live model (Claude or Copilot), no network, no credentials; cover such a line with an end-to-end test the plan writes with stub agents, named beside the line, or move it to `## Acceptance, at close (the operator's)`.",
+      "met": true,
+      "evidence": "guidelines.md diff adds the bullet in the 'Sessions cannot' section with the rule, the commands, and both options"
+    },
+    {
+      "criterion": "Both plugin templates and both binary templates gain, between the Worked example and Out of scope, the optional section `## Acceptance, at close (the operator's)` (English pair) / `## Aceptaci\u00f3n, al cierre (del operador)` (Spanish pair), with a placeholder in the template's language saying what goes there, identical within each pair so internal/cli/plugin_templates_test.go stays green; `vloop brief new` writes it.",
+      "met": true,
+      "evidence": "all four templates add the section between Worked example and Out of scope; the pair texts are identical; the go check passed (plugin_templates_test)"
+    },
+    {
+      "criterion": "review-brief's check 4 (Runnability) asks whether a worked-example line needs what the verify session cannot do (a command the verify fence denies, a live model, the network, credentials) with no named test covering it and outside the acceptance section \u2014 such a line is a `runnability` finding; the commands are named in plain words, not as code, and no fence/ path is cited.",
+      "met": true,
+      "evidence": "review-brief SKILL.md check 4 adds the question, names commands in plain words, no fence/ path, and says runnability finding"
+    },
+    {
+      "criterion": "operate's close step 2 gains one sentence: run each line the verify report lists as not run, and the brief's acceptance section, before stating findings. internal/budget/budget.go sets operate's ceiling to 1800 with a comment naming B30 (#113); every other ceiling is unchanged, the verify ceiling included.",
+      "met": true,
+      "evidence": "operate SKILL.md close step 2 gains one sentence; budget.go operate 1800 with B30 (#113) comment; no other ceiling changed"
+    },
+    {
+      "criterion": "docs/domain/execution/session.md's verify report section becomes verify/v2's, naming `complete`, `not_run` and the driver's stopped-early warning; docs/domain/execution/run.md and docs/guide/concepts.md name verify/v2 where they name the report the session writes.",
+      "met": true,
+      "evidence": "session.md section renamed verify/v2 with complete, not_run and the warning; run.md and concepts.md say verify/v2"
+    },
+    {
+      "criterion": "tools/copilot-acceptance/report.py validates each kept verify report against the schema its own `schema` field names (verify/v1 or verify/v2) and its report line says which; tools/copilot-acceptance/README.md and verify.sh's header comment say so.",
+      "met": true,
+      "evidence": "report.py validates against the schema field (v1 or v2) and prints it; README and verify.sh header updated"
+    },
+    {
+      "criterion": "plugin/evals/verify-planted-mismatches/graders/report-validates.md's pattern is `vloop schema validate verify/v2`.",
+      "met": true,
+      "evidence": "report-validates.md pattern is 'vloop schema validate verify/v2'"
+    },
+    {
+      "criterion": "A new eval case plugin/evals/verify-unrunnable-line/, built like verify-planted-mismatches (prompt.md, case.yaml, a scaffold.sh that exits non-zero when its built result does not hold), whose brief's worked example holds one sound line and one line running `claude -p \"say hi\"`; its graders: a `regex` on the trace for `vloop schema validate verify/v2`, a `regex` on the file .vloop/tmp/verify.json for `\"complete\": *true`, and an `llm` grader focused on that file asking that the claude line is the one not_run entry and that no finding names it. It joins the catalogue in plugin/evals/README.md.",
+      "met": true,
+      "evidence": "new case has prompt.md, case.yaml, scaffold.sh (sound line and claude line) and three graders (regex trace, regex file, llm focused on file); README and evals.md catalogue rows added"
+    },
+    {
+      "criterion": "The skills test's eval and fenced-skill checks (go check: `go test ./internal/cli/`, among them TestPluginSkills and TestEvalGrantsCoverFence) and the budget test pass: the new case's grants cover the work fence and appear in docs/guide/evals.md's --allow-tools, as verify-planted-mismatches' do. These and the eval case itself are the committed tests this task leaves.",
+      "met": true,
+      "evidence": "go check log passes all packages including internal/cli and budget; prompt.md grants match verify-planted-mismatches"
+    },
+    {
+      "criterion": "No fence file and not docs/design-notes/fence-audit.md change.",
+      "met": true,
+      "evidence": "git status shows no fence file nor fence-audit.md changed"
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}

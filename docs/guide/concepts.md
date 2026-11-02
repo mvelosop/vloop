@@ -54,7 +54,7 @@ The plugin ships eight skills. Five are the sessions of the loop;
   `spec-gap` or `gate-gap`. It fails closed.
 - `/vloop:verify` runs once per complete run, in a session separate from the work
   and the reviews, checks the built result against the brief in three passes and
-  writes `verify/v1`.
+  writes `verify/v2`.
 - `/vloop:operate` is yours: invoke it in an interactive session to run a brief
   on a work branch, handle halts, verify, record defects and interventions, close
   the brief and merge.

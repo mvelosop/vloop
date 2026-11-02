@@ -5,9 +5,9 @@
   "base": "28f49ae8009ed10d3ee753520bdee280fe780a4d",
   "branch": "B20261102-1332-b30-i113-verify-unrunnable-lines",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-02T14:02:09Z",
-  "updated": "2026-11-02T14:44:59Z",
+  "updated": "2026-11-02T14:53:33Z",
   "shell": "sh",
   "checks": [
     {
@@ -214,7 +214,7 @@
         "No fence file and not docs/design-notes/fence-audit.md change."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

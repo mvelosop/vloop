@@ -43,3 +43,10 @@ committing the plan
    review T3 · 0m20s · $0.09 · run $5.31 / $40.00
    review: PASS
    T3 done
+── iteration 6 (6 this run) · T4 · 3/5 done ──
+   Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
+   work T4 · 3m39s · $0.28 · run $5.59 / $40.00
+   check go
+   review T4 · 0m32s · $0.13 · run $5.72 / $40.00
+   review: PASS
+   T4 done

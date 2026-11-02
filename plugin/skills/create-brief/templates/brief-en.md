@@ -136,6 +136,14 @@ gate must thread the value it computes rather than hardcoding one. A hardcoded
 count is correct on the day the plan is written and wrong the day anything
 else lands.>
 
+## Acceptance, at close (the operator's)
+
+<Optional. The worked-example lines no session can run (a live model, the
+network, credentials, an interactive login), each with the command and the
+exact expected result. The operator runs them at close, before stating
+findings. Delete the section if every line is run by a session or covered by a
+named test.>
+
 ## Out of scope
 
 <Not smaller versions of these. Not at all. This list is how scope creep

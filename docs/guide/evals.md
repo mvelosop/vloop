@@ -150,6 +150,7 @@ run's grader verdicts; the HTML report shows the same per case and arm.
 | `/vloop:create-brief` | `create-brief-drafts-checked` | a request that settles every fork becomes a draft written with `vloop brief new` and checked to `0 warning(s)`, graded from the trace |
 | `/vloop:review-brief` | `review-brief-planted-faults` | a draft brief with three planted faults (a claim the code contradicts, a value stated twice differently, a check red from the first task to the last): the verdict is not `PASS`, each fault is named, the brief is not edited |
 | `/vloop:verify` | `verify-planted-mismatches` | a built result with one sound worked-example line and three planted mismatches: one finding of each matching kind and none on the sound line |
+| `/vloop:verify` | `verify-unrunnable-line` | a correct built result whose brief has a sound line and a line running `claude`: that line is the one `not_run` entry and no finding names it |
 | `/vloop:operate` | `operate-proposes-options` | a run halted on a gate dispute: one to three real options, one recommended and why, no gate amended before the operator answers |
 
 [plugin/evals/README.md](../../plugin/evals/README.md) lists every case.

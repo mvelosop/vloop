@@ -64,11 +64,15 @@ verdicts recorded before B20). The gate-review session judges the plan's gates, 
 per-task model override. The driver keeps the verdict as
 `reports/gate-review-<round>.json`; a missing or invalid one is a `FAIL`.
 
-## Verify report — `verify/v1`
+## Verify report — `verify/v2`
 
-`schema`, `findings` (each `{kind, claim, observed, where}`, `kind` one of
+`schema`, `complete` (boolean), `findings` (each `{kind, claim, observed, where}`, `kind` one of
 `example`, `contract`, `surface`), `checked` (`{example_lines, sentences,
-surfaces}`) and `notes`. The verify session runs once, after the final pass of a
+surfaces}`), `not_run` (each `{line, reason}`: a worked-example line the session
+could not run) and `notes`. The session writes the report after reading the
+brief and again after each pass, setting `complete` true only when the last pass
+finished; the driver prints a warning when the session stopped before its last
+pass. The verify session runs once, after the final pass of a
 complete run, with no argument; it checks the brief's worked example, its
 contract sentences and every surface stating a changed behaviour. The driver
 keeps a valid report as `reports/verify.json`. A finding never changes the run's

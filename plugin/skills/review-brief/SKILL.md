@@ -69,7 +69,10 @@ if it is still a draft, under the same file name) and keep its output; you do no
    each task, would every check still pass? Would each gate fail on the base for
    the right reason, and could a correct task pass it? Is anything a loop session
    cannot do (edit `.vloop/`, reach the network, run a tool that is not
-   installed) left to a task?
+   installed) left to a task? Does a worked-example line need what the
+   verify session cannot do (a command its fence denies, such as init, run, brief review
+   or claude; a live model; the network; credentials) with no named test covering
+   it and outside the acceptance section? Such a line is a `runnability` finding.
 5. **Decisions the operator has not seen.** List every decision the author took on
    their own: the "decided here" section, the choices of form, anything marked as
    discarded. The operator approves the brief knowing what is in it, not finding

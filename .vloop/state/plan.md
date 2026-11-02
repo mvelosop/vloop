@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/5 done** · iteration 5
+**Status:** running · **4/5 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` · **Updated:** 2026-11-02T14:44:59Z
+**Brief:** `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` · **Updated:** 2026-11-02T14:53:33Z
 
 ## Progress
 
 - [x] **T1** — Add the verify/v2 report schema, embedded and listed · 1 attempt(s)
 - [x] **T2** — Read verify/v2 in the driver's verify step and print not_run and complete at close · 1 attempt(s)
 - [x] **T3** — Make the verify skill write verify/v2 from the start and list the lines it does not run
-- [ ] **T4** — Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
+- [x] **T4** — Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
 - [ ] **T5** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
@@ -90,7 +90,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
 
-`pending` · depends on: T2, T3
+`done` · depends on: T2, T3
 
 The knowledge of which worked-example lines a verify session cannot run moves upstream to the brief's author and reviewer, and the operator is told to run what the session left; the docs, the Copilot acceptance kit and the verify evals follow verify/v2. This is mostly prose: if the review fails it twice on wording, the task is blocked and the operator finishes it.
 

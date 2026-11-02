@@ -186,13 +186,17 @@ def verify_report(repo, vloop, rc):
     if not reports:
         out.append("- verify.json: not present")
     for f in reports:
-        ok = subprocess.run([vloop, "schema", "validate", "verify/v1", f], cwd=repo,
-                            capture_output=True).returncode == 0
         try:
-            n = len(json.load(open(f)).get("findings") or [])
-        except ValueError:
-            n = "unreadable"
-        out.append(f"- verify.json: present, verify/v1 {'ok' if ok else 'INVALID'}, {n} finding(s)")
+            data = json.load(open(f))
+            n = len(data.get("findings") or [])
+            sch = data.get("schema")
+        except (ValueError, AttributeError):
+            n, sch = "unreadable", None
+        if sch not in ("verify/v1", "verify/v2"):
+            sch = "verify/v2"
+        ok = subprocess.run([vloop, "schema", "validate", sch, f], cwd=repo,
+                            capture_output=True).returncode == 0
+        out.append(f"- verify.json: present, {sch} {'ok' if ok else 'INVALID'}, {n} finding(s)")
     print("\n".join(out) + "\n")
 
 
