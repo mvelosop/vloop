@@ -38,7 +38,13 @@ func verifyIterator(t *testing.T, report string, silent bool, code string) (*Ite
 	if !silent {
 		script += "cat <<'EOF'\n" + claudeOut + "EOF\n"
 	}
-	script += "exit " + code + "\n"
+	timeout := time.Minute
+	if code == "timeout" {
+		timeout = time.Second
+		script += "exec sleep 30\n"
+	} else {
+		script += "exit " + code + "\n"
+	}
 	stub := filepath.Join(t.TempDir(), "claude")
 	if err := os.WriteFile(stub, []byte(script), 0o755); err != nil {
 		t.Fatal(err)
@@ -48,7 +54,7 @@ func verifyIterator(t *testing.T, report string, silent bool, code string) (*Ite
 		resolved: &Resolved{model: map[string]string{}, effort: map[string]string{}, agent: map[string]string{PhaseVerify: AgentClaude}},
 		Env:      []string{"PATH=" + os.Getenv("PATH")}}
 	it.r = &Runner{Root: root, Version: "1.2.3", RunID: "B1", RunDir: dir, Claude: stub, Home: t.TempDir(), User: "tester",
-		Timeout: time.Minute, Env: it.Env}
+		Timeout: timeout, Env: it.Env}
 	return it, &out, &errb
 }
 
@@ -59,7 +65,7 @@ func TestVerifySessionKeepsReportAfterFailedSession(t *testing.T) {
 	for name, c := range map[string]struct {
 		silent bool
 		code   string
-	}{"exit non-zero": {false, "3"}, "no record": {true, "0"}} {
+	}{"exit non-zero": {false, "3"}, "no record": {true, "0"}, "timed out": {false, "timeout"}} {
 		t.Run(name, func(t *testing.T) {
 			it, out, errb := verifyIterator(t, verifyV2Report, c.silent, c.code)
 			if err := it.verifySession(); err != nil {
@@ -92,5 +98,29 @@ func TestVerifySessionRejectsV1(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(it.RunDir, "reports", "verify.json")); err == nil {
 		t.Error("a verify/v1 report was kept")
+	}
+}
+
+// After a failed session (exit non-zero or timed out) an invalid report, a
+// verify/v1 one included, is kept by no one: the failed-to-run warning alone.
+func TestVerifySessionInvalidReportAfterFailedSession(t *testing.T) {
+	v1 := `{"schema":"verify/v1","findings":[],"checked":{"example_lines":0,"sentences":0,"surfaces":0},"notes":"none"}`
+	for name, code := range map[string]string{"exit non-zero": "3", "timed out": "timeout"} {
+		t.Run(name, func(t *testing.T) {
+			it, out, errb := verifyIterator(t, v1, false, code)
+			if err := it.verifySession(); err != nil {
+				t.Fatal(err)
+			}
+			rel := relRunDir(it.Root, it.RunDir)
+			if strings.Contains(out.String(), "verify: ") {
+				t.Errorf("stdout %q", out.String())
+			}
+			if want := "vloop: the verify session failed to run — verify by hand; see " + rel + "run.log\n"; errb.String() != want {
+				t.Errorf("stderr %q, want %q", errb.String(), want)
+			}
+			if _, err := os.Stat(filepath.Join(it.RunDir, "reports", "verify.json")); err == nil {
+				t.Error("an invalid report was kept")
+			}
+		})
 	}
 }

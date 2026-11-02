@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/5 done** · iteration 3
+**Status:** running · **2/5 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` · **Updated:** 2026-11-02T14:30:52Z
+**Brief:** `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` · **Updated:** 2026-11-02T14:37:08Z
 
 ## Progress
 
 - [x] **T1** — Add the verify/v2 report schema, embedded and listed · 1 attempt(s)
-- [ ] **T2** — Read verify/v2 in the driver's verify step and print not_run and complete at close · 1 attempt(s)
+- [x] **T2** — Read verify/v2 in the driver's verify step and print not_run and complete at close · 1 attempt(s)
 - [ ] **T3** — Make the verify skill write verify/v2 from the start and list the lines it does not run
 - [ ] **T4** — Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
 - [ ] **T5** — Close the run: every gate and the worked example on the final tree
@@ -41,7 +41,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Read verify/v2 in the driver's verify step and print not_run and complete at close
 
-`pending` · 1 attempt(s) · depends on: T1
+`done` · 1 attempt(s) · depends on: T1
 
 B29's verify session stopped early and left no report, so nothing it checked was kept. The driver now reads the report as verify/v2 even after a session that failed, timed out or left no record, prints how many example lines were not run, and warns when the session did not finish; `vloop brief close` shows the lines not run and the unfinished session to the operator. None of this may change how a run ends.
 
@@ -55,8 +55,6 @@ B29's verify session stopped early and left no report, so nothing it checked was
 - A bare `vloop brief close` on a kept verify/v2 report prints the header `verify of <run id>/<stamp>: ` followed by `no findings` or `<N> finding(s)`, then `; <M> example line(s) not run` when not_run is not empty; the findings as at the base; one line `  not run: <line> — <reason>` per entry; and `  the session stopped before its last pass` when complete is false. A kept verify/v1 report prints exactly the base's lines.
 - The base's stub verify reports in cmd/vloop/run_verify_test.go, cmd/vloop/run_iterate_test.go and cmd/vloop/b16_e2e_test.go become verify/v2 and nothing else in those tests weakens; internal/cli/close_test.go keeps its verify/v1 reports and gains verify/v2 siblings; the work session names the contract item in its notes.
 - Committed tests run by the go check cover every worked-example line and planted failure: in cmd/vloop/run_verify_test.go for the run lines, in internal/cli/close_test.go for the close lines, and in internal/driver/ with a stub runner whose result says the session timed out and one that left no record (the same two lines, the report kept). A case of the worked example with no test behind it fails this criterion.
-
-**From the last attempt:** No driver test uses a stub runner whose result says the session timed out; the timed-out case named by the acceptance criterion has no test behind it; No test covers an invalid or verify/v1 report after a failed session (only the failed-to-run warning must appear)
 
 <details><summary>verify command</summary>
 
