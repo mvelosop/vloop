@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":222035,"exit":0,"name":"go"}],"ended":"2026-11-02T21:51:05Z","gate":{"duration_ms":42,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261102-2101-b32-i84-gates-through-the-named-surface","schema":"iteration/v2","started":"2026-11-02T21:42:24Z","task":"T1"}

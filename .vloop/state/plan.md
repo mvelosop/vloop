@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/4 done** · iteration 0
+**Status:** running · **1/4 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T21:42:24Z
+**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T21:51:05Z
 
 ## Progress
 
-- [ ] **T1** — Make the plan skill judge through the surface the brief names, and act on every revision finding (G1, G2)
+- [x] **T1** — Make the plan skill judge through the surface the brief names, and act on every revision finding (G1, G2)
 - [ ] **T2** — Say in the gate review when a pin is sound, and raise its word ceiling to 1600 (G3)
 - [ ] **T3** — Add the eval case plan-judges-through-named-surface and list it in both catalogues (G4)
 - [ ] **T4** — Close the run: every gate and the worked example on the final tree
@@ -17,7 +17,7 @@
 
 ### T1 — Make the plan skill judge through the surface the brief names, and act on every revision finding (G1, G2)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The plan skill lets a planner pin any name a gate needs where the brief is silent, while the gate review flags such pins as `pins-unnamed`; a model that follows the skill literally (gpt-6.1-terra on 2026-11-02) fails the gate review by construction, and its revision round changed nothing it was told to. This task replaces the "Naming" section's second paragraph with the brief's fixed text (gates judge through the named surface, a pin only where no named surface reaches a criterion, stated in the task's acceptance), adjusts two phrases that depend on it, and adds two sentences to "A revision round" so every finding is acted on. The text is fixed so that gates and the gate review can find it; nothing else in the skill moves.
 

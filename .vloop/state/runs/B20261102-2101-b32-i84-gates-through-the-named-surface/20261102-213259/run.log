@@ -10,3 +10,10 @@ planned: B20261102-2101-b32-i84-gates-through-the-named-surface — 4 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 1m20s · $0.27 · run $1.63 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/4 done ──
+   Make the plan skill judge through the surface the brief names, and act on every revision finding (G1, G2)
+   work T1 · 4m26s · $0.13 · run $1.77 / $40.00
+   check go
+   review T1 · 0m32s · $0.09 · run $1.86 / $40.00
+   review: PASS
+   T1 done

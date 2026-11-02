@@ -5,9 +5,9 @@
   "base": "38b28f0a81ceac57acc72c020c2c6a67f99040a4",
   "branch": "B20261102-2101-b32-i84-gates-through-the-named-surface",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-02T21:40:00Z",
-  "updated": "2026-11-02T21:42:24Z",
+  "updated": "2026-11-02T21:51:05Z",
   "shell": "sh",
   "checks": [
     {
@@ -53,7 +53,7 @@
         "The skill stays within its 4100-word ceiling and the configured go check (TestPluginSkills and the budget test among it) is green; the task changes behaviour of no program, so it leaves no new test, but it may not weaken an existing one."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

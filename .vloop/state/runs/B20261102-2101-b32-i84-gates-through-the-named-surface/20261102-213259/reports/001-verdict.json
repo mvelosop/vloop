@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "In plugin/skills/plan/SKILL.md the paragraph beginning `**Where the brief is silent, you may pin what a gate needs.**` is replaced, whole, by the brief's G1 paragraph beginning `**Where the brief is silent, judge through what it names.**` and ending `a cost the operator should see rather than discover.`, word for word, wrapped as the file wraps; the section's first paragraph is unchanged.", "met": true, "evidence": "diff replaces the paragraph; text compared with docs/briefs b32 lines 154-165, identical; first paragraph not in the diff"},
+    {"criterion": "The \"Known trap\" parenthesis reads `(a file's contents, a `--help` exit code, an import of a module the brief names)`, and the \"Gates are judged, not self-checked\" sentence ends `pins no name the brief does not, beyond a pin \"Naming\" allows.`; the rest of both paragraphs is unchanged.", "met": true, "evidence": "diff hunks at the Known trap and gate-review sentence show only those edits"},
+    {"criterion": "In \"A revision round\", the two G2 sentences (`Each finding names a task: change that task's gate, or the task itself when the finding is about a criterion, until the finding no longer holds. A gate you leave as it was gets the same finding again.`) sit right after `not patched until it fails.` and before `You get one revision round;`.", "met": true, "evidence": "last diff hunk inserts both sentences between those two phrases"},
+    {"criterion": "Violation to rule against: any other sentence of the plan skill changed, moved or reworded, or any other file changed (the gate compares the whole file's joined text to the base with exactly these edits).", "met": true, "evidence": "git diff HEAD --stat shows only plugin/skills/plan/SKILL.md; the hunks hold only the listed edits"},
+    {"criterion": "The skill stays within its 4100-word ceiling and the configured go check (TestPluginSkills and the budget test among it) is green; the task changes behaviour of no program, so it leaves no new test, but it may not weaken an existing one.", "met": true, "evidence": "wc -w gives 3917; checks.json go exit 0; no test files changed"}
+  ],
+  "findings": [],
+  "notes": "none"
+}
