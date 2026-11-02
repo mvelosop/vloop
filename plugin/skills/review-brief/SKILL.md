@@ -44,8 +44,8 @@ faults that only reading finds:
 5. The code the brief makes claims about. Open it; do not trust the brief's
    summary of it.
 
-Run `vloop brief check <brief>` (on a copy with `status: ready` if it is still a
-draft) and keep its output; you do not repeat what it already says.
+Run `vloop brief check <brief>` (on a copy with `status: ready` under `.vloop/tmp/`
+if it is still a draft, under the same file name) and keep its output; you do not repeat what it already says.
 
 ## 2. Check five ways
 
@@ -76,6 +76,19 @@ draft) and keep its output; you do not repeat what it already says.
    it in a pull request.
 
 ## 3. Report
+
+Write the report as `brief-review/v1` to `.vloop/tmp/brief-review.json`, then
+validate it with `vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json`
+and fix it until it passes. Also answer in prose, whether a command started you
+or you run interactively. The file has `schema`, `brief` (the path),
+`verdict`, `findings` (each `{kind, section, summary, evidence, fix}`; `FIX` and
+`ASK` need at least one), `decisions`, `checked` and `header`:
+
+```json
+{"schema": "brief-review/v1", "brief": "docs/briefs/B1-x.loop-brief.md", "verdict": "PASS",
+ "findings": [], "decisions": [], "checked": "facts, consistency, rules, runnability",
+ "header": "Reviewed 2026-11-02: PASS, 0 findings"}
+```
 
 Return, in the language of the brief:
 

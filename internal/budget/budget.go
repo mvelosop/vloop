@@ -25,7 +25,7 @@ var Ceilings = map[string]int{
 	"operate":      1750, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
 	"verify":       1500, // 2026-10-15, B16 (V2, L10): the ceiling set with the skill
 	"create-brief": 1200, // 2026-11-02, B28 (#101): its size when it joined the plugin, plus headroom
-	"review-brief": 1000, // 2026-11-02, B28 (#101): its size when it joined the plugin, plus headroom
+	"review-brief": 1100, // 2026-11-02, B29 (#94): 1000 (B28) plus the report step
 }
 
 // CountWords counts the whitespace-separated words of data, as wc -w does.

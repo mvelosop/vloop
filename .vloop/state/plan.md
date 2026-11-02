@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 7
+**Status:** running · **5/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:48:20Z
+**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:58:32Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
 - [x] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict · 1 attempt(s)
 - [x] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
-- [ ] **T5** — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
+- [x] **T5** — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
 - [ ] **T6** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
@@ -112,7 +112,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
 
-`pending` · depends on: T4
+`done` · depends on: T4
 
 The command is only used if the design act calls it and the skill writes the report it reads. This task makes /vloop:create-brief ask for the review with vloop brief review, gives /vloop:review-brief its report step, raises its word ceiling, puts the skill under the fenced-skills check, and documents the new session in the fence audit, the domain pages and the configuration guide. Prose: if it fails review twice on wording, it is blocked and the operator finishes it.
 

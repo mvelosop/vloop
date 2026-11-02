@@ -105,9 +105,10 @@ sessions could read two ways is a decision you have not made.
 2. **Your own read:** every sentence, asking "could two sessions read this two
    ways?"; every number and value against the worked example; every task
    against the checks.
-3. **An independent review:** run `/vloop:review-brief` on the brief in
-   a separate session that has none of your context: a subagent given only the
-   brief's path and the instruction to apply the skill. Fix the `FIX` findings;
+3. **An independent review:** run `vloop brief review <brief>`, which runs
+   `/vloop:review-brief` on the brief in a fresh session on the configured agent
+   (`agent.review-brief`) that has none of your context, and prints the verdict
+   and findings. Fix the `FIX` findings;
    bring every `ASK` finding to the operator. Re-review after substantial
    changes. Record it in the header bullets (verdict, number of findings, and
    that the operator's decisions are in).

@@ -60,3 +60,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** agent.review-brief = copilot now runs the brief review through the Copilot adapter (Supports review-brief), with the command's Copilot preflight (missing copilot, clash, login, default model, experimental warning) and doctor's Copilot rows; vloop run ignores the key.
 - **Files:** internal/driver/agent_copilot.go, internal/driver/agent_copilot_test.go, internal/cli/brief_review.go, internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_copilot_review_brief_test.go
 - **Notes for next iteration:** R3: TestCopilotSupportsWorkReviewAndVerify changed only to add review-brief. copilotKeys deliberately excludes agent.review-brief; doctor appends it via copilotReviewBriefKey, and runPreflight skips the copilot, copilot login and clash rows when copilotKeys is empty. TestTaskGate* in internal/cli fail when go test runs inside a loop session (plan-changed guard), unrelated.
+
+## T5 — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
+
+- **Outcome:** done (review: PASS)
+- **Summary:** create-brief step 5.3 now asks for vloop brief review; review-brief gained its report step (brief-review/v1 to .vloop/tmp/brief-review.json, validated, plus prose), ceiling 1100, and is under the fenced-skills check. Fence audit, session.md, domain-model.md and configuration.md document the review-brief session.
+- **Files:** plugin/skills/create-brief/SKILL.md, plugin/skills/review-brief/SKILL.md, internal/budget/budget.go, internal/cli/skills_test.go, docs/design-notes/fence-audit.md, docs/domain/execution/session.md, docs/domain/domain-model.md, docs/guide/configuration.md
+- **Notes for next iteration:** review-brief SKILL.md must not name `vloop brief review` in backticks: its own fence denies it and TestPluginSkills fails. skills_test.go changed only by adding review-brief to fencedSkills (the brief's own item). Full go test: only TestTaskGate* in internal/cli fail inside a loop session (plan-changed guard), unrelated.
