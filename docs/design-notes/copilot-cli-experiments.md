@@ -508,6 +508,44 @@ Operated from a Claude Code session.
 - **Setup:** Claude's folder trust accepted through tmux; Copilot asked for
   none there.
 
+## Acceptance of Copilot brief review (B29, 2026-11-02)
+
+vloop built from the B29 branch, Copilot CLI 1.0.105. `vloop brief review`
+on the URL shortener brief, in a fresh clone of
+`mvelosop/url-shortener-template` (its remote removed) that Claude and
+Copilot trust: twice with `agent.review-brief = copilot` and
+`model.review-brief = gpt-5.6-terra`, then once with Claude on the default
+`opus`, for comparison. Operated from a Claude Code session.
+
+| | Copilot, attempt 1 | Copilot, attempt 2 | Claude |
+| --- | --- | --- | --- |
+| Ended | exit 7: report rejected | exit 1, `ASK` | exit 1, `ASK` |
+| Findings | (5, not kept) | 5: 3 `runnability`, 1 `consistency`, 1 `rule` | 9: 3 `runnability`, 2 `fact`, 2 `consistency`, 1 `decision`, 1 `rule` |
+| Session | 56 s, 19.8 credits (≈ $0.13) | 58 s, 16.2 credits (≈ $0.11) | 230 s, 17 turns, $0.97 |
+| Record | `session/v5`, agent `copilot`, model `gpt-5.6-terra` | the same | `session/v5`, agent `claude`, model `opus` |
+| Hook denials | 0 | 0 | — (Claude fence: 0 denials) |
+
+- **The first Copilot report was rejected by vloop, not by the schema.** It
+  validated against `brief-review/v1`, but its `brief` held the brief's path
+  where the contract and the driver want its name (`<run id>.loop-brief`).
+  Copilot had followed the skill, whose report step said "`brief` (the
+  path)" and showed a path in its example: the run's skill text contradicted
+  its own contract, and neither the review nor the gates read the two
+  together. Fixed on the branch at close (the skill now says the name); the
+  second attempt, with the fixed skill, passed first time.
+- **Both agents returned `ASK`**, and agreed on three areas of the brief: the
+  error responses (*Status codes and errors*), the configured checks against
+  the task shape, and what the run's environment needs. Claude raised four
+  more, roughly (two about claims in the header, one decision, one about
+  persistence); Copilot one more, about the shape's gates. The findings were
+  matched by section, not checked one by one against the brief.
+- **Copilot was about 4× faster and about 9× cheaper** than Claude Opus for
+  the review, with fewer findings; as a second, independent read it is cheap.
+- **The fence did not get in the way**: no denial in any session; every report
+  write went to `.vloop/tmp/`, and the brief was unchanged.
+- **Setup:** Claude's folder trust accepted through tmux; Copilot asked for
+  none there.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts
