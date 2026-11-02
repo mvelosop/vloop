@@ -1,10 +1,10 @@
 ok  	github.com/mvelosop/vloop	(cached)
 ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	209.703s
+ok  	github.com/mvelosop/vloop/cmd/vloop	213.570s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	90.008s
+ok  	github.com/mvelosop/vloop/internal/cli	88.251s
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
@@ -14,7 +14,7 @@ ok  	github.com/mvelosop/vloop/internal/fence	(cached)
 ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
-ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	0.228s
 ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
 ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)

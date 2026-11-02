@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 2
+**Status:** running · **3/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:40:55Z
+**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:48:53Z
 
 ## Progress
 
 - [x] **T1** — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
 - [x] **T2** — Add the Go test that holds each plugin brief template to the binary's
-- [ ] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
+- [x] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
 - [ ] **T4** — Add an eval case for each brief skill and update the evals README and guide
 - [ ] **T5** — Name the two brief skills in the README, the concepts guide and the domain pages
 - [ ] **T6** — Close the run: every gate at once and the worked example line for line
@@ -70,7 +70,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The CLAUDE.md section that vloop init writes and vloop upgrade refreshes is how an interactive session in any repository learns which vloop skill to follow. This task changes its interactive-session paragraph so it also sends a session to /vloop:create-brief to write a brief and to /vloop:review-brief to review one in a separate session. Every other line of the section stays as it is; upgrade replaces an older section between the markers with no change to its logic.
 

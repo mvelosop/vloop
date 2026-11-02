@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** internal/cli/plugin_templates_test.go adds checkPluginTemplates(pluginDir, binDir), a test on the repository's own files and fixture tests on temp copies covering each planted failure.
 - **Files:** internal/cli/plugin_templates_test.go
 - **Notes for next iteration:** The executive summary is cut from its heading up to the next line starting '## ' before the byte comparison. No template edited, no earlier test changed.
+
+## T3 — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
+
+- **Outcome:** done (review: PASS)
+- **Summary:** install.Section's interactive-session paragraph now also sends a session to /vloop:create-brief to write a brief and /vloop:review-brief to review one in a separate session; the pinning test asserts the new paragraph.
+- **Files:** internal/install/section.go, internal/install/install_test.go
+- **Notes for next iteration:** internal/install/install_test.go line 108 changed only to the new paragraph (contract item K3). go test ./internal/cli had one failure, TestTaskGateUnknownTask ('plan was changed during this session'), which comes from running inside a driver session; not touched by this task.
