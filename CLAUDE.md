@@ -15,10 +15,10 @@ invariants, contexts — is `docs/domain/README-domain.md`. The briefs live in
   or review session: the loop's rules below and the vloop section bind you, all
   of them. You do not commit, you do one task, you set no status.
 - **An interactive session with the operator**: you are the operator's hands,
-  not a loop session. Writing a brief follows
-  `.claude/skills/vloop-create-brief/SKILL.md` (the design act, experimental
-  before it joins the plugin, reviewed with `vloop-review-brief`) with this
-  repository's additions in `.claude/skills/vloop-architect/SKILL.md`; running,
+  not a loop session. Writing a brief follows `/vloop:create-brief` (the
+  design act, reviewed with `/vloop:review-brief` in a separate session; until
+  a release ships them, `plugin/skills/create-brief/SKILL.md` and
+  `plugin/skills/review-brief/SKILL.md`) with this repository's additions in `.claude/skills/vloop-architect/SKILL.md`; running,
   verifying and closing one follows `/vloop:operate` with this repository's
   additions in `.claude/skills/vloop-operator/SKILL.md`. You may commit
   on work branches; merging, pushing and anything outward-facing wait for the
