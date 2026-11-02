@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The fence judge now serves a plan phase (plan fence, plan write rule, plan skill hint), and vloop fence check/hook accept it, with help and docs/guide/commands.md regenerated.",
+  "files": ["internal/fence/judge.go", "internal/fence/judge_test.go", "internal/cli/fence.go", "internal/cli/fence_hook_test.go", "docs/guide/commands.md"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok.",
+  "notes": "Contract item P1: TestUnknownPhase now uses 'deploy' and the new message; TestFenceHookFailsClosed's 'plan phase' case became 'old plan name' (plans). New TestPlanPhase in internal/fence/judge_test.go covers both tables, patches and write-rule edges. planWrite in judge.go is the plan write rule; other phases untouched. TestTaskGate* in internal/cli fail inside the driver session (plan-held env), not from this change."
+}

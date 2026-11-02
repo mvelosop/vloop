@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "`tools/copilot-acceptance/` gains a script that runs `greet.loop-brief.md` in a scratch repository with a vloop built from this tree, `agent.plan = copilot` and `model.plan` the model given, gate review, work, review and verify on Claude, and writes a summary of each plan session's record (agent, model, credits, estimated cost, `session/v4` validity, its `permission_denials`), of the plan (its tasks, `state/v2` validity) and of the gate review's verdict per round.", "met": true, "evidence": "plan.sh builds vloop from the tree, sets agent.plan and model.plan with the config keys that exist in internal/config/config.go, and runs the fixture brief. report.py plan_report prints the plan session rows with all listed fields, the plan's tasks with state/v2 validity, and the gate-verdict/v2 verdict per round."},
+    {"criterion": "The README gains its section, under a heading naming plan sessions: how to run the script, what it needs (copilot, a logged-in gh, claude), what it spends, what the summary holds, and that the outcome is recorded in `docs/design-notes/copilot-cli-experiments.md` before close.", "met": true, "evidence": "README.md 'B27: Copilot plan sessions' section covers usage, needs, spend, summary contents and recording the outcome before close."},
+    {"criterion": "The kit's scripts pass `sh -n` and its Python parses; flags, keys and messages of existing vloop commands the script uses are taken from running them, not memory; no gate or check runs the kit, copilot, gh or the network.", "met": true, "evidence": "sh -n plan.sh and the Python parse both ran clean. The vloop commands used (init, config set, doctor, run, schema validate with session/v4, state/v2 and gate-verdict/v2) match run.sh and gatereview.sh, and `vloop schema list` shows those schemas. The go check log is all ok, and nothing in the diff wires the kit into a check."}
+  ],
+  "findings": [],
+  "notes": "plan.sh closely mirrors run.sh. Nothing new is tested, which is expected for an operator-run kit. Not run against the real CLI."
+}

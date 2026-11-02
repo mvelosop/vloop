@@ -126,12 +126,7 @@ func TestCopilotSupportsWorkReviewAndVerify(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, ph := range []string{PhasePlan} {
-		if a.Supports(ph) {
-			t.Errorf("copilot supports %s", ph)
-		}
-	}
-	for _, ph := range []string{PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify, PhaseGateReview} {
+	for _, ph := range []string{PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify, PhaseGateReview} {
 		if !a.Supports(ph) {
 			t.Errorf("copilot does not support %s", ph)
 		}
@@ -198,6 +193,8 @@ func TestCopilotVerifyRecordIsSessionV4(t *testing.T) {
 		{PhaseReview, AgentCopilot, "session/v3"},
 		{PhaseGateReview, AgentCopilot, "session/v4"},
 		{PhaseGateReview, "claude", "session/v3"},
+		{PhasePlan, AgentCopilot, "session/v4"},
+		{PhasePlan, "claude", "session/v3"},
 	} {
 		rec := r.record(Spec{Phase: c.phase, Model: "m"}, c.agent, "", time.Now(), time.Now(), Output{})
 		if rec["schema"] != c.want || rec["phase"] != c.phase || rec["agent"] != c.agent {
@@ -228,6 +225,29 @@ func TestCopilotGateReviewArgvAndHooks(t *testing.T) {
 	}
 	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
 	if err != nil || !strings.Contains(string(data), " fence hook --phase gate-review --root ") || strings.Contains(string(data), "--phase review") {
+		t.Errorf("hooks file %s: %v", data, err)
+	}
+}
+
+func TestCopilotPlanArgvAndHooks(t *testing.T) {
+	root := t.TempDir()
+	a := copilotAdapter{}
+	p, err := a.Prepare(root, "9.9.9", PhasePlan)
+	if err != nil {
+		t.Fatal(err)
+	}
+	args := a.Command(Spec{Phase: PhasePlan, Arg: "docs/briefs/b.md", Model: "m1", Agent: AgentCopilot}, root, nil, p).Args[1:]
+	line := " " + strings.Join(args, " ") + " "
+	if !strings.Contains(line, " /vloop:plan docs/briefs/b.md ") {
+		t.Errorf("argv lacks the plan prompt: %v", args)
+	}
+	for _, d := range copilotDenials {
+		if !strings.Contains(line, " --deny-tool="+d+" ") {
+			t.Errorf("no denial %q", d)
+		}
+	}
+	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if err != nil || !strings.Contains(string(data), " fence hook --phase plan --root ") {
 		t.Errorf("hooks file %s: %v", data, err)
 	}
 }

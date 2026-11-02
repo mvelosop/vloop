@@ -184,3 +184,33 @@ its number of findings by kind.
 
 Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
 brief is closed.
+
+## B27: Copilot plan sessions
+
+`plan.sh` is the operator's acceptance of `agent.plan = copilot` on the real
+Copilot CLI. Gates use a stub `copilot`; only a run on the real one proves a
+Copilot plan session works and leaves a plan the driver accepts. It is run by no
+gate or check.
+
+```
+tools/copilot-acceptance/plan.sh <copilot model id> [dir]
+```
+
+It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
+(logged in, with folder trust accepted for `<dir>/repo-plan`), `go` and
+`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+repository with `agent.plan = copilot` and `model.plan` the model given; gate
+review, work, review and verify stay on Claude. A first run may stop at
+`vloop doctor`, as above.
+
+It spends Copilot credits for the plan sessions and Claude money for the gate
+review, work, review and verify sessions.
+
+It writes `<dir>/b27-plan-summary.md` (`report.py plan`): one row per plan
+session record with agent, model, credits, estimated cost, `session/v4`
+validity and its `permission_denials`; then the plan: present or not,
+`state/v2` validity and its tasks; then the gate review's verdict per round
+(present or not, `gate-verdict/v2` validity, the verdict).
+
+Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
+brief is closed.

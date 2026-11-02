@@ -200,7 +200,7 @@ func doctorClaude(add func(name, result, msg string)) bool {
 }
 
 // copilotExperimental is the warning every place that chooses copilot for the
-// work, review, gate-review or verify sessions gives.
+// plan, work, review, gate-review or verify sessions gives.
 const copilotExperimental = "is copilot: experimental (docs/guide/configuration.md)"
 
 // copilotNoLogin says what is missing when no GitHub login reaches a Copilot
@@ -218,6 +218,13 @@ func copilotLoggedIn() bool {
 	}
 	out, err := exec.Command("gh", "auth", "token").Output()
 	return err == nil && strings.TrimSpace(string(out)) != ""
+}
+
+// copilotPlan reports whether agent.plan is copilot. Planning has no switch, so
+// the key is in use whenever it is copilot, also on a resume that will not plan.
+func copilotPlan(root string) bool {
+	v, err := config.Get(root, "agent.plan")
+	return err == nil && v.Value == driver.AgentCopilot
 }
 
 // copilotWork reports whether agent.work is copilot.
@@ -264,10 +271,13 @@ func copilotSecond(root string) bool {
 	return secondReviewMode(root) != "off" && err == nil && v.Value == driver.AgentCopilot
 }
 
-// copilotKeys names the agent keys that choose copilot, for the work sessions,
-// the gate review, the reviews and the verify session in use.
+// copilotKeys names the agent keys that choose copilot, for the plan session,
+// the work sessions, the gate review, the reviews and the verify session in use.
 func copilotKeys(root string) []string {
 	var keys []string
+	if copilotPlan(root) {
+		keys = append(keys, "agent.plan")
+	}
 	if copilotWork(root) {
 		keys = append(keys, "agent.work")
 	}
@@ -326,7 +336,7 @@ func skillClashes(root string) []skillClash {
 	return out
 }
 
-// doctorCopilot adds the checks of a copilot work, gate-review, review or verify agent: copilot found and
+// doctorCopilot adds the checks of a copilot plan, work, gate-review, review or verify agent: copilot found and
 // working, the experimental warning, and a warning for each project skill
 // whose name ends in review, which a copilot session may pick instead of
 // /vloop:review.

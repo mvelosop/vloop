@@ -6,6 +6,7 @@
     report.py second <repo> <vloop> <exit code>  the second-review records and dissents of a run, as Markdown
     report.py verify <repo> <vloop> <exit code>  the verify session record and the kept report of a run, as Markdown
     report.py gate-review <repo> <vloop> <exit code>  the gate-review session records and kept verdicts of a run, as Markdown
+    report.py plan <repo> <vloop> <exit code>    the plan session records, the plan and the gate-review verdicts per round of a run, as Markdown
     report.py work <repo> <vloop> <exit code>    the work session records and each task's outcome of a run, as Markdown
 """
 import glob
@@ -235,6 +236,53 @@ def gate_review_report(repo, vloop, rc):
     print("\n".join(out) + "\n")
 
 
+def plan_report(repo, vloop, rc):
+    out = ["## A1 — a real run with Copilot plan sessions", "", f"`vloop run` exit {rc}.", "",
+           "| record | phase | agent | model | credits | cost_usd | cost_source | turns | session/v4 | permission_denials |",
+           "|---|---|---|---|---|---|---|---|---|---|"]
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/sessions/*.json"))):
+        r = json.load(open(f))
+        if r.get("phase") != "plan":
+            continue
+        ok = subprocess.run([vloop, "schema", "validate", "session/v4", f], cwd=repo,
+                            capture_output=True).returncode == 0
+        out.append(f"| {os.path.basename(f)} | {r.get('phase')} | {r.get('agent')} "
+                   f"| {r.get('model')} | {r.get('credits')} | {r.get('cost_usd')} | {r.get('cost_source')} "
+                   f"| {r.get('turns')} | {'ok' if ok else 'INVALID'} "
+                   f"| {json.dumps(r.get('permission_denials'))} |")
+    out += ["", "The plan (.vloop/state/state.json):", ""]
+    sf = os.path.join(repo, ".vloop/state/state.json")
+    if not os.path.exists(sf):
+        out.append("- state.json: not present")
+    else:
+        ok = subprocess.run([vloop, "schema", "validate", "state/v2", sf], cwd=repo,
+                            capture_output=True).returncode == 0
+        try:
+            tasks = json.load(open(sf)).get("tasks") or []
+        except ValueError:
+            tasks = None
+        out.append(f"- state.json: present, state/v2 {'ok' if ok else 'INVALID'}, "
+                   f"{'unreadable' if tasks is None else len(tasks)} task(s)")
+        for t in tasks or []:
+            out.append(f"  - {t.get('id')} ({t.get('kind')}, {t.get('status')}): {t.get('title')}")
+    out += ["", "Gate-review verdict per round (reports/gate-review-<round>.json):", "",
+            "| round | verdict | gate-verdict/v2 |", "|---|---|---|"]
+    found = False
+    for f in sorted(glob.glob(os.path.join(repo, ".vloop/state/runs/*/*/reports/gate-review-*.json"))):
+        found = True
+        rnd = os.path.basename(f)[len("gate-review-"):-len(".json")]
+        ok = subprocess.run([vloop, "schema", "validate", "gate-verdict/v2", f], cwd=repo,
+                            capture_output=True).returncode == 0
+        try:
+            verdict = json.load(open(f)).get("verdict")
+        except ValueError:
+            verdict = "unreadable"
+        out.append(f"| {rnd} | {verdict} | {'ok' if ok else 'INVALID'} |")
+    if not found:
+        out.append("| - | not present | - |")
+    print("\n".join(out) + "\n")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "run":
@@ -247,6 +295,8 @@ if __name__ == "__main__":
         verify_report(*sys.argv[2:5])
     elif cmd == "gate-review":
         gate_review_report(*sys.argv[2:5])
+    elif cmd == "plan":
+        plan_report(*sys.argv[2:5])
     elif cmd == "work":
         work_report(*sys.argv[2:5])
     elif cmd == "second":

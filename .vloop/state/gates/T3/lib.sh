@@ -1,4 +1,4 @@
-# Shared harness for B26's run gates (the same file in T2 and T3). The sourcing
+# Shared harness for B27's run gates (the same file in T2 and T3). The sourcing
 # gate sets G, its own folder. Every repository, binary, stub and HOME a gate
 # makes lives under $t, a temporary directory removed on exit. Nothing touches
 # this repository's tree or refs, the network or the real HOME: runs happen in
@@ -19,29 +19,39 @@ export GOMODCACHE GOCACHE GOPATH GOPROXY=off
 BRIEF=docs/briefs/B20260101-0900-demo.loop-brief.md
 # The Copilot model id of the fixtures.
 MODEL=gpt-5.6-terra
-# What a gate expects from every stub copilot gate-review session's hook, one
+# What a gate expects from every stub copilot plan session's hook, one
 # "<label> <decision> <exit>" per line (see stub-copilot.sh): the worked
-# example's gate-review decisions, as Copilot's payloads.
-GRHOOK='gate allow 0
-show allow 0
-cdout deny 0
-gateedit deny 0
-rmtmp deny 0
-taskverify deny 0
-gitc deny 0
+# example's plan decisions, as Copilot's payloads.
+PLHOOK='gate allow 0
+validate allow 0
+statewrite allow 0
+gatewrite allow 0
+tmpwrite allow 0
+journal deny 0
+srcwrite deny 0
+cdf deny 0
+rmgate deny 0
+shgate deny 0
+taskdrop deny 0
 shpush deny 0
 envgh deny 0
-verdictrel allow 0
-verdictabs allow 0
-staterel deny 0
-srcrel deny 0
-viewgate allow 0
-skillg allow 0
+subst deny 0
+staterel allow 0
+oracle allow 0
+gateabs allow 0
+notes allow 0
+planmd deny 0
+config deny 0
+gatesdir deny 0
+viewbrief allow 0
+skillp allow 0
 skillother deny 0
 webfetch deny 0'
+# The planning session's failure line, as the driver prints it for each agent.
+planfail() { echo "vloop: planning session failed ($1 exited $2) — see $3"; }
 
 # The fences as they stood when this plan was written: no task changes them.
-for f in gate-review verify work review; do
+for f in plan gate-review verify work review; do
   cmp -s "$G/$f.json" "$top/fence/$f.json" || fail "fence/$f.json differs from the fence this plan was written against: no task may change a fence's rules"
 done
 
@@ -72,7 +82,7 @@ fixture() {
   pv=$("$JQ" -r .version "$top/plugin/.claude-plugin/plugin.json") || fail "plugin version"
   cp "$G/plan1.json" "$t/stub/plan.json" && ln -s "$GITBIN" "$t/stub/git" && ln -s "$JQ" "$t/stub/jq" &&
     cp "$G/review.json" "$t/stub/review-fence.json" && cp "$G/work.json" "$t/stub/work-fence.json" &&
-    cp "$G/verify.json" "$t/stub/verify-fence.json" && cp "$G/gate-review.json" "$t/stub/gate-review-fence.json" &&
+    cp "$G/verify.json" "$t/stub/verify-fence.json" && cp "$G/gate-review.json" "$t/stub/gate-review-fence.json" && cp "$G/plan.json" "$t/stub/plan-fence.json" &&
     sed "s/@PLUGIN_VERSION@/$pv/" "$G/stub-claude.sh" >"$t/stub/claude" && cp "$G/stub-copilot.sh" "$t/stub/copilot" &&
     chmod +x "$t/stub/claude" "$t/stub/copilot" || fail "stub"
   printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$t/repo" >"$t/home/.claude.json"

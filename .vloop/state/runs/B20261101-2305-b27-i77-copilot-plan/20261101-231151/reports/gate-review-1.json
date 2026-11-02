@@ -1,0 +1,16 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "FAIL", "findings": [
+      {"summary": "gate.sh requires `[ \"$n\" -gt 100 ]` deny rules read from fence/plan.json, but that file holds only 90 (`jq '.permissions.deny|length' fence/plan.json` = 90), so no correct audit can ever pass the gate", "kind": "unpassable"}
+    ]},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "T1, T2, T3, T5 fail on the base at the expected behavioural assertion (unknown phase plan, agent.plan accepts only claude, no heading or script yet). T4 fails on base at the missing heading, but it would still fail after the work because of the `-gt 100` sanity bound; use the real count (90) or drop the bound. T6 runs the other gates, so it is unpassable only while T4 is."
+}
+

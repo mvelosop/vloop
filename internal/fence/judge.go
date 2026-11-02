@@ -20,6 +20,7 @@ const (
 	PhaseWork         = "work"
 	PhaseVerify       = "verify"
 	PhaseGateReview   = "gate-review"
+	PhasePlan         = "plan"
 )
 
 // maxDepth bounds how many sh -c layers are looked through.
@@ -51,11 +52,11 @@ func deny(format string, a ...any) Decision {
 // embedded plugin's skill names. Relative paths resolve against root; home is
 // what a leading ~ expands to ("" leaves it unexpanded).
 func New(phase, root, home string) (*Judge, error) {
-	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork && phase != PhaseVerify && phase != PhaseGateReview {
-		return nil, fmt.Errorf("unknown phase %q: want review, second-review, work, verify or gate-review", phase)
+	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork && phase != PhaseVerify && phase != PhaseGateReview && phase != PhasePlan {
+		return nil, fmt.Errorf("unknown phase %q: want review, second-review, work, verify, gate-review or plan", phase)
 	}
 	fenceName := PhaseReview
-	if phase == PhaseWork || phase == PhaseVerify || phase == PhaseGateReview {
+	if phase == PhaseWork || phase == PhaseVerify || phase == PhaseGateReview || phase == PhasePlan {
 		fenceName = phase
 	}
 	raw, err := vloop.Fence(fenceName)
@@ -169,7 +170,7 @@ func under(dir, p string) bool {
 
 // skillPhase is the plugin skill a session of this phase runs.
 func (j *Judge) skillPhase() string {
-	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview {
+	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview || j.phase == PhasePlan {
 		return j.phase
 	}
 	return PhaseReview
@@ -183,11 +184,29 @@ func (j *Judge) write(p string) Decision {
 	if j.phase == PhaseWork {
 		return j.workWrite(p, r)
 	}
+	if j.phase == PhasePlan {
+		return j.planWrite(p, r)
+	}
 	if rel, err := filepath.Rel(filepath.Join(j.root, ".vloop", "tmp"), r); err == nil && rel != "." &&
 		rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		return allow()
 	}
 	return deny("write to %s is not allowed in a %s session: only .vloop/tmp/ may be written", p, j.phase)
+}
+
+// planWrite decides a write of a plan session (S-4): the plan file, anything
+// under its gate folders and anything under .vloop/tmp/, the two directories
+// themselves excepted.
+func (j *Judge) planWrite(p, r string) Decision {
+	for _, d := range []string{filepath.Join(j.root, ".vloop", "state", "gates"), filepath.Join(j.root, ".vloop", "tmp")} {
+		if r != d && under(d, r) {
+			return allow()
+		}
+	}
+	if r == filepath.Join(j.root, ".vloop", "state", "state.json") {
+		return allow()
+	}
+	return deny("write to %s is not allowed in a plan session: only .vloop/state/state.json, .vloop/state/gates/ and .vloop/tmp/ may be written", p)
 }
 
 // workWrite decides a write of a work session (S-4): anywhere under the root
@@ -324,7 +343,7 @@ func (j *Judge) words(ws []string, depth int) string {
 }
 
 func (j *Judge) fenceLabel() string {
-	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview {
+	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview || j.phase == PhasePlan {
 		return j.phase
 	}
 	return PhaseReview
