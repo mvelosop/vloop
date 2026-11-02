@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Gate T5 runs T1-T4 gates on the final tree and finds fence/*.json unchanged; the worked example was walked line by line and one uncovered line (kept brief reviews validate) got a committed test.",
+  "files": ["internal/schema/keptreviews_test.go"],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: ok; go test ./internal/schema/ ok.",
+  "notes": "Walk. V1: doctor pass line text+--json, run naming a/none refusing with plan+preflight lines, another brief resetting (exit 0, 'resetting and planning fresh'), planted running plan -> TestRunCompletePlanOfAnotherBriefIsNotValidated (cmd/vloop) and TestDoctorCompletePlanOfAnotherBrief (internal/cli); gate T2 runs the full fixture. V2: four warnings in order, plan commit files, README/notes/scratch state, run.log -> TestPlanPhaseRevertsStrayChanges; plan exit 3 revert before halt and clean git status -> TestPlanPhaseRevertsBeforeFailureHalt; plan-line gate and clean session -> TestPlanPhaseRevertsBeforeBaseGates and TestPlanPhaseCleanSessionNoWarning (all cmd/vloop/run_planedges_test.go). The 'at the base's code the gate passes and acceptance refuses it' half is historical (pre-fix behaviour), covered only by the shape of the test, not a committed pre-fix run. V3: six schema lines (accept/refuse cases, bare .loop-brief accepted) -> TestBriefReviewAndSession5; kept brief reviews (6 files) had no committed test, so this task added TestKeptBriefReviewsValidate; skill example -> TestPluginSkills (internal/cli/skills_test.go, example validation). No fence file changed; no behaviour fix was needed. Not run by this session: full go test ./... (the driver does)."
+}

@@ -80,7 +80,7 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 					return err
 				}
 			}
-			if err := runPreflight(b, root, cmd); err != nil {
+			if err := runPreflight(b, root, cmd, briefPath); err != nil {
 				return err
 			}
 
@@ -179,11 +179,11 @@ func runBriefPath(g *Globals, root, arg string) (string, error) {
 // The branch check is not run's business: it creates the work branch itself;
 // nor are gate scratch and the checks, which the planner refuses in its own
 // words.
-func runPreflight(b Build, root string, cmd *cobra.Command) error {
+func runPreflight(b Build, root string, cmd *cobra.Command, briefPath string) error {
 	errOut := cmd.ErrOrStderr()
 	bad := 0
 	runKeys := len(copilotKeys(root)) > 0
-	for _, c := range runDoctor(b, root) {
+	for _, c := range runDoctor(b, root, &briefPath) {
 		switch {
 		case !runKeys && (c.Name == "copilot" || c.Name == "copilot login" || strings.HasPrefix(c.Message, "has the name of vloop's ")): // only agent.review-brief is copilot, which vloop run ignores
 		case c.Name == "branch", c.Name == "gate scratch", c.Name == "checks": // the planner refuses these itself, in its own words

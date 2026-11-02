@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "schemas/brief-review.v1.json's brief now has the pattern ^[^/\\\\]*\\.loop-brief$; schema tests gain the worked example's accepted and refused cases.",
+  "files": ["schemas/brief-review.v1.json", "internal/schema/schema_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go test ./internal/schema/ passes.",
+  "notes": "Contract item V3: in internal/schema/schema_test.go only the two brief-review/v1 literals whose brief was b changed, to B1-x.loop-brief. New cases (.loop-brief, slash path, backslash path, .md name, b) are derived from that literal by strings.Replace. Driver check and skills untouched."
+}

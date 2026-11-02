@@ -171,7 +171,7 @@ func TestInstallModuleIsOptionalString(t *testing.T) {
 // The B29 schemas: brief-review/v1 and session/v5 are checked against the same fixtures as the gate.
 func TestBriefReviewAndSession5(t *testing.T) {
 	brief := func(extra string) string {
-		return `{"schema":"brief-review/v1","brief":"b","verdict":"PASS","findings":[]` + extra + `}`
+		return `{"schema":"brief-review/v1","brief":"B1-x.loop-brief","verdict":"PASS","findings":[]` + extra + `}`
 	}
 	finding := `{"kind":"fact","section":"S","summary":"x"}`
 	cases := []struct {
@@ -180,7 +180,7 @@ func TestBriefReviewAndSession5(t *testing.T) {
 	}{
 		{"pass empty", "brief-review/v1", brief(""), true},
 		{"pass with finding", "brief-review/v1", strings.Replace(brief(""), `[]`, `[`+finding+`]`, 1), true},
-		{"fix full", "brief-review/v1", `{"schema":"brief-review/v1","brief":"b","verdict":"FIX","findings":[{"kind":"decision","section":"S","summary":"x","evidence":"e","fix":"f"}],"decisions":["d"],"checked":"c","header":"h"}`, true},
+		{"fix full", "brief-review/v1", `{"schema":"brief-review/v1","brief":"B1-x.loop-brief","verdict":"FIX","findings":[{"kind":"decision","section":"S","summary":"x","evidence":"e","fix":"f"}],"decisions":["d"],"checked":"c","header":"h"}`, true},
 		{"fix empty", "brief-review/v1", strings.Replace(brief(""), "PASS", "FIX", 1), false},
 		{"ask empty", "brief-review/v1", strings.Replace(brief(""), "PASS", "ASK", 1), false},
 		{"verdict ok", "brief-review/v1", strings.Replace(brief(""), "PASS", "OK", 1), false},
@@ -190,6 +190,11 @@ func TestBriefReviewAndSession5(t *testing.T) {
 		{"empty summary", "brief-review/v1", strings.Replace(brief(""), `[]`, `[{"kind":"fact","section":"S","summary":""}]`, 1), false},
 		{"decisions number", "brief-review/v1", brief(`,"decisions":[1]`), false},
 		{"no brief", "brief-review/v1", `{"schema":"brief-review/v1","verdict":"PASS","findings":[]}`, false},
+		{"brief bare suffix", "brief-review/v1", strings.Replace(brief(""), "B1-x.loop-brief", ".loop-brief", 1), true},
+		{"brief slash path", "brief-review/v1", strings.Replace(brief(""), "B1-x.loop-brief", "docs/briefs/B1-x.loop-brief", 1), false},
+		{"brief backslash path", "brief-review/v1", strings.Replace(brief(""), "B1-x.loop-brief", `docs\\briefs\\B1-x.loop-brief`, 1), false},
+		{"brief with md", "brief-review/v1", strings.Replace(brief(""), "B1-x.loop-brief", "B1-x.loop-brief.md", 1), false},
+		{"brief b", "brief-review/v1", strings.Replace(brief(""), "B1-x.loop-brief", "b", 1), false},
 	}
 	sess := func(phase, extra string) string {
 		return `{"schema":"session/v5","run_id":"r","iteration":0,"phase":"` + phase + `","agent":"claude","model":"opus","effort":null,"models_used":{},"started":"2099-01-01T00:00:00Z","ended":"2099-01-01T00:01:00Z","duration_ms":1,"wall_ms":1,"cost_usd":0,"cost_source":"reported","turns":1,"is_error":false,"permission_denials":[]` + extra + `}`

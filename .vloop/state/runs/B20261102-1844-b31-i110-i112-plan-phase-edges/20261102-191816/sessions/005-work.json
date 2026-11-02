@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.3048319000000001,
+  "duration_ms": 268495,
+  "effort": null,
+  "ended": "2026-11-02T19:40:44Z",
+  "is_error": false,
+  "iteration": 2,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 38957,
+      "cache_read_input_tokens": 696319,
+      "cost_usd": 0.3048319000000001,
+      "input_tokens": 36,
+      "output_tokens": 7930
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261102-1844-b31-i110-i112-plan-phase-edges",
+  "schema": "session/v3",
+  "started": "2026-11-02T19:36:15Z",
+  "task": "T2",
+  "turns": 21,
+  "wall_ms": 269110
+}

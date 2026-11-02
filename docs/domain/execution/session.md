@@ -28,7 +28,8 @@ the agent `agent.review-brief` names, under the review-brief fence
 (`fence/review-brief.json`; writes only under `.vloop/tmp/`). The command keeps the validated report and the session's record under
 `.vloop/state/brief-reviews/<run id>/<folder>/` (the run id is the brief's) and exits by the verdict (0
 `PASS`; 1 `FIX` or `ASK`; 7 no valid report). Its record is `session/v5`, phase
-`review-brief`, with no task. The brief is never changed: a session that edits it
+`review-brief`, with no task. Its report's `brief` is the brief's name, its file name without
+`.md`; the schema rejects a path. The brief is never changed: a session that edits it
 halts the command (exit 9) and the brief is restored.
 
 A **second-review** session is a review session of phase `second-review`, run
@@ -114,7 +115,8 @@ The driver checks anyway, and
 records what it found in `run.log`. It keeps its inputs — the plan, the brief's
 status — in memory and hands the plan's hash to sessions as `VLOOP_PLAN_SHA256`;
 what a session changed among them is restored (a review session that changes the
-work it judges has it reverted and fails). A session or gate that moves any ref,
+work it judges has it reverted and fails). A plan or gate-review session's change outside
+`.vloop/state/` and `.vloop/tmp/` is reverted after the session, with a warning. A session or gate that moves any ref,
 `.git/config` or the git hooks halts the run with exit 9 and nothing is
 committed. A session writes nothing under `.git/` and nothing under `.vloop/`
 but `.vloop/tmp/` (S-4).

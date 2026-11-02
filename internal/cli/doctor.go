@@ -46,7 +46,7 @@ func newDoctor(b Build, g *Globals) *cobra.Command {
 			if err != nil {
 				return Problem(err)
 			}
-			checks := runDoctor(b, root)
+			checks := runDoctor(b, root, nil)
 			return writeDoctor(g, cmd, checks)
 		},
 	}
@@ -89,7 +89,11 @@ func writeDoctor(g *Globals, cmd *cobra.Command, checks []doctorCheck) error {
 	return nil
 }
 
-func runDoctor(b Build, root string) []doctorCheck {
+// runDoctor runs the checks. runBrief is nil for the bare doctor; for a run it
+// points at the brief the run named, "" when it named none. A complete
+// state/v2 plan passes unvalidated for the bare doctor and for a run naming
+// another brief — the planner resets it — and is validated otherwise.
+func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 	var checks []doctorCheck
 	add := func(name, result, msg string) { checks = append(checks, doctorCheck{name, result, msg}) }
 
@@ -124,7 +128,7 @@ func runDoctor(b Build, root string) []doctorCheck {
 	}
 
 	plan, hasPlan := doctorPlan(root)
-	doctorPlanShell(root, plan, hasPlan, vals, isRepo, add)
+	doctorPlanShell(root, plan, hasPlan, runBrief, vals, isRepo, add)
 
 	if !hasClaude {
 		add("plugin", resNA, "")
@@ -377,7 +381,7 @@ func doctorCopilot(root string, keys []string, add func(name, result, msg string
 }
 
 // doctorPlanShell adds the gate shell, plan and branch checks.
-func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
+func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *string, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
 	shell := plan.Shell
 	if !hasPlan {
 		shell = ""
@@ -408,8 +412,16 @@ func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, vals []conf
 				areas = v.List
 			}
 		}
-		rep, err := state.Check(root, areas)
+		replaced := plan.Schema == state.SchemaName && plan.Status == "complete" &&
+			(runBrief == nil || *runBrief != "" && *runBrief != plan.Brief)
+		var rep *state.Report
+		var err error
+		if !replaced {
+			rep, err = state.Check(root, areas)
+		}
 		switch {
+		case replaced:
+			add("plan", resPass, "a complete plan of "+plan.Brief+" — the next brief's plan replaces it")
 		case plan.Schema == state.SchemaV1 && plan.Status == "complete":
 			add("plan", resPass, "a complete "+state.SchemaV1+" plan — the next brief's plan replaces it")
 		case plan.Schema == state.SchemaV1:
@@ -547,7 +559,7 @@ func doctorTrusted(root string) bool {
 }
 
 // doctorPlanInfo is the part of the plan the doctor reads.
-type doctorPlanInfo struct{ Schema, Shell, Status string }
+type doctorPlanInfo struct{ Schema, Shell, Status, Brief string }
 
 // doctorPlan reads just the plan's shell and status, leniently: validity is
 // the plan check's business.

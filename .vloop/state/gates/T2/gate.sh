@@ -1,125 +1,109 @@
 #!/bin/sh
-# Gate T2 — V1, the driver and the close. With the stub claude (stub-claude.sh)
-# in fixture repositories (lib.sh) whose one-task run completes, every line of
-# the brief's worked example and each planted failure: what the verify step
-# prints (stdout's "verify: " line, stderr's warnings), what it keeps as
-# <run dir>reports/verify.json, and that the run still exits 0 with its plan
-# complete; then `vloop brief close <brief>` with no flag on the kept reports
-# (exit 2, the verify block on stdout), and on a kept verify/v1 report the
-# base's lines exactly.
-G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
-. "$G/lib.sh"
-cd "$top" || fail "repo root"
-newbin
-
-CK='{"example_lines":2,"sentences":3,"surfaces":1}'
-F1='{"kind":"example","claim":"`demo` exits 0","observed":"exit 1","where":"Worked example, line 1; bin/demo"}'
-F2='{"kind":"surface","claim":"README.md:3: \"demo ignores its arguments\"","observed":"demo reads its first argument","where":"Behaviour contract; README.md:3"}'
-N1='{"line":"vloop init","reason":"denied by the verify fence (Bash(vloop init:*))"}'
-N2='{"line":"vloop brief review docs/briefs/x.loop-brief.md","reason":"the operator'"'"'s, at close"}'
-# v2 <complete> <findings> <not_run>: a verify/v2 report.
-v2() { printf '{"schema":"verify/v2","complete":%s,"findings":%s,"not_run":%s,"checked":%s,"notes":"none"}' "$1" "$2" "$3" "$CK"; }
-FBLOCK1='  1. example — Worked example, line 1; bin/demo
-     brief:    `demo` exits 0
-     observed: exit 1'
-FBLOCK2='  2. surface — Behaviour contract; README.md:3
-     brief:    README.md:3: "demo ignores its arguments"
-     observed: demo reads its first argument'
-NOTRUN1='  not run: vloop init — denied by the verify fence (Bash(vloop init:*))'
-NOTRUN2="  not run: vloop brief review docs/briefs/x.loop-brief.md — the operator's, at close"
-STOPPED='  the session stopped before its last pass'
-REFUSE='say what you found before merge'
-# closewant <name> <expected stdout>: a bare close refuses with exit 2 and
-# prints exactly the expected verify block on stdout.
-closewant() {
-  closebare "$1"
-  [ "$crc" = 2 ] || fail "$1: vloop brief close with no flag exited $crc, want 2: $(cat "$t/$1.cerr")"
-  grep -qF "$REFUSE" "$t/$1.cerr" || fail "$1: vloop brief close with no flag did not refuse: $(cat "$t/$1.cerr")"
-  printf '%s\n' "$2" >"$t/$1.cwant"
-  cmp -s "$t/$1.cwant" "$t/$1.cout" || fail "$1: vloop brief close prints:
-$(cat "$t/$1.cout")
---- want
-$(cat "$t/$1.cwant")"
+# Gate T2 — V1, a finished plan does not block the next brief. This tree's
+# binary, built into a temporary directory, in fixture repositories under $t
+# with the stub claude (stub-claude.sh) first on PATH, a fake HOME trusting
+# the fixture, and nothing of this repository's tree, refs or HOME touched.
+#
+# The fixture: on work branch B20260101-0900-a, a committed state/v2 plan of
+# docs/briefs/B20260101-0900-a.loop-brief.md (run id B20260101-0900-a, branch
+# the current one) whose T1 references docs/old.md, which a later commit
+# removed; and a ready brief docs/briefs/B20260101-0910-b.loop-brief.md.
+# <n> is what `vloop task validate` counts on it.
+#   complete plan: `vloop doctor` prints the pass line (and --json carries it,
+#     result pass); `vloop run <b>` resets it and plans fresh, exit 0;
+#     `vloop run <a>` and a bare `vloop run` refuse in preflight, exit 1, with
+#     the plan line and the preflight line, nothing run.
+#   planted, status running: `vloop run <b>` refuses the same way, exit 1.
+#   `vloop task validate` still counts the complete plan's problems.
+set -u
+fail() { echo "GATE FAIL: $*" >&2; exit 1; }
+for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p; s/^\(COPILOT_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
+unset NO_COLOR GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE CLAUDE_PLUGIN_ROOT GOFLAGS GOBIN GH_TOKEN GITHUB_TOKEN
+export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GOTOOLCHAIN=local
+G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
+top=$(pwd -P)
+JQ=$(command -v jq) || fail "jq is not on PATH"
+GITBIN=$(command -v git) || fail "git is not on PATH"
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
+trap 'chmod -R u+w "$t" 2>/dev/null; rm -rf "$t"' EXIT
+GOMODCACHE=$(go env GOMODCACHE) && GOCACHE=$(go env GOCACHE) && GOPATH=$(go env GOPATH) || fail "go env"
+export GOMODCACHE GOCACHE GOPATH GOPROXY=off
+mkdir -p "$t/bin" && go build -buildvcs=false -o "$t/bin/vloop" ./cmd/vloop || fail "go build of this tree"
+S=$t/bin/vloop
+A=docs/briefs/B20260101-0900-a.loop-brief.md
+B=docs/briefs/B20260101-0910-b.loop-brief.md
+venv() {
+  env -i PATH="$t/stub:/usr/bin:/bin" HOME="$t/home" USER=gateuser LOGNAME=gateuser TMPDIR="$t/tmp" LC_ALL=C \
+    GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 "$@"
 }
-stamp() { basename "$RD"; }
-
-# 1. complete, no findings, nothing not run: the base's line.
-runcase e1 "$(v2 true '[]' '[]')"
-completed e1; verifylines e1 1; outis e1 'verify: no findings'
-nowhere e1 'not run'; nowhere e1 'stopped before its last pass'; nowhere e1 'verify by hand'; kept e1
-
-# 2. complete, one finding: the base's line.
-runcase e2 "$(v2 true "[$F1]" '[]')"
-completed e2; verifylines e2 1; outis e2 "verify: 1 finding(s) — see ${RD}reports/verify.json"
-nowhere e2 'not run'; nowhere e2 'stopped before its last pass'; kept e2
-# A kept verify/v1 report prints exactly the base's lines at close.
-printf '%s\n' "{\"schema\":\"verify/v1\",\"findings\":[$F1],\"checked\":$CK,\"notes\":\"none\"}" >"$t/repo/${RD}reports/verify.json"
-closewant e2v1 "verify of $RID/$(stamp): 1 finding(s)
-$FBLOCK1"
-printf '%s\n' "{\"schema\":\"verify/v1\",\"findings\":[],\"checked\":$CK,\"notes\":\"none\"}" >"$t/repo/${RD}reports/verify.json"
-closewant e2v1e "verify of $RID/$(stamp): no findings"
-
-# 3. complete, no findings, one line not run.
-runcase e3 "$(v2 true '[]' "[$N1]")"
-completed e3; verifylines e3 1; outis e3 "verify: no findings; 1 example line(s) not run — see ${RD}reports/verify.json"
-nowhere e3 'stopped before its last pass'; nowhere e3 'verify by hand'; kept e3
-closewant e3 "verify of $RID/$(stamp): no findings; 1 example line(s) not run
-$NOTRUN1"
-
-# 4. complete, two findings, two lines not run.
-runcase e4 "$(v2 true "[$F1,$F2]" "[$N1,$N2]")"
-completed e4; verifylines e4 1; outis e4 "verify: 2 finding(s); 2 example line(s) not run — see ${RD}reports/verify.json"
-nowhere e4 'stopped before its last pass'; kept e4
-closewant e4 "verify of $RID/$(stamp): 2 finding(s); 2 example line(s) not run
-$FBLOCK1
-$FBLOCK2
-$NOTRUN1
-$NOTRUN2"
-
-# 5. incomplete, exit 0: the line, then the stopped-early warning.
-runcase e5 "$(v2 false '[]' '[]')"
-completed e5; verifylines e5 1; outis e5 'verify: no findings'
-erris e5 "vloop: the verify session stopped before its last pass — verify the rest by hand; see ${RD}reports/verify.json"
-nowhere e5 'failed to run'; nowhere e5 'not run'; kept e5
-closewant e5 "verify of $RID/$(stamp): no findings
-$STOPPED"
-
-# 6. incomplete, one finding, then the session exits 3: the line and the
-# base's failed-to-run warning, not the stopped-early one; the report kept.
-runcase e6 "$(v2 false "[$F1]" '[]')" claude.verify-exit3
-completed e6; verifylines e6 1; outis e6 "verify: 1 finding(s) — see ${RD}reports/verify.json"
-erris e6 "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
-nowhere e6 'stopped before its last pass'; nowhere e6 'left no valid'; kept e6
-closewant e6 "verify of $RID/$(stamp): 1 finding(s)
-$FBLOCK1
-$STOPPED"
-
-# 6b. the same report after a session that left no record (nothing on stdout,
-# exit 0): the same two lines.
-runcase e6n "$(v2 false "[$F1]" '[]')" claude.verify-norecord
-completed e6n; verifylines e6n 1; outis e6n "verify: 1 finding(s) — see ${RD}reports/verify.json"
-erris e6n "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
-nowhere e6n 'stopped before its last pass'; nowhere e6n 'left no valid'; kept e6n
-
-# Planted failures.
-LEFT='vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand'
-# planted <name> <report> [flag]: exit 0, the left-no-valid line, no
-# "verify: " line, nothing kept.
-planted() {
-  runcase "$@"
-  completed "$1"; verifylines "$1" 0; erris "$1" "$LEFT"; nowhere "$1" 'failed to run'; notkept "$1"
+g() { venv git -C "$t/repo" "$@"; }
+# fixture <plan status> <task status>: $t/repo afresh, as above.
+fixture() {
+  chmod -R u+w "$t/repo" "$t/home" 2>/dev/null; rm -rf "$t/repo" "$t/home" "$t/tmp" "$t/stub"
+  mkdir -p "$t/repo/docs/briefs" "$t/home" "$t/tmp" "$t/stub" || fail mkdir
+  pv=$("$JQ" -r .version "$top/plugin/.claude-plugin/plugin.json") || fail "plugin version"
+  cp "$G/plan-b.json" "$t/stub/plan.json" && ln -s "$GITBIN" "$t/stub/git" && ln -s "$JQ" "$t/stub/jq" &&
+    sed "s/@PLUGIN_VERSION@/$pv/" "$G/stub-claude.sh" >"$t/stub/claude" && chmod +x "$t/stub/claude" || fail "stub"
+  printf '{"projects":{"%s":{"hasTrustDialogAccepted":true}}}\n' "$t/repo" >"$t/home/.claude.json"
+  g init -q -b main && g config user.name Gate && g config user.email gate@example.invalid && g config commit.gpgsign false || fail "git init"
+  echo x >"$t/repo/docs/x.md"
+  echo "the old contract" >"$t/repo/docs/old.md"
+  echo "the fixture's readme" >"$t/repo/README.md"
+  (cd "$t/repo" && venv "$S" init >"$t/init.out" 2>&1) || fail "vloop init: $(cat "$t/init.out")"
+  printf '[[check]]\nname = "all"\npaths = ["**"]\nrun = "true"\n' >"$t/repo/.vloop/config.toml"
+  sed 's/@NAME@/B20260101-0900-a/' "$G/brief.md" >"$t/repo/$A" && sed 's/@NAME@/B20260101-0910-b/' "$G/brief.md" >"$t/repo/$B" || fail brief
+  g add -A && g commit -q -m "gate fixture" || fail "fixture commit"
+  g switch -q -c B20260101-0900-a || fail "work branch"
+  base=$(g rev-parse HEAD) || fail "rev-parse"
+  mkdir -p "$t/repo/.vloop/state" && sed -e "s/@BASE@/$base/" -e "s/@STATUS@/$1/" -e "s/@TSTATUS@/$2/" "$G/plan-a.json" >"$t/repo/.vloop/state/state.json" || fail plan
+  g add -A && g commit -q -m "[vloop] B20260101-0900-a: the plan" || fail "plan commit"
+  g rm -q docs/old.md && g commit -q -m "move docs/old.md away" || fail "remove docs/old.md"
 }
-planted p1 "{\"schema\":\"verify/v1\",\"findings\":[],\"checked\":$CK,\"notes\":\"none\"}"
-planted p2 '{"schema":"verify/v2","findings":[],"not_run":[],"checked":'"$CK"',"notes":"none"}'
-planted p3 "$(v2 true '[]' '[{"line":"vloop init"}]')"
-# No report, then exit 3: the failed-to-run warning alone, nothing kept.
-runcase p4 - claude.verify-exit3
-completed p4; verifylines p4 0
-erris p4 "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
-nowhere p4 'left no valid'; notkept p4
-# An invalid report after a failed session: the failed-to-run warning alone.
-runcase p5 "{\"schema\":\"verify/v1\",\"findings\":[],\"checked\":$CK,\"notes\":\"none\"}" claude.verify-exit3
-completed p5; verifylines p5 0
-erris p5 "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
-nowhere p5 'left no valid'; notkept p5
+# inrepo <name> cmd...: run cmd in the fixture; $rc, $t/<name>.out and .err.
+inrepo() { n=$1; shift; (cd "$t/repo" && venv "$S" "$@" >"$t/$n.out" 2>"$t/$n.err"); rc=$?; }
+# refused <name>: exit 1 from the preflight, with the plan line and the
+# preflight line on stderr, no session run and the plan as it was.
+refused() {
+  [ "$rc" = 1 ] || fail "$1: exit $rc, want 1: $(tail -5 "$t/$1.err")"
+  grep -qxF "  ✗ plan $np problem(s) — run vloop task validate" "$t/$1.err" || fail "$1: no '  ✗ plan $np problem(s) — run vloop task validate' on stderr: $(cat "$t/$1.err")"
+  grep -qxF "vloop: preflight failed — 1 problem(s), nothing has run" "$t/$1.err" || fail "$1: no 'vloop: preflight failed — 1 problem(s), nothing has run' on stderr: $(cat "$t/$1.err")"
+  [ -s "$t/stub/events" ] && fail "$1: a session ran: $(cat "$t/stub/events")"
+  [ "$("$JQ" -r .run_id "$t/repo/.vloop/state/state.json")" = B20260101-0900-a ] || fail "$1: the plan was replaced"
+  return 0
+}
+
+# The complete plan: what the doctor and task validate say.
+fixture complete done
+inrepo tv task validate
+np=$(sed -n 's/^\([0-9][0-9]*\) problem(s).*/\1/p' "$t/tv.out" "$t/tv.err" | head -1)
+[ -n "$np" ] && [ "$np" -ge 1 ] || fail "vloop task validate does not count the complete plan's problems (exit $rc): $(cat "$t/tv.out" "$t/tv.err")"
+[ "$rc" != 0 ] || fail "vloop task validate passes the complete plan whose reference is gone"
+grep -qF docs/old.md "$t/tv.out" "$t/tv.err" || fail "vloop task validate does not name docs/old.md: $(cat "$t/tv.out" "$t/tv.err")"
+WANT="✓ plan a complete plan of $A — the next brief's plan replaces it"
+inrepo doc doctor
+grep -qxF "$WANT" "$t/doc.out" || fail "vloop doctor: want the line '$WANT', got: $(grep -F plan "$t/doc.out")"
+inrepo docj --json doctor
+m=$("$JQ" -r '.checks[] | select(.name == "plan") | .result + "|" + .message' "$t/docj.out" 2>/dev/null)
+[ "$m" = "pass|a complete plan of $A — the next brief's plan replaces it" ] || fail "vloop doctor --json's plan check: want pass with the message, got '$m'"
+
+# A run naming the plan's own brief, and a bare run, are resumes: validated.
+inrepo resume run "$A"; refused resume
+inrepo bare run; refused bare
+
+# A run naming another brief: the plan is reset and the run goes on.
+inrepo fresh run "$B"
+[ "$rc" = 0 ] || fail "vloop run $B on a complete plan of another brief exited $rc, want 0: $(tail -8 "$t/fresh.err")"
+grep -qxF "the plan B20260101-0900-a was for $A — you asked for $B: resetting and planning fresh" "$t/fresh.out" ||
+  fail "vloop run $B: no reset line on stdout: $(head -8 "$t/fresh.out")"
+grep -qF '✗ plan' "$t/fresh.err" && fail "vloop run $B: the preflight printed the plan check: $(grep -F '✗ plan' "$t/fresh.err")"
+st=$("$JQ" -r '.brief + " " + .status' "$t/repo/.vloop/state/state.json")
+[ "$st" = "$B complete" ] || fail "vloop run $B: the plan reads '$st', want '$B complete'"
+grep -q '^session plan ' "$t/stub/events" || fail "vloop run $B: no plan session ran"
+
+# Planted: the same plan, running: validated, refused.
+fixture running pending
+inrepo planted run "$B"; refused planted
+inrepo pdoc doctor
+grep -qF "a complete plan of" "$t/pdoc.out" && fail "vloop doctor passes a running plan as complete: $(grep -F plan "$t/pdoc.out")"
+grep -qxF "✗ plan $np problem(s) — run vloop task validate" "$t/pdoc.out" || fail "vloop doctor on a running plan: want '✗ plan $np problem(s) — run vloop task validate', got: $(grep -F plan "$t/pdoc.out")"
 echo "gate T2: ok"

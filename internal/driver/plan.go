@@ -535,6 +535,7 @@ func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effor
 	root := p.Root
 	before := refsState(root)
 	gguard := snapshotGit(root)
+	tree := snapshotTree(root)
 	agent, err := ResolveAgent(root, PhasePlan)
 	if err != nil {
 		return halt(ExitPreflight, "%v", err)
@@ -555,11 +556,27 @@ func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effor
 		t.warn("restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run")
 		return halt(ExitRefsMoved, "REFS MOVED plan — the planning session changed git refs; nothing was committed")
 	}
+	if err := t.revertTree(tree, "plan"); err != nil {
+		return err
+	}
 	if res.TimedOut {
 		return halt(ExitSessionError, "planning session timed out after %s — see %s", p.SessionTimeout, relRunDir(root, runDir))
 	}
 	if res.ExitCode != 0 {
 		return halt(ExitPreflight, "%s", planFailure(agent, res.ExitCode, relRunDir(root, runDir)))
+	}
+	return nil
+}
+
+// revertTree undoes what a plan or gate-review session changed outside
+// .vloop/state/ and .vloop/tmp/, one warning per path in path order.
+func (t term) revertTree(tree treeGuard, phase string) error {
+	changed, failed := tree.revert()
+	if len(failed) > 0 {
+		return halt(ExitPreflight, "the %s session changed files the driver could not revert: %s", phase, strings.Join(failed, "; "))
+	}
+	for _, p := range changed {
+		t.warn("vloop: the %s session changed %s — reverted", phase, p)
 	}
 	return nil
 }

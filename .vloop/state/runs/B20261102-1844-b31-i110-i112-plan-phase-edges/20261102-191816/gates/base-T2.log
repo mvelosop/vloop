@@ -1,0 +1,1 @@
+GATE FAIL: vloop doctor: want the line '✓ plan a complete plan of docs/briefs/B20260101-0900-a.loop-brief.md — the next brief's plan replaces it', got: ✗ plan 1 problem(s) — run vloop task validate

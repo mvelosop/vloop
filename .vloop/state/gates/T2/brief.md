@@ -1,5 +1,5 @@
 ---
-name: B20260101-0900-demo.loop-brief
+name: @NAME@.loop-brief
 description: Build a demo
 kind: brief
 status: ready

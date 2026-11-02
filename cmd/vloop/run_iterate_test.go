@@ -544,3 +544,64 @@ func TestRunHeadCheck(t *testing.T) {
 	}
 	wantIn(t, "stderr", res.err, "nothing was committed")
 }
+
+// TestRunCompletePlanOfAnotherBriefIsNotValidated is B31's V1: a complete plan
+// whose reference is gone does not stop a run naming another brief, which
+// resets it; a run naming its brief, a bare run and a running plan still
+// validate it.
+func TestRunCompletePlanOfAnotherBriefIsNotValidated(t *testing.T) {
+	t.Parallel()
+	r := newRunRepo(t)
+	r.scripted(twoTasks(t), defaultScript)
+	wantExit(t, r.vloop("run", runBrief), 0)
+
+	// The finished plan refers to a file that is gone.
+	breakPlan := func(status string) {
+		var p map[string]any
+		if err := json.Unmarshal([]byte(r.read(".vloop/state/state.json")), &p); err != nil {
+			t.Fatal(err)
+		}
+		p["status"] = status
+		tasks := p["tasks"].([]any)
+		tasks[0].(map[string]any)["references"] = []any{map[string]any{"path": "docs/gone.md", "why": "it moved"}}
+		b, _ := json.MarshalIndent(p, "", "  ")
+		r.write(".vloop/state/state.json", string(b)+"\n")
+		r.commitAll("plan " + status)
+	}
+	breakPlan("complete")
+
+	const other = "B20260101-1000-other"
+	otherPath := "docs/briefs/" + other + ".loop-brief.md"
+	r.write(otherPath, strings.Replace(runBriefText(), runBriefName, other+".loop-brief", 1))
+	r.commitAll("another brief")
+	problem := "  ✗ plan "
+	preflight := "vloop: preflight failed — 1 problem(s), nothing has run"
+
+	// The bare doctor passes the complete plan, text and --json.
+	want := "a complete plan of " + runBrief + " — the next brief's plan replaces it"
+	res := r.vloop("doctor")
+	wantIn(t, "doctor", res.out, "✓ plan "+want)
+	res = r.vloop("--json", "doctor")
+	wantIn(t, "doctor --json", res.out, `"name":"plan","result":"pass","message":"`+want+`"`)
+
+	// A resume or a bare run validates it.
+	for _, args := range [][]string{{"run", runBrief}, {"run"}} {
+		res = r.vloop(args...)
+		wantExit(t, res, 1)
+		wantIn(t, strings.Join(args, " "), res.err, problem, preflight)
+	}
+
+	// Another brief resets it and goes on.
+	r.scripted(planJSON(t, planTask("T1", map[string]any{"verify": "test -f other.flag"})),
+		defaultScript+"if [ \"$PHASE\" = work ]; then touch other.flag; fi\n")
+	res = r.vloop("run", otherPath)
+	wantExit(t, res, 0)
+	wantIn(t, "output", res.out+res.err, "resetting and planning fresh")
+	wantNotIn(t, "output", res.err, problem)
+
+	// A plan that is not complete is validated whatever the run names.
+	breakPlan("running")
+	res = r.vloop("run", runBrief)
+	wantExit(t, res, 1)
+	wantIn(t, "running", res.err, problem, preflight)
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "schemas/brief-review.v1.json's `brief` is `{\"type\": \"string\", \"pattern\": \"^[^/\\\\\\\\]*\\\\.loop-brief$\"}` as the brief gives it (no `/` or `\\`, ending `.loop-brief`); nothing else in the schema changes and its title stays brief-review/v1; no brief-review/v2 is added.", "met": true, "evidence": "The diff changes only the `brief` line of schemas/brief-review.v1.json, to type string plus pattern `^[^/\\\\]*\\.loop-brief$`. The title is untouched and no v2 file is added."},
+    {"criterion": "`vloop schema validate brief-review/v1` exits 0 on the worked example's `B1-x.loop-brief` and `.loop-brief` reports and 1 on `docs/briefs/B1-x.loop-brief`, `docs\\\\briefs\\\\B1-x.loop-brief`, `B1-x.loop-brief.md` and `b`.", "met": true, "evidence": "The new cases in internal/schema/schema_test.go cover all six values, and the go check log is green (internal/schema ok)."},
+    {"criterion": "Every kept .vloop/state/brief-reviews/*/*/brief-review.json still validates, and the review-brief skill's report example still validates.", "met": true, "evidence": "I validated the 6 kept reports with `go run ./cmd/vloop schema validate`; none failed. SKILL.md:92 uses `B1-x.loop-brief`, which matches the pattern."},
+    {"criterion": "The driver's check in internal/driver/briefreview.go and its refusal line are unchanged, and no skill file changes.", "met": true, "evidence": "git status shows only schema_test.go and brief-review.v1.json modified outside .vloop."},
+    {"criterion": "In internal/schema/schema_test.go only the brief-review/v1 cases built from the two literals whose `brief` is `b` change, and only that value, to `B1-x.loop-brief`; the work session names the contract item (V3) in its notes. A changed expectation anywhere else is a violation.", "met": true, "evidence": "The diff changes only the two `brief` literals, `b` to `B1-x.loop-brief`: the `brief()` helper and the 'fix full' case. No expectation changed. V3 is not cited in the diff; I treated that as the work session's notes and read the proposal only for the claim."},
+    {"criterion": "Committed tests run by the go check gain the planted cases of the worked example (a `/` path, a `\\` path, the `.md` file name and `b` refused; `B1-x.loop-brief` and `.loop-brief` accepted). A task that tightens the schema and leaves no such test fails this criterion.", "met": true, "evidence": "Five new cases were added to TestBriefReviewAndSession5 (bare suffix accepted; slash path, backslash path, .md and b refused). `B1-x.loop-brief` is accepted by the existing cases. The go check passed."}
+  ],
+  "findings": [],
+  "notes": "The installed vloop binary on PATH predates brief-review/v1 (\"unknown schema\"), so I validated with go run ./cmd/vloop instead."
+}

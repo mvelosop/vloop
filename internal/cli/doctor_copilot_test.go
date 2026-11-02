@@ -45,7 +45,7 @@ func (e *doctorEnv) preflight() (string, error) {
 	var errOut bytes.Buffer
 	cmd := &cobra.Command{}
 	cmd.SetErr(&errOut)
-	err := runPreflight(e.build, e.repo, cmd)
+	err := runPreflight(e.build, e.repo, cmd, "")
 	return errOut.String(), err
 }
 

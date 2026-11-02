@@ -1,0 +1,5 @@
+{"schema":"proposal/v1","task":"T2","outcome":"done",
+"summary":"A complete state/v2 plan now passes the bare vloop doctor (text and --json) and vloop run's preflight when the run names another brief; resumes, bare runs and non-complete plans stay validated.",
+"files":["internal/cli/doctor.go","internal/cli/run.go","internal/cli/doctor_copilot_test.go","internal/cli/doctor_second_review_test.go","cmd/vloop/run_iterate_test.go"],
+"verified":"vloop task gate T2 exited 0 and printed gate T2: ok; go vet, gofmt and the new tests pass.",
+"notes":"runDoctor gained runBrief *string (nil = bare doctor, pointer to \"\" = run naming none); runPreflight gained briefPath string. Existing callers in doctor_copilot_test.go and doctor_second_review_test.go changed only to pass nil / \"\" (contract item V1), assertions untouched. New tests: TestDoctorCompletePlanOfAnotherBrief (internal/cli) and TestRunCompletePlanOfAnotherBriefIsNotValidated (cmd/vloop). Full go test ./... was not run by this session; the driver runs it."}

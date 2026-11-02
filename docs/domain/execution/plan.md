@@ -7,6 +7,8 @@ description: Binds the Plan aggregate — state.json's fields, its lifecycle fro
 A brief decomposed into tasks, in `state.json` (`state/v2`; `vloop run` never resumes a `state/v1` plan — an unfinished one is refused, a complete one is replaced by the next brief's plan). *Part of
 [execution](execution-context.md).*
 
+A complete `state/v2` plan of another brief does not block the next brief either: `vloop run` naming another brief does not validate it, and `vloop doctor` run on its own reports every complete `state/v2` plan as a pass; a resumed plan, or one not complete, is validated.
+
 ## Fields
 
 | Field | Meaning |

@@ -1,0 +1,7 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": { "example_lines": 7, "sentences": 9, "surfaces": 7 },
+  "notes": "Ran as written: V3's six `vloop schema validate brief-review/v1` lines (exit 0, 1, 1, 1, 1, 0 as the brief says), the bare `vloop doctor` plan line on a fixture with a complete state/v2 plan (text and result `pass` in --json match the brief), and the kept brief reviews in .vloop/state/brief-reviews (6, all valid). Not run: V1's `vloop run` lines and all of V2's examples, which need stub plan and gate-review sessions; the brief says the plan's tests in cmd/vloop cover them. For those I read the changed code (internal/cli/doctor.go, run.go, internal/driver/plan.go, gatereview.go) and found the revert placed after the refs check and before the timeout/exit judgement, as the contract orders, and the warning and halt texts as the brief gives them. The halt exit is ExitPreflight = 1. The doctor fixture was minimal (tasks: []), hand-written because the run's own state.json could not be copied. The doctor's `✓ plan` line was seen only through --json. Surfaces read: docs/guide/configuration.md, docs/domain/execution/plan.md, session.md (two edits), docs/design-notes/fence-audit.md (both notes), the review-brief skill example, the doctor and run code comments. I did not check `vloop doctor --help`."
+}
+

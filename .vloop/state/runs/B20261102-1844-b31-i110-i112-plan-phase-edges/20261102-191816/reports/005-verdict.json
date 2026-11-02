@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Gates T1 to T4 all pass on the final tree, run together by this task's gate.", "met": true, "evidence": "gates/T5.log shows gate T1..T4: ok then gate T5: ok; gate.sh loops over T1-T4"},
+    {"criterion": "fence/*.json are byte for byte as at the base, with no fence file added or removed; the Copilot hook is unchanged.", "met": true, "evidence": "git diff HEAD shows no change under fence/ or plugin; gate.sh cmp's every fence file and compares listings"},
+    {"criterion": "The work session's notes walk the brief's worked example line for line (V1's doctor and run lines and the planted running plan; V2's four warnings, the plan commit, the exit-3 plan session, the plan-line gate and the clean session; V3's six schema lines, the kept brief reviews and the skill's example) and name the committed test or gate that covers each; a line no committed test covers is fixed in this task or reported, not skipped.", "met": true, "evidence": "proposal notes walk V1, V2, V3 and name tests; the named tests exist in cmd/vloop/run_planedges_test.go, internal/cli/doctor_second_review_test.go, internal/cli/skills_test.go, internal/schema/schema_test.go; the uncovered kept-reviews line got internal/schema/keptreviews_test.go; the pre-fix half is reported as historical"},
+    {"criterion": "Any fix this task makes is to the contract as the brief states it, leaves a committed test where it changes behaviour, and weakens no check.", "met": true, "evidence": "the only product change is the new test file; no existing test or check was altered"}
+  ],
+  "findings": [],
+  "notes": "TestKeptBriefReviewsValidate passes vacuously if the glob matches nothing, but six kept files exist now. Not a finding."
+}

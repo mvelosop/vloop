@@ -48,6 +48,7 @@ func (p *Planner) gateReviewRound(t term, round int) ([]string, int, error) {
 	t.say("reviewing the gates using %s (round %d)", model, round)
 	before := refsState(root)
 	gguard := snapshotGit(root)
+	tree := snapshotTree(root)
 	res, err := t.r.Run(Spec{Agent: agent, Phase: PhaseGateReview, Model: model, Effort: effort})
 	if err != nil {
 		return nil, 0, halt(ExitPreflight, "gate review session failed: %v", err)
@@ -58,6 +59,9 @@ func (p *Planner) gateReviewRound(t term, round int) ([]string, int, error) {
 	}
 	if len(refsDiff(before, refsState(root))) > 0 {
 		return nil, 0, halt(ExitRefsMoved, "REFS MOVED gate-review — the gate review changed git refs; nothing was committed")
+	}
+	if err := t.revertTree(tree, "gate-review"); err != nil {
+		return nil, 0, err
 	}
 	if res.TimedOut {
 		return nil, 0, halt(ExitSessionError, "gate review session timed out after %s — see %s", t.r.Timeout, relRunDir(root, t.r.RunDir))
