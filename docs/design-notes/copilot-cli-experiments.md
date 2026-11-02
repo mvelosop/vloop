@@ -620,6 +620,46 @@ starts its sessions.
   (`.vloop/tmp/` is cleared at the next run), which is why the probe had to
   rebuild the case.
 
+## Which model ids Copilot takes (2026-11-02)
+
+Copilot CLI 1.0.105 does not list its models: `--help` gives only
+`--model <model>` and an example, an unknown id fails with
+`Model "<id>" from --model flag is not available.` and nothing else, and
+its logs under the Copilot home do not keep the list. The CLI gets the list
+from the Copilot API, which answers the operator's `gh` login:
+
+```
+curl -s -H "Authorization: Bearer $(gh auth token)" \
+     -H "Copilot-Integration-Id: copilot-developer-cli" \
+     https://api.githubcopilot.com/models \
+  | jq -r '.data[] | select(.model_picker_enabled) | [.id, (.policy.state // "-")] | @tsv'
+```
+
+Each `id` is the exact string `--model` and `model.<phase>` take. The second
+column is the account's policy for the model: `enabled`, `disabled` (it
+exists, the policy blocks it) or `-` (no policy applies; `gpt-6.1-terra`
+showed `-` and ran). The response carries no price: credits per session are
+still measured, as in the section above. `model_picker_enabled` false marks
+older or utility models (embeddings, dated GPT-4 snapshots).
+
+The list on 2026-11-02, picker models only:
+
+| id | policy |
+| --- | --- |
+| `gpt-5.6-terra` | enabled (retires 2026-11-16, #84) |
+| `gpt-6.1-terra` | - |
+| `gpt-5.6-luna`, `gpt-6-luna` | enabled |
+| `gpt-5.6-sol`, `gpt-6-sol`, `gpt-6.1-sol`, `gpt-6-astra` | disabled |
+| `gpt-5.3-codex` | - |
+| `claude-haiku-4.5`, `claude-haiku-5.5`, `claude-sonnet-5`, `claude-sonnet-5.5` | enabled |
+| `claude-opus-4.8`, `claude-opus-4.8-fast`, `claude-opus-5`, `claude-opus-5.5`, `claude-fable-5`, `claude-fable-5.1` | disabled |
+| `gemini-3.8-flash`, `kimi-k3`, `mai-code-1.1-flash` | enabled |
+| `gemini-4-argon` | disabled |
+| `grok-4.6`, `grok-4.7` | - |
+
+There is no `gpt-6-terra`, which is why that id failed: the Terra after 5.6
+is 6.1.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts
