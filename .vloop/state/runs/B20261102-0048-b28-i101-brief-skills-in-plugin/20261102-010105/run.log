@@ -53,3 +53,10 @@ committing the plan
    review T4 · 0m27s · $0.13 · run $6.99 / $40.00
    review: PASS
    T4 done
+── iteration 5 (5 this run) · T5 · 4/6 done ──
+   Name the two brief skills in the README, the concepts guide and the domain pages
+   work T5 · 2m46s · $0.12 · run $7.11 / $40.00
+   check go
+   review T5 · 0m19s · $0.09 · run $7.20 / $40.00
+   review: PASS
+   T5 done

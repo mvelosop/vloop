@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added the eval cases review-brief-planted-faults and create-brief-drafts-checked (case.yaml, prompt.md, scaffold.sh, graders), their rows in plugin/evals/README.md, and updated docs/guide/evals.md (21 cases, suites table, operate line removed).
 - **Files:** plugin/evals/review-brief-planted-faults/case.yaml, plugin/evals/review-brief-planted-faults/prompt.md, plugin/evals/review-brief-planted-faults/scaffold.sh, plugin/evals/review-brief-planted-faults/graders, plugin/evals/create-brief-drafts-checked/case.yaml, plugin/evals/create-brief-drafts-checked/prompt.md, plugin/evals/create-brief-drafts-checked/scaffold.sh, plugin/evals/create-brief-drafts-checked/graders, plugin/evals/README.md, docs/guide/evals.md
 - **Notes for next iteration:** create-brief-drafts-checked grants Bash(vloop brief:*) beyond the fence; added 'Bash(vloop brief:*)' to the guide's --allow-tools list so TestEvalGrantsCoverFence holds. The planted brief passes vloop brief check once status is ready; its plant: GREET_NAME claim, usage message differing between contract and worked example, tests/golden.sh red after task 1 (usage.txt regenerated only in task 2). No eval was run.
+
+## T5 — Name the two brief skills in the README, the concepts guide and the domain pages
+
+- **Outcome:** done (review: PASS)
+- **Summary:** README, concepts guide, session page and domain model now name all eight skills; /vloop:create-brief and /vloop:review-brief are described as the operator's, interactive, and the brief stays vloop's only input (B-1 unchanged).
+- **Files:** README.md, docs/guide/concepts.md, docs/domain/execution/session.md, docs/domain/domain-model.md, internal/cli/readme_test.go
+- **Notes for next iteration:** K4: TestReadmeNamesTheSkills list gained create-brief and review-brief only. The concepts Skills section lacked /vloop:verify, so a bullet for it was added to list all eight. Other internal/cli tests (TestTaskGate*) fail inside the work session with 'the plan was changed during this session'; that is the driver's guard, not related to this change.

@@ -5,9 +5,9 @@
   "base": "3655c351a577ef4925612aa4b5aba230c1b0fd80",
   "branch": "B20261102-0048-b28-i101-brief-skills-in-plugin",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-02T01:13:33Z",
-  "updated": "2026-11-02T01:56:07Z",
+  "updated": "2026-11-02T02:03:15Z",
   "shell": "sh",
   "checks": [
     {
@@ -209,7 +209,7 @@
         "docs/domain/domain-model.md's `- A **Brief**` paragraph and the glossary's **design act** row each say the plugin offers /vloop:create-brief and /vloop:review-brief for the design act, and that the brief stays vloop's only input; invariant B-1 is unchanged. A wording that makes the design act vloop's, or makes vloop start these skills, is a violation."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

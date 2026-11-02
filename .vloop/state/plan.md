@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 4
+**Status:** running · **5/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:56:07Z
+**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T02:03:15Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Add the Go test that holds each plugin brief template to the binary's
 - [x] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
 - [x] **T4** — Add an eval case for each brief skill and update the evals README and guide
-- [ ] **T5** — Name the two brief skills in the README, the concepts guide and the domain pages
+- [x] **T5** — Name the two brief skills in the README, the concepts guide and the domain pages
 - [ ] **T6** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
@@ -113,7 +113,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Name the two brief skills in the README, the concepts guide and the domain pages
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 The documentation still describes six plugin skills and a design act wholly outside vloop. This task makes the README's and the concepts guide's Skills sections list all eight skills, the two new ones described as the operator's, interactive, like /vloop:operate; says in the session page that they are the operator's, not sessions; and says in the domain model that the plugin offers /vloop:create-brief and /vloop:review-brief for the design act while the brief stays vloop's only input (B-1 stands). It is a prose task: if it fails review twice on wording alone, block it and the operator finishes it.
 

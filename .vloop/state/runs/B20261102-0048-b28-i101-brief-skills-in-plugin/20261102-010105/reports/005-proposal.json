@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "README, concepts guide, session page and domain model now name all eight skills; /vloop:create-brief and /vloop:review-brief are described as the operator's, interactive, and the brief stays vloop's only input (B-1 unchanged).",
+  "files": ["README.md", "docs/guide/concepts.md", "docs/domain/execution/session.md", "docs/domain/domain-model.md", "internal/cli/readme_test.go"],
+  "verified": "vloop task gate T5 exited 0 and printed ok; go test ./internal/cli -run 'TestReadme|TestGuide' passed.",
+  "notes": "K4: TestReadmeNamesTheSkills list gained create-brief and review-brief only. The concepts Skills section lacked /vloop:verify, so a bullet for it was added to list all eight. Other internal/cli tests (TestTaskGate*) fail inside the work session with 'the plan was changed during this session'; that is the driver's guard, not related to this change."
+}

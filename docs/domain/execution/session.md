@@ -133,7 +133,9 @@ record is reported by the metrics, never silently skipped.
 ## Skills, as built
 
 `/vloop:plan`, `/vloop:gate-review`, `/vloop:work`, `/vloop:review` and `/vloop:verify` are the plugin's session skills,
-and `/vloop:operate` the operator's playbook (not a session). They write their
+and `/vloop:operate` the operator's playbook (not a session). `/vloop:create-brief`
+and `/vloop:review-brief` are likewise the operator's skills, used in an
+interactive session, not sessions. They write their
 prose in the repo's `language` (C-4).
 
 ## Gaps
