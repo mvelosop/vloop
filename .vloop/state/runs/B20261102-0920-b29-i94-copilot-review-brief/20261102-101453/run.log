@@ -18,3 +18,10 @@
    review T3 · 0m40s · $0.16 · run $1.87 / $40.00
    review: PASS
    T3 done
+── iteration 7 (4 this run) · T4 · 3/6 done ──
+   Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
+   work T4 · 2m43s · $0.32 · run $2.18 / $40.00
+   check go
+   review T4 · 0m29s · $0.13 · run $2.32 / $40.00
+   review: PASS
+   T4 done

@@ -107,8 +107,8 @@ func briefReviewPreflight(root string, cmd *cobra.Command) error {
 	if err != nil {
 		return Problem(err)
 	}
-	if agent != driver.AgentClaude {
-		return nil // the Copilot preflight is the Copilot adapter's task
+	if agent == driver.AgentCopilot {
+		return briefReviewCopilotPreflight(root, cmd)
 	}
 	errOut := cmd.ErrOrStderr()
 	bad := 0
@@ -123,5 +123,28 @@ func briefReviewPreflight(root string, cmd *cobra.Command) error {
 	if bad > 0 {
 		return Problem(fmt.Errorf("preflight failed — %d problem(s), nothing has run", bad))
 	}
+	return nil
+}
+
+// briefReviewCopilotPreflight refuses, in order: copilot missing, a project
+// skill with the name of a plugin skill, no GitHub login, the default model.
+// Nothing has run when it refuses; when it passes it gives the experimental
+// warning.
+func briefReviewCopilotPreflight(root string, cmd *cobra.Command) error {
+	const key = "agent.review-brief"
+	if _, problem := driver.AgentPreflight(driver.AgentCopilot); problem != "" {
+		fmt.Fprintf(cmd.ErrOrStderr(), "  ✗ copilot %s\n", problem)
+		return Problem(errors.New("preflight failed — 1 problem(s), nothing has run"))
+	}
+	if cl := skillClashes(root); len(cl) > 0 {
+		return Problem(fmt.Errorf("%s %s", cl[0].path, cl[0].message()))
+	}
+	if !copilotLoggedIn() {
+		return Problem(fmt.Errorf("%s is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login", key))
+	}
+	if m, err := config.Get(root, "model.review-brief"); err == nil && m.Source == config.SourceDefault {
+		return Problem(fmt.Errorf("%s is copilot but model.review-brief is the default %q, a Claude alias: set model.review-brief to a Copilot model id", key, m.Value))
+	}
+	fmt.Fprintf(cmd.ErrOrStderr(), "  ! %s %s\n", key, copilotExperimental)
 	return nil
 }

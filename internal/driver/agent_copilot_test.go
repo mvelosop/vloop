@@ -126,7 +126,7 @@ func TestCopilotSupportsWorkReviewAndVerify(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, ph := range []string{PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify, PhaseGateReview} {
+	for _, ph := range []string{PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify, PhaseGateReview, PhaseReviewBrief} {
 		if !a.Supports(ph) {
 			t.Errorf("copilot does not support %s", ph)
 		}
@@ -195,6 +195,8 @@ func TestCopilotVerifyRecordIsSessionV4(t *testing.T) {
 		{PhaseGateReview, "claude", "session/v3"},
 		{PhasePlan, AgentCopilot, "session/v4"},
 		{PhasePlan, "claude", "session/v3"},
+		{PhaseReviewBrief, AgentCopilot, "session/v5"},
+		{PhaseReviewBrief, "claude", "session/v5"},
 	} {
 		rec := r.record(Spec{Phase: c.phase, Model: "m"}, c.agent, "", time.Now(), time.Now(), Output{})
 		if rec["schema"] != c.want || rec["phase"] != c.phase || rec["agent"] != c.agent {
@@ -248,6 +250,29 @@ func TestCopilotPlanArgvAndHooks(t *testing.T) {
 	}
 	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
 	if err != nil || !strings.Contains(string(data), " fence hook --phase plan --root ") {
+		t.Errorf("hooks file %s: %v", data, err)
+	}
+}
+
+func TestCopilotReviewBriefArgvAndHooks(t *testing.T) {
+	root := t.TempDir()
+	a := copilotAdapter{}
+	p, err := a.Prepare(root, "9.9.9", PhaseReviewBrief)
+	if err != nil {
+		t.Fatal(err)
+	}
+	args := a.Command(Spec{Phase: PhaseReviewBrief, Arg: "docs/briefs/b.md", Model: "m1", Agent: AgentCopilot}, root, nil, p).Args[1:]
+	line := " " + strings.Join(args, " ") + " "
+	if !strings.Contains(line, "-p /vloop:review-brief docs/briefs/b.md ") {
+		t.Errorf("argv lacks the review-brief prompt: %v", args)
+	}
+	for _, d := range copilotDenials {
+		if !strings.Contains(line, " --deny-tool="+d+" ") {
+			t.Errorf("no denial %q", d)
+		}
+	}
+	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if err != nil || !strings.Contains(string(data), " fence hook --phase review-brief --root ") {
 		t.Errorf("hooks file %s: %v", data, err)
 	}
 }

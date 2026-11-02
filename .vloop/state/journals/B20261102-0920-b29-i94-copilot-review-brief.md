@@ -53,3 +53,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop brief review on Claude already existed from the earlier attempt; this attempt adds the missing committed test of the preflight refusals (claude not on PATH, folder untrusted, exit 1, no folder).
 - **Files:** internal/cli/brief_review_test.go
 - **Notes for next iteration:** Only TestBriefReviewPreflightRefusals was added (PATH and HOME set to empty temp dirs). Copilot is not handled here; T4 adds its adapter and preflight. R1: config list tests changed only to add the three keys.
+
+## T4 — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
+
+- **Outcome:** done (review: PASS)
+- **Summary:** agent.review-brief = copilot now runs the brief review through the Copilot adapter (Supports review-brief), with the command's Copilot preflight (missing copilot, clash, login, default model, experimental warning) and doctor's Copilot rows; vloop run ignores the key.
+- **Files:** internal/driver/agent_copilot.go, internal/driver/agent_copilot_test.go, internal/cli/brief_review.go, internal/cli/doctor.go, internal/cli/run.go, internal/cli/doctor_copilot_review_brief_test.go
+- **Notes for next iteration:** R3: TestCopilotSupportsWorkReviewAndVerify changed only to add review-brief. copilotKeys deliberately excludes agent.review-brief; doctor appends it via copilotReviewBriefKey, and runPreflight skips the copilot, copilot login and clash rows when copilotKeys is empty. TestTaskGate* in internal/cli fail when go test runs inside a loop session (plan-changed guard), unrelated.

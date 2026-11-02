@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 6
+**Status:** running · **4/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:41:10Z
+**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:48:20Z
 
 ## Progress
 
 - [x] **T1** — Add the brief-review/v1 report schema and the session/v5 record schema · 1 attempt(s)
 - [x] **T2** — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
 - [x] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict · 1 attempt(s)
-- [ ] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
+- [x] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
 - [ ] **T5** — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
 - [ ] **T6** — Close the run: every gate and the worked example on the final tree
 
@@ -90,7 +90,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 The point of the brief is that a model of another vendor can review a brief Claude wrote. This task lets agent.review-brief = copilot run the review-brief session through the Copilot adapter, fenced by the hook's review-brief phase (T2), with the command's Copilot preflight and doctor's rows, while vloop run keeps ignoring the key.
 

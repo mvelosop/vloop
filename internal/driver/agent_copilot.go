@@ -12,8 +12,8 @@ import (
 	vloop "github.com/mvelosop/vloop"
 )
 
-// AgentCopilot is the GitHub Copilot CLI, which can run plan, work, review, second-review, verify and
-// gate-review sessions only.
+// AgentCopilot is the GitHub Copilot CLI, which can run plan, work, review, second-review, verify,
+// gate-review and review-brief sessions only.
 const AgentCopilot = "copilot"
 
 // copilotDenials are the stems a copilot session may not run: Copilot's
@@ -71,7 +71,7 @@ type copilotAdapter struct {
 func (copilotAdapter) Name() string { return AgentCopilot }
 
 func (copilotAdapter) Supports(phase string) bool {
-	return phase == PhaseWork || phase == PhaseReview || phase == PhaseSecondReview || phase == PhaseVerify || phase == PhaseGateReview || phase == PhasePlan
+	return phase == PhaseWork || phase == PhaseReview || phase == PhaseSecondReview || phase == PhaseVerify || phase == PhaseGateReview || phase == PhasePlan || phase == PhaseReviewBrief
 }
 
 func (a copilotAdapter) command() string {

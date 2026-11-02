@@ -112,7 +112,7 @@ func runDoctor(b Build, root string) []doctorCheck {
 
 	if cerr == nil {
 		doctorSecondReview(root, add)
-		if keys := copilotKeys(root); len(keys) > 0 {
+		if keys := append(copilotKeys(root), copilotReviewBriefKey(root)...); len(keys) > 0 {
 			doctorCopilot(root, keys, add)
 		}
 	}
@@ -200,7 +200,7 @@ func doctorClaude(add func(name, result, msg string)) bool {
 }
 
 // copilotExperimental is the warning every place that chooses copilot for the
-// plan, work, review, gate-review or verify sessions gives.
+// plan, work, review, gate-review, verify or review-brief sessions gives.
 const copilotExperimental = "is copilot: experimental (docs/guide/configuration.md)"
 
 // copilotNoLogin says what is missing when no GitHub login reaches a Copilot
@@ -271,6 +271,16 @@ func copilotSecond(root string) bool {
 	return secondReviewMode(root) != "off" && err == nil && v.Value == driver.AgentCopilot
 }
 
+// copilotReviewBriefKey is agent.review-brief when it is copilot, else nothing.
+// The key belongs to vloop brief review and to doctor, not to vloop run, so
+// copilotKeys leaves it out.
+func copilotReviewBriefKey(root string) []string {
+	if v, err := config.Get(root, "agent.review-brief"); err == nil && v.Value == driver.AgentCopilot {
+		return []string{"agent.review-brief"}
+	}
+	return nil
+}
+
 // copilotKeys names the agent keys that choose copilot, for the plan session,
 // the work sessions, the gate review, the reviews and the verify session in use.
 func copilotKeys(root string) []string {
@@ -336,7 +346,7 @@ func skillClashes(root string) []skillClash {
 	return out
 }
 
-// doctorCopilot adds the checks of a copilot plan, work, gate-review, review or verify agent: copilot found and
+// doctorCopilot adds the checks of a copilot plan, work, gate-review, review, verify or review-brief agent: copilot found and
 // working, the experimental warning, and a warning for each project skill
 // whose name ends in review, which a copilot session may pick instead of
 // /vloop:review.
