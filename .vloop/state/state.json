@@ -5,9 +5,9 @@
   "base": "7a09ce6182ea6b80134ecc06e92ec3dbaeb7172e",
   "branch": "B20261102-0920-b29-i94-copilot-review-brief",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-02T09:52:00Z",
-  "updated": "2026-11-02T10:03:56Z",
+  "updated": "2026-11-02T10:08:55Z",
   "shell": "sh",
   "checks": [
     {
@@ -45,9 +45,9 @@
         "Committed Go tests cover both schemas with valid and invalid documents (in internal/schema or beside the existing schema tests); the schema lists pinned by internal/cli/schema_test.go and internal/schema/schema_test.go gain exactly brief-review/v1 and session/v5 and nothing else changes in them (the work notes name the contract item, R2). A schema shipped with no committed test is a violation."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261102-0920-b29-i94-copilot-review-brief/20261102-093342/checks/001-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T2",

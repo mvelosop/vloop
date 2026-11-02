@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 1
+**Status:** running · **1/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:03:56Z
+**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:08:55Z
 
 ## Progress
 
-- [ ] **T1** — Add the brief-review/v1 report schema and the session/v5 record schema · 1 attempt(s)
+- [x] **T1** — Add the brief-review/v1 report schema and the session/v5 record schema · 1 attempt(s)
 - [ ] **T2** — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
 - [ ] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
 - [ ] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
@@ -19,7 +19,7 @@
 
 ### T1 — Add the brief-review/v1 report schema and the session/v5 record schema
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 The brief review ends in a report the driver must validate before it prints or keeps it, and its session needs a record schema whose phase enum holds review-brief, because session/v4 is published and does not change. This task adds both schemas, embedded and listed by vloop schema, so the command (T3) and the skill (T5) have something to validate against.
 
@@ -30,8 +30,6 @@ The brief review ends in a report the driver must validate before it prints or k
 - schemas/session.v4.json is unchanged and still refuses a record with phase review-brief; no other existing schema changes.
 - `vloop schema validate` accepts every fixture in the gate's valid/ folder and refuses every one in invalid/ with exit 1.
 - Committed Go tests cover both schemas with valid and invalid documents (in internal/schema or beside the existing schema tests); the schema lists pinned by internal/cli/schema_test.go and internal/schema/schema_test.go gain exactly brief-review/v1 and session/v5 and nothing else changes in them (the work notes name the contract item, R2). A schema shipped with no committed test is a violation.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261102-0920-b29-i94-copilot-review-brief/20261102-093342/checks/001-go.fail.log
 
 <details><summary>verify command</summary>
 

@@ -1,27 +1,23 @@
---- FAIL: TestSchemasAreEmbedded (0.00s)
-    embed_test.go:19: embedded schemas: 25 entries, err <nil>
-FAIL
-FAIL	github.com/mvelosop/vloop	0.265s
+ok  	github.com/mvelosop/vloop	0.163s
 ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	213.720s
+ok  	github.com/mvelosop/vloop/cmd/vloop	213.093s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	85.656s
-ok  	github.com/mvelosop/vloop/internal/closing	0.275s
+ok  	github.com/mvelosop/vloop/internal/cli	89.592s
+ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
 ok  	github.com/mvelosop/vloop/internal/detect	(cached)
-ok  	github.com/mvelosop/vloop/internal/driver	7.867s
+ok  	github.com/mvelosop/vloop/internal/driver	(cached)
 ok  	github.com/mvelosop/vloop/internal/fence	(cached)
 ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
 ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
 ok  	github.com/mvelosop/vloop/internal/install	(cached)
-ok  	github.com/mvelosop/vloop/internal/intervention	0.267s
+ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
 ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
 ok  	github.com/mvelosop/vloop/internal/runs	(cached)
-ok  	github.com/mvelosop/vloop/internal/schema	0.186s
-ok  	github.com/mvelosop/vloop/internal/state	1.392s
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/state	(cached)
 ok  	github.com/mvelosop/vloop/tools/release	(cached)
-FAIL
