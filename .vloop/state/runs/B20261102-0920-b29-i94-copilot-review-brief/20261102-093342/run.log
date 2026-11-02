@@ -11,3 +11,8 @@ planned: B20261102-0920-b29-i94-copilot-review-brief — 6 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 2m48s · $0.63 · run $5.99 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/6 done ──
+   Add the brief-review/v1 report schema and the session/v5 record schema
+   work T1 · 4m46s · $0.21 · run $6.20 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261102-0920-b29-i94-copilot-review-brief/20261102-093342/checks/001-go.fail.log; review skipped

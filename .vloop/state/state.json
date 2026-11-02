@@ -5,9 +5,9 @@
   "base": "7a09ce6182ea6b80134ecc06e92ec3dbaeb7172e",
   "branch": "B20261102-0920-b29-i94-copilot-review-brief",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-02T09:52:00Z",
-  "updated": "2026-11-02T09:55:33Z",
+  "updated": "2026-11-02T10:03:56Z",
   "shell": "sh",
   "checks": [
     {
@@ -46,8 +46,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261102-0920-b29-i94-copilot-review-brief/20261102-093342/checks/001-go.fail.log"
     },
     {
       "id": "T2",

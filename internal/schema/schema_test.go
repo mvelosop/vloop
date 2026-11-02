@@ -66,7 +66,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"defect/v1", "export/v1", "gate-verdict/v1", "gate-verdict/v2", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "iteration/v3", "metrics/v1", "metrics/v2", "metrics/v3", "metrics/v4", "proposal/v1", "session/v1", "session/v2", "session/v3", "session/v4", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
+	want := []string{"brief-review/v1", "defect/v1", "export/v1", "gate-verdict/v1", "gate-verdict/v2", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "iteration/v3", "metrics/v1", "metrics/v2", "metrics/v3", "metrics/v4", "proposal/v1", "session/v1", "session/v2", "session/v3", "session/v4", "session/v5", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}
@@ -164,5 +164,56 @@ func TestInstallModuleIsOptionalString(t *testing.T) {
 	notString := strings.Replace(valid, `"commit":"abc1234",`, `"commit":"abc1234","module":5,`, 1)
 	if vs, _ := Validate("install/v1", []byte(notString)); len(vs) == 0 {
 		t.Error("a module that is not a string was accepted")
+	}
+}
+
+// The B29 schemas: brief-review/v1 and session/v5 are checked against the same fixtures as the gate.
+func TestBriefReviewAndSession5(t *testing.T) {
+	brief := func(extra string) string {
+		return `{"schema":"brief-review/v1","brief":"b","verdict":"PASS","findings":[]` + extra + `}`
+	}
+	finding := `{"kind":"fact","section":"S","summary":"x"}`
+	cases := []struct {
+		name, schema, doc string
+		ok                bool
+	}{
+		{"pass empty", "brief-review/v1", brief(""), true},
+		{"pass with finding", "brief-review/v1", strings.Replace(brief(""), `[]`, `[`+finding+`]`, 1), true},
+		{"fix full", "brief-review/v1", `{"schema":"brief-review/v1","brief":"b","verdict":"FIX","findings":[{"kind":"decision","section":"S","summary":"x","evidence":"e","fix":"f"}],"decisions":["d"],"checked":"c","header":"h"}`, true},
+		{"fix empty", "brief-review/v1", strings.Replace(brief(""), "PASS", "FIX", 1), false},
+		{"ask empty", "brief-review/v1", strings.Replace(brief(""), "PASS", "ASK", 1), false},
+		{"verdict ok", "brief-review/v1", strings.Replace(brief(""), "PASS", "OK", 1), false},
+		{"extra key", "brief-review/v1", brief(`,"extra":1`), false},
+		{"bad kind", "brief-review/v1", strings.Replace(brief(""), `[]`, `[{"kind":"style","section":"S","summary":"x"}]`, 1), false},
+		{"empty section", "brief-review/v1", strings.Replace(brief(""), `[]`, `[{"kind":"fact","section":"","summary":"x"}]`, 1), false},
+		{"empty summary", "brief-review/v1", strings.Replace(brief(""), `[]`, `[{"kind":"fact","section":"S","summary":""}]`, 1), false},
+		{"decisions number", "brief-review/v1", brief(`,"decisions":[1]`), false},
+		{"no brief", "brief-review/v1", `{"schema":"brief-review/v1","verdict":"PASS","findings":[]}`, false},
+	}
+	sess := func(phase, extra string) string {
+		return `{"schema":"session/v5","run_id":"r","iteration":0,"phase":"` + phase + `","agent":"claude","model":"opus","effort":null,"models_used":{},"started":"2099-01-01T00:00:00Z","ended":"2099-01-01T00:01:00Z","duration_ms":1,"wall_ms":1,"cost_usd":0,"cost_source":"reported","turns":1,"is_error":false,"permission_denials":[]` + extra + `}`
+	}
+	cases = append(cases, []struct {
+		name, schema, doc string
+		ok                bool
+	}{
+		{"v5 review-brief", "session/v5", sess("review-brief", ""), true},
+		{"v5 review-brief with task", "session/v5", sess("review-brief", `,"task":"T1"`), false},
+		{"v5 work with task", "session/v5", sess("work", `,"task":"T1"`), true},
+		{"v5 work without task", "session/v5", sess("work", ""), false},
+		{"v5 bad phase", "session/v5", sess("deploy", ""), false},
+		{"v5 claude estimated", "session/v5", strings.Replace(sess("plan", ""), `"reported"`, `"estimated"`, 1), false},
+		{"v4 refuses review-brief", "session/v4", strings.Replace(sess("review-brief", ""), "session/v5", "session/v4", 1), false},
+	}...)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			vs, err := Validate(c.schema, []byte(c.doc))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if (len(vs) == 0) != c.ok {
+				t.Fatalf("violations = %+v, want ok=%v", vs, c.ok)
+			}
+		})
 	}
 }
