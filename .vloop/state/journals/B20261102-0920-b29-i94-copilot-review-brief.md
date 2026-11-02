@@ -32,3 +32,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261102-0920-b29-i94-copilot-review-brief` · 3 iteration(s) this run
 - **Plan:** 1/6 done, 1 blocked
+
+## T2 — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The review-brief phase, fence/review-brief.json and the nested-review deny rule in every fence already exist from the earlier attempt (committed); the operator's amended gate now passes.
+- **Files:** fence/review-brief.json, fence/plan.json, fence/work.json, fence/review.json, fence/gate-review.json, fence/verify.json, internal/fence/judge.go, internal/fence/judge_test.go, internal/fence/review_brief_test.go, internal/cli/fence.go, internal/cli/fence_test.go, internal/cli/fence_hook_test.go, docs/guide/commands.md, embed.go
+- **Notes for next iteration:** No new edits this attempt; re-verified. R3: TestUnknownPhase-equivalent and TestFenceHookFailsClosed changed only their expected unknown-phase message; fencePhases and the write table in internal/cli/fence_test.go gained review-brief with gate-review's expectations.

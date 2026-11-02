@@ -87,9 +87,9 @@ grep -qxF 'vloop: unknown phase "deploy": want review, second-review, work, veri
 denyx gate-review skill "skill vloop-review-brief is not vloop's — use /vloop:gate-review" --path vloop-review-brief
 
 # Every phase denies a nested brief review through its own fence.
-for ph in plan:plan review:review second-review:review verify:verify gate-review:gate-review work:work review-brief:review-brief; do
-  denyx "${ph%%:*}" bash "vloop brief review x.loop-brief.md is denied by the ${ph#*:} fence (Bash(vloop brief review:*))" 'vloop brief review x.loop-brief.md'
-  denyx "${ph%%:*}" bash "vloop brief review $B is denied by the ${ph#*:} fence (Bash(vloop brief review:*))" "env vloop brief review $B"
+for pf in plan:plan review:review second-review:review verify:verify gate-review:gate-review work:work review-brief:review-brief; do
+  denyx "${pf%%:*}" bash "vloop brief review x.loop-brief.md is denied by the ${pf#*:} fence (Bash(vloop brief review:*))" 'vloop brief review x.loop-brief.md'
+  denyx "${pf%%:*}" bash "vloop brief review $B is denied by the ${pf#*:} fence (Bash(vloop brief review:*))" "env vloop brief review $B"
 done
 
 # review-brief beyond the example: decided as gate-review, with its own name.

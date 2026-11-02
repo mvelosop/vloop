@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **1/6 done** · iteration 3
+**Status:** running · **2/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:11:30Z
+**Brief:** `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` · **Updated:** 2026-11-02T10:20:39Z
 
 ## Progress
 
 - [x] **T1** — Add the brief-review/v1 report schema and the session/v5 record schema · 1 attempt(s)
-- [ ] **T2** — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence · **blocked**
+- [x] **T2** — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
 - [ ] **T3** — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
 - [ ] **T4** — Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
 - [ ] **T5** — Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
@@ -41,7 +41,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
 
-`blocked` · **blocked** · depends on: none
+`done` · depends on: none
 
 A review-brief session must be fenced like a review session: it reads anything and writes only under .vloop/tmp/, and no session of any phase may start a nested brief review, since the command starts an agent and writes under .vloop/state/ (S-4). This task gives vloop fence check and vloop fence hook the review-brief phase (which the Copilot adapter of T4 and the Claude fence of T3 both rely on), creates fence/review-brief.json and adds Bash(vloop brief review:*) to every fence.
 
@@ -54,8 +54,6 @@ A review-brief session must be fenced like a review session: it reads anything a
 - `vloop fence check --help` and `vloop fence hook --help` name review-brief in the usage line, the --phase flag and the long help; docs/guide/commands.md is regenerated in this task so TestCommandsReferenceIsCurrent stays green in the go check.
 - The other phases decide and word every call as before, bar the unknown-phase message and the one new deny rule (unchanged: `vloop fence check --phase gate-review --root . --tool skill --path vloop-review-brief` → `deny: skill vloop-review-brief is not vloop's — use /vloop:gate-review`, exit 1). TestUnknownPhase and TestFenceHookFailsClosed change only their expected message (their unknown names stay); fencePhases and the write table of internal/cli/fence_test.go gain review-brief with the gate-review row's expectations; the work notes name the contract item (R3).
 - Committed Go tests cover the review-brief phase in internal/fence (every line of the worked example's table, the write rule, the skill hint, the nested-review denial in every phase and the unknown-phase message) and the hook's review-brief phase; a phase that leaves no committed test behind is a violation. No Claude session's argv or settings change other than through the fence files themselves.
-
-**From the last attempt:** gate disputed: The gate's nested-review loop reuses the variable ph, which denyx overwrites, so the second assertion per phase expects the phase name as the fence name; for second-review it demands 'second-review fence', contradicting acceptance 2 (second-review through the review fence). — gate.sh: `denyx` does `ph=$1`; the loop's second denyx uses ${ph#*:} after that, giving 'second-review'. Output: want '...denied by the second-review fence (Bash(vloop brief review:*))', got '...denied by the review fence...'; the first assertion for second-review (loop-correct) passes.
 
 <details><summary>verify command</summary>
 

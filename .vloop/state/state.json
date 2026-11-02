@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md",
   "base": "7a09ce6182ea6b80134ecc06e92ec3dbaeb7172e",
   "branch": "B20261102-0920-b29-i94-copilot-review-brief",
-  "status": "blocked",
-  "iteration": 3,
+  "status": "running",
+  "iteration": 4,
   "created": "2026-11-02T09:52:00Z",
-  "updated": "2026-11-02T10:11:30Z",
+  "updated": "2026-11-02T10:20:39Z",
   "shell": "sh",
   "checks": [
     {
@@ -54,7 +54,7 @@
       "title": "Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence",
       "goal": "A review-brief session must be fenced like a review session: it reads anything and writes only under .vloop/tmp/, and no session of any phase may start a nested brief review, since the command starts an agent and writes under .vloop/state/ (S-4). This task gives vloop fence check and vloop fence hook the review-brief phase (which the Copilot adapter of T4 and the Claude fence of T3 both rely on), creates fence/review-brief.json and adds Bash(vloop brief review:*) to every fence.",
       "kind": "feature",
-      "fixtures": "557e072dd9e5718c2d08bb2ed8ff60a1a1c76e1e5984ffa2b92fb10138d04032",
+      "fixtures": "3c93ec59c9cf8becd2d489a785d7ffb4ecc17549ecd440ea93185a8ae75bf605",
       "references": [
         {
           "path": "internal/fence/judge.go",
@@ -88,9 +88,18 @@
         "Committed Go tests cover the review-brief phase in internal/fence (every line of the worked example's table, the write rule, the skill hint, the nested-review denial in every phase and the unknown-phase message) and the hook's review-brief phase; a phase that leaves no committed test behind is a violation. No Claude session's argv or settings change other than through the fence files themselves."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "blocked",
+      "status": "done",
       "attempts": 0,
-      "notes": "gate disputed: The gate's nested-review loop reuses the variable ph, which denyx overwrites, so the second assertion per phase expects the phase name as the fence name; for second-review it demands 'second-review fence', contradicting acceptance 2 (second-review through the review fence). — gate.sh: `denyx` does `ph=$1`; the loop's second denyx uses ${ph#*:} after that, giving 'second-review'. Output: want '...denied by the second-review fence (Bash(vloop brief review:*))', got '...denied by the review fence...'; the first assertion for second-review (loop-correct) passes."
+      "notes": "",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T2/gate.sh",
+          "replaced_at": "2026-11-02T10:14:32Z",
+          "reason": "the gate's nested-review loop reused ph, which denyx overwrites, so for second-review it demanded 'second-review fence' against the acceptance's review fence; the loop variable renamed to pf, every assertion unchanged (approved by the operator 2026-11-02)",
+          "by": "operator",
+          "fixtures": "557e072dd9e5718c2d08bb2ed8ff60a1a1c76e1e5984ffa2b92fb10138d04032"
+        }
+      ]
     },
     {
       "id": "T3",

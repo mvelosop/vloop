@@ -1,0 +1,7 @@
+── iteration 4 (1 this run) · T2 · 1/6 done ──
+   Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
+   work T2 · 1m34s · $0.14 · run $0.14 / $40.00
+   check go
+   review T2 · 0m31s · $0.14 · run $0.28 / $40.00
+   review: PASS
+   T2 done
