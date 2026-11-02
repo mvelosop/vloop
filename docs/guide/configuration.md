@@ -24,18 +24,21 @@ environment and in `config set`.
 | `model.second-review` | `sonnet` | any model name | `VLOOP_MODEL_SECOND_REVIEW` | model of the second review session |
 | `model.gate-review` | `sonnet` | any model name | `VLOOP_MODEL_GATE_REVIEW` | model of the gate-review session |
 | `model.verify` | `sonnet` | any model name | `VLOOP_MODEL_VERIFY` | model of the verify session |
+| `model.review-brief` | `opus` | any model name | `VLOOP_MODEL_REVIEW_BRIEF` | model of the session `vloop brief review` runs |
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` | effort of the plan session |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` | effort of the work sessions |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` | effort of the review sessions |
 | `effort.second-review` | unset | same | `VLOOP_EFFORT_SECOND_REVIEW` | effort of the second review session |
 | `effort.gate-review` | unset | same | `VLOOP_EFFORT_GATE_REVIEW` | effort of the gate-review session |
 | `effort.verify` | unset | same | `VLOOP_EFFORT_VERIFY` | effort of the verify session |
+| `effort.review-brief` | unset | same | `VLOOP_EFFORT_REVIEW_BRIEF` | effort of the session `vloop brief review` runs |
 | `agent.plan` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_PLAN` | agent CLI of the plan session (`copilot` is experimental) |
 | `agent.work` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_WORK` | agent CLI of the work sessions (`copilot` is experimental) |
 | `agent.review` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_REVIEW` | agent CLI of the review sessions (`copilot` is experimental) |
 | `agent.second-review` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_SECOND_REVIEW` | agent CLI of the second review session (`copilot` is experimental) |
 | `agent.gate-review` | `claude` | `claude`, `copilot` (experimental) | `VLOOP_AGENT_GATE_REVIEW` | agent CLI of the gate-review session |
 | `agent.verify` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_VERIFY` | agent CLI of the verify session (`copilot` is experimental) |
+| `agent.review-brief` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_REVIEW_BRIEF` | agent CLI of the session `vloop brief review` runs |
 | `copilot.credit-usd` | `0.0066667` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot credit, for the estimated cost of a copilot session |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
@@ -59,6 +62,8 @@ environment and in `config set`.
 | `run.keep-awake` | `on` | `on` or `off` | `VLOOP_RUN_KEEP_AWAKE`  | `on` holds a no-idle-sleep hold for the lifetime of `vloop run` (macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`); `off` takes none |
 
 **Copilot plan, work, review, verify and gate-review sessions are experimental.** `agent.plan = "copilot"` runs the plan session, `agent.work = "copilot"` runs the work sessions, and `agent.review = "copilot"` (or `agent.second-review`) the review sessions, and `agent.verify = "copilot"` the verify session, and `agent.gate-review = "copilot"` the gate-review session, on the GitHub Copilot CLI. Every Copilot session runs under the fence hook, and the adapter's deny list is also on its command line. `vloop doctor` and `vloop run` warn `! agent.review is copilot: experimental (docs/guide/configuration.md)` (and `! agent.plan is copilot: experimental (docs/guide/configuration.md)` for the plan session, the same for `agent.work`, `agent.gate-review`, `agent.second-review` and `agent.verify`, the last only while `run.verify` is not `false`; `agent.plan` and `agent.gate-review` have no switch, so they warn whenever they are `copilot`, also on a resume that will not plan), check that `copilot` is on PATH and that `copilot --version` runs, and that a GitHub login reaches Copilot sessions (a Copilot session logs in through `COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, set and not empty, else `gh auth token`: run `gh auth login`; an interactive `/login` does not reach vloop's sessions; the token is never printed or kept). `vloop run` refuses to start while `model.work` (or `model.plan`, `model.gate-review`, `model.review`, `model.second-review` or `model.verify`, when that agent is in use) is still the default (`sonnet`; for `model.plan`, `opus`), a Claude alias: `agent.work is copilot but model.work is the default "sonnet", a Claude alias: set model.work to a Copilot model id` (`agent.verify is copilot but model.verify is the default "sonnet", a Claude alias: set model.verify to a Copilot model id` for the verify session; `agent.gate-review is copilot but model.gate-review is the default "sonnet", a Claude alias: set model.gate-review to a Copilot model id` for the gate-review session; `agent.plan is copilot but model.plan is the default "opus", a Claude alias: set model.plan to a Copilot model id` for the plan session). A plan session that exits non-zero halts with `planning session failed (copilot exited <code>) — see <run folder>`.
+
+**`agent.review-brief = "copilot"` is experimental too, and is read by `vloop brief review`, not by `vloop run`.** `vloop brief review <brief>` warns `! agent.review-brief is copilot: experimental (docs/guide/configuration.md)` and refuses, with nothing run, when `copilot` is not on PATH, when a project skill has the name of a plugin skill, when no GitHub login reaches Copilot (`agent.review-brief is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login`) and while `model.review-brief` is still the default (`agent.review-brief is copilot but model.review-brief is the default "opus", a Claude alias: set model.review-brief to a Copilot model id`). `vloop run` ignores the key.
 
 ### The fence hook
 

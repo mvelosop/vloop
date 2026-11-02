@@ -143,11 +143,13 @@ docs/briefs/<name>.md                     the briefs
 .vloop/state/journals/<run id>.md         the journal
 .vloop/state/runs/<run id>/<folder>/      sessions/, iterations.jsonl, reports/, run.log
 .vloop/state/metrics/<run id>.json        the snapshot, written by close
+.vloop/state/brief-reviews/<run id>/<folder>/  a brief review's report and session record, written by vloop brief review
 .vloop/defects/<id>.md                    recorded defects
 .vloop/interventions/<id>.md              recorded interventions (data)
 .vloop/tmp/proposal.json                  the work session's report, read back by the driver
 .vloop/tmp/verdict.json                   the review session's verdict, read back by the driver
 .vloop/tmp/verify.json                    the verify session's findings report, kept by the driver as reports/verify.json
+.vloop/tmp/brief-review.json            the review-brief session's report, kept by vloop brief review
 .vloop/tmp/checks.json                    the checks that ran this iteration, handed to the review session
 .vloop/tmp/gate-verdict.json               the gate review session's verdict, read back by the driver
 .vloop/tmp/plan-problems.md                what the plan session must revise, written by the driver

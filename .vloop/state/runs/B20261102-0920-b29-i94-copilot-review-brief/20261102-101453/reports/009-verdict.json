@@ -1,0 +1,6 @@
+{"schema":"verdict/v1","task":"T6","verdict":"PASS","criteria":[
+{"criterion":"Every gate T1–T5 passes on the final tree.","met":true,"evidence":"gates/T6.log shows gate T1..T5: ok; gate.sh runs each T1–T5 gate in order"},
+{"criterion":"Every line of the brief's worked example holds against the built binary: the stub Claude FIX and PASS runs (output, exit, record, argv, fence), the stub Copilot run (warning, model line, record, deny list, hooks file), every planted failure, the review-brief fence-check table, the work line, the changed unknown-phase line and the unchanged gate-review line.","met":true,"evidence":"T6 gate delegates to the T2–T4 gates that cover those lines; all passed in the log. I did not re-read the sub-gates line by line."},
+{"criterion":"The go check passes on the final tree.","met":true,"evidence":"checks.json go exit 0; the go.log tail shows all packages ok"}],
+"findings":[],
+"notes":"No product files changed, as expected for a closing task. The go.log tests show '(cached)'. The proposal says VLOOP_PLAN_SHA256 makes TestTaskGate* fail inside a session, which is a vloop issue, not this brief's."}

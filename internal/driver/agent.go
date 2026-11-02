@@ -107,7 +107,7 @@ func (claudeAdapter) Name() string { return AgentClaude }
 
 func (claudeAdapter) Supports(phase string) bool {
 	switch phase {
-	case PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseGateReview, PhaseVerify:
+	case PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseGateReview, PhaseVerify, PhaseReviewBrief:
 		return true
 	}
 	return false

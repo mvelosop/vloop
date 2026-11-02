@@ -1,42 +1,34 @@
-# T5 (K4): the README, the concepts guide and the domain pages name the two
-# brief skills, by the text of the sections the brief names.
-G=.vloop/state/gates/T5
-. "$G/lib.sh"
-cd "$top" || fail cd
-
-# section <file> <heading line> : the lines after the heading, up to the next
-# heading of the same or a higher level.
-section() {
-  awk -v h="$2" '
-    $0 == h { on = 1; lvl = index(h, " "); next }
-    on && /^#+ / { if (index($0, " ") <= lvl) exit }
-    on { print }
-  ' "$1"
-}
-names() {
-  for s in $3; do
-    printf '%s\n' "$2" | grep -qF "/vloop:$s" || fail "$1 does not name /vloop:$s"
-  done
-}
-ALL="plan gate-review work review verify operate create-brief review-brief"
-
-s=$(section README.md '### Skills')
-[ -n "$s" ] || fail "README.md has no ### Skills section"
-names "README.md's Skills section" "$s" "$ALL"
-
-s=$(section docs/guide/concepts.md '## Skills')
-[ -n "$s" ] || fail "docs/guide/concepts.md has no ## Skills section"
-names "docs/guide/concepts.md's Skills section" "$s" "$ALL"
-
-s=$(section docs/domain/execution/session.md '## Skills, as built')
-[ -n "$s" ] || fail "docs/domain/execution/session.md has no ## Skills, as built section"
-names "session.md's Skills, as built" "$s" "create-brief review-brief"
-
-D=docs/domain/domain-model.md
-s=$(awk '/^- A \*\*Brief\*\*/ { on = 1; print; next } on && (/^- / || /^$/ || /^#/) { exit } on { print }' "$D")
-[ -n "$s" ] || fail "$D has no '- A **Brief**' paragraph"
-names "$D's Brief paragraph" "$s" "create-brief review-brief"
-s=$(grep -E '^\| \*\*design act\*\* \|' "$D")
-[ -n "$s" ] || fail "$D's glossary has no **design act** row"
-names "$D's glossary row for the design act" "$s" "create-brief review-brief"
-echo "T5 gate: ok"
+#!/bin/sh
+# Gate T5 — R4: the skills and the docs say what the new session is. Prose is
+# the review's to judge; this gate only holds the surfaces the brief names to
+# the facts they must carry: /vloop:create-brief asks for the review with
+# `vloop brief review`; /vloop:review-brief writes and validates its
+# brief-review/v1 report at .vloop/tmp/brief-review.json; the fence audit has
+# a part for the review-brief session and a row for the new deny rule in each
+# fence's part; the session kinds, the on-disk layout and the configuration
+# guide's Copilot section name the command, the folder and the report. The
+# skill's validate command is one the review-brief fence allows.
+set -u
+fail() { echo "GATE FAIL: $*" >&2; exit 1; }
+for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
+export LC_ALL=C GOTOOLCHAIN=local
+top=$(pwd -P)
+# has <file> <fixed text> <what>
+has() { grep -qF -- "$2" "$top/$1" || fail "$1 does not $3 ('$2')"; }
+has plugin/skills/create-brief/SKILL.md 'vloop brief review' 'ask for the independent review with vloop brief review'
+has plugin/skills/review-brief/SKILL.md '.vloop/tmp/brief-review.json' 'write its report to .vloop/tmp/brief-review.json'
+has plugin/skills/review-brief/SKILL.md 'vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json' 'validate its report'
+grep -qE '^#+ .*review-brief' "$top/docs/design-notes/fence-audit.md" || fail "docs/design-notes/fence-audit.md has no part for the review-brief session (a heading naming review-brief)"
+n=$(grep -cF 'vloop brief review:*' "$top/docs/design-notes/fence-audit.md")
+[ "$n" -ge 6 ] || fail "docs/design-notes/fence-audit.md names Bash(vloop brief review:*) on $n line(s); want a row in each of the six fences' parts"
+has docs/domain/execution/session.md 'vloop brief review' 'say the review-brief session is started by vloop brief review'
+has docs/domain/domain-model.md 'brief-reviews/' 'give the on-disk layout .vloop/state/brief-reviews/'
+has docs/domain/domain-model.md '.vloop/tmp/brief-review.json' 'give the on-disk layout .vloop/tmp/brief-review.json'
+has docs/guide/configuration.md 'vloop brief review' 'say, in its Copilot section, that vloop brief review warns and refuses for agent.review-brief'
+t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
+trap 'rm -rf "$t"' EXIT
+go build -buildvcs=false -o "$t/vloop" ./cmd/vloop || fail "go build of this tree"
+mkdir -p "$t/r" && cd "$t/r" || fail mkdir
+out=$(env -i PATH=/usr/bin:/bin HOME="$t" LC_ALL=C "$t/vloop" fence check --phase review-brief --root . --tool bash 'vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json' 2>&1)
+[ "$out" = allow ] || fail "the review-brief fence does not allow the skill's validate command: $out"
+echo "gate T5: ok"

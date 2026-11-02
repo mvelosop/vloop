@@ -182,8 +182,10 @@ func runBriefPath(g *Globals, root, arg string) (string, error) {
 func runPreflight(b Build, root string, cmd *cobra.Command) error {
 	errOut := cmd.ErrOrStderr()
 	bad := 0
+	runKeys := len(copilotKeys(root)) > 0
 	for _, c := range runDoctor(b, root) {
 		switch {
+		case !runKeys && (c.Name == "copilot" || c.Name == "copilot login" || strings.HasPrefix(c.Message, "has the name of vloop's ")): // only agent.review-brief is copilot, which vloop run ignores
 		case c.Name == "branch", c.Name == "gate scratch", c.Name == "checks": // the planner refuses these itself, in its own words
 		case c.Name == "copilot login": // refused below, in its own words
 		case c.Result == resProblem && strings.HasPrefix(c.Message, "has the name of vloop's "): // refused below, in its own words

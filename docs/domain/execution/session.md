@@ -10,7 +10,7 @@ agent-specific (preflight, the phases it supports, the command and
 environment, whether stdout is a record, its mapping onto the record) is the
 agent's adapter's; claude and copilot are the adapters; copilot runs every session kind: plan, work, review, second-review, verify and gate-review. *Part of [execution](execution-context.md).*
 
-## The six kinds
+## The seven kinds
 
 | Kind | Invoked with | Reads | Writes |
 | --- | --- | --- | --- |
@@ -20,6 +20,16 @@ agent's adapter's; claude and copilot are the adapters; copilot runs every sessi
 | **second-review** | one task id | what the review reads, never the primary's verdict | a **verdict**, kept apart from the primary's |
 | **gate-review** | none | the brief, the plan, the gates, their logs on the base | a **gate verdict** |
 | **verify** | none | the brief, the plan's base diff and a fresh build of the result | a **verify report** (`.vloop/tmp/verify.json`) |
+| **review-brief** | one brief path | the brief, `CLAUDE.md`, the code it makes claims about | a **brief review** (`.vloop/tmp/brief-review.json`, `brief-review/v1`) |
+
+A **review-brief** session is started by `vloop brief review <brief>`, not by
+`vloop run`: it runs `/vloop:review-brief` once on one brief of any status, on
+the agent `agent.review-brief` names, under the review-brief fence
+(`fence/review-brief.json`; writes only under `.vloop/tmp/`). The command keeps the validated report and the session's record under
+`.vloop/state/brief-reviews/<run id>/<folder>/` (the run id is the brief's) and exits by the verdict (0
+`PASS`; 1 `FIX` or `ASK`; 7 no valid report). Its record is `session/v5`, phase
+`review-brief`, with no task. The brief is never changed: a session that edits it
+halts the command (exit 9) and the brief is restored.
 
 A **second-review** session is a review session of phase `second-review`, run
 only when `run.second-review` is not `off`, by its own agent and model

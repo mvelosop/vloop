@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "vloop brief review on Claude already existed from the earlier attempt; this attempt adds the missing committed test of the preflight refusals (claude not on PATH, folder untrusted, exit 1, no folder).",
+  "files": ["internal/cli/brief_review_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; go test ./internal/cli -run BriefReview passes; gofmt and go vet clean.",
+  "notes": "Only TestBriefReviewPreflightRefusals was added (PATH and HOME set to empty temp dirs). Copilot is not handled here; T4 adds its adapter and preflight. R1: config list tests changed only to add the three keys."
+}

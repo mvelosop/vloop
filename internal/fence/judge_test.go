@@ -254,7 +254,7 @@ func TestApplyPatch(t *testing.T) {
 // W1, V1: the work and verify phases are served; any other name is not.
 func TestUnknownPhase(t *testing.T) {
 	_, err := New("deploy", t.TempDir(), "")
-	if err == nil || err.Error() != `unknown phase "deploy": want review, second-review, work, verify, gate-review or plan` {
+	if err == nil || err.Error() != `unknown phase "deploy": want review, second-review, work, verify, gate-review, plan or review-brief` {
 		t.Errorf("New(deploy) error = %v", err)
 	}
 }

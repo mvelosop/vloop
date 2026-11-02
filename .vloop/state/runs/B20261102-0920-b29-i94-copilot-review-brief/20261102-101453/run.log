@@ -1,0 +1,49 @@
+── iteration 4 (1 this run) · T2 · 1/6 done ──
+   Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
+   work T2 · 1m34s · $0.14 · run $0.14 / $40.00
+   check go
+   review T2 · 0m31s · $0.14 · run $0.28 / $40.00
+   review: PASS
+   T2 done
+── iteration 5 (2 this run) · T3 · 2/6 done ──
+   Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
+   work T3 · 9m50s · $1.01 · run $1.28 / $40.00
+   check go
+   review T3 · 0m44s · $0.21 · run $1.49 / $40.00
+   review: FAIL
+── iteration 6 (3 this run) · T3 · 2/6 done ──
+   Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
+   work T3 · 1m39s · $0.21 · run $1.70 / $40.00
+   check go
+   review T3 · 0m40s · $0.16 · run $1.87 / $40.00
+   review: PASS
+   T3 done
+── iteration 7 (4 this run) · T4 · 3/6 done ──
+   Run the brief review on Copilot: the adapter's review-brief phase, the command's Copilot preflight, doctor
+   work T4 · 2m43s · $0.32 · run $2.18 / $40.00
+   check go
+   review T4 · 0m29s · $0.13 · run $2.32 / $40.00
+   review: PASS
+   T4 done
+── iteration 8 (5 this run) · T5 · 4/6 done ──
+   Update the brief skills, the review-brief word ceiling and the docs for the review-brief session
+   work T5 · 5m33s · $0.40 · run $2.71 / $40.00
+   check go
+   review T5 · 0m39s · $0.15 · run $2.87 / $40.00
+   review: PASS
+   T5 done
+── iteration 9 (6 this run) · T6 · 5/6 done ──
+   Close the run: every gate and the worked example on the final tree
+   work T6 · 6m57s · $0.10 · run $2.96 / $40.00
+   check go
+   review T6 · 0m20s · $0.07 · run $3.04 / $40.00
+   review: PASS
+   T6 done
+   check go
+   verify · 0m56s · $0.15 · run $3.19 / $40.00
+vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand
+
+═══ complete ═══
+run:    B20261102-0920-b29-i94-copilot-review-brief/20261102-101453  (6 iteration(s) this run)
+plan:   6/6 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261102-0920-b29-i94-copilot-review-brief.md

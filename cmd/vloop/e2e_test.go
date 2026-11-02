@@ -140,9 +140,9 @@ func TestWorkedExampleEnglishSession(t *testing.T) {
 	}
 
 	expect(t, s.run(nil, "config", "list"), 0,
-		"language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\nmodel.second-review=sonnet (default)\nmodel.gate-review=sonnet (default)\nmodel.verify=sonnet (default)\n"+
-			"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\neffort.second-review= (default)\neffort.gate-review= (default)\neffort.verify= (default)\n"+
-			"agent.plan=claude (default)\nagent.work=claude (default)\nagent.review=claude (default)\nagent.second-review=claude (default)\nagent.gate-review=claude (default)\nagent.verify=claude (default)\ncopilot.credit-usd=0.0066667 (default)\n"+
+		"language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\nmodel.second-review=sonnet (default)\nmodel.gate-review=sonnet (default)\nmodel.verify=sonnet (default)\nmodel.review-brief=opus (default)\n"+
+			"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\neffort.second-review= (default)\neffort.gate-review= (default)\neffort.verify= (default)\neffort.review-brief= (default)\n"+
+			"agent.plan=claude (default)\nagent.work=claude (default)\nagent.review=claude (default)\nagent.second-review=claude (default)\nagent.gate-review=claude (default)\nagent.verify=claude (default)\nagent.review-brief=claude (default)\ncopilot.credit-usd=0.0066667 (default)\n"+
 			"shell="+defaultShell()+" (default)\nareas= (default)\n"+
 			"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n"+
 			"run.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\n"+

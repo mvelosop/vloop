@@ -60,6 +60,14 @@ vloop brief new <slug> [flags]
 
 - `--dry-run`: print the path and write nothing
 
+## vloop brief review
+
+Review a brief in a fresh session and print the verdict
+
+```
+vloop brief review <path>
+```
+
 ## vloop config
 
 Read and write repo-local configuration
@@ -165,11 +173,11 @@ vloop fence
 Print allow or deny: <reason> for one tool call; exit 1 on deny
 
 ```
-vloop fence check --phase <review|second-review|work|verify|gate-review|plan> --root <dir> --tool <name> [--path <p>] ["<command>"] [flags]
+vloop fence check --phase <review|second-review|work|verify|gate-review|plan|review-brief> --root <dir> --tool <name> [--path <p>] ["<command>"] [flags]
 ```
 
 - `--path string`: the file path a file tool names, or the skill's name
-- `--phase string`: the session phase: review, second-review, work, verify, gate-review or plan
+- `--phase string`: the session phase: review, second-review, work, verify, gate-review, plan or review-brief
 - `--root string`: the repository root relative paths resolve against
 - `--tool string`: the tool's name, as Copilot spells it
 
@@ -178,10 +186,10 @@ vloop fence check --phase <review|second-review|work|verify|gate-review|plan> --
 Answer one Copilot preToolUse payload from stdin with an allow or deny line
 
 ```
-vloop fence hook --phase <review|second-review|work|verify|gate-review|plan> --root <dir> [flags]
+vloop fence hook --phase <review|second-review|work|verify|gate-review|plan|review-brief> --root <dir> [flags]
 ```
 
-- `--phase string`: the session phase: review, second-review, work, verify, gate-review or plan
+- `--phase string`: the session phase: review, second-review, work, verify, gate-review, plan or review-brief
 - `--root string`: the repository root relative paths resolve against
 
 ## vloop init

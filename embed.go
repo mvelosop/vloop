@@ -16,7 +16,7 @@ var Plugin embed.FS
 var Schemas embed.FS
 
 // Fences are the permission settings a session runs under, one file per
-// phase: fence/plan.json, fence/work.json, fence/review.json and fence/gate-review.json.
+// phase: fence/plan.json, fence/work.json, fence/review.json, fence/gate-review.json and fence/review-brief.json.
 //
 //go:embed fence/*.json
 var Fences embed.FS
