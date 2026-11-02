@@ -48,3 +48,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Walked the worked example on the built tree and ran all gates together; nothing needed fixing, so no change was made.
 - **Files:** none
 - **Notes for next iteration:** No fixes made. Checked: skill list, create-brief files and templates, no stale 'experimental' hits (exit 1), cross-references and names, and the committed tests for the template, budget (1,201 words) and doctor review-brief clash. I could not run the fresh-repo steps (vloop init, plugin path, fence check) because the sandbox denied the command. Under go test ./..., five TestTaskGate* tests in internal/cli fail with 'the plan was changed during this session'; this is the live driver session's plan guard and is not a tree defect. The driver's own check run decides.
+
+## Run ended — complete
+
+- **Run:** `B20261102-0048-b28-i101-brief-skills-in-plugin` · 6 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked

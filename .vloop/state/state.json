@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md",
   "base": "3655c351a577ef4925612aa4b5aba230c1b0fd80",
   "branch": "B20261102-0048-b28-i101-brief-skills-in-plugin",
-  "status": "running",
+  "status": "complete",
   "iteration": 6,
   "created": "2026-11-02T01:13:33Z",
-  "updated": "2026-11-02T02:13:54Z",
+  "updated": "2026-11-02T02:22:29Z",
   "shell": "sh",
   "checks": [
     {
