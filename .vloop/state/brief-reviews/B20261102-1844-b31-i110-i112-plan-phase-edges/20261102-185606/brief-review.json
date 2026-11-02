@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Docs / Binding references",
+      "summary": "V2 makes docs/design-notes/fence-audit.md wrong in its plan and gate-review sections, and the brief neither updates that file nor puts it out of scope. The file says repeatedly that the driver does not revert a file after a plan or gate-review session and that the plan commit stages the whole tree. docs/guide/configuration.md:78 points readers to this file as the rule-by-rule account of who enforces what.",
+      "evidence": "docs/design-notes/fence-audit.md:592-595 (gate review: 'It does **not** revert a file the session changed outside .vloop/tmp/: the plan commit stages the whole tree'), :785-789 (the same for the plan session), :751-752 and :943-944 (the 'What is neither' paragraphs), and 13 table rows saying 'the driver does not revert files after a plan/gate-review session' (e.g. :632, :705-709, :825, :886-890). Also the 'does not revert the file it writes' rows at :694-699 and :875-880. `grep -rn 'not revert' docs/domain docs/guide plugin` finds only configuration.md, which the brief already covers.",
+      "fix": "Add fence-audit.md to the binding references and the Docs section. At minimum, give literal replacement sentences for the two 'What the driver checks after the session' paragraphs and the two 'What is neither' paragraphs, and reword the affected rows (enforcer 'hook, driver'; 'the driver reverts it after the session, with a warning'). Or name the file under Out of scope with the reason, and accept that it will be stale."
+    },
+    {
+      "kind": "runnability",
+      "section": "Shape, task 4 / Docs",
+      "summary": "The docs gate ('a grep per sentence') can fail on a correct edit. docs/domain/execution/plan.md and session.md are hard-wrapped at about 80 columns, so a work session that wraps the new sentences in the file's own style breaks a one-line grep -F. A work session that writes each sentence on one line passes the grep but breaks the file's style.",
+      "evidence": "docs/domain/execution/plan.md:7-8: the first paragraph is split across two lines ('*Part of' / '[execution](execution-context.md).*'). docs/domain/execution/session.md:25-32 and :113-119 wrap at about 80 columns. configuration.md:78 is a single long line, so it is not affected.",
+      "fix": "In task 4, say how the gate matches: compare against the file with its lines joined (for example `tr '\\n' ' ' < f | tr -s ' ' | grep -qF '<sentence>'`). Or say that each new sentence is written unwrapped. Either way, both the work session and the gate know the rule."
+    }
+  ],
+  "decisions": [
+    "One brief for #110–#112: sound. The files are disjoint, and every task leaves the go check green when its test edits ship with it.",
+    "Only a complete state/v2 plan of another brief is exempt; a resume (no brief named, or the plan's own brief named) is still validated: agree. This matches the planner's own resuming test (internal/driver/plan.go:434) and CheckRunID (internal/driver/safety.go:197).",
+    "The bare vloop doctor passes a complete state/v2 plan and names the plan's brief field as stored: agree. No existing test pins today's resProblem for that case (internal/cli/doctor_test.go:240-275 only checks the branch line for a complete v2 plan).",
+    "The form of the doctor's three-case parameter is left to the plan: acceptable. The two existing test callers' fixtures do not depend on it, and their assertions are protected.",
+    "The guard wraps each plan and gate-review session (inside planSession, so revision rounds are covered), not the commit: agree. baseGates reads the working tree right after the plan session.",
+    "Planning may write under .vloop/state/ and .vloop/tmp/ (reviewMayWrite), wider than S-4's list: acceptable. The narrower state guard is out of scope.",
+    "Revert and warn rather than halt on #111: the operator's decision. A failed revert halts with exit 1 and is not gated: acceptable.",
+    "brief-review/v1 is tightened in place, a stated exception to B29's 'a published schema does not change': the operator's decision. Verified that the driver accepts no report the pattern rejects (internal/driver/briefreview.go:133, internal/cli/brief_review.go:71), and that all 4 kept reports use a name.",
+    "The pattern allows '.loop-brief' alone and rejects '\\': agree."
+  ],
+  "checked": "facts (doctor plan check and rendering, runPreflight and its callers, newRun order, CheckRunID, planner preflight/reset/resume, state.Load leniency and the reference problem, treeGuard/revert order and halt, planSession and gateReviewRound ordering, phase names, commit message, brief-review schema, driver and CLI checks, schema and skills tests, kept reviews, doc anchors, R-4/S-4/C-3, 0a87d5a, B29's rule); consistency; rules; runnability against the go check; vloop brief check (ok, 0 warnings)",
+  "header": "Reviewed 2026-11-02: FIX, 2 findings"
+}
+

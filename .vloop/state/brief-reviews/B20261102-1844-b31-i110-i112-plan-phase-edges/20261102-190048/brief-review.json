@@ -1,0 +1,31 @@
+{"schema": "brief-review/v1",
+ "brief": "B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief",
+ "verdict": "FIX",
+ "findings": [
+  {"kind": "consistency", "section": "Behaviour contract — Docs (docs/design-notes/fence-audit.md)",
+   "summary": "The two notes go under '## The gate-review fence's deny rules' and '## The plan fence's deny rules' and cover only 'a row below'. Each audit's opening section sits above those headings and still says, in prose, that the driver does not revert: '# Fence audit: … gate-review session' says 'It does **not** revert a file the session changed outside `.vloop/tmp/`: the plan commit stages the whole tree' (about lines 583-588), and '# Fence audit: … plan session' says the same (lines 783-788). The 'What is neither' bullets (lines 751-752, 943-944) also say it in prose, not in rows. After the run, the file still contradicts V2 in exactly the places a reader checks first.",
+   "evidence": "grep -n '^# ' docs/design-notes/fence-audit.md gives 573 (gate-review) and 765 (plan); sed -n 783,788p shows 'What the driver checks after the session. Only git … It does **not** revert a file the session changed outside the files it may write: the plan commit stages the whole tree'; the deny-rules H2s are at 607 and 800, below these lines.",
+   "fix": "Put each note as the first paragraph under its H1 ('# Fence audit: who enforces each rule in a Copilot gate-review session' / '… plan session') instead of under the deny-rules H2. Reword 'where a row below says' as 'where this audit says' so the prose bullets are covered too. Keep the note literal so task 4's grep still pins it."},
+  {"kind": "consistency", "section": "Executive summary — V1",
+   "summary": "The summary says the doctor reports a complete state/v2 plan 'worded as for state/v1'. The contract gives a different message: 'a complete plan of <plan's brief> — the next brief's plan replaces it', not 'a complete state/v1 plan — …'. The summary is meant to restate the contract, and a planner could take this as a second wording.",
+   "evidence": "internal/cli/doctor.go:414 'a complete \"+state.SchemaV1+\" plan — the next brief's plan replaces it' vs the brief's V1 block '✓ plan a complete plan of <plan's brief> — the next brief's plan replaces it'.",
+   "fix": "Write: '`vloop doctor` reports one as a pass, naming the plan's brief.'"},
+  {"kind": "consistency", "section": "Behaviour contract — Docs (docs/domain/execution/plan.md)",
+   "summary": "Minor. The new plan.md paragraph says a complete state/v2 plan 'of another brief' is reported by `vloop doctor` as a pass. The contract has the bare doctor pass every complete state/v2 plan, because it cannot know the next brief. The domain page states a narrower rule than the code will follow.",
+   "evidence": "Contract V1: 'In vloop doctor, run on its own, a complete state/v2 plan is not validated either', with no condition on the brief; 'Decided here': 'The bare vloop doctor passes a complete plan'.",
+   "fix": "Write: '… `vloop run` naming another brief does not validate it, and `vloop doctor` reports any complete plan as a pass; a resumed plan, or one not complete, is validated.' Keep it literal for task 4's grep."}
+ ],
+ "decisions": [
+  "One brief for #110-#112. Sound: the issues touch disjoint files and every task leaves the go check green.",
+  "The bare `vloop doctor` passes every complete state/v2 plan. Agree: a complete plan cannot be resumed into work, and validating it is what forced B29's manual delete.",
+  "The doctor message names the plan's brief path, not its run id. Agree.",
+  "The V2 guard wraps each plan and gate-review session (ref and git-config checks first, then the revert, then timeout and exit judged), not just the commit. Agree: it mirrors reviewRun and keeps the base gate checks honest.",
+  "V2's write area is all of `.vloop/state/` plus `.vloop/tmp/` (reviewMayWrite), not S-4's narrower plan and gates list. A gate-review session editing a gate folder stays unguarded until the state-guard issue. Acceptable since it is named out of scope.",
+  "A revert that fails halts with exit 1, ungated. Acceptable, and stated.",
+  "brief-review/v1 is tightened in place, an exception to B29's 'a published schema does not change' (operator's decision). The exception is recorded only in this brief. The living rule (docs/design-notes/vloop-v2.0-roadmap.md, 'Schemas version on a breaking change') is not amended. Fine if the operator reads 'breaking' as 'rejects what the driver accepts'.",
+  "The pattern also rejects `\\` and accepts a bare `.loop-brief`. Agree: it matches exactly what the CLI and driver accept.",
+  "The audit leaves verdict/proposal/gate-verdict `task` fields untightened. Agree."
+ ],
+ "checked": "facts (doctor plan check and state/v1 precedent at internal/cli/doctor.go:413-422; runPreflight/runBriefPath order at internal/cli/run.go:77-85; planner reset line plan.go:312; planSession/gateReviewRound check order; treeGuard/reviewMayWrite/revert in iterate.go; base gates run in the working tree, acceptance.go:42ff; state.Load is lenient; ExitPreflight=1, ExitSessionError=7; brief-review driver check briefreview.go:133; schema_test.go:174,183 are the two 'b' literals; runDoctor/runPreflight callers are exactly the two named tests), consistency, rules (S-4, R-4, C-3, B29 schema rule, P-8), runnability (task order against the single go check; each gate red on base; all 5 kept brief-review.json files match the new pattern; skills_test validates the skill's json example; harness stub counters live outside the repo; vloop brief check: ok, 0 warnings)",
+ "header": "Reviewed 2026-11-02: FIX, 3 findings"}
+

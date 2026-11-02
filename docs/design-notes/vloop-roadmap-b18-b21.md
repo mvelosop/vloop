@@ -5,7 +5,7 @@ kind: design-note
 status: draft
 created: 2026-10-25
 ---
-# vloop — the roadmap after v0.12.0 (B18–B30)
+# vloop — the roadmap after v0.12.0 (B18–B31)
 
 v0.12.0 (tag `v0.12.0`) is B1–B17; B12–B17 are
 `docs/design-notes/vloop-roadmap-b12-b17.md`. This series starts with the
@@ -35,6 +35,7 @@ in `depends-on:`. Candidates not yet placed are GitHub issues (for example
 | B28 | `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` — **consumed** (issue #101) | **The brief skills in the plugin**: `/vloop:create-brief` (with its guidelines and templates, held to the binary's brief template by a test) and `/vloop:review-brief`, no longer experimental, within word ceilings of their own; the CLAUDE.md section names them; one eval case each; the project copies removed at close | B27 |
 | B29 | `docs/briefs/B20261102-0920-b29-i94-copilot-review-brief.loop-brief.md` — **consumed** (issue #94) | **The brief review as a session, on Copilot too**: `vloop brief review <brief>` runs one `/vloop:review-brief` session on `agent.review-brief` (claude or copilot, experimental) and `model.review-brief` (default opus), fenced (`fence/review-brief.json`, the hook's `review-brief` phase), recorded (`session/v5`) under `.vloop/state/brief-reviews/`, and exits by its validated `brief-review/v1` verdict; every fence denies `vloop brief review`; `/vloop:create-brief`'s review step calls it | B28 |
 | B30 | `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` — **consumed** (issue #113) | **Verify reports what it could not run**: `verify/v2` (`verify/v1` plus `complete` and `not_run`), read by the driver also after a failed session, with the count of lines not run and a warning when the session did not finish; `vloop brief close` prints them; `/vloop:verify` writes its report from the start and after each pass, lists the lines it cannot run, sets up scratch repositories with `git init -q <dir>`; `/vloop:create-brief`'s guideline and the four templates gain the operator's acceptance section; `/vloop:review-brief` flags an unrunnable line; `/vloop:operate` runs what verify left (ceiling 1800); a new eval case | B29 |
+| B31 | `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` — ready (issues #110, #111, #112) | **The plan phase's edges and the brief review's name**: a complete `state/v2` plan of another brief no longer blocks `vloop run`'s preflight, and the bare `vloop doctor` passes it; the driver reverts, with a warning, what a plan or gate-review session changed outside `.vloop/state/` and `.vloop/tmp/`; `brief-review/v1`'s `brief` gains a pattern, in place (a stated exception to B29's rule) | B30 |
 
 **Before the fence: hardening (decided by the operator on 2026-10-25).** B19's
 acceptance on the real CLI (`docs/design-notes/copilot-cli-experiments.md` →
