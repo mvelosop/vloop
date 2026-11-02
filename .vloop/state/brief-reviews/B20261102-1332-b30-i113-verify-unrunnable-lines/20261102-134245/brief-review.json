@@ -1,0 +1,52 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Why this shape (A brief keeps an unrunnable line one of two ways); V3",
+      "summary": "The brief creates a section 'which the operator runs at close' and a not_run list left to the operator, but the operator's playbook (/vloop:operate) is not changed and says neither. §3 step 3 says to run the worked example by hand, and §5 step 2 says to read the verify findings. Neither tells the operator to run the Acceptance section or each not_run line. operate has no room for a fix: it is at 1746 of its 1750-word ceiling.",
+      "evidence": "plugin/skills/operate/SKILL.md:83 (worked example by hand), :158-162 (read findings); grep -i acceptance plugin/skills/operate/SKILL.md: nothing; wc -w plugin/skills/operate/SKILL.md = 1746; internal/budget/budget.go:25 operate 1750",
+      "fix": "The operator decides: (a) add one sentence to operate §3 or §5 ('run the brief's Acceptance section and each not_run line of the verify report') and either trim operate or raise its ceiling in budget.go with a dated comment, listing the change in V3 and the Violations; or (b) leave operate unchanged and add it to Out of scope with a follow-up issue."
+    },
+    {
+      "kind": "fact",
+      "section": "V2 (A line it does not run); V3 (review-brief question)",
+      "summary": "Both plugin skills are told to point at fence/verify.json's deny list. That path exists only in vloop's own repository. The plugin's sessions run in any repository, where the path does not exist and the session cannot read the list. No plugin skill names a fence/ path today.",
+      "evidence": "fence/verify.json is the source in this repo; for other repos the binary extracts fences under .vloop/tmp/fence/<version>/ (here only review-brief.json is present), and the verify driver step clears .vloop/tmp before the session (internal/driver/iterate.go:949 it.clearTmp()); grep -rn 'fence/' plugin/skills/*/SKILL.md: nothing",
+      "fix": "Write the list the skills need into the skills, as the guideline already does: the verify skill can list them as code (it is not in fencedSkills, internal/cli/skills_test.go:33). review-brief can list them in prose without backticks (vloop init, vloop run, vloop brief review, vloop brief close, claude), or say 'the commands the guideline's rule names'. Remove the fence/verify.json pointer from V2 and V3."
+    },
+    {
+      "kind": "consistency",
+      "section": "V1 (driver reads after timeout / no record); Worked example",
+      "summary": "The contract says a valid report is read after a session that timed out or left no record. The worked example pins only the non-zero exit (the stub exits 3). The timeout and no-record cases have no fixture, although the Constraints say new tooling is proven by fixtures.",
+      "evidence": "internal/driver/iterate.go:980 joins res.TimedOut || res.ExitCode != 0 || !res.Recorded in one branch; the worked example has only 'then the stub exits 3' lines",
+      "fix": "Add one worked-example line for a stub that writes a valid verify/v2 report and then exceeds the session timeout (or leaves no record), with the same two output lines as the exit-3 case. Alternatively, state that the three conditions share one code path and that the exit-3 fixture stands for all three."
+    },
+    {
+      "kind": "fact",
+      "section": "Why this shape (A brief keeps an unrunnable line one of two ways)",
+      "summary": "The claim 'as B26–B29 did' is half right. B26, B27 and B29 have an acceptance section, under a different heading: '## Acceptance on the real CLI, at close (the operator's)'. B28 has none.",
+      "evidence": "grep '^## .*Accept' docs/briefs/*b2[6-9]*: B26:367, B27:364, B29:430; B28 none (also B22:343, B24:298)",
+      "fix": "Write 'as B22, B24, B26, B27 and B29 did, under a longer heading'. Say whether the new shorter heading is meant to replace the old one, so the verify skill does not key on the exact text."
+    }
+  ],
+  "decisions": [
+    "verify/v2 as a new schema rather than fields in verify/v1's notes — sound; follows B29's rule that a published schema does not change",
+    "The driver reads verify/v2 only — sound; both adapters load the binary's own plugin (--plugin-dir in internal/driver/session.go:101 and agent_copilot.go:175)",
+    "complete as a boolean the session states, not a pass counter — fine",
+    "Read a valid report even after a failed or timed-out session, keeping the 'failed to run' warning — sound; it is the case the brief exists for",
+    "A line not run is a not_run entry, not a finding, and is not counted in example_lines — fine",
+    "No retry of a denied command in another form — sound (S-4)",
+    "No fence change; git init -q <dir> instead of an allow rule — sound; no fence denies git init, all six deny git -C",
+    "Two ways to keep an unrunnable line (a named stub test, or the acceptance section) and the new heading '## Acceptance, at close (the operator's)' — fine, but see the finding about the earlier, longer heading",
+    "The verify skill lists operator-kept and test-covered lines in not_run with fixed reasons — fine",
+    "The verify ceiling stays at 1500 (1061 now, about +250) — fine",
+    "M counts every not_run entry; 'example line(s)' wording; a not_run line missing from the brief is not the driver's concern — fine",
+    "Not decided: whether /vloop:operate learns to run the acceptance section and the not_run lines (see finding 1)"
+  ],
+  "checked": "facts (driver verify step and readReport, close's printVerifyReport/showVerifyReport, verify skill and word count, every fence's git -C/git init rules, the B29 verify record's turns/duration/denials, budget ceilings, plugin_templates_test equality, skills test fencedSkills/checkPaths, eval grader forms including the regex file target, the --case flag in docs/guide/evals.md, every file naming verify/v1); consistency (summary vs contract, worked example vs contract lines and planted failures, close output); rules (S-4, C-2, M-6 exist; published-schema rule; P-8 and the no-claude gates); runnability (task order against the single go check: T1 must update the three schema-list tests, which the Constraints allow; T2 makes the driver read only v2 while the skill still writes v1 until T3, which no test checks for consistency; vloop brief check on a ready copy: ok, 0 warnings)",
+  "header": "Reviewed 2026-11-02: ASK, 4 findings"
+}
+
