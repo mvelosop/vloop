@@ -74,3 +74,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Closed the run: every gate T1–T5 and T6 passes together on the final tree, and the go check is green. No code changes.
 - **Files:** none
 - **Notes for next iteration:** Inside a vloop session VLOOP_PLAN_SHA256 is set and makes internal/cli TestTaskGate* fail ('plan was changed during this session'); run go test with `env -u VLOOP_PLAN_SHA256`. Without it the whole suite passes. Not caused by this brief.
+
+## Run ended — complete
+
+- **Run:** `B20261102-0920-b29-i94-copilot-review-brief` · 6 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked
