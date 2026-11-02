@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/4 done** · iteration 4
+**Status:** complete · **4/4 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T22:14:19Z
+**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T22:19:03Z
 
 ## Progress
 

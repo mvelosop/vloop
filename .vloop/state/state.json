@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md",
   "base": "38b28f0a81ceac57acc72c020c2c6a67f99040a4",
   "branch": "B20261102-2101-b32-i84-gates-through-the-named-surface",
-  "status": "running",
+  "status": "complete",
   "iteration": 4,
   "created": "2026-11-02T21:40:00Z",
-  "updated": "2026-11-02T22:14:19Z",
+  "updated": "2026-11-02T22:19:03Z",
   "shell": "sh",
   "checks": [
     {

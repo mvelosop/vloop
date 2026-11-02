@@ -38,3 +38,11 @@ committing the plan
    review T4 · 0m28s · $0.08 · run $2.60 / $40.00
    review: PASS
    T4 done
+   check go
+   verify · 1m09s · $0.20 · run $2.79 / $40.00
+verify: 1 finding(s); 3 example line(s) not run — see .vloop/state/runs/B20261102-2101-b32-i84-gates-through-the-named-surface/20261102-213259/reports/verify.json
+
+═══ complete ═══
+run:    B20261102-2101-b32-i84-gates-through-the-named-surface/20261102-213259  (4 iteration(s) this run)
+plan:   4/4 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261102-2101-b32-i84-gates-through-the-named-surface.md

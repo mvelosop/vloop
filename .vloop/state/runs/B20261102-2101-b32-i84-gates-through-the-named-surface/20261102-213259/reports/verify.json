@@ -1,0 +1,20 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [
+    {
+      "kind": "contract",
+      "claim": "G4 brief.md: \"so other scripts can source it too; whether there is one, its file name and its function names are the implementer's. Only `bin/tally`'s behaviour above is the contract.\"",
+      "observed": "plugin/evals/plan-judges-through-named-surface/brief.md says only: \"The arithmetic and file handling may live in a shell library that `bin/tally` sources; whether it exists, its file name and its function names are the implementer's.\" It omits \"so other scripts can source it too\" and the sentence \"Only bin/tally's behaviour above is the contract.\"",
+      "where": "brief G4, brief.md bullets (\"contract is exactly\"); plugin/evals/plan-judges-through-named-surface/brief.md, Behaviour contract section"
+    }
+  ],
+  "not_run": [
+    {"line": "the configured go check (go test ./... and the rest)", "reason": "the repository's test suite is not verify's pass; already run by the driver"},
+    {"line": "Acceptance at close 1 (evals with --case globs)", "reason": "the operator's, at close; needs a live model"},
+    {"line": "Acceptance at close 2 (gpt-6.1-terra on every phase)", "reason": "the operator's, at close; needs Copilot and network"}
+  ],
+  "checked": { "example_lines": 13, "sentences": 12, "surfaces": 6 },
+  "notes": "Joined-text greps on plan and gate-review skills, the word count (1562 <= 1600) and the budget.go ceiling all agree. The scaffold example was run in a plain empty directory (not git-initialised first), since the scaffold itself requires an empty directory and runs git_init; exit 0, tally total gives 'tally: not implemented' exit 1, status empty, ls-files as stated, second run exits 1. The eval README row, guide row and the 23-case count (23 case directories) agree. I did not diff the G1 paragraph character for character beyond the quoted grep phrases; the diff reads as stated. Surfaces read: both skills, budget.go comment, plugin/evals/README.md, docs/guide/evals.md, the new case's files."
+}
+

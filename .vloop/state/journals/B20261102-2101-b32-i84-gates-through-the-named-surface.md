@@ -34,3 +34,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Closed the run: gates T1 to T3 and T4 pass together on the final tree; no schema or other skill changed; the Go checks are green. No file was changed.
 - **Files:** none
 - **Notes for next iteration:** Worked example, line by line, and what covers each. Gate T1: the plan skill's five phrases, the absent 'you may pin what a gate needs', and equality with plan-expected.md. Gate T2: the gate review's two phrases, wc -w at most 1600, the budget.go entry 'gate-review': 1600 with the dated comment. Gate T3: the scaffold run (exit 0), bin/tally total (stderr 'tally: not implemented', exit 1), clean status, the three tracked files, the refused second run, brief.md's three strings and no 'lib/', and both catalogues naming the case. Gate T4: schemas/*.json and the six other skills byte for byte, no shortener mention. The configured go check (go test ./... and the rest) is not in a gate: I ran it, and TestTaskGate* in internal/cli fail only inside a driver session because VLOOP_PLAN_SHA256 is set in the environment (the tests then hit the 'plan was changed during this session' refusal); with that variable unset the whole package passes. This is environmental, not a regression; the driver's own check runs outside the session. Nothing was left uncovered. No claude, copilot or eval was run.
+
+## Run ended — complete
+
+- **Run:** `B20261102-2101-b32-i84-gates-through-the-named-surface` · 4 iteration(s) this run
+- **Plan:** 4/4 done, 0 blocked
