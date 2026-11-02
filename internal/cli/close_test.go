@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -424,5 +425,33 @@ func TestCloseVerifyBlock(t *testing.T) {
 	code, out, errs := runCLI(t, dir, "brief", "close", closeName)
 	if code != 2 || out != want || errs != "vloop: "+closeFindingsMsg+"\n" {
 		t.Errorf("refusal: exit %d %q %q", code, out, errs)
+	}
+}
+
+// V2 (verify/v2): the close shows the lines not run and the unfinished session.
+func TestCloseVerifyBlockV2(t *testing.T) {
+	dir := closeRepo(t, true, "")
+	folder := ".loop/state/runs/" + closeBrief + "/"
+	ck := `"checked":{"example_lines":2,"sentences":0,"surfaces":0},"notes":"none"`
+	f1 := `{"kind":"example","claim":"exit 2","observed":"exit 1","where":"Worked example"}`
+	n1 := `{"line":"vloop init","reason":"denied by the verify fence"}`
+	n2 := `{"line":"vloop x","reason":"the operator's, at close"}`
+	for i, c := range []struct{ body, want string }{
+		{`{"schema":"verify/v2","complete":true,"findings":[],"not_run":[],` + ck + `}`, ": no findings\n"},
+		{`{"schema":"verify/v2","complete":true,"findings":[],"not_run":[` + n1 + `],` + ck + `}`, ": no findings; 1 example line(s) not run\n  not run: vloop init — denied by the verify fence\n"},
+		{`{"schema":"verify/v2","complete":true,"findings":[` + f1 + `],"not_run":[` + n1 + `,` + n2 + `],` + ck + `}`,
+			": 1 finding(s); 2 example line(s) not run\n  1. example — Worked example\n     brief:    exit 2\n     observed: exit 1\n  not run: vloop init — denied by the verify fence\n  not run: vloop x — the operator's, at close\n"},
+		{`{"schema":"verify/v2","complete":false,"findings":[],"not_run":[],` + ck + `}`, ": no findings\n  the session stopped before its last pass\n"},
+	} {
+		stamp := fmt.Sprintf("20260102-0%d0000", i)
+		write(t, dir, folder+stamp+"/loop.log", "[loop] planning from docs/briefs/"+closeName+".md using opus\n")
+		write(t, dir, folder+stamp+"/reports/verify.json", c.body)
+		gitIn(t, dir, "2026-01-01T10:00:00Z", "add", "-A")
+		gitIn(t, dir, "2026-01-01T10:00:00Z", "commit", "-q", "-m", "report "+stamp)
+		_, out, _ := runCLI(t, dir, "brief", "close", closeName, "--dry-run", "--no-findings")
+		want := "verify of " + closeBrief + "/" + stamp + c.want
+		if !strings.HasPrefix(out, want) {
+			t.Errorf("case %d: %q, want prefix %q", i, out, want)
+		}
 	}
 }

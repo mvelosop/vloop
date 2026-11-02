@@ -218,6 +218,11 @@ func printVerifyReport(out io.Writer, root string, m *runs.Model) {
 			continue
 		}
 		var rep struct {
+			Complete *bool `json:"complete"`
+			NotRun   []struct {
+				Line   string `json:"line"`
+				Reason string `json:"reason"`
+			} `json:"not_run"`
 			Findings []struct {
 				Kind     string `json:"kind"`
 				Claim    string `json:"claim"`
@@ -230,12 +235,22 @@ func printVerifyReport(out io.Writer, root string, m *runs.Model) {
 		}
 		head := "verify of " + m.RunID + "/" + path.Base(p)
 		if len(rep.Findings) == 0 {
-			fmt.Fprintf(out, "%s: no findings\n", head)
-			return
+			head += ": no findings"
+		} else {
+			head += fmt.Sprintf(": %d finding(s)", len(rep.Findings))
 		}
-		fmt.Fprintf(out, "%s: %d finding(s)\n", head, len(rep.Findings))
+		if len(rep.NotRun) > 0 {
+			head += fmt.Sprintf("; %d example line(s) not run", len(rep.NotRun))
+		}
+		fmt.Fprintln(out, head)
 		for j, f := range rep.Findings {
 			fmt.Fprintf(out, "  %d. %s — %s\n     brief:    %s\n     observed: %s\n", j+1, f.Kind, f.Where, f.Claim, f.Observed)
+		}
+		for _, n := range rep.NotRun {
+			fmt.Fprintf(out, "  not run: %s — %s\n", n.Line, n.Reason)
+		}
+		if rep.Complete != nil && !*rep.Complete {
+			fmt.Fprintln(out, "  the session stopped before its last pass")
 		}
 		return
 	}

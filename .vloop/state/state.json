@@ -5,9 +5,9 @@
   "base": "28f49ae8009ed10d3ee753520bdee280fe780a4d",
   "branch": "B20261102-1332-b30-i113-verify-unrunnable-lines",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-02T14:02:09Z",
-  "updated": "2026-11-02T14:16:03Z",
+  "updated": "2026-11-02T14:30:52Z",
   "shell": "sh",
   "checks": [
     {
@@ -89,8 +89,8 @@
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "No driver test uses a stub runner whose result says the session timed out; the timed-out case named by the acceptance criterion has no test behind it; No test covers an invalid or verify/v1 report after a failed session (only the failed-to-run warning must appear)"
     },
     {
       "id": "T3",

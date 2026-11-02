@@ -23,3 +23,9 @@ committing the plan
    review T1 · 0m20s · $0.11 · run $4.14 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/5 done ──
+   Read verify/v2 in the driver's verify step and print not_run and complete at close
+   work T2 · 10m02s · $0.50 · run $4.64 / $40.00
+   check go
+   review T2 · 0m32s · $0.14 · run $4.78 / $40.00
+   review: FAIL
