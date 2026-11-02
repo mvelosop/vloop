@@ -1,0 +1,2 @@
+GATE FAIL: vloop schema validate brief-review/v1 invalid/b.json (brief "b") exited 0, want 1: ~/source/personal/vloop/.vloop/state/gates/T1/invalid/b.json: ok
+GATE FAIL: gate T1 fails on the final tree

@@ -1,0 +1,11 @@
+checking the base: go
+the plan B20261102-1332-b30-i113-verify-unrunnable-lines was for docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md — you asked for docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md using opus
+   plan · 7m44s · $2.42 · run $2.42 / $40.00
+REFS MOVED plan — the planning session changed git refs; nothing was committed:
+     before: refs/remotes/origin/HEAD a30ab36ac4c5e5050c6d3222b5eaa0adeca02995 refs/remotes/origin/main
+     before: refs/remotes/origin/main a30ab36ac4c5e5050c6d3222b5eaa0adeca02995 
+     after:  refs/remotes/origin/HEAD 475d945a29f7c7c0126b10d0901106f8756634c2 refs/remotes/origin/main
+     after:  refs/remotes/origin/docs/copilot-models-list 5ce138af0838d4bd1a529c992489ef30d8600527 
+     after:  refs/remotes/origin/main 475d945a29f7c7c0126b10d0901106f8756634c2 
+restore them (git branch -m, git switch, git update-ref -d, git remote set-head), then re-run

@@ -1,0 +1,7 @@
+GATE FAIL: main: the revert warnings on stderr are:
+
+--- want
+vloop: the plan session changed README.md — reverted
+vloop: the plan session changed notes.txt — reverted
+vloop: the gate-review session changed README.md — reverted
+vloop: the gate-review session changed scratch.txt — reverted

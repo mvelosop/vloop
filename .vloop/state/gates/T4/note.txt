@@ -1,0 +1,1 @@
+Since B31 the driver reverts a file a gate-review or plan session changed outside `.vloop/state/` and `.vloop/tmp/`, with a warning, before the plan commit: where this audit says the driver does not revert files after such a session, or that the plan commit would commit the change, that predates it.

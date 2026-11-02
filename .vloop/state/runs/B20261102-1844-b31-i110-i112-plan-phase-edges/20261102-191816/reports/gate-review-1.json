@@ -1,0 +1,8 @@
+{"schema":"gate-verdict/v2","verdict":"PASS","tasks":[
+{"task":"T1","verdict":"PASS","findings":[]},
+{"task":"T2","verdict":"PASS","findings":[]},
+{"task":"T3","verdict":"PASS","findings":[]},
+{"task":"T4","verdict":"PASS","findings":[]},
+{"task":"T5","verdict":"PASS","findings":[]}],
+"notes":"Each gate fails on the base at its behavioural assertion; fixtures and matchers read back."}
+
