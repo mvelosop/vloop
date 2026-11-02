@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/5 done** · iteration 4
+**Status:** running · **5/5 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T20:04:08Z
+**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T20:10:51Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Let a complete plan of another brief pass vloop run's preflight and the bare vloop doctor
 - [x] **T3** — Revert and warn what each plan and gate-review session changes outside .vloop/state/ and .vloop/tmp/
 - [x] **T4** — Write V1, V2 and V3 into the configuration guide, the plan and session pages and the fence audit
-- [ ] **T5** — Close the run: every gate and the worked example on the final tree
+- [x] **T5** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
 
@@ -108,7 +108,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Close the run: every gate and the worked example on the final tree
 
-`pending` · depends on: T1, T2, T3, T4
+`done` · depends on: T1, T2, T3, T4
 
 The last task proves the whole brief holds at once on the final tree: every earlier gate passes together, no fence changed, and the worked example holds line for line. It exists so a regression one task caused in another's surface is found before the run's verify session, which cannot run `vloop run` itself and relies on the committed tests named here.
 

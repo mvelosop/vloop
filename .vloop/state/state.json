@@ -5,9 +5,9 @@
   "base": "a30ab36ac4c5e5050c6d3222b5eaa0adeca02995",
   "branch": "B20261102-1844-b31-i110-i112-plan-phase-edges",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-02T19:28:53Z",
-  "updated": "2026-11-02T20:04:08Z",
+  "updated": "2026-11-02T20:10:51Z",
   "shell": "sh",
   "checks": [
     {
@@ -211,7 +211,7 @@
         "Any fix this task makes is to the contract as the brief states it, leaves a committed test where it changes behaviour, and weakens no check."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }
