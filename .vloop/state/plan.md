@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/4 done** · iteration 2
+**Status:** running · **3/4 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T21:57:58Z
+**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T22:03:21Z
 
 ## Progress
 
 - [x] **T1** — Make the plan skill judge through the surface the brief names, and act on every revision finding (G1, G2)
 - [x] **T2** — Say in the gate review when a pin is sound, and raise its word ceiling to 1600 (G3)
-- [ ] **T3** — Add the eval case plan-judges-through-named-surface and list it in both catalogues (G4)
+- [x] **T3** — Add the eval case plan-judges-through-named-surface and list it in both catalogues (G4)
 - [ ] **T4** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
@@ -61,7 +61,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Add the eval case plan-judges-through-named-surface and list it in both catalogues (G4)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The skill edits of T1 need a test that holds a planner to them: an eval case whose brief names a command (`bin/tally`) and leaves its shell library's file and function names to the implementer, graded on the plan validating and on no gate naming the library. The case is built like plan-checks-its-gates (prompt, case.yaml, graders, brief, scaffold) and joins plugin/evals/README.md and docs/guide/evals.md, whose case count is corrected to 23. The case must leave the temptation to pin the library, not describe it; no session runs it, the operator does at close.
 

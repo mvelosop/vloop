@@ -130,7 +130,7 @@ claude plugin eval plugin \
   `TestEvalGrantsCoverFence` holds the cases to the fence and the list above to
   the cases.
 - `--max-cost-usd` is a hard ceiling, checked before each run. The full suite
-  is 21 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
+  is 23 cases × 3 runs × 2 arms; start at the loop's `run.cost-ceiling`.
 - `--keep-temp` keeps each run's sandbox and `trace.jsonl`, the only way to see
   what a session ran and which commands were denied; read them before
   re-running a case that scores low.
@@ -144,7 +144,7 @@ run's grader verdicts; the HTML report shows the same per case and arm.
 | Skill | Cases | Asks |
 | --- | --- | --- |
 | `/vloop:review` | `01`–`07b`, `08-vloop-records-out-of-scope` | nine planted defects in work that passes its gate, which the review returns `FAIL` on and names; and correct work whose only defects are in vloop's own records, which it passes with a `notes` line |
-| `/vloop:plan` | `plan-valid-state`, `plan-checks-its-gates`, `language-es` | a valid plan, judges in the `verify` or the gate folder and no repository suite in a `verify`, prose in the configured language |
+| `/vloop:plan` | `plan-valid-state`, `plan-checks-its-gates`, `plan-judges-through-named-surface`, `language-es` | a valid plan, judges in the `verify` or the gate folder and no repository suite in a `verify`, prose in the configured language, gates through the surface the brief names |
 | `/vloop:gate-review` | `gate-review-planted-gates`, `gate-review-real-misses`, `gate-review-coverage` | five planted gates, then six gates that fooled the gate review in past runs (macOS hosts) and one sound gate; the typo, the task-written judge, the source grep, the gate that passes on the base and the six real misses are found with the right finding kind, and the sound gates pass; then sound gates whose criteria are a check gap, uncovered and unpassable, each found as that kind, and a fully covered task that passes |
 | `/vloop:work` | `work-disputes-impossible-gate` | a gate no correct implementation passes is disputed, not edited |
 | `/vloop:create-brief` | `create-brief-drafts-checked` | a request that settles every fork becomes a draft written with `vloop brief new` and checked to `0 warning(s)`, graded from the trace |

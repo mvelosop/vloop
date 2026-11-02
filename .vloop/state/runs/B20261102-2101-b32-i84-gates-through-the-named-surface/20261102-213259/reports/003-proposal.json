@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Added the eval case plan-judges-through-named-surface (prompt, case.yaml, brief, scaffold, two graders) and listed it in plugin/evals/README.md and docs/guide/evals.md, whose case count is now 23.",
+  "files": ["plugin/evals/plan-judges-through-named-surface/prompt.md", "plugin/evals/plan-judges-through-named-surface/case.yaml", "plugin/evals/plan-judges-through-named-surface/brief.md", "plugin/evals/plan-judges-through-named-surface/scaffold.sh", "plugin/evals/plan-judges-through-named-surface/graders/state-validates.md", "plugin/evals/plan-judges-through-named-surface/graders/judges-through-the-command.md", "plugin/evals/README.md", "docs/guide/evals.md"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; go test ./internal/cli -run Eval passed.",
+  "notes": "The brief names no library path or function and does not mention the bad gate. No committed case list needed updating: TestEvalGrantsCoverFence reads the case directories."
+}

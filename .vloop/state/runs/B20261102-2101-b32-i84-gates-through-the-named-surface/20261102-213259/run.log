@@ -24,3 +24,10 @@ committing the plan
    review T2 · 0m15s · $0.08 · run $2.04 / $40.00
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/4 done ──
+   Add the eval case plan-judges-through-named-surface and list it in both catalogues (G4)
+   work T3 · 0m51s · $0.19 · run $2.23 / $40.00
+   check go
+   review T3 · 0m49s · $0.12 · run $2.35 / $40.00
+   review: PASS
+   T3 done
