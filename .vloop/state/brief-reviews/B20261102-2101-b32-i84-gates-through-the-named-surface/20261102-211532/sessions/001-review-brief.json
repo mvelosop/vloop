@@ -1,0 +1,36 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 1.1183882,
+  "duration_ms": 195861,
+  "effort": null,
+  "ended": "2026-11-02T21:18:48Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 51624,
+      "cache_read_input_tokens": 1693301,
+      "cost_usd": 1.1183882,
+      "input_tokens": 64,
+      "output_tokens": 18324
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "claude plugin eval --help 2\u003e\u00261 | head -50; sed -n 95,125p docs/guide/evals.md",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json; rm -rf .vloop/tmp/rb",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261102-2101-b32-i84-gates-through-the-named-surface",
+  "schema": "session/v5",
+  "started": "2026-11-02T21:15:32Z",
+  "turns": 34,
+  "wall_ms": 196494
+}

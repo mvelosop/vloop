@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Behaviour contract — G4 (the guide's cost sentence)",
+      "summary": "The suite already has 22 cases, so the new one makes 23, not 22. The guide's '21 cases' has been stale since B30 added verify-unrunnable-line without updating it. G4 fixes the count to another wrong number.",
+      "evidence": "ls plugin/evals | grep -v '^_' | grep -v README | wc -l -> 22 (10 review cases plus 12 others). git log -L on docs/guide/evals.md: B28 (ccb7372) set it to 21. B30 (1023008) added plugin/evals/verify-unrunnable-line/ and left the sentence alone.",
+      "fix": "In G4, `is 21 cases × 3 runs × 2 arms` becomes `is 23 cases × 3 runs × 2 arms`. Say in 'Decided here' that this also corrects B30's stale count."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — G3 / Violations the review must rule on",
+      "summary": "The gate review's `not-contract` kind still forbids any gate that judges 'internals the brief does not name'. That covers exactly the pin G1 and G3 now call sound, and the Violations list forbids touching that bullet. So a gate review can still reject a sound, stated pin as `not-contract`, and the plan skill and the gate review still disagree on when a pin is allowed, which is the goal's own wording. Unsure how often this bites: the rare case is a criterion no named surface reaches. The 2026-11-02 failures are rejected correctly by both kinds.",
+      "evidence": "plugin/skills/gate-review/SKILL.md:96-100: `not-contract` — '... or internals the brief does not name, rather than what the product does'. The brief's Violations: 'Any other sentence of the plan or gate-review skill changed, moved or reworded'. Executive summary: 'the plan skill and the gate review agree on when a gate may pin a name'.",
+      "fix": "Either add a few words to `not-contract` ('internals the brief does not name, beyond a sound pin under `pins-unnamed`'), list it in G3 and the worked example, and adjust the Violations bullet and the ceiling arithmetic. Or record in 'Decided here' that `not-contract` stays absolute and why."
+    }
+  ],
+  "decisions": [
+    "Change the plan skill, not the gate review's standard. Agree.",
+    "A pin stays possible where no named surface reaches a criterion, stated in the task's acceptance. Agree; see the not-contract finding.",
+    "The old paragraph's 'Do not pin a name that no gate uses' is dropped and folded into 'the minimum a gate needs, and no more'. Fine.",
+    "gpt-6.1-terra is the only candidate; the others wait for #81. Agree.",
+    "Qualification is the operator's acceptance at close, not a task, and the PR closes #84 only if every phase qualifies. Agree.",
+    "Only the gate-review ceiling rises, from 1550 to 1600. Agree: about 1556 words after G3, which leaves about 44 of headroom.",
+    "The eval's library is a shell library, and its brief bars gate folders ('verify command alone'). Fine. Barring the folder narrows what the case measures, but keeps the grader on one file.",
+    "No domain invariant changes; P-4 and P-8 already hold the principle. Agree.",
+    "Acceptance 1 runs one run per case and reruns from main at 7de2855 only the cases below 1.00. Cheap but noisy: a one-run 1.00 does not prove there is no regression. Acceptable for a first record."
+  ],
+  "checked": "facts (plan skill line 151-155, 164-174, 393-421; gate-review lines 110-111 and the word count of 1527, so 23 words of headroom; plan at 3804 of 4100; budget.go Ceilings; the plan-checks-its-gates prompt, case.yaml, scaffold, graders and _lib.sh helpers; README and guide tables; the gpt-6.1-terra notes, 8 of 9 gates; P-4 and P-8), consistency (worked example vs G1-G4, the joined-text greps against the current wrapping, the eval brief vs its grader), rules (CLAUDE.md, the domain invariants, checkEvals, checkLLMFocus and TestEvalGrantsCoverFence in internal/cli/skills_test.go), runnability (the go check after each task, each gate failing on the base, no network or eval in a task). vloop brief check on a ready copy: ok, 0 warnings. Not checked: `claude plugin eval --help` (permission denied here; round 3 cited it).",
+  "header": "Reviewed 2026-11-02 (round 6): FIX, 2 findings"
+}
+

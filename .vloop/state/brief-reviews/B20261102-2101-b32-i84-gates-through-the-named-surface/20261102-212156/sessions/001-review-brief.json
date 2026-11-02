@@ -1,0 +1,36 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 1.1971319999999999,
+  "duration_ms": 226269,
+  "effort": null,
+  "ended": "2026-11-02T21:25:43Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 56208,
+      "cache_read_input_tokens": 1665600,
+      "cost_usd": 1.1971319999999999,
+      "input_tokens": 62,
+      "output_tokens": 20705
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop \u0026\u0026 cat plugin/evals/plan-valid-state/scaffold.sh | grep -v \"^#\"; go build -o .vloop/tmp/rb/vloop ./cmd/vloop \u0026\u0026 d=$(mktemp -d) \u0026\u0026 cd $d \u0026\u0026 git init -q \u0026\u0026 mkdir -p .vloop/sta…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "claude plugin eval --help 2\u003e\u00261 | grep -n -i -e \"--case\" -e \"--runs\" -e \"glob\" | head",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261102-2101-b32-i84-gates-through-the-named-surface",
+  "schema": "session/v5",
+  "started": "2026-11-02T21:21:56Z",
+  "turns": 32,
+  "wall_ms": 226873
+}

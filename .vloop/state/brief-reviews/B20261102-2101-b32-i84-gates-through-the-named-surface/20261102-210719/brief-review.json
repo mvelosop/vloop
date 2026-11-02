@@ -1,0 +1,50 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Acceptance, at close — 1",
+      "summary": "The baseline rerun swaps the binary and keeps the skills. What this brief changes is plugin/skills/plan and plugin/skills/gate-review; the binary changes only by one ceiling. `claude plugin eval plugin` run from the branch's checkout with a binary built from main at 7de2855 still loads the branch's skills, so it compares the branch with itself.",
+      "evidence": "docs/guide/evals.md:103-115 (`claude plugin eval plugin` reads the plugin directory of the checkout it runs in); the brief's G1-G3 touch only plugin/skills/ and internal/budget/budget.go.",
+      "fix": "Make it: 'is run again from a worktree of main at 7de2855 (its plugin/ and a binary installed from it)'. For example, `git worktree add <scratch>/main 7de2855`, then `go install ./cmd/vloop` and the same invocation there."
+    },
+    {
+      "kind": "consistency",
+      "section": "Acceptance, at close — 1",
+      "summary": "`--case 'plan-*'` misses `language-es`, a /vloop:plan case that the G1/G2 edit can affect. It is also unverified whether `--case` takes a glob. The repo's guideline says a tool's flags come from the tool. The guide and B30 only use `--case` with exact names, and `claude plugin eval --help` could not be run in this review.",
+      "evidence": "plugin/evals/language-es/prompt.md:4 (`/vloop:plan docs/briefs/greet.loop-brief.md`); docs/guide/evals.md:147 lists language-es among the /vloop:plan cases; docs/guide/evals.md:93 and docs/briefs/B20261102-1332-b30-*.loop-brief.md:450-451 use `--case <exact name>`.",
+      "fix": "List the cases by name: `--case plan-valid-state --case plan-checks-its-gates --case plan-judges-through-named-surface --case language-es --case gate-review-planted-gates --case gate-review-real-misses --case gate-review-coverage`. Or check `claude plugin eval --help` for glob support and add language-es."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — G1 / Violations",
+      "summary": "Unsure. The plan skill's 'Known trap' paragraph still suggests asserting on 'an import'. A planner may read that as permission to import an unnamed module, against the new G1 paragraph, and the Violations bullet forbids touching that sentence. This is the same kind of literal reading that gpt-6.1-terra did.",
+      "evidence": "plugin/skills/plan/SKILL.md:151-154 ('Assert on the thing the task actually produces (an import, a file's contents, a `--help` exit code)').",
+      "fix": "Either add one line to 'Decided here' saying that sentence stays because its import is of something the brief names, or let G1 add 'of a name the brief gives' after 'an import' and exempt it in Violations. An eval run of plan-judges-through-named-surface would settle whether it matters."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example / Acceptance, at close — 1",
+      "summary": "The worked example expects `grep -c plan-judges-through-named-surface plugin/evals/README.md` to give 1. Acceptance 1 then records the case's scores in that same README, which most likely names the case again, so the line no longer holds after close.",
+      "evidence": "plugin/evals/README.md:62-69 (earlier records name their cases); the brief's worked example's last line.",
+      "fix": "Make it 'at least 1', or scope the line to the catalogue table (`grep -c '^| `plan-judges-through-named-surface`'`)."
+    }
+  ],
+  "decisions": [
+    "Fix the plan skill rather than relax the gate review's pins-unnamed. Agree.",
+    "A pin stays allowed where no named surface reaches a criterion, and is stated in the task's acceptance. Agree; it also lets the gate review, which reads state.json and not the report, see the pin.",
+    "G2: a gate left unchanged gets the same finding again. This is a warning, not a driver check (driver checks are out of scope). Fine; the eval does not exercise a revision round, so the operator's run at close is the only test of G2.",
+    "Gate-review ceiling 1550 → 1600 (about 1556 after the 29-word sentence); plan stays at 4100 (about 3,890 after the edits). Agree.",
+    "The eval's brief forbids a gate folder ('each task's judge is its verify command alone'). This is not listed under 'Decided here'. It exists because the llm grader can see only state.json. Sound, but say so.",
+    "The eval uses a shell library so it needs only sh. Fine.",
+    "No domain invariant changes; P-4 and P-8 already cover it. Agree.",
+    "gpt-6.1-terra is the only candidate; the others wait for #81. Fine.",
+    "The PR closes #84 only if every phase qualifies. Sensible.",
+    "The whole brief was written under the operator's delegation of 2026-11-02. The operator should confirm that the delegation covers marking it ready."
+  ],
+  "checked": "facts: plan SKILL.md Naming 164-174 and A revision round 410-420, where G2 is inserted, the replaced phrase occurring only once; gate-review pins-unnamed 110-111; word counts 3804/1527 against the 4100/1550 ceilings and the comment style in budget.go; the gpt-6.1-terra section of the experiments note (8 of 9 gates, 2 rounds); P-4 and P-8; plan-checks-its-gates' files and _lib.sh; both catalogue tables; the config keys agent./model.<phase>, review-brief and run.second-review. Consistency: worked example against the contract, scaffold re-run failing through require_empty, git ls-files and status after the scaffold. Rules: CLAUDE.md, checkEvals, checkLLMFocus, TestEvalGrantsCoverFence (the copied allowed_tools cover the fence). Runnability: the 3+1 tasks against the single go check; each gate fails on the base for its own reason. Round 1's three fixes are applied. vloop brief check on a ready copy: 0 warnings.",
+  "header": "Reviewed 2026-11-02 (round 2): FIX, 4 findings"
+}
+

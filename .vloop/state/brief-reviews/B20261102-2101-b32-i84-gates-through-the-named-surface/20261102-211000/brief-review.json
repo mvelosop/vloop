@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — G1 / Violations the review must rule on",
+      "summary": "The plan skill keeps a second, absolute statement of the pin rule that G1 leaves untouched and the Violations list forbids touching: the gate review judges that each gate 'pins no name the brief does not'. After G1 and G3, a pin is sound where no named surface reaches the criterion and the task's acceptance states it. So the plan skill will say both 'you may pin the minimum' and 'the gate review rejects any pin'. This is the same plan-skill-vs-gate-review disagreement the brief exists to remove, now inside one file, and a literal reader (the gpt-6.1-terra case) can follow either sentence.",
+      "evidence": "plugin/skills/plan/SKILL.md:396-401 ('...judges each gate: ... can be passed by a correct implementation, and pins no name the brief does not.'); the brief's Violations bullet 1 allows only the 'Known trap' parenthesis to change.",
+      "fix": "Have G1 also replace 'and pins no name the brief does not' with fixed text such as 'and pins a name the brief does not only where no surface it names reaches the criterion'. Exempt that clause in Violations, and add a joined-text line for it to the worked example. Or add a line to 'Decided here' explaining why the absolute wording stays."
+    },
+    {
+      "kind": "fact",
+      "section": "Acceptance, at close — 1",
+      "summary": "The brief justifies `--case 'plan-*'` and `--case 'gate-review-*'` with 'a quoted pattern, as B30's acceptance ran `--case 'verify-*'`'. B30 did not do that: it named both cases exactly. Nothing in the repository uses a glob with --case, so it is still unverified whether --case takes a pattern. The repository's guideline says a tool's flags come from the tool, not from memory. If --case does exact matching, the narrowed run selects no cases, or fails.",
+      "evidence": "docs/briefs/B20261102-1332-b30-*.loop-brief.md:449-451 ('narrowed with `--case verify-planted-mismatches` and `--case verify-unrunnable-line` (`--case` from `claude plugin eval --help`)'). `grep -rn -e \"--case '\" docs plugin` finds nothing outside this brief. CLAUDE.md repository guideline (D20261001-1338). `claude plugin eval --help` could not be run in this review session.",
+      "fix": "List the seven cases by name: --case plan-valid-state --case plan-checks-its-gates --case plan-judges-through-named-surface --case language-es --case gate-review-planted-gates --case gate-review-real-misses --case gate-review-coverage. Or check `claude plugin eval --help` for pattern support and cite that instead of B30."
+    }
+  ],
+  "decisions": [
+    "Fix the plan skill, not the gate review's pins-unnamed standard: agree.",
+    "A pin stays possible where no named surface reaches the criterion, stated in the task's acceptance: agree. The gate review reads state.json, not the plan's report, so the acceptance is the right place.",
+    "G2 is a warning in the skill, not a driver check (out of scope): fine. The eval does not exercise a revision round, so only the operator's run at close tests G2.",
+    "Gate-review ceiling 1550 → 1600 (1527 now, about 1556 after the sentence); plan stays at 4100 (3804 now, about 3900 after): agree.",
+    "The eval's brief forbids a gate folder ('each task's judge is its verify command alone') without saying why. It exists because the llm grader's single focus is state.json. Sound, but it is the author's choice and it still isn't listed under 'Decided here' (round 2 raised it too).",
+    "Shell library, so the case needs only sh: fine.",
+    "No domain invariant changes (P-4 and P-8 already hold): agree.",
+    "gpt-6.1-terra is the only candidate; the other models wait for #81: fine.",
+    "Qualification is the operator's acceptance at close, and the PR closes #84 only if every phase qualifies: necessary and sensible.",
+    "The whole brief was written under the operator's delegation of 2026-11-02 for the #81–#88 chain. The operator should confirm that marking it ready is covered."
+  ],
+  "checked": "facts: plan SKILL.md Naming 164-174, Known trap 151-155 (its parenthesis wraps across 153-154 and matches once joined), A revision round 410-420 (the G2 anchor sentences), the replaced phrase occurring only at :170; gate-review pins-unnamed 110-111; word counts 3804/1527 against ceilings 4100/1550 (23 words of headroom, as stated); Ceilings and the comment style in budget.go (as operate's entry); no test pins the replaced skill text; the experiments note's gpt-6.1-terra section (eight of nine gates import internals, two rounds); P-4 and P-8. Consistency: worked example against the contract, scaffold re-run failing through require_empty, git_init adding no tracked file, ls-files and status, brief.md containing none of 'lib/', README and guide rows. Rules: CLAUDE.md, checkEvals, checkLLMFocus (focus state.json), TestEvalGrantsCoverFence (the copied allowed_tools). Runnability: the 3+1 tasks against the single go check, each gate failing on the base for its own reason; no plugin/, internal/ or docs/guide change between 7de2855 and HEAD, so main's baseline is the same. Round 1's and round 2's findings are fixed. vloop brief check on a ready copy: 0 warnings.",
+  "header": "Reviewed 2026-11-02 (round 3): FIX, 2 findings"
+}
+

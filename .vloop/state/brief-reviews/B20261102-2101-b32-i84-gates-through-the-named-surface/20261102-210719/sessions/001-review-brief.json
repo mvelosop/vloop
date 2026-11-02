@@ -1,0 +1,32 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.9745102,
+  "duration_ms": 144536,
+  "effort": null,
+  "ended": "2026-11-02T21:09:44Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 59818,
+      "cache_read_input_tokens": 1137811,
+      "cost_usd": 0.9745102,
+      "input_tokens": 46,
+      "output_tokens": 13411
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop; sed -n 88,115p docs/guide/evals.md; claude plugin eval --help 2\u003e\u00261 | grep -n -i -A2 \"case\" | head -20",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261102-2101-b32-i84-gates-through-the-named-surface",
+  "schema": "session/v5",
+  "started": "2026-11-02T21:07:19Z",
+  "turns": 24,
+  "wall_ms": 145142
+}

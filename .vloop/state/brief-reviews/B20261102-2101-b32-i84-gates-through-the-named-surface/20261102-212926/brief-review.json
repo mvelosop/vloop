@@ -1,0 +1,29 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Behaviour contract — Decided here",
+      "summary": "The parenthesis '(the other plan cases need python3 only through _lib.sh)' is wrong: no plan case needs python3 at all.",
+      "evidence": "plugin/evals/plan-valid-state/scaffold.sh, plugin/evals/language-es/scaffold.sh and plugin/evals/plan-checks-its-gates/scaffold.sh call only require_empty, git_init and commit_all from _lib.sh; python3 appears only in _lib.sh's task/report helpers (plugin/evals/_lib.sh:205, 228, 237), which the review cases use. The new case is no different from the existing plan cases in this respect.",
+      "fix": "Drop the parenthesis, or write '(like the other plan cases, whose scaffolds use only _lib.sh's require_empty, git_init and commit_all)'."
+    }
+  ],
+  "decisions": [
+    "Change the plan skill rather than the gate review's standard; pins-unnamed stays. Agree.",
+    "A pin stays allowed where no named surface reaches the criterion, and the pinned name goes into the task's acceptance (the gate review reads acceptance via vloop task show, so it can see it). Agree.",
+    "The new Naming paragraph drops the old sentence 'Do not pin a name that no gate uses.'; 'the minimum a gate needs, and no more' covers it. Acceptable, but it is a silent deletion the operator should know about.",
+    "A revision round must change each named task until its finding no longer holds (G2). Agree.",
+    "gate-review ceiling 1550 -> 1600; the plan skill's ceiling is left at 4100 (simulated result is about 3,920 words). Agree.",
+    "The eval case's scaffold writes no .vloop/state/, unlike the other plan scaffolds; the planner must create it (mkdir and Write are granted). Harmless.",
+    "The eval brief forces verify-only judges (no gate-folder files) so the llm grader, which sees only state.json, can see every judge. A sensible workaround for D20261004-1309.",
+    "gpt-6.1-terra is the only candidate, and qualifying it is the operator's acceptance at close, not a task. Agree.",
+    "No domain invariant changes; the pin rule lives in the skills only. Agree.",
+    "The guide's case count is corrected from 21 to 23 (it was 22 before this case). Verified: 22 case directories today."
+  ],
+  "checked": "facts (skill sections and sentences quoted, budget values and alignment, word counts, case count, _lib.sh functions, config keys, gate review reads acceptance), consistency (worked example against contract, joined-text strings, scaffold outputs), rules (P-4/P-7/P-8, no gate runs tests, repo-relative paths, eval structure test checkEvals and TestEvalGrantsCoverFence), runnability (go check after each task, budgets within ceilings per task, gates fail on base)",
+  "header": "Reviewed 2026-11-02: FIX, 1 finding"
+}
+
