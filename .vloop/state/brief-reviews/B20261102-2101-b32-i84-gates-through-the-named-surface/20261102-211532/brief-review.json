@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / G4 (catalogues)",
+      "summary": "The new case makes the suite 22 cases, but docs/guide/evals.md still says 21. G4 updates the guide's /vloop:plan row and the README catalogue, not this count. A work session that fixes it touches a line the contract does not name, and one that leaves it ships a stale doc.",
+      "evidence": "docs/guide/evals.md:133: 'The full suite is 21 cases × 3 runs × 2 arms'. ls plugin/evals: 10 review cases (01–08, 05b, 07b) + 11 others = 21 directories.",
+      "fix": "In G4, add: in docs/guide/evals.md, '21 cases' becomes '22 cases'. Add a worked-example line: joined docs/guide/evals.md contains 'The full suite is 22 cases'."
+    },
+    {
+      "kind": "consistency",
+      "section": "Acceptance, at close / 1. The evals",
+      "summary": "Unsure. The acceptance asks for 'one run each', but the guide's invocation implies 3 runs per case ('21 cases × 3 runs'), and the brief names no flag for the run count. It cites --case from the tool's help but not this flag.",
+      "evidence": "docs/guide/evals.md:104-116 (the invocation, with no run-count flag) and :133. This review could not run 'claude plugin eval --help' (the call was denied), so it could not confirm the flag's name or whether the default is 3.",
+      "fix": "Name the run-count flag, taken from 'claude plugin eval --help', next to --case. Or say that one run per case is the tool's default for this invocation."
+    }
+  ],
+  "decisions": [
+    "Change the plan skill, not the gate review's standard (pins-unnamed stays as is). Agree: the gate review was right in the 2026-11-02 attempt.",
+    "A pin stays allowed where no surface the brief names reaches a criterion, and the pinned name goes into the task's acceptance. Agree: forbidding every pin turns such criteria into uncovered findings.",
+    "G2 tells the planner to change every task a finding names until the finding no longer holds. The plan skill gives the planner no way to dispute a gate-review finding, so a false finding (like B26's false unpassable) now pushes the planner to rewrite a sound gate. Probably acceptable, because a second failure still stops the run for the operator, but the operator should know.",
+    "gpt-6.1-terra is the only candidate; gpt-6-luna, claude-sonnet-5.5 through Copilot and kimi-k3 are deferred to #81.",
+    "Qualifying gpt-6.1-terra is the operator's acceptance at close, and #84 closes only if every phase qualifies.",
+    "The gate-review ceiling rises from 1550 to 1600. The estimated size after G3 is about 1556 words, which leaves about 44 words of headroom.",
+    "The eval's library is a shell library, so the case needs nothing but sh.",
+    "The eval's brief requires 'its verify command alone, with no file in a gate folder', so the llm grader (focused on state.json only) sees every judge. This narrows what the case tests, because the planner's gate-folder path is not exercised. Fine for this case.",
+    "No domain invariant changes: P-4 and P-8 stand, and the pin rule lives in the skills."
+  ],
+  "checked": "facts: plan SKILL.md 3804 words (ceiling 4100) and gate-review 1527 (ceiling 1550, so 23 words of headroom); the Naming paragraph, Known trap parenthesis, 'pins no name the brief does not.' and 'A revision round' sentences exist as quoted, each only once; the pins-unnamed bullet; budget.go Ceilings and its comment style; plan-checks-its-gates (max_turns 80, its allowed_tools, case.yaml, state-validates.md, scaffold layout); _lib.sh require_empty/git_init/commit_all; both catalogue tables; P-4/P-8; the copilot-cli-experiments section, which bears out the eight-of-nine imports and the unchanged round 2. consistency: the worked example matches G1–G4 and the scaffold spec; estimated sizes after the edits are about 3915 (plan) and about 1556 (gate-review), both under their ceilings. rules: no repository rule contradicted; the brief cites invariants by ID. runnability: one go check; each task's gate fails on the base and stays green after each task; the new eval case passes checkEvals and checkLLMFocus (one file focus, no 'transcript'); no task runs claude, copilot or the network; vloop brief check on a ready copy: ok, 0 warnings. Not checked: the claude plugin eval flags (the help call was denied).",
+  "header": "Reviewed 2026-11-02 (round 5): FIX, 2 findings"
+}
+

@@ -1,0 +1,43 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "Shape",
+      "summary": "Tasks 1, 2 and 3 are 'Gated on ... go test ./internal/cli' (task 2 on 'go test ./internal/budget ./internal/cli'). A gate that runs the repository's tests breaks P-8, and the gate review flags it as task-reach. A planner that follows the brief literally, which is exactly the behaviour this brief is about, writes gates that the gate review sends back.",
+      "evidence": "docs/domain/domain-model.md:210-213 (P-8: a gate 'never runs the repository's suite, a check, or a test a task writes'); plugin/skills/gate-review/SKILL.md:103-105 ('A gate that runs the repository's suite, a check or a task's test is this kind too (P-8)', task-reach); plugin/skills/plan/SKILL.md:385-386 ('no verify runs the repository's suite'); plugin/evals/plan-checks-its-gates/graders/no-repository-suite.md scores 0 on a verify containing 'go test'. The packages are already covered: the `go` check in .vloop/config.toml runs `go test ./...` with paths [\"**\"] after every iteration. B31's gates (.vloop/state/gates/T1-T5/gate.sh) ran no go test.",
+      "fix": "Remove 'go test ...' from the three Shape items: task 1 is 'Gated on the joined-text lines', task 2 on 'the joined-text lines and the word count', task 3 on 'the scaffold lines of the worked example, run in a temporary directory'. Keep the Constraints line on TestPluginSkills and the budget test, and say there that the `go` check holds it, not a gate. The worked example's 'go test ./internal/budget ./internal/cli' line can stay for the verify session, or be marked as the check's."
+    },
+    {
+      "kind": "consistency",
+      "section": "Out of scope; Binding references",
+      "summary": "Out of scope excludes 'Any other section of the plan or gate-review skill', but G1 edits two plan-skill sections beyond 'Naming' and 'A revision round': the 'Known trap' paragraph, which sits under '### Assert on the parse, not on its text', and '## Gates are judged, not self-checked'. The Violations list was amended to allow both edits, Out of scope was not. Binding references cite only 'Naming' and 'A revision round' for the plan skill.",
+      "evidence": "plugin/skills/plan/SKILL.md:93 (### Assert on the parse, not on its text) holds the Known trap at 151-155; :393 (## Gates are judged, not self-checked) holds 'pins no name the brief does not.' at 400-401. Brief, Out of scope: 'Any other section of the plan or gate-review skill'.",
+      "fix": "Reword the Out of scope bullet as 'Any other section or sentence of the plan or gate-review skill beyond those G1-G3 name'. Extend the plan skill's Binding reference to also cite the Known trap paragraph (in 'Assert on the parse, not on its text') and 'Gates are judged, not self-checked'."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example; Constraints",
+      "summary": "One expected string, \"(a file's contents, a `--help` exit code, an import of a module the brief names)\", is written in double quotes and contains backticks. Copied into a shell gate as written, `--help` becomes a command substitution and the pattern is mangled. The string also contains an apostrophe, so plain single quotes do not hold it either. A gate built that way still fails on the base, so it looks right, but it also fails after a correct edit. That makes it unpassable, and it would surface only as a gate_dispute in the work session.",
+      "evidence": "Brief, Worked example, line 4 of the plan SKILL.md block; the Constraints cover BSD regex pitfalls but not shell quoting of the literals.",
+      "fix": "Add a Constraint: 'Expected strings with a backtick or an apostrophe are read from a quoted here-document (<<'EOF') or a file in the gate folder, never put inside a double-quoted shell argument.' Alternatively, have the worked example grep that line as two fragments with no backtick."
+    }
+  ],
+  "decisions": [
+    "Change the plan skill rather than the gate review's standard: agree; the 2026-11-02 attempt (docs/design-notes/copilot-cli-experiments.md:549-592) shows the gate review was right.",
+    "A pin is still allowed where no named surface reaches the criterion, and is stated in the task's acceptance: agree; 'Naming' and pins-unnamed/not-contract now say the same thing.",
+    "G2 gives no exit for a finding the planner cannot resolve: 'until the finding no longer holds' applies to check-gap, where the gate review itself says 'The planner cannot add a check', and the plan skill never mentions check-gap. The only way to clear one is to reword or drop a brief criterion. The 2026-11-02 run ended on exactly such a check gap. My opinion: acceptable for this brief, but the operator should know that G2 pushes in that direction; a follow-up could tell the planner to leave a check-gap standing and report it.",
+    "gpt-6.1-terra is the only candidate; the others wait for #81: fine.",
+    "Qualification is the operator's acceptance at close, and #84 closes only if every phase qualifies: necessary, since sessions have no network.",
+    "Only the gate-review ceiling rises, 1550 to 1600: about 1562 words after G3 (1527 + 35); plan about 3917 of 4100. Fine.",
+    "The eval's brief bars gate folders, so the single-file llm grader sees every judge, and its library is a shell library: fine.",
+    "The new scaffold writes no .vloop/state/, unlike both plan scaffolds: harmless, since Write creates the folder.",
+    "Acceptance 1 does one run per case, with reruns from 7de2855 only below 1.00: cheap but noisy; the operator's call.",
+    "The whole brief was written under the operator's delegation of 2026-11-02 for the #81-#88 chain: the operator should confirm that the delegation covers these choices."
+  ],
+  "checked": "facts (section texts and line positions in both skills, word counts 3804/1527 and the post-edit estimates, Ceilings and its tests, case count 22 -> 23, guide line 133 and table row 147, README catalogue, plan-checks-its-gates files and _lib.sh helpers, config keys agent/model.review-brief, the experiments section), consistency (worked example vs contract, quoting, Out of scope vs G1, Violations), rules (P-4, P-8, the gate review's kinds, CLAUDE.md), runnability (each task against the go check, gates failing on the base, TestPluginSkills and TestEvalGrantsCoverFence against the new case); claude plugin eval --help not run (denied here), the --case/--runs flags taken from earlier rounds",
+  "header": "Reviewed 2026-11-02 (round 7): FIX, 3 findings"
+}
+

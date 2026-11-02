@@ -1,0 +1,43 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — G4 (brief.md) vs G1",
+      "summary": "The eval's brief includes a criterion that no named surface reaches: the arithmetic and file handling live in a shell library that bin/tally sources. By G1's own new text ('Only where no surface the brief names reaches a criterion may you pin the minimum a gate needs'), a planner that follows the rule correctly may pin the library's file name to judge that criterion and state it in acceptance. judges-through-the-command.md then scores it 0 ('no verify or acceptance criterion sources, runs or names a library file or function'). The case can penalise correct obedience to the rule it tests.",
+      "evidence": "Brief G1 paragraph ('Only where no surface the brief names reaches a criterion may you pin…'); G4 brief.md bullet 4 and the judges-through-the-command grader; docs/domain/domain-model.md:210-213 (P-8: a criterion may instead be judged by the review).",
+      "fix": "Have the eval's brief leave that criterion to the review, not a gate. For example, end the library bullet with 'where the code lives is the review's to judge'. Or move the library sentence from the contract into the eval brief's 'What it is' prose, so it is context and not a criterion. Either way the graded 'no gate names the library' becomes the only correct plan."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — G4 (brief.md)",
+      "summary": "The eval's brief keeps the total in 'tally.txt at the repository's root' and doesn't say how bin/tally finds that root: from the current directory or from its own location. A gate must build its fixture outside the repo (the repo's constraint, and the driver flags a changed tree). Without that rule, the obvious way to isolate bin/tally is to copy it to a temp dir with its library, and that means naming the library. The case pushes planners toward the pin it grades against, through an ambiguity rather than through the temptation it means to set.",
+      "evidence": "G4 brief.md bullets 1-2 ('tally.txt at the repository's root'); brief Constraints ('Tests and gates build their fixtures in temporary directories'); plugin/skills/plan/SKILL.md:414 ('a changed tree' as an acceptance problem).",
+      "fix": "Pin it literally in the eval brief: 'tally.txt in the current directory' (or 'at the root of the git repository containing the current directory'). Then a gate can run \"$R\"/bin/tally from a fresh mktemp directory and never copy or name the library."
+    },
+    {
+      "kind": "consistency",
+      "section": "Acceptance, at close — 1",
+      "summary": "'No other plan or gate-review case scores below its last recorded score' has no named record. plugin/evals/README.md records scores only for review-brief, create-brief and verify cases. The plan and gate-review scores are scattered across older briefs' run records.",
+      "evidence": "plugin/evals/README.md:62-69 (the only recorded scores); grep finds plan-checks-its-gates scores only in docs/briefs/B20261003-2049-*, B20261005-0933-*, B20261011-2251-* and B20261001-1025-*.",
+      "fix": "Either name where the baseline is (for example, the latest Run record that lists each case), or state the threshold literally: each of those cases scores 1.00, or as recorded in the named brief."
+    }
+  ],
+  "decisions": [
+    "Change the plan skill rather than relax the gate review's pins-unnamed: agree, the gate review's standard is the right one.",
+    "A pin stays allowed where no named surface reaches a criterion (rather than 'never pin'): reasonable, but see finding 1. The rule should also point at the review (P-8) as the alternative to a pin.",
+    "A pinned name goes into the task's acceptance, not only the plan's report: agree, the gate review reads state.json, not the report.",
+    "gpt-6.1-terra is the only candidate; gpt-6-luna, claude-sonnet-5.5 via Copilot and kimi-k3 are deferred to #81: fine for scope.",
+    "Qualification is the operator's acceptance at close, not a task: necessary, since sessions have no network or credentials.",
+    "Gate-review ceiling 1550 → 1600 (the sentence adds about 28 words to 1527); plan ceiling left at 4100 (about 3900 after the edits): numbers check out.",
+    "The eval uses a shell library so it needs only sh: fine.",
+    "No domain invariant changes; the pin rule lives in the skills as planning practice: agree, P-4 and P-8 already hold the principle.",
+    "The PR closes #84 only if every phase qualifies, otherwise it names the open phases: sensible.",
+    "The whole brief was authored under the operator's delegation of 2026-11-02 for the #81–#88 chain. The operator should confirm that the delegation covers marking it ready."
+  ],
+  "checked": "facts (plan SKILL.md Naming lines 164-174 and A revision round 410-420, the replaced sentence's only occurrence, gate-review pins-unnamed at 110-111, word counts 3804 and 1527 against ceilings 4100 and 1550, budget.go Ceilings and comment style, the experiments section's numbers, P-4 and P-8, plan-checks-its-gates' files and _lib.sh helpers, both catalogue tables, --case in the guide); consistency (the worked example against the contract, grep -c counts, scaffold re-run failure via require_empty); rules (CLAUDE.md, the skills test's eval-structure and grant checks, llm focus check); runnability (task order against the single go check; each gate fails on the base for the right reason); vloop brief check on a ready copy: 0 warnings",
+  "header": "Reviewed 2026-11-02: FIX, 3 findings"
+}
+

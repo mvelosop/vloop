@@ -1,0 +1,29 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Executive summary",
+      "summary": "The summary does not fully restate the contract. G1 names only the 'Naming' paragraph, and G3 names only the pins-unnamed sentence. Then 'Unchanged: ... every other skill and section' leaves out three edits the contract makes: the 'Known trap' parenthesis (in the section 'Assert on the parse, not on its text'), the sentence in 'Gates are judged, not self-checked', and the not-contract parenthesis. Round 7 fixed the same mismatch in Out of scope but not here.",
+      "evidence": "Brief, Executive summary bullets G1, G3 and 'Unchanged'; Behaviour contract G1 (last paragraph) and G3 (not-contract); plugin/skills/plan/SKILL.md:151-155 and :400-401; plugin/skills/gate-review/SKILL.md:95-96.",
+      "fix": "Add to G1: 'plus one phrase each in the Known trap paragraph and in Gates are judged, not self-checked'. Add to G3: 'and its not-contract bullet defers to a sound pin'. Reword 'Unchanged' to 'every other sentence of the two skills beyond those G1-G3 name, every other skill'."
+    }
+  ],
+  "decisions": [
+    "The whole brief was written under the operator's delegation of 2026-11-02 for the #81-#88 chain. The operator should confirm the delegation covers these choices.",
+    "Change the plan skill, not the gate review's standard: agree. docs/design-notes/copilot-cli-experiments.md:549-592 shows the gate review was right (8 of 9 gates imported internal modules).",
+    "A pin stays allowed where no named surface reaches the criterion, stated in the task's acceptance: agree. After the edit, Naming, pins-unnamed and not-contract say the same thing.",
+    "G1 replaces the whole paragraph and drops 'Do not pin a name that no gate uses.'; 'the minimum a gate needs, and no more' covers it. Fine.",
+    "G2 ('until the finding no longer holds') gives the planner no exit for a check-gap it cannot close (the 2026-11-02 run ended on one). Acceptable here; worth a follow-up that tells the planner to leave a check-gap standing and report it.",
+    "gpt-6.1-terra is the only candidate; the others wait for #81. Fine.",
+    "Qualification is the operator's acceptance at close, and #84 closes only if every phase qualifies. Necessary: sessions have no network.",
+    "Only the gate-review ceiling rises (1550 to 1600; about 1564 words after G3). Plan ends at about 3,930 of 4,100. Fine.",
+    "The eval's brief rules out gate folders, so the single-file llm grader sees every judge; its library is a shell library. Fine.",
+    "Acceptance 1 runs each case once and reruns from 7de2855 only below 1.00: cheap but noisy. The operator's call."
+  ],
+  "checked": "facts: the text and position of every anchor in plan SKILL.md (164-174, 151-155, 393-401, 410-420) and gate-review SKILL.md (95-112); word counts 3804/1527 and the post-edit estimates; Ceilings and gofmt alignment of the expected '\"gate-review\":  1600'; no other copy of the replaced text in the repo; case count 22 -> 23; guide lines 133 and 147; README 'The other cases'; plan-checks-its-gates files, _lib.sh's require_empty/git_init/commit_all; the experiments section; P-4/P-8. Consistency: worked example vs contract, quoting of expected strings, Violations and Out of scope vs G1-G3. Rules: P-8 (no gate runs the tests), CLAUDE.md. Runnability: each task against the go check (TestPluginSkills, checkEvals key/grader/focus rules, TestEvalGrantsCoverFence, budget test; G3 and its ceiling share task 2), every gate fails on the base. vloop brief check on a ready copy: ok, 0 warnings. Not run: claude plugin eval --help (denied here), so the --case/--runs flags rest on the brief's quotes.",
+  "header": "Reviewed 2026-11-02 (round 8): FIX, 1 finding"
+}
+
