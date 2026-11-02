@@ -36,8 +36,8 @@ Sessions propose; the driver disposes.
 
 ## Skills
 
-The plugin ships five skills. The first four are the sessions of the loop;
-`vloop run` starts each one, you do not.
+The plugin ships eight skills. Five are the sessions of the loop;
+`vloop run` starts each one, you do not. The other three are the operator's.
 
 - `/vloop:plan` reads the brief and its binding references and writes the plan
   (`.vloop/state/state.json`): tasks with acceptance criteria, a verify command,
@@ -52,9 +52,17 @@ The plugin ships five skills. The first four are the sessions of the loop;
 - `/vloop:review` reads the diff and the proposal and writes `verdict/v1`:
   `PASS` or `FAIL`, per-criterion evidence, and findings of kind `bug`,
   `spec-gap` or `gate-gap`. It fails closed.
+- `/vloop:verify` runs once per complete run, in a session separate from the work
+  and the reviews, checks the built result against the brief in three passes and
+  writes `verify/v1`.
 - `/vloop:operate` is yours: invoke it in an interactive session to run a brief
   on a work branch, handle halts, verify, record defects and interventions, close
   the brief and merge.
+- `/vloop:create-brief` is yours too: invoke it in an interactive session to
+  write a brief with the operator, from the project's documentation and code,
+  up to status `draft`. `vloop run` never starts it.
+- `/vloop:review-brief` is yours: invoke it in a separate interactive session to
+  review a brief independently before it is marked ready and run.
 
 Each skill's behaviour is checked by evals in the plugin. They are run by the
 operator with `claude plugin eval`; `vloop run` never runs them.

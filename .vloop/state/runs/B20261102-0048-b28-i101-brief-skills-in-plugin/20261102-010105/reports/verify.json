@@ -1,0 +1,7 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": { "example_lines": 7, "sentences": 9, "surfaces": 8 },
+  "notes": "Incomplete pass 1: the example lines that need a scratch git repository (vloop init + grep -c in CLAUDE.md, ls of vloop plugin path templates, and the two vloop fence check lines) were NOT run, because the permission layer denied creating a scratch repo (git init) under .vloop/tmp/. The planted-failure lines (K2 template test, budget 1201 words, doctor clash line) were not run as planted copies either. I covered them by reading code and running existing tests (internal/budget, internal/install, internal/cli passed). The internal/fence and cmd/vloop test run was still pending when this report was written. Run: the seven first-table lines match the brief (eight skill folders; create-brief files; grep exit 1; counts 1/2/1; name lines). Contract checked: K1 folders/names/pointers/operate description, budget Skills and Ceilings with comments, K3 section text, K4 evals guide rows and removal of the 'no suite' line, case count 21. Surfaces read: README.md:123, concepts.md (eight skills, three operator's), evals.md table, evals README, session.md, domain-model.md (two places), operate description, section.go. No mismatch seen in what was checked."
+}
+

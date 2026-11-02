@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.137799,
+  "duration_ms": 48969,
+  "effort": null,
+  "ended": "2026-11-02T01:36:44Z",
+  "is_error": false,
+  "iteration": 2,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 21357,
+      "cache_read_input_tokens": 126910,
+      "cost_usd": 0.137799,
+      "input_tokens": 10,
+      "output_tokens": 3966
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261102-0048-b28-i101-brief-skills-in-plugin",
+  "schema": "session/v3",
+  "started": "2026-11-02T01:35:55Z",
+  "task": "T2",
+  "turns": 5,
+  "wall_ms": 49634
+}

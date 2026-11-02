@@ -65,7 +65,9 @@ classDiagram
 ```
 
 - A **Brief** is the only input vloop takes about a project. Everything upstream
-  of it (the design act, other kinds of brief) belongs to the consumer.
+  of it (the design act, other kinds of brief) belongs to the consumer; the plugin
+  offers `/vloop:create-brief` and `/vloop:review-brief` for the design act, but
+  vloop never starts them and the brief stays its only input.
 - A **Plan** is a brief decomposed into **Tasks**. There is one plan per repo at
   a time, and it belongs to the branch that planned it.
 - A **Run** is one invocation of the driver on a plan. A brief may take several
@@ -81,7 +83,7 @@ classDiagram
 | Term | Meaning |
 | --- | --- |
 | **operator** | the human who writes briefs, runs the loop, verifies, closes and merges — or an interactive session acting as the operator's hands |
-| **design act** | turning the operator's intent into a loop brief; upstream of vloop |
+| **design act** | turning the operator's intent into a loop brief; upstream of vloop; the plugin offers `/vloop:create-brief` and `/vloop:review-brief` for it, and the brief stays vloop's only input |
 | **brief**, **loop brief** | `B<YYYYMMDD-HHMM>-<slug>.loop-brief.md`: the contract a run executes |
 | **name**, **run id** | a brief's file name without `.md`; the name without `.loop-brief` |
 | **plan** | the brief as tasks, in `state.json` |

@@ -120,9 +120,11 @@ preflight print have run.
 
 ### Skills
 
-The plugin's six skills: `/vloop:plan`, `/vloop:gate-review`, `/vloop:work`,
-`/vloop:review` and `/vloop:verify` are the sessions `vloop run` starts; `/vloop:operate` is yours, to
-run, verify, close and merge a brief.
+The plugin's eight skills: `/vloop:plan`, `/vloop:gate-review`, `/vloop:work`,
+`/vloop:review` and `/vloop:verify` are the sessions `vloop run` starts. Three are yours,
+used in an interactive session: `/vloop:operate` to run, verify, close and merge a
+brief, and `/vloop:create-brief` and `/vloop:review-brief` to write a brief and
+have it reviewed independently.
 
 ## What changed in 0.8
 

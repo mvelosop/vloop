@@ -12,18 +12,20 @@ import (
 )
 
 // Skills lists the plugin skills in the order Check reports them.
-var Skills = []string{"plan", "gate-review", "work", "review", "operate", "verify"}
+var Skills = []string{"plan", "gate-review", "work", "review", "operate", "verify", "create-brief", "review-brief"}
 
 // Ceilings is each skill's word ceiling, so that growth by drift becomes a
 // recorded decision: a failing test, and an edit of the number and of its
 // comment, which says when and why the ceiling was last set.
 var Ceilings = map[string]int{
-	"plan":        4100, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
-	"gate-review": 1550, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
-	"work":        1800, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
-	"review":      1820, // 2026-10-26, B20 (J4): 1650 (2026-10-12, B14, L10) plus the 166 words of "The product" section and the reworded path question
-	"operate":     1750, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
-	"verify":      1500, // 2026-10-15, B16 (V2, L10): the ceiling set with the skill
+	"plan":         4100, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
+	"gate-review":  1550, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
+	"work":         1800, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
+	"review":       1820, // 2026-10-26, B20 (J4): 1650 (2026-10-12, B14, L10) plus the 166 words of "The product" section and the reworded path question
+	"operate":      1750, // 2026-10-12, B14 (L10): its size after B14's task 3, plus headroom
+	"verify":       1500, // 2026-10-15, B16 (V2, L10): the ceiling set with the skill
+	"create-brief": 1200, // 2026-11-02, B28 (#101): its size when it joined the plugin, plus headroom
+	"review-brief": 1000, // 2026-11-02, B28 (#101): its size when it joined the plugin, plus headroom
 }
 
 // CountWords counts the whitespace-separated words of data, as wc -w does.

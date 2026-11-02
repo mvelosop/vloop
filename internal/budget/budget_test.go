@@ -40,6 +40,24 @@ func TestCheck(t *testing.T) {
 	}
 }
 
+func TestCheckCreateBriefOverCeiling(t *testing.T) {
+	dir := t.TempDir()
+	d := filepath.Join(dir, "skills", "create-brief")
+	if err := os.MkdirAll(d, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(d, "SKILL.md"), []byte(strings.Repeat("w ", 1201)), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	want := "create-brief: 1,201 words, over its ceiling of 1,200"
+	for _, m := range Check(dir) {
+		if m == want {
+			return
+		}
+	}
+	t.Errorf("Check did not report %q: %v", want, Check(dir))
+}
+
 func TestSep(t *testing.T) {
 	for n, want := range map[int]string{0: "0", 999: "999", 1000: "1,000", 4213: "4,213", 1234567: "1,234,567"} {
 		if got := Sep(n); got != want {

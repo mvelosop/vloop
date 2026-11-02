@@ -1,14 +1,16 @@
 ---
 name: vloop-architect
-description: The design act for this repo — the vloop-create-brief skill, plus what this repository adds to it (the roadmap row, the domain's invariants cited by ID, the constraints every brief here carries). Use in an interactive session when the operator asks to write, draft, revise or scope the next brief. Running, verifying and closing briefs belong to the vloop-operator skill.
+description: The design act for this repo — the /vloop:create-brief skill, plus what this repository adds to it (the roadmap row, the domain's invariants cited by ID, the constraints every brief here carries). Use in an interactive session when the operator asks to write, draft, revise or scope the next brief. Running, verifying and closing briefs belong to the vloop-operator skill.
 ---
 
 # The design act here
 
-**Follow the `vloop-create-brief` skill** for the whole act: find the
+**Follow `/vloop:create-brief`** for the whole act: find the
 documentation, survey, settle forks with the operator, write from the template,
-check it, have it reviewed with `vloop-review-brief`, hand over at `draft`. This
-skill only adds what is particular to this repository.
+check it, have it reviewed with `/vloop:review-brief`, hand over at `draft`.
+Until a release ships them, read them from `plugin/skills/create-brief/` and
+`plugin/skills/review-brief/`. This skill only adds what is particular to this
+repository.
 
 ## Scope comes from the roadmap
 
