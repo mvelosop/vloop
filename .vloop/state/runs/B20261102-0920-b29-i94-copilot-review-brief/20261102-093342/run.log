@@ -23,3 +23,8 @@ committing the plan
    review T1 · 0m35s · $0.11 · run $6.41 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/6 done ──
+   Add the review-brief phase to the fence judge, its fence, and the nested-review deny rule to every fence
+   work T2 · 2m33s · $0.26 · run $6.68 / $40.00
+   GATE DISPUTE T2 — blocked for the operator; no review, no attempt charged
+   T2 blocked — the operator resolves the disputed gate with vloop task verify

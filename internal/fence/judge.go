@@ -21,6 +21,7 @@ const (
 	PhaseVerify       = "verify"
 	PhaseGateReview   = "gate-review"
 	PhasePlan         = "plan"
+	PhaseReviewBrief  = "review-brief"
 )
 
 // maxDepth bounds how many sh -c layers are looked through.
@@ -52,11 +53,11 @@ func deny(format string, a ...any) Decision {
 // embedded plugin's skill names. Relative paths resolve against root; home is
 // what a leading ~ expands to ("" leaves it unexpanded).
 func New(phase, root, home string) (*Judge, error) {
-	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork && phase != PhaseVerify && phase != PhaseGateReview && phase != PhasePlan {
-		return nil, fmt.Errorf("unknown phase %q: want review, second-review, work, verify, gate-review or plan", phase)
+	if phase != PhaseReview && phase != PhaseSecondReview && phase != PhaseWork && phase != PhaseVerify && phase != PhaseGateReview && phase != PhasePlan && phase != PhaseReviewBrief {
+		return nil, fmt.Errorf("unknown phase %q: want review, second-review, work, verify, gate-review, plan or review-brief", phase)
 	}
 	fenceName := PhaseReview
-	if phase == PhaseWork || phase == PhaseVerify || phase == PhaseGateReview || phase == PhasePlan {
+	if phase == PhaseWork || phase == PhaseVerify || phase == PhaseGateReview || phase == PhasePlan || phase == PhaseReviewBrief {
 		fenceName = phase
 	}
 	raw, err := vloop.Fence(fenceName)
@@ -170,7 +171,7 @@ func under(dir, p string) bool {
 
 // skillPhase is the plugin skill a session of this phase runs.
 func (j *Judge) skillPhase() string {
-	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview || j.phase == PhasePlan {
+	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview || j.phase == PhasePlan || j.phase == PhaseReviewBrief {
 		return j.phase
 	}
 	return PhaseReview
@@ -343,7 +344,7 @@ func (j *Judge) words(ws []string, depth int) string {
 }
 
 func (j *Judge) fenceLabel() string {
-	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview || j.phase == PhasePlan {
+	if j.phase == PhaseWork || j.phase == PhaseVerify || j.phase == PhaseGateReview || j.phase == PhasePlan || j.phase == PhaseReviewBrief {
 		return j.phase
 	}
 	return PhaseReview

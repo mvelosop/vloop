@@ -92,7 +92,7 @@ func TestFenceHookFailsClosed(t *testing.T) {
 		if code != ExitUsage || d != "deny" || !strings.HasPrefix(why, "vloop fence: ") {
 			t.Errorf("%s: exit %d, %q", c.name, code, out)
 		}
-		if c.name == "unknown phase" && why != `vloop fence: unknown phase "bogus": want review, second-review, work, verify, gate-review or plan` {
+		if c.name == "unknown phase" && why != `vloop fence: unknown phase "bogus": want review, second-review, work, verify, gate-review, plan or review-brief` {
 			t.Errorf("%s: reason %q", c.name, why)
 		}
 	}

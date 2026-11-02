@@ -123,7 +123,8 @@
       "Bash(rm --recursive:*)",
       "Bash(vloop -C:*)",
       "Bash(vloop --chdir:*)",
-      "Bash(vloop brief new:*)"
+      "Bash(vloop brief new:*)",
+      "Bash(vloop brief review:*)"
     ]
   }
 }
