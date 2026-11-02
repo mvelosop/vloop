@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md",
   "base": "a30ab36ac4c5e5050c6d3222b5eaa0adeca02995",
   "branch": "B20261102-1844-b31-i110-i112-plan-phase-edges",
-  "status": "running",
+  "status": "complete",
   "iteration": 5,
   "created": "2026-11-02T19:28:53Z",
-  "updated": "2026-11-02T20:10:51Z",
+  "updated": "2026-11-02T20:17:19Z",
   "shell": "sh",
   "checks": [
     {
