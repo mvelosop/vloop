@@ -51,6 +51,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | setup | repair | yes | no-options | [I20260928-2215-the-loop-s-install-proof-failed-in-every](I20260928-2215-the-loop-s-install-proof-failed-in-every.md) |
 | setup | repair | partly | no-options | [I20261031-144252-the-default-node-had-no-pnpm-pnpm-10-33](I20261031-144252-the-default-node-had-no-pnpm-pnpm-10-33.md) |
 | setup | repair | partly | no-options | [I20261101-222016-claude-trust-accepted-for-the-acceptance](I20261101-222016-claude-trust-accepted-for-the-acceptance.md) |
+| setup | repair | partly | no-options | [I20261102-004524-claude-trust-accepted-for-the-acceptance](I20261102-004524-claude-trust-accepted-for-the-acceptance.md) |
 | design | carry-forward | yes | no-options | [I20260929-2150-b1-s-open-items-carried-into-b2](I20260929-2150-b1-s-open-items-carried-into-b2.md) |
 | design | context-supply | partly | no-options | [I20260929-1222-the-design-conversation-was-reachable-on](I20260929-1222-the-design-conversation-was-reachable-on.md) |
 | design | decision | partly | no-options | [I20260929-1804-seven-forks-settled-for-the-first-brief](I20260929-1804-seven-forks-settled-for-the-first-brief.md) |
@@ -115,6 +116,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | decision | partly | no-options | [I20261101-223145-the-copilot-gate-review-found-a-second-c](I20261101-223145-the-copilot-gate-review-found-a-second-c.md) |
 | halt | halt | yes | no-options | [I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new](I20261003-2323-b9-halted-on-t2-s-gate-dispute-t1-s-new.md) |
 | halt | halt | partly | recommended | [I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate](I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate.md) |
+| halt | halt | no | no-options | [I20261102-004525-acceptance-halted-twice-at-the-gate-revi](I20261102-004525-acceptance-halted-twice-at-the-gate-revi.md) |
 | halt | repair | partly | no-options | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
 | halt | repair | yes | no-options | [I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th](I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th.md) |
 | halt | repair | partly | recommended | [I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio](I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio.md) |
@@ -130,6 +132,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | partly | no-options | [I20261015-215305-t9-stalled-on-a-check-the-fence-forbids](I20261015-215305-t9-stalled-on-a-check-the-fence-forbids.md) |
 | verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261101-230340-acceptance-on-the-real-cli-the-url-short](I20261101-230340-acceptance-on-the-real-cli-the-url-short.md) |
+| verify | ceremony | partly | no-options | [I20261102-004526-acceptance-on-the-real-cli-the-url-short](I20261102-004526-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |

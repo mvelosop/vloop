@@ -459,6 +459,55 @@ the `app` check. Plan, work, review and verify on Claude with the defaults;
 - **Setup:** Claude's folder trust accepted through tmux; Copilot asked for
   none there.
 
+## Acceptance of Copilot planning (B27, 2026-11-02)
+
+vloop built from the B27 branch, Copilot CLI 1.0.105, `gpt-5.6-terra` for
+the plan. The URL shortener brief in a fresh clone of
+`mvelosop/url-shortener-template`, in a folder Claude and Copilot trust, with
+the checks the B26 acceptance ended with (`app` and `clean`). Gate review,
+work, review and verify on Claude with the defaults; `agent.plan = copilot`.
+Operated from a Claude Code session.
+
+| | |
+| --- | --- |
+| Attempts | 2, each from the same commit; both halted with exit 2 after the gate review failed the plan twice; no task ran |
+| Plan sessions | 4 (two per attempt), every record `session/v4`, agent `copilot`, model `gpt-5.6-terra`, `cost_source: "estimated"`, 21–99 s |
+| Plan cost | 77.2 credits, ≈ $0.51 (attempt 1: 27.3 + 25.1; attempt 2: 15.3 + 9.4) |
+| Gate reviews (Claude, Sonnet) | attempt 1: round 1 FAIL, 9 findings on T2–T5, T8, T9; round 2 FAIL, 6 findings on T2–T4, T6, T7, T9. Attempt 2: round 1 FAIL, 1 finding (T2, `unpassable`); round 2 FAIL, 16 findings on T2–T9 (8 `task-reach`, 8 `pins-unnamed`) |
+| Hook denials | 3, all in attempt 1, all shell syntax the hook cannot judge (`if`, `for`, a redirection target holding `$`); none for a path after a `cd` |
+| Driver | the preflight warned `agent.plan is copilot: experimental`; the plan commits took nothing outside `.vloop/`; no restoration |
+| Total | ≈ $1.11 over the two attempts (plan $0.51, gate review $0.59); ≈ 5 and ≈ 2 min of wall time |
+
+- **The mechanism worked; the plans did not pass.** Copilot ran the plan
+  skill under the plan fence, wrote `state.json` and `plan.md`, answered the
+  gate review's problems in a second session, and the driver checked the gates
+  on the base, committed the plan and halted as it should. Every gate review
+  failed the plan, and the run never reached a work session.
+- **Terra wrote no gate folder.** In four sessions every gate was a command
+  line: inline `node -e` checks against the built server or the module, or
+  `pnpm test -- --runTestsByPath <spec>` on a spec its task would write.
+  Claude's plan of the same brief (B26) held every gate as a judge in
+  `.vloop/state/gates/<id>/`. The findings follow from that: gates pinning
+  module paths and class names the brief leaves open, gates whose judge is the
+  task's own test, and, in attempt 1's second round, three gates cut to
+  `pnpm build`, which pass once the scaffold lands.
+- **The second plan session answered only what it was sent.** Attempt 2's
+  first round flagged T2 alone and passed T3–T9; the second plan session fixed
+  T2's test tier; the second round then failed T3–T9 on gates of the kind the
+  first round had passed. The Sonnet gate review was the inconsistent party
+  there, and the plan stayed as weak as before.
+- **The operator's options at the halt** were to amend the gates with
+  `vloop task verify` and re-run, or to replan. Amending eight gates by hand
+  would have tested the operator's gates and not Copilot's plan, so the second
+  attempt replanned from scratch, and the acceptance stops at the plan. Whether
+  a Copilot plan can carry this brief through a run, with another model or
+  hand-amended gates, is open.
+- **The fence held and did not get in the way**: each denial was a form the
+  hook refuses by design, and the session went on another way. No session
+  tried to write outside the plan's paths.
+- **Setup:** Claude's folder trust accepted through tmux; Copilot asked for
+  none there.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts
