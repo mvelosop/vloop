@@ -5,9 +5,9 @@
   "base": "28f49ae8009ed10d3ee753520bdee280fe780a4d",
   "branch": "B20261102-1332-b30-i113-verify-unrunnable-lines",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-11-02T14:02:09Z",
-  "updated": "2026-11-02T14:53:33Z",
+  "updated": "2026-11-02T14:59:59Z",
   "shell": "sh",
   "checks": [
     {
@@ -243,7 +243,7 @@
         "Any fix this task makes is to the contract as the brief states it, leaves a committed test where it changes behaviour, and weakens no check."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

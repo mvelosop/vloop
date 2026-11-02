@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/5 done** · iteration 6
+**Status:** running · **5/5 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` · **Updated:** 2026-11-02T14:53:33Z
+**Brief:** `docs/briefs/B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief.md` · **Updated:** 2026-11-02T14:59:59Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Read verify/v2 in the driver's verify step and print not_run and complete at close · 1 attempt(s)
 - [x] **T3** — Make the verify skill write verify/v2 from the start and list the lines it does not run
 - [x] **T4** — Teach the brief skills and operate about unrunnable lines; name verify/v2 in the docs, the kit and the evals
-- [ ] **T5** — Close the run: every gate and the worked example on the final tree
+- [x] **T5** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
 
@@ -117,7 +117,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Close the run: every gate and the worked example on the final tree
 
-`pending` · depends on: T1, T2, T3, T4
+`done` · depends on: T1, T2, T3, T4
 
 The last task proves the whole brief holds at once on the final tree: every earlier gate passes together, no fence or the fence audit changed, and the worked example holds line for line. It exists so a regression one task caused in another's surface is found before the run's verify session, not after.
 
