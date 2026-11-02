@@ -1,0 +1,32 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 1.6450780000000007,
+  "duration_ms": 270958,
+  "effort": null,
+  "ended": "2026-11-02T13:47:17Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 74893,
+      "cache_read_input_tokens": 3049470,
+      "cost_usd": 1.6450780000000007,
+      "input_tokens": 100,
+      "output_tokens": 21782
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "sed -n 38,62p docs/guide/evals.md; grep -rn \"target\" internal/cli/skills_test.go plugin/evals/README.md | head; claude plugin eval --help 2\u003e\u00261 | grep -in \"target\\|regex\\|case\" | head",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261102-1332-b30-i113-verify-unrunnable-lines",
+  "schema": "session/v5",
+  "started": "2026-11-02T13:42:46Z",
+  "turns": 52,
+  "wall_ms": 271533
+}

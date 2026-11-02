@@ -1,0 +1,93 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract V3 / Shape task 4",
+      "summary": "Adding the acceptance section to the plugin templates alone turns the go check red: the plugin templates must equal the binary's internal/brief/templates/{en,es}.md outside the executive summary, and the brief never names those files.",
+      "evidence": "internal/cli/plugin_templates_test.go:46-75 (TestPluginBriefTemplatesMatchBinary, checkPluginTemplates: bytes.Equal(rest, b) against internal/brief/templates/en.md and es.md); internal/brief/new.go:11 embeds those templates for vloop brief new.",
+      "fix": "In V3 and Binding references, add internal/brief/templates/en.md and es.md: the same section goes into both, so vloop brief new writes it too. Task 4 changes all four files together."
+    },
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract V4 (new eval case)",
+      "summary": "'a script grader reading the kept report' is not a grader type claude plugin eval knows, and an eval has no driver, so no report is 'kept'.",
+      "evidence": "internal/cli/skills_test.go:739 allows only regex, tool_used, tool_order, file_exists, llm, baseline; a script grader fails the eval-shape test. The repository's graders are 48 llm, 36 regex, 9 tool_used. verify-planted-mismatches grades with llm graders whose focus is the file .vloop/tmp/verify.json.",
+      "fix": "Make the graders: a regex on the trace for 'vloop schema validate verify/v2', and llm graders with focus {source: file, path: .vloop/tmp/verify.json} checking that complete is true, that the claude line is the only not_run entry, and that no finding names it."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example (against V3's own rule)",
+      "summary": "This brief's own worked example fails the rule it introduces. Every driver and close line needs vloop run or vloop brief close, which the verify fence denies, and no line names the test that covers it. This run's own verify session (0.14.0 skill) is the same setup in which B29's verify session left no report.",
+      "evidence": "fence/verify.json denies Bash(vloop run:*) and Bash(vloop brief close:*). The Worked example only says 'as the base's verify tests do (cmd/vloop/run_verify_test.go)'. Review-brief's new question in V3 would flag each of these lines.",
+      "fix": "Name the covering tests beside the lines (for example new tests in cmd/vloop/run_verify_test.go for the five stub cases and the three planted failures, and in internal/cli/close_test.go for the close lines), or say which lines are for the operator at close. Tell the operator to expect this run's verify to report little."
+    },
+    {
+      "kind": "decision",
+      "section": "Executive summary goal / What it is",
+      "summary": "'A verify session always ends with a valid report' and 'a session that stops early still leaves what it checked, and the driver says so' only hold for a session that exits 0 after pass 1. A session that times out or exits non-zero gets 'failed to run — verify by hand' and its partial report is not read. A session that stops inside pass 1 (where B29's stopped) has written nothing yet.",
+      "evidence": "internal/driver/iterate.go:980-983 returns before readReport when res.TimedOut || res.ExitCode != 0 || !res.Recorded. V2 writes the first report only after pass 1.",
+      "fix": "Operator's choice: (a) narrow the claims to 'a session that ends normally'; or (b) also read and keep a valid v2 report after a timeout or a non-zero exit, beside the existing warning, and have the skill write an initial complete:false report before pass 1. Recommendation: (b), at least the initial write, which costs one tool call and covers B29's actual failure."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract V4",
+      "summary": "The Copilot acceptance kit's code still validates verify/v1. Only its README is listed, so after this brief report.py marks every kept report INVALID.",
+      "evidence": "tools/copilot-acceptance/report.py:189 runs 'vloop schema validate verify/v1', and :195 prints 'verify/v1 ok/INVALID'. The comment at tools/copilot-acceptance/verify.sh:11 also names verify/v1.",
+      "fix": "Add report.py (the validate call and its line, which could also print not_run and complete) and verify.sh's comment to V4 and task 4."
+    },
+    {
+      "kind": "runnability",
+      "section": "Constraints (tests that may change) / Shape task 1",
+      "summary": "A third test pins the schema list, and the constraint does not name it. Task 1 turns it red unless it may be updated.",
+      "evidence": "cmd/vloop/b2_e2e_test.go:128 expects 'vloop schema list' to output exactly ...verdict/v1\\nverify/v1\\n. The constraint names only internal/cli/schema_test.go and internal/schema/schema_test.go.",
+      "fix": "Add cmd/vloop/b2_e2e_test.go to the constraint's list. For task 2, name the stub-report tests explicitly too: cmd/vloop/run_verify_test.go, cmd/vloop/b16_e2e_test.go (asserts 'verify: 2 finding(s)'), cmd/vloop/run_iterate_test.go."
+    },
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract V3 (review-brief question)",
+      "summary": "review-brief is a fenced skill in the skills test: any `vloop init`, `vloop run` or `vloop brief review` written as code in its SKILL.md is judged against fence/review-brief.json and fails the test.",
+      "evidence": "internal/cli/skills_test.go:33 has review-brief in fencedSkills; :153-162 judges each vloop command in a code snippet; fence/review-brief.json:61-62,136 deny vloop run, vloop init, vloop brief review.",
+      "fix": "Say in V3 that the review-brief question names what the verify session cannot do without writing denied vloop commands as code (or points to the guideline), as the contract's current wording already does."
+    },
+    {
+      "kind": "rule",
+      "section": "Acceptance, at close (the operator's)",
+      "summary": "`--case` is a claude plugin eval flag that no repository document gives. The documented invocation also needs --scaffold, --trust-plugin and --allow-tools, without which no scaffold runs. The repository guideline says an external tool's flags come from the tool or its docs.",
+      "evidence": "docs/guide/evals.md:102-121 gives the full invocation, with no --case. .vloop/repo-guidelines.md, first lesson.",
+      "fix": "Check `claude plugin eval --help` for how to select one case and write the command as documented in docs/guide/evals.md (go install ./cmd/vloop first, --scaffold --trust-plugin --no-publish --allow-tools ...), or point to that section."
+    },
+    {
+      "kind": "fact",
+      "section": "Worked example (kept report)",
+      "summary": "'kept byte for byte (the base's masking aside)' is not what the base does: it writes Mask(data) followed by an extra newline, so a stub's printf '...\\n' report is kept with two trailing newlines.",
+      "evidence": "internal/driver/iterate.go:997 writes []byte(it.r.Mask(string(data))+\"\\n\"); stubs in cmd/vloop/run_verify_test.go:13 end with \\n.",
+      "fix": "Write 'kept as at the base (masked, newline-terminated)' or 'kept, its JSON equal to the stub's', so a gate does not compare raw bytes."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary",
+      "summary": "'four commands denied' is three Bash commands and one Read. The Read was of Claude's own tool-results spill file under ~/.claude, which the verify fence denies. That is a further reason a verify session can lose output, and the brief does not mention it.",
+      "evidence": ".vloop/state/runs/B20261102-0920-b29-i94-copilot-review-brief/20261102-101453/sessions/013-verify.json permission_denials: 1 Read of ~/.claude/projects/.../tool-results/*.txt, 3 Bash; fence/verify.json denies Read(~/.claude/**).",
+      "fix": "Say 'four tool calls denied'. Optionally add to the skill's scratch set-up that long output goes to a file under .vloop/tmp/ rather than the tool result (no fence change)."
+    }
+  ],
+  "decisions": [
+    "verify/v2 as a new schema rather than fields in v1: sound, consistent with B29's session/v4 decision.",
+    "The driver accepts only verify/v2: sound, since sessions load the binary's own plugin (internal/driver/session.go:101 --plugin-dir).",
+    "complete is the session's own boolean, with no pass counter: fine.",
+    "A not_run line is neither a finding nor counted in example_lines: fine.",
+    "The skill does not retry a denied command in another form: agree, the fence is the boundary.",
+    "No fence change; git init -q <dir> instead of git -C (no fence denies git init, the Claude adapter runs --permission-mode auto): fine. Note the ~/.claude tool-results Read denial is left as is.",
+    "One section name, '## Acceptance, at close (the operator's)': B26, B27 and B29 used 'Acceptance on the real CLI, at close (the operator's)' and B28 'At close (the operator's)'. The skill must recognise the section by its new name. Fine, but the verify skill text could say 'or an earlier brief's equivalent'.",
+    "Unrunnable lines of the operator's or covered by a test are still listed in not_run: agree, the count stays honest.",
+    "The verify ceiling stays at 1500 (1061 at the base, confirmed): fine. review-brief is at 998 of 1100 and has room for the question.",
+    "The driver does not check that a not_run line is in the brief: fine.",
+    "Open: whether a timed-out or non-zero-exit verify session's partial report is read (finding 4)."
+  ],
+  "checked": "facts (verify.v1 schema, iterate.go verify step and readReport, close.go printVerifyReport, fence/verify.json and git -C in every fence, B29 session record denials, skill word counts 1061/998, budget ceilings, M-6/S-4/C-2, every verify/v1 mention in the tree); consistency (contract vs worked example lines, close output, executive summary); rules (repo guidelines on external tool flags, constraint on changed tests); runnability (go check after each task: schema-list tests, template sync test, skills test fence judging, eval grader types); decisions",
+  "header": "Reviewed 2026-11-02: ASK, 10 findings"
+}
+

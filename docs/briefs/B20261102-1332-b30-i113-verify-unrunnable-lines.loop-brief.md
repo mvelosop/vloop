@@ -2,7 +2,7 @@
 name: B20261102-1332-b30-i113-verify-unrunnable-lines.loop-brief
 description: Make the verify session leave a report even when it cannot run every worked-example line — verify/v2 with the lines not run and whether every pass finished — and make the brief skills say which lines it cannot run
 kind: brief
-status: draft
+status: ready
 created: 2026-11-02
 issue: 113
 seeds: Issue 113 under 75, from B29's verify session, which left no report; the operator's go-ahead of 2026-11-02 for one brief on the verify skill and the brief skills, the rest decided by the assistant under the operator's delegation
@@ -20,7 +20,12 @@ depends-on: [B20261102-0920-b29-i94-copilot-review-brief.loop-brief]
   (`.vloop/state/runs/B20261102-0920-b29-i94-copilot-review-brief/20261102-101453/sessions/013-verify.json`)
   and its intervention. The design decisions were taken by the assistant
   under the operator's delegation.
-- **Review:** pending.
+- **Review:** `vloop brief review` (Claude Opus), ASK — 10 findings
+  (4 runnability, 2 consistency, 2 fact, 1 rule, 1 decision), all fixed;
+  re-review ASK — 4 findings (2 fact, 1 consistency, 1 decision), all
+  fixed. The two decisions (read a report after a failed session; operate
+  tells the operator to run what verify left) were taken by the assistant
+  under the operator's delegation, 2026-11-02.
 
 ## Executive summary
 
@@ -53,7 +58,9 @@ close.
   scratch directories with one command per call and `git init -q <dir>`.
 - **V3 — the brief skills.** `/vloop:create-brief`'s guidelines and both
   templates (with the binary's copies, which `vloop brief new` writes) say how a brief keeps a line the verify session cannot run;
-  `/vloop:review-brief`'s runnability check flags a line that does neither.
+  `/vloop:review-brief`'s runnability check flags a line that does neither;
+  `/vloop:operate` tells the operator to run the lines verify did not run
+  and the acceptance section at close.
 - **V4 — the docs and the evals.** The domain pages, the concepts guide and
   the Copilot acceptance kit (its README and its report script) name
   `verify/v2`; the verify eval's grader
@@ -134,7 +141,10 @@ Decided by the assistant under the operator's delegation:
   agents (the test named beside the line), or moved to a section
   `## Acceptance, at close (the operator's)` (Spanish:
   `## Aceptación, al cierre (del operador)`), which the operator runs on the
-  real tools at close, as B26–B29 did. *Rejected:* a marker inside the
+  real tools at close, as B26, B27 and B29 did under the heading
+  `## Acceptance on the real CLI, at close (the operator's)` (B28 had
+  none); the new heading drops "on the real CLI", which not every
+  repository's acceptance is. *Rejected:* a marker inside the
   Worked example — the verify session would still have to judge each line,
   and a section is what this repository's briefs already use.
 - **The verify skill lists a line the brief keeps for the operator** in
@@ -142,6 +152,13 @@ Decided by the assistant under the operator's delegation:
   a line the brief covers with a named test, whose command the session
   cannot run, is listed with the reason `covered by <test>`. Both stay
   visible in the count, so the operator sees what the session left to them.
+- **`/vloop:operate` tells the operator to run what verify left**: its
+  close step (reading the verify findings) gains one sentence: run each
+  line the report lists as not run, and the brief's acceptance section,
+  before stating findings. Its ceiling rises from 1750 to 1800 words (it is
+  1746 at the base), with the ceiling's comment saying why. *Rejected:*
+  leaving the playbook as it is — the count the driver prints would point
+  at work nobody is told to do.
 - **The verify skill's word ceiling stays 1500.** It is 1061 words at the
   base; this brief adds about 250.
 
@@ -175,7 +192,9 @@ Decided by the assistant under the operator's delegation:
 - `plugin/skills/review-brief/SKILL.md` — check 4, runnability
 - `fence/verify.json` — what the verify session may run: the deny rules the
   guideline names, unchanged
-- `internal/budget/budget.go` — the skills' word ceilings, unchanged
+- `internal/budget/budget.go` — the skills' word ceilings: operate's rises
+- `plugin/skills/operate/SKILL.md` — the close step that reads the verify
+  findings
 - `plugin/evals/verify-planted-mismatches/graders/report-validates.md` — the
   grader that names `verify/v1`
 - `plugin/evals/README.md` — the eval catalogue a new case joins
@@ -254,9 +273,10 @@ A kept `verify/v1` report prints exactly as at the base.
   which passes remain while it is `false`.
 - **A line it does not run.** A worked-example line is not run when the
   brief keeps it for the operator's acceptance, when its command is one the
-  verify fence denies (`vloop init`, `vloop run`, `vloop brief review`,
-  `claude`, and the rest of `fence/verify.json`'s deny list), when it needs
-  a live model (Claude or Copilot), the network or credentials, or when a command it
+  verify fence denies (the skill names at least `vloop init`, `vloop run`,
+  `vloop brief review`, `vloop brief close` and `claude`; it cites no
+  `fence/` path, which exists only in vloop's own repository), when it
+  needs a live model (Claude or Copilot), the network or credentials, or when a command it
   needs was denied. The session does not retry a denied command in another
   form. Each such line is one `not_run` entry: `line` quotes the line as the
   brief writes it, `reason` says why in a few words (the denied rule, `needs
@@ -299,9 +319,15 @@ question: does a worked-example line need what the verify session cannot
 do (a command the verify fence denies, a live model, the network,
 credentials), with no named test covering it and outside the acceptance
 section? Such a line is a `runnability` finding. review-brief is a fenced
-skill in the skills test, so the question names no command the
-review-brief fence denies as code: it points at fence/verify.json's deny
-list instead.
+skill in the skills test, so the question names the commands in plain
+words, not as code (a command that starts vloop's loop, closes a brief or
+starts an agent session), and cites no `fence/` path.
+
+`plugin/skills/operate/SKILL.md`, step 2 of the close (where it reads the
+verify findings), gains one sentence: run each line the report lists as
+not run, and the brief's acceptance section, before stating findings.
+`internal/budget/budget.go`: operate's ceiling becomes 1800, its comment
+naming B30 (#113).
 
 ### V4 — the docs and the evals
 
@@ -342,7 +368,8 @@ list instead.
 - The skill retrying a denied command in another form, or counting a line
   not run in `example_lines`.
 - A fence file or the fence audit changed.
-- The verify skill over its ceiling of 1500 words, or the ceiling raised.
+- The verify skill over its ceiling of 1500 words, or the ceiling raised;
+  any ceiling but operate's changed.
 
 ## Worked example
 
@@ -376,6 +403,11 @@ verify/v2, complete false, one finding, not_run [], then the stub exits 3
   -> verify: 1 finding(s) — see <run dir>reports/verify.json
      vloop: the verify session failed to run — verify by hand; see <run dir>run.log      run exit 0
 ```
+
+The same two lines, with the same report, after a session that timed out
+and after one that left no record: gated in the driver's own tests with a
+stub runner whose result says so (a real timeout is at least a minute),
+in `internal/driver/`.
 
 Each valid report is kept as `<run dir>reports/verify.json` as the base
 keeps it (masked, with a trailing newline). Planted failures:
@@ -473,7 +505,8 @@ evidence for it.
    stub verify session, every worked-example line and planted failure.
 3. **V2 — the verify skill**, its example a valid `verify/v2` report, under
    its ceiling. Gated on the skills test and the ceiling.
-4. **V3 and V4 — the brief skills, the docs and the evals.** Prose: if it
+4. **V3 and V4 — the brief skills, operate and its ceiling, the docs and
+   the evals.** Prose: if it
    fails review twice on wording, block it and the operator finishes it.
    Gated on the skills test, the eval-shape test and a grep per item.
 5. **Close:** every gate at once, and the worked example line for line.
