@@ -5,9 +5,9 @@
   "base": "a30ab36ac4c5e5050c6d3222b5eaa0adeca02995",
   "branch": "B20261102-1844-b31-i110-i112-plan-phase-edges",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-02T19:28:53Z",
-  "updated": "2026-11-02T19:31:16Z",
+  "updated": "2026-11-02T19:36:15Z",
   "shell": "sh",
   "checks": [
     {
@@ -66,7 +66,7 @@
         "Committed tests run by the go check gain the planted cases of the worked example (a `/` path, a `\\` path, the `.md` file name and `b` refused; `B1-x.loop-brief` and `.loop-brief` accepted). A task that tightens the schema and leaves no such test fails this criterion."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

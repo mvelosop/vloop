@@ -11,3 +11,10 @@ planned: B20261102-1844-b31-i110-i112-plan-phase-edges — 5 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 0m54s · $0.20 · run $2.81 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/5 done ──
+   Tighten brief-review/v1's brief to a brief's name, in place
+   work T1 · 0m39s · $0.12 · run $2.93 / $40.00
+   check go
+   review T1 · 0m33s · $0.10 · run $3.03 / $40.00
+   review: PASS
+   T1 done

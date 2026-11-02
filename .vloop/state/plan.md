@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/5 done** · iteration 0
+**Status:** running · **1/5 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T19:31:16Z
+**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T19:36:15Z
 
 ## Progress
 
-- [ ] **T1** — Tighten brief-review/v1's brief to a brief's name, in place
+- [x] **T1** — Tighten brief-review/v1's brief to a brief's name, in place
 - [ ] **T2** — Let a complete plan of another brief pass vloop run's preflight and the bare vloop doctor
 - [ ] **T3** — Revert and warn what each plan and gate-review session changes outside .vloop/state/ and .vloop/tmp/
 - [ ] **T4** — Write V1, V2 and V3 into the configuration guide, the plan and session pages and the fence audit
@@ -18,7 +18,7 @@
 
 ### T1 — Tighten brief-review/v1's brief to a brief's name, in place
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The driver accepts a brief review's report only when `brief` is the brief's file name without `.md`, but the schema accepts any string, so a skill example saying "path" drifted without any test noticing and a Copilot report was rejected in B29 (#112). This task makes the schema reject every `brief` the driver rejects — no `/` or `\`, ending `.loop-brief` — so a drifting example fails the existing skills test. It is a stated exception to the rule that a published schema does not change: no report the driver accepts today becomes invalid.
 

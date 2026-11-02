@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "properties": {
     "schema": { "const": "brief-review/v1" },
-    "brief": { "type": "string" },
+    "brief": { "type": "string", "pattern": "^[^/\\\\]*\\.loop-brief$" },
     "verdict": { "enum": ["PASS", "FIX", "ASK"] },
     "findings": {
       "type": "array",
