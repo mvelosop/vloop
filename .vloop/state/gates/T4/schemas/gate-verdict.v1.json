@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "gate-verdict/v1",
+  "description": "A gate-review session's verdict on every task's gate: .vloop/tmp/gate-verdict.json",
+  "type": "object",
+  "required": ["schema", "verdict", "tasks", "notes"],
+  "not": { "required": ["task"] },
+  "properties": {
+    "schema": { "const": "gate-verdict/v1" },
+    "verdict": { "enum": ["PASS", "FAIL"] },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["task", "verdict", "findings"],
+        "properties": {
+          "task": { "type": "string" },
+          "verdict": { "enum": ["PASS", "FAIL"] },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["summary", "kind"],
+              "properties": {
+                "summary": { "type": "string" },
+                "kind": { "enum": ["wrong-reason", "not-contract", "task-reach", "unpassable", "pins-unnamed"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "notes": { "type": "string" }
+  }
+}

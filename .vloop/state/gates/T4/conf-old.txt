@@ -1,1 +1,0 @@
-The driver does not revert a file a plan session changed elsewhere (the plan commit stages the whole tree), so the hook is the line.

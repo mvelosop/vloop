@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.26611809999999997,
+  "duration_ms": 79590,
+  "effort": null,
+  "ended": "2026-11-02T21:42:24Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 42384,
+      "cache_read_input_tokens": 512401,
+      "cost_usd": 0.26611809999999997,
+      "input_tokens": 26,
+      "output_tokens": 4529
+    }
+  },
+  "permission_denials": [],
+  "phase": "gate-review",
+  "run_id": "B20261102-2101-b32-i84-gates-through-the-named-surface",
+  "schema": "session/v3",
+  "started": "2026-11-02T21:41:04Z",
+  "turns": 14,
+  "wall_ms": 80127
+}

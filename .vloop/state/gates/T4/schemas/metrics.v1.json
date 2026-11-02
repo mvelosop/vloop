@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "metrics/v1",
+  "description": "The document `vloop metrics --json` prints for one brief. Durations are milliseconds, money is unrounded USD, unknowns are null.",
+  "type": "object",
+  "required": [
+    "schema", "brief", "run_id", "status", "merged", "tasks", "size", "time", "rate", "cost", "tokens",
+    "models", "effort", "defects", "records", "lead_time", "permission_denials", "iterations",
+    "iterations_per_closed", "by_task"
+  ],
+  "properties": {
+    "schema": { "const": "metrics/v1" },
+    "brief": { "type": "string", "description": "the loop brief's file name" },
+    "run_id": { "type": "string", "description": "the brief's name without .loop-brief" },
+    "status": { "type": "string", "description": "the brief's frontmatter status" },
+    "merged": { "type": ["string", "null"], "description": "full SHA of the commit on the default branch that consumed the brief; null when not merged" },
+    "tasks": {
+      "type": "object",
+      "required": ["planned", "done", "blocked", "first_pass", "estimate"],
+      "properties": {
+        "planned": { "type": "integer", "minimum": 0 },
+        "done": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "integer", "minimum": 0 },
+        "first_pass": { "type": "integer", "minimum": 0 },
+        "estimate": {
+          "type": ["object", "null"],
+          "description": "the brief's `<n> to <m> tasks` phrase; null when it states none",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "integer" },
+            "max": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "size": {
+      "type": "object",
+      "required": ["delivered", "churn", "test_code_ratio", "rework"],
+      "properties": {
+        "delivered": { "$ref": "#/$defs/lines" },
+        "churn": { "$ref": "#/$defs/lines" },
+        "test_code_ratio": { "type": ["number", "null"], "description": "delivered test / delivered code" },
+        "rework": { "type": ["number", "null"], "description": "churn code / delivered code" }
+      }
+    },
+    "time": {
+      "type": "object",
+      "required": ["agent_ms", "work_ms", "review_ms", "plan_ms", "gates_ms", "wall_ms"],
+      "properties": {
+        "agent_ms": { "type": "integer", "minimum": 0, "description": "work + review sessions" },
+        "work_ms": { "type": "integer", "minimum": 0 },
+        "review_ms": { "type": "integer", "minimum": 0 },
+        "plan_ms": { "type": "integer", "minimum": 0 },
+        "gates_ms": { "type": ["integer", "null"], "description": "null when no gate durations were recorded" },
+        "wall_ms": { "type": ["integer", "null"], "description": "plan commit to the last run commit" }
+      }
+    },
+    "rate": {
+      "type": "object",
+      "required": ["code_per_min", "code_test_per_min"],
+      "properties": {
+        "code_per_min": { "type": ["number", "null"], "description": "delivered code lines per agent minute" },
+        "code_test_per_min": { "type": ["number", "null"], "description": "delivered code + test lines per agent minute" }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "required": ["total_usd", "plan_usd", "work_usd", "review_usd", "per_1000_code_lines_usd"],
+      "properties": {
+        "total_usd": { "type": "number", "minimum": 0 },
+        "plan_usd": { "type": "number", "minimum": 0 },
+        "work_usd": { "type": "number", "minimum": 0 },
+        "review_usd": { "type": "number", "minimum": 0 },
+        "per_1000_code_lines_usd": { "type": ["number", "null"] }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "required": ["input", "output", "cache_read", "cache_creation", "cache_hit_ratio"],
+      "properties": {
+        "input": { "type": "integer", "minimum": 0 },
+        "output": { "type": "integer", "minimum": 0 },
+        "cache_read": { "type": "integer", "minimum": 0 },
+        "cache_creation": { "type": "integer", "minimum": 0 },
+        "cache_hit_ratio": { "type": ["number", "null"], "description": "cache_read / (input + cache_read + cache_creation)" }
+      }
+    },
+    "models": { "$ref": "#/$defs/perPhaseModels" },
+    "effort": {
+      "type": "object",
+      "required": ["plan", "work", "review"],
+      "description": "per phase, null when the records do not carry it",
+      "properties": {
+        "plan": { "type": ["string", "null"] },
+        "work": { "type": ["string", "null"] },
+        "review": { "type": ["string", "null"] }
+      }
+    },
+    "defects": {
+      "type": "object",
+      "required": ["in_loop", "operator", "escaped", "total", "removal_efficiency"],
+      "properties": {
+        "in_loop": { "type": "integer", "minimum": 0, "description": "found by gate or review" },
+        "operator": { "type": "integer", "minimum": 0 },
+        "escaped": { "type": "integer", "minimum": 0, "description": "found by user" },
+        "total": { "type": "integer", "minimum": 0 },
+        "removal_efficiency": { "type": ["number", "null"], "description": "(in_loop + operator) / total; null with no defects" }
+      }
+    },
+    "records": {
+      "type": "object",
+      "required": ["missing"],
+      "properties": {
+        "missing": {
+          "type": "array",
+          "description": "session records that should exist and do not; their time and cost are not counted",
+          "items": {
+            "type": "object",
+            "required": ["task", "phase", "iteration"],
+            "properties": {
+              "task": { "type": "string" },
+              "phase": { "enum": ["work", "review"] },
+              "iteration": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "lead_time": {
+      "type": "object",
+      "required": ["plan_to_merge_ms"],
+      "properties": {
+        "plan_to_merge_ms": { "type": ["integer", "null"], "description": "plan commit to the merge commit; null when not merged" }
+      }
+    },
+    "permission_denials": { "type": "integer", "minimum": 0 },
+    "iterations": { "type": "integer", "minimum": 0 },
+    "iterations_per_closed": { "type": ["number", "null"], "description": "iterations / done tasks; null when none is done" },
+    "by_task": {
+      "type": "array",
+      "description": "one row per task, in plan order",
+      "items": {
+        "type": "object",
+        "required": ["id", "area", "kind", "attempts", "churn", "agent_ms", "cost_usd", "models"],
+        "properties": {
+          "id": { "type": "string" },
+          "area": { "type": ["string", "null"] },
+          "kind": { "type": ["string", "null"] },
+          "attempts": { "type": "integer", "minimum": 0, "description": "the task's iterations" },
+          "churn": { "$ref": "#/$defs/lines" },
+          "agent_ms": { "type": "integer", "minimum": 0 },
+          "cost_usd": { "type": "number", "minimum": 0 },
+          "models": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "counts": {
+      "type": "object",
+      "required": ["code", "test", "docs", "other"],
+      "properties": {
+        "code": { "type": "integer", "minimum": 0 },
+        "test": { "type": "integer", "minimum": 0 },
+        "docs": { "type": "integer", "minimum": 0 },
+        "other": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "lines": {
+      "type": "object",
+      "description": "added non-blank lines per category, and deleted lines apart",
+      "required": ["code", "test", "docs", "other", "deleted"],
+      "properties": {
+        "code": { "type": "integer", "minimum": 0 },
+        "test": { "type": "integer", "minimum": 0 },
+        "docs": { "type": "integer", "minimum": 0 },
+        "other": { "type": "integer", "minimum": 0 },
+        "deleted": { "$ref": "#/$defs/counts" }
+      }
+    },
+    "perPhaseModels": {
+      "type": "object",
+      "required": ["plan", "work", "review"],
+      "description": "per phase, the sorted models seen in the sessions' model usage",
+      "properties": {
+        "plan": { "type": "array", "items": { "type": "string" } },
+        "work": { "type": "array", "items": { "type": "string" } },
+        "review": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

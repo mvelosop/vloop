@@ -1,1 +1,0 @@
-A plan or gate-review session's change outside `.vloop/state/` and `.vloop/tmp/` is reverted after the session, with a warning.

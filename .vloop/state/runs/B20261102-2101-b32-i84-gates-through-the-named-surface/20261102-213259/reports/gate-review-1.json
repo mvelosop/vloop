@@ -1,0 +1,12 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Each gate fails on the base at its assertion (missing phrase, missing case folder). The expected-text fixtures differ from the base skills by exactly the brief's edits, and the T4 schema and skill snapshots equal the base. The ceiling entry, README row and guide row matchers fit the current files."
+}
+
