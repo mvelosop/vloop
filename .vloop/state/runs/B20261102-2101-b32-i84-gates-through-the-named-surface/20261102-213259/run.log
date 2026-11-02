@@ -17,3 +17,10 @@ committing the plan
    review T1 · 0m32s · $0.09 · run $1.86 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/4 done ──
+   Say in the gate review when a pin is sound, and raise its word ceiling to 1600 (G3)
+   work T2 · 2m57s · $0.10 · run $1.96 / $40.00
+   check go
+   review T2 · 0m15s · $0.08 · run $2.04 / $40.00
+   review: PASS
+   T2 done

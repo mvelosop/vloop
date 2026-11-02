@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/4 done** · iteration 1
+**Status:** running · **2/4 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T21:51:05Z
+**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T21:57:58Z
 
 ## Progress
 
 - [x] **T1** — Make the plan skill judge through the surface the brief names, and act on every revision finding (G1, G2)
-- [ ] **T2** — Say in the gate review when a pin is sound, and raise its word ceiling to 1600 (G3)
+- [x] **T2** — Say in the gate review when a pin is sound, and raise its word ceiling to 1600 (G3)
 - [ ] **T3** — Add the eval case plan-judges-through-named-surface and list it in both catalogues (G4)
 - [ ] **T4** — Close the run: every gate and the worked example on the final tree
 
@@ -39,7 +39,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Say in the gate review when a pin is sound, and raise its word ceiling to 1600 (G3)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The gate review's `pins-unnamed` and `not-contract` must apply the same rule the plan skill now states, or a planner following the plan skill is still sent back for a sound pin. This task adds the brief's one sentence to the `pins-unnamed` bullet, one parenthesis to `not-contract`, and, because the gate-review skill had only 23 words of headroom, raises its ceiling in internal/budget/budget.go from 1550 to 1600 with a dated comment. Finding kinds and every other sentence stay as they are.
 

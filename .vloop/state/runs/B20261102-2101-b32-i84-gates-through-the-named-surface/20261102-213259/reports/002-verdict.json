@@ -1,0 +1,14 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "plugin/skills/gate-review/SKILL.md's `pins-unnamed` bullet keeps its sentence and gains, right after it in the same bullet, `A pin is sound only where no surface the brief names (a command, a route, a file) could judge the same criterion, and its task's acceptance states the name.`", "met": true, "evidence": "diff adds the sentence verbatim (line-wrapped) right after the existing pins-unnamed sentence"},
+    {"criterion": "The `not-contract` bullet reads `or internals the brief does not name (beyond a sound pin, as below),` where it read `or internals the brief does not name,`; the rest of that bullet is unchanged.", "met": true, "evidence": "diff shows only that one line changed in the bullet"},
+    {"criterion": "Violation to rule against: any other sentence of the gate-review skill changed, moved or reworded, or a finding kind added, removed or renamed (the gate compares the whole file's joined text to the base with exactly these two edits).", "met": true, "evidence": "git diff HEAD of SKILL.md has only the two hunks; no kind changed"},
+    {"criterion": "`wc -w < plugin/skills/gate-review/SKILL.md` is at most 1600, and internal/budget/budget.go's `Ceilings[\"gate-review\"]` is `1600` with the comment `2026-11-02, B32 (#84): 1550 (B14) plus the sound-pin sentence of pins-unnamed and its reference in not-contract`; no other ceiling changes.", "met": true, "evidence": "wc -w gives 1562; budget.go line changed to 1600 with the exact comment; only that line differs"},
+    {"criterion": "The configured go check (the budget test and TestPluginSkills among it) is green; the existing budget tests, which derive from `Ceilings`, cover the new value, and no test is weakened.", "met": true, "evidence": "checks.json: go exit 0; no test files in the diff"}
+  ],
+  "findings": [],
+  "notes": "none"
+}
