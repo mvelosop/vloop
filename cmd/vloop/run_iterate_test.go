@@ -20,7 +20,7 @@ const defaultScript = `case "$PHASE" in
   review) mkdir -p .vloop/tmp
     printf '{"schema":"verdict/v1","task":"%s","verdict":"PASS","criteria":[],"findings":[],"notes":"none"}\n' "$TASK" > .vloop/tmp/verdict.json;;
   verify) mkdir -p .vloop/tmp
-    printf '{"schema":"verify/v1","findings":[],"checked":{"example_lines":0,"sentences":0,"surfaces":0},"notes":"none"}\n' > .vloop/tmp/verify.json;;
+    printf '{"schema":"verify/v2","complete":true,"not_run":[],"findings":[],"checked":{"example_lines":0,"sentences":0,"surfaces":0},"notes":"none"}\n' > .vloop/tmp/verify.json;;
 esac
 `
 

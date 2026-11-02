@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "schemas/verify.v2.json exists and is embedded like the others; `vloop schema list` names both verify/v1 and verify/v2.", "met": true, "evidence": "schemas/verify.v2.json added; embed_test.go count 25 to 26; internal/cli/schema_test.go and cmd/vloop/b2_e2e_test.go pin the list with verify/v1 and verify/v2; go check passes."},
+    {"criterion": "verify/v2 has verify/v1's properties and constraints, `schema`'s const is `verify/v2`, and it requires two more properties: `complete`, a boolean, and `not_run`, an array (empty allowed) of objects with required `line` and `reason`, both non-empty strings.", "met": true, "evidence": "A sorted-key diff of v1 and v2 shows only title, const, and the added complete, not_run and their required entries."},
+    {"criterion": "`vloop schema validate verify/v2` exits 0 on each worked-example stub report and 1 on a verify/v1 report, on a report without `complete`, and on a `not_run` entry missing `reason`.", "met": true, "evidence": "Validation is by schema; the valid fixture passes and the three planted invalid fixtures are refused in TestVerifyV2PlantedInvalid. The schema constraints settle the exit codes."},
+    {"criterion": "schemas/verify.v1.json is byte for byte as at the base.", "met": true, "evidence": "git diff 28f49ae -- schemas/verify.v1.json is empty."},
+    {"criterion": "The schema lists pinned in internal/cli/schema_test.go, internal/schema/schema_test.go and cmd/vloop/b2_e2e_test.go gain verify/v2 and change in nothing else; the work session names the contract item (V1, the new schema listed) in its notes.", "met": true, "evidence": "The three diffs add only verify/v2 or the count 25 to 26; the proposal notes name V1. The only other change is the embed_test.go count, a consequence of the new file."},
+    {"criterion": "Committed tests run by the go check cover verify/v2: at least one valid report and the three planted invalid ones (a verify/v1 report, no `complete`, a `not_run` entry without `reason`). A task that adds the schema and leaves no such test fails this criterion.", "met": true, "evidence": "internal/schema/testdata/verify2.valid.json and the invalid fixtures, plus TestVerifyV2PlantedInvalid in internal/schema/schema_test.go; the go check log is green."}
+  ],
+  "findings": [],
+  "notes": "The first attempt missed embed_test.go; this attempt fixed it. verify2.invalid.json duplicates verify2-not-run-no-reason.invalid.json, which is harmless."
+}

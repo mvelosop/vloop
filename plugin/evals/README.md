@@ -55,11 +55,17 @@ the only thing that stops it.
 | `operate-proposes-options` | `/vloop:operate` | a run halted on a gate dispute: the skill proposes one to three real options, recommends one and says why, amends no gate before the operator answers, and pads no straw option |
 | `language-es` | `/vloop:plan` | with `language = "es"`, titles and acceptance are Spanish and keys stay English |
 | `verify-planted-mismatches` | `/vloop:verify` | a small built result whose brief has one sound worked-example line and three planted mismatches (an example line whose exit code differs, a Behaviour contract sentence not done, a README stating the old behaviour): one finding of each matching kind and none on the sound line |
+| `verify-unrunnable-line` | `/vloop:verify` | a correct built result whose brief's worked example holds a sound line and a line running `claude -p "say hi"`, which the session cannot run: a `verify/v2` report with `complete` true, that line the one `not_run` entry and no finding naming it |
 | `review-brief-planted-faults` | `/vloop:review-brief` | a draft brief with three planted faults (a claim about the code that the code contradicts, a usage message the Behaviour contract and the Worked example state differently, a configured check that is red after the first task until the last): the verdict is not `PASS`, each fault is named and the brief is not edited |
 | `create-brief-drafts-checked` | `/vloop:create-brief` | a request that settles every fork and states every literal value becomes a draft written with `vloop brief new` and checked with `vloop brief check` to `0 warning(s)`; graded from the trace, because the brief's file name is only known at run time |
 
 `review-brief-planted-faults` and `create-brief-drafts-checked` were first run
 when the skills joined the plugin (2026-11-02, B28): one run each, with the
 plugin and the default model, both scored 1.0 (≈ $0.84 together).
+
+`verify-planted-mismatches` (on `verify/v2`) and `verify-unrunnable-line` were
+run when the verify skill moved to `verify/v2` (2026-11-02, B30): one run each,
+with the default model and the no-plugin baseline arm, both scored 1.0 with the
+plugin and 0.0 without (≈ $0.79 together, both arms).
 
 `gate-review-real-misses` is for macOS hosts: its first gate's `grep -P` is a defect only where `grep` is BSD grep, which rejects the option. Its scaffold exits non-zero on a host whose `grep` accepts `-P`, and on any host where a planted gate does not fail for its recorded reason. The scaffold needs `vloop` on `PATH`.

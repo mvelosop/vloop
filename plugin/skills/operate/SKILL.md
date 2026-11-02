@@ -159,7 +159,9 @@ intervention migrate` brings older records to the current version.
    (the newest run's `reports/verify.json`, or `no verify report — verify by
    hand`) and writes nothing. Read the dissents too (`second review: <n>
    dissent(s)` ends the run; `reports/<iteration>-second-verdict.json`). Judge
-   each one: close records only the findings you pass it.
+   each one: close records only the findings you pass it. Before stating
+   findings, run each line the verify report lists as not run, and the brief's
+   acceptance section.
 3. Close: `vloop brief close <brief> --finding "<brief|plan|work|env>: <what you found>"`
    (repeatable; the origin is whose defect it is),
    or `--no-findings` when you found nothing — state it, do not skip it.

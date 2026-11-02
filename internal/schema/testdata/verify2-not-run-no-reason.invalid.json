@@ -1,0 +1,1 @@
+{"schema":"verify/v2","complete":false,"findings":[],"not_run":[{"line":"vloop greet --loud"}],"checked":{"example_lines":1,"sentences":1,"surfaces":1},"notes":"none"}

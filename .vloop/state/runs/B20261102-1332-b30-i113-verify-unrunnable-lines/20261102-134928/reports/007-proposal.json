@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "No code change. Ran the close gate on the final tree: gates T1-T4 pass together, fence/*.json and fence-audit.md are unchanged, and each worked-example line maps to a committed test or gate (below).",
+  "files": [],
+  "verified": "vloop task gate T5 exited 0 and printed gate T1..T4: ok, gate T5: ok.",
+  "notes": "Worked example coverage, no line left uncovered, so no fix was made. Stub report lines 1-6 (no findings; one finding; one not_run; two findings and two not_run; incomplete; incomplete with one finding then exit 3): gate T2 (gate.sh sections 1-6, with stub-claude.sh) and cmd/vloop/run_verify_test.go (TestRunVerifyKeepsReport, TestRunVerifyNoFindings, TestRunVerifyNotRunAndIncomplete, TestRunVerifySessionFails). Same two lines after a timed-out session and after no record: gate T2 6b and internal/driver/verify_v2_test.go (cases 'no record' and 'timed out'). Planted failures (v1 report, v2 without complete, not_run entry without reason, no report then exit 3): gate T2 'Planted failures' and TestRunVerifyMissingAndInvalidReport, TestRunVerifySessionFails, and verify_v2_test.go for an invalid report after a failed session. Close lines (not run block for the third case, stopped-early line for the fifth, the v1 report unchanged): gate T2 closewant checks, TestCloseVerifyBlock (v1) and TestCloseVerifyBlockV2 in internal/cli/close_test.go. Schema lines (verify/v2 validates on the skill example and on each valid stub report, fails on the planted ones; schema list names verify/v1 and verify/v2): gate T1 (valid/ and invalid/ fixtures) and gate T3 (the skill's example), plus the schema list tests. Skills lines (example validates as verify/v2, at most 1500 words, guideline rule, template headings, review-brief question): gate T3 and gate T4. I did not run go test ./... myself; the driver runs the checks. Do not copy the 38s runtime of this gate as a benchmark."
+}

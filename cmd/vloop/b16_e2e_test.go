@@ -17,7 +17,7 @@ import (
 
 const b16Report2 = `case "$PHASE" in
   verify) mkdir -p .vloop/tmp
-    printf '{"schema":"verify/v1","findings":[{"kind":"example","claim":"exit 2","observed":"exit 1","where":"Worked example, line 3; vloop greet --loud"},{"kind":"surface","claim":"greet prints in upper case with --loud","observed":"README.md says --loud is not supported","where":"README.md:12"}],"checked":{"example_lines":3,"sentences":4,"surfaces":2},"notes":"stub"}\n' > .vloop/tmp/verify.json;;
+    printf '{"schema":"verify/v2","complete":true,"not_run":[],"findings":[{"kind":"example","claim":"exit 2","observed":"exit 1","where":"Worked example, line 3; vloop greet --loud"},{"kind":"surface","claim":"greet prints in upper case with --loud","observed":"README.md says --loud is not supported","where":"README.md:12"}],"checked":{"example_lines":3,"sentences":4,"surfaces":2},"notes":"stub"}\n' > .vloop/tmp/verify.json;;
 esac
 `
 

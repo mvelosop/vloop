@@ -126,6 +126,14 @@ que la puerta debe usar el valor que calcula en vez de codificar uno. Un conteo
 codificado es correcto el día que se escribe el plan e incorrecto el día que
 entra cualquier otra cosa.>
 
+## Aceptación, al cierre (del operador)
+
+<Opcional. Las líneas del ejemplo trabajado que ninguna sesión puede ejecutar
+(un modelo real, la red, credenciales, un login interactivo), cada una con el
+comando y el resultado esperado exacto. El operador las ejecuta al cierre, antes
+de dar los hallazgos. Borra la sección si toda línea la ejecuta una sesión o la
+cubre una prueba con nombre.>
+
 ## Fuera de alcance
 
 <No versiones más pequeñas de esto. Nada de esto. Esta lista es lo que convierte

@@ -57,6 +57,12 @@ verify. Each one trusts the text. Write for that reader.
 - **Sessions cannot**: commit, move git refs, edit `.vloop/`, reach the network,
   log in interactively, or use a tool that is not installed. Whatever needs that
   belongs to the operator, before or after the run; say which, in the header.
+- **Say which worked-example lines the verify session cannot run.** The verify
+  session cannot run `vloop init`, `vloop run`, `vloop brief review` or `claude`,
+  use a live model (Claude or Copilot), reach the network or use credentials.
+  Cover such a line with an end-to-end test the plan writes with stub agents,
+  named beside the line, or move it to `## Acceptance, at close (the operator's)`,
+  the optional section after the Worked example.
 - **The environment is part of the brief**: the machine the run needs, the
   tools, the environment variables, the services, and what it must never touch.
 - **Prose-only tasks**: if no script can check a task, say what happens when its

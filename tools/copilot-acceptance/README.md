@@ -149,8 +149,8 @@ credits for the one verify session.
 
 It writes `<dir>/b25-verify-summary.md` (`report.py verify`): the verify session
 record with agent, model, credits, estimated cost, `session/v4` validity and its
-`permission_denials`; then the kept report: present or not, `verify/v1`
-validity and its number of findings.
+`permission_denials`; then the kept report: present or not, its validity against the schema its own `schema` field
+names (`verify/v1` or `verify/v2`) and its number of findings.
 
 Record the summary in `docs/design-notes/copilot-cli-experiments.md` before the
 brief is closed.

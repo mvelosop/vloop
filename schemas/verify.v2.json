@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "verify/v2",
+  "description": "A verify session's report of what it found wrong on the built surface: .vloop/tmp/verify.json",
+  "type": "object",
+  "required": ["schema", "complete", "findings", "not_run", "checked", "notes"],
+  "properties": {
+    "schema": { "const": "verify/v2" },
+    "complete": { "type": "boolean" },
+    "not_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["line", "reason"],
+        "properties": {
+          "line": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "claim", "observed", "where"],
+        "properties": {
+          "kind": { "enum": ["example", "contract", "surface"] },
+          "claim": { "type": "string" },
+          "observed": { "type": "string" },
+          "where": { "type": "string" }
+        }
+      }
+    },
+    "checked": {
+      "type": "object",
+      "required": ["example_lines", "sentences", "surfaces"],
+      "properties": {
+        "example_lines": { "type": "integer" },
+        "sentences": { "type": "integer" },
+        "surfaces": { "type": "integer" }
+      }
+    },
+    "notes": { "type": "string" }
+  }
+}

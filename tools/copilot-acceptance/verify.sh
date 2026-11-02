@@ -8,7 +8,7 @@
 #
 # Writes <dir>/b25-verify-summary.md: the verify session record (agent, model,
 # credits, estimated cost, session/v4 validity, permission_denials) and the kept
-# report (present, verify/v1 validity, findings), to be recorded in docs/design-notes/copilot-cli-experiments.md
+# report (present, verify/v1 or verify/v2 validity, findings), to be recorded in docs/design-notes/copilot-cli-experiments.md
 # before the brief is closed. Spends Claude money (plan, work and reviews) and Copilot
 # credits (verify). Needs copilot, claude and gh on PATH, claude and gh logged in,
 # go and python3.

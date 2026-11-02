@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Gates T1 to T4 all pass on the final tree, run together by this task's gate.", "met": true, "evidence": "gate.sh loops T1..T4; the driver re-ran the gate (exit 0, gates/T5.log) and the go check exit 0 in checks.json"},
+    {"criterion": "fence/*.json and docs/design-notes/fence-audit.md are byte for byte as at the base, with no fence file added or removed.", "met": true, "evidence": "git diff HEAD and git status show no change under fence/ or docs/design-notes/fence-audit.md; gate T5 cmp checks pass"},
+    {"criterion": "The work session's notes walk the brief's worked example line for line (each stub report, each planted failure, the close lines, the schema lines, the skills lines) and name the committed test or gate that covers each; a line no test covers is fixed in this task or reported, not skipped.", "met": true, "evidence": "proposal notes cover stub reports, planted failures, close lines, schema lines and skills lines; the cited Go tests (TestRunVerify*, TestCloseVerifyBlock, TestCloseVerifyBlockV2) exist and verify_v2_test.go has the 'no record' and 'timed out' cases"},
+    {"criterion": "Any fix this task makes is to the contract as the brief states it, leaves a committed test where it changes behaviour, and weakens no check.", "met": true, "evidence": "no product diff outside .vloop/, so no fix and no weakened check"}
+  ],
+  "findings": [],
+  "notes": "None."
+}

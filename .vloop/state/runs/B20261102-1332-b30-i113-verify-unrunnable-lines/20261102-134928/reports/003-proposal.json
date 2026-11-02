@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The driver's verify step reads verify/v2 only, keeps it even after a failed session, prints not_run counts and warns when incomplete; brief close prints the lines not run and the unfinished session.",
+  "files": ["internal/driver/iterate.go", "internal/cli/close.go", "internal/driver/verify_v2_test.go", "internal/cli/close_test.go", "cmd/vloop/run_verify_test.go", "cmd/vloop/run_iterate_test.go", "cmd/vloop/b16_e2e_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: pass; go test passes in internal/driver, cmd/vloop and the new close tests.",
+  "notes": "Contract item (stub verify reports become verify/v2): the stub reports in cmd/vloop/run_verify_test.go, run_iterate_test.go and b16_e2e_test.go moved from verify/v1 to verify/v2 (complete true, not_run empty), nothing else weakened; internal/cli/close_test.go keeps its verify/v1 cases and gains TestCloseVerifyBlockV2. internal/driver/verify_v2_test.go runs verifySession against a stub claude script (non-zero exit, and silent exit 0) in a temp git repo. A session that failed to start still returns before any read. internal/cli task_gate tests fail only inside a driver-held session."
+}

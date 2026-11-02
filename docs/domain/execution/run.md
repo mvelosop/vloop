@@ -21,7 +21,7 @@ gates/T<n>.log              the last gate output per task
 gates/base-T<n>.log         the task's gate on the base, at acceptance
 checks/<name>.log           the last output of each check; final-<name>.log for the final pass
 reports/gate-review-<round>.json  the gate review's verdict
-reports/verify.json         the verify session's report (verify/v1), when the run completed and run.verify is on
+reports/verify.json         the verify session's report (verify/v2), when the run completed and run.verify is on
 run.log                     the driver's own log (the shell loop's is loop.log)
 ```
 

@@ -30,6 +30,7 @@ var invalidAt = map[string]string{
 	"gate-verdict":  "/tasks/0/findings/0/kind",
 	"gate-verdict2": "/tasks/0/findings/0/kind",
 	"verify":        "/findings/0/kind",
+	"verify2":       "/not_run/0",
 
 	// export/v1 has one fixture pair per record type; the name is the part before the dash.
 	"export-brief":        "",
@@ -66,7 +67,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"brief-review/v1", "defect/v1", "export/v1", "gate-verdict/v1", "gate-verdict/v2", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "iteration/v3", "metrics/v1", "metrics/v2", "metrics/v3", "metrics/v4", "proposal/v1", "session/v1", "session/v2", "session/v3", "session/v4", "session/v5", "state/v1", "state/v2", "verdict/v1", "verify/v1"}
+	want := []string{"brief-review/v1", "defect/v1", "export/v1", "gate-verdict/v1", "gate-verdict/v2", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "iteration/v3", "metrics/v1", "metrics/v2", "metrics/v3", "metrics/v4", "proposal/v1", "session/v1", "session/v2", "session/v3", "session/v4", "session/v5", "state/v1", "state/v2", "verdict/v1", "verify/v1", "verify/v2"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}
@@ -215,5 +216,15 @@ func TestBriefReviewAndSession5(t *testing.T) {
 				t.Fatalf("violations = %+v, want ok=%v", vs, c.ok)
 			}
 		})
+	}
+}
+
+// The planted verify/v2 reports: each is refused, and a verify/v1 report is not a verify/v2 one.
+func TestVerifyV2PlantedInvalid(t *testing.T) {
+	for _, n := range []string{"verify2-v1-report", "verify2-no-complete", "verify2-not-run-no-reason"} {
+		vs, err := Validate("verify/v2", fixture(t, n+".invalid.json"))
+		if err != nil || len(vs) == 0 {
+			t.Fatalf("%s: violations = %v, err = %v, want a refusal", n, vs, err)
+		}
 	}
 }

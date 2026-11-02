@@ -1,172 +1,125 @@
 #!/bin/sh
-# Gate T2 — R3's judge: the review-brief phase of `vloop fence check` and
-# `vloop fence hook`, fence/review-brief.json, and the one deny rule every
-# fence gains. The fences are judged as parsed JSON against the copies of the
-# base fences in this folder: each of the five loop fences is its base copy
-# plus the deny rule Bash(vloop brief review:*) and nothing else; the new
-# fence is gate-review's plus Bash(vloop brief check:*) in its allow list and
-# Bash(vloop brief review:*) in its deny list (rules compared as sets). Then
-# every line of the brief's fence-check worked example, the work line, the
-# changed unknown-phase message, the unchanged gate-review skill line, the
-# review-brief rules beyond the example, every phase denying a nested brief
-# review, the hook answering review-brief payloads, and both commands' help.
-# Nothing runs a command under judgment: the gate only asks the judge, in a
-# fixture root with a fake HOME, never this repository's tree.
-set -u
-fail() { echo "GATE FAIL: $*" >&2; exit 1; }
-for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
-export LC_ALL=C GOTOOLCHAIN=local
-G=$(cd "$(dirname "$0")" && pwd -P) || fail "no gate folder"
-top=$(pwd -P)
-JQ=$(command -v jq) || fail "jq is not on PATH"
-t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
-trap 'rm -rf "$t"' EXIT
+# Gate T2 — V1, the driver and the close. With the stub claude (stub-claude.sh)
+# in fixture repositories (lib.sh) whose one-task run completes, every line of
+# the brief's worked example and each planted failure: what the verify step
+# prints (stdout's "verify: " line, stderr's warnings), what it keeps as
+# <run dir>reports/verify.json, and that the run still exits 0 with its plan
+# complete; then `vloop brief close <brief>` with no flag on the kept reports
+# (exit 2, the verify block on stdout), and on a kept verify/v1 report the
+# base's lines exactly.
+G=$(cd "$(dirname "$0")" && pwd -P) || { echo "GATE FAIL: no gate folder" >&2; exit 1; }
+. "$G/lib.sh"
+cd "$top" || fail "repo root"
+newbin
 
-# The fences, as parsed JSON.
-NR='Bash(vloop brief review:*)'
-# same <file> <expected file>: equal but for rule order.
-same() {
-  "$JQ" -e -n --slurpfile a "$1" --slurpfile b "$2" '
-    def norm: (.permissions.allow |= sort) | (.permissions.deny |= sort);
-    ($a[0] | norm) == ($b[0] | norm)' >/dev/null 2>&1
+CK='{"example_lines":2,"sentences":3,"surfaces":1}'
+F1='{"kind":"example","claim":"`demo` exits 0","observed":"exit 1","where":"Worked example, line 1; bin/demo"}'
+F2='{"kind":"surface","claim":"README.md:3: \"demo ignores its arguments\"","observed":"demo reads its first argument","where":"Behaviour contract; README.md:3"}'
+N1='{"line":"vloop init","reason":"denied by the verify fence (Bash(vloop init:*))"}'
+N2='{"line":"vloop brief review docs/briefs/x.loop-brief.md","reason":"the operator'"'"'s, at close"}'
+# v2 <complete> <findings> <not_run>: a verify/v2 report.
+v2() { printf '{"schema":"verify/v2","complete":%s,"findings":%s,"not_run":%s,"checked":%s,"notes":"none"}' "$1" "$2" "$3" "$CK"; }
+FBLOCK1='  1. example — Worked example, line 1; bin/demo
+     brief:    `demo` exits 0
+     observed: exit 1'
+FBLOCK2='  2. surface — Behaviour contract; README.md:3
+     brief:    README.md:3: "demo ignores its arguments"
+     observed: demo reads its first argument'
+NOTRUN1='  not run: vloop init — denied by the verify fence (Bash(vloop init:*))'
+NOTRUN2="  not run: vloop brief review docs/briefs/x.loop-brief.md — the operator's, at close"
+STOPPED='  the session stopped before its last pass'
+REFUSE='say what you found before merge'
+# closewant <name> <expected stdout>: a bare close refuses with exit 2 and
+# prints exactly the expected verify block on stdout.
+closewant() {
+  closebare "$1"
+  [ "$crc" = 2 ] || fail "$1: vloop brief close with no flag exited $crc, want 2: $(cat "$t/$1.cerr")"
+  grep -qF "$REFUSE" "$t/$1.cerr" || fail "$1: vloop brief close with no flag did not refuse: $(cat "$t/$1.cerr")"
+  printf '%s\n' "$2" >"$t/$1.cwant"
+  cmp -s "$t/$1.cwant" "$t/$1.cout" || fail "$1: vloop brief close prints:
+$(cat "$t/$1.cout")
+--- want
+$(cat "$t/$1.cwant")"
 }
-for f in plan work review gate-review verify; do
-  [ -f "$top/fence/$f.json" ] || fail "fence/$f.json is missing"
-  "$JQ" --arg r "$NR" '.permissions.deny += [$r]' "$G/$f.json" >"$t/want-$f.json" || fail "jq"
-  same "$top/fence/$f.json" "$t/want-$f.json" ||
-    fail "fence/$f.json is not its base rules plus the one deny rule $NR: allow +$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($a[0].permissions.allow - $b[0].permissions.allow)') -$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($b[0].permissions.allow - $a[0].permissions.allow)'), deny +$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($a[0].permissions.deny - $b[0].permissions.deny)') -$("$JQ" -c -n --slurpfile a "$top/fence/$f.json" --slurpfile b "$t/want-$f.json" '($b[0].permissions.deny - $a[0].permissions.deny)')"
-done
-[ -f "$top/fence/review-brief.json" ] || fail "fence/review-brief.json is missing"
-"$JQ" --arg r "$NR" '.permissions.deny += [$r] | .permissions.allow += ["Bash(vloop brief check:*)"]' "$G/gate-review.json" >"$t/want-rb.json" || fail "jq"
-same "$top/fence/review-brief.json" "$t/want-rb.json" ||
-  fail "fence/review-brief.json is not the gate-review fence plus Bash(vloop brief check:*) allowed and $NR denied"
+stamp() { basename "$RD"; }
 
-go build -buildvcs=false -o "$t/vloop" ./cmd/vloop || fail "go build of this tree"
-S=$t/vloop
-R=$t/repo
-mkdir -p "$R/docs/briefs" "$t/home" "$t/tmp" || fail mkdir
-git -C "$R" init -q || fail "git init of the fixture root"
-B=docs/briefs/B20990101-0000-x.loop-brief.md
-printf -- '---\nstatus: draft\n---\n# Brief\n' >"$R/$B"
-cd "$R" || fail "fixture root"
+# 1. complete, no findings, nothing not run: the base's line.
+runcase e1 "$(v2 true '[]' '[]')"
+completed e1; verifylines e1 1; outis e1 'verify: no findings'
+nowhere e1 'not run'; nowhere e1 'stopped before its last pass'; nowhere e1 'verify by hand'; kept e1
 
-ROOTARG=.
-chk() {
-  ph=$1 tl=$2; shift 2
-  out=$(env -i PATH=/usr/bin:/bin HOME="$t/home" TMPDIR="$t/tmp" LC_ALL=C "$S" fence check --phase "$ph" --root "$ROOTARG" --tool "$tl" "$@" 2>"$t/err"); rc=$?
+# 2. complete, one finding: the base's line.
+runcase e2 "$(v2 true "[$F1]" '[]')"
+completed e2; verifylines e2 1; outis e2 "verify: 1 finding(s) — see ${RD}reports/verify.json"
+nowhere e2 'not run'; nowhere e2 'stopped before its last pass'; kept e2
+# A kept verify/v1 report prints exactly the base's lines at close.
+printf '%s\n' "{\"schema\":\"verify/v1\",\"findings\":[$F1],\"checked\":$CK,\"notes\":\"none\"}" >"$t/repo/${RD}reports/verify.json"
+closewant e2v1 "verify of $RID/$(stamp): 1 finding(s)
+$FBLOCK1"
+printf '%s\n' "{\"schema\":\"verify/v1\",\"findings\":[],\"checked\":$CK,\"notes\":\"none\"}" >"$t/repo/${RD}reports/verify.json"
+closewant e2v1e "verify of $RID/$(stamp): no findings"
+
+# 3. complete, no findings, one line not run.
+runcase e3 "$(v2 true '[]' "[$N1]")"
+completed e3; verifylines e3 1; outis e3 "verify: no findings; 1 example line(s) not run — see ${RD}reports/verify.json"
+nowhere e3 'stopped before its last pass'; nowhere e3 'verify by hand'; kept e3
+closewant e3 "verify of $RID/$(stamp): no findings; 1 example line(s) not run
+$NOTRUN1"
+
+# 4. complete, two findings, two lines not run.
+runcase e4 "$(v2 true "[$F1,$F2]" "[$N1,$N2]")"
+completed e4; verifylines e4 1; outis e4 "verify: 2 finding(s); 2 example line(s) not run — see ${RD}reports/verify.json"
+nowhere e4 'stopped before its last pass'; kept e4
+closewant e4 "verify of $RID/$(stamp): 2 finding(s); 2 example line(s) not run
+$FBLOCK1
+$FBLOCK2
+$NOTRUN1
+$NOTRUN2"
+
+# 5. incomplete, exit 0: the line, then the stopped-early warning.
+runcase e5 "$(v2 false '[]' '[]')"
+completed e5; verifylines e5 1; outis e5 'verify: no findings'
+erris e5 "vloop: the verify session stopped before its last pass — verify the rest by hand; see ${RD}reports/verify.json"
+nowhere e5 'failed to run'; nowhere e5 'not run'; kept e5
+closewant e5 "verify of $RID/$(stamp): no findings
+$STOPPED"
+
+# 6. incomplete, one finding, then the session exits 3: the line and the
+# base's failed-to-run warning, not the stopped-early one; the report kept.
+runcase e6 "$(v2 false "[$F1]" '[]')" claude.verify-exit3
+completed e6; verifylines e6 1; outis e6 "verify: 1 finding(s) — see ${RD}reports/verify.json"
+erris e6 "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
+nowhere e6 'stopped before its last pass'; nowhere e6 'left no valid'; kept e6
+closewant e6 "verify of $RID/$(stamp): 1 finding(s)
+$FBLOCK1
+$STOPPED"
+
+# 6b. the same report after a session that left no record (nothing on stdout,
+# exit 0): the same two lines.
+runcase e6n "$(v2 false "[$F1]" '[]')" claude.verify-norecord
+completed e6n; verifylines e6n 1; outis e6n "verify: 1 finding(s) — see ${RD}reports/verify.json"
+erris e6n "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
+nowhere e6n 'stopped before its last pass'; nowhere e6n 'left no valid'; kept e6n
+
+# Planted failures.
+LEFT='vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand'
+# planted <name> <report> [flag]: exit 0, the left-no-valid line, no
+# "verify: " line, nothing kept.
+planted() {
+  runcase "$@"
+  completed "$1"; verifylines "$1" 0; erris "$1" "$LEFT"; nowhere "$1" 'failed to run'; notkept "$1"
 }
-allow() {
-  ph=$1 tl=$2; shift 2; chk "$ph" "$tl" "$@"
-  [ "$rc" = 0 ] && [ "$out" = allow ] || fail "[$ph] $tl $*: want 'allow' and exit 0, got exit $rc, stdout '$out', stderr '$(cat "$t/err")'"
-}
-# denyx <phase> <tool> <exact reason> [args...]
-denyx() {
-  ph=$1 tl=$2 want=$3; shift 3; chk "$ph" "$tl" "$@"
-  [ "$rc" = 1 ] && [ "$out" = "deny: $want" ] || fail "[$ph] $tl $*: want 'deny: $want' and exit 1, got exit $rc, stdout '$out', stderr '$(cat "$t/err")'"
-}
-P=review-brief
-OW="is not allowed in a review-brief session: only .vloop/tmp/ may be written"
-
-# The worked example, line for line.
-allow $P bash 'vloop brief check .vloop/tmp/rb/B20990101-0000-x.loop-brief.md'
-allow $P bash "cat $B"
-allow $P create --path .vloop/tmp/brief-review.json
-denyx $P create "write to $B $OW" --path "$B"
-denyx $P bash 'git commit -m x is denied by the review-brief fence (Bash(git commit:*))' 'git commit -m x'
-denyx $P bash "rm $B is denied by the Copilot deny list (rm:*)" "rm $B"
-allow $P skill --path review-brief
-denyx $P skill "skill vloop-review-brief is not vloop's — use /vloop:review-brief" --path vloop-review-brief
-denyx $P bash "vloop brief review $B is denied by the review-brief fence (Bash(vloop brief review:*))" "vloop brief review $B"
-denyx work bash "vloop brief review $B is denied by the work fence (Bash(vloop brief review:*))" "vloop brief review $B"
-# The changed unknown-phase message.
-chk deploy bash ls
-[ "$rc" = 2 ] || fail "fence check --phase deploy: want exit 2, got $rc ('$out')"
-grep -qxF 'vloop: unknown phase "deploy": want review, second-review, work, verify, gate-review, plan or review-brief' "$t/err" ||
-  fail "fence check --phase deploy: want 'vloop: unknown phase \"deploy\": want review, second-review, work, verify, gate-review, plan or review-brief' on stderr, got '$(cat "$t/err")'"
-# Unchanged.
-denyx gate-review skill "skill vloop-review-brief is not vloop's — use /vloop:gate-review" --path vloop-review-brief
-
-# Every phase denies a nested brief review through its own fence.
-for pf in plan:plan review:review second-review:review verify:verify gate-review:gate-review work:work review-brief:review-brief; do
-  denyx "${pf%%:*}" bash "vloop brief review x.loop-brief.md is denied by the ${pf#*:} fence (Bash(vloop brief review:*))" 'vloop brief review x.loop-brief.md'
-  denyx "${pf%%:*}" bash "vloop brief review $B is denied by the ${pf#*:} fence (Bash(vloop brief review:*))" "env vloop brief review $B"
-done
-
-# review-brief beyond the example: decided as gate-review, with its own name.
-allow $P bash 'vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json'
-allow $P bash "mkdir -p .vloop/tmp/rb && cp $B .vloop/tmp/rb/B20990101-0000-x.loop-brief.md"
-allow $P bash 'git log --oneline -5'
-allow $P bash 'vloop brief check docs/briefs/B20990101-0000-x.loop-brief.md'
-allow $P view --path internal/x.go
-denyx $P bash 'vloop run is denied by the review-brief fence (Bash(vloop run:*))' 'vloop run'
-denyx $P bash 'vloop task verify T1 is denied by the review-brief fence (Bash(vloop task verify:*))' 'vloop task verify T1'
-denyx $P bash 'vloop brief close x is denied by the review-brief fence (Bash(vloop brief close:*))' 'vloop brief close x'
-denyx $P bash 'vloop brief new x is denied by the review-brief fence (Bash(vloop brief new:*))' 'vloop brief new x'
-denyx $P bash 'gh pr list is denied by the Copilot deny list (gh:*)' 'sh -c "gh pr list"'
-denyx $P bash 'rm .vloop/tmp/rb/x.md is denied by the Copilot deny list (rm:*)' 'rm .vloop/tmp/rb/x.md'
-denyx $P bash "write to $B $OW" "echo x >> $B"
-denyx $P create "write to src/a.go $OW" --path src/a.go
-denyx $P edit "write to .vloop/state/state.json $OW" --path .vloop/state/state.json
-denyx $P create "write to .vloop/state/brief-reviews/x.json $OW" --path .vloop/state/brief-reviews/x.json
-denyx $P web_fetch 'tool web_fetch is not allowed in a review-brief session'
-# Other phases word as before.
-denyx gate-review create "write to $B is not allowed in a gate-review session: only .vloop/tmp/ may be written" --path "$B"
-denyx review skill "skill vloop-plan is not vloop's — use /vloop:review" --path vloop-plan
-allow work bash 'rm src/old.go'
-denyx verify bash 'vloop run is denied by the verify fence (Bash(vloop run:*))' 'vloop run'
-
-# The hook, phase review-brief.
-H=$t/hookroot
-mkdir -p "$H/docs/briefs" "$H/.vloop/tmp" || fail mkdir
-cp "$R/$B" "$H/$B" || fail cp
-snap() { (cd "$t" && find hookroot home -print | LC_ALL=C sort && cat "hookroot/$B"); }
-before=$(snap)
-hookrun() {
-  hout=$(printf '%s' "$2" | (cd "$H" && env -i PATH=/usr/bin:/bin HOME="$t/home" TMPDIR="$t/tmp" LC_ALL=C "$S" fence hook --phase "$1" --root "$H") 2>"$t/err"); rc=$?
-  [ "$(printf '%s\n' "$hout" | grep -c .)" = 1 ] || fail "[hook $1] payload $2: want one line on stdout, got '$hout'"
-  dec=$(printf '%s\n' "$hout" | "$JQ" -r '.permissionDecision // "none"' 2>/dev/null) || fail "[hook $1] payload $2: stdout is not JSON: '$hout'"
-  why=$(printf '%s\n' "$hout" | "$JQ" -r '.permissionDecisionReason // ""')
-}
-payload() { "$JQ" -cn --arg n "$1" --argjson a "$2" --arg c "$H" '{timestamp: 1700000000000, cwd: $c, toolName: $n, toolArgs: $a}'; }
-bash_() { payload bash "$("$JQ" -cn --arg c "$1" '{command: $c, description: "d"}')"; }
-file_() { payload "$1" "$("$JQ" -cn --arg p "$2" '{path: $p, file_text: "x"}')"; }
-ok() {
-  hookrun "$1" "$2"
-  [ "$rc" = 0 ] && [ "$dec" = allow ] || fail "[hook $1] payload $2: want allow and exit 0, got '$hout', exit $rc"
-}
-no() {
-  hookrun "$1" "$2"
-  [ "$rc" = 0 ] && [ "$dec" = deny ] && [ "$why" = "$3" ] || fail "[hook $1] payload $2: want deny '$3' and exit 0, got '$hout', exit $rc"
-}
-ok $P "$(bash_ 'vloop brief check .vloop/tmp/rb/B20990101-0000-x.loop-brief.md')"
-ok $P "$(bash_ "cat $B")"
-ok $P "$(file_ create .vloop/tmp/brief-review.json)"
-ok $P "$(file_ create "$H/.vloop/tmp/rb/x.md")"
-no $P "$(file_ create "$B")" "vloop fence: write to $B $OW"
-hookrun $P "$(file_ edit "$H/$B")"
-[ "$rc" = 0 ] && [ "$dec" = deny ] || fail "[hook $P] an edit of the brief by its absolute path: want deny and exit 0, got '$hout', exit $rc"
-no $P "$(bash_ 'git commit -m x')" 'vloop fence: git commit -m x is denied by the review-brief fence (Bash(git commit:*))'
-no $P "$(bash_ "rm $B")" "vloop fence: rm $B is denied by the Copilot deny list (rm:*)"
-no $P "$(bash_ "vloop brief review $B")" "vloop fence: vloop brief review $B is denied by the review-brief fence (Bash(vloop brief review:*))"
-ok $P "$(payload skill '{"skill":"review-brief"}')"
-no $P "$(payload skill '{"skill":"vloop-review-brief"}')" "vloop fence: skill vloop-review-brief is not vloop's — use /vloop:review-brief"
-no $P "$(payload web_fetch '{"url":"https://example.invalid"}')" 'vloop fence: tool web_fetch is not allowed in a review-brief session'
-no work "$(bash_ "vloop brief review $B")" "vloop fence: vloop brief review $B is denied by the work fence (Bash(vloop brief review:*))"
-no gate-review "$(payload skill '{"skill":"vloop-review-brief"}')" "vloop fence: skill vloop-review-brief is not vloop's — use /vloop:gate-review"
-for ph in deploy bogus; do
-  hookrun "$ph" "$(bash_ 'ls')"
-  [ "$rc" = 2 ] && [ "$dec" = deny ] || fail "fence hook --phase $ph: want the deny line and exit 2, got '$hout', exit $rc"
-  printf '%s' "$why" | grep -qF "unknown phase \"$ph\": want review, second-review, work, verify, gate-review, plan or review-brief" ||
-    fail "fence hook --phase $ph: the reason '$why' does not hold the new unknown-phase message"
-done
-[ "$(snap)" = "$before" ] || fail "the hook changed the fixture root or the HOME"
-
-# Both commands' help name the phase: usage line and --phase flag.
-for c in check hook; do
-  "$S" fence "$c" --help >"$t/help" 2>&1 || fail "vloop fence $c --help failed"
-  grep -E "^[[:space:]]*vloop fence $c --phase <[^>]*>" "$t/help" | grep -qF 'review-brief' ||
-    fail "vloop fence $c --help: the usage line does not name review-brief: $(grep -F "vloop fence $c --phase" "$t/help")"
-  grep -E '^[[:space:]]*--phase ' "$t/help" | grep -qF 'review-brief' ||
-    fail "vloop fence $c --help: the --phase flag does not name review-brief: $(grep -F -- '--phase ' "$t/help")"
-done
+planted p1 "{\"schema\":\"verify/v1\",\"findings\":[],\"checked\":$CK,\"notes\":\"none\"}"
+planted p2 '{"schema":"verify/v2","findings":[],"not_run":[],"checked":'"$CK"',"notes":"none"}'
+planted p3 "$(v2 true '[]' '[{"line":"vloop init"}]')"
+# No report, then exit 3: the failed-to-run warning alone, nothing kept.
+runcase p4 - claude.verify-exit3
+completed p4; verifylines p4 0
+erris p4 "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
+nowhere p4 'left no valid'; notkept p4
+# An invalid report after a failed session: the failed-to-run warning alone.
+runcase p5 "{\"schema\":\"verify/v1\",\"findings\":[],\"checked\":$CK,\"notes\":\"none\"}" claude.verify-exit3
+completed p5; verifylines p5 0
+erris p5 "vloop: the verify session failed to run — verify by hand; see ${RD}run.log"
+nowhere p5 'left no valid'; notkept p5
 echo "gate T2: ok"

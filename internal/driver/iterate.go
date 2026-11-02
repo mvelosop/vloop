@@ -977,17 +977,23 @@ func (it *Iterator) verifySession() error {
 		it.warn("vloop: the verify session changed %s — reverted", p)
 	}
 	guard.restoreTouched()
-	if res.TimedOut || res.ExitCode != 0 || !res.Recorded {
+	failedRun := res.TimedOut || res.ExitCode != 0 || !res.Recorded
+	failedWarn := func() {
 		it.warn("vloop: the verify session failed to run — verify by hand; see %s", relRunDir(root, it.RunDir)+"run.log")
-		return nil
 	}
-	data, ok := it.readReport("verify.json", "verify/v1")
+	data, ok := it.readReport("verify.json", "verify/v2")
 	if !ok {
-		it.warn("vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand")
+		if failedRun {
+			failedWarn()
+		} else {
+			it.warn("vloop: the verify session left no valid .vloop/tmp/verify.json — verify by hand")
+		}
 		return nil
 	}
 	var v struct {
+		Complete bool              `json:"complete"`
 		Findings []json.RawMessage `json:"findings"`
+		NotRun   []json.RawMessage `json:"not_run"`
 	}
 	_ = json.Unmarshal(data, &v)
 	dir := filepath.Join(it.RunDir, "reports")
@@ -997,10 +1003,24 @@ func (it *Iterator) verifySession() error {
 	if err := os.WriteFile(filepath.Join(dir, "verify.json"), []byte(it.r.Mask(string(data))+"\n"), 0o644); err != nil {
 		return err
 	}
-	if len(v.Findings) == 0 {
-		it.say("verify: no findings")
+	rel := relRunDir(root, it.RunDir)
+	found := "no findings"
+	if len(v.Findings) > 0 {
+		found = fmt.Sprintf("%d finding(s)", len(v.Findings))
+	}
+	if len(v.NotRun) == 0 {
+		if len(v.Findings) == 0 {
+			it.say("verify: no findings")
+		} else {
+			it.say("verify: %s — see %sreports/verify.json", found, rel)
+		}
 	} else {
-		it.say("verify: %d finding(s) — see %sreports/verify.json", len(v.Findings), relRunDir(root, it.RunDir))
+		it.say("verify: %s; %d example line(s) not run — see %sreports/verify.json", found, len(v.NotRun), rel)
+	}
+	if failedRun {
+		failedWarn()
+	} else if !v.Complete {
+		it.warn("vloop: the verify session stopped before its last pass — verify the rest by hand; see %sreports/verify.json", rel)
 	}
 	return nil
 }

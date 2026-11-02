@@ -10,7 +10,7 @@ import (
 
 const verifyTwoFindings = `case "$PHASE" in
   verify) mkdir -p .vloop/tmp
-    printf '{"schema":"verify/v1","findings":[{"kind":"example","claim":"a","observed":"b","where":"x"},{"kind":"surface","claim":"c","observed":"d","where":"y"}],"checked":{"example_lines":1,"sentences":1,"surfaces":1},"notes":"none"}\n' > .vloop/tmp/verify.json;;
+    printf '{"schema":"verify/v2","complete":true,"not_run":[],"findings":[{"kind":"example","claim":"a","observed":"b","where":"x"},{"kind":"surface","claim":"c","observed":"d","where":"y"}],"checked":{"example_lines":1,"sentences":1,"surfaces":1},"notes":"none"}\n' > .vloop/tmp/verify.json;;
 esac
 `
 
@@ -52,7 +52,7 @@ func TestRunVerifyOff(t *testing.T) {
 
 const verifyEmptyReport = `case "$PHASE" in
   verify) mkdir -p .vloop/tmp
-    printf '{"schema":"verify/v1","findings":[],"checked":{"example_lines":1,"sentences":1,"surfaces":1},"notes":"none"}\n' > .vloop/tmp/verify.json;;
+    printf '{"schema":"verify/v2","complete":true,"not_run":[],"findings":[],"checked":{"example_lines":1,"sentences":1,"surfaces":1},"notes":"none"}\n' > .vloop/tmp/verify.json;;
 esac
 `
 
@@ -87,7 +87,7 @@ func TestRunVerifyMissingAndInvalidReport(t *testing.T) {
 	for name, body := range map[string]string{
 		"missing": `case "$PHASE" in verify) rm -f .vloop/tmp/verify.json;; esac
 `,
-		"invalid": `case "$PHASE" in verify) mkdir -p .vloop/tmp; echo '{"schema":"verify/v1","findings":[{"kind":"bug"}]}' > .vloop/tmp/verify.json;; esac
+		"invalid": `case "$PHASE" in verify) mkdir -p .vloop/tmp; echo '{"schema":"verify/v2","complete":true,"not_run":[],"findings":[{"kind":"bug"}]}' > .vloop/tmp/verify.json;; esac
 `,
 	} {
 		t.Run(name, func(t *testing.T) {
@@ -214,5 +214,34 @@ func TestRunVerifyOnResume(t *testing.T) {
 	wantIn(t, "stdout", res.out, "verify: no findings")
 	if n := r.verifySessions(); n != 1 {
 		t.Errorf("%d verify sessions after the resume, want 1", n)
+	}
+}
+
+// V1 (verify/v2): lines not run and an unfinished session are printed and
+// warned, and neither changes how the run ends.
+func TestRunVerifyNotRunAndIncomplete(t *testing.T) {
+	t.Parallel()
+	const ck = `"checked":{"example_lines":1,"sentences":1,"surfaces":1},"notes":"none"`
+	for name, c := range map[string]struct{ report, out, err string }{
+		"not run": {`{"schema":"verify/v2","complete":true,"findings":[],"not_run":[{"line":"vloop init","reason":"denied"}],` + ck + `}`,
+			"verify: no findings; 1 example line(s) not run — see ", ""},
+		"incomplete": {`{"schema":"verify/v2","complete":false,"findings":[],"not_run":[],` + ck + `}`,
+			"verify: no findings", "vloop: the verify session stopped before its last pass — verify the rest by hand; see "},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			r := newRunRepo(t)
+			r.scripted(oneTask(t), defaultScript+"case \"$PHASE\" in verify) mkdir -p .vloop/tmp\n cat > .vloop/tmp/verify.json <<'EOF'\n"+c.report+"\nEOF\n;; esac\n")
+			res := r.vloop("run", runBrief)
+			wantExit(t, res, 0)
+			r.wantStatus("complete")
+			wantIn(t, "stdout", res.out, c.out)
+			if c.err != "" {
+				wantIn(t, "stderr", res.err, c.err)
+			}
+			if _, err := os.Stat(filepath.Join(r.runFolder(), "reports", "verify.json")); err != nil {
+				t.Error("no reports/verify.json")
+			}
+		})
 	}
 }
