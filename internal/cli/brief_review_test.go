@@ -48,3 +48,40 @@ func TestConfigSetAgentReviewBrief(t *testing.T) {
 		t.Errorf("codex: exit %d, want 2", code)
 	}
 }
+
+func TestBriefReviewPreflightRefusals(t *testing.T) {
+	d := scratchRepo(t)
+	if err := os.MkdirAll(filepath.Join(d, ".vloop"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(d, "docs", "briefs"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	rel := "docs/briefs/B20990101-0001-x.loop-brief.md"
+	if err := os.WriteFile(filepath.Join(d, rel), []byte("# x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// No claude on PATH and no trust record in the (empty) home folder.
+	t.Setenv("PATH", t.TempDir())
+	t.Setenv("HOME", t.TempDir())
+	t.Setenv("USERPROFILE", os.Getenv("HOME"))
+	code, out, errOut := run(t, "-C", d, "brief", "review", rel)
+	if code != 1 {
+		t.Errorf("exit %d, want 1: %q", code, errOut)
+	}
+	for _, want := range []string{
+		"  ✗ claude claude is not on PATH\n",
+		"  ✗ trust ",
+		"vloop: preflight failed — 2 problem(s), nothing has run",
+	} {
+		if !strings.Contains(errOut, want) {
+			t.Errorf("stderr lacks %q: %q", want, errOut)
+		}
+	}
+	if out != "" {
+		t.Errorf("stdout %q, want empty", out)
+	}
+	if _, err := os.Stat(filepath.Join(d, ".vloop", "state")); err == nil {
+		t.Error("a preflight refusal made a state folder")
+	}
+}

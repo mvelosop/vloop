@@ -5,9 +5,9 @@
   "base": "7a09ce6182ea6b80134ecc06e92ec3dbaeb7172e",
   "branch": "B20261102-0920-b29-i94-copilot-review-brief",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-02T09:52:00Z",
-  "updated": "2026-11-02T10:35:02Z",
+  "updated": "2026-11-02T10:41:10Z",
   "shell": "sh",
   "checks": [
     {
@@ -160,9 +160,9 @@
         "Committed Go tests, with a stub claude and fixtures in temporary directories addressed with git -C, cover the FIX and PASS runs (output, exit, record, argv, fence), the lock refusal, the preflight refusals and every planted failure of the worked example (no report, verdict OK, FIX with no findings, another brief's name, exit 3, git config, moved HEAD, a changed brief) and the timeout; the config keys' list test changes only to add the three keys (work notes name R1). No test or gate runs claude, copilot, gh or the network."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "The preflight refusals (briefReviewPreflight: claude not on PATH, folder not trusted, exit 1, no session or folder) have no committed test, though the criterion lists them"
+      "notes": ""
     },
     {
       "id": "T4",

@@ -46,3 +46,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added vloop brief review: one fenced, recorded review-brief session on Claude with the three config keys, lock, tmp clearing, preflight, git/refs/brief guards, session/v5 record and the validated kept report.
 - **Files:** internal/driver/briefreview.go, internal/driver/briefreview_test.go, internal/cli/brief_review.go, internal/cli/brief_review_test.go, internal/cli/brief.go, internal/cli/root.go, internal/driver/session.go, internal/driver/agent.go, internal/config/config.go, internal/config/config_test.go, internal/cli/config_test.go, cmd/vloop/e2e_test.go, docs/guide/configuration.md, docs/guide/commands.md
 - **Notes for next iteration:** R1: the command creates .vloop/tmp/ right after the vloop-repository check because the gate writes a lock file there before any session has run. Copilot is not handled: agent.review-brief=copilot skips the Claude preflight and the session fails as unsupported; T4 adds the adapter and preflight. R1: config list tests in internal/cli, internal/config and cmd/vloop changed only to add the three keys. TestTaskGate* in internal/cli fail when go test runs inside a loop session (plan-changed guard), unrelated.
+
+## T3 — Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop brief review on Claude already existed from the earlier attempt; this attempt adds the missing committed test of the preflight refusals (claude not on PATH, folder untrusted, exit 1, no folder).
+- **Files:** internal/cli/brief_review_test.go
+- **Notes for next iteration:** Only TestBriefReviewPreflightRefusals was added (PATH and HOME set to empty temp dirs). Copilot is not handled here; T4 adds its adapter and preflight. R1: config list tests changed only to add the three keys.

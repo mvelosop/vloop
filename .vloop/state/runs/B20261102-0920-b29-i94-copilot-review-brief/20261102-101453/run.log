@@ -11,3 +11,10 @@
    check go
    review T3 · 0m44s · $0.21 · run $1.49 / $40.00
    review: FAIL
+── iteration 6 (3 this run) · T3 · 2/6 done ──
+   Add vloop brief review: one fenced, recorded review-brief session on Claude, exiting by the report's verdict
+   work T3 · 1m39s · $0.21 · run $1.70 / $40.00
+   check go
+   review T3 · 0m40s · $0.16 · run $1.87 / $40.00
+   review: PASS
+   T3 done
