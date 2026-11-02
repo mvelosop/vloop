@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 1
+**Status:** running · **2/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:35:54Z
+**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:40:55Z
 
 ## Progress
 
 - [x] **T1** — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
-- [ ] **T2** — Add the Go test that holds each plugin brief template to the binary's
+- [x] **T2** — Add the Go test that holds each plugin brief template to the binary's
 - [ ] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
 - [ ] **T4** — Add an eval case for each brief skill and update the evals README and guide
 - [ ] **T5** — Name the two brief skills in the README, the concepts guide and the domain pages
@@ -47,7 +47,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Add the Go test that holds each plugin brief template to the binary's
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 The plugin's brief templates are a copy of the binary's templates (internal/brief/templates/&lt;language&gt;.md) with an executive-summary section added, and nothing generates them, so they can drift. This task adds a Go test that fails when a plugin template, with its executive-summary section removed, differs from the binary's template of the same language, or has no executive-summary heading at all. It reads the repository's own plugin and templates by relative path, as TestPluginSkills reads ../../plugin, and proves its failures with fixtures on copies in temporary directories. Neither the templates nor the binary's templates are edited to make it pass.
 

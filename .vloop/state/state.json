@@ -5,9 +5,9 @@
   "base": "3655c351a577ef4925612aa4b5aba230c1b0fd80",
   "branch": "B20261102-0048-b28-i101-brief-skills-in-plugin",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-02T01:13:33Z",
-  "updated": "2026-11-02T01:35:54Z",
+  "updated": "2026-11-02T01:40:55Z",
   "shell": "sh",
   "checks": [
     {
@@ -107,7 +107,7 @@
         "No template, plugin or binary, is edited, and vloop brief new/check are unchanged."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A committed Go test — a new top-level test function, in any package and under any name, not a case added inside a test that exists at the base — compares each of plugin/skills/create-brief/templates/brief-en.md and brief-es.md, minus the lines from its executive-summary heading (`## Executive summary`, `## Resumen ejecutivo`) up to but not including the next line starting `## `, with internal/brief/templates/en.md and es.md byte for byte, and passes on the repository as it is.", "met": true, "evidence": "internal/cli/plugin_templates_test.go: new TestPluginBriefTemplatesMatchBinary, withoutSummary strips heading to next '## ', bytes.Equal; go check log is ok for internal/cli"},
+    {"criterion": "The comparison is a function of the plugin directory and the binary's template directory; the test runs it on the repository's own (by relative path, as TestPluginSkills reads ../../plugin) and committed fixture tests run it on copies in temporary directories, covering each planted failure below. A test that only reads the repository's files and has no fixture proving it fails is a violation.", "met": true, "evidence": "checkPluginTemplates(pluginDir, binDir); repo test uses ../../plugin and ../brief/templates; TestPluginBriefTemplateCheckFixtures uses t.TempDir copies with planted failures; editFile fails if an edit changes nothing"},
+    {"criterion": "A heading of brief-en.md changed outside the executive summary makes the test fail with `plugin/skills/create-brief/templates/brief-en.md differs from internal/brief/templates/en.md outside its executive summary`; a change to internal/brief/templates/es.md makes it fail with the brief-es.md / es.md form of that message.", "met": true, "evidence": "fixtures 'heading changed' and 'binary es changed' assert those exact messages"},
+    {"criterion": "brief-es.md without its `## Resumen ejecutivo` heading makes the test fail with `plugin/skills/create-brief/templates/brief-es.md has no executive summary` (and likewise for brief-en.md without `## Executive summary`).", "met": true, "evidence": "fixtures 'no es summary' and 'no en summary'; found=false path emits the message"},
+    {"criterion": "A line changed or added inside a template's executive summary is not a difference: the test passes. The messages name both files as paths under the repository root, with forward slashes on every OS.", "met": true, "evidence": "fixture 'line inside summary' expects acceptance; messages built from string constants joined with '/', not filepath.Join"},
+    {"criterion": "No template, plugin or binary, is edited, and vloop brief new/check are unchanged.", "met": true, "evidence": "git status shows only the new test file outside .vloop/; no template or brief code in the diff"}
+  ],
+  "findings": [],
+  "notes": "none"
+}

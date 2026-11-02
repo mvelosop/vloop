@@ -32,3 +32,10 @@ committing the plan
    review T1 · 0m38s · $0.15 · run $5.85 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/6 done ──
+   Add the Go test that holds each plugin brief template to the binary's
+   work T2 · 0m50s · $0.14 · run $5.99 / $40.00
+   check go
+   review T2 · 0m18s · $0.09 · run $6.08 / $40.00
+   review: PASS
+   T2 done
