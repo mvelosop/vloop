@@ -1,0 +1,86 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2301-b33-i81-agent-eval-runner.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "A2 — one run of a case",
+      "summary": "A Copilot session started 'as vloop run starts it' gets a preToolUse hook that runs os.Executable() with 'fence hook --phase <p> --root <r>'. In this tool, os.Executable() is the agent-eval binary (a go run temp binary), which has no 'fence hook'. Every tool call of a real Copilot session would hit a failing hook. Tests with a fake copilot never run the hook, so the run passes and only the operator's acceptance fails.",
+      "evidence": "internal/driver/agent_copilot.go:136 exe, err := os.Executable(); :143 tail := \" fence hook --phase \" + phase + \" --root \"; os.Executable is used nowhere else in internal/ (grep). The Claude fences (fence/*.json) have no hooks, so only Copilot is affected.",
+      "fix": "Decide and pin how the hook resolves in the tool. Either agent-eval answers 'fence hook --phase --root' by calling the same judge 'vloop fence hook' runs, or the adapter gains a hook-command seam that the tool sets to 'vloop' on PATH, with vloop run's default (os.Executable) unchanged. Add a worked-example line or test: the hooks file of a tool-run Copilot session names a command that answers 'fence hook' with the judge's verdict."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example / A1",
+      "summary": "A1 reads cases only from 'plugin/evals/', and no flag points elsewhere. The worked example's fixture lives 'in the tool's test data, not under plugin/evals/', yet '--case fixture-*' must find it. The brief does not say how. Also, the Claude line reuses '--out <tmp>/o', which the line before says exits 2 because it is not empty.",
+      "evidence": "Brief A1: 'The cases are the directories of plugin/evals/ ... in name order'. Worked example: 'A fixture case (in the tool's test data, not under plugin/evals/)'. tools/release/main.go:23 run(args, dir, stdout, stderr) takes a dir, so a test could pass a temp root, but the brief never says the cases are read relative to it.",
+      "fix": "State that the cases are '<dir>/plugin/evals/', where dir is the directory run is given (the repository root under go run). Tests build a temp root holding plugin/evals/fixture-review/ and plugin/evals/operate-fixture/. Give the Claude line its own --out."
+    },
+    {
+      "kind": "consistency",
+      "section": "A1 / A5 (literal values)",
+      "summary": "Several values a gate will compare are described, not written. Only 'unknown agent nope' is literal. The <reason> texts for a missing flag, --runs below 1, a bad duration and a non-empty --out are not pinned, and the worked example's non-empty --out line pins no message. Also unpinned: what happens when no case matches --case; whether report.json's mean is rounded (the worked example says 0.67, the computed value is 0.666…); the table's column widths and separators, the NOTES separator for several failed graders, whether <n> in the total counts all cases or only scored ones, and the $ precision; whether cost_usd includes the judge's calls.",
+      "evidence": "Brief A1: 'prints agent-eval: <reason> on stderr and exits 2'. A5: '<n> case(s) · <s> skipped · <e> error(s) · $<cost>'. Worked example: 'mean 0.67' against weights 1,2,1,2 with b=0, which gives 4/6.",
+      "fix": "Write each reason literally (e.g. 'agent-eval: --model is required', 'agent-eval: --out <dir> is not empty'), decide 'no case matches' (exit 2 with a literal message, or exit 0 with an empty table), say report.json keeps full precision and the table rounds to 2 decimals, give one literal stdout line in the worked example, and say whether judge cost is counted."
+    },
+    {
+      "kind": "consistency",
+      "section": "A5 — the report",
+      "summary": "A run can end in error ('scaffold exited <code>', 'no session result'), but run objects have no status or reason field. The case status is undefined when, at --runs 3, some runs score and some error.",
+      "evidence": "A5 run object: {score, graders, cost_usd, credits, wall_ms}. Case: status scored|skipped|error and 'mean ... over the scored runs', which implies mixed runs exist.",
+      "fix": "Add 'status' and 'reason' to each run. Pin that a case is 'error' when any run is, with the first error's reason, and that mean is taken over the scored runs."
+    },
+    {
+      "kind": "runnability",
+      "section": "A2 / Violations the review must rule on",
+      "summary": "Runner.Run discards stdout after Parse, and Args hard-codes '--output-format json'. The tool cannot keep a transcript or stream Claude without a new seam in internal/driver. 'Unchanged: vloop run's sessions' and the violation 'any change to the argv, record or output of a vloop run session' can be read as forbidding any edit to internal/driver, so a careful planner may stall or a reviewer may fail a correct task.",
+      "evidence": "internal/driver/session.go: Args ends with \"--output-format\", \"json\"; Run parses stdout.Bytes() and keeps only the record.",
+      "fix": "Say explicitly that internal/driver may gain an exported seam (stdout handed to the caller, output format chosen by the caller) as long as vloop run's argv, records and existing session tests stay unchanged."
+    },
+    {
+      "kind": "fact",
+      "section": "A3 — the trace",
+      "summary": "Unsure. Several event shapes have no source in the repository: Copilot's assistant.message data.content and tool.execution_complete data.result.content, and Claude's stream-json assistant/tool_use/tool_result layout. The repository guideline says an external tool's format comes from the tool or its docs. Fixtures written from the brief will pass whatever shape the brief states, so a wrong field only shows at acceptance.",
+      "evidence": "Confirmed in the repo: toolCallId and toolName (internal/driver/agent_copilot_parse_test.go:76-81), data.arguments and assistant.message (tools/copilot-acceptance/hook.py:122, run.sh:112). No hit for data.result.content, data.content or a stream-json transcript (grep over the repo). .vloop/repo-guidelines.md, first lesson.",
+      "fix": "Before the run, have the operator capture one real transcript per agent, commit them as the tool's testdata, and cite them (plus tools/copilot-acceptance/hook.py) as binding. The A3 field names then come from the captures."
+    },
+    {
+      "kind": "fact",
+      "section": "A2 — one run of a case",
+      "summary": "'a phase vloop run starts (... review-brief)' is half right. vloop brief review starts review-brief sessions, not vloop run. The '<agent> does not run <phase>' skip cannot happen today: both adapters support all seven phases, so no test can reach it.",
+      "evidence": "internal/driver/agent.go:110-115 (claude Supports) and internal/driver/agent_copilot.go:74-76 (copilot Supports) list plan, work, review, second-review, gate-review, verify and review-brief. 'vloop brief --help' lists 'review  Review a brief in a fresh session'.",
+      "fix": "Say 'a phase vloop starts', and note that the unsupported-phase skip is defensive and has no reachable case with today's adapters (or cover it with a fake adapter)."
+    },
+    {
+      "kind": "fact",
+      "section": "A6 — the docs",
+      "summary": "The sentence that defers the runner is not the closing sentence of docs/design-notes/multi-agent-backends.md. The note ends one paragraph later.",
+      "evidence": "docs/design-notes/multi-agent-backends.md:94-96 'A backend-agnostic eval runner is deferred: ... needs it first.'; :97 'The fence audit is worth doing even if no other model is ever added.' (the file's last line).",
+      "fix": "Write: 'the sentence ending \"needs it first.\" gains: It is tools/agent-eval since B33.'"
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references",
+      "summary": "No domain invariant is cited. The tool starts sessions, and S-1, S-2 and S-4 govern them. This repository's architect skill asks briefs to cite the invariants that apply by ID.",
+      "evidence": "docs/domain/domain-model.md:217-220 (S-1, S-2, S-4). .claude/skills/vloop-architect/SKILL.md, 'Bind by invariant'.",
+      "fix": "Add '- docs/domain/domain-model.md — S-1, S-2 and S-4: the sessions the tool starts are the same sessions, in a scratch workspace'."
+    }
+  ],
+  "decisions": [
+    "A repository tool, not a vloop subcommand: sound, since plugin/evals/ is not extracted (internal/driver/extract.go skips evals).",
+    "Sessions start under the phase's fence; the case's allowed_tools and max_turns are ignored: sound, but the scores are not comparable with claude plugin eval's results, which the brief already accepts.",
+    "Claude streams only in this tool: sound.",
+    "The judge is always Claude, default sonnet, three votes with the majority deciding: fine. The basis ('as claude plugin eval's reports show its judge voting') is not in the repository and I could not run claude plugin eval --help to check it.",
+    "--case uses path.Match and is repeatable: fine. The claim that claude plugin eval --help offers this glob is unverified for the same reason.",
+    "One arm, no baseline: sound.",
+    "Cases of skills with no phase (operate, create-brief) are skipped, not failed: sound.",
+    "The Copilot-to-Claude tool-name table: it covers every name internal/fence/judge.go:107-133 knows; fine.",
+    "The qualifying rule (3 runs, every case of the phase at a mean no lower than the phase's default Claude model on the same tool): consider a tolerance or 'no case drops a grader Claude passes'. Three runs of llm-graded cases are noisy, so 'no lower' will flip on a single vote. The rule also needs a Claude baseline run per phase, which costs money.",
+    "Defaults: --timeout 20m, --out must be absent or empty, --runs 1: fine.",
+    "Acceptance records the scores on #84 (the terra replacement issue) as well as in copilot-cli-experiments.md: consistent with B32; the operator posts it."
+  ],
+  "checked": "facts (adapters, Runner/Args, extract, fence hooks, judge tool names, every case's prompt.md and grader frontmatter, release tool shape, design notes), consistency (worked-example arithmetic, contract vs example), rules (CLAUDE.md, guidelines, architect additions), runnability (go check after each task, gates vs fakes, acceptance)",
+  "header": "Reviewed 2026-11-02: FIX, 9 findings"
+}
+

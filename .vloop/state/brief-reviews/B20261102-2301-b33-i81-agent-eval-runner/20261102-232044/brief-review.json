@@ -1,0 +1,58 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2301-b33-i81-agent-eval-runner.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / A2",
+      "summary": "The plan hash is not 'the SHA-256 of .vloop/state/state.json, as a driver holding that plan would hand it'. vloop hands state.PlanDigest: the plan's bytes followed by every gate file under .vloop/state/gates/. `vloop task gate` checks against that digest. vloop also hands the hash only to work, review and verify sessions, never to plan, gate-review or review-brief. No case scaffold builds a gate folder today, so the two hashes agree for now. The first case that has a gate folder would make every `vloop task gate` in its session refuse with 'the plan was changed during this session'.",
+      "evidence": "internal/state/fixtures.go:152-165 (PlanDigest: plan, then \\0<path>\\0<contents> per gate file); internal/cli/task_gate.go:30-31 and 120-139 (compares PlanDigest(state.json, GateFiles) with VLOOP_PLAN_SHA256); internal/driver/iterate.go:650, 780, 956 pass PlanSHA; plan.go:543, gatereview.go:52, briefreview.go:100 pass none; `grep -l state/gates plugin/evals/*/scaffold.sh` matches only plan-checks-its-gates, in a comment.",
+      "fix": "In A2, say that the plan hash is state.PlanDigest of the scaffold's .vloop/state/state.json and its gate files, handed to work, review and verify sessions when the scaffold left a plan, and to no other phase, as vloop run hands it."
+    },
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract / A2",
+      "summary": "'The case's scaffold.sh runs in it with bash' does not say how the script is named. Every scaffold finds its shared files through its own path: HERE=$(dirname ${BASH_SOURCE[0]}), then `. $HERE/../_lib.sh`. With the default `--cases plugin/evals`, a relative path, and the workspace as the working directory, `bash plugin/evals/<case>/scaffold.sh` does not resolve. Every gate builds its fixtures in a temporary directory, which is an absolute path, so the gates pass and the fault shows only at the operator's acceptance.",
+      "evidence": "grep of plugin/evals/*/scaffold.sh: all 23 scaffolds set HERE from BASH_SOURCE and source shared files under $HERE/../; A1's --cases default is plugin/evals; Shape: the gates use fixture cases 'the gate builds in a temporary directory'.",
+      "fix": "In A2, write 'the case's scaffold.sh runs as `bash <its absolute path>`, with the workspace as its working directory'. Add a worked-example or task-2 gate line run with a relative --cases."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A2",
+      "summary": "Unsure. 'Started as vloop starts that phase' leaves open whether the tool clears the workspace's .vloop/tmp/ and takes the lock first. vloop run and vloop brief review both clear .vloop/tmp/ before their sessions. Case 08-vloop-records-out-of-scope stages .vloop/tmp/checks.json and .vloop/tmp/checks/all.log for the review to read, so a planner that copies vloop's clear would break that case silently. The parenthetical (fence, plugin, adapter command and environment) suggests no clear, but the brief does not say so. Writing it down settles the question.",
+      "evidence": "internal/driver/briefreview.go:75 and iterate.go:147 (ClearTmp); plugin/evals/08-vloop-records-out-of-scope/scaffold.sh:19, 49-51.",
+      "fix": "Add to A2: 'The tool neither clears the workspace's .vloop/tmp/ nor takes the run lock: the scaffold's files are the session's inputs.'"
+    },
+    {
+      "kind": "fact",
+      "section": "Binding references; Behaviour contract / A6",
+      "summary": "The binding references say docs/guide/evals.md gives 'where the new section goes'. It does not: it has no placeholder and does not mention other agents. A6 adds `## Other agents` without saying where.",
+      "evidence": "docs/guide/evals.md sections: Evals and gates (9), A case (26), Pre-flight (65), Running (96), vloop's suites (142), The reviewer calibration (158); `grep -i 'other agent\\|copilot' docs/guide/evals.md` matches nothing.",
+      "fix": "In A6, name the position, for example 'after `## Running`, before `## vloop's suites`', and drop 'where the new section goes' from the binding reference."
+    },
+    {
+      "kind": "consistency",
+      "section": "Executive summary / A1",
+      "summary": "The summary's flag list leaves out `--list`, which the contract, the worked example and task 1's gate all use.",
+      "evidence": "Executive summary A1: 'with --cases, --case, --runs, --judge-model, --timeout and --vloop'; A1's table has --list.",
+      "fix": "Add `--list` to the summary's A1 bullet."
+    }
+  ],
+  "decisions": [
+    "A repository tool (tools/agent-eval), not a `vloop eval` subcommand: sound, since vloop plugin path never extracts plugin/evals/.",
+    "Sessions run with the phase's fence and --permission-mode auto, ignoring the cases' allowed_tools and max_turns: sound for qualifying, but it means the tool's Claude scores are not comparable with claude plugin eval's, which the rule already accounts for.",
+    "The Copilot fence hook runs an installed vloop (--vloop, default from PATH) rather than the tool's own executable.",
+    "Claude's stream-json form is used only by this tool, as a driver option that defaults off.",
+    "The llm judge is always Claude (default sonnet), with 3 votes and the majority deciding, run in an empty temp dir with no plugin.",
+    "One arm only, with no without-plugin baseline. tool_order and baseline graders are out of scope; a grader type the tool cannot evaluate scores 0.",
+    "Cases of skills vloop does not start (operate, create-brief) are skipped, not failed.",
+    "Grader and prompt frontmatter is parsed by hand (a narrow subset), with no YAML module added.",
+    "--case uses path.Match and can be repeated; a case runs when any pattern matches. This differs from claude plugin eval, where only the last --case counts.",
+    "Qualifying rule: at 3 runs, every case of the phase has a mean no lower than the phase's default Claude model on the same tool. Opinion: this is strict, because Claude's own scores are noisy at 3 runs, so a candidate can fail on noise. Acceptable as a first rule; consider a tolerance once there is data.",
+    "Effort is never set for the tool's sessions, unlike vloop run."
+  ],
+  "checked": "facts (session.go Runner/Spec/Prompt/Args and Run's record-only parse; agent.go adapters; agent_copilot.go command, parse and writeCopilotHooks using os.Executable; fence/judge.go Copilot tool names, all covered by A3's table; briefreview.go; TestSessionArgs and TestRunClaudeInvocations exist; design note lines 94-97 for A6's insertion point; S-1/S-2/S-4 exist; the observed samples exist, hold no absolute path, and have exactly A3's shapes; every case's prompt body starts with /vloop:<skill>; the 98 graders use only the keys and forms A1's frontmatter subset covers; grader types are llm 50, regex 39, tool_used 9; tool_used tools are Bash, Edit and Write), consistency (the worked example's arithmetic, 4/6 = 0.67 with NOTES b; refusal order against the examples; the --list counts; exit codes in A1, A5 and the example), rules (no vloop argv change; no plan/evals change; repo-relative paths), runnability (the config's single go check stays green with testdata already present and no Go files; every gate goes through the command with fake binaries; the last example line is covered by named tests; the acceptance lists gh, macOS and vloop on PATH; copilot.credit-usd defaults when a workspace has no config); vloop brief check on a ready copy: ok, 0 warning(s)",
+  "header": "Reviewed 2026-11-02 (round 4): FIX, 5 findings"
+}
+

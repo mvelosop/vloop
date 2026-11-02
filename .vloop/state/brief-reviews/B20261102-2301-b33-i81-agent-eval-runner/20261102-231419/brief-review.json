@@ -1,0 +1,88 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261102-2301-b33-i81-agent-eval-runner.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Shape",
+      "summary": "Tasks 1-3 cannot be judged through the only surface the brief names, the command. B32 just made plans judge through that surface (P-8: no gate runs a test a task writes). The trace (T2) and the graders (T3) show nothing through the command until T4 runs a session. T1's second gate ('reading every case of plugin/evals/ without an error') has no command output that shows it: the command has no list or dry-run mode, and running it on plugin/evals runs the real scaffolds (which need vloop, python3 and git, and one of which exits non-zero off macOS). Round 2 (20261102-230926) found this too, and it is not fixed.",
+      "evidence": "Shape items 1-3; docs/domain/domain-model.md:210-213 (P-8); plugin/evals/README.md (gate-review-real-misses is macOS-only, and its scaffold needs vloop on PATH); A1 has no flag that lists cases without running them.",
+      "fix": "Reorder so that every task is visible through the command with fake agents and fixture cases. T1: the flags, the refusals, and one run of a fixture case with a fake agent writing report.json (status, error reasons, skipped). T2: the trace, judged on trace.jsonl. T3: the graders, judged on report.json's grader scores. T4: the table and the exit codes. Drop the 'every case of plugin/evals/' gate, or leave it to a Go test that the go check runs."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A4 llm; Worked example o6",
+      "summary": "The llm judge is not specified well enough. (1) It does not say which field holds the judge's answer and cost. The json form puts them in `result` and `total_cost_usd`, which judge_cost_usd sums. (2) It does not say where the judge runs, or with which tools, settings and plugins. docs/guide/evals.md says the judge 'has no access to the workspace'. A `claude -p` started in the workspace can read files and loads the user's settings. (3) It does not say how the prompt is passed. A `focus: trace` of a long session passed in argv can exceed ARG_MAX. (4) In o6 one fake `claude` on PATH is both the agent under test and the judge, and nothing says how it tells the two calls apart. Round 2 raised (1) and (4).",
+      "evidence": "Brief A4 'The judge is claude -p with --model ... --output-format json, given the grader's body and the focus'; docs/guide/evals.md lines 'It has no access to the workspace'; worked example o6.",
+      "fix": "Pin the following: the judge runs in an empty temporary directory, outside the workspace. It gets its prompt on stdin. Its answer is the last non-empty line of the JSON's `result`, and its cost is `total_cost_usd`. Take any flag that turns off tools or settings from `claude --help` (this review could not run it). For o6: the fake tells the calls apart by `--output-format stream-json` (the agent) versus `json` (the judge)."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / A6",
+      "summary": "The paragraph that defers the runner does not end with the deferral. Its last line is 'The fence audit is worth doing even if no other model is ever added.', in the same paragraph with no blank line before it. If 'It is tools/agent-eval since B33.' goes at the paragraph's end, 'It' refers to the fence audit.",
+      "evidence": "docs/design-notes/multi-agent-backends.md:93-97 (line 96 ends 'needs it first.', line 97 'The fence audit is worth doing…', then a blank line).",
+      "fix": "Insert the sentence right after 'another agent needs it first.' (line 96), not at the paragraph's end."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A1, A2, A4, A5 (literal values)",
+      "summary": "Several values that a gate or test will compare are still described rather than written. (a) The `phase` of a skipped case, in report.json and in the PHASE column (fixture-operate has no phase). (b) The NOTES column when --runs > 1: graders below 1 in any run, or in the mean? (c) The form of <d> in 'timed out after <d>': the flag as given ('20m') or Go's Duration.String ('20m0s')? (d) The llm grader's default focus, 'the final assistant text': the trace's last `text` event, or Claude's `result`? (e) That `input_match` is a Go regular expression. The real cases write it as one (`vloop\\s+brief\\s+check`, `state\\.json|\\.gitignore`). The worked example's `vloop schema validate` also passes as a substring, so a substring implementation passes every gate and scores the real cases wrong. (f) Which refusal wins when several A1 conditions hold, for example two required flags missing. Round 2 raised (a), (b), (c) and (e).",
+      "evidence": "A2 skip ('the reason no phase', no phase value); A5 report shape and NOTES column; A2 'timed out after <d>'; A4 tool_used 'whose input matches it'; plugin/evals/*/graders: 9 tool_used graders with regex input_match.",
+      "fix": "Write each value literally. For example: phase `-` for a skipped case. NOTES names the graders below 1 in any run, in name order. <d> is printed as Duration.String(). The default focus is the last text event. input_match is a Go regexp searched in the input. Refusals are checked in the table's order, and missing flags in the order --agent, --model, --out."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / A2",
+      "summary": "'Started as vloop starts that phase' is not exactly true, and the brief does not name the difference. vloop run gives work, review and verify sessions VLOOP_PLAN_SHA256 (the hash `vloop task gate` checks) and an effort from config. The tool has no driver-held plan and no effort flag. Round 2 found this, and it is not fixed.",
+      "evidence": "internal/driver/iterate.go:650, 780, 956 (PlanSHA: guard.hash()); internal/cli/task_gate.go:30 (checks it only when set); internal/driver/session.go Spec.Effort.",
+      "fix": "Add one line to A2: the tool's sessions get no plan hash and no effort (or the effort config gives the phase in the workspace), and those are the only differences."
+    },
+    {
+      "kind": "decision",
+      "section": "Behaviour contract / A4 (grader parsing)",
+      "summary": "The grader frontmatter is nested YAML: `target:` and `focus:` hold maps of `source` and `path` in 60 of the 98 graders, and patterns are single-quoted with backslashes. go.mod has no YAML library, and nothing in the repository parses nested frontmatter. The brief does not say whether a task may add a module dependency (which a session would have to fetch) or must parse this narrow subset by hand. A planner will choose silently.",
+      "evidence": "go.mod (no yaml module); internal/cli/skills_test.go:175 frontmatter() returns map[string]string; grader shapes counted over plugin/evals/*/graders/*.md.",
+      "fix": "Decide and write it under 'Decided here'. Either: no new dependency, and the tool reads the subset the cases use (scalars, single-quoted strings, one level of nested map). Or: gopkg.in/yaml.v3, fetched by the operator before the run."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example (last line)",
+      "summary": "The last line needs a `vloop run` session, which the verify session cannot start. The brief does not name the test that covers it. A test already does: TestSessionArgs pins the argv ending in \"--output-format\", \"json\". Round 2 found this, and it is not fixed.",
+      "evidence": "internal/driver/session_test.go:17-21 (TestSessionArgs); guidelines.md 'Say which worked-example lines the verify session cannot run'.",
+      "fix": "Write beside the line: '(covered by TestSessionArgs, internal/driver/session_test.go, unchanged)'."
+    },
+    {
+      "kind": "runnability",
+      "section": "Acceptance, at close (the operator's)",
+      "summary": "The acceptance leaves out environment it depends on. A Copilot session's COPILOT_HOME holds no login, so Copilot logs in through `gh auth token`, and gh must be logged in. gate-review-real-misses is macOS-only: its scaffold exits non-zero where grep accepts -P, which here is a run error and exit 1. The sessions run `vloop` from PATH, while the hook runs `--vloop`'s binary.",
+      "evidence": "tools/copilot-acceptance/README.md ('Copilot logs in with gh auth token: the GitHub CLI must be logged in'); plugin/evals/README.md (gate-review-real-misses is for macOS hosts; its scaffold needs vloop on PATH).",
+      "fix": "In the acceptance, state: on macOS, `gh auth status` logged in, and `go install ./cmd/vloop` so that the PATH vloop and the hook's vloop are the branch's."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / A3",
+      "summary": "Unsure. The event shapes are 'as observed on 2026-11-02', but no sample of either transcript is in the repository. The fixtures the tests use will be written from the brief, so a wrong field name only shows at acceptance. This repository's guideline takes external formats from the tool or its docs.",
+      "evidence": "grep for '\"assistant.message\"' and '\"tool_result\"' outside .vloop/state finds only this brief; .vloop/repo-guidelines.md (formats from the tool, never from memory).",
+      "fix": "Commit the observed samples, trimmed and masked, as the tests' transcript fixtures, or put them in docs/design-notes/copilot-cli-experiments.md, and cite them. The acceptance run then settles the question."
+    }
+  ],
+  "decisions": [
+    "A repository tool, not a `vloop eval` subcommand: sound, since the cases are not shipped.",
+    "Sessions run under the phase's fence, and a case's allowed_tools and max_turns are ignored: right for qualification, but scores are not comparable with claude plugin eval (the brief says so).",
+    "`--vloop` names the hook's binary rather than the tool building its own fence hook: sound. Consider defaulting it to the PATH vloop the sessions also use (it already does).",
+    "Claude's stream-json is used only by this tool: sound, and it keeps every vloop session unchanged.",
+    "The judge is always Claude, default `sonnet`, three votes by majority: sound. Three votes triple judge cost on the 50 llm graders.",
+    "One arm, no without-plugin baseline: sound.",
+    "Cases of skills vloop does not start (operate, create-brief) are skipped, not failed: verified, these are exactly the two cases.",
+    "Exit 1 only when a run errors, never on a low score: this differs from claude plugin eval's --threshold exit. Fine for a bench, worth saying in the README.",
+    "Qualifying rule: a model's mean is no lower than the phase's default Claude model's on every case, at 3 runs. With llm graders' noise, a strict 'no lower' at 3 runs may fail a model on chance. Consider a stated tolerance, or more runs.",
+    "transcript.jsonl is kept unmasked under --out, whereas session records are masked. Acceptable for a scratch directory, but not stated.",
+    "`path.Match` and a repeatable `--case`: sound (and it fixes the claude plugin eval quirk the README notes).",
+    "Unsupported grader types score 0: sound. No current case uses tool_order or baseline.",
+    "Default --timeout of 20m: no source cited. Fine as a default."
+  ],
+  "checked": "facts (base SHA 24c0533 = HEAD; depends-on; driver Runner/Spec/Args/Run, adapters, writeCopilotHooks' os.Executable; Claude fence has no hook binary; Copilot tool names in fence/judge.go:107-133 all mapped; first word of all 23 prompt.md bodies; grader types and keys over 98 graders; tools/release run() and exit codes; S-1/S-2/S-4 at domain-model.md:217-220; design-note paragraph; experiments section), consistency (worked-example arithmetic: weights 1,2,1,2 give 4/6; o1 reused for the non-empty refusal), rules (P-8, guidelines' literal values and unrunnable lines, repo guideline on external formats), runnability (go check after each task; evals-guide test unaffected by a new section; fixture cases outside plugin/evals avoid skills_test). vloop brief check on a ready copy: ok, 0 warning(s). Five of the nine findings repeat round 2 (20261102-230926), whose findings the header does not mention.",
+  "header": "Reviewed 2026-11-02 (round 3): FIX, 9 findings"
+}
+
