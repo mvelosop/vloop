@@ -63,4 +63,9 @@ the only thing that stops it.
 when the skills joined the plugin (2026-11-02, B28): one run each, with the
 plugin and the default model, both scored 1.0 (≈ $0.84 together).
 
+`verify-planted-mismatches` (on `verify/v2`) and `verify-unrunnable-line` were
+run when the verify skill moved to `verify/v2` (2026-11-02, B30): one run each,
+with the default model and the no-plugin baseline arm, both scored 1.0 with the
+plugin and 0.0 without (≈ $0.79 together, both arms).
+
 `gate-review-real-misses` is for macOS hosts: its first gate's `grep -P` is a defect only where `grep` is BSD grep, which rejects the option. Its scaffold exits non-zero on a host whose `grep` accepts `-P`, and on any host where a planted gate does not fail for its recorded reason. The scaffold needs `vloop` on `PATH`.
