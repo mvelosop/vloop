@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Walked the worked example on the built tree and ran all gates together; nothing needed fixing, so no change was made.",
+  "files": [],
+  "verified": "vloop task gate T6 exited 0 (T1-T5 gates each printed ok).",
+  "notes": "No fixes made. Checked: skill list, create-brief files and templates, no stale 'experimental' hits (exit 1), cross-references and names, and the committed tests for the template, budget (1,201 words) and doctor review-brief clash. I could not run the fresh-repo steps (vloop init, plugin path, fence check) because the sandbox denied the command. Under go test ./..., five TestTaskGate* tests in internal/cli fail with 'the plan was changed during this session'; this is the live driver session's plan guard and is not a tree defect. The driver's own check run decides."
+}

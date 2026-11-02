@@ -1,0 +1,7 @@
+{"schema":"verdict/v1","task":"T6","verdict":"PASS",
+"criteria":[
+{"criterion":"The gates of T1 to T5 pass together on the finished tree, and the `go` check passes in full.","met":true,"evidence":"gates/T6.log shows T1..T5 gate: ok; checks.json go exit 0, go.log all packages ok"},
+{"criterion":"Every line of the brief's worked example holds on the built tree, including each planted failure (the template test's two messages, the padded create-brief's budget message, doctor's review-brief clash line), each proven by a committed test.","met":true,"evidence":"Re-ran the tree listings, grep (exit 1), counts (1,2,1), name lines and word count 1085 (<1200); committed tests exist in internal/cli/plugin_templates_test.go, internal/budget/budget_test.go, internal/cli/doctor_copilot_review_brief_test.go"},
+{"criterion":"Any fix this task makes is confined to what an earlier task's acceptance already required; it changes no other skill's instructions, no fence, the driver, or vloop brief new/check, and its notes list each fix and the contract item it serves.","met":true,"evidence":"git diff HEAD shows no product change; the proposal states no fixes were made"}],
+"findings":[],
+"notes":"No change was needed, as the task allows. The work session could not run the fresh-repo steps (init, plugin path, fence check); the committed tests and checks cover them."}

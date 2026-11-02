@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** README, concepts guide, session page and domain model now name all eight skills; /vloop:create-brief and /vloop:review-brief are described as the operator's, interactive, and the brief stays vloop's only input (B-1 unchanged).
 - **Files:** README.md, docs/guide/concepts.md, docs/domain/execution/session.md, docs/domain/domain-model.md, internal/cli/readme_test.go
 - **Notes for next iteration:** K4: TestReadmeNamesTheSkills list gained create-brief and review-brief only. The concepts Skills section lacked /vloop:verify, so a bullet for it was added to list all eight. Other internal/cli tests (TestTaskGate*) fail inside the work session with 'the plan was changed during this session'; that is the driver's guard, not related to this change.
+
+## T6 — Close the run: every gate at once and the worked example line for line
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Walked the worked example on the built tree and ran all gates together; nothing needed fixing, so no change was made.
+- **Files:** none
+- **Notes for next iteration:** No fixes made. Checked: skill list, create-brief files and templates, no stale 'experimental' hits (exit 1), cross-references and names, and the committed tests for the template, budget (1,201 words) and doctor review-brief clash. I could not run the fresh-repo steps (vloop init, plugin path, fence check) because the sandbox denied the command. Under go test ./..., five TestTaskGate* tests in internal/cli fail with 'the plan was changed during this session'; this is the live driver session's plan guard and is not a tree defect. The driver's own check run decides.

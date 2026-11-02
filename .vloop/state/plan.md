@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 5
+**Status:** running · **6/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T02:03:15Z
+**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T02:13:54Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
 - [x] **T4** — Add an eval case for each brief skill and update the evals README and guide
 - [x] **T5** — Name the two brief skills in the README, the concepts guide and the domain pages
-- [ ] **T6** — Close the run: every gate at once and the worked example line for line
+- [x] **T6** — Close the run: every gate at once and the worked example line for line
 
 ## Tasks
 
@@ -135,7 +135,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Close the run: every gate at once and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 The earlier tasks each prove one item; this one proves they hold together on the finished tree. It runs every gate of the run at once and walks the brief's worked example line for line, fixing whatever no longer agrees — a stale count, a pointer, a test left on the old list — without widening any task's scope. If nothing needs fixing, the task is done with no change and says so.
 

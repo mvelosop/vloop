@@ -5,9 +5,9 @@
   "base": "3655c351a577ef4925612aa4b5aba230c1b0fd80",
   "branch": "B20261102-0048-b28-i101-brief-skills-in-plugin",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-02T01:13:33Z",
-  "updated": "2026-11-02T02:03:15Z",
+  "updated": "2026-11-02T02:13:54Z",
   "shell": "sh",
   "checks": [
     {
@@ -233,7 +233,7 @@
         "Any fix this task makes is confined to what an earlier task's acceptance already required; it changes no other skill's instructions, no fence, the driver, or vloop brief new/check, and its notes list each fix and the contract item it serves."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh && sh .vloop/state/gates/T2/gate.sh && sh .vloop/state/gates/T3/gate.sh && sh .vloop/state/gates/T4/gate.sh && sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }
