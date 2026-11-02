@@ -5,9 +5,9 @@
   "base": "38b28f0a81ceac57acc72c020c2c6a67f99040a4",
   "branch": "B20261102-2101-b32-i84-gates-through-the-named-surface",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-02T21:40:00Z",
-  "updated": "2026-11-02T22:03:21Z",
+  "updated": "2026-11-02T22:14:19Z",
   "shell": "sh",
   "checks": [
     {
@@ -153,7 +153,7 @@
         "No task runs `claude`, `copilot` or any eval; any fix this task makes is to the contract as the brief states it and weakens no check."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

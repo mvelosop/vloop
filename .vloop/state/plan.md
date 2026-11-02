@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/4 done** · iteration 3
+**Status:** running · **4/4 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T22:03:21Z
+**Brief:** `docs/briefs/B20261102-2101-b32-i84-gates-through-the-named-surface.loop-brief.md` · **Updated:** 2026-11-02T22:14:19Z
 
 ## Progress
 
 - [x] **T1** — Make the plan skill judge through the surface the brief names, and act on every revision finding (G1, G2)
 - [x] **T2** — Say in the gate review when a pin is sound, and raise its word ceiling to 1600 (G3)
 - [x] **T3** — Add the eval case plan-judges-through-named-surface and list it in both catalogues (G4)
-- [ ] **T4** — Close the run: every gate and the worked example on the final tree
+- [x] **T4** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
 
@@ -85,7 +85,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Close the run: every gate and the worked example on the final tree
 
-`pending` · depends on: T1, T2, T3
+`done` · depends on: T1, T2, T3
 
 The last task proves the whole brief holds at once on the final tree: gates T1 to T3 pass together, no schema or other skill changed, and the brief's worked example holds line for line. It exists so a regression one task caused in another's surface is found before the run's verify session; the operator's acceptance at close (the evals and gpt-6.1-terra on every phase) cannot run in a session and is not this task's.
 

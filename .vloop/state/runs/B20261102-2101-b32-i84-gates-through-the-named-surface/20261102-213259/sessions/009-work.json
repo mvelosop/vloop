@@ -1,0 +1,33 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.1605266,
+  "duration_ms": 413154,
+  "effort": null,
+  "ended": "2026-11-02T22:10:15Z",
+  "is_error": false,
+  "iteration": 4,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 24480,
+      "cache_read_input_tokens": 329126,
+      "cost_usd": 0.1605266,
+      "input_tokens": 22,
+      "output_tokens": 2965
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "R=$(pwd); d=$(mktemp -d)\n(cd \"$d\" \u0026\u0026 bash \"$R\"/plugin/evals/plan-judges-through-named-surface/scaffold.sh \u003e/dev/null 2\u003e\u00261); echo scaffold $?\n\"$d\"/bin/tally total; echo exit $?\ngit -C \"$d\" status --por…",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261102-2101-b32-i84-gates-through-the-named-surface",
+  "schema": "session/v3",
+  "started": "2026-11-02T22:03:21Z",
+  "task": "T4",
+  "turns": 11,
+  "wall_ms": 413881
+}
