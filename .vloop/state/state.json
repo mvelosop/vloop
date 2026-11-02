@@ -5,9 +5,9 @@
   "base": "28f49ae8009ed10d3ee753520bdee280fe780a4d",
   "branch": "B20261102-1332-b30-i113-verify-unrunnable-lines",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-02T14:02:09Z",
-  "updated": "2026-11-02T14:04:04Z",
+  "updated": "2026-11-02T14:11:45Z",
   "shell": "sh",
   "checks": [
     {
@@ -47,8 +47,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261102-1332-b30-i113-verify-unrunnable-lines/20261102-134928/checks/001-go.fail.log"
     },
     {
       "id": "T2",

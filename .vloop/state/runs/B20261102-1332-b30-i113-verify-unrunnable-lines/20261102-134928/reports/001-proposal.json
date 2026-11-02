@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added schemas/verify.v2.json (verify/v1 plus required boolean complete and not_run array of {line, reason} non-empty strings), embedded and listed, with committed tests.",
+  "files": ["schemas/verify.v2.json", "internal/schema/schema_test.go", "internal/schema/testdata/verify2.valid.json", "internal/schema/testdata/verify2.invalid.json", "internal/schema/testdata/verify2-no-complete.invalid.json", "internal/schema/testdata/verify2-not-run-no-reason.invalid.json", "internal/schema/testdata/verify2-v1-report.invalid.json", "internal/cli/schema_test.go", "cmd/vloop/b2_e2e_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go test of internal/schema passes; the schema-list tests in internal/cli and cmd/vloop pass.",
+  "notes": "Contract item V1 (new schema listed): the three pinned schema lists gained verify/v2 only; the one other edit is the length check in internal/cli/schema_test.go TestSchemaList, 25 to 26, a consequence of the added name. Other internal/cli task_gate tests fail inside this session only because the plan is held by the driver; not related. verify.v1.json is untouched."
+}
