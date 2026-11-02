@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "planSession and gateReviewRound now snapshot the tree (as the review guard does), and after the session's ref and git-config checks revert every stray change with one warning per path; cmd/vloop tests cover the V2 lines.",
+  "files": ["internal/driver/plan.go", "internal/driver/gatereview.go", "cmd/vloop/run_planedges_test.go"],
+  "verified": "vloop task gate T3 equivalent (sh .vloop/state/gates/T3/gate.sh) exited 0 and printed 'gate T3: ok'; go test ./... passes, internal/cli with a clean VLOOP_* env.",
+  "notes": "Added term.revertTree in plan.go (same ignore rule, warning shape and could-not-revert halt, ExitPreflight, as the verify session); it runs after the moved-ref check and before the timeout and exit-code halts. No existing test changed. internal/cli TestTaskGate* fail only when the inherited VLOOP_PLAN_SHA is set in the environment, unrelated to this task."
+}

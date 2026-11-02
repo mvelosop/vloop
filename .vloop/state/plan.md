@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/5 done** · iteration 2
+**Status:** running · **3/5 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T19:44:58Z
+**Brief:** `docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md` · **Updated:** 2026-11-02T19:59:05Z
 
 ## Progress
 
 - [x] **T1** — Tighten brief-review/v1's brief to a brief's name, in place
 - [x] **T2** — Let a complete plan of another brief pass vloop run's preflight and the bare vloop doctor
-- [ ] **T3** — Revert and warn what each plan and gate-review session changes outside .vloop/state/ and .vloop/tmp/
+- [x] **T3** — Revert and warn what each plan and gate-review session changes outside .vloop/state/ and .vloop/tmp/
 - [ ] **T4** — Write V1, V2 and V3 into the configuration guide, the plan and session pages and the fence audit
 - [ ] **T5** — Close the run: every gate and the worked example on the final tree
 
@@ -63,7 +63,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Revert and warn what each plan and gate-review session changes outside .vloop/state/ and .vloop/tmp/
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The plan commit stages the whole tree, so a file a plan or gate-review session changes elsewhere is committed with the plan, and only the fence stands in the way — for Copilot its hook fails open (#111). The operator chose reverting with a warning, as the review and verify sessions' guards do, around each session rather than once before the commit: a plan session's stray change would otherwise be in the tree while the gates are checked on the base and could make a gate pass there for the wrong reason, and per session the warning names who made it. This reuses the review's tree guard; it adds no new halt.
 

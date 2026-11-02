@@ -25,3 +25,10 @@ committing the plan
    review T2 · 0m25s · $0.11 · run $3.45 / $40.00
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/5 done ──
+   Revert and warn what each plan and gate-review session changes outside .vloop/state/ and .vloop/tmp/
+   work T3 · 9m39s · $0.37 · run $3.82 / $40.00
+   check go
+   review T3 · 0m29s · $0.13 · run $3.95 / $40.00
+   review: PASS
+   T3 done

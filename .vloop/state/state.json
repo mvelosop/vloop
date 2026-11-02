@@ -5,9 +5,9 @@
   "base": "a30ab36ac4c5e5050c6d3222b5eaa0adeca02995",
   "branch": "B20261102-1844-b31-i110-i112-plan-phase-edges",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-02T19:28:53Z",
-  "updated": "2026-11-02T19:44:58Z",
+  "updated": "2026-11-02T19:59:05Z",
   "shell": "sh",
   "checks": [
     {
@@ -141,7 +141,7 @@
         "Committed tests run by the go check, in cmd/vloop with stub plan and gate-review sessions as the base's run tests do, cover every V2 line of the worked example: the four warnings in order with the plan commit and tree checked, the plan session that exits 3 after a change, the plan-line gate that fails on the base after the revert, and a clean plan session with no warning and its gate folder committed. A task that ships the guard and leaves no such test fails this criterion."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
