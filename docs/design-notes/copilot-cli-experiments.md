@@ -546,6 +546,80 @@ Copilot trust: twice with `agent.review-brief = copilot` and
 - **Setup:** Claude's folder trust accepted through tmux; Copilot asked for
   none there.
 
+## `gpt-6.1-terra`: planning and the URL probe (2026-11-02)
+
+Two small tests of `gpt-6.1-terra`, the cheaper successor to
+`gpt-5.6-terra` (which retires on 2026-11-16; #84), Copilot CLI 1.0.105,
+vloop built from `main` at `75bba52`. Operated from a Claude Code session.
+
+### Planning, as B27's acceptance
+
+B27's set-up exactly, with `model.plan = "gpt-6.1-terra"`: a fresh clone of
+`mvelosop/url-shortener-template`, the URL shortener brief, the `app` and
+`clean` checks, gate review and the rest on Claude with the defaults. One
+attempt.
+
+| | |
+| --- | --- |
+| Plan sessions | 2, every record `session/v4`, agent `copilot`, model `gpt-6.1-terra`, 64 and 231 s |
+| Plan cost | 23.9 credits, ≈ $0.16 (16.8 + 7.0); B27's two attempts on 5.6: 77.2 credits |
+| Gate reviews (Claude, Sonnet) | round 1 FAIL, 10 findings on T1–T8 (8 `pins-unnamed`, 1 `not-contract`, 1 `unpassable`); round 2 FAIL, 10 findings on T1–T9 (9 `pins-unnamed`, 1 `check-gap`) |
+| Ending | exit 2 on the check gap, nothing kept; no task ran |
+| Hook denials | 2, one per plan session, both shell syntax the hook cannot judge (`if`) |
+| Total | ≈ $0.55 (plan $0.16, gate review $0.38); ≈ 8 min of wall time |
+
+- **The gates are real judges now.** Each of the nine is an inline
+  `node -e` script of 350–1,900 characters that builds the project into a
+  temporary folder and asserts the contract (status codes, bodies, the
+  SQLite rows, a spawned server). Every one failed on the base for the right
+  reason. 5.6's gates were `pnpm build` or the task's own spec file.
+- **But they reach into the implementation.** Every gate but T9's imports
+  internal modules by name (`dist/app.js`'s `createApp({databasePath})`,
+  `links-store.js`, `slug.js`'s `generateSlug`), which the brief leaves open.
+  That was the gate review's finding in both rounds.
+- **The second plan session did not act on the findings.** Round 2
+  repeated round 1's `pins-unnamed` findings on T1–T8, and added one on T2
+  (the table's name) and the check gap on T9.
+- **No gate folder again**, as with 5.6: every judge sits in the task's
+  `verify` line.
+- **The check gap is the one B26's Terra gate review raised**: the brief
+  requires a `pnpm smoke` script, and the `clean` check runs it only when
+  `package.json` names it.
+- **Verdict:** a better planner than 5.6 at about a third of the credits,
+  and still not one whose plan passes this brief's gate review. Whether a
+  plan-skill rule on judging through the brief's public surface (HTTP here)
+  would carry it is for #84's evaluation.
+
+### The URL masking probe (B26's open question)
+
+B26's false `unpassable` finding showed `https://` as `******` in the kept
+verdict. The probe ran one task through Copilot outside any vloop run, on
+both models: read a file holding `https://example.com:8443/a`, run it
+through `node -e "new URL(…)"`, and write the URL, the exact command and
+its output to a report. It ran in three set-ups, each on 5.6 and on 6.1:
+plain Copilot with only `node` and file writes allowed, with and without
+`--deny-tool=url`; the URL read from a file, with vloop's session flags
+(`--no-ask-user`, `--output-format json`, `--disable-builtin-mcps`, part of
+the deny list); and vloop's own `vloop fence hook` for the gate-review phase,
+in a fresh `COPILOT_HOME`, with the GitHub login passed as a token, as vloop
+starts its sessions.
+
+| | |
+| --- | --- |
+| Runs | 8 (4, 2 and 2), plus one line checking that the model id works (1.9 credits) |
+| Cost | one premium request each; `--output-format json` reports no credits |
+| Masking | none: in every run the report, the command and the session's event log hold `https://` as written, and `node` printed `8443 https:` |
+
+- **Copilot does not mask that URL** in any set-up tried, so the `******`
+  in B26's verdict was not a transform Copilot applies to it. vloop's own
+  redaction writes `<redacted:NAME>`. Most likely the model wrote the
+  asterisks itself and reasoned from its own mangled URL, which makes B26's
+  false finding the model's.
+- **Not reproduced**, so not settled: B26's gate review ran a longer
+  session, with the plugin and its guidelines. Its raw events were not kept
+  (`.vloop/tmp/` is cleared at the next run), which is why the probe had to
+  rebuild the case.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts
