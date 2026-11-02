@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 5
+**Status:** running · **5/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-02T00:05:43Z
+**Brief:** `docs/briefs/B20261101-2305-b27-i77-copilot-plan.loop-brief.md` · **Updated:** 2026-11-02T00:11:05Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Run plan sessions on Copilot: the adapter, its record, agent.plan = copilot and the exit line
 - [x] **T3** — Check agent.plan = copilot in the run preflight and doctor
 - [x] **T4** — Document Copilot plan sessions in the fence audit, the configuration guide and the domain pages
-- [ ] **T5** — Extend the Copilot acceptance kit with a plan run on the real CLI
+- [x] **T5** — Extend the Copilot acceptance kit with a plan run on the real CLI
 - [ ] **T6** — Close the run: every gate and the worked example on the final tree
 
 ## Tasks
@@ -111,7 +111,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Extend the Copilot acceptance kit with a plan run on the real CLI
 
-`pending` · depends on: T2, T3
+`done` · depends on: T2, T3
 
 Gates use a stub copilot; only a run on the real CLI proves a Copilot plan session works and leaves a plan the driver accepts. This task gives the operator a script for that acceptance at close and documents it; no gate or check runs it.
 

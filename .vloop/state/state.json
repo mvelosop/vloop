@@ -5,9 +5,9 @@
   "base": "432365fd0fdfd121665ced1c61b23db67c306719",
   "branch": "B20261101-2305-b27-i77-copilot-plan",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-01T23:23:21Z",
-  "updated": "2026-11-02T00:05:43Z",
+  "updated": "2026-11-02T00:11:05Z",
   "shell": "sh",
   "checks": [
     {
@@ -210,7 +210,7 @@
         "The kit's scripts pass `sh -n` and its Python parses; flags, keys and messages of existing vloop commands the script uses are taken from running them, not memory; no gate or check runs the kit, copilot, gh or the network."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

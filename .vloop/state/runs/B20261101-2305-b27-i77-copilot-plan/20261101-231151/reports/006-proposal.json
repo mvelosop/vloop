@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "The acceptance kit gains plan.sh (fixture brief, agent.plan = copilot with model.plan, other phases on Claude) and report.py plan (plan session records, state/v2 validity and tasks, gate-review verdict per round); README has its B27 plan-sessions section.",
+  "files": ["tools/copilot-acceptance/plan.sh", "tools/copilot-acceptance/report.py", "tools/copilot-acceptance/README.md"],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: ok.",
+  "notes": "plan.sh is modelled on gatereview.sh; the kit was not run (needs copilot, claude, gh, network). Schema names (session/v4, state/v2, gate-verdict/v2) were checked against vloop schema list. Round is numbered from the gate-review report filename."
+}
