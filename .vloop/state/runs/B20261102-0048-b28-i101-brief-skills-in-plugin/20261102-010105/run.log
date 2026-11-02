@@ -25,3 +25,10 @@ planned: B20261102-0048-b28-i101-brief-skills-in-plugin — 6 tasks
 reviewing the gates using sonnet (round 2)
    gate review · 1m19s · $0.30 · run $5.47 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/6 done ──
+   Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
+   work T1 · 5m06s · $0.23 · run $5.70 / $40.00
+   check go
+   review T1 · 0m38s · $0.15 · run $5.85 / $40.00
+   review: PASS
+   T1 done

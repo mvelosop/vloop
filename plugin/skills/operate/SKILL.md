@@ -1,6 +1,6 @@
 ---
 name: operate
-description: The operator's playbook — from a ready brief, check the repository, run it with vloop on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief and merge. Use in an interactive session when asked to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is not this skill's job.
+description: The operator's playbook — from a ready brief, check the repository, run it with vloop on a work branch, handle halts, verify the result independently, record defects and interventions, close the brief and merge. Use in an interactive session when asked to run, resume, verify, close or merge a brief, or what to do about a halt or a finding. Writing briefs is /vloop:create-brief's.
 ---
 
 # Operating the loop

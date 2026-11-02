@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **1/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:26:14Z
+**Brief:** `docs/briefs/B20261102-0048-b28-i101-brief-skills-in-plugin.loop-brief.md` · **Updated:** 2026-11-02T01:35:54Z
 
 ## Progress
 
-- [ ] **T1** — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
+- [x] **T1** — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
 - [ ] **T2** — Add the Go test that holds each plugin brief template to the binary's
 - [ ] **T3** — Name /vloop:create-brief and /vloop:review-brief in the CLAUDE.md section vloop writes
 - [ ] **T4** — Add an eval case for each brief skill and update the evals README and guide
@@ -19,7 +19,7 @@
 
 ### T1 — Move the two brief skills into the plugin as create-brief and review-brief, with their budgets
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Every repository that loads the vloop plugin should be able to write a brief with /vloop:create-brief and have it reviewed with /vloop:review-brief; today the two skills live only in this repository's .claude/skills/, labelled experimental. This task copies them into plugin/skills/ under their plugin names, drops the experimental label, points them at each other and at /vloop:operate, fixes create-brief's structure-check step, changes /vloop:operate's description to name /vloop:create-brief, and gives the two skills word ceilings of their own. The move is a move: the skills' instructions stay as they are beyond these changes, and the project copies under .claude/skills/ stay where they are (removing them is the operator's, at close).
 

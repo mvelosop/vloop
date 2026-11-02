@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":230870,"exit":0,"name":"go"}],"ended":"2026-11-02T01:35:54Z","gate":{"duration_ms":4186,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261102-0048-b28-i101-brief-skills-in-plugin","schema":"iteration/v2","started":"2026-11-02T01:26:14Z","task":"T1"}
