@@ -1,0 +1,7 @@
+{
+  "schema": "verify/v1",
+  "findings": [],
+  "checked": { "example_lines": 2, "sentences": 12, "surfaces": 14 },
+  "notes": "This session ran under the installed 0.14.0 skill, which writes verify/v1; the branch's driver reads verify/v2 only, so this report is expected to count as invalid (the brief's acceptance section says so). Worked-example run/close lines were not run: vloop run and vloop brief close are denied by the verify fence; they are covered by cmd/vloop/run_verify_test.go, internal/driver/verify_v2_test.go and internal/cli/close_test.go, whose targeted tests I ran (driver, cli, budget: pass). Run: schema list names verify/v1 and verify/v2; the 4 invalid verify2 fixtures exit 1, the valid one 0, the skill's example validates as verify/v2; verify skill is 1333 words (ceiling 1500); operate ceiling 1800 with B30 comment; v1 schema and fence/ untouched. Read driver, close.go, skill, guideline, templates, review-brief, operate, docs, kit. Not checked: the new eval's grader behaviour (needs a live model). Remaining verify/v1 mentions are in the kit (intended), design notes and the published v1 schema."
+}
+
