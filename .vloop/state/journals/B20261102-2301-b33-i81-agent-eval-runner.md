@@ -53,3 +53,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added tools/agent-eval/README.md, the '## Other agents' section with the qualifying rule in docs/guide/evals.md, and the B33 sentence in the multi-agent-backends design note.
 - **Files:** tools/agent-eval/README.md, docs/guide/evals.md, docs/design-notes/multi-agent-backends.md
 - **Notes for next iteration:** Docs only. README describes the layout as repo/, transcript.jsonl, trace.jsonl and sessions/ (the driver's RunDir/sessions record); I did not verify that directory name against a live run.
+
+## T6 — Close: the worked example as a committed test, every gate at once
+
+- **Outcome:** done (review: PASS)
+- **Summary:** tools/agent-eval/worked_test.go runs every line of the brief's worked example (o1-o4, both --list lines, --agent nope, non-empty --out, o6) against fixture-review and fixture-operate under testdata/worked, with fake copilot, claude and vloop on a temporary PATH.
+- **Files:** tools/agent-eval/worked_test.go, tools/agent-eval/testdata/worked
+- **Notes for next iteration:** testdata/worked is a copy of the T6 gate fixtures (cases, fake-*.sh with @ST@ substituted by the test, session/stream samples). The test skips if bash is missing. --list over plugin/evals is run with --cases ../../plugin/evals because the default is relative to the process cwd. No existing test or plugin/evals file changed.

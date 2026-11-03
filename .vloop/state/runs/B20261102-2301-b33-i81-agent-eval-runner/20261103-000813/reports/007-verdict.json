@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "A committed test in tools/agent-eval runs every line of the brief's worked example (o1, o2, o3, o4, --list over the fixture cases, --list over plugin/evals, --agent nope, a non-empty --out, o6) against fixture cases fixture-review (graders a, b, c, d as the brief gives them) and fixture-operate under tools/agent-eval/testdata, with fake copilot, claude and vloop scripts on a temporary PATH, asserting each line's exit code, report fields and messages as the brief states them.", "met": true, "evidence": "tools/agent-eval/worked_test.go TestWorkedExample covers o1 (mean 1, graders a-d, Bash trace event), o2 (b=0, mean 4/6, table 0.67 and NOTES b), o3 (exit 1, 'scaffold exited 3:'), o4 (skipped, 'no phase'), --list on fixtures and plugin/evals, --agent nope and the non-empty --out (exit 2 with exact messages), o6 (same trace as o1, mean 1). Fixtures in testdata/worked/cases with graders a-d with the brief's weights; fake scripts are put first on a temporary PATH."},
+    {"criterion": "Every earlier task's gate passes in the same tree.", "met": true, "evidence": "The driver ran the T6 gate (sh .vloop/state/gates/T6/gate.sh) before the review. The go check log shows the agent-eval package and all others ok."},
+    {"criterion": "No test runs a real claude or copilot, or the network; no file under plugin/evals and neither testdata/observed sample changes; the configured go check is green.", "met": true, "evidence": "The test uses only the fake-*.sh scripts on a temporary PATH. git status shows only untracked testdata/worked/ and worked_test.go outside .vloop/state, so nothing under plugin/evals or testdata/observed changed. checks.json go exit 0."}
+  ],
+  "findings": [],
+  "notes": "None."
+}

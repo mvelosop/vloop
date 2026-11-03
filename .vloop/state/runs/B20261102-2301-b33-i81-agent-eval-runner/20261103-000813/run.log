@@ -26,3 +26,10 @@
    review T5 · 0m21s · $0.09 · run $1.36 / $40.00
    review: PASS
    T5 done
+── iteration 7 (5 this run) · T6 · 5/6 done ──
+   Close: the worked example as a committed test, every gate at once
+   work T6 · 1m20s · $0.25 · run $1.61 / $40.00
+   check go
+   review T6 · 0m22s · $0.12 · run $1.73 / $40.00
+   review: PASS
+   T6 done

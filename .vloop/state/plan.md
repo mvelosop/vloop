@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 6
+**Status:** running · **6/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:30:47Z
+**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:36:25Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Score the llm grader with a Claude judge voting three times
 - [x] **T4** — Stream a Claude session's transcript into the same trace
 - [x] **T5** — Document the tool, the qualifying rule and the design note's answer
-- [ ] **T6** — Close: the worked example as a committed test, every gate at once
+- [x] **T6** — Close: the worked example as a committed test, every gate at once
 
 ## Tasks
 
@@ -140,7 +140,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Close: the worked example as a committed test, every gate at once
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 Each earlier task was judged on its own slice; the close shows the whole tool does what the brief's worked example says, line for line, with every earlier gate still passing together. It leaves the worked example behind as a committed test, so the configured go check keeps holding the tool to it after the run's gates are archived.
 
