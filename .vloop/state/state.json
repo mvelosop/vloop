@@ -4,7 +4,7 @@
   "brief": "docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md",
   "base": "b9060704dd074b944832e8b31df292cc9affec6f",
   "branch": "B20261102-2301-b33-i81-agent-eval-runner",
-  "status": "running",
+  "status": "blocked",
   "iteration": 2,
   "created": "2026-11-02T23:51:55Z",
   "updated": "2026-11-03T00:06:57Z",
