@@ -224,7 +224,7 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		t.Fatalf("init stderr: %q", init.err)
 	}
 	lines := b5Lines(init.out)
-	if len(lines) != 18 {
+	if len(lines) != 22 {
 		t.Fatalf("init printed %d lines: %q", len(lines), init.out)
 	}
 	brief := regexp.MustCompile(`^wrote docs/briefs/B\d{8}-\d{4}-primeros-pasos\.loop-brief\.md$`)
@@ -236,10 +236,14 @@ func TestWorkedExampleB5Session(t *testing.T) {
 		"each check is a starting point — edit it in .vloop/config.toml",
 		"wrote .vloop/config.toml", "wrote .vloop/install.json", "wrote .vloop/repo-guidelines.md", lines[7],
 		"updated .gitignore", "wrote CLAUDE.md", "wrote .claude/settings.json", "next:", "vloop doctor",
-		"get /vloop:operate for your Claude Code sessions, once:",
+		"get /vloop:operate for your Claude Code sessions in this repository, once:",
 		"claude plugin marketplace add mvelosop/vloop",
-		"claude plugin install vloop@vloop",
+		"claude plugin install vloop@vloop --scope project",
 		`or, for one session: claude --plugin-dir "$(vloop plugin path)"`,
+		"for Copilot CLI: trust this folder in copilot (the plugin is declared in .claude/settings.json), or once:",
+		"copilot plugin marketplace add mvelosop/vloop",
+		"copilot plugin install vloop@vloop",
+		`or, for one session: copilot --plugin-dir "$(vloop plugin path)"`,
 		`then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop`}
 	if strings.Join(lines, "\n") != strings.Join(want, "\n") {
 		t.Fatalf("init printed %q, want %q", lines, want)

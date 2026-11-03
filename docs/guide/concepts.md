@@ -323,9 +323,11 @@ scoped to it, like `csharp@services/api`), the **stamp** `.vloop/install.json`
 (which vloop version set the repository up), a starter brief, the line
 `.vloop/tmp/` in `.gitignore`, and vloop's section of `CLAUDE.md`, between
 `<!-- vloop:begin -->` and `<!-- vloop:end -->` markers; text outside the markers
-is kept. It refuses a repository already set up. `--dry-run` writes nothing.
+is kept; it also declares the plugin in `.claude/settings.json` (a marketplace
+entry and an enabled plugin, merged into what is there). It refuses a repository already set up. `--dry-run` writes nothing.
 
-`vloop upgrade` refreshes that `CLAUDE.md` section and `.gitignore` line and
+`vloop upgrade` refreshes that `CLAUDE.md` section and `.gitignore` line, adds
+what is missing of the plugin's declaration in `.claude/settings.json`, and
 rewrites the stamp. It refuses a repository set up by a newer vloop, and a
 breaking jump (a new major version, or a new minor while 0.x) or a pre-release
 needs `--yes`.
@@ -352,8 +354,9 @@ This is preferred over `$PROFILE`, which reaches PowerShell only.
 
 `vloop doctor` checks the setup without writing anything: git, the install stamp,
 the config, the `[[check]]` entries (`checks`), `claude`, workspace trust, the
-gate shell, the plan, the branch, the plugin (a warning when no vloop plugin
-is installed), `gate edits` (a warning, with the rule to add, unless the
+gate shell, the plan, the branch, the `plugin` row (a warning when no vloop plugin
+is installed for this repository or per user), a `copilot plugin` row (where
+the copilot row appears; the same for Copilot CLI), `gate edits` (a warning, with the rule to add, unless the
 operator's settings let a session edit `.vloop/state/gates/`), the scoped
 `stacks` (printed only when `metrics.stacks` has scoped entries) and
 `self-hosting`. It exits 1 on a problem.
@@ -371,9 +374,44 @@ claude --plugin-dir "$(vloop plugin path)"
 `vloop version --check-plugin
 <dir>` compares an installed plugin with the binary.
 
+`vloop init` declares the plugin in `.claude/settings.json`. Copilot CLI installs
+a declared plugin when the folder is trusted. Claude Code is not relied on to
+act on the declaration: install the plugin for the repository, from inside it
+(without `--scope project` it installs for every repository):
+
+```
+claude plugin marketplace add mvelosop/vloop
+claude plugin install vloop@vloop --scope project
+```
+
+For Copilot CLI, per user instead of by trust:
+
+```
+copilot plugin marketplace add mvelosop/vloop
+copilot plugin install vloop@vloop
+```
+
 `vloop run`'s sessions load the plugin it hands them and not the plugins enabled
-in your settings (measured 2026-10-11). For interactive sessions, either install
-the plugin or pass `--plugin-dir`, not both.
+in your settings (measured 2026-10-11). For interactive sessions, use one of them: where the plugin is enabled for the repository (installed for it, or per user), do not also pass `--plugin-dir`.
+
+### From Copilot CLI
+
+Trust the folder: the declaration in `.claude/settings.json` then installs the
+plugin for this repository on the first session. It is ignored in an untrusted
+folder. A `.github/copilot/settings.local.json` can opt one person out; it is a
+file that exists only in a repository that adds it.
+
+Or install per user, with the two commands above (`copilot plugin marketplace
+add mvelosop/vloop`, then `copilot plugin install vloop@vloop`).
+
+Or, for one session, from inside the repository:
+
+```
+copilot --plugin-dir "$(vloop plugin path)"
+```
+
+`vloop run`'s Copilot sessions load the plugin with `--plugin-dir` whatever is
+installed.
 
 ## The .vloop/ layout
 

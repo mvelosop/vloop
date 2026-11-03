@@ -5,9 +5,9 @@
   "base": "27e775409fb3e38de301cd3cb1903ee8e997a36b",
   "branch": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-03T06:34:04Z",
-  "updated": "2026-11-03T07:07:55Z",
+  "updated": "2026-11-03T07:21:01Z",
   "shell": "sh",
   "checks": [
     {
@@ -152,7 +152,7 @@
         "The prose is judged on the facts each item lists, not on wording."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

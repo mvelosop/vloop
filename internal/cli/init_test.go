@@ -40,7 +40,7 @@ func TestInitWritesEverything(t *testing.T) {
 	if code != 0 || errs != "" {
 		t.Fatalf("code %d, stderr %q", code, errs)
 	}
-	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "wrote .vloop/install.json\nwrote .vloop/repo-guidelines.md\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  vloop doctor\n  get /vloop:operate for your Claude Code sessions, once:\n    claude plugin marketplace add mvelosop/vloop\n    claude plugin install vloop@vloop\n  or, for one session: claude --plugin-dir \"$(vloop plugin path)\"\n  then ask Claude Code for what you want (\"run the brief docs/briefs/<name>\"); /vloop:operate drives vloop\n"} {
+	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "wrote .vloop/install.json\nwrote .vloop/repo-guidelines.md\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  vloop doctor\n  get /vloop:operate for your Claude Code sessions in this repository, once:\n    claude plugin marketplace add mvelosop/vloop\n    claude plugin install vloop@vloop --scope project\n  or, for one session: claude --plugin-dir \"$(vloop plugin path)\"\n  for Copilot CLI: trust this folder in copilot (the plugin is declared in .claude/settings.json), or once:\n    copilot plugin marketplace add mvelosop/vloop\n    copilot plugin install vloop@vloop\n  or, for one session: copilot --plugin-dir \"$(vloop plugin path)\"\n  then ask Claude Code for what you want (\"run the brief docs/briefs/<name>\"); /vloop:operate drives vloop\n"} {
 		if !strings.Contains(out, want) {
 			t.Errorf("output lacks %q:\n%s", want, out)
 		}
@@ -113,7 +113,7 @@ func TestInitClaudeMarkers(t *testing.T) {
 		t.Error(out)
 	}
 	got := readFile(t, d, "CLAUDE.md")
-	if !strings.HasPrefix(got, "# Mine\n<!-- vloop:begin -->\n") || !strings.HasSuffix(got, "<!-- vloop:end -->\nbelow  \nlast") || strings.Contains(got, "old") {
+	if !strings.HasPrefix(got, "# Mine\n<!-- vloop:begin -->\n") || !strings.HasSuffix(got, "<!-- vloop:end -->\nbelow  \nlast") || strings.Contains(got, "\nold\n") {
 		t.Errorf("got %q", got)
 	}
 	d = initRepo(t, map[string]string{"CLAUDE.md": "# Rules\nmine", ".gitignore": "keep"})

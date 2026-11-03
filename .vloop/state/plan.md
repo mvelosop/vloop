@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/4 done** · iteration 4
+**Status:** running · **3/4 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` · **Updated:** 2026-11-03T07:07:55Z
+**Brief:** `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` · **Updated:** 2026-11-03T07:21:01Z
 
 ## Progress
 
 - [x] **T1** — Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1) · 1 attempt(s)
 - [x] **T2** — Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4) · 1 attempt(s)
-- [ ] **T3** — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
+- [x] **T3** — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -67,7 +67,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
 
-`pending` · depends on: T1, T2
+`done` · depends on: T1, T2
 
 Nothing tells a Copilot CLI user how to get /vloop:operate, and the docs still give Claude's per-user install as the way. With the declaration (T1) and doctor's per-agent rows (T2) in place, this task makes init's closing lines, the CLAUDE.md section, README.md and docs/guide/concepts.md give both agents' ways: the declaration and trusting the folder in Copilot, Claude Code's per-repository install, and --plugin-dir for one session. Prose is judged on the facts P2 lists, not on wording.
 

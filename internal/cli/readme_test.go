@@ -18,8 +18,8 @@ import (
 
 const readmeLineCap = 200
 
-// claudeFlags are flags of the claude CLI that the README may name.
-var claudeFlags = map[string]bool{"--plugin-dir": true}
+// claudeFlags are flags of the claude and copilot CLIs that the README may name.
+var claudeFlags = map[string]bool{"--plugin-dir": true, "--scope": true}
 
 // walk collects the path of every runnable leaf command (without the root
 // name) and every flag name in the tree.

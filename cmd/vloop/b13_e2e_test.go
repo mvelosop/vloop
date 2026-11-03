@@ -70,13 +70,17 @@ func TestWorkedExampleB13(t *testing.T) {
 	r.write(".vloop/config.toml", r.read(".vloop/config.toml")+"\n[[check]]\nname = \"all\"\npaths = [\"**\"]\nrun = \"true\"\n")
 	lines := b5Lines(init.out)
 	wantNext := []string{"next:", "vloop doctor",
-		"get /vloop:operate for your Claude Code sessions, once:",
+		"get /vloop:operate for your Claude Code sessions in this repository, once:",
 		"claude plugin marketplace add mvelosop/vloop",
-		"claude plugin install vloop@vloop",
+		"claude plugin install vloop@vloop --scope project",
 		`or, for one session: claude --plugin-dir "$(vloop plugin path)"`,
+		"for Copilot CLI: trust this folder in copilot (the plugin is declared in .claude/settings.json), or once:",
+		"copilot plugin marketplace add mvelosop/vloop",
+		"copilot plugin install vloop@vloop",
+		`or, for one session: copilot --plugin-dir "$(vloop plugin path)"`,
 		`then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop`}
 	if len(lines) < len(wantNext) || strings.Join(lines[len(lines)-len(wantNext):], "\n") != strings.Join(wantNext, "\n") {
-		t.Fatalf("init does not end with D3's seven lines: %q", lines)
+		t.Fatalf("init does not end with D3's closing lines: %q", lines)
 	}
 	if !strings.Contains(r.read("CLAUDE.md"), "If /vloop:operate is not available, the vloop plugin is not loaded") {
 		t.Fatalf("CLAUDE.md lacks D3's sentence:\n%s", r.read("CLAUDE.md"))

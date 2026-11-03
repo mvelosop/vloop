@@ -344,9 +344,13 @@ func applySteps(out io.Writer, root string, steps []initStep, dryRun bool) error
 func printInitNext(out io.Writer) {
 	fmt.Fprintln(out, "next:")
 	fmt.Fprintln(out, "  vloop doctor")
-	fmt.Fprintln(out, "  get /vloop:operate for your Claude Code sessions, once:")
+	fmt.Fprintln(out, "  get /vloop:operate for your Claude Code sessions in this repository, once:")
 	fmt.Fprintln(out, "    claude plugin marketplace add mvelosop/vloop")
-	fmt.Fprintln(out, "    claude plugin install vloop@vloop")
+	fmt.Fprintln(out, "    claude plugin install vloop@vloop --scope project")
 	fmt.Fprintln(out, `  or, for one session: claude --plugin-dir "$(vloop plugin path)"`)
+	fmt.Fprintln(out, "  for Copilot CLI: trust this folder in copilot (the plugin is declared in .claude/settings.json), or once:")
+	fmt.Fprintln(out, "    copilot plugin marketplace add mvelosop/vloop")
+	fmt.Fprintln(out, "    copilot plugin install vloop@vloop")
+	fmt.Fprintln(out, `  or, for one session: copilot --plugin-dir "$(vloop plugin path)"`)
 	fmt.Fprintln(out, `  then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop`)
 }

@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Doctor's plugin row counts only this repository's vloop entries, honours the .claude/settings(.local).json opt-out and uses P3's messages. A new copilot plugin row (P4) runs copilot plugin list --json in the root, only where the copilot row appears, and never in the run preflight. This attempt fixes the two cmd/vloop e2e tests that failed the go check.
 - **Files:** internal/cli/doctor.go, internal/cli/doctor_test.go, cmd/vloop/b5_e2e_test.go, cmd/vloop/b13_e2e_test.go
 - **Notes for next iteration:** cmd/vloop/b5_e2e_test.go (plugin_version_warning line) and b13_e2e_test.go (pluginWarn) changed only to P3's new message text, as the brief's Constraints allow. The rest of the go check was green in the previous failing run (only these two failed). Preflight is told apart from doctor by runBrief != nil in runDoctor.
+
+## T3 — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** init's closing lines, the CLAUDE.md section sentence, README install/Quickstart and docs/guide/concepts.md (plus a new From Copilot CLI subsection) now give both agents' ways to load the plugin.
+- **Files:** internal/cli/init.go, internal/install/section.go, README.md, docs/guide/concepts.md, internal/install/install_test.go, internal/cli/b11_verify_test.go, cmd/vloop/b5_e2e_test.go, cmd/vloop/b13_e2e_test.go, internal/cli/init_test.go, internal/cli/readme_test.go
+- **Notes for next iteration:** Tests changed only to pin the new init closing lines (22 output lines now) and the CLAUDE.md sentence (P2): install_test.go, b11_verify_test.go, b5/b13_e2e_test.go. Repo's own CLAUDE.md left to vloop upgrade. TestTaskGate* fail inside a work session with 'the plan was changed during this session' (environment, as T1/T2 noted). Docs claim nothing about Claude Code acting on the declaration. init_test.go TestInitClaudeMarkers now looks for "\nold\n" because the brief's verbatim text contains "folder"; readme_test.go allows --scope as a claude flag.
