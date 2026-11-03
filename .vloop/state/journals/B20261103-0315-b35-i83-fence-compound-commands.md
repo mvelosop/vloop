@@ -32,3 +32,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** C2 is implemented: the lexer marks each word expanded or literal, the judge refuses expanded words wherever it reads structure (command name, wrapper options, -c string, redirection target, xargs input), and match retries with expanded words as any text after the as-written pass.
 - **Files:** internal/fence/split.go, internal/fence/judge.go, internal/fence/expand.go, internal/fence/judge_test.go
 - **Notes for next iteration:** Work was already on disk from the earlier blocked attempt; the replaced gate (git remote $X expects the Copilot stem message) now passes. Per-byte quote state in the lexer feeds expands(); internal/fence/expand.go holds match, skipXargs, shellString, xargsCommand and an NFA intersection deciding whether a rule and a command with wildcard words share a string. TestExpandedWords holds every gate case plus command -$v git push. No existing test changed.
+
+## T3 — Document the wider reading in the guide, the fence audit and fence check's help (C4)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The configuration guide, the fence audit (hook bullet and work-session paragraph) and `vloop fence check --help` now describe the wider reading, with the brief's C4 text word for word.
+- **Files:** docs/guide/configuration.md, docs/design-notes/fence-audit.md, internal/cli/fence.go
+- **Notes for next iteration:** none

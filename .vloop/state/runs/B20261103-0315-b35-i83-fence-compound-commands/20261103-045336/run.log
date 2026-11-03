@@ -5,3 +5,10 @@
    review T2 · 0m37s · $0.18 · run $0.27 / $40.00
    review: PASS
    T2 done
+── iteration 4 (2 this run) · T3 · 2/4 done ──
+   Document the wider reading in the guide, the fence audit and fence check's help (C4)
+   work T3 · 0m24s · $0.13 · run $0.40 / $40.00
+   check go
+   review T3 · 0m20s · $0.10 · run $0.50 / $40.00
+   review: PASS
+   T3 done

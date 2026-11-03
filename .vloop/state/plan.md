@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/4 done** · iteration 3
+**Status:** running · **3/4 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T04:58:25Z
+**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T05:02:57Z
 
 ## Progress
 
 - [x] **T1** — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
 - [x] **T2** — Match a word the shell expands as any text (C2)
-- [ ] **T3** — Document the wider reading in the guide, the fence audit and fence check's help (C4)
+- [x] **T3** — Document the wider reading in the guide, the fence audit and fence check's help (C4)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -71,7 +71,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Document the wider reading in the guide, the fence audit and fence check's help (C4)
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 An operator or a session reading why a call was denied must find the judge's new reading described where it is described today: the configuration guide's work-fence bullet, the fence audit's hook bullet and work-session paragraph, and `vloop fence check --help`. Each edit is the brief's text word for word, wrapped in the file's style, so the docs never claim behaviour the judge lacks.
 
