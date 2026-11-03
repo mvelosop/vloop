@@ -203,7 +203,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261102-112848-review-brief-s-report-step-said-brief-is](I20261102-112848-review-brief-s-report-step-said-brief-is.md) |
 | verify | verification-finding | partly | no-options | [I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph](I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph.md) |
 | verify | verification-finding | partly | no-options | [I20261103-005742-the-design-note-s-two-hard-parts-still-c](I20261103-005742-the-design-note-s-two-hard-parts-still-c.md) |
-| verify | verification-finding | no | no-options | [I20261103-031500-verify-finding-three-more-lists-of-exit](I20261103-031500-verify-finding-three-more-lists-of-exit.md) |
+| verify | verification-finding | partly | no-options | [I20261103-031508-f4-s-list-missed-three-sentences-that-li](I20261103-031508-f4-s-list-missed-three-sentences-that-li.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
