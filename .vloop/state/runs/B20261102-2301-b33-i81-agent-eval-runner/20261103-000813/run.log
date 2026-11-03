@@ -19,3 +19,10 @@
    review T4 · 0m23s · $0.12 · run $1.11 / $40.00
    review: PASS
    T4 done
+── iteration 6 (4 this run) · T5 · 4/6 done ──
+   Document the tool, the qualifying rule and the design note's answer
+   work T5 · 0m36s · $0.16 · run $1.27 / $40.00
+   check go
+   review T5 · 0m21s · $0.09 · run $1.36 / $40.00
+   review: PASS
+   T5 done

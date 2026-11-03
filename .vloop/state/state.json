@@ -5,9 +5,9 @@
   "base": "b9060704dd074b944832e8b31df292cc9affec6f",
   "branch": "B20261102-2301-b33-i81-agent-eval-runner",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-02T23:51:55Z",
-  "updated": "2026-11-03T00:26:00Z",
+  "updated": "2026-11-03T00:30:47Z",
   "shell": "sh",
   "checks": [
     {
@@ -238,7 +238,7 @@
         "Docs only: no Go file changes; the configured go check stays green."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

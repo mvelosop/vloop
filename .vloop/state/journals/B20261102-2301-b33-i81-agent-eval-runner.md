@@ -46,3 +46,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Claude sessions in tools/agent-eval run with stream-json --verbose via a new driver.Runner.Stream option; the record is read from the stream's last result line, and claudeTrace turns the stream into the same trace events as Copilot.
 - **Files:** internal/driver/agent.go, internal/driver/session.go, internal/driver/agent_copilot_test.go, tools/agent-eval/runner.go, tools/agent-eval/trace.go, tools/agent-eval/run_test.go
 - **Notes for next iteration:** Runner.Stream (default false) is handed to claudeAdapter.stream by withSession; Args is untouched (streamArgs rewrites '--output-format json' in Command only). Parse reads the last non-blank line only if its type is result, else not a record, which the tool reports as 'no session result'. No existing test file was changed; tests were appended.
+
+## T5 — Document the tool, the qualifying rule and the design note's answer
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added tools/agent-eval/README.md, the '## Other agents' section with the qualifying rule in docs/guide/evals.md, and the B33 sentence in the multi-agent-backends design note.
+- **Files:** tools/agent-eval/README.md, docs/guide/evals.md, docs/design-notes/multi-agent-backends.md
+- **Notes for next iteration:** Docs only. README describes the layout as repo/, transcript.jsonl, trace.jsonl and sessions/ (the driver's RunDir/sessions record); I did not verify that directory name against a live run.
