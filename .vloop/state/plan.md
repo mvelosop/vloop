@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 4
+**Status:** running · **4/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:20:16Z
+**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:26:00Z
 
 ## Progress
 
 - [x] **T1** — Add tools/agent-eval's flags, its case reader and --list
 - [x] **T2** — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
 - [x] **T3** — Score the llm grader with a Claude judge voting three times
-- [ ] **T4** — Stream a Claude session's transcript into the same trace
+- [x] **T4** — Stream a Claude session's transcript into the same trace
 - [ ] **T5** — Document the tool, the qualifying rule and the design note's answer
 - [ ] **T6** — Close: the worked example as a committed test, every gate at once
 
@@ -97,7 +97,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Stream a Claude session's transcript into the same trace
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 A Claude session normally prints one JSON result, which says nothing of the tools it called, so the graders cannot be applied. Only this tool runs Claude with `--output-format stream-json --verbose`, whose last line carries the result the record is read from; the stream becomes the same normalised trace a Copilot session gives, so one case's graders score both agents alike. vloop's own Claude sessions keep `--output-format json`.
 

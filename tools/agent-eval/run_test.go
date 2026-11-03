@@ -184,3 +184,51 @@ func TestNoResultAndTimeout(t *testing.T) {
 		}
 	}
 }
+
+func TestObservedClaudeTrace(t *testing.T) {
+	raw, err := os.ReadFile("testdata/observed/claude-stream.jsonl")
+	if err != nil {
+		t.Fatal(err)
+	}
+	events := claudeTrace(raw)
+	if len(events) == 0 || events[0].Kind != "tool" || events[0].Tool != "Read" || events[0].Output == "" {
+		t.Fatalf("events = %+v", events)
+	}
+}
+
+func TestClaudeRunEndToEnd(t *testing.T) {
+	bin := t.TempDir()
+	stream := `{"type":"system","subtype":"init"}
+{"type":"assistant","message":{"content":[{"type":"thinking","thinking":"hm"},{"type":"tool_use","id":"t1","name":"Bash","input":{"command":"echo a<b"}}]}}
+{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"t1","content":[{"type":"text","text":"x"},{"type":"text","text":"y"}]}]}}
+{"type":"assistant","message":{"content":[{"type":"text","text":"done"}]}}
+{"type":"result","total_cost_usd":0.25,"num_turns":2,"duration_ms":9}
+`
+	write(t, filepath.Join(bin, "claude"), "#!/bin/sh\ncase \"$1\" in --version) echo 1; exit 0;; esac\nprintf '%s\\n' \"$@\" > \"$PWD/../argv\"\ncat <<'EOF2'\n"+stream+"EOF2\n")
+	if err := os.Chmod(filepath.Join(bin, "claude"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", bin+string(os.PathListSeparator)+os.Getenv("PATH"))
+	cases := t.TempDir()
+	write(t, filepath.Join(cases, "rev", "prompt.md"), "/vloop:review T1\n")
+	write(t, filepath.Join(cases, "rev", "scaffold.sh"), "true\n")
+	graderFile(t, cases, "rev", "a", "type: tool_used\ntool: Bash\ninput_match: 'a<b'\n")
+	graderFile(t, cases, "rev", "b", "type: regex\ntarget: trace\nmatch: contains\npattern: 'done'\n")
+	out := filepath.Join(t.TempDir(), "o")
+	code, _, stderr := invoke("--agent", "claude", "--model", "m", "--cases", cases, "--out", out, "--timeout", "1m")
+	if code != 0 {
+		t.Fatalf("exit %d: %s", code, stderr)
+	}
+	r := readReport(t, out).Cases[0].Runs[0]
+	if r.Status != "scored" || *r.Score != 1 || r.Credits != nil || r.CostUSD != 0.25 {
+		t.Errorf("run = %+v", r)
+	}
+	trace, _ := os.ReadFile(filepath.Join(out, "rev", "run-1", "trace.jsonl"))
+	if !strings.Contains(string(trace), `"output":"x\ny"`) || strings.Count(string(trace), "\n") != 2 {
+		t.Errorf("trace = %s", trace)
+	}
+	argv, _ := os.ReadFile(filepath.Join(out, "rev", "run-1", "argv"))
+	if !strings.Contains(string(argv), "stream-json\n--verbose") {
+		t.Errorf("argv = %s", argv)
+	}
+}

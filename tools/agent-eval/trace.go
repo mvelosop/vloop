@@ -146,3 +146,74 @@ func traceText(events []event) string {
 	}
 	return strings.Join(lines, "\n")
 }
+
+// claudeTrace reads Claude's stream-json lines into events, in order: a text
+// item of an assistant line is text; a tool_use item is a tool call, paired by
+// id with the tool_result of a user line. Thinking items and the system,
+// rate_limit_event and result lines are not events.
+func claudeTrace(transcript []byte) []event {
+	var events []event
+	at := map[string]int{} // tool_use id -> index in events
+	for _, line := range bytes.Split(transcript, []byte("\n")) {
+		var ev struct {
+			Type    string `json:"type"`
+			Message struct {
+				Content json.RawMessage `json:"content"`
+			} `json:"message"`
+		}
+		if json.Unmarshal(bytes.TrimSpace(line), &ev) != nil || (ev.Type != "assistant" && ev.Type != "user") {
+			continue
+		}
+		var items []struct {
+			Type      string          `json:"type"`
+			Text      string          `json:"text"`
+			ID        string          `json:"id"`
+			Name      string          `json:"name"`
+			Input     json.RawMessage `json:"input"`
+			ToolUseID string          `json:"tool_use_id"`
+			Content   json.RawMessage `json:"content"`
+		}
+		if json.Unmarshal(ev.Message.Content, &items) != nil {
+			continue
+		}
+		for _, it := range items {
+			switch {
+			case ev.Type == "assistant" && it.Type == "text":
+				if it.Text != "" {
+					events = append(events, event{Kind: "text", Text: it.Text})
+				}
+			case ev.Type == "assistant" && it.Type == "tool_use":
+				at[it.ID] = len(events)
+				events = append(events, event{Kind: "tool", Tool: it.Name, Input: compactInput(it.Input)})
+			case ev.Type == "user" && it.Type == "tool_result":
+				if i, ok := at[it.ToolUseID]; ok {
+					events[i].Output = claudeResultText(it.Content)
+				}
+			}
+		}
+	}
+	return events
+}
+
+// claudeResultText is a tool_result's content: a string as it is; a list of
+// {type: text, text} items as their texts joined by newlines.
+func claudeResultText(raw json.RawMessage) string {
+	var s string
+	if json.Unmarshal(raw, &s) == nil {
+		return s
+	}
+	var items []struct {
+		Type string `json:"type"`
+		Text string `json:"text"`
+	}
+	if json.Unmarshal(raw, &items) == nil {
+		var parts []string
+		for _, it := range items {
+			if it.Type == "text" {
+				parts = append(parts, it.Text)
+			}
+		}
+		return strings.Join(parts, "\n")
+	}
+	return resultText(raw)
+}

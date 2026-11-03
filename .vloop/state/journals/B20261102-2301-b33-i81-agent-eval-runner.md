@@ -39,3 +39,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The llm grader now scores through a Claude judge asked three times (majority decides, non-answer is FAIL), with focus last text / trace / file; a judge that cannot be asked is a run error 'judge failed: <grader>: <cause>'.
 - **Files:** tools/agent-eval/judge.go, tools/agent-eval/judge_test.go, tools/agent-eval/graders.go, tools/agent-eval/cases.go, tools/agent-eval/runner.go
 - **Notes for next iteration:** judge.go: askJudge runs claude in an empty os.MkdirTemp dir with the prompt on stdin; scoreLLM picks the focus. grader now carries its body; graderResult.cost (not in JSON) is summed into runResult.JudgeCostUSD, also on a judge failure. A missing focus file scores 0 'no <path>' without calling the judge. judge_test.go uses a fake claude on a temp PATH, no real claude.
+
+## T4 — Stream a Claude session's transcript into the same trace
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Claude sessions in tools/agent-eval run with stream-json --verbose via a new driver.Runner.Stream option; the record is read from the stream's last result line, and claudeTrace turns the stream into the same trace events as Copilot.
+- **Files:** internal/driver/agent.go, internal/driver/session.go, internal/driver/agent_copilot_test.go, tools/agent-eval/runner.go, tools/agent-eval/trace.go, tools/agent-eval/run_test.go
+- **Notes for next iteration:** Runner.Stream (default false) is handed to claudeAdapter.stream by withSession; Args is untouched (streamArgs rewrites '--output-format json' in Command only). Parse reads the last non-blank line only if its type is result, else not a record, which the tool reports as 'no session result'. No existing test file was changed; tests were appended.

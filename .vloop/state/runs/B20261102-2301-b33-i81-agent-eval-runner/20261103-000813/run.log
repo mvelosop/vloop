@@ -12,3 +12,10 @@
    review T3 · 0m21s · $0.11 · run $0.69 / $40.00
    review: PASS
    T3 done
+── iteration 5 (3 this run) · T4 · 3/6 done ──
+   Stream a Claude session's transcript into the same trace
+   work T4 · 1m30s · $0.30 · run $0.99 / $40.00
+   check go
+   review T4 · 0m23s · $0.12 · run $1.11 / $40.00
+   review: PASS
+   T4 done

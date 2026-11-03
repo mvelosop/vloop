@@ -325,3 +325,40 @@ func TestRunnerKeepsTranscriptOnlyWhenAsked(t *testing.T) {
 		}
 	}
 }
+
+func TestStreamOptionClaudeArgvAndRecord(t *testing.T) {
+	s := Spec{Phase: PhaseReview, Arg: "T1", Model: "m"}
+	plain := Args(s, "f", "p")
+	got := streamArgs(plain)
+	want := append(append([]string{}, plain[:len(plain)-1]...), "stream-json", "--verbose")
+	if strings.Join(got, "\x00") != strings.Join(want, "\x00") {
+		t.Errorf("streamArgs = %q, want %q", got, want)
+	}
+	cmd := claudeAdapter{stream: true}.Command(s, t.TempDir(), nil, Prepared{Fence: "f", Plugin: "p"})
+	if !strings.Contains(strings.Join(cmd.Args, " "), "--output-format stream-json --verbose") {
+		t.Errorf("argv = %q", cmd.Args)
+	}
+	cmd = claudeAdapter{}.Command(s, t.TempDir(), nil, Prepared{Fence: "f", Plugin: "p"})
+	if !strings.HasSuffix(strings.Join(cmd.Args, " "), "--output-format json") {
+		t.Errorf("default argv = %q", cmd.Args)
+	}
+	stream := "{\"type\":\"assistant\"}\n{\"type\":\"result\",\"total_cost_usd\":0.5,\"num_turns\":3,\"duration_ms\":7}\n"
+	o, ok := claudeAdapter{stream: true}.Parse([]byte(stream), func(s string) string { return s })
+	if !ok || o.Cost != 0.5 || o.Turns != 3 || o.AgentMS != 7 {
+		t.Errorf("Parse = %+v %v", o, ok)
+	}
+	if _, ok := (claudeAdapter{stream: true}).Parse([]byte("{\"type\":\"assistant\"}\n"), nil); ok {
+		t.Errorf("a stream without a result line is a record")
+	}
+}
+
+func TestRunnerStreamIsPassedToClaude(t *testing.T) {
+	ad, err := (&Runner{Root: t.TempDir(), Stream: true}).withSession(claudeAdapter{}, Spec{})
+	if err != nil || !ad.(claudeAdapter).stream {
+		t.Errorf("Stream not handed to the adapter: %v", err)
+	}
+	ad, _ = (&Runner{Root: t.TempDir()}).withSession(claudeAdapter{}, Spec{})
+	if ad.(claudeAdapter).stream {
+		t.Errorf("stream is on by default")
+	}
+}

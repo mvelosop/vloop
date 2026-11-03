@@ -48,6 +48,7 @@ type Runner struct {
 	Timeout time.Duration // a session still running after this is killed with its group; none when zero
 
 	Transcript string // when set, the session's stdout is also kept, as printed, in this file
+	Stream     bool   // a Claude session prints stream-json with --verbose; its record is read from the stream's result line
 	HookBinary string // when set, a Copilot session's fence hook runs this binary, not os.Executable()
 
 	n int // sessions started in this run folder

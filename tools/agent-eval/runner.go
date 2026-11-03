@@ -155,9 +155,6 @@ func runOnce(o *options, c *evalCase, phase, dir, hook string, timeout time.Dura
 		}
 		return errorRun(fmt.Sprintf("scaffold exited %d: %s", code, lastLine(serr.String())))
 	}
-	if o.agent != "copilot" {
-		return errorRun("claude sessions are not built yet")
-	}
 
 	spec := driver.Spec{Phase: phase, Iteration: 1, Arg: promptArg(c.body), Model: o.model, Agent: o.agent}
 	if phase == driver.PhaseWork || phase == driver.PhaseReview || phase == driver.PhaseVerify {
@@ -168,7 +165,7 @@ func runOnce(o *options, c *evalCase, phase, dir, hook string, timeout time.Dura
 	}
 	transcript := filepath.Join(dir, "transcript.jsonl")
 	r := &driver.Runner{Root: repo, Version: version, RunID: version, RunDir: dir, Timeout: timeout,
-		Transcript: transcript, HookBinary: hook}
+		Transcript: transcript, HookBinary: hook, Stream: o.agent == "claude"}
 	res, err := r.Run(spec)
 	if err != nil {
 		return errorRun("session failed: " + oneLine(err.Error()))
@@ -188,6 +185,9 @@ func runOnce(o *options, c *evalCase, phase, dir, hook string, timeout time.Dura
 
 	raw, _ := os.ReadFile(transcript)
 	events := copilotTrace(raw)
+	if o.agent == "claude" {
+		events = claudeTrace(raw)
+	}
 	var tb bytes.Buffer
 	for _, e := range events {
 		b, _ := e.MarshalJSON()

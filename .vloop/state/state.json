@@ -5,9 +5,9 @@
   "base": "b9060704dd074b944832e8b31df292cc9affec6f",
   "branch": "B20261102-2301-b33-i81-agent-eval-runner",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-02T23:51:55Z",
-  "updated": "2026-11-03T00:20:16Z",
+  "updated": "2026-11-03T00:26:00Z",
   "shell": "sh",
   "checks": [
     {
@@ -204,7 +204,7 @@
         "Committed tests in tools/agent-eval cover a Claude run with a fake claude streaming on a temporary PATH and the trace read from testdata/observed/claude-stream.jsonl; any driver option added has a test in internal/driver; no test runs a real claude."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
