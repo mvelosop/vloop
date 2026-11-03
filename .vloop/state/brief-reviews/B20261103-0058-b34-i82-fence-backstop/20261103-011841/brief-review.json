@@ -1,0 +1,57 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0058-b34-i82-fence-backstop.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F4",
+      "summary": "F4 changes what exit 9 means in concepts.md, S-2, session.md and the operate skill. Four other places that define exit 9 stay as they are and would contradict it: the domain's R-3 invariant, the exit table in execution/run.md, and the help texts of `vloop run` and `vloop brief review`.",
+      "evidence": "docs/domain/domain-model.md:231-233 (R-3: '9 refs or repository configuration moved'); docs/domain/execution/run.md:127 ('| 9 | refs or repository configuration moved; nothing committed |'); internal/cli/run.go:45-46 ('9 refs or repository configuration moved'); internal/cli/brief_review.go:35-36 ('9 the session changed the brief, git refs or the repository configuration'). F4 names none of these, so a review that greps exit 9's definition finds two meanings.",
+      "fix": "Add to F4 one literal edit for each: R-3's '9 refs or repository configuration moved' → '9 refs or repository configuration moved, or a Copilot session got past its fence'; the same text in run.md:127's ending cell and in run.go's help; and brief_review.go's help gains ', or ran a call its fence denies or changed the fence hook's binary'. Add those files to the binding references."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F1, F2 (where the halt comes)",
+      "summary": "The brief does not say whether F2/F1 run before or after the existing .git/config and REFS MOVED checks. It only says 'where REFS MOVED halts'. A real bypass usually trips both: a `git commit` or `git push` that got past the hook also moves a ref. Which check runs first decides whether the operator sees the calls named. The worked example cannot settle it, because the stub only emits the event and moves no ref.",
+      "evidence": "internal/driver/iterate.go:658-663 (work: restoreInputs, gitChanged, gitRefsMoved in that order; review at 791-796, verify at 966-971); plan.go:548-558; gatereview.go:57-62; briefreview.go:111-117. The brief's F1 example is 'git commit -m x', exactly a call that moves HEAD when it really runs.",
+      "fix": "Pin the order. Recommended: HOOK CHANGED, then FENCE BYPASSED, then the existing gitChanged/REFS MOVED checks, so the bypassing calls are always named. Add a worked-example line where the stub's script both emits a 'git commit -m x' call and runs `git commit --allow-empty`, expecting FENCE BYPASSED (or the order you choose)."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F1 ('written to the run log too')",
+      "summary": "`vloop brief review` has no run log. Its Runner sets no Log, and its folder holds only brief-review.json, review-brief-0.stderr and sessions/. So 'masked … and written to the run log too' cannot hold for the review-brief phase, and a test author has to guess what it means there.",
+      "evidence": "internal/driver/briefreview.go:95-96 (Runner without Log); .vloop/state/brief-reviews/B20261103-0058-b34-i82-fence-backstop/20261103-011419/ lists brief-review.json, review-brief-0.stderr, sessions.",
+      "fix": "Say 'written to the run log too, where the phase has one (not `vloop brief review`, which prints them on stderr only)'."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example (the first three lines and the killed-session line)",
+      "summary": "The seven phase lines and the F2 line each name a test. The git-commit line, the denied-completion line, the 'ls' line and the killed-session line name none. The verify session cannot run `vloop run`. The killed line through `vloop run` also costs at least 60 s, because run.session-timeout is whole minutes, 1 or more.",
+      "evidence": "plugin/skills/create-brief/guidelines.md ('Cover such a line with an end-to-end test … named beside the line'); docs/guide/configuration.md:59 (run.session-timeout: 'a whole number of minutes, 1 or more'); internal/driver/iterate_test.go:154 (driver tests set Runner.Timeout to a second).",
+      "fix": "Mark each of those four lines as a named test. Make the killed-session line a driver test with a short Runner.Timeout and a stub copilot on the Runner's PATH, as the F2 line already is."
+    },
+    {
+      "kind": "consistency",
+      "section": "Binding references (copilot-cli-experiments.md); F4",
+      "summary": "Minor. The brief cites B22.3 as 'the probes this answers', but leaves that note's 'What remains' paragraph unchanged. The paragraph still reads '`timeoutSec` 30' and says whether a session can write the hook's binary is not probed. fence-audit.md gets a 'Since B34' note; this note does not.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:346-349.",
+      "fix": "Either add to F4 a note line after that paragraph ('*Since B34 timeoutSec is 120, and the driver halts (HOOK CHANGED) when the hook's binary changes during a session.*'), or say that the design note stays historical on purpose."
+    }
+  ],
+  "decisions": [
+    "Re-judge every call that ran from the JSON Lines, rather than match a hook log. Sound: a log could be written by the session it judges. I re-ran it: the 7 kept sessions (B27–B32) hold 140 calls; the hook, as built at 1ed7f37, denies none of the calls among them that ran.",
+    "Accepted risk: a tool that never calls the hook would halt every Copilot run, with no switch to turn the check off. The evidence says none does today.",
+    "Exit 9 rather than a charged attempt or a new code. Sound.",
+    "SHA-256 of the hook binary before and after the session, rather than a writability probe.",
+    "timeoutSec 30 → 120.",
+    "A call with no completion counts as run, and the check runs whatever the session's exit (timed-out and killed sessions included).",
+    "The re-judge applies the hook's own empty-command rule for bash/powershell before the judge.",
+    "No revert after FENCE BYPASSED or HOOK CHANGED beyond what each phase already restores. The review, verify, plan and gate-review tree reverts come after the halt point, so a bypassing session's edits stay for the operator.",
+    "The check lives in vloop's phases, not in Runner.Run, so tools/agent-eval is never halted.",
+    "The stub copilot grows to accept every phase's prompt and emit scripted tool events. The one test that pins '/vloop:work T1' being refused (cmd/vloop/run_harness_test.go:399) changes to a prompt the stub still refuses."
+  ],
+  "checked": "facts (agent_copilot.go writeCopilotHooks/timeoutSec 30/Parse denied counting; fence.go hook, empty-command rule, parseHookPayload untested and used only there; judge.go imports driver and touches no filesystem, so it is deterministic; Runner.Run returns before the record on a missing result, and Result carries no stdout; the halt sites in iterate/plan/gatereview/briefreview; the stub copilot accepts only /vloop:review; no test pins timeoutSec; run.second-review 'record' runs unconditionally; agent.review-brief exists); worked-example reasons, via `vloop fence check` for all seven phases and for 'git commit -m x' and 'ls'; F4 anchors (S-2 line 219, session.md 120-121, concepts row 9 and its 'Ending' column, configuration.md sentence, six fence-audit headings, operate row 9); a real-data re-judge of the kept Copilot sessions; `vloop brief check` passes on a ready copy; .vloop/config.toml's single go check stays green task by task.",
+  "header": "Reviewed 2026-11-03 (round 5): FIX, 5 findings"
+}
+

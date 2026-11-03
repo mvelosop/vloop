@@ -1,0 +1,84 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0058-b34-i82-fence-backstop.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract / F1; Violations (unknown tools)",
+      "summary": "Unsure, and the most severe finding: if Copilot runs any tool without calling the preToolUse hook (report_intent being the likely one), F1 halts almost every real Copilot session. The judge denies every tool it does not name, and the violations list forbids exempting one.",
+      "evidence": "`vloop fence check --phase work --root . --tool report_intent` prints `deny: tool report_intent is not allowed in a work session`. tools/agent-eval/testdata/worked/copilot-session.jsonl:10-11 shows a report_intent call completing with success:true, not denied. That fixture is hand-made, so it does not settle the question. The seed's claim ('B32's Copilot session events, which show every call passing a preToolUse hook') has no evidence in the repository: no real Copilot JSONL is committed, and copilot-cli-experiments.md's list of observed tool names (B22.3) does not include report_intent.",
+      "fix": "Settle it on a real trace (B32's or B33's acceptance JSON Lines): does any tool.execution_start complete without being denied for a tool the judge does not name? If so, the operator decides between exempting the named non-acting tools and teaching the judge them, and the brief records the choice. Either way, commit one real trace as a fixture and add an acceptance section where a real Copilot session of each agent-backed phase finishes without FENCE BYPASSED."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / F1 ('the same fence.New … the hook builds'); Shape task 1",
+      "summary": "The driver cannot call fence.New: internal/fence already imports internal/driver, so the import would be a cycle. The brief does not mention this, and task 1 will run into it.",
+      "evidence": "`go list -f '{{.Imports}}' ./internal/fence` includes github.com/mvelosop/vloop/internal/driver (for driver.CopilotDenyStems, internal/fence/judge.go:79). internal/cli imports both packages.",
+      "fix": "Say that the judge reaches the driver without driver importing fence: either it is injected from internal/cli (a judge function on the Runner, Iterator or Planner), or the deny-list stems move out of driver. Name which one, or leave the choice open explicitly, so the planner plans it."
+    },
+    {
+      "kind": "fact",
+      "section": "Worked example; Shape task 2",
+      "summary": "The harness's stub copilot cannot run any line of the worked example as it stands. It accepts only `/vloop:review <task>` (it exits 64 on any other prompt), emits no tool events and has no way to touch the hook binary. The worked example presents it as if it can already run work and plan sessions.",
+      "evidence": "cmd/vloop/run_harness_test.go:127-130: `if [ \"$cmd\" != /vloop:review ] ... echo \"stub copilot: unrecognised prompt\" ... exit 64`. It prints only session.start, assistant.turn_start, session.usage_checkpoint and result (lines 136-146).",
+      "fix": "State in Shape that task 1 or 2 extends the stub copilot: /vloop:work and /vloop:plan prompts, per-test tool.execution_start and tool.execution_complete lines (for example a STUB_EVENTS variable), and the plan file a plan session must write. Existing stub tests stay green."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example (HOOK CHANGED line)",
+      "summary": "No setting lets a `vloop run` point the hook at a different binary. Runner.HookBinary is set only by tools/agent-eval, so under `vloop run` the hook runs os.Executable(), which is TestMain's shared binPath. The test therefore has to run `vloop run` from a copy of the binary. Appending to that copy while it runs also fails on Linux with ETXTBSY.",
+      "evidence": "internal/driver/agent.go:82 and tools/agent-eval/runner.go:168 are the only places HookBinary is set. cmd/vloop tests run exec.Command(binPath, \"run\", …), for example b12_e2e_test.go:300.",
+      "fix": "Pin the mechanism: the test copies binPath, runs `vloop run` from the copy, and the stub replaces the copy (writes a changed file and renames it over the original) instead of appending a byte. That changes the hash on macOS and Linux alike. Or name a test-only seam."
+    },
+    {
+      "kind": "rule",
+      "section": "Behaviour contract / F4; Binding references (domain-model.md S-2)",
+      "summary": "The domain says exactly what halts with exit 9, and F4 does not update it. S-2 and docs/domain/execution/session.md's account of the driver's checks would go on saying exit 9 means only refs, .git/config or hooks.",
+      "evidence": "docs/domain/domain-model.md S-2: 'It halts (exit 9) if a ref, a key of `.git/config` or the git hooks change …'. docs/domain/execution/session.md:118-121: 'A session or gate that moves any ref, `.git/config` or the git hooks halts the run with exit 9'. The brief cites S-2 as binding but changes the behaviour it describes.",
+      "fix": "Add both to F4 with literal text, for example S-2 gains 'or a Copilot session ran a call its fence denies or changed the binary its fence hook runs', and session.md gets the same sentence after its exit-9 sentence."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F1 (stderr line); Worked example",
+      "summary": "The stderr line `vloop: <tool> <path or command> — <reason>` is not literal for every case. An apply_patch call's command is the whole multi-line patch, which breaks 'one line per call'. A tool with neither a path nor a command, such as report_intent, gives a double space. The worked example also leaves its values unpinned: `<the work fence's reason>` and the elided `FENCE BYPASSED plan — …`.",
+      "evidence": "internal/cli/fence.go:182-189 (apply_patch's command is the patch). The judge's actual reasons: `vloop fence check --phase work … \"git commit -m x\"` prints `deny: git commit -m x is denied by the work fence (Bash(git commit:*))`, and `--phase plan … \"git push\"` prints `deny: git push is denied by the plan fence (Bash(git push:*))`.",
+      "fix": "Pin what is printed for apply_patch (for example its paths, joined with ', ') and for a tool with neither path nor command (the tool alone). Write the worked example's lines literally: `vloop: bash git commit -m x — git commit -m x is denied by the work fence (Bash(git commit:*))`, and the full plan message `FENCE BYPASSED plan — the session ran 1 call(s) its fence denies; nothing from it was used`."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F1 ('before the session's output is read')",
+      "summary": "The halt cannot come before the session's output is read: Runner.Run parses stdout and writes the session record before any REFS MOVED site runs. In review-brief, the brief is also restored before the refs check, so 'the work tree is left as the session left it' is not quite true there.",
+      "evidence": "internal/driver/session.go:433-447 (Parse, then the session record written); internal/driver/briefreview.go:105-117 (the brief restored, then the guard and refs checks).",
+      "fix": "Say 'before the session's proposal, verdict, plan or report is read; its session record is kept', and 'the work tree is left as the session left it, apart from what the driver already restores today'."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F4 (fence-audit.md)",
+      "summary": "'after each sentence saying the hook `fails open on the two limits above`' matches 4 sentences (work, verify, gate-review, plan). Each wraps across lines, so a gate that greps the literal misses them. The review fence's own fail-open paragraph (lines 26-32) and the review-brief section get nothing, although F1 covers those phases.",
+      "evidence": "docs/design-notes/fence-audit.md:233-235, 416-418, 605-607, 800-802 (the phrase is split across lines at 233-234), and lines 26-32 in different wording.",
+      "fix": "Name the five places by section (review/second-review at the top, work, verify, gate-review, plan) and say the gate counts the new sentence with the wrapping normalised. Also decide whether copilot-cli-experiments.md's 'What remains' (line 347) gains a line, since B34 answers it."
+    },
+    {
+      "kind": "fact",
+      "section": "Constraints ('except where they pin timeoutSec 30')",
+      "summary": "No existing test pins timeoutSec. The only 30 is in internal/driver/agent_copilot.go:157. The exception is harmless, but F3 then has no test today, and its gate must add one.",
+      "evidence": "A grep for timeoutSec over *.go finds only internal/driver/agent_copilot.go:157.",
+      "fix": "Drop the exception, or say that F3's gate adds the assertion (the hooks file's timeoutSec is 120)."
+    }
+  ],
+  "decisions": [
+    "Re-judge each call from the JSON Lines instead of matching the hook's own log: sound. The rejection's reasoning (a session can write the log; the payload has no call id) holds.",
+    "Exit 9 instead of failing the attempt or adding a new code: agreed. It fits 'a guard tripped'.",
+    "Hash the hook binary (F2) instead of probing whether a session can write it: agreed, and cheap. Note that an operator who reinstalls vloop during a session, or a work session that runs `go install ./cmd/vloop` in this repo, also trips HOOK CHANGED. That is arguably correct, but the operator should know.",
+    "timeoutSec 120: fine. The only cost is a longer stall before a timed-out hook fails open.",
+    "A call with no completion counts as having run: safe, but it can halt on a call whose hook was still deciding when the session was killed. Acceptable.",
+    "The check runs whatever the session's exit: agreed.",
+    "No acceptance on the real Copilot CLI: not decided explicitly. Given finding 1, I recommend one.",
+    "Not stated: whether tools/agent-eval, which also uses Runner.Run, gets the re-judge. If the re-judge goes into Runner.Run, eval cases inherit it. Name it in scope or out of scope.",
+    "The re-judge does not reproduce the hook's own deny of a shell call with no readable command (internal/cli/fence.go:117-120). The judge alone allows an empty command, so such a call would not halt. That errs toward fewer halts; I would let it stand but say so."
+  ],
+  "checked": "facts (agent_copilot.go writeCopilotHooks/Parse, fence.go parseHookPayload, judge.go New/Decide, session.go Runner.Run, REFS MOVED sites in iterate/plan/gatereview/briefreview, the event fixtures, the stub copilot, HookBinary wiring, the import graph, the F4 target sentences); consistency of the messages and the worked example against the judge's real reasons; rules (CLAUDE.md, the architect skill's constraints, domain S-2/S-4); runnability against the go check; vloop brief check on a ready copy: ok, 0 warnings",
+  "header": "Reviewed 2026-11-03: ASK, 9 findings"
+}
+

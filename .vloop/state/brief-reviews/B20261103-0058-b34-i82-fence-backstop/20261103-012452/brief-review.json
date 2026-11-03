@@ -1,0 +1,41 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0058-b34-i82-fence-backstop.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F1 (where the checks run)",
+      "summary": "The brief does not pin where F2 and F1 run relative to each phase's restores. It says they run 'after the session's existing guards are taken but before they are compared', with the .git/config, hooks and REFS MOVED checks after them. But in work, review, second-review and verify the first comparison is restoreInputs. It restores the driver's inputs, and it halts with exit 1 when it cannot. In review-brief the first comparison is the brief's restore, and the worked example requires the brief restored. So 'before they are compared' would skip that restore. Read one way, a FENCE BYPASSED halt leaves the session's changes to the driver's inputs in place; read the other way, an exit-1 restore failure hides the breach. Both readings pass the worked example, except in review-brief.",
+      "evidence": "internal/driver/iterate.go:657-666 (work: restoreInputs, then gitChanged, then gitRefsMoved); iterate.go:788-805 (review and second-review: restoreInputs, gitChanged, gitRefsMoved, then tree.revert and restoreTouched); iterate.go:966-979 (verify, same order); iterate.go:368-369 (restoreInputs halts with ExitPreflight); internal/driver/briefreview.go:104-117 (brief restored before guard.changed and refsDiff); plan.go:548-560 and gatereview.go:57-65 (no input restore, so tree.revert comes after the git checks).",
+      "fix": "State it literally, per phase. F2, then F1, run after restoreInputs (work, review, second-review, verify) and after the brief's restore (review-brief), and before the .git/config and hooks check. That is the point where REFS MOVED halts today. The later restores (tree.revert of plan, gate-review, review and verify; restoreTouched) do not run, so the work tree stays as the session left it. Then drop 'before they are compared'."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example (the killed-session line)",
+      "summary": "A killed session is covered only by a driver test that hands the shared check the JSON Lines. Nothing tests that a phase actually passes it the JSON Lines of a session that printed no result event. Runner.Run returns early in that case, with no record, and Result carries no stdout. So an implementation that reads the calls only from a parsed or recorded session passes every line and still never re-judges a killed session, which is the case 'Decided here' names.",
+      "evidence": "internal/driver/session.go:433-436 (`if !ok { … SESSION RECORD MISSING …; return res, nil }`, before the record is written); session.go:71-81 (Result has no stdout or calls). The harness stub already has STUB_SILENT=1, which prints no result event (cmd/vloop/run_harness_test.go:104, 143-145).",
+      "fix": "Add one cmd/vloop line: agent.work = \"copilot\", the stub runs a bash call \"git commit -m x\" with STUB_SILENT=1 (no result event), and expects the FENCE BYPASSED work halt, exit 9 and no new commit. Or say in F1 that the JSON Lines reach the phase however Run ends, a missing result event included."
+    },
+    {
+      "kind": "consistency",
+      "section": "Executive summary (F4)",
+      "summary": "Minor. The summary's F4 names four doc targets: the exit-code table, the configuration guide, the fence audit and the operate skill. The contract's F4 edits ten places, including the domain's S-2 and R-3, session.md, run.md, both help texts and B22.3's note. An operator who reads only the summary does not see that the domain invariants and the CLI help change.",
+      "evidence": "Brief, Executive summary: '**F4 — the docs:** the exit-code table, the configuration guide's fence section, the fence audit, and the operate skill's exit-9 row.' Compare the F4 contract section.",
+      "fix": "Make it 'every place that defines exit 9 (the guide, the domain's S-2 and R-3, the run and session pages, both help texts, the operate skill), the configuration guide's fence section, the fence audit and B22.3's note'."
+    }
+  ],
+  "decisions": [
+    "Re-judge the calls from the JSON Lines rather than have the hook log its decisions. Sound: the log would be writable by the very session it audits.",
+    "A breach halts with exit 9, not a charged attempt or a new exit code. Agree: same class as REFS MOVED.",
+    "Hash the hook binary before and after every Copilot session (F2). Agree. It also halts when the operator replaces vloop mid-run (go install, brew upgrade). That is correct behaviour, but the operate skill's row should say so.",
+    "timeoutSec 30 → 120 for every phase. Agree.",
+    "A call with no completion counts as having run; the check runs whatever the session's exit. Agree, see finding 2 for its test.",
+    "The hook's own deny answers need no check, because they show up as denied completions. Agree.",
+    "Accepted risk, carried from round 1: no setting turns the re-judge off. A Copilot tool that skips the hook and that the judge denies (report_intent is the candidate: `vloop fence check --phase work --root . --tool report_intent` prints deny) would halt every Copilot run. The evidence is 140 real calls with no false halt, outside the repository. The operator should know that the only way back is a code change.",
+    "The halt leaves the work tree as the session left it (no revert), and the operator decides. Agree, once finding 1 pins exactly which restores still run."
+  ],
+  "checked": "facts (agent_copilot.go: writeCopilotHooks timeoutSec 30, Parse denied completions, Runner.HookBinary; fence.go hook rule and parseHookPayload; fence imports driver; every phase's REFS MOVED site; the stub copilot accepts only /vloop:review; no test pins timeoutSec or the exit-9 help; every F4 anchor sentence exists; fence audit has six headings; config keys agent.<phase> and run.second-review=record exist), consistency, rules, runnability (the check order; the cmd/vloop package fits run.gate-timeout 30; the F2 driver test via HookBinary), decisions. All worked-example reasons taken from `vloop fence check`.",
+  "header": "Reviewed 2026-11-03 (round 6): FIX, 3 findings"
+}
+
