@@ -25,3 +25,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261103-0315-b35-i83-fence-compound-commands` · 2 iteration(s) this run
 - **Plan:** 1/4 done, 1 blocked
+
+## T2 — Match a word the shell expands as any text (C2)
+
+- **Outcome:** done (review: PASS)
+- **Summary:** C2 is implemented: the lexer marks each word expanded or literal, the judge refuses expanded words wherever it reads structure (command name, wrapper options, -c string, redirection target, xargs input), and match retries with expanded words as any text after the as-written pass.
+- **Files:** internal/fence/split.go, internal/fence/judge.go, internal/fence/expand.go, internal/fence/judge_test.go
+- **Notes for next iteration:** Work was already on disk from the earlier blocked attempt; the replaced gate (git remote $X expects the Copilot stem message) now passes. Per-byte quote state in the lexer feeds expands(); internal/fence/expand.go holds match, skipXargs, shellString, xargsCommand and an NFA intersection deciding whether a rule and a command with wildcard words share a string. TestExpandedWords holds every gate case plus command -$v git push. No existing test changed.

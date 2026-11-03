@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **1/4 done** · iteration 2
+**Status:** running · **2/4 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T04:52:44Z
+**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T04:58:25Z
 
 ## Progress
 
 - [x] **T1** — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
-- [ ] **T2** — Match a word the shell expands as any text (C2) · **blocked**
+- [x] **T2** — Match a word the shell expands as any text (C2)
 - [ ] **T3** — Document the wider reading in the guide, the fence audit and fence check's help (C4)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
 
@@ -45,7 +45,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Match a word the shell expands as any text (C2)
 
-`blocked` · **blocked** · depends on: T1
+`done` · depends on: T1
 
 Once compounds are read, `for x in push; do git "$x" origin; done` would slip past the fence, and today `X=push; git $X origin`, `git pu{sh,} origin` and `git pu?h origin` already do, because the judge matches an expanded word as written. This task makes a word holding an unquoted or double-quoted $, an unquoted glob or a brace expansion stand for any text when the deny rules are matched (after the as-written match, which keeps today's messages), and refuses such a word wherever the judge reads it as structure: a command name, a wrapper's or shell's option, a -c string, a redirection target, or xargs' input as a command name. Quoted text stays literal; a harmless command denied costs a retry, a dangerous one allowed is the failure.
 
@@ -60,8 +60,6 @@ Once compounds are read, `for x in push; do git "$x" origin; done` would slip pa
 - A redirection target holding a glob or a brace expansion answers `a redirection target that expands cannot be resolved: <word>`; one holding `$` keeps today's message; a quoted one is a path as written. Writes and reads judged by path are otherwise unchanged.
 - Committed tests in internal/fence/judge_test.go hold every C2 worked-example line (and `command -$v git push`) as a named case, plus the quoted-is-literal cases; the `go` check runs them. Violation: behaviour shipped with no committed test the check runs.
 - The existing tests pass unchanged (beyond the cases T1 changed); no module dependency is added to go.mod; no fence rule file under fence/ changes.
-
-**From the last attempt:** gate disputed: The gate case `review git remote $X` expects the fence rule `Bash(git remote add:*)` with the any-text suffix. The command as written already matches the Copilot stem `git remote:*`, so acceptance 3 (as-written match first, with today's rules and messages) gives the stem message. — cases.tsv row `review\tgit remote $X` wants `git remote $X is denied by the review fence (Bash(git remote add:*)): a word the shell expands may be any text`. internal/driver/agent_copilot.go:24 lists `git remote:*` among the stems, and `git remote $X` has the prefix `git remote `, so the first pass matches it. Today's output is `git remote $X is denied by the Copilot deny list (git remote:*)`. Producing the fence message would mean skipping the as-written pass for the stems.
 
 <details><summary>verify command</summary>
 

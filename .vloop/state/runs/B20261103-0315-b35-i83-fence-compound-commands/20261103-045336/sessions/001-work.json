@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.09318340000000001,
+  "duration_ms": 16894,
+  "effort": null,
+  "ended": "2026-11-03T04:53:53Z",
+  "is_error": false,
+  "iteration": 3,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 16867,
+      "cache_read_input_tokens": 122954,
+      "cost_usd": 0.09318340000000001,
+      "input_tokens": 10,
+      "output_tokens": 1340
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261103-0315-b35-i83-fence-compound-commands",
+  "schema": "session/v3",
+  "started": "2026-11-03T04:53:36Z",
+  "task": "T2",
+  "turns": 5,
+  "wall_ms": 17552
+}
