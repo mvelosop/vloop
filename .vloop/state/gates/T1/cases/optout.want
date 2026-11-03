@@ -1,0 +1,13 @@
+{
+  "enabledPlugins": {
+    "vloop@vloop": false
+  },
+  "extraKnownMarketplaces": {
+    "vloop": {
+      "source": {
+        "source": "github",
+        "repo": "mvelosop/vloop"
+      }
+    }
+  }
+}

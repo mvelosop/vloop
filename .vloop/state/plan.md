@@ -1,39 +1,36 @@
-# Plan — B20261103-0315-b35-i83-fence-compound-commands
+# Plan — B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **4/4 done** · iteration 5
+**Status:** running · **0/4 done** · iteration 0
 
-**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T05:19:46Z
+**Brief:** `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` · **Updated:** 2026-11-03T06:38:05Z
 
 ## Progress
 
-- [x] **T1** — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
-- [x] **T2** — Match a word the shell expands as any text (C2)
-- [x] **T3** — Document the wider reading in the guide, the fence audit and fence check's help (C4)
-- [x] **T4** — Close the run: every gate at once, and the worked example line for line
+- [ ] **T1** — Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1)
+- [ ] **T2** — Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4)
+- [ ] **T3** — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
+- [ ] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
-### T1 — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
+### T1 — Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1)
 
-`done` · depends on: none
+`pending` · depends on: none
 
-Copilot sessions lose a retry every time they write an if, a for, a while, a { … } or a subshell, because the fence judge refuses all of them, and command -v curl is denied because the judge looks through command to curl. This task makes the splitter and the judge read those forms by dropping a leading keyword and judging every command inside, with the brief's exact rules for closing keywords, for, subshells and ((, and treats command -v/-V as a lookup. It must never judge a command inside a compound less than it would be judged alone; C2 (expanded words) is the next task's.
+A Copilot CLI session installs the vloop plugin for a repository once the folder is trusted, if .claude/settings.json declares it, and a Claude user installs it for the repository with one command. This task makes vloop init and vloop upgrade merge extraKnownMarketplaces.vloop and enabledPlugins["vloop@vloop"] into that file, adding each only when its key is absent and keeping every other key, value and order, so an operator's opt-out (false) survives. The docs (T3) and doctor's opt-out reading (T2) build on it.
 
 **Acceptance**
 
-- Every line of the brief's worked example under `# C1` and `# C3` (but `command -$v git push`, which is T2's) gives exactly the answer and exit code the brief shows through `vloop fence check --tool bash`, in the phase it names.
-- Opening keywords (`if`, `then`, `elif`, `else`, `while`, `until`, `do`, `!`, `{`) are dropped only while they are the command's first word, before assignments are skipped; a keyword after an assignment or a wrapper is not dropped (`X=1 if true` and `env ! git status` keep `shell syntax … cannot be judged`), and one in an argument is an argument (`echo if` is an `echo`). Violation: a keyword dropped from the middle of a command.
-- `fi`, `done` and `}` alone are allowed once their redirections are (`done > .vloop/state/x` is denied in a review session as a write); followed by any other word they answer `shell syntax <word> cannot be judged`. `for NAME` and `for NAME in WORDS…` (NAME matching `[A-Za-z_][A-Za-z0-9_]*`) run nothing; any other `for` answers `shell syntax for cannot be judged`.
-- `case`, `esac`, `select`, `function`, `coproc` and `[[` stay refused with `shell syntax <word> cannot be judged`, first or after an opening keyword. Violation: any of them allowed.
-- A `(` opens a subshell only when no word is being built and the current command holds nothing but opening keywords and no redirection (complete or pending); a `)` with one open ends the command and may be followed by a redirection or an operator, not a word; subshells nest written apart. `((`, a `(` anywhere else (`a=(1 2)`, `f() {`, `<(`, `>(`), a `)` with none open and a string ending with one open answer `subshells and process substitution cannot be judged`; `$(` and a backtick keep `command substitution cannot be judged`.
-- A command inside a compound or a subshell is judged exactly as it would be alone: `if true; then git push; fi`, `(git push)` and `while true; do git push; done` each give `git push is denied by the review fence (Bash(git push:*))`. Violation: any inner command judged less than alone.
-- When the judge looks through `command` and an option before the name is a literal `-` followed only by `p`, `v` and `V` with at least one `v` or `V` (no `$`, no quote), the command is allowed whatever follows; `command '-v' git push`, `command -p git push` and `command git push` are looked through as today; `time -v git push` stays denied.
-- The hook (`vloop fence hook`) gives the same answers, since it uses the same judge; no change to the hook's own code is needed or made beyond what the judge provides.
-- Committed tests in internal/fence/judge_test.go hold every C1 and C3 worked-example line as a named case (the phase, the command, the reason) and cover the closing-keyword, for and subshell rules above; the `go` check runs them. Violation: behaviour shipped with no committed test the check runs.
-- The existing tests pass unchanged except the cases the brief's Constraints name: in TestSplitRefuses `(gh x)` gives way to `(gh x` and `a=(1 2)`; in the work fence's table `for f in a b; do echo $f; done` becomes allowed; `if true; then gh x; fi` stays denied, its case keeping `*`.
-- No module dependency is added to go.mod (no shell-grammar parser such as mvdan.cc/sh); no fence rule file under fence/ changes.
+- Every P1 line of the brief's worked example holds through the built binary, on temporary git repositories: the exact file bytes, the `wrote` / `updated` / `would write` / `would update` lines, no line and unchanged bytes when both entries are present, and exit 1 with `.claude/settings.json is not a JSON object — fix it, then re-run` (or `.claude/settings.json's <key> is not a JSON object — fix it, then re-run`, naming enabledPlugins or extraKnownMarketplaces) with no file changed.
+- Merge rules: each entry is added only when its key is absent; an existing value is kept whatever it is (an `enabledPlugins["vloop@vloop"]: false` stays false, an existing `extraKnownMarketplaces.vloop` stays as it is); every other key at every level keeps its value and order; a new key goes at the end of its object, extraKnownMarketplaces before enabledPlugins when both are new at the top level. Violation: a key or value other than the two entries changed, reordered or dropped, or an existing false turned true.
+- When written, the file is laid out as json.MarshalIndent with "" and two spaces lays it out (an empty {} or [] inline), with HTML escaping off (`&`, `<`, `>` written as themselves), numbers keeping their digits (1.50 stays 1.50, 12345678901234567890 stays as is), and a final newline; a file that is kept is not rewritten, so its bytes do not change.
+- No file: it is created holding the two entries and nothing else, with .claude/ created if missing. init reports `wrote`, `updated` or `kept .claude/settings.json` after the CLAUDE.md step (`would write` / `would update` / `would keep` on --dry-run, which writes nothing); upgrade reports `updated .claude/settings.json` when it wrote the file, nothing when it kept it, and `would update .claude/settings.json` on --dry-run and on the breaking path before --yes; upgrade's `already at <v>` return is unchanged.
+- A file that is not a JSON object (invalid JSON, an array, a string), or whose enabledPlugins or extraKnownMarketplaces is present but not an object, is refused with exit 1 and the message above: by init before any step writes and before any would-line on --dry-run; by upgrade before any file is written, on --dry-run and on the breaking path too, before any `would update` line. A symlinked .claude/settings.json is refused as the other targets are (checkRepoPath).
+- Nothing is written outside the repository and no `claude plugin` or `copilot plugin` command is run by init or upgrade. No new module dependency.
+- Committed tests in internal/cli's init and upgrade tests hold each P1 worked-example line as a named test on a temporary git repository (addressed with git -C), plus the merge-rule cases above; the `go` check runs them. Violation: the merge shipped with no committed test the check runs.
+- Existing tests change only where the brief's Constraints allow: tests pinning init's or upgrade's output lines gain the new .claude/settings.json line, and TestDoctorGateEditsNoClaudeAndWritesNothing asserts the only file under .claude/ is settings.json holding the two entries.
 
 <details><summary>verify command</summary>
 
@@ -43,23 +40,22 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Match a word the shell expands as any text (C2)
+### T2 — Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4)
 
-`done` · depends on: T1
+`pending` · depends on: T1
 
-Once compounds are read, `for x in push; do git "$x" origin; done` would slip past the fence, and today `X=push; git $X origin`, `git pu{sh,} origin` and `git pu?h origin` already do, because the judge matches an expanded word as written. This task makes a word holding an unquoted or double-quoted $, an unquoted glob or a brace expansion stand for any text when the deny rules are matched (after the as-written match, which keeps today's messages), and refuses such a word wherever the judge reads it as structure: a command name, a wrapper's or shell's option, a -c string, a redirection target, or xargs' input as a command name. Quoted text stays literal; a harmless command denied costs a retry, a dangerous one allowed is the failure.
+Doctor's plugin row counts a plugin enabled in another repository as enabled here, and its disabled warning names a command that changes the user's global settings, which a Copilot session once ran. This task makes the Claude row count only entries for this repository (user scope or absent, or a projectPath matching the root as the trust row matches it), honour the repository's own opt-out, and say what each case means for a run; and adds a `copilot plugin` row, only where doctor's `copilot` row appears, from `copilot plugin list --json` run in the root. Both lists are computed for the working directory, so running them anywhere else gives the wrong answer.
 
 **Acceptance**
 
-- Every line of the brief's worked example under `# C2`, and `command -$v git push`, gives exactly the answer and exit code the brief shows through `vloop fence check --tool bash`, in the phase it names.
-- A word is expanded exactly when it holds a `$` unquoted or in double quotes, an unquoted `*` or `?`, an unquoted `[` with an unquoted `]` later in the word, or an unquoted `{` and the first unquoted `}` after it (no unquoted `{` between) with an unquoted `,` or `..` between them. Violation: a single-quoted, double-quoted (for a glob or brace) or backslash-escaped `$`, glob or brace read as any text (`git '$X' origin`, `git "pu*" origin`, `git pu\$X origin` stay allowed), or `@{u}`, `{}`, `HEAD@{1}`, `[ -f x ]` read as expanded.
-- `match` first matches the command as written with today's rules, order and messages; only when nothing matches does it match again with each expanded word standing for any text (none, one or several words), trying the fence's rules then the Copilot deny list in today's order and naming the first that can match, with the suffix `: a word the shell expands may be any text` and the words joined by spaces, quotes removed.
-- A command name (after assignments and wrappers) that expands answers `command word <word> expands and cannot be judged`, a leading `$` keeping today's message; an expanded word a wrapper skips before the name (an option or its value, timeout's duration, exec -a's name, env's NAME=value, nice -n's number, xargs' and stdbuf's options, command's options) answers `<word> expands before the command name and cannot be judged`; assignments before the first word are unaffected.
-- For sh, bash, zsh, dash and ksh: an expanded option word before the -c string (or -o's value) answers `<shell>: <word> expands before the command string and cannot be judged`; a -c string expanded by a glob or brace answers `<shell>: the -c string expands and cannot be judged`; one holding `$` keeps today's message; a literal -c string is split and judged with C2 inside it.
-- xargs judges its command as if it ended with one more expanded word, added before wrappers are looked through (`xargs env` answers `command word <xargs input> expands and cannot be judged`; `xargs` with no command is `echo` and allowed); with a replace option (`-I <s>`, `-i[<s>]`, `--replace[=<s>]`, `-J <s>`, defaulting to `{}`) nothing is appended, every word holding the replace string is expanded, a name holding it is refused, and a -c string holding it answers `<shell>: the -c string holds xargs' replace string <s> and cannot be judged`. `-J`, `-R` and `-S` take an argument.
-- A redirection target holding a glob or a brace expansion answers `a redirection target that expands cannot be resolved: <word>`; one holding `$` keeps today's message; a quoted one is a path as written. Writes and reads judged by path are otherwise unchanged.
-- Committed tests in internal/fence/judge_test.go hold every C2 worked-example line (and `command -$v git push`) as a named case, plus the quoted-is-literal cases; the `go` check runs them. Violation: behaviour shipped with no committed test the check runs.
-- The existing tests pass unchanged (beyond the cases T1 changed); no module dependency is added to go.mod; no fence rule file under fence/ changes.
+- Every P3 and P4 line of the brief's worked example holds through the built binary with stub claude and copilot on PATH, doctor started with -C &lt;root&gt; from another directory: the row's result and its message exactly as the brief's tables give them.
+- P3: `claude plugin list --json` runs with the repository root as its working directory. An entry counts when its id starts with `vloop@`, its version is not empty or missing, and it is for this repository: scope user or absent, or a projectPath matching the root or its symlink-resolved path by trustKeyMatch (the entry's path is not resolved). A counted entry is enabled when its enabled is true and neither .claude/settings.json nor .claude/settings.local.json sets enabledPlugins["vloop@vloop"] to false; a settings file that is missing, unreadable, not an object, or whose enabledPlugins is not an object, is ignored for this. `<v>` is the version of the first enabled counted entry in the list's order. Violation: a project entry of another repository counted here.
+- P3's messages are exactly the brief's table: pass with no message; the version warning naming `claude plugin update vloop@vloop`; `installed but not enabled for this repository — …` naming `claude plugin enable vloop@vloop --scope project`; `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop --scope project …`; `cannot read claude plugin list --json: <error>` (stderr's text when there is one). The row stays where it is and is n/a without claude. Violation: a message that suggests `claude plugin enable` without a --scope, or presents a user-level change as required.
+- P4: a `copilot plugin` row appears exactly when doctor's `copilot` row does (copilotKeys plus agent.review-brief; not agent.verify with run.verify false, nor agent.second-review with run.second-review off), right after the plugin row and before gate edits (also when plugin is n/a for want of claude); it is n/a when the copilot row is a problem; no row when no key is copilot or the config cannot be read, and then copilot is never run. It runs `copilot plugin list --json` in the root with the environment as given (COPILOT_HOME included); an entry counts when its name is `vloop`; its messages are exactly the brief's P4 table.
+- vloop run's preflight does not compute the copilot plugin row: no `copilot plugin` command runs at a run's start, while the preflight keeps checking copilot as today.
+- doctor runs no `claude plugin` or `copilot plugin` command other than `list --json` and writes nothing. No new module dependency.
+- Committed tests in internal/cli/doctor_test.go hold every P3 and P4 worked-example line as a named test, with stub claude and copilot on PATH that print the JSON shown and record their working directory, each test checking it was the repository root (doctor run with -C &lt;root&gt; from another directory); a test shows the preflight runs no copilot plugin list. The `go` check runs them. Violation: the rows shipped with no committed test the check runs.
+- Existing tests change only where the brief's Constraints allow (messages P3 changes); the stubs' scope-less entries in internal/cli/doctor_test.go and cmd/vloop's harnesses and end-to-end tests keep their results, and no test runs a real claude or copilot or touches the real ~/.claude or ~/.copilot.
 
 <details><summary>verify command</summary>
 
@@ -69,18 +65,21 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Document the wider reading in the guide, the fence audit and fence check's help (C4)
+### T3 — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
 
-`done` · depends on: T2
+`pending` · depends on: T1, T2
 
-An operator or a session reading why a call was denied must find the judge's new reading described where it is described today: the configuration guide's work-fence bullet, the fence audit's hook bullet and work-session paragraph, and `vloop fence check --help`. Each edit is the brief's text word for word, wrapped in the file's style, so the docs never claim behaviour the judge lacks.
+Nothing tells a Copilot CLI user how to get /vloop:operate, and the docs still give Claude's per-user install as the way. With the declaration (T1) and doctor's per-agent rows (T2) in place, this task makes init's closing lines, the CLAUDE.md section, README.md and docs/guide/concepts.md give both agents' ways: the declaration and trusting the folder in Copilot, Claude Code's per-repository install, and --plugin-dir for one session. Prose is judged on the facts P2 lists, not on wording.
 
 **Acceptance**
 
-- docs/guide/configuration.md: in the work-fence bullet, the sentences from `Shell syntax the judge cannot read is denied, not guessed at:` through `Write the commands one per line instead.` are replaced by the brief's C4 text word for word, between `the recursive forms stay denied.` and `Copilot still runs a call`.
-- docs/design-notes/fence-audit.md: the hook bullet of "The three enforcers" gains the brief's sentence straight after `a command word starting with `$`.`; the work-session paragraph's first sentence becomes the brief's text, and the rest of that paragraph (from `The hook fails open`) is unchanged.
-- `vloop fence check --help` reads `…xargs and sh -c, read through if, while, until, for, !, { } and subshells, and matched against…` and, after the sentence ending `the Copilot adapter's deny list.`, `A word the shell expands ($, a glob, a brace expansion) matches as any text.` (internal/cli/fence.go).
-- Violation: any other sentence of those files changed, or a doc stating behaviour the judge does not have.
+- vloop init's closing lines are exactly the brief's "init's closing lines" block, after the step lines; the CLAUDE.md section's sentence is exactly the brief's new text (in Claude Code … --scope project …; in Copilot CLI, trust this folder …), and the old "give the user the two ways to load it" is gone.
+- README.md: the install section's Claude install line is `claude plugin install vloop@vloop --scope project`, with a sentence that it runs inside the repository and installs for that repository (without --scope project, for every repository); a paragraph says vloop init declares the plugin in .claude/settings.json, so trusting the folder in Copilot CLI installs it for that repository, and in Claude Code to run the install above; then the Copilot block `copilot plugin marketplace add mvelosop/vloop` / `copilot plugin install vloop@vloop` and `copilot --plugin-dir "$(vloop plugin path)"` for one session. Quickstart step 1 names .claude/settings.json (the plugin's declaration).
+- docs/guide/concepts.md, "Setting up a repository": the init and upgrade paragraphs name .claude/settings.json; the vloop doctor paragraph names the `copilot plugin` row; the plugin paragraph gives the declaration, that Copilot CLI installs it on trust, Claude Code's per-repository install and both agents' commands; the sentence "either install the plugin or pass `--plugin-dir`, not both" becomes the brief's "For interactive sessions, use one of them: where the plugin is enabled for the repository (installed for it, or per user), do not also pass `--plugin-dir`."
+- A new subsection "From Copilot CLI" after the plugin paragraph says: trust the folder (the declaration then installs the plugin for this repository on the first session; it is ignored in an untrusted folder; a .github/copilot/settings.local.json can opt one person out, a file that exists only in a repository that adds it); or install per user (the two commands); or `copilot --plugin-dir "$(vloop plugin path)"` for one session; and that vloop run's Copilot sessions load the plugin with --plugin-dir whatever is installed.
+- No doc makes a claim about what Claude Code does with the declaration (it was measured not to act on it for a user who knows the marketplace, and not measured otherwise). Violation: text saying Claude Code installs or enables the declared plugin. The commands' help (vloop init, upgrade, doctor) is unchanged.
+- Committed tests that pin printInitNext's lines and the CLAUDE.md section's text change only to the new text, and pin it (the `go` check runs them); docs/guide/commands.md stays in step with the help (unchanged). This repository's own CLAUDE.md section is left to vloop upgrade, not hand-edited, unless a committed test requires it.
+- The prose is judged on the facts each item lists, not on wording.
 
 <details><summary>verify command</summary>
 
@@ -92,14 +91,14 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Close the run: every gate at once, and the worked example line for line
 
-`done` · depends on: T3
+`pending` · depends on: T3
 
-Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap.
+Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap. Nothing new is built here unless a worked-example line turns out to have no committed test.
 
 **Acceptance**
 
 - Gates T1, T2 and T3 all pass on the final tree, run together by this task's gate.
-- The work session's notes walk the brief's worked example line for line (the C1, C2 and C3 sections) and name the committed test case in internal/fence/judge_test.go and the gate table (T1's or T2's cases.tsv) that covers each; a line no committed test covers is fixed in this task (a test added) or reported, not skipped.
+- The work session's notes walk the brief's worked example line for line (P1, P3, P4) and name, for each, the committed test in internal/cli (init, upgrade or doctor tests) and the gate (T1 or T2) that covers it; a line no committed test covers is fixed in this task (a test added) or reported, not skipped.
 - Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds).
 
 <details><summary>verify command</summary>
