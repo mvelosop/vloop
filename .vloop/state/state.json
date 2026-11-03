@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md",
   "base": "27e775409fb3e38de301cd3cb1903ee8e997a36b",
   "branch": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent",
-  "status": "running",
+  "status": "complete",
   "iteration": 6,
   "created": "2026-11-03T06:34:04Z",
-  "updated": "2026-11-03T07:30:59Z",
+  "updated": "2026-11-03T07:36:18Z",
   "shell": "sh",
   "checks": [
     {
