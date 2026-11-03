@@ -20,3 +20,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** C2 is implemented: the lexer marks each word as expanded or literal, the judge refuses expanded words wherever it reads structure, xargs gets the appended or replace-string word, and match tries expanded words as any text after the as-written pass. Gate T2 passes 108 of 109 cases. The one miss is a gate case that contradicts acceptance 3.
 - **Files:** internal/fence/split.go, internal/fence/judge.go, internal/fence/expand.go, internal/fence/judge_test.go
 - **Notes for next iteration:** Per-byte quote state (stUnquoted, stDouble, stLiteral) in the lexer feeds expands(); command.exp runs parallel to words and plain. internal/fence/expand.go holds match (as written, then any-text), skipXargs, shellString, xargsCommand and the NFA intersection used to decide whether a rule and a command with wildcard words share a string. The xargs input is the word <xargs input>, left out of the message text. TestExpandedWords in judge_test.go holds every gate case plus `command -$v git push`; the `git remote $X` row there expects the as-written stem message, as acceptance 3 requires. No existing test changed in this task.
+
+## Run ended — blocked
+
+- **Run:** `B20261103-0315-b35-i83-fence-compound-commands` · 2 iteration(s) this run
+- **Plan:** 1/4 done, 1 blocked

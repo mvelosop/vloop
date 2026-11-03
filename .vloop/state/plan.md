@@ -2,7 +2,7 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/4 done** · iteration 2
+**Status:** blocked · **1/4 done** · iteration 2
 
 **Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T04:52:44Z
 
