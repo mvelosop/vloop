@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -114,10 +115,17 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 
 	hasClaude := doctorClaude(add)
 
+	copilotRow, copilotBad := false, false
 	if cerr == nil {
 		doctorSecondReview(root, add)
 		if keys := append(copilotKeys(root), copilotReviewBriefKey(root)...); len(keys) > 0 {
 			doctorCopilot(root, keys, add)
+			copilotRow = true
+			for _, c := range checks {
+				if c.Name == "copilot" && c.Result == resProblem {
+					copilotBad = true
+				}
+			}
 		}
 	}
 
@@ -132,9 +140,20 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 
 	if !hasClaude {
 		add("plugin", resNA, "")
+	} else {
+		add(doctorPlugin(b, root))
+	}
+	// a run's preflight does not run copilot plugin list (runBrief is set)
+	if copilotRow && runBrief == nil {
+		if copilotBad {
+			add("copilot plugin", resNA, "")
+		} else {
+			add(doctorCopilotPlugin(b, root))
+		}
+	}
+	if !hasClaude {
 		add("gate edits", resNA, "")
 	} else {
-		add(doctorPlugin(b))
 		add(doctorGateEdits(root))
 	}
 	add(doctorGuidelines(root))
@@ -572,47 +591,136 @@ func doctorPlan(root string) (p doctorPlanInfo, ok bool) {
 	return p, true
 }
 
-func doctorPlugin(b Build) (string, string, string) {
-	out, err := exec.Command("claude", "plugin", "list", "--json").Output()
+// pluginOptedOut reports whether the repository's own Claude settings set
+// enabledPlugins["vloop@vloop"] to false. A file that is missing, unreadable,
+// not an object, or whose enabledPlugins is not an object is ignored.
+func pluginOptedOut(root string) bool {
+	for _, f := range []string{"settings.json", "settings.local.json"} {
+		raw, err := os.ReadFile(filepath.Join(root, ".claude", f))
+		if err != nil {
+			continue
+		}
+		var doc map[string]json.RawMessage
+		if json.Unmarshal(raw, &doc) != nil {
+			continue
+		}
+		var ep map[string]json.RawMessage
+		if json.Unmarshal(doc["enabledPlugins"], &ep) != nil {
+			continue
+		}
+		if string(bytes.TrimSpace(ep["vloop@vloop"])) == "false" {
+			return true
+		}
+	}
+	return false
+}
+
+// runPluginList runs `<tool> plugin list --json` with root as its working
+// directory and decodes the JSON array into out.
+func runPluginList(tool, root string, out any) error {
+	cmd := exec.Command(tool, "plugin", "list", "--json")
+	cmd.Dir = root
+	raw, err := cmd.Output()
 	var stderr string
 	if ee := (*exec.ExitError)(nil); errors.As(err, &ee) {
 		stderr = strings.TrimSpace(string(ee.Stderr))
 	}
-	var list []struct {
-		ID      string `json:"id"`
-		Version string `json:"version"`
-		Enabled bool   `json:"enabled"`
-	}
 	if err == nil {
-		err = json.Unmarshal(out, &list)
+		err = json.Unmarshal(raw, out)
 	}
-	if err != nil {
-		if stderr != "" {
-			err = errors.New(stderr)
-		}
+	if err != nil && stderr != "" {
+		err = errors.New(stderr)
+	}
+	return err
+}
+
+func doctorPlugin(b Build, root string) (string, string, string) {
+	var list []struct {
+		ID          string `json:"id"`
+		Version     string `json:"version"`
+		Scope       string `json:"scope"`
+		ProjectPath string `json:"projectPath"`
+		Enabled     bool   `json:"enabled"`
+	}
+	if err := runPluginList("claude", root, &list); err != nil {
 		return "plugin", resWarning, "cannot read claude plugin list --json: " + err.Error()
 	}
-	found, disabled := "", false
+	keys := []string{root}
+	if real, err := filepath.EvalSymlinks(root); err == nil {
+		keys = append(keys, real)
+	}
+	optedOut := pluginOptedOut(root)
+	counted, found := false, ""
 	for _, p := range list {
-		if !strings.HasPrefix(p.ID, "vloop@") {
+		if !strings.HasPrefix(p.ID, "vloop@") || p.Version == "" {
 			continue
 		}
-		if !p.Enabled {
-			disabled = true
+		mine := p.Scope == "" || p.Scope == "user"
+		if !mine {
+			for _, k := range keys {
+				if p.ProjectPath != "" && trustKeyMatch(hostOS, p.ProjectPath, k) {
+					mine = true
+					break
+				}
+			}
+		}
+		if !mine {
+			continue
+		}
+		counted = true
+		if !p.Enabled || optedOut {
 			continue
 		}
 		if p.Version == b.Version {
 			return "plugin", resPass, ""
 		}
-		found = p.Version
-	}
-	if found == "" {
-		if disabled {
-			return "plugin", resWarning, "installed but disabled — claude plugin enable vloop@vloop"
+		if found == "" {
+			found = p.Version
 		}
-		return "plugin", resWarning, `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`
 	}
-	return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — update the one that is behind", found, b.Version)
+	switch {
+	case found != "":
+		return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind", found, b.Version)
+	case counted:
+		return "plugin", resWarning, `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, claude plugin enable vloop@vloop --scope project (or with --scope user, if you disabled it for every repository), or start claude --plugin-dir "$(vloop plugin path)"`
+	}
+	return "plugin", resWarning, `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop --scope project installs it for this repository (after claude plugin marketplace add mvelosop/vloop if claude does not know the marketplace), or claude --plugin-dir "$(vloop plugin path)" for one session`
+}
+
+// doctorCopilotPlugin is the copilot plugin row: copilot plugin list --json,
+// run in the root, for the entries named vloop.
+func doctorCopilotPlugin(b Build, root string) (string, string, string) {
+	var list []struct {
+		Name    string `json:"name"`
+		Version string `json:"version"`
+		Enabled bool   `json:"enabled"`
+	}
+	if err := runPluginList("copilot", root, &list); err != nil {
+		return "copilot plugin", resWarning, "cannot read copilot plugin list --json: " + err.Error()
+	}
+	counted, found := false, ""
+	for _, p := range list {
+		if p.Name != "vloop" {
+			continue
+		}
+		counted = true
+		if !p.Enabled {
+			continue
+		}
+		if p.Version == b.Version {
+			return "copilot plugin", resPass, ""
+		}
+		if found == "" {
+			found = p.Version
+		}
+	}
+	switch {
+	case found != "":
+		return "copilot plugin", resWarning, fmt.Sprintf("the vloop plugin for copilot is %s but this binary is %s — vloop run is unaffected; copilot plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind", found, b.Version)
+	case counted:
+		return "copilot plugin", resWarning, `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, set enabledPlugins["vloop@vloop"] to true in .claude/settings.json and trust this folder in copilot, or start copilot --plugin-dir "$(vloop plugin path)"`
+	}
+	return "copilot plugin", resWarning, `/vloop:operate is not available in your copilot sessions — trusting this folder in copilot installs it when .claude/settings.json declares it (vloop init writes the declaration), or copilot plugin install vloop@vloop (after copilot plugin marketplace add mvelosop/vloop), or copilot --plugin-dir "$(vloop plugin path)" for one session`
 }
 
 // userHomeDir is the seam through which doctor finds the user's home, so tests

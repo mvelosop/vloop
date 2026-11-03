@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop init and vloop upgrade merge extraKnownMarketplaces.vloop and enabledPlugins["vloop@vloop"] into .claude/settings.json via install.MergeClaudeSettings. The previous check failure (TestWorkedExampleB5Session pinning init's 17 output lines) is fixed.
 - **Files:** internal/install/settings.go, internal/cli/init.go, internal/cli/upgrade.go, internal/cli/init_test.go, internal/cli/upgrade_test.go, internal/cli/doctor_test.go, cmd/vloop/b5_e2e_test.go
 - **Notes for next iteration:** cmd/vloop/b5_e2e_test.go changed only where it pins init's output lines: 18 lines now, with 'wrote .claude/settings.json' after 'wrote CLAUDE.md' (brief Constraints). That test takes about 215s.
+
+## T2 — Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4)
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** Doctor's plugin row now counts only this repository's vloop entries (user/absent scope or projectPath matching the root), honours the .claude/settings(.local).json opt-out, and uses P3's messages; a new copilot plugin row (P4) runs copilot plugin list --json in the root, only where the copilot row appears, and never in the run preflight.
+- **Files:** internal/cli/doctor.go, internal/cli/doctor_test.go
+- **Notes for next iteration:** Both lists run via runPluginList with cmd.Dir=root. Preflight is told apart by runBrief != nil in runDoctor (copilot plugin row skipped, so copilot plugin list never runs). TestDoctorPluginMessages changed only where P3 changes messages. New tests: TestDoctorPluginScopeP3, TestDoctorCopilotPluginP4, TestDoctorNoCopilotPluginRow, TestPreflightRunsNoCopilotPluginList; stubs record pwd -P. TestTaskGate* fail inside a work session with 'the plan was changed during this session' (same as T1's note), not touched.
