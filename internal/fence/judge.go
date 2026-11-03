@@ -261,7 +261,7 @@ func (j *Judge) shell(s string, depth int) string {
 				return fmt.Sprintf("read of %s is not allowed: it is under ~/.claude, ~/.copilot or ~/.config/gh", r)
 			}
 		}
-		if r := j.words(c.words, depth); r != "" {
+		if r := j.words(c.words, c.plain, depth); r != "" {
 			return r
 		}
 	}
@@ -274,6 +274,10 @@ var keywords = map[string]bool{
 	"for": true, "while": true, "until": true, "do": true, "done": true, "case": true, "esac": true,
 	"select": true, "function": true, "coproc": true, "[[": true,
 }
+
+var forName = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+
+var lookupOption = regexp.MustCompile(`^-[pvV]*[vV][pvV]*$`)
 
 var assignment = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*=`)
 
@@ -289,10 +293,29 @@ func baseName(w string) string {
 }
 
 // words judges one simple command's words, looking through wrappers.
-func (j *Judge) words(ws []string, depth int) string {
+func (j *Judge) words(ws []string, plain []bool, depth int) string {
+	// Opening keywords are dropped while they are the command's first word,
+	// before assignments; closing keywords and for read only there too.
+	for len(ws) > 0 && opening[ws[0]] {
+		ws, plain = ws[1:], plain[1:]
+	}
+	if len(ws) > 0 {
+		switch ws[0] {
+		case "fi", "done", "}":
+			if len(ws) == 1 {
+				return ""
+			}
+			return fmt.Sprintf("shell syntax %s cannot be judged", ws[0])
+		case "for":
+			if len(ws) == 1 || !forName.MatchString(ws[1]) || (len(ws) > 2 && ws[2] != "in") {
+				return "shell syntax for cannot be judged"
+			}
+			return ""
+		}
+	}
 	for {
 		for len(ws) > 0 && assignment.MatchString(ws[0]) {
-			ws = ws[1:]
+			ws, plain = ws[1:], plain[1:]
 		}
 		if len(ws) == 0 {
 			return ""
@@ -314,7 +337,13 @@ func (j *Judge) words(ws []string, depth int) string {
 			return name + " is not allowed"
 		case "env":
 			rest, err = skipEnv(rest)
-		case "command", "time":
+		case "command":
+			var lookup bool
+			rest, lookup = skipCommand(rest, plain[1:])
+			if lookup {
+				return ""
+			}
+		case "time":
 			rest = skipDashes(rest)
 		case "exec":
 			rest = skipExec(rest)
@@ -339,8 +368,24 @@ func (j *Judge) words(ws []string, depth int) string {
 		if err != "" {
 			return err
 		}
-		ws = rest
+		ws, plain = rest, plain[len(ws)-len(rest):]
 	}
+}
+
+// skipCommand skips command's options and reports whether one is a literal
+// lookup (-v or -V, with p), which runs nothing. A -- ends the options, and
+// ends the lookup too.
+func skipCommand(rest []string, plain []bool) ([]string, bool) {
+	k, ended := 0, false
+	for k < len(rest) && isOption(rest[k]) {
+		if rest[k] == "--" {
+			ended = true
+		} else if !ended && plain[k] && lookupOption.MatchString(rest[k]) {
+			return nil, true
+		}
+		k++
+	}
+	return rest[k:], false
 }
 
 func (j *Judge) fenceLabel() string {

@@ -12,6 +12,7 @@ import (
 // from.
 type command struct {
 	words  []string
+	plain  []bool // per word: written with no quote or escape
 	writes []string
 	reads  []string
 }
@@ -33,6 +34,15 @@ type lexer struct {
 	in     bool // a word is being built (possibly empty, if quoted)
 	quoted bool
 	pend   pending
+	depth  int  // subshells open
+	closed bool // a subshell was just closed: only a redirection or an operator may follow
+}
+
+const subshellRefusal = "subshells and process substitution cannot be judged"
+
+// opening are the keywords that start a command whose own words follow.
+var opening = map[string]bool{
+	"if": true, "then": true, "elif": true, "else": true, "while": true, "until": true, "do": true, "!": true, "{": true,
 }
 
 func (l *lexer) add(s string) {
@@ -58,12 +68,17 @@ func (l *lexer) flush() error {
 	}
 	w := l.word.String()
 	l.word.Reset()
+	plain := !l.quoted
 	l.in, l.quoted = false, false
 	p := l.pend
 	l.pend = pendNone
 	switch p {
 	case pendNone:
+		if l.closed {
+			return errors.New(subshellRefusal)
+		}
 		l.cur.words = append(l.cur.words, w)
+		l.cur.plain = append(l.cur.plain, plain)
 		return nil
 	case pendSkip:
 		return nil
@@ -95,12 +110,29 @@ func (l *lexer) end() error {
 		l.cmds = append(l.cmds, l.cur)
 	}
 	l.cur = command{}
+	l.closed = false
 	return nil
+}
+
+// opens reports whether a ( here opens a subshell: no word is being built,
+// no redirection is complete or waiting, and the command holds nothing but
+// opening keywords.
+func (l *lexer) opens() bool {
+	if l.in || l.closed || l.pend != pendNone || len(l.cur.writes)+len(l.cur.reads) > 0 {
+		return false
+	}
+	for _, w := range l.cur.words {
+		if !opening[w] {
+			return false
+		}
+	}
+	return true
 }
 
 // split cuts a command string into simple commands at ; && || | & and
 // newlines outside quotes. It refuses what it cannot judge: an unterminated
-// quote, command substitution, process substitution and grouping.
+// quote, command substitution, process substitution and what a ( opens
+// anywhere but a subshell. A subshell's ( and ) cut commands like ; does.
 func split(s string) ([]command, error) {
 	l := &lexer{}
 	next := func(i int) byte {
@@ -165,8 +197,23 @@ func split(s string) ([]command, error) {
 			}
 			l.word.WriteByte(c)
 			l.in = true
-		case '(', ')':
-			return nil, errors.New("subshells and process substitution cannot be judged")
+		case '(':
+			if (i > 0 && s[i-1] == '(') || !l.opens() {
+				return nil, errors.New(subshellRefusal)
+			}
+			if err := l.end(); err != nil {
+				return nil, err
+			}
+			l.depth++
+		case ')':
+			if l.depth == 0 {
+				return nil, errors.New(subshellRefusal)
+			}
+			if err := l.end(); err != nil {
+				return nil, err
+			}
+			l.depth--
+			l.closed = true
 		case '#':
 			if l.in {
 				l.word.WriteByte(c)
@@ -253,6 +300,9 @@ func split(s string) ([]command, error) {
 	}
 	if err := l.end(); err != nil {
 		return nil, err
+	}
+	if l.depth > 0 {
+		return nil, errors.New(subshellRefusal)
 	}
 	return l.cmds, nil
 }

@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":227326,"exit":0,"name":"go"}],"ended":"2026-11-03T04:48:03Z","gate":{"duration_ms":1283,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261103-0315-b35-i83-fence-compound-commands","schema":"iteration/v2","started":"2026-11-03T04:37:08Z","task":"T1"}

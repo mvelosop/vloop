@@ -82,7 +82,7 @@ func TestSplitRedirections(t *testing.T) {
 
 func TestSplitRefuses(t *testing.T) {
 	for _, in := range []string{
-		"echo 'x", `echo "x`, "echo `x`", "echo $(x)", `echo "$(x)"`, "cat <(x)", "tee >(x)", "(gh x)", "echo > ", "cat > $F",
+		"echo 'x", `echo "x`, "echo `x`", "echo $(x)", `echo "$(x)"`, "cat <(x)", "tee >(x)", "(gh x", "a=(1 2)", "echo > ", "cat > $F",
 	} {
 		if _, err := split(in); err == nil {
 			t.Errorf("split(%q) did not refuse", in)
@@ -282,7 +282,7 @@ func TestWorkShell(t *testing.T) {
 		{"echo x > .vloop/state/state.json", "write to .vloop/state/state.json is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/"},
 		{"echo x > .git/config", "nothing under .git/ or .vloop/ but .vloop/tmp/"},
 		{"echo x > ../outside.txt", "write to ../outside.txt is not allowed in a work session: it is outside the repository"},
-		{"for f in a b; do echo $f; done", "*"},
+		{"for f in a b; do echo $f; done", ""},
 		{"echo $(date)", "*"},
 		{"echo `date`", "*"},
 		{"eval ls", "*"},
@@ -514,5 +514,72 @@ func TestPlanPhase(t *testing.T) {
 		} else if d.Allow || d.Reason != c.want {
 			t.Errorf("%s: got allow=%v %q, want deny %q", c.name, d.Allow, d.Reason, c.want)
 		}
+	}
+}
+
+// compoundCases are B35's C1 and C3 worked-example lines: the phase, the
+// command and the answer ("" = allowed, else the exact reason).
+var compoundCases = []struct{ name, phase, cmd, want string }{
+	{"if-else-plan", PhasePlan, `if test -f .vloop/tmp/plan-problems.md; then cat .vloop/tmp/plan-problems.md; else printf 'No revision feedback\n'; fi`, ""},
+	{"for-command-v", PhasePlan, `for tool in node pnpm npm curl vloop; do command -v "$tool" || true; done`, ""},
+	{"while-read", PhaseReview, `while read -r f; do wc -l "$f"; done < .vloop/tmp/list`, ""},
+	{"brace-group", PhaseReview, `{ git status; git diff; } > .vloop/tmp/out`, ""},
+	{"subshell-redirect", PhaseReview, `(cd src && ls) > .vloop/tmp/x`, ""},
+	{"if-not", PhaseReview, `if ! git diff --quiet; then echo changed; fi`, ""},
+	{"inside-if", PhaseReview, `if true; then git push; fi`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"inside-subshell", PhaseReview, `(git push)`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"inside-while", PhaseReview, `while true; do git push; done`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"brace-write", PhaseReview, `{ git status; } > .vloop/state/x`, "write to .vloop/state/x is not allowed in a review session: only .vloop/tmp/ may be written"},
+	{"fi-word", PhaseReview, `fi now`, "shell syntax fi cannot be judged"},
+	{"for-arith", PhaseReview, `for ((i=0; i<3; i++)); do ls; done`, subshellRefusal},
+	{"case", PhaseReview, `case x in a) ls;; esac`, subshellRefusal},
+	{"dbl-bracket", PhaseReview, `[[ -f x ]]`, "shell syntax [[ cannot be judged"},
+	{"keyword-after-wrapper", PhaseReview, `env ! git status`, "shell syntax ! cannot be judged"},
+	{"keyword-after-assignment", PhaseReview, `X=1 if true; then ls; fi`, "shell syntax if cannot be judged"},
+	{"arith", PhaseReview, `((x))`, subshellRefusal},
+	{"arith-subscript", PhaseReview, `x='a[$(git push)]'; ((x))`, subshellRefusal},
+	{"nested-subshell", PhaseReview, `( (ls) )`, ""},
+	{"array", PhaseReview, `a=(1 2)`, subshellRefusal},
+	{"open-subshell", PhaseReview, `(ls`, subshellRefusal},
+	{"process-subst", PhaseReview, `cat <(ls)`, subshellRefusal},
+	{"echo-keyword", PhaseReview, `echo if`, ""},
+	{"closing-alone", PhaseReview, `fi`, ""},
+	{"done-write", PhaseReview, `done > .vloop/state/x`, "write to .vloop/state/x is not allowed in a review session: only .vloop/tmp/ may be written"},
+	{"brace-word", PhaseReview, `} x`, "shell syntax } cannot be judged"},
+	{"for-name", PhaseReview, `for x`, ""},
+	{"for-in", PhaseReview, `for x in a b c`, ""},
+	{"for-bare", PhaseReview, `for`, "shell syntax for cannot be judged"},
+	{"for-bad-name", PhaseReview, `for 1x in a`, "shell syntax for cannot be judged"},
+	{"for-not-in", PhaseReview, `for x of a`, "shell syntax for cannot be judged"},
+	{"select", PhaseReview, `select x in a b`, "shell syntax select cannot be judged"},
+	{"case-after-bang", PhaseReview, `! case x in`, "shell syntax case cannot be judged"},
+	{"subshell-word", PhaseReview, `(ls) foo`, subshellRefusal},
+	{"stray-close", PhaseReview, `ls)`, subshellRefusal},
+	{"func-def", PhaseReview, `f() { ls; }`, subshellRefusal},
+	{"subst-in-subshell", PhaseReview, `(echo $(ls))`, "command substitution cannot be judged"},
+	{"command-v", PhaseReview, `command -v curl`, ""},
+	{"command-V", PhaseReview, `command -V git`, ""},
+	{"command-pv", PhaseReview, `command -pv git push`, ""},
+	{"command-p-v", PhaseReview, `command -p -v git push`, ""},
+	{"command-quoted-v", PhaseReview, `command '-v' git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"command-p", PhaseReview, `command -p git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"command-plain", PhaseReview, `command git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"time-v", PhaseReview, `time -v git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"command-gh", PhaseReview, `command gh pr list`, "gh pr list is denied by the Copilot deny list (gh:*)"},
+	{"work-for", PhaseWork, `for f in a b; do echo $f; done`, ""},
+}
+
+func TestCompoundCommands(t *testing.T) {
+	for _, c := range compoundCases {
+		t.Run(c.name, func(t *testing.T) {
+			j, _, _ := newJudge(t, c.phase)
+			d := j.Decide("bash", "", c.cmd)
+			if c.want == "" && !d.Allow {
+				t.Errorf("%q denied: %s", c.cmd, d.Reason)
+			}
+			if c.want != "" && (d.Allow || d.Reason != c.want) {
+				t.Errorf("%q = allow %v, %q; want deny %q", c.cmd, d.Allow, d.Reason, c.want)
+			}
+		})
 	}
 }

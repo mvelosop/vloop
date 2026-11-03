@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/4 done** · iteration 0
+**Status:** running · **1/4 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T04:37:08Z
+**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T04:48:03Z
 
 ## Progress
 
-- [ ] **T1** — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
+- [x] **T1** — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
 - [ ] **T2** — Match a word the shell expands as any text (C2)
 - [ ] **T3** — Document the wider reading in the guide, the fence audit and fence check's help (C4)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
@@ -17,7 +17,7 @@
 
 ### T1 — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Copilot sessions lose a retry every time they write an if, a for, a while, a { … } or a subshell, because the fence judge refuses all of them, and command -v curl is denied because the judge looks through command to curl. This task makes the splitter and the judge read those forms by dropping a leading keyword and judging every command inside, with the brief's exact rules for closing keywords, for, subshells and ((, and treats command -v/-V as a lookup. It must never judge a command inside a compound less than it would be judged alone; C2 (expanded words) is the next task's.
 
