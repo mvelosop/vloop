@@ -22,7 +22,12 @@ rule by rule, who enforces it there.
   (`pre:*` is the prefix alone or followed by a space, `*` elsewhere any run of
   characters). What it cannot parse it denies: a backtick, `$(`, `<(`, `>(`,
   `eval`, `source`, `.`, an unterminated quote, a `-c` string that is not literal,
-  a command word starting with `$`. File tools (`create`, `edit`, `apply_patch`)
+  a command word starting with `$`. It reads `if`, `while`, `until`,
+  `for NAME in …`, `!`, `{ … }` and subshells by judging every command inside
+  them, and matches a word the shell expands (a `$`, a glob, a brace expansion)
+  as any text; it refuses a command name that expands, an expanded word before
+  the command name (a wrapper's option, or a shell's before its `-c` string),
+  and a redirection target holding a glob or a brace expansion (B35). File tools (`create`, `edit`, `apply_patch`)
   and a shell redirection may write only under `.vloop/tmp/`; reads may not touch
   `~/.claude`, `~/.copilot` or `~/.config/gh`; a `skill` call must name one of
   vloop's skills (K1); every other tool is denied. It fails closed: an error
@@ -232,9 +237,11 @@ three ways:
   /vloop:work`.
 
 Shell syntax the judge cannot read is denied in a work session as in a review one:
-a backtick, `$(`, `<(`, `>(`, `eval`, `source`, `.`, and a compound command,
-`if`, `for`, `while`, `until`, `case`, `select`, `function`, `{`, `[[` or a
-subshell, answers `shell syntax … cannot be judged`. The hook fails open on the
+a backtick or `$(` answers `command substitution cannot be judged`; `<(`, `>(`,
+`((` and `case`, `subshells and process substitution cannot be judged`; `eval`,
+`source` and `.`, `… is not allowed`; `select`, `function`, `coproc` and `[[`,
+`shell syntax … cannot be judged`. `if`, `while`, `until`, `for`, `!`, `{ … }`
+and subshells are judged through (B35). The hook fails open on the
 two limits above (B22.2, B22.3), for work sessions too: it always prints its
 answer and is fast, and the deny list stays behind it.
 

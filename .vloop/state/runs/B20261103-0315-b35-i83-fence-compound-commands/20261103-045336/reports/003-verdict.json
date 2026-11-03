@@ -1,0 +1,54 @@
+{
+ "schema": "verdict/v1",
+ "task": "T2",
+ "verdict": "PASS",
+ "criteria": [
+  {
+   "criterion": "Every line of the brief's worked example under `# C2`, and `command -$v git push`, gives exactly the answer and exit code the brief shows through `vloop fence check --tool bash`, in the phase it names.",
+   "met": true,
+   "evidence": "internal/fence/judge_test.go TestExpandedWords holds every C2 line and `command -$v git push` with exact reasons; the go check log shows internal/fence ok; the gate (same cases.tsv) passed."
+  },
+  {
+   "criterion": "A word is expanded exactly when it holds a `$` unquoted or in double quotes, an unquoted `*` or `?`, an unquoted `[` with an unquoted `]` later in the word, or an unquoted `{` and the first unquoted `}` after it (no unquoted `{` between) with an unquoted `,` or `..` between them. Violation: a single-quoted, double-quoted (for a glob or brace) or backslash-escaped `$`, glob or brace read as any text (`git '$X' origin`, `git \"pu*\" origin`, `git pu\\$X origin` stay allowed), or `@{u}`, `{}`, `HEAD@{1}`, `[ -f x ]` read as expanded.",
+   "met": true,
+   "evidence": "split.go marks per-byte quote state feeding expands(); cases for pu\\$X, \"pu*\", pu\\*, '$X', @{u}, {}, HEAD@{1}, [ -f x ] are allowed and the unquoted/double-quoted $, [p], pu*, {push,pull}, {1..3} are denied (judge_test.go expandedCases)."
+  },
+  {
+   "criterion": "`match` first matches the command as written with today's rules, order and messages; only when nothing matches does it match again with each expanded word standing for any text (none, one or several words), trying the fence's rules then the Copilot deny list in today's order and naming the first that can match, with the suffix `: a word the shell expands may be any text` and the words joined by spaces, quotes removed.",
+   "met": true,
+   "evidence": "expand.go match(): as-written fence then stems first, then patternMeets over fence then stems with the suffix; the git remote $X and rm *.tmp cases pin the as-written-first order."
+  },
+  {
+   "criterion": "A command name (after assignments and wrappers) that expands answers `command word <word> expands and cannot be judged`, a leading `$` keeping today's message; an expanded word a wrapper skips before the name (an option or its value, timeout's duration, exec -a's name, env's NAME=value, nice -n's number, xargs' and stdbuf's options, command's options) answers `<word> expands before the command name and cannot be judged`; assignments before the first word are unaffected.",
+   "met": true,
+   "evidence": "Cases g?t, g$X, /usr/bin/$X, $CMD, env g*t, env FOO=$X, timeout $T, exec -a $N, stdbuf -o $M, xargs -n $N, nice -n $N, X=$Y git status (allowed) in expandedCases."
+  },
+  {
+   "criterion": "For sh, bash, zsh, dash and ksh: an expanded option word before the -c string (or -o's value) answers `<shell>: <word> expands before the command string and cannot be judged`; a -c string expanded by a glob or brace answers `<shell>: the -c string expands and cannot be judged`; one holding `$` keeps today's message; a literal -c string is split and judged with C2 inside it.",
+   "met": true,
+   "evidence": "expand.go shellString: option expansion, -c string expansion, $ keeps today's message, literal -c is judged (sh -c 'git pu{sh,} origin' denied); cases in expandedCases."
+  },
+  {
+   "criterion": "xargs judges its command as if it ended with one more expanded word, added before wrappers are looked through (`xargs env` answers `command word <xargs input> expands and cannot be judged`; `xargs` with no command is `echo` and allowed); with a replace option (`-I <s>`, `-i[<s>]`, `--replace[=<s>]`, `-J <s>`, defaulting to `{}`) nothing is appended, every word holding the replace string is expanded, a name holding it is refused, and a -c string holding it answers `<shell>: the -c string holds xargs' replace string <s> and cannot be judged`. `-J`, `-R` and `-S` take an argument.",
+   "met": true,
+   "evidence": "expand.go xargsCommand/skipXargs: appended <xargs input> word, replace options -I/-i/--replace/-J with -J,-R,-S taking arguments, -c string replace-string message; cases xargs env, xargs -I % sh -c, xargs (echo), xargs -J % git push."
+  },
+  {
+   "criterion": "A redirection target holding a glob or a brace expansion answers `a redirection target that expands cannot be resolved: <word>`; one holding `$` keeps today's message; a quoted one is a path as written. Writes and reads judged by path are otherwise unchanged.",
+   "met": true,
+   "evidence": "Cases echo x > .vloop/*, src/{a,b}.txt, [ab], ?, cat < $F, quoted 'src/*.txt' and src/@{u} allowed, in expandedCases."
+  },
+  {
+   "criterion": "Committed tests in internal/fence/judge_test.go hold every C2 worked-example line (and `command -$v git push`) as a named case, plus the quoted-is-literal cases; the `go` check runs them. Violation: behaviour shipped with no committed test the check runs.",
+   "met": true,
+   "evidence": "judge_test.go adds TestExpandedWords (+130 lines) with every worked-example line as a named subtest; the go check runs it."
+  },
+  {
+   "criterion": "The existing tests pass unchanged (beyond the cases T1 changed); no module dependency is added to go.mod; no fence rule file under fence/ changes.",
+   "met": true,
+   "evidence": "git diff 13cb9800..HEAD: judge_test.go has only added lines, go.mod and fence/ untouched."
+  }
+ ],
+ "findings": [],
+ "notes": "git diff HEAD is empty outside .vloop/ because the work was committed in 046ab6e4 (T2: blocked); I judged it against 13cb9800 (T1 done). The gate case git remote $X was already corrected by the operator. Bypass probes through the CLI were not run (fence check needs --root); judged from tests and code."
+}

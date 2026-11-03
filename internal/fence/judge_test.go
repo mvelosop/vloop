@@ -82,7 +82,7 @@ func TestSplitRedirections(t *testing.T) {
 
 func TestSplitRefuses(t *testing.T) {
 	for _, in := range []string{
-		"echo 'x", `echo "x`, "echo `x`", "echo $(x)", `echo "$(x)"`, "cat <(x)", "tee >(x)", "(gh x)", "echo > ", "cat > $F",
+		"echo 'x", `echo "x`, "echo `x`", "echo $(x)", `echo "$(x)"`, "cat <(x)", "tee >(x)", "(gh x", "a=(1 2)", "echo > ", "cat > $F",
 	} {
 		if _, err := split(in); err == nil {
 			t.Errorf("split(%q) did not refuse", in)
@@ -282,7 +282,7 @@ func TestWorkShell(t *testing.T) {
 		{"echo x > .vloop/state/state.json", "write to .vloop/state/state.json is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/"},
 		{"echo x > .git/config", "nothing under .git/ or .vloop/ but .vloop/tmp/"},
 		{"echo x > ../outside.txt", "write to ../outside.txt is not allowed in a work session: it is outside the repository"},
-		{"for f in a b; do echo $f; done", "*"},
+		{"for f in a b; do echo $f; done", ""},
 		{"echo $(date)", "*"},
 		{"echo `date`", "*"},
 		{"eval ls", "*"},
@@ -514,5 +514,202 @@ func TestPlanPhase(t *testing.T) {
 		} else if d.Allow || d.Reason != c.want {
 			t.Errorf("%s: got allow=%v %q, want deny %q", c.name, d.Allow, d.Reason, c.want)
 		}
+	}
+}
+
+// compoundCases are B35's C1 and C3 worked-example lines: the phase, the
+// command and the answer ("" = allowed, else the exact reason).
+var compoundCases = []struct{ name, phase, cmd, want string }{
+	{"if-else-plan", PhasePlan, `if test -f .vloop/tmp/plan-problems.md; then cat .vloop/tmp/plan-problems.md; else printf 'No revision feedback\n'; fi`, ""},
+	{"for-command-v", PhasePlan, `for tool in node pnpm npm curl vloop; do command -v "$tool" || true; done`, ""},
+	{"while-read", PhaseReview, `while read -r f; do wc -l "$f"; done < .vloop/tmp/list`, ""},
+	{"brace-group", PhaseReview, `{ git status; git diff; } > .vloop/tmp/out`, ""},
+	{"subshell-redirect", PhaseReview, `(cd src && ls) > .vloop/tmp/x`, ""},
+	{"if-not", PhaseReview, `if ! git diff --quiet; then echo changed; fi`, ""},
+	{"inside-if", PhaseReview, `if true; then git push; fi`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"inside-subshell", PhaseReview, `(git push)`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"inside-while", PhaseReview, `while true; do git push; done`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"brace-write", PhaseReview, `{ git status; } > .vloop/state/x`, "write to .vloop/state/x is not allowed in a review session: only .vloop/tmp/ may be written"},
+	{"fi-word", PhaseReview, `fi now`, "shell syntax fi cannot be judged"},
+	{"for-arith", PhaseReview, `for ((i=0; i<3; i++)); do ls; done`, subshellRefusal},
+	{"case", PhaseReview, `case x in a) ls;; esac`, subshellRefusal},
+	{"dbl-bracket", PhaseReview, `[[ -f x ]]`, "shell syntax [[ cannot be judged"},
+	{"keyword-after-wrapper", PhaseReview, `env ! git status`, "shell syntax ! cannot be judged"},
+	{"keyword-after-assignment", PhaseReview, `X=1 if true; then ls; fi`, "shell syntax if cannot be judged"},
+	{"arith", PhaseReview, `((x))`, subshellRefusal},
+	{"arith-subscript", PhaseReview, `x='a[$(git push)]'; ((x))`, subshellRefusal},
+	{"nested-subshell", PhaseReview, `( (ls) )`, ""},
+	{"array", PhaseReview, `a=(1 2)`, subshellRefusal},
+	{"open-subshell", PhaseReview, `(ls`, subshellRefusal},
+	{"process-subst", PhaseReview, `cat <(ls)`, subshellRefusal},
+	{"echo-keyword", PhaseReview, `echo if`, ""},
+	{"closing-alone", PhaseReview, `fi`, ""},
+	{"done-write", PhaseReview, `done > .vloop/state/x`, "write to .vloop/state/x is not allowed in a review session: only .vloop/tmp/ may be written"},
+	{"brace-word", PhaseReview, `} x`, "shell syntax } cannot be judged"},
+	{"for-name", PhaseReview, `for x`, ""},
+	{"for-in", PhaseReview, `for x in a b c`, ""},
+	{"for-bare", PhaseReview, `for`, "shell syntax for cannot be judged"},
+	{"for-bad-name", PhaseReview, `for 1x in a`, "shell syntax for cannot be judged"},
+	{"for-not-in", PhaseReview, `for x of a`, "shell syntax for cannot be judged"},
+	{"select", PhaseReview, `select x in a b`, "shell syntax select cannot be judged"},
+	{"case-after-bang", PhaseReview, `! case x in`, "shell syntax case cannot be judged"},
+	{"subshell-word", PhaseReview, `(ls) foo`, subshellRefusal},
+	{"stray-close", PhaseReview, `ls)`, subshellRefusal},
+	{"func-def", PhaseReview, `f() { ls; }`, subshellRefusal},
+	{"subst-in-subshell", PhaseReview, `(echo $(ls))`, "command substitution cannot be judged"},
+	{"command-v", PhaseReview, `command -v curl`, ""},
+	{"command-V", PhaseReview, `command -V git`, ""},
+	{"command-pv", PhaseReview, `command -pv git push`, ""},
+	{"command-p-v", PhaseReview, `command -p -v git push`, ""},
+	{"command-quoted-v", PhaseReview, `command '-v' git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"command-p", PhaseReview, `command -p git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"command-plain", PhaseReview, `command git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"time-v", PhaseReview, `time -v git push`, "git push is denied by the review fence (Bash(git push:*))"},
+	{"command-gh", PhaseReview, `command gh pr list`, "gh pr list is denied by the Copilot deny list (gh:*)"},
+	{"work-for", PhaseWork, `for f in a b; do echo $f; done`, ""},
+}
+
+func TestCompoundCommands(t *testing.T) {
+	for _, c := range compoundCases {
+		t.Run(c.name, func(t *testing.T) {
+			j, _, _ := newJudge(t, c.phase)
+			d := j.Decide("bash", "", c.cmd)
+			if c.want == "" && !d.Allow {
+				t.Errorf("%q denied: %s", c.cmd, d.Reason)
+			}
+			if c.want != "" && (d.Allow || d.Reason != c.want) {
+				t.Errorf("%q = allow %v, %q; want deny %q", c.cmd, d.Allow, d.Reason, c.want)
+			}
+		})
+	}
+}
+
+// expandedCases are B35's C2 worked-example lines and the quoted-is-literal
+// cases: the phase, the command and the answer ("" = allowed, else the exact
+// reason).
+var expandedCases = []struct{ phase, cmd, want string }{
+	{PhaseReview, `X=push; git $X origin`, `git $X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseWork, `for x in push; do git "$x" origin; done`, `git $x origin is denied by the work fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git pu{sh,} origin`, `git pu{sh,} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git pu?h origin`, `git pu?h origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git 'pu{sh,}' origin`, ""},
+	{PhaseReview, `git log @{u}..HEAD`, ""},
+	{PhaseReview, `[ -f x ] && echo yes`, ""},
+	{PhaseReview, `g?t push`, `command word g?t expands and cannot be judged`},
+	{PhaseReview, `g$X push origin`, `command word g$X expands and cannot be judged`},
+	{PhaseReview, `/usr/bin/$X push origin`, `command word /usr/bin/$X expands and cannot be judged`},
+	{PhaseReview, `git log HEAD@{1}..HEAD@{0}`, ""},
+	{PhaseReview, `bash -$O -c 'git status'`, `bash: -$O expands before the command string and cannot be judged`},
+	{PhaseReview, `echo push | xargs -I{} git {} origin`, `git {} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `xargs -J % git push`, `git push is denied by the review fence (Bash(git push:*))`},
+	{PhaseReview, `xargs -I {} -R 1 git push`, `git push is denied by the review fence (Bash(git push:*))`},
+	{PhaseReview, `xargs -S 255 -I {} git push`, `git push is denied by the review fence (Bash(git push:*))`},
+	{PhaseReview, `ls | xargs -n 1`, ""},
+	{PhaseReview, `echo git push | xargs env`, `command word <xargs input> expands and cannot be judged`},
+	{PhaseReview, `sh -c git\ \'pu{sh,}\'`, `sh: the -c string expands and cannot be judged`},
+	{PhaseReview, `echo push | xargs -I % sh -c 'git %'`, `sh: the -c string holds xargs' replace string % and cannot be judged`},
+	{PhaseReview, `echo git | xargs -I{} {} push`, `command word {} expands and cannot be judged`},
+	{PhaseReview, `echo push origin | xargs git`, `git is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `find src -name '*.go' | xargs wc -l`, ""},
+	{PhaseReview, `nice -n $N push origin`, `$N expands before the command name and cannot be judged`},
+	{PhaseReview, `X=$Y git status`, ""},
+	{PhaseReview, `git '$X' origin`, ""},
+	{PhaseWork, `echo x > .vloop/*`, `a redirection target that expands cannot be resolved: .vloop/*`},
+	{PhaseWork, `echo x > 'src/*.txt'`, ""},
+	{PhaseReview, `git diff "$BASE" --stat`, `git diff $BASE --stat is denied by the review fence (Bash(git diff*--output*)): a word the shell expands may be any text`},
+	{PhaseReview, `git diff -- 'src/*.go'`, ""},
+	{PhaseReview, `printf 'Gate exit: %s\n' "$gate_status"`, ""},
+	{PhaseReview, `command -$v git push`, `-$v expands before the command name and cannot be judged`},
+	{PhaseReview, `git "pu$X" origin`, `git pu$X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git 'pu'$X origin`, `git pu$X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git ${X} origin`, `git ${X} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git [p]ush origin`, `git [p]ush origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git pu* origin`, `git pu* origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git {push,pull} origin`, `git {push,pull} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git pu{1..3} origin`, `git pu{1..3} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git pu\$X origin`, ""},
+	{PhaseReview, `git "pu*" origin`, ""},
+	{PhaseReview, `git pu\* origin`, ""},
+	{PhaseReview, `git "pu{sh,}" origin`, ""},
+	{PhaseReview, `git pu\{sh,\} origin`, ""},
+	{PhaseReview, `git "[p]ush" origin`, ""},
+	{PhaseReview, `git pu'?'h origin`, ""},
+	{PhaseReview, `grep '$(' x`, ""},
+	{PhaseReview, `echo {}`, ""},
+	{PhaseReview, `git log @{1}`, ""},
+	{PhaseReview, `git log a{b}c,d`, ""},
+	{PhaseReview, `git pu[ origin`, ""},
+	{PhaseReview, `echo $HOME *.go {a,b}`, ""},
+	{PhaseReview, `git $X`, `git $X is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git "$sub" --help`, `git $sub --help is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git $A $B`, `git $A $B is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `git remote $X`, `git remote $X is denied by the Copilot deny list (git remote:*)`},
+	{PhaseReview, `find "$d" -name x`, `find $d -name x is denied by the review fence (Bash(find*-delete*)): a word the shell expands may be any text`},
+	{PhaseReview, `git show "$SHA"`, `git show $SHA is denied by the review fence (Bash(git show*--output*)): a word the shell expands may be any text`},
+	{PhaseReview, `git diff -- src/*.go`, `git diff -- src/*.go is denied by the review fence (Bash(git diff*--output*)): a word the shell expands may be any text`},
+	{PhaseWork, `rm "$f"`, `rm $f is denied by the work fence (Bash(rm -rf:*)): a word the shell expands may be any text`},
+	{PhaseWork, `rm *.tmp`, `rm *.tmp is denied by the work fence (Bash(rm -rf:*)): a word the shell expands may be any text`},
+	{PhaseWork, `git log -- *.go`, `git log -- *.go is denied by the work fence (Bash(git log*--output*)): a word the shell expands may be any text`},
+	{PhaseReview, `rm *.tmp`, `rm *.tmp is denied by the Copilot deny list (rm:*)`},
+	{PhaseReview, `git push $X`, `git push $X is denied by the review fence (Bash(git push:*))`},
+	{PhaseWork, `rm x`, ""},
+	{PhaseReview, `git status $X`, ""},
+	{PhaseReview, `wc -l "$f"`, ""},
+	{PhaseReview, `ls *.go src/{a,b}`, ""},
+	{PhaseReview, `git log --oneline "$BASE..HEAD"`, `git log --oneline $BASE..HEAD is denied by the review fence (Bash(git log*--output*)): a word the shell expands may be any text`},
+	{PhaseReview, `if true; then git $X origin; fi`, `git $X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `(git pu{sh,} origin)`, `git pu{sh,} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `sh -c 'git pu{sh,} origin'`, `git pu{sh,} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `sh -c 'ls *.go'`, ""},
+	{PhaseReview, `bash -c "git $X"`, `bash: the -c string holds $ and cannot be judged`},
+	{PhaseReview, `sh -c ls\ *.go`, `sh: the -c string expands and cannot be judged`},
+	{PhaseReview, `sh -o $O -c ls`, `sh: $O expands before the command string and cannot be judged`},
+	{PhaseReview, `$CMD pr list`, `command word $CMD starts with $ and cannot be judged`},
+	{PhaseReview, `g{i,}t push`, `command word g{i,}t expands and cannot be judged`},
+	{PhaseReview, `env g*t push`, `command word g*t expands and cannot be judged`},
+	{PhaseReview, `nohup gi[t] push`, `command word gi[t] expands and cannot be judged`},
+	{PhaseReview, `"g*t" push`, ""},
+	{PhaseReview, `env FOO=$X git status`, `FOO=$X expands before the command name and cannot be judged`},
+	{PhaseReview, `timeout $T git status`, `$T expands before the command name and cannot be judged`},
+	{PhaseReview, `exec -a $N git status`, `$N expands before the command name and cannot be judged`},
+	{PhaseReview, `stdbuf -o $M git status`, `$M expands before the command name and cannot be judged`},
+	{PhaseReview, `xargs -n $N git status`, `$N expands before the command name and cannot be judged`},
+	{PhaseReview, `nice -n 5 git status`, ""},
+	{PhaseReview, `X=$Y Z=* git status`, ""},
+	{PhaseReview, `echo x | xargs nohup`, `command word <xargs input> expands and cannot be judged`},
+	{PhaseReview, `echo x | xargs timeout 5`, `command word <xargs input> expands and cannot be judged`},
+	{PhaseReview, `echo x | xargs xargs`, `command word <xargs input> expands and cannot be judged`},
+	{PhaseReview, `ls | xargs`, ""},
+	{PhaseReview, `ls | xargs grep -n x`, ""},
+	{PhaseWork, `ls | xargs rm`, `rm is denied by the work fence (Bash(rm -rf:*)): a word the shell expands may be any text`},
+	{PhaseReview, `echo push | xargs -i git {} origin`, `git {} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `echo push | xargs --replace git {} origin`, `git {} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `echo push | xargs --replace=% git % origin`, `git % origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `echo push | xargs -J % git % origin`, `git % origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`},
+	{PhaseReview, `echo git | xargs -I % % push`, `command word % expands and cannot be judged`},
+	{PhaseReview, `echo a | xargs -I % echo %`, ""},
+	{PhaseReview, `echo a | xargs -I % git status`, ""},
+	{PhaseReview, `echo push | xargs -i sh -c 'git {}'`, `sh: the -c string holds xargs' replace string {} and cannot be judged`},
+	{PhaseReview, `xargs -J % ls`, ""},
+	{PhaseWork, `echo x > src/{a,b}.txt`, `a redirection target that expands cannot be resolved: src/{a,b}.txt`},
+	{PhaseReview, `cat < .vloop/tmp/[ab]`, `a redirection target that expands cannot be resolved: .vloop/tmp/[ab]`},
+	{PhaseReview, `echo x > .vloop/tmp/?`, `a redirection target that expands cannot be resolved: .vloop/tmp/?`},
+	{PhaseReview, `cat < $F`, `a redirection target holding $ cannot be resolved: $F`},
+	{PhaseWork, `echo x > "src/{a,b}.txt"`, ""},
+	{PhaseWork, `echo x > src/@{u}`, ""},
+}
+
+func TestExpandedWords(t *testing.T) {
+	for _, c := range expandedCases {
+		t.Run(c.phase+" "+c.cmd, func(t *testing.T) {
+			j, _, _ := newJudge(t, c.phase)
+			d := j.Decide("bash", "", c.cmd)
+			if c.want == "" && !d.Allow {
+				t.Errorf("%q denied: %s", c.cmd, d.Reason)
+			}
+			if c.want != "" && (d.Allow || d.Reason != c.want) {
+				t.Errorf("%q = allow %v, %q; want deny %q", c.cmd, d.Allow, d.Reason, c.want)
+			}
+		})
 	}
 }

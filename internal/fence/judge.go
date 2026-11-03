@@ -261,7 +261,7 @@ func (j *Judge) shell(s string, depth int) string {
 				return fmt.Sprintf("read of %s is not allowed: it is under ~/.claude, ~/.copilot or ~/.config/gh", r)
 			}
 		}
-		if r := j.words(c.words, depth); r != "" {
+		if r := j.words(c.words, c.plain, c.exp, depth); r != "" {
 			return r
 		}
 	}
@@ -274,6 +274,10 @@ var keywords = map[string]bool{
 	"for": true, "while": true, "until": true, "do": true, "done": true, "case": true, "esac": true,
 	"select": true, "function": true, "coproc": true, "[[": true,
 }
+
+var forName = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+
+var lookupOption = regexp.MustCompile(`^-[pvV]*[vV][pvV]*$`)
 
 var assignment = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*=`)
 
@@ -289,10 +293,30 @@ func baseName(w string) string {
 }
 
 // words judges one simple command's words, looking through wrappers.
-func (j *Judge) words(ws []string, depth int) string {
+func (j *Judge) words(ws []string, plain, exp []bool, depth int) string {
+	var repls []string // the replace strings of the xargs looked through
+	// Opening keywords are dropped while they are the command's first word,
+	// before assignments; closing keywords and for read only there too.
+	for len(ws) > 0 && opening[ws[0]] {
+		ws, plain, exp = ws[1:], plain[1:], exp[1:]
+	}
+	if len(ws) > 0 {
+		switch ws[0] {
+		case "fi", "done", "}":
+			if len(ws) == 1 {
+				return ""
+			}
+			return fmt.Sprintf("shell syntax %s cannot be judged", ws[0])
+		case "for":
+			if len(ws) == 1 || !forName.MatchString(ws[1]) || (len(ws) > 2 && ws[2] != "in") {
+				return "shell syntax for cannot be judged"
+			}
+			return ""
+		}
+	}
 	for {
 		for len(ws) > 0 && assignment.MatchString(ws[0]) {
-			ws = ws[1:]
+			ws, plain, exp = ws[1:], plain[1:], exp[1:]
 		}
 		if len(ws) == 0 {
 			return ""
@@ -301,6 +325,9 @@ func (j *Judge) words(ws []string, depth int) string {
 		if strings.HasPrefix(w, "$") {
 			return fmt.Sprintf("command word %s starts with $ and cannot be judged", w)
 		}
+		if exp[0] {
+			return fmt.Sprintf("command word %s expands and cannot be judged", w)
+		}
 		if w == "." {
 			return ". (source) is not allowed"
 		}
@@ -308,13 +335,19 @@ func (j *Judge) words(ws []string, depth int) string {
 		if keywords[name] {
 			return fmt.Sprintf("shell syntax %s cannot be judged", name)
 		}
-		var err string
+		var err, repl string
 		switch name {
 		case "eval", "source":
 			return name + " is not allowed"
 		case "env":
 			rest, err = skipEnv(rest)
-		case "command", "time":
+		case "command":
+			var lookup bool
+			rest, lookup = skipCommand(rest, plain[1:])
+			if lookup {
+				return ""
+			}
+		case "time":
 			rest = skipDashes(rest)
 		case "exec":
 			rest = skipExec(rest)
@@ -326,21 +359,49 @@ func (j *Judge) words(ws []string, depth int) string {
 		case "stdbuf":
 			rest = skipStdbuf(rest)
 		case "xargs":
-			rest = skipXargs(rest)
+			rest, repl = skipXargs(rest)
 		case "sh", "bash", "zsh", "dash", "ksh":
-			str, e := shellString(rest)
+			str, e := shellString(rest, exp[1:], repls)
 			if e != "" {
 				return fmt.Sprintf("%s: %s", name, e)
 			}
 			return j.shell(str, depth+1)
 		default:
-			return j.match(append([]string{name}, rest...))
+			return j.match(append([]string{name}, rest...), append([]bool{false}, exp[1:]...))
 		}
 		if err != "" {
 			return err
 		}
-		ws = rest
+		n := len(ws) - len(rest) // the name and what the wrapper skipped
+		for k := 1; k < n; k++ {
+			if exp[k] {
+				return fmt.Sprintf("%s expands before the command name and cannot be judged", ws[k])
+			}
+		}
+		ws, plain, exp = rest, plain[n:], exp[n:]
+		if name == "xargs" {
+			ws, plain, exp = xargsCommand(ws, plain, exp, repl)
+			if repl != "" {
+				repls = append(repls, repl)
+			}
+		}
 	}
+}
+
+// skipCommand skips command's options and reports whether one is a literal
+// lookup (-v or -V, with p), which runs nothing. A -- ends the options, and
+// ends the lookup too.
+func skipCommand(rest []string, plain []bool) ([]string, bool) {
+	k, ended := 0, false
+	for k < len(rest) && isOption(rest[k]) {
+		if rest[k] == "--" {
+			ended = true
+		} else if !ended && plain[k] && lookupOption.MatchString(rest[k]) {
+			return nil, true
+		}
+		k++
+	}
+	return rest[k:], false
 }
 
 func (j *Judge) fenceLabel() string {
@@ -348,23 +409,6 @@ func (j *Judge) fenceLabel() string {
 		return j.phase
 	}
 	return PhaseReview
-}
-
-// match denies a simple command that a deny rule of the review fence or one of
-// the adapter's stems covers.
-func (j *Judge) match(ws []string) string {
-	text := strings.Join(ws, " ")
-	for _, p := range j.fence {
-		if patternMatch(p, text) {
-			return fmt.Sprintf("%s is denied by the %s fence (Bash(%s))", text, j.fenceLabel(), p)
-		}
-	}
-	for _, p := range j.stems {
-		if patternMatch(p, text) {
-			return fmt.Sprintf("%s is denied by the Copilot deny list (%s)", text, p)
-		}
-	}
-	return ""
 }
 
 // patternMatch is the fence's matching: `pre:*` is the prefix alone or
@@ -463,55 +507,4 @@ func skipStdbuf(rest []string) []string {
 var xargsLongArgs = map[string]bool{
 	"--max-args": true, "--max-procs": true, "--delimiter": true, "--arg-file": true,
 	"--eof": true, "--max-lines": true, "--max-chars": true,
-}
-
-func skipXargs(rest []string) []string {
-	for len(rest) > 0 && isOption(rest[0]) {
-		o := rest[0]
-		rest = rest[1:]
-		if o == "--" {
-			break
-		}
-		if strings.HasPrefix(o, "--") {
-			if xargsLongArgs[o] && len(rest) > 0 {
-				rest = rest[1:]
-			}
-			continue
-		}
-		for k := 1; k < len(o); k++ {
-			if strings.IndexByte("adEILnPs", o[k]) >= 0 {
-				if k == len(o)-1 && len(rest) > 0 {
-					rest = rest[1:]
-				}
-				break
-			}
-			if strings.IndexByte("eil", o[k]) >= 0 {
-				break
-			}
-		}
-	}
-	return rest
-}
-
-// shellString finds the -c string of a shell invocation's arguments.
-func shellString(rest []string) (string, string) {
-	for i := 0; i < len(rest); i++ {
-		o := rest[i]
-		switch {
-		case o == "-o" || o == "+o":
-			i++
-		case o != "" && o[0] == '-' && !strings.HasPrefix(o, "--") && strings.Contains(o, "c"):
-			if i+1 >= len(rest) {
-				return "", "-c has no command string"
-			}
-			if strings.Contains(rest[i+1], "$") {
-				return "", "the -c string holds $ and cannot be judged"
-			}
-			return rest[i+1], ""
-		case isOption(o) || (len(o) > 1 && o[0] == '+'):
-		default:
-			return "", "runs a script or stdin, not a literal -c string"
-		}
-	}
-	return "", "runs a script or stdin, not a literal -c string"
 }

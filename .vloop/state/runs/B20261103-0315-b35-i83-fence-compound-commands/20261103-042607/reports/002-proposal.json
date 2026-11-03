@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "blocked",
+  "summary": "C2 is implemented: the lexer marks each word as expanded or literal, the judge refuses expanded words wherever it reads structure, xargs gets the appended or replace-string word, and match tries expanded words as any text after the as-written pass. Gate T2 passes 108 of 109 cases. The one miss is a gate case that contradicts acceptance 3.",
+  "files": ["internal/fence/split.go", "internal/fence/judge.go", "internal/fence/expand.go", "internal/fence/judge_test.go"],
+  "verified": "vloop task gate T2 exited 1: only `review git remote $X` mismatched (got: denied by the Copilot deny list (git remote:*)); go test ./internal/fence, go vet, GOOS=linux and GOOS=windows builds and go mod tidy -diff pass.",
+  "notes": "Per-byte quote state (stUnquoted, stDouble, stLiteral) in the lexer feeds expands(); command.exp runs parallel to words and plain. internal/fence/expand.go holds match (as written, then any-text), skipXargs, shellString, xargsCommand and the NFA intersection used to decide whether a rule and a command with wildcard words share a string. The xargs input is the word <xargs input>, left out of the message text. TestExpandedWords in judge_test.go holds every gate case plus `command -$v git push`; the `git remote $X` row there expects the as-written stem message, as acceptance 3 requires. No existing test changed in this task.",
+  "gate_dispute": {
+    "reason": "The gate case `review git remote $X` expects the fence rule `Bash(git remote add:*)` with the any-text suffix. The command as written already matches the Copilot stem `git remote:*`, so acceptance 3 (as-written match first, with today's rules and messages) gives the stem message.",
+    "evidence": "cases.tsv row `review\\tgit remote $X` wants `git remote $X is denied by the review fence (Bash(git remote add:*)): a word the shell expands may be any text`. internal/driver/agent_copilot.go:24 lists `git remote:*` among the stems, and `git remote $X` has the prefix `git remote `, so the first pass matches it. Today's output is `git remote $X is denied by the Copilot deny list (git remote:*)`. Producing the fence message would mean skipping the as-written pass for the stems."
+  }
+}

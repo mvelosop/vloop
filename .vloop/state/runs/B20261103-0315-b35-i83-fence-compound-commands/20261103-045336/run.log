@@ -1,0 +1,29 @@
+── iteration 3 (1 this run) · T2 · 1/4 done ──
+   Match a word the shell expands as any text (C2)
+   work T2 · 0m18s · $0.09 · run $0.09 / $40.00
+   check go
+   review T2 · 0m37s · $0.18 · run $0.27 / $40.00
+   review: PASS
+   T2 done
+── iteration 4 (2 this run) · T3 · 2/4 done ──
+   Document the wider reading in the guide, the fence audit and fence check's help (C4)
+   work T3 · 0m24s · $0.13 · run $0.40 / $40.00
+   check go
+   review T3 · 0m20s · $0.10 · run $0.50 / $40.00
+   review: PASS
+   T3 done
+── iteration 5 (3 this run) · T4 · 3/4 done ──
+   Close the run: every gate at once, and the worked example line for line
+   work T4 · 7m32s · $0.15 · run $0.65 / $40.00
+   check go
+   review T4 · 0m36s · $0.11 · run $0.76 / $40.00
+   review: PASS
+   T4 done
+   check go
+   verify · 1m18s · $0.25 · run $1.01 / $40.00
+verify: no findings
+
+═══ complete ═══
+run:    B20261103-0315-b35-i83-fence-compound-commands/20261103-045336  (3 iteration(s) this run)
+plan:   4/4 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261103-0315-b35-i83-fence-compound-commands.md

@@ -136,6 +136,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | yes | no-options | [I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s](I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s.md) |
 | halt | verification-finding | no | recommended | [I20261102-112835-t2-s-gate-disputed-its-loop-variable-was](I20261102-112835-t2-s-gate-disputed-its-loop-variable-was.md) |
 | halt | verification-finding | partly | no-options | [I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi](I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi.md) |
+| halt | verification-finding | no | no-options | [I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh](I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh.md) |
 | verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261101-230340-acceptance-on-the-real-cli-the-url-short](I20261101-230340-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261102-004526-acceptance-on-the-real-cli-the-url-short](I20261102-004526-acceptance-on-the-real-cli-the-url-short.md) |
@@ -146,6 +147,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | ceremony | partly | no-options | [I20261102-230009-acceptance-the-plan-and-gate-review-eval](I20261102-230009-acceptance-the-plan-and-gate-review-eval.md) |
 | verify | ceremony | partly | no-options | [I20261103-005741-acceptance-tools-agent-eval-on-the-gate](I20261103-005741-acceptance-tools-agent-eval-on-the-gate.md) |
 | verify | ceremony | partly | no-options | [I20261103-031502-acceptance-real-copilot-sessions-on-a-fr](I20261103-031502-acceptance-real-copilot-sessions-on-a-fr.md) |
+| verify | ceremony | partly | no-options | [I20261103-052614-acceptance-the-b35-judge-on-real-data-an](I20261103-052614-acceptance-the-b35-judge-on-real-data-an.md) |
 | verify | context-supply | partly | no-options | [I20261103-031501-trust-acceptance-for-the-b34-acceptance](I20261103-031501-trust-acceptance-for-the-b34-acceptance.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |

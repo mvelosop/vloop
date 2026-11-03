@@ -1,35 +1,39 @@
-# Plan — B20261103-0058-b34-i82-fence-backstop
+# Plan — B20261103-0315-b35-i83-fence-compound-commands
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
 **Status:** complete · **4/4 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T02:39:55Z
+**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T05:19:46Z
 
 ## Progress
 
-- [x] **T1** — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1) · 1 attempt(s)
-- [x] **T2** — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
-- [x] **T3** — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
+- [x] **T1** — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
+- [x] **T2** — Match a word the shell expands as any text (C2)
+- [x] **T3** — Document the wider reading in the guide, the fence audit and fence check's help (C4)
 - [x] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
-### T1 — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1)
+### T1 — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
 
-`done` · 1 attempt(s) · depends on: none
+`done` · depends on: none
 
-A Copilot session is fenced by the preToolUse hook, which fails open when it misbehaves; nothing behind it notices. This task adds the driver's re-judge of every call a Copilot session ran — read from its JSON Lines, judged by the same fence judge the hook uses — and wires it, with its stderr lines and the FENCE BYPASSED exit-9 halt, into the work phase. T2 extends the same after-session check to every other phase and adds the binary check.
+Copilot sessions lose a retry every time they write an if, a for, a while, a { … } or a subshell, because the fence judge refuses all of them, and command -v curl is denied because the judge looks through command to curl. This task makes the splitter and the judge read those forms by dropping a leading keyword and judging every command inside, with the brief's exact rules for closing keywords, for, subshells and ((, and treats command -v/-V as a lookup. It must never judge a command inside a compound less than it would be judged alone; C2 (expanded words) is the next task's.
 
 **Acceptance**
 
-- After every Copilot work session the driver reads the session's JSON Lines; a call that ran is a `tool.execution_start` whose `tool.execution_complete` of the same `data.toolCallId` does not carry `data.error.code` `denied`, or that has no completion.
-- Each call that ran is judged by `fence.New(phase, root, home)` and `Decide` — the hook's own judge — with tool, path and command read from `data.toolName` and `data.arguments` exactly as `parseHookPayload` reads `toolName` and `toolArgs` (an object, or a JSON string holding one; `path`; a skill's `skill` or `name`; apply_patch's `input`, `patch` or `command`), and with the hook's rule first: a `bash` or `powershell` call with an empty command is denied with `the <tool> call has no command the hook can read`. Violation: a second argument parser that can diverge from the hook's, or any judge or rule list other than the hook's.
-- The driver does not import `internal/fence` (which imports `internal/driver`); the judge reaches the driver another way (for example as a function the CLI hands it). The check is the phases', not `Runner.Run`'s: `tools/agent-eval` and its tests are unchanged.
-- With one or more denied, stderr has one line per denied call, `vloop: <tool> <what> — <the judge's reason>`, `<what>` the call's path, else the first line of its command cut to 200 runes with `…` added when cut, else nothing (`vloop: <tool> — <reason>`); then the run halts with exit 9 and `FENCE BYPASSED work — the session ran <n> call(s) its fence denies; nothing from it was used`. Every line is masked (`$HOME` as `~`) and written to the run log too, as `REFS MOVED`'s warnings are.
-- The check runs as soon as the work session ends, whatever its exit, before the phase's own checks (so before REFS MOVED); the phase still makes its restores of the driver's inputs before exiting 9; the halt comes before the proposal is used or anything is committed, and the work tree is otherwise left as the session left it. With no call denied nothing changes and nothing is printed. A Claude session's handling is unchanged (violation: any change to how a Claude session is run, parsed or halted).
-- Committed tests: the worked example's first three lines as one `cmd/vloop` test each (a work session's bash `git commit -m x` completed without error -&gt; the two stderr lines, exit 9, no new commit; the same call completed `denied` -&gt; the iteration goes on; a bash `ls` only -&gt; the iteration goes on), with the harness's stub `copilot` gaining, in test code, the prompts of every phase (`/vloop:<phase>` with or without an argument) and the tool events a test's copilot-script.sh asks for; and tests of the reading of fixture JSON Lines (a call with no completion, a denied completion, the path / first-line / 200-rune / nothing forms of `<what>`, the empty-command rule). `TestRunHarnessCopilot`'s refusal of `/vloop:work T1` changes only to pin a prompt the stub still refuses; no other existing test changes.
-- No fence's rules change: `fence/*.json` and the judge's decisions are as at the base.
+- Every line of the brief's worked example under `# C1` and `# C3` (but `command -$v git push`, which is T2's) gives exactly the answer and exit code the brief shows through `vloop fence check --tool bash`, in the phase it names.
+- Opening keywords (`if`, `then`, `elif`, `else`, `while`, `until`, `do`, `!`, `{`) are dropped only while they are the command's first word, before assignments are skipped; a keyword after an assignment or a wrapper is not dropped (`X=1 if true` and `env ! git status` keep `shell syntax … cannot be judged`), and one in an argument is an argument (`echo if` is an `echo`). Violation: a keyword dropped from the middle of a command.
+- `fi`, `done` and `}` alone are allowed once their redirections are (`done > .vloop/state/x` is denied in a review session as a write); followed by any other word they answer `shell syntax <word> cannot be judged`. `for NAME` and `for NAME in WORDS…` (NAME matching `[A-Za-z_][A-Za-z0-9_]*`) run nothing; any other `for` answers `shell syntax for cannot be judged`.
+- `case`, `esac`, `select`, `function`, `coproc` and `[[` stay refused with `shell syntax <word> cannot be judged`, first or after an opening keyword. Violation: any of them allowed.
+- A `(` opens a subshell only when no word is being built and the current command holds nothing but opening keywords and no redirection (complete or pending); a `)` with one open ends the command and may be followed by a redirection or an operator, not a word; subshells nest written apart. `((`, a `(` anywhere else (`a=(1 2)`, `f() {`, `<(`, `>(`), a `)` with none open and a string ending with one open answer `subshells and process substitution cannot be judged`; `$(` and a backtick keep `command substitution cannot be judged`.
+- A command inside a compound or a subshell is judged exactly as it would be alone: `if true; then git push; fi`, `(git push)` and `while true; do git push; done` each give `git push is denied by the review fence (Bash(git push:*))`. Violation: any inner command judged less than alone.
+- When the judge looks through `command` and an option before the name is a literal `-` followed only by `p`, `v` and `V` with at least one `v` or `V` (no `$`, no quote), the command is allowed whatever follows; `command '-v' git push`, `command -p git push` and `command git push` are looked through as today; `time -v git push` stays denied.
+- The hook (`vloop fence hook`) gives the same answers, since it uses the same judge; no change to the hook's own code is needed or made beyond what the judge provides.
+- Committed tests in internal/fence/judge_test.go hold every C1 and C3 worked-example line as a named case (the phase, the command, the reason) and cover the closing-keyword, for and subshell rules above; the `go` check runs them. Violation: behaviour shipped with no committed test the check runs.
+- The existing tests pass unchanged except the cases the brief's Constraints name: in TestSplitRefuses `(gh x)` gives way to `(gh x` and `a=(1 2)`; in the work fence's table `for f in a b; do echo $f; done` becomes allowed; `if true; then gh x; fi` stays denied, its case keeping `*`.
+- No module dependency is added to go.mod (no shell-grammar parser such as mvdan.cc/sh); no fence rule file under fence/ changes.
 
 <details><summary>verify command</summary>
 
@@ -39,20 +43,23 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
+### T2 — Match a word the shell expands as any text (C2)
 
 `done` · depends on: T1
 
-T1's re-judge halts only the work phase; a call can get past the hook in any phase. This task runs the same after-session check after every Copilot session of plan, gate-review, review, second-review, verify and review-brief, adds the SHA-256 check of the hook's binary before and after each session (HOOK CHANGED, exit 9, checked before F1), and makes Runner.Run hand the phase the session's stdout even when no result event was printed, so a killed session is re-judged.
+Once compounds are read, `for x in push; do git "$x" origin; done` would slip past the fence, and today `X=push; git $X origin`, `git pu{sh,} origin` and `git pu?h origin` already do, because the judge matches an expanded word as written. This task makes a word holding an unquoted or double-quoted $, an unquoted glob or a brace expansion stand for any text when the deny rules are matched (after the as-written match, which keeps today's messages), and refuses such a word wherever the judge reads it as structure: a command name, a wrapper's or shell's option, a -c string, a redirection target, or xargs' input as a command name. Quoted text stays literal; a harmless command denied costs a retry, a dangerous one allowed is the failure.
 
 **Acceptance**
 
-- After every Copilot session of every phase (plan, gate-review, work, review, second-review, verify, review-brief) the re-judge of T1 runs with that phase's judge (`second-review` judged as the hook judges it, by the review fence), and a denied call that ran halts with exit 9 and `FENCE BYPASSED <phase> — the session ran <n> call(s) its fence denies; nothing from it was used`, preceded by the per-call lines. The halt comes where REFS MOVED halts for that phase: a plan or gate-review halt leaves no plan commit and starts no work; a review or second-review halt commits nothing; a verify halt keeps no reports/verify.json; a review-brief halt prints no verdict and its brief is restored.
-- Before each Copilot session the driver takes the SHA-256 of the binary the hook runs (the one writeCopilotHooks writes into the hooks file); after it, again. A difference, or the binary gone, halts with exit 9 and `HOOK CHANGED <phase> — the binary the fence hook runs changed during the session: <path>; nothing from it was used`, `<path>` as the hooks file names it, masked. F2 is checked before F1, both as soon as the session ends and before the phase's own checks, so a call that got past the hook and also moved a ref is named before REFS MOVED; the phase's restores (the driver's inputs; a review-brief session's brief) are still made, and a restore that fails is reported after the halt's lines.
-- The lines and halts are masked and written to the run log too where the phase has one; `vloop brief review` has no run log, so there stderr only.
-- `Runner.Run` hands the phase the session's stdout whether or not it printed a result event, so a session killed at its timeout, or one that died, is re-judged; a call with no completion counts as run. Claude sessions and `tools/agent-eval`'s scoring are unchanged.
-- Committed tests: the worked example's seven phase lines, one `cmd/vloop` test each (agent.&lt;phase&gt; = "copilot", a session that runs a bash `git push`; second-review with `run.second-review = "record"`; verify with the last task done; review-brief through `vloop brief review`), each asserting the `vloop: bash git push — …` line, the halt, exit 9 and what was not used; a driver test of the phases' shared after-session check, phase work, whose hook binary is a copy of a file the test changes between the check's before and after (the HOOK CHANGED halt); and a driver test of a stub Copilot session run through `Runner.Run` with a Timeout of 1 s that prints a started bash `git commit -m x` and sleeps, whose result handed to the shared check gives the FENCE BYPASSED work halt.
-- No fence's rules change, and no judge but the hook's is used.
+- Every line of the brief's worked example under `# C2`, and `command -$v git push`, gives exactly the answer and exit code the brief shows through `vloop fence check --tool bash`, in the phase it names.
+- A word is expanded exactly when it holds a `$` unquoted or in double quotes, an unquoted `*` or `?`, an unquoted `[` with an unquoted `]` later in the word, or an unquoted `{` and the first unquoted `}` after it (no unquoted `{` between) with an unquoted `,` or `..` between them. Violation: a single-quoted, double-quoted (for a glob or brace) or backslash-escaped `$`, glob or brace read as any text (`git '$X' origin`, `git "pu*" origin`, `git pu\$X origin` stay allowed), or `@{u}`, `{}`, `HEAD@{1}`, `[ -f x ]` read as expanded.
+- `match` first matches the command as written with today's rules, order and messages; only when nothing matches does it match again with each expanded word standing for any text (none, one or several words), trying the fence's rules then the Copilot deny list in today's order and naming the first that can match, with the suffix `: a word the shell expands may be any text` and the words joined by spaces, quotes removed.
+- A command name (after assignments and wrappers) that expands answers `command word <word> expands and cannot be judged`, a leading `$` keeping today's message; an expanded word a wrapper skips before the name (an option or its value, timeout's duration, exec -a's name, env's NAME=value, nice -n's number, xargs' and stdbuf's options, command's options) answers `<word> expands before the command name and cannot be judged`; assignments before the first word are unaffected.
+- For sh, bash, zsh, dash and ksh: an expanded option word before the -c string (or -o's value) answers `<shell>: <word> expands before the command string and cannot be judged`; a -c string expanded by a glob or brace answers `<shell>: the -c string expands and cannot be judged`; one holding `$` keeps today's message; a literal -c string is split and judged with C2 inside it.
+- xargs judges its command as if it ended with one more expanded word, added before wrappers are looked through (`xargs env` answers `command word <xargs input> expands and cannot be judged`; `xargs` with no command is `echo` and allowed); with a replace option (`-I <s>`, `-i[<s>]`, `--replace[=<s>]`, `-J <s>`, defaulting to `{}`) nothing is appended, every word holding the replace string is expanded, a name holding it is refused, and a -c string holding it answers `<shell>: the -c string holds xargs' replace string <s> and cannot be judged`. `-J`, `-R` and `-S` take an argument.
+- A redirection target holding a glob or a brace expansion answers `a redirection target that expands cannot be resolved: <word>`; one holding `$` keeps today's message; a quoted one is a path as written. Writes and reads judged by path are otherwise unchanged.
+- Committed tests in internal/fence/judge_test.go hold every C2 worked-example line (and `command -$v git push`) as a named case, plus the quoted-is-literal cases; the `go` check runs them. Violation: behaviour shipped with no committed test the check runs.
+- The existing tests pass unchanged (beyond the cases T1 changed); no module dependency is added to go.mod; no fence rule file under fence/ changes.
 
 <details><summary>verify command</summary>
 
@@ -62,18 +69,18 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
+### T3 — Document the wider reading in the guide, the fence audit and fence check's help (C4)
 
 `done` · depends on: T2
 
-The hook answers in milliseconds and a timeout only ever lets a call run, so its limit should be far above any stall: 120 seconds for every phase. And every place that defines exit 9 or describes the hook's fail-open must now say the driver backs it, so an operator reading a FENCE BYPASSED or HOOK CHANGED halt finds it explained and knows to inspect before resuming.
+An operator or a session reading why a call was denied must find the judge's new reading described where it is described today: the configuration guide's work-fence bullet, the fence audit's hook bullet and work-session paragraph, and `vloop fence check --help`. Each edit is the brief's text word for word, wrapped in the file's style, so the docs never claim behaviour the judge lacks.
 
 **Acceptance**
 
-- The hooks file the driver writes has `"timeoutSec": 120` for every phase; a new test reads the hooks file the driver writes and pins it.
-- Every F4 edit is made word for word as the brief gives it, wrapped in the file's style: domain-model.md's S-2 (the sentence after `It halts (exit 9) if a ref …`) and R-3; docs/domain/execution/session.md's sentence after `halts the run with exit 9 and nothing is committed.`; concepts.md's row `9` (its first cell, the `, or a Copilot session ran …` insertion straight after `or the git hooks` and before `; nothing was committed`, and its last cell); configuration.md's sentence; the fence audit's note under each of its six headings, on a line of its own; docs/domain/execution/run.md's row `9` first cell; copilot-cli-experiments.md's `**What remains:**` paragraph; the operate skill's row `9`.
-- `vloop run --help` reads `9 refs or repository configuration moved, or a Copilot session got past its fence` (internal/cli/run.go) and `vloop brief review --help` reads `9 the session changed the brief, git refs or the repository configuration, or a Copilot session got past its fence.` (internal/cli/brief_review.go); the generated reference docs, if any, follow whatever regenerates them today.
-- Violation: any other sentence of those files changed, or a doc stating behaviour the driver does not have.
+- docs/guide/configuration.md: in the work-fence bullet, the sentences from `Shell syntax the judge cannot read is denied, not guessed at:` through `Write the commands one per line instead.` are replaced by the brief's C4 text word for word, between `the recursive forms stay denied.` and `Copilot still runs a call`.
+- docs/design-notes/fence-audit.md: the hook bullet of "The three enforcers" gains the brief's sentence straight after `a command word starting with `$`.`; the work-session paragraph's first sentence becomes the brief's text, and the rest of that paragraph (from `The hook fails open`) is unchanged.
+- `vloop fence check --help` reads `…xargs and sh -c, read through if, while, until, for, !, { } and subshells, and matched against…` and, after the sentence ending `the Copilot adapter's deny list.`, `A word the shell expands ($, a glob, a brace expansion) matches as any text.` (internal/cli/fence.go).
+- Violation: any other sentence of those files changed, or a doc stating behaviour the judge does not have.
 
 <details><summary>verify command</summary>
 
@@ -87,18 +94,18 @@ sh .vloop/state/gates/T3/gate.sh
 
 `done` · depends on: T3
 
-Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate or a committed test, or named as a gap.
+Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap.
 
 **Acceptance**
 
 - Gates T1, T2 and T3 all pass on the final tree, run together by this task's gate.
-- The work session's notes walk the brief's worked example line for line (the three work lines, the HOOK CHANGED driver test, the killed-session driver test, the timeoutSec test, the seven phase lines) and name the committed test, and the gate, that covers each; a line nothing covers is fixed in this task (a test added) or reported, not skipped.
+- The work session's notes walk the brief's worked example line for line (the C1, C2 and C3 sections) and name the committed test case in internal/fence/judge_test.go and the gate table (T1's or T2's cases.tsv) that covers each; a line no committed test covers is fixed in this task (a test added) or reported, not skipped.
 - Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds).
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T1/gate.sh && sh .vloop/state/gates/T2/gate.sh && sh .vloop/state/gates/T3/gate.sh
+sh .vloop/state/gates/T4/gate.sh
 ```
 
 </details>
