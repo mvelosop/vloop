@@ -12,3 +12,10 @@ planned: B20261102-2301-b33-i81-agent-eval-runner — 6 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 2m02s · $0.57 · run $4.37 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/6 done ──
+   Add tools/agent-eval's flags, its case reader and --list
+   work T1 · 1m36s · $0.32 · run $4.69 / $40.00
+   check go
+   review T1 · 0m27s · $0.13 · run $4.81 / $40.00
+   review: PASS
+   T1 done

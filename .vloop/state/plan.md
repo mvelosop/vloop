@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **1/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-02T23:55:30Z
+**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:01:10Z
 
 ## Progress
 
-- [ ] **T1** — Add tools/agent-eval's flags, its case reader and --list
+- [x] **T1** — Add tools/agent-eval's flags, its case reader and --list
 - [ ] **T2** — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
 - [ ] **T3** — Score the llm grader with a Claude judge voting three times
 - [ ] **T4** — Stream a Claude session's transcript into the same trace
@@ -19,7 +19,7 @@
 
 ### T1 — Add tools/agent-eval's flags, its case reader and --list
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Issue #81 needs a repository tool, `go run ./tools/agent-eval`, that replays the plugin's eval cases on Claude or Copilot with any model. This task builds its front door: the flags and their refusals (A1), the reading of a cases directory (each case's prompt.md and graders/*.md frontmatter, read by hand with no new module dependency), and `--list`, which prints the selected cases and runs nothing. Every later task runs cases through what this one reads, so the frontmatter subset and the refusal order must be exactly the brief's.
 
