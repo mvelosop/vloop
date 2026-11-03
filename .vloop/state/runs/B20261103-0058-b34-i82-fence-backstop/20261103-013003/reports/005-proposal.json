@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Closed the run: gates T1, T2 and T3 pass together on the final tree and every line of the brief's worked example maps to a gate clause or a committed test; no code changed.",
+  "files": [],
+  "verified": "vloop task gate T4 exited 0 (gate T1: ok, gate T2: ok, gate T3: ok); go vet, gofmt -l, go mod tidy -diff, linux and windows builds print nothing; go test ./... fails only internal/cli TestTaskGate* (see notes).",
+  "notes": "Worked example coverage. Lines 1-3 (git commit completed -> exit 9; denied by hook -> goes on; ls only -> goes on): committed cmd/vloop TestRunFenceBackstopBypassed, TestRunFenceBackstopDeniedByHook, TestRunFenceBackstopAllowedCall (run_fencecheck_test.go); gate T1 cases 1-3. HOOK CHANGED driver test (copy of a file changed between before/after): internal/driver TestBackstopHookChanged; gate T2 F2 replace/remove loop (through the product). Killed-session driver test (Timeout 1 s, started call, Runner.Run result to the shared check): internal/driver TestBackstopTimedOutSession; gate T2 no-result-event case. timeoutSec 120: internal/driver TestCopilotHooksTimeoutSec; gate T3 F3 checks timeout 120 for all seven phases. Seven phase lines: cmd/vloop TestRunFenceBackstopEveryPhase, subtests plan, gate-review, review, second-review, verify, review-brief (brief review) and the work phase via TestRunFenceBackstopBypassed; gate T2 phase block. Extra coverage: internal/driver TestBypassedCalls and internal/cli TestCallJudge (reading of a call, empty-command rule); gate T1 case 4. No line uncovered. The only red in go test ./... is internal/cli TestTaskGate* (TestTaskGateShellMissing etc.), which fail with 'the plan was changed during this session' only because they run inside a live vloop session holding the plan (environmental, same as T1/T2 notes); they are untouched by this run and need re-running outside a session."
+}

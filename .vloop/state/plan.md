@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/4 done** · iteration 4
+**Status:** running · **4/4 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T02:25:10Z
+**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T02:35:10Z
 
 ## Progress
 
 - [x] **T1** — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1) · 1 attempt(s)
 - [x] **T2** — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
 - [x] **T3** — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
-- [ ] **T4** — Close the run: every gate at once, and the worked example line for line
+- [x] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
@@ -85,7 +85,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Close the run: every gate at once, and the worked example line for line
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate or a committed test, or named as a gap.
 
