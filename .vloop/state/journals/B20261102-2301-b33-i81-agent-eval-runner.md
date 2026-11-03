@@ -25,3 +25,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261102-2301-b33-i81-agent-eval-runner` · 2 iteration(s) this run
 - **Plan:** 1/6 done, 1 blocked
+
+## T2 — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Copilot run end to end: scaffold, session via driver.Runner, transcript.jsonl, trace.jsonl, regex/tool_used/file_exists graders, report.json and the table.
+- **Files:** internal/driver/session.go, internal/driver/agent.go, internal/driver/agent_copilot.go, internal/driver/agent_copilot_test.go, tools/agent-eval/main.go, tools/agent-eval/runner.go, tools/agent-eval/trace.go, tools/agent-eval/graders.go, tools/agent-eval/run_test.go
+- **Notes for next iteration:** Work was done in the earlier blocked attempt; the operator replaced the gate (%.17g) and it now passes. Driver options, both defaulting to today's behaviour: Runner.Transcript and Runner.HookBinary (tested in internal/driver/agent_copilot_test.go). An llm grader makes the run an error 'judge failed: <grader>: the llm grader is not built yet' (T3 replaces it); --agent claude cases error 'claude sessions are not built yet' (T4 replaces it).

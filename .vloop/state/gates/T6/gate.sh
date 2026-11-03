@@ -43,7 +43,7 @@ ae o2 --agent copilot --model m --vloop "$fb/vloop" --cases "$TD" --case 'fixtur
 rm -f "$st/mode"
 [ "$(rc o2)" = 0 ] || fail "o2: exit $(rc o2), want 0"
 [ "$(grades o2)" = "a=1 b=0 c=1 d=1" ] || fail "o2: graders are not b 0 and the others 1: $(grades o2)"
-near "$(q "$t/o2/report.json" '.cases[0].mean')" "$(awk 'BEGIN { print 4 / 6 }')" || fail "o2: mean is not 0.6666…"
+near "$(q "$t/o2/report.json" '.cases[0].mean')" "$(awk 'BEGIN { printf "%.17g", 4 / 6 }')" || fail "o2: mean is not 0.6666…"
 [ "$(row o2 fixture-review | awk '{ print $4, $NF }')" = "0.67 b" ] || fail "o2: the table's MEAN is not 0.67 with NOTES b: $(row o2 fixture-review)"
 
 # same, the fixture's scaffold exiting 3, --out <tmp>/o3

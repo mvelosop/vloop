@@ -67,8 +67,8 @@ reset; echo pass >"$st/mode"
 run o2 'fixture-review'
 [ "$(rc o2)" = 0 ] || fail "o2 exits $(rc o2), want 0: $(tail -n 5 "$t/o2.err")"
 [ "$(grades o2 fixture-review)" = "a=1 b=0 c=1 d=1" ] || fail "o2: graders are not a=1 b=0 c=1 d=1: $(grades o2 fixture-review)"
-near "$(q "$t/o2/report.json" '.cases[0].mean')" "$(awk 'BEGIN { print 4 / 6 }')" || fail "o2: mean is not the unrounded 4/6: $(q "$t/o2/report.json" '.cases[0].mean')"
-near "$(q "$t/o2/report.json" '.cases[0].runs[0].score')" "$(awk 'BEGIN { print 4 / 6 }')" || fail "o2: the run's score is not 4/6"
+near "$(q "$t/o2/report.json" '.cases[0].mean')" "$(awk 'BEGIN { printf "%.17g", 4 / 6 }')" || fail "o2: mean is not the unrounded 4/6: $(q "$t/o2/report.json" '.cases[0].mean')"
+near "$(q "$t/o2/report.json" '.cases[0].runs[0].score')" "$(awk 'BEGIN { printf "%.17g", 4 / 6 }')" || fail "o2: the run's score is not 4/6"
 [ "$(row o2 fixture-review)" = 'fixture-review review 1 0.67 $0.04 b' ] || fail "o2's line is not 'fixture-review review 1 0.67 \$0.04 b': $(row o2 fixture-review)"
 
 # --- the majority decides: FAIL, FAIL, PASS scores 0; an answer that is neither counts as FAIL

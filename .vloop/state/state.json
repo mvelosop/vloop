@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md",
   "base": "b9060704dd074b944832e8b31df292cc9affec6f",
   "branch": "B20261102-2301-b33-i81-agent-eval-runner",
-  "status": "blocked",
-  "iteration": 2,
+  "status": "running",
+  "iteration": 3,
   "created": "2026-11-02T23:51:55Z",
-  "updated": "2026-11-03T00:06:57Z",
+  "updated": "2026-11-03T00:12:51Z",
   "shell": "sh",
   "checks": [
     {
@@ -65,7 +65,7 @@
       "title": "Run a case on Copilot end to end and score its regex, tool_used and file_exists graders",
       "goal": "This is the core of the runner: one run of a case scaffolds a workspace, starts one session exactly as vloop starts that phase on that agent, keeps the transcript, normalises it into a trace with Claude's tool names, scores the case's graders and writes report.json and the table. It is built and judged on Copilot first, with every grader type except llm (the next task's). The driver may gain options for this (keeping the transcript, naming the fence hook's binary), but every vloop session's argv, record and output must stay exactly as they are: what is being qualified is how vloop really runs the agent.",
       "kind": "feature",
-      "fixtures": "308c8e885cad5ab66e73e9e3f2362f4485cf8e96a76878784c2932f637d38081",
+      "fixtures": "d5a871f03e1f5c9e2131445ada001528e0d987fac99b45a09e8c61a2a87ec9b5",
       "references": [
         {
           "path": "internal/driver/session.go",
@@ -119,16 +119,25 @@
         "Committed tests in tools/agent-eval cover a Copilot run end to end with a fake copilot and fake vloop scripts on a temporary PATH and fixture cases in a temporary directory (scored, scaffold error, skipped, no result, timeout), the trace read from testdata/observed/copilot-events.jsonl, each grader type and the table; any driver option added has a test in internal/driver; no test runs a real claude or copilot."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "blocked",
+      "status": "done",
       "attempts": 0,
-      "notes": "gate disputed: The gate compares the score to awk's six-digit print of 7/11 with a 1e-9 tolerance, which an unrounded score cannot meet; the brief requires the unrounded mean. — Clause near \"$(q \"$R\" \"$RUN | .score\")\" \"$(awk 'BEGIN { print 7 / 11 }')\" fails: awk prints 0.636364, the report holds 0.6363636363636364, and |difference| = 3.6e-7 > 1e-9."
+      "notes": "",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T2/gate.sh",
+          "replaced_at": "2026-11-03T00:07:43Z",
+          "reason": "awk's print gives six digits, so a 1e-9 comparison with the report's unrounded score could never pass (T2's gate dispute); print with %.17g",
+          "by": "operator",
+          "fixtures": "308c8e885cad5ab66e73e9e3f2362f4485cf8e96a76878784c2932f637d38081"
+        }
+      ]
     },
     {
       "id": "T3",
       "title": "Score the llm grader with a Claude judge voting three times",
       "goal": "Most of the plugin's graders are llm graders, so without them no case scores fully. The judge is always Claude, whatever agent is under test, so scores across agents compare; it is asked three times and the majority decides. A judge that cannot be asked is a run error, never a vote, so a broken judge can never pass or fail a model silently.",
       "kind": "feature",
-      "fixtures": "2d8f6ea91b5a7c94901ea4e341293415f5a0f6e8556bae06557b270d0dc0d587",
+      "fixtures": "cd181b9766eb263e3e7a98076c37271b0c4dc3c16fb8b80d7f0554418f5f070b",
       "references": [
         {
           "path": "docs/guide/evals.md",
@@ -149,7 +158,16 @@
       "verify": "sh .vloop/state/gates/T3/gate.sh",
       "status": "pending",
       "attempts": 0,
-      "notes": ""
+      "notes": "",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T3/gate.sh",
+          "replaced_at": "2026-11-03T00:07:44Z",
+          "reason": "awk's print gives six digits, so a 1e-9 comparison with the report's unrounded score could never pass (T2's gate dispute); print with %.17g",
+          "by": "operator",
+          "fixtures": "2d8f6ea91b5a7c94901ea4e341293415f5a0f6e8556bae06557b270d0dc0d587"
+        }
+      ]
     },
     {
       "id": "T4",
@@ -229,7 +247,7 @@
       "title": "Close: the worked example as a committed test, every gate at once",
       "goal": "Each earlier task was judged on its own slice; the close shows the whole tool does what the brief's worked example says, line for line, with every earlier gate still passing together. It leaves the worked example behind as a committed test, so the configured go check keeps holding the tool to it after the run's gates are archived.",
       "kind": "test",
-      "fixtures": "a3a96f9545fc0adb7371fa5fc2ab9c9a02a6534e27b4ea5dfe3bc40c8c2e7870",
+      "fixtures": "9e0b318a4250f2dae0aad6352deed22677d4b210e6859d263097ddcb3078540b",
       "references": [],
       "depends_on": [
         "T1",
@@ -246,7 +264,16 @@
       "verify": "sh .vloop/state/gates/T6/gate.sh",
       "status": "pending",
       "attempts": 0,
-      "notes": ""
+      "notes": "",
+      "gate_history": [
+        {
+          "verify": "sh .vloop/state/gates/T6/gate.sh",
+          "replaced_at": "2026-11-03T00:07:44Z",
+          "reason": "awk's print gives six digits, so a 1e-9 comparison with the report's unrounded score could never pass (T2's gate dispute); print with %.17g",
+          "by": "operator",
+          "fixtures": "a3a96f9545fc0adb7371fa5fc2ab9c9a02a6534e27b4ea5dfe3bc40c8c2e7870"
+        }
+      ]
     }
   ]
 }

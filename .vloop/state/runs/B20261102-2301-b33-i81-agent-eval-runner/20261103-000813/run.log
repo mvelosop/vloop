@@ -1,0 +1,7 @@
+── iteration 3 (1 this run) · T2 · 1/6 done ──
+   Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
+   work T2 · 0m19s · $0.09 · run $0.09 / $40.00
+   check go
+   review T2 · 0m33s · $0.17 · run $0.27 / $40.00
+   review: PASS
+   T2 done

@@ -60,7 +60,7 @@ RUN="$C | .runs[0]"
   fail "o1: fixture-graders scores are not e=1 f=0 g=0 h=1 i=1 j=1 k=1 l=1 m=0 n=1 p=0: $(q "$R" "$RUN | [.graders[] | \"\(.name)=\(.score)\"]")"
 [ "$(q "$R" "$RUN | .graders[] | select(.name == \"g\") | .reason")" = "no .vloop/tmp/absent.json" ] || fail "o1: grader g's reason is not 'no .vloop/tmp/absent.json'"
 [ "$(q "$R" "$RUN | .graders[] | select(.name == \"m\") | .reason")" = "unsupported grader tool_order" ] || fail "o1: grader m's reason is not 'unsupported grader tool_order'"
-near "$(q "$R" "$RUN | .score")" "$(awk 'BEGIN { print 7 / 11 }')" || fail "o1: fixture-graders' score is not 7/11: $(q "$R" "$RUN | .score")"
+near "$(q "$R" "$RUN | .score")" "$(awk 'BEGIN { printf "%.17g", 7 / 11 }')" || fail "o1: fixture-graders' score is not 7/11: $(q "$R" "$RUN | .score")"
 
 # the run folder: workspace, transcript, trace, session record, stderr
 D=$t/o1/fixture-review/run-1
