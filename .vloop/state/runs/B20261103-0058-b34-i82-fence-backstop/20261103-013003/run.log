@@ -44,3 +44,11 @@ committing the plan
    review T4 · 0m17s · $0.09 · run $6.56 / $40.00
    review: PASS
    T4 done
+   check go
+   verify · 1m08s · $0.27 · run $6.83 / $40.00
+verify: 1 finding(s); 1 example line(s) not run — see .vloop/state/runs/B20261103-0058-b34-i82-fence-backstop/20261103-013003/reports/verify.json
+
+═══ complete ═══
+run:    B20261103-0058-b34-i82-fence-backstop/20261103-013003  (5 iteration(s) this run)
+plan:   4/4 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261103-0058-b34-i82-fence-backstop.md
