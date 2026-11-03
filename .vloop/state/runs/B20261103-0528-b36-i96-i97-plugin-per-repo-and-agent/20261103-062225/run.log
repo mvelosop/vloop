@@ -27,3 +27,10 @@ committing the plan
    work T2 · 2m52s · $0.33 · run $4.31 / $40.00
    check go
    CHECK FAIL T2 — check go failed — see .vloop/state/runs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent/20261103-062225/checks/003-go.fail.log; review skipped
+── iteration 4 (4 this run) · T2 · 1/4 done ──
+   Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4)
+   work T2 · 1m01s · $0.16 · run $4.47 / $40.00
+   check go
+   review T2 · 0m37s · $0.17 · run $4.64 / $40.00
+   review: PASS
+   T2 done

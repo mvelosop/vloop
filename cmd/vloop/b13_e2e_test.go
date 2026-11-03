@@ -61,7 +61,7 @@ func b13After(t *testing.T, out string) string {
 func TestWorkedExampleB13(t *testing.T) {
 	t.Parallel()
 	const version = "0.9.0"
-	const pluginWarn = `! plugin /vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`
+	const pluginWarn = `! plugin /vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop --scope project installs it for this repository (after claude plugin marketplace add mvelosop/vloop if claude does not know the marketplace), or claude --plugin-dir "$(vloop plugin path)" for one session`
 	const gateWarn = `! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add "Edit(./.vloop/state/gates/**)" to permissions.allow in .claude/settings.json`
 	r := b5New(t, false, false)
 

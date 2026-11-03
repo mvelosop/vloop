@@ -355,7 +355,7 @@ func TestWorkedExampleB5PlantedFailures(t *testing.T) {
 		r.write(".vloop/config.toml", r.read(".vloop/config.toml")+runCheckConfig)
 		doc := r.run("0.2.0", "doctor")
 		b5Code(t, doc, 0)
-		b5Has(t, doc, "! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — update the one that is behind")
+		b5Has(t, doc, "! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind")
 		b5Has(t, doc, "doctor: 0 problem(s), 2 warning(s)")
 	})
 

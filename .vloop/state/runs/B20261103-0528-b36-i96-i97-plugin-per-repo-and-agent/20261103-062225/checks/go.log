@@ -1,16 +1,10 @@
 ok  	github.com/mvelosop/vloop	(cached)
-ok  	github.com/mvelosop/vloop/cmd/gendocs	0.986s
---- FAIL: TestWorkedExampleB5PlantedFailures (4.00s)
-    --- FAIL: TestWorkedExampleB5PlantedFailures/plugin_version_warning (0.28s)
-        b5_e2e_test.go:358: no stdout line "! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — update the one that is behind" in "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n✓ guidelines 0 rule(s)\n- self-hosting\ndoctor: 0 problem(s), 2 warning(s)\n"
---- FAIL: TestWorkedExampleB13 (0.99s)
-    b13_e2e_test.go:90: no stdout line "! plugin /vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir \"$(vloop plugin path)\" for one session" in "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n! plugin /vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop --scope project installs it for this repository (after claude plugin marketplace add mvelosop/vloop if claude does not know the marketplace), or claude --plugin-dir \"$(vloop plugin path)\" for one session\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n✓ guidelines 0 rule(s)\n- self-hosting\ndoctor: 0 problem(s), 2 warning(s)\n"
-FAIL
-FAIL	github.com/mvelosop/vloop/cmd/vloop	222.248s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
+ok  	github.com/mvelosop/vloop/cmd/vloop	215.601s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	102.562s
+ok  	github.com/mvelosop/vloop/internal/cli	(cached)
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
@@ -28,4 +22,3 @@ ok  	github.com/mvelosop/vloop/internal/schema	(cached)
 ok  	github.com/mvelosop/vloop/internal/state	(cached)
 ok  	github.com/mvelosop/vloop/tools/agent-eval	(cached)
 ok  	github.com/mvelosop/vloop/tools/release	(cached)
-FAIL
