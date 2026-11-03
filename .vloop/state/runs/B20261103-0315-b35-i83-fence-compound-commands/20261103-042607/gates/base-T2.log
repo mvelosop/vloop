@@ -1,0 +1,196 @@
+GATE MISMATCH [review] X=push; git $X origin
+  want (exit 1): deny: git $X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [work] for x in push; do git "$x" origin; done
+  want (exit 1): deny: git $x origin is denied by the work fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 1): deny: shell syntax for cannot be judged 
+GATE MISMATCH [review] git pu{sh,} origin
+  want (exit 1): deny: git pu{sh,} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git pu?h origin
+  want (exit 1): deny: git pu?h origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] g?t push
+  want (exit 1): deny: command word g?t expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] g$X push origin
+  want (exit 1): deny: command word g$X expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] /usr/bin/$X push origin
+  want (exit 1): deny: command word /usr/bin/$X expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] bash -$O -c 'git status'
+  want (exit 1): deny: bash: -$O expands before the command string and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push | xargs -I{} git {} origin
+  want (exit 1): deny: git {} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] xargs -J % git push
+  want (exit 1): deny: git push is denied by the review fence (Bash(git push:*))
+  got  (exit 0): allow 
+GATE MISMATCH [review] xargs -I {} -R 1 git push
+  want (exit 1): deny: git push is denied by the review fence (Bash(git push:*))
+  got  (exit 0): allow 
+GATE MISMATCH [review] xargs -S 255 -I {} git push
+  want (exit 1): deny: git push is denied by the review fence (Bash(git push:*))
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo git push | xargs env
+  want (exit 1): deny: command word <xargs input> expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] sh -c git\ \'pu{sh,}\'
+  want (exit 1): deny: sh: the -c string expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push | xargs -I % sh -c 'git %'
+  want (exit 1): deny: sh: the -c string holds xargs' replace string % and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo git | xargs -I{} {} push
+  want (exit 1): deny: command word {} expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push origin | xargs git
+  want (exit 1): deny: git is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] nice -n $N push origin
+  want (exit 1): deny: $N expands before the command name and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [work] echo x > .vloop/*
+  want (exit 1): deny: a redirection target that expands cannot be resolved: .vloop/*
+  got  (exit 1): deny: write to .vloop/* is not allowed in a work session: nothing under .git/ or .vloop/ but .vloop/tmp/ 
+GATE MISMATCH [review] git diff "$BASE" --stat
+  want (exit 1): deny: git diff $BASE --stat is denied by the review fence (Bash(git diff*--output*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] command -$v git push
+  want (exit 1): deny: -$v expands before the command name and cannot be judged
+  got  (exit 1): deny: git push is denied by the review fence (Bash(git push:*)) 
+GATE MISMATCH [review] git "pu$X" origin
+  want (exit 1): deny: git pu$X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git 'pu'$X origin
+  want (exit 1): deny: git pu$X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git ${X} origin
+  want (exit 1): deny: git ${X} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git [p]ush origin
+  want (exit 1): deny: git [p]ush origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git pu* origin
+  want (exit 1): deny: git pu* origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git {push,pull} origin
+  want (exit 1): deny: git {push,pull} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git pu{1..3} origin
+  want (exit 1): deny: git pu{1..3} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git $X
+  want (exit 1): deny: git $X is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git "$sub" --help
+  want (exit 1): deny: git $sub --help is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git $A $B
+  want (exit 1): deny: git $A $B is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git remote $X
+  want (exit 1): deny: git remote $X is denied by the review fence (Bash(git remote add:*)): a word the shell expands may be any text
+  got  (exit 1): deny: git remote $X is denied by the Copilot deny list (git remote:*) 
+GATE MISMATCH [review] find "$d" -name x
+  want (exit 1): deny: find $d -name x is denied by the review fence (Bash(find*-delete*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git show "$SHA"
+  want (exit 1): deny: git show $SHA is denied by the review fence (Bash(git show*--output*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git diff -- src/*.go
+  want (exit 1): deny: git diff -- src/*.go is denied by the review fence (Bash(git diff*--output*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [work] rm "$f"
+  want (exit 1): deny: rm $f is denied by the work fence (Bash(rm -rf:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [work] rm *.tmp
+  want (exit 1): deny: rm *.tmp is denied by the work fence (Bash(rm -rf:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [work] git log -- *.go
+  want (exit 1): deny: git log -- *.go is denied by the work fence (Bash(git log*--output*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] git log --oneline "$BASE..HEAD"
+  want (exit 1): deny: git log --oneline $BASE..HEAD is denied by the review fence (Bash(git log*--output*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] if true; then git $X origin; fi
+  want (exit 1): deny: git $X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 1): deny: shell syntax if cannot be judged 
+GATE MISMATCH [review] (git pu{sh,} origin)
+  want (exit 1): deny: git pu{sh,} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 1): deny: subshells and process substitution cannot be judged 
+GATE MISMATCH [review] sh -c 'git pu{sh,} origin'
+  want (exit 1): deny: git pu{sh,} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] sh -c ls\ *.go
+  want (exit 1): deny: sh: the -c string expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] sh -o $O -c ls
+  want (exit 1): deny: sh: $O expands before the command string and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] g{i,}t push
+  want (exit 1): deny: command word g{i,}t expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] env g*t push
+  want (exit 1): deny: command word g*t expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] nohup gi[t] push
+  want (exit 1): deny: command word gi[t] expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] env FOO=$X git status
+  want (exit 1): deny: FOO=$X expands before the command name and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] timeout $T git status
+  want (exit 1): deny: $T expands before the command name and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] exec -a $N git status
+  want (exit 1): deny: $N expands before the command name and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] stdbuf -o $M git status
+  want (exit 1): deny: $M expands before the command name and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] xargs -n $N git status
+  want (exit 1): deny: $N expands before the command name and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo x | xargs nohup
+  want (exit 1): deny: command word <xargs input> expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo x | xargs timeout 5
+  want (exit 1): deny: command word <xargs input> expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo x | xargs xargs
+  want (exit 1): deny: command word <xargs input> expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [work] ls | xargs rm
+  want (exit 1): deny: rm is denied by the work fence (Bash(rm -rf:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push | xargs -i git {} origin
+  want (exit 1): deny: git {} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push | xargs --replace git {} origin
+  want (exit 1): deny: git {} origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push | xargs --replace=% git % origin
+  want (exit 1): deny: git % origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push | xargs -J % git % origin
+  want (exit 1): deny: git % origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo git | xargs -I % % push
+  want (exit 1): deny: command word % expands and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo push | xargs -i sh -c 'git {}'
+  want (exit 1): deny: sh: the -c string holds xargs' replace string {} and cannot be judged
+  got  (exit 0): allow 
+GATE MISMATCH [work] echo x > src/{a,b}.txt
+  want (exit 1): deny: a redirection target that expands cannot be resolved: src/{a,b}.txt
+  got  (exit 0): allow 
+GATE MISMATCH [review] cat < .vloop/tmp/[ab]
+  want (exit 1): deny: a redirection target that expands cannot be resolved: .vloop/tmp/[ab]
+  got  (exit 0): allow 
+GATE MISMATCH [review] echo x > .vloop/tmp/?
+  want (exit 1): deny: a redirection target that expands cannot be resolved: .vloop/tmp/?
+  got  (exit 0): allow 
+GATE FAIL: 65 of 109 cases in .vloop/state/gates/T2/cases.tsv answered otherwise
