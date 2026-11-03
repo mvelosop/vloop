@@ -774,3 +774,14 @@ curl; vloop version`, because it looks through `command` to `curl` (`curl
 is denied by the review-brief fence`).
 5 of the 52 hold a `$` outside single quotes; none names a command a fence
 denies.
+
+## Compound commands judged through (B35, 2026-11-03)
+
+B35's judge reads `if`, `while`, `until`, `for … in`, `!`, `{ … }` and
+subshells, matches a word the shell expands as any text, and treats
+`command -v` as a lookup. Re-judging the 62 shell calls of the 9 kept
+Copilot sessions with the work fence, before and after: 5 answers change,
+all from deny to allow (3 `if`, 1 `for`, 1 `command -v … curl`); none is
+newly denied. A `gpt-6.1-terra` brief review with the new judge made 28
+calls; its one denial was a fence rule (`git branch`), none was shell
+syntax.

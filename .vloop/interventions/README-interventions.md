@@ -147,6 +147,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | ceremony | partly | no-options | [I20261102-230009-acceptance-the-plan-and-gate-review-eval](I20261102-230009-acceptance-the-plan-and-gate-review-eval.md) |
 | verify | ceremony | partly | no-options | [I20261103-005741-acceptance-tools-agent-eval-on-the-gate](I20261103-005741-acceptance-tools-agent-eval-on-the-gate.md) |
 | verify | ceremony | partly | no-options | [I20261103-031502-acceptance-real-copilot-sessions-on-a-fr](I20261103-031502-acceptance-real-copilot-sessions-on-a-fr.md) |
+| verify | ceremony | partly | no-options | [I20261103-052614-acceptance-the-b35-judge-on-real-data-an](I20261103-052614-acceptance-the-b35-judge-on-real-data-an.md) |
 | verify | context-supply | partly | no-options | [I20261103-031501-trust-acceptance-for-the-b34-acceptance](I20261103-031501-trust-acceptance-for-the-b34-acceptance.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
