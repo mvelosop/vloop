@@ -5,9 +5,9 @@
   "base": "7a7dc7dc2a3cabf529a33af6921d73e48dcf0ba6",
   "branch": "B20261103-0058-b34-i82-fence-backstop",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-03T01:43:50Z",
-  "updated": "2026-11-03T02:06:01Z",
+  "updated": "2026-11-03T02:19:07Z",
   "shell": "sh",
   "checks": [
     {
@@ -127,7 +127,7 @@
         "No fence's rules change, and no judge but the hook's is used."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

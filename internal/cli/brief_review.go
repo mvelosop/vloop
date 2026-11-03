@@ -85,7 +85,7 @@ func runBriefReview(b Build, g *Globals, cmd *cobra.Command, arg string) error {
 
 	br := &driver.BriefReview{Root: root, Version: b.Version, Brief: rel,
 		Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(),
-		Timeout: time.Duration(budget.SessionTimeout) * time.Minute}
+		Timeout: time.Duration(budget.SessionTimeout) * time.Minute, Judge: CallJudge(root)}
 	verdict, err := br.Run()
 	if err != nil {
 		var h *driver.Halt

@@ -2,7 +2,11 @@ package driver
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"io"
+	"os"
 	"strings"
 )
 
@@ -90,4 +94,53 @@ func bypassedCalls(stdout []byte, phase string, judge CallJudge) []BypassedCall 
 		out = append(out, BypassedCall{Tool: c.tool, What: what, Reason: v.Reason})
 	}
 	return out
+}
+
+// hookBinaryPath is the binary a Copilot session's fence hook runs: the one
+// writeCopilotHooks writes into the hooks file.
+func hookBinaryPath(configured string) string {
+	if configured != "" {
+		return configured
+	}
+	exe, _ := os.Executable()
+	return exe
+}
+
+// fileHash is the SHA-256 of a file, "" when it cannot be read.
+func fileHash(path string) string {
+	f, err := os.Open(path)
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// backstop is the after-session check every phase of a Copilot session shares:
+// the hook's binary first (F2), then the calls the fence denies that ran (F1).
+// It writes its lines through warn, which masks and logs, and returns the exit
+// 9 halt, nil when the session passes.
+func (res Result) backstop(phase string, warn func(format string, a ...any)) *Halt {
+	if res.HookChanged {
+		h := halt(ExitRefsMoved, "HOOK CHANGED %s — the binary the fence hook runs changed during the session: %s; nothing from it was used", phase, res.HookPath)
+		warn("%v", h)
+		return h
+	}
+	if len(res.Bypassed) == 0 {
+		return nil
+	}
+	for _, c := range res.Bypassed {
+		if c.What == "" {
+			warn("vloop: %s — %s", c.Tool, c.Reason)
+		} else {
+			warn("vloop: %s %s — %s", c.Tool, c.What, c.Reason)
+		}
+	}
+	h := halt(ExitRefsMoved, "FENCE BYPASSED %s — the session ran %d call(s) its fence denies; nothing from it was used", phase, len(res.Bypassed))
+	warn("%v", h)
+	return h
 }

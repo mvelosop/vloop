@@ -81,6 +81,9 @@ type Result struct {
 	Wall     time.Duration // how long the session ran, by the driver's clock
 
 	Bypassed []BypassedCall // calls a Copilot session ran that its fence denies; only with Runner.Judge
+
+	HookChanged bool   // the binary the fence hook runs differs after the session, or is gone; only with Runner.Judge
+	HookPath    string // that binary as the hooks file names it, masked
 }
 
 // Prompt is the slash command a session of the phase starts with.
@@ -401,6 +404,11 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	updateLock(r.Root, func(l *lockRecord) {
 		l.Phase, l.Task, l.SessionStarted, l.Spent = s.Phase, task, started.Format(time.RFC3339), spent
 	})
+	hookPath, hookBefore := "", ""
+	if r.Judge != nil && ad.Name() == AgentCopilot {
+		hookPath = hookBinaryPath(r.HookBinary)
+		hookBefore = fileHash(hookPath)
+	}
 	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
 	ended := r.now().Round(0).UTC()
 	// However it ended, the session is over: record the spend, clear the session.
@@ -434,6 +442,9 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	}
 
 	if r.Judge != nil && ad.Name() == AgentCopilot {
+		if fileHash(hookPath) != hookBefore || hookBefore == "" {
+			res.HookChanged, res.HookPath = true, r.Mask(hookPath)
+		}
 		res.Bypassed = bypassedCalls(stdout.Bytes(), s.Phase, r.Judge)
 	}
 

@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/4 done** · iteration 2
+**Status:** running · **2/4 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T02:06:01Z
+**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T02:19:07Z
 
 ## Progress
 
 - [x] **T1** — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1) · 1 attempt(s)
-- [ ] **T2** — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
+- [x] **T2** — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
 - [ ] **T3** — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
 
@@ -41,7 +41,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 T1's re-judge halts only the work phase; a call can get past the hook in any phase. This task runs the same after-session check after every Copilot session of plan, gate-review, review, second-review, verify and review-brief, adds the SHA-256 check of the hook's binary before and after each session (HOOK CHANGED, exit 9, checked before F1), and makes Runner.Run hand the phase the session's stdout even when no result event was printed, so a killed session is re-judged.
 

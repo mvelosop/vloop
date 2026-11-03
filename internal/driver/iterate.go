@@ -397,20 +397,21 @@ func (it *Iterator) haltGit(format string, a ...any) error {
 	return err
 }
 
-// fenceBypassed halts when a Copilot session ran calls its fence denies: one
-// line per call, then the halt, committing nothing.
-func (it *Iterator) fenceBypassed(res Result, phase string) error {
-	if len(res.Bypassed) == 0 {
-		return nil
+// afterSession is the check every Copilot session gets once it ends and its
+// inputs are restored: the hook's binary, then the calls its fence denies. A
+// halt is exit 9 and commits nothing; a failed restore is reported after it.
+func (it *Iterator) afterSession(res Result, phase string, restoreErr error) error {
+	h := res.backstop(phase, it.warn)
+	if h == nil {
+		return restoreErr
 	}
-	for _, c := range res.Bypassed {
-		if c.What == "" {
-			it.warn("vloop: %s — %s", c.Tool, c.Reason)
-		} else {
-			it.warn("vloop: %s %s — %s", c.Tool, c.What, c.Reason)
-		}
+	if restoreErr != nil {
+		it.warn("%v", restoreErr)
 	}
-	return it.haltGit("FENCE BYPASSED %s — the session ran %d call(s) its fence denies; nothing from it was used", phase, len(res.Bypassed))
+	it.plan.Status = "halted"
+	_ = it.save()
+	_ = it.log.flush()
+	return h
 }
 
 func (it *Iterator) gitRefsMoved(before []string, task, phase string) error {
@@ -673,10 +674,8 @@ func (it *Iterator) workSession(task *state.Task, iter int) (workReport, error) 
 	if err != nil {
 		return workReport{}, err
 	}
-	if _, err := it.restoreInputs(inputs, PhaseWork, wres.Path); err != nil {
-		return workReport{}, err
-	}
-	if err := it.fenceBypassed(wres, PhaseWork); err != nil {
+	_, rerr := it.restoreInputs(inputs, PhaseWork, wres.Path)
+	if err := it.afterSession(wres, PhaseWork, rerr); err != nil {
 		return workReport{}, err
 	}
 	if err := it.gitChanged(gguard, PhaseWork); err != nil {
@@ -807,7 +806,7 @@ func (it *Iterator) reviewRun(task *state.Task, iter int, phase string) (reviewR
 		return reviewResult{}, err
 	}
 	inputsChanged, err := it.restoreInputs(inputs, phase, rres.Path)
-	if err != nil {
+	if err = it.afterSession(rres, phase, err); err != nil {
 		return reviewResult{}, err
 	}
 	if err := it.gitChanged(gguard, phase); err != nil {
@@ -981,7 +980,8 @@ func (it *Iterator) verifySession() error {
 		return nil
 	}
 	it.sessionDone(Spec{Phase: PhaseVerify}, res)
-	if _, err := it.restoreInputs(inputs, PhaseVerify, res.Path); err != nil {
+	_, rerr := it.restoreInputs(inputs, PhaseVerify, res.Path)
+	if err := it.afterSession(res, PhaseVerify, rerr); err != nil {
 		return err
 	}
 	if err := it.gitChanged(gguard, PhaseVerify); err != nil {
