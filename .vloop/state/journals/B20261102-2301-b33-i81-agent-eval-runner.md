@@ -60,3 +60,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** tools/agent-eval/worked_test.go runs every line of the brief's worked example (o1-o4, both --list lines, --agent nope, non-empty --out, o6) against fixture-review and fixture-operate under testdata/worked, with fake copilot, claude and vloop on a temporary PATH.
 - **Files:** tools/agent-eval/worked_test.go, tools/agent-eval/testdata/worked
 - **Notes for next iteration:** testdata/worked is a copy of the T6 gate fixtures (cases, fake-*.sh with @ST@ substituted by the test, session/stream samples). The test skips if bash is missing. --list over plugin/evals is run with --cases ../../plugin/evals because the default is relative to the process cwd. No existing test or plugin/evals file changed.
+
+## Run ended — complete
+
+- **Run:** `B20261102-2301-b33-i81-agent-eval-runner` · 5 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked

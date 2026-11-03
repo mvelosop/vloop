@@ -1,0 +1,21 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "docs/design-notes/multi-agent-backends.md:63-65: \"Needed: a backend-agnostic eval runner replaying the same cases and graders.\"",
+      "observed": "The same note's line 96 now says \"It is tools/agent-eval since B33.\", but the \"two hard parts\" item 2 still lists the runner as needed, with no mention that it exists.",
+      "where": "brief A6 (design note: one sentence added); docs/design-notes/multi-agent-backends.md:63-65 against :94-96"
+    }
+  ],
+  "not_run": [
+    {
+      "line": "a vloop run session's Claude argv -> ends in \"--output-format\" \"json\", as before",
+      "reason": "covered by TestSessionArgs and TestRunClaudeInvocations, which the brief says are not run by hand"
+    }
+  ],
+  "checked": { "example_lines": 9, "sentences": 22, "surfaces": 5 },
+  "notes": "Passes 1-3 done. Every worked-example line ran as written, against fake copilot/claude/vloop scripts built from the tool's testdata/worked, and all matched the brief: o1 mean 1 with graders a-d at 1; o2 mean 0.6667 with b at 0 and NOTES b; o3 exit 1 'scaffold exited 3: boom'; o4 skipped 'no phase'; both --list lines; the unknown-agent and not-empty refusals; o6 gave the same trace as o1. Contract spot checks, all as stated: each A1 refusal text and exit 2; 'no vloop binary for the fence hook'; frontmatter and missing-prompt errors exit 1; 'timed out after 1s'; 'no session result'; effort null; the Claude session argv has stream-json and --verbose; the judge argv has no --plugin-dir, runs in an empty temp directory and gets its prompt on stdin; the Copilot hook runs the --vloop binary; the plugin and fence are extracted under the name agent-eval. Not checked by hand: the Windows/Linux builds, the full list of grader edge cases (covered by the tool's own tests), and the real-agent acceptance, which is the operator's. Observations that are not findings, because the brief says nothing on them: 'agent-eval --help' prints only 'agent-eval: flag: help requested' and no usage. tools/agent-eval/README.md says skipped cases 'do not count', but the stdout total counts every selected case, skipped ones included, as A5 specifies. The README's layout list omits the per-run <phase>-<n>.stderr file and the copilot-home and plugin directories under repo/.vloop/tmp. docs/design-notes/vloop-roadmap.md has no B33 row yet, which is presumably the operator's at close."
+}
+
