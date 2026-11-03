@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/4 done** · iteration 4
+**Status:** running · **4/4 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T05:02:57Z
+**Brief:** `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` · **Updated:** 2026-11-03T05:14:50Z
 
 ## Progress
 
 - [x] **T1** — Judge compound commands through, and let command -v and -V run nothing (C1, C3)
 - [x] **T2** — Match a word the shell expands as any text (C2)
 - [x] **T3** — Document the wider reading in the guide, the fence audit and fence check's help (C4)
-- [ ] **T4** — Close the run: every gate at once, and the worked example line for line
+- [x] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
@@ -92,7 +92,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Close the run: every gate at once, and the worked example line for line
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap.
 

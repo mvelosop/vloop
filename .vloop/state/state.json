@@ -5,9 +5,9 @@
   "base": "866a9b77d79f00a5b65e5db5559df03ed3a203b0",
   "branch": "B20261103-0315-b35-i83-fence-compound-commands",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-03T04:35:57Z",
-  "updated": "2026-11-03T05:02:57Z",
+  "updated": "2026-11-03T05:14:50Z",
   "shell": "sh",
   "checks": [
     {
@@ -173,7 +173,7 @@
         "Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds)."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

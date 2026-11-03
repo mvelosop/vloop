@@ -12,3 +12,10 @@
    review T3 · 0m20s · $0.10 · run $0.50 / $40.00
    review: PASS
    T3 done
+── iteration 5 (3 this run) · T4 · 3/4 done ──
+   Close the run: every gate at once, and the worked example line for line
+   work T4 · 7m32s · $0.15 · run $0.65 / $40.00
+   check go
+   review T4 · 0m36s · $0.11 · run $0.76 / $40.00
+   review: PASS
+   T4 done

@@ -39,3 +39,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The configuration guide, the fence audit (hook bullet and work-session paragraph) and `vloop fence check --help` now describe the wider reading, with the brief's C4 text word for word.
 - **Files:** docs/guide/configuration.md, docs/design-notes/fence-audit.md, internal/cli/fence.go
 - **Notes for next iteration:** none
+
+## T4 — Close the run: every gate at once, and the worked example line for line
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Ran gates T1, T2 and T3 together on the final tree (all ok) and checked every worked-example line against the committed tests; no code changed.
+- **Files:** none
+- **Notes for next iteration:** Line-for-line: every C1, C2 and C3 worked-example command is a case in gate T1's cases.tsv (C1, C3 lines; command -$v git push is in T2's) or T2's cases.tsv (C2 lines), and a Go-string case in internal/fence/judge_test.go: TestCompoundCommands (C1 lines, including the (ls case as 'open-subshell'), TestExpandedWords (C2 lines, the for x in push line, git diff "$BASE" --stat, command -$v git push), and C3 command -v/-V, time -v, command gh pr list in the same tests (grep -F found each at least once). No gap found, no test added. The TestTaskGate* failures in internal/cli are the live driver's plan guard firing because the plan differs from the driver's in-session; not touched by this run.
