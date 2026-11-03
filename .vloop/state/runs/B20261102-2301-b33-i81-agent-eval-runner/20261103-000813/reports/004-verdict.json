@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "An llm grader's focus is the trace's last text event (default), the trace text (`focus: trace`) or a workspace file (focus source: file, path); a missing file scores 0 with reason `no <path>` and calls no judge.", "met": true, "evidence": "judge.go scoreLLM picks the focus; TestJudgeFocus and TestJudgeMissingFocusFile assert the stdin and that the judge is not called"},
+    {"criterion": "The judge is `claude -p --model <--judge-model> --output-format json --strict-mcp-config --setting-sources project`, started in an empty temporary directory outside the workspace and --out, with no --plugin-dir, its prompt on stdin holding the grader's body and the focus and asking for PASS or FAIL on the last line; the answer is the JSON's `result`, its cost `total_cost_usd`.", "met": true, "evidence": "judge.go askJudge builds exactly these args, cmd.Dir is a MkdirTemp dir, the prompt goes on stdin; judgePrompt asks for PASS/FAIL"},
+    {"criterion": "It is asked three times and the majority decides 1 or 0; an answer whose last line is neither PASS nor FAIL counts as FAIL; the three calls' cost is the run's judge_cost_usd, and COST in the table adds it to the session's.", "met": true, "evidence": "judgeVotes=3, pass*2>3; vote() is true only for PASS; runner.go:204 sums gr.cost into JudgeCostUSD and runner.go:257 adds it to COST; TestJudgeMajority checks the majority, a non-answer and the 0.03 cost"},
+    {"criterion": "A judge call that does not run, exits non-zero or prints no JSON with a `result` is not a vote: the run is an error with reason `judge failed: <grader>: <cause>`, and the tool exits 1.", "met": true, "evidence": "askJudge returns an error in each case, scoreLLM wraps it as 'judge failed: <name>: ...', and runner.go sets status error; TestJudgeFailureIsAnError covers exit, non-JSON and no result. The exit 1 comes from the existing error handling and is not tested here"},
+    {"criterion": "The judge is Claude whatever --agent is; report.json's judge_model is the --judge-model given (sonnet by default).", "met": true, "evidence": "askJudge always runs claude; runner.go:87 sets JudgeModel from o.judgeModel; main.go:47 defaults it to sonnet"},
+    {"criterion": "Committed tests in tools/agent-eval cover the judge with a fake claude on a temporary PATH: the majority, a non-answer, a failing judge, each focus and a missing focus file; no test runs a real claude.", "met": true, "evidence": "judge_test.go fakeClaude puts a script on a temporary PATH; the four tests cover every listed case; the go check passed"}
+  ],
+  "findings": [],
+  "notes": "None."
+}

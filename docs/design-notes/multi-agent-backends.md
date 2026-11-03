@@ -62,7 +62,8 @@ Runner (unchanged: masking, lock, timeout/RunGroup, session/v1 record, stderr fi
 2. **Skill quality on other models.** Skills are tuned on Claude. The
    `plugin/evals` suites (hollow test, gate gaming, scope creep, …) are how to
    qualify a model, but run via `claude plugin eval`. Needed: a backend-agnostic
-   eval runner replaying the same cases and graders.
+   eval runner replaying the same cases and graders: `tools/agent-eval` since
+   B33.
 
 ## Copilot vs Grok
 
@@ -93,5 +94,5 @@ Settled with the operator on 2026-10-25, Copilot first:
 Plain-text prompt rendering is no longer on the path for Copilot; it returns
 if a harness that loads no plugins is added. A backend-agnostic eval runner is
 deferred: the replays qualified Copilot for review, and opening work or plan to
-another agent needs it first.
+another agent needs it first. It is tools/agent-eval since B33.
 The fence audit is worth doing even if no other model is ever added.

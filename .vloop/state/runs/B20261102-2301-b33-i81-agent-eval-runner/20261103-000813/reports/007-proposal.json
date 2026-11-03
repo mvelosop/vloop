@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "tools/agent-eval/worked_test.go runs every line of the brief's worked example (o1-o4, both --list lines, --agent nope, non-empty --out, o6) against fixture-review and fixture-operate under testdata/worked, with fake copilot, claude and vloop on a temporary PATH.",
+  "files": ["tools/agent-eval/worked_test.go", "tools/agent-eval/testdata/worked"],
+  "verified": "vloop task gate T6 equivalent (sh .vloop/state/gates/T6/gate.sh) exited 0 and printed 'gate T6: ok'; go test ./tools/agent-eval and go vet pass.",
+  "notes": "testdata/worked is a copy of the T6 gate fixtures (cases, fake-*.sh with @ST@ substituted by the test, session/stream samples). The test skips if bash is missing. --list over plugin/evals is run with --cases ../../plugin/evals because the default is relative to the process cwd. No existing test or plugin/evals file changed."
+}

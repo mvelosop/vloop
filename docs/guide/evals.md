@@ -139,6 +139,17 @@ The exit code is 0 when every case scores at least `--threshold` (default 1.0),
 1 otherwise, 2 when the cost ceiling was hit. `--json <file>` writes every
 run's grader verdicts; the HTML report shows the same per case and arm.
 
+## Other agents
+
+`claude plugin eval` runs on Claude only. To replay the cases on another agent
+or model, run `go run ./tools/agent-eval` from the repository root; its flags,
+output layout and differences from `claude plugin eval` are in
+[tools/agent-eval/README.md](../../tools/agent-eval/README.md).
+
+A model qualifies for a phase on an agent when, at 3 runs, every case of that
+phase scores a mean no lower than the phase's default Claude model scores on the
+same tool with the same runs.
+
 ## vloop's suites
 
 | Skill | Cases | Asks |

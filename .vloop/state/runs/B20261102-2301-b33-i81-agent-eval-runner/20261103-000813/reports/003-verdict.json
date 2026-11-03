@@ -1,0 +1,74 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "A case whose skill is plan, work, review, gate-review or verify starts as vloop run starts that phase, and review-brief as vloop brief review starts it, with the case's argument (the rest of prompt.md's first body line) as the session's, the --model given, no effort, killed at --timeout; any other skill skips the case with reason `no phase` (phase \"\" in report.json, `-` in the table, 0 runs), starting nothing.",
+      "met": true,
+      "evidence": "tools/agent-eval/runner.go sessionPhases maps the six skills to driver phases; Spec has no effort; Timeout is passed to Runner; other skills are skipped with 'no phase' (TestCopilotRunEndToEnd, case op)"
+    },
+    {
+      "criterion": "Run k of a case uses `<out>/<case>/run-<k>/repo/`, created empty, where the case's scaffold.sh runs as `bash <absolute path of the script>`; a non-zero exit makes the run an error with reason `scaffold exited <code>: <the scaffold's last stderr line>` and starts no session.",
+      "met": true,
+      "evidence": "runner.go runOnce runs `bash <abs script>` in an empty repo/ and returns 'scaffold exited N: last stderr line'; test case bad asserts 'scaffold exited 3: broke'"
+    },
+    {
+      "criterion": "The session's run folder is `<out>/<case>/run-<k>/` (its record under sessions/, its stderr file), outside repo/; the plugin is the tool's embedded copy, extracted into the workspace's .vloop/tmp/ as vloop extracts it under the version name `agent-eval`; the tool takes no lock and does not clear the workspace's .vloop/tmp/.",
+      "met": true,
+      "evidence": "Runner{Root: repo, Version: 'agent-eval', RunDir: dir}; no lock taken by the tool; test checks sessions/*.json under run-1 and the plugin under repo/.vloop/tmp"
+    },
+    {
+      "criterion": "A Copilot session's fence hook runs --vloop's binary (`'<vloop path>' fence hook --phase <phase> --root ...`); vloop's own Copilot sessions still run os.Executable()'s.",
+      "met": true,
+      "evidence": "driver Runner.HookBinary feeds writeCopilotHooks; default stays os.Executable(); tested by TestCopilotHookBinaryOption and by the end-to-end hook assertion"
+    },
+    {
+      "criterion": "A work, review or verify session gets VLOOP_PLAN_SHA256 computed as vloop run computes it (state.PlanDigest over the scaffold's .vloop/state/state.json and its gate files) when the scaffold left a plan, none otherwise; plan, gate-review and review-brief sessions get none.",
+      "met": true,
+      "evidence": "runOnce sets spec.PlanSHA via state.PlanDigest only for work/review/verify when state.json exists"
+    },
+    {
+      "criterion": "`<out>/<case>/run-<k>/transcript.jsonl` holds Copilot's JSON Lines exactly as printed; `trace.jsonl` holds one object per event in order: `{\"kind\":\"text\",\"text\":...}` for an assistant.message with non-empty content, `{\"kind\":\"tool\",\"tool\":...,\"input\":...,\"output\":...}` for a tool.execution_start paired by toolCallId with its tool.execution_complete \u2014 input the arguments as compact JSON without HTML escaping, output the result's content (\"\" when none), the tool name mapped by the brief's table, any other name unchanged.",
+      "met": true,
+      "evidence": "Runner.Transcript keeps stdout as printed; trace.go builds the trace; the test asserts unescaped input JSON and TestObservedCopilotTrace reads testdata/observed"
+    },
+    {
+      "criterion": "The trace text is each event on its own line: a text event's text; a tool event's `<tool> <input>` and, on the next line, its output.",
+      "met": true,
+      "evidence": "traceText in trace.go/runner.go; exercised by the regex grader 'Bash .*a<b&c' scoring 1"
+    },
+    {
+      "criterion": "regex searches the trace text (target: trace) or a workspace file (target source: file, path) with a Go regular expression, match contains or not_contains, a missing file scoring 0 with reason `no <path>`; tool_used counts tool events whose tool equals `tool` and, when input_match is given, whose input matches it as a Go regular expression, scoring 1 when the count is at least min (default 1) and at most max (unbounded when absent); file_exists scores 1 when path exists in the workspace; any other type except llm scores 0 with reason `unsupported grader <type>` \u2014 never as passing. A run's score is the weighted mean of its graders' scores.",
+      "met": true,
+      "evidence": "graders.go implements regex, tool_used and file_exists, with 'no <path>' and 'unsupported grader <type>' reasons; test graders a-g assert each"
+    },
+    {
+      "criterion": "A session that leaves no result is an error with reason `no session result`; one killed at --timeout is `timed out after <d>` as Go prints the duration (`2s`, `20m0s`), the timeout's reason winning when both hold.",
+      "met": true,
+      "evidence": "runOnce checks TimedOut before Recorded, with the reasons 'timed out after <d>' and 'no session result'; TestNoResultAndTimeout covers both"
+    },
+    {
+      "criterion": "report.json is `{agent, model, judge_model, runs, cases: [{name, phase, status scored|skipped|error, reason, mean, runs: [{status, reason, score, graders: [{name, weight, score, reason}], cost_usd, credits, judge_cost_usd, wall_ms}]}]}`: a grader's name is its file name without .md; an errored run has score null and no graders; a case is error when any run errored, skipped when skipped, scored otherwise; mean is the unrounded mean of its scored runs' scores, null when none; credits is the session's Copilot credits.",
+      "met": true,
+      "evidence": "report/caseResult/runResult structs in runner.go match the schema; the mean is unrounded; the end-to-end test reads report.json"
+    },
+    {
+      "criterion": "stdout is a header CASE PHASE RUNS MEAN COST NOTES, one line per case in name order (text/tabwriter, padding 2; RUNS the runs started, MEAN two decimals or `-`, COST the sessions' and judge's dollars with two decimals, NOTES a skipped or errored case's reason, else the names of graders below 1 in any run, each once, in name order, joined by \", \"), then `<c> case(s) \u00b7 <s> skipped \u00b7 <e> error(s) \u00b7 $<total>`. Exit 0 when no case is error, 1 when any is.",
+      "met": true,
+      "evidence": "printTable uses tabwriter with padding 2, the specified header and the total line; exit 1 on an error; the test asserts the lines and exit code 1"
+    },
+    {
+      "criterion": "The argv, record and output of every vloop session are unchanged, and TestSessionArgs (internal/driver/session_test.go) and TestRunClaudeInvocations (cmd/vloop/run_agent_test.go) pass unmodified \u2014 a change to either test file, or to any file under plugin/evals, is a violation the review rules against.",
+      "met": true,
+      "evidence": "No diff to session_test.go, cmd/vloop tests or plugin/evals; driver additions default to the old behaviour; TestRunnerKeepsTranscriptOnlyWhenAsked"
+    },
+    {
+      "criterion": "Committed tests in tools/agent-eval cover a Copilot run end to end with a fake copilot and fake vloop scripts on a temporary PATH and fixture cases in a temporary directory (scored, scaffold error, skipped, no result, timeout), the trace read from testdata/observed/copilot-events.jsonl, each grader type and the table; any driver option added has a test in internal/driver; no test runs a real claude or copilot.",
+      "met": true,
+      "evidence": "tools/agent-eval/run_test.go uses fake copilot/vloop scripts on PATH and temp case dirs; internal/driver tests exist for both new options; the go check log passed"
+    }
+  ],
+  "findings": [],
+  "notes": "Work was committed in the earlier attempt (c69d729); the only working-tree diff is the operator's gate replacement (%.17g) in vloop records. The llm grader and claude sessions error out until T3 and T4, which the proposal states and the brief expects."
+}

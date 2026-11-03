@@ -1,0 +1,43 @@
+── iteration 3 (1 this run) · T2 · 1/6 done ──
+   Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
+   work T2 · 0m19s · $0.09 · run $0.09 / $40.00
+   check go
+   review T2 · 0m33s · $0.17 · run $0.27 / $40.00
+   review: PASS
+   T2 done
+── iteration 4 (2 this run) · T3 · 2/6 done ──
+   Score the llm grader with a Claude judge voting three times
+   work T3 · 3m23s · $0.31 · run $0.57 / $40.00
+   check go
+   review T3 · 0m21s · $0.11 · run $0.69 / $40.00
+   review: PASS
+   T3 done
+── iteration 5 (3 this run) · T4 · 3/6 done ──
+   Stream a Claude session's transcript into the same trace
+   work T4 · 1m30s · $0.30 · run $0.99 / $40.00
+   check go
+   review T4 · 0m23s · $0.12 · run $1.11 / $40.00
+   review: PASS
+   T4 done
+── iteration 6 (4 this run) · T5 · 4/6 done ──
+   Document the tool, the qualifying rule and the design note's answer
+   work T5 · 0m36s · $0.16 · run $1.27 / $40.00
+   check go
+   review T5 · 0m21s · $0.09 · run $1.36 / $40.00
+   review: PASS
+   T5 done
+── iteration 7 (5 this run) · T6 · 5/6 done ──
+   Close: the worked example as a committed test, every gate at once
+   work T6 · 1m20s · $0.25 · run $1.61 / $40.00
+   check go
+   review T6 · 0m22s · $0.12 · run $1.73 / $40.00
+   review: PASS
+   T6 done
+   check go
+   verify · 1m44s · $0.31 · run $2.04 / $40.00
+verify: 1 finding(s); 1 example line(s) not run — see .vloop/state/runs/B20261102-2301-b33-i81-agent-eval-runner/20261103-000813/reports/verify.json
+
+═══ complete ═══
+run:    B20261102-2301-b33-i81-agent-eval-runner/20261103-000813  (5 iteration(s) this run)
+plan:   6/6 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261102-2301-b33-i81-agent-eval-runner.md

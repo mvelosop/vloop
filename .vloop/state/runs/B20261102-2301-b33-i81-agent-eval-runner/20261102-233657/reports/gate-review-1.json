@@ -1,0 +1,14 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Every gate fails on the base for the missing behaviour (no Go files in tools/agent-eval; no README.md), not for a typo. The expected values were checked against the driver: the copilot credit price gives 2 credits as $0.01, the plan digest equals the sha256 of state.json when no gate files exist, the fence path is .vloop/tmp/fence/agent-eval/review.json, and the session record has effort null. The T1 awk matcher reproduces the phase and grader count of every case in plugin/evals. Criteria about committed tests, unchanged driver tests and plugin/evals are judged by the review and the go check."
+}
+

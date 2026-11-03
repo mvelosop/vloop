@@ -276,3 +276,89 @@ func TestCopilotReviewBriefArgvAndHooks(t *testing.T) {
 		t.Errorf("hooks file %s: %v", data, err)
 	}
 }
+
+func TestCopilotHookBinaryOption(t *testing.T) {
+	root := t.TempDir()
+	a := copilotAdapter{hook: "/opt/it's/vloop"}
+	p, err := a.Prepare(root, "9.9.9", PhaseReview)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if err != nil || !strings.Contains(string(data), `'/opt/it'\\''s/vloop' fence hook --phase review --root `) {
+		t.Errorf("the hook does not run the named binary: %s %v", data, err)
+	}
+	exe, _ := os.Executable()
+	p, err = copilotAdapter{}.Prepare(t.TempDir(), "9.9.9", PhaseReview)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, _ = os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if !strings.Contains(string(data), "'"+exe+"' fence hook") {
+		t.Errorf("by default the hook runs os.Executable(): %s", data)
+	}
+}
+
+func TestRunnerKeepsTranscriptOnlyWhenAsked(t *testing.T) {
+	bin := t.TempDir()
+	fake := filepath.Join(bin, "claude")
+	script := "#!/bin/sh\nprintf '{\"type\":\"x\"}\\n{\"total_cost_usd\":0.5,\"num_turns\":1}\\n'\n"
+	if err := os.WriteFile(fake, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, keep := range []bool{false, true} {
+		root, dir := t.TempDir(), t.TempDir()
+		r := &Runner{Root: root, Version: "9.9.9", RunID: "r", RunDir: dir, Claude: fake, Env: []string{"PATH=" + os.Getenv("PATH")}}
+		tr := filepath.Join(dir, "transcript.jsonl")
+		if keep {
+			r.Transcript = tr
+		}
+		if _, err := r.Run(Spec{Phase: PhaseReview, Arg: "T1", Model: "m", Iteration: 1}); err != nil {
+			t.Fatal(err)
+		}
+		data, err := os.ReadFile(tr)
+		if keep && (err != nil || string(data) != "{\"type\":\"x\"}\n{\"total_cost_usd\":0.5,\"num_turns\":1}\n") {
+			t.Errorf("transcript = %q, %v", data, err)
+		}
+		if !keep && err == nil {
+			t.Errorf("a transcript was kept without being asked")
+		}
+	}
+}
+
+func TestStreamOptionClaudeArgvAndRecord(t *testing.T) {
+	s := Spec{Phase: PhaseReview, Arg: "T1", Model: "m"}
+	plain := Args(s, "f", "p")
+	got := streamArgs(plain)
+	want := append(append([]string{}, plain[:len(plain)-1]...), "stream-json", "--verbose")
+	if strings.Join(got, "\x00") != strings.Join(want, "\x00") {
+		t.Errorf("streamArgs = %q, want %q", got, want)
+	}
+	cmd := claudeAdapter{stream: true}.Command(s, t.TempDir(), nil, Prepared{Fence: "f", Plugin: "p"})
+	if !strings.Contains(strings.Join(cmd.Args, " "), "--output-format stream-json --verbose") {
+		t.Errorf("argv = %q", cmd.Args)
+	}
+	cmd = claudeAdapter{}.Command(s, t.TempDir(), nil, Prepared{Fence: "f", Plugin: "p"})
+	if !strings.HasSuffix(strings.Join(cmd.Args, " "), "--output-format json") {
+		t.Errorf("default argv = %q", cmd.Args)
+	}
+	stream := "{\"type\":\"assistant\"}\n{\"type\":\"result\",\"total_cost_usd\":0.5,\"num_turns\":3,\"duration_ms\":7}\n"
+	o, ok := claudeAdapter{stream: true}.Parse([]byte(stream), func(s string) string { return s })
+	if !ok || o.Cost != 0.5 || o.Turns != 3 || o.AgentMS != 7 {
+		t.Errorf("Parse = %+v %v", o, ok)
+	}
+	if _, ok := (claudeAdapter{stream: true}).Parse([]byte("{\"type\":\"assistant\"}\n"), nil); ok {
+		t.Errorf("a stream without a result line is a record")
+	}
+}
+
+func TestRunnerStreamIsPassedToClaude(t *testing.T) {
+	ad, err := (&Runner{Root: t.TempDir(), Stream: true}).withSession(claudeAdapter{}, Spec{})
+	if err != nil || !ad.(claudeAdapter).stream {
+		t.Errorf("Stream not handed to the adapter: %v", err)
+	}
+	ad, _ = (&Runner{Root: t.TempDir()}).withSession(claudeAdapter{}, Spec{})
+	if ad.(claudeAdapter).stream {
+		t.Errorf("stream is on by default")
+	}
+}

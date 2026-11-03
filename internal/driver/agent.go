@@ -63,6 +63,10 @@ type Output struct {
 // withSession gives an adapter what only the session knows and its Parse needs:
 // the model, and the price of a Copilot credit.
 func (r *Runner) withSession(ad Adapter, s Spec) (Adapter, error) {
+	if cl, ok := ad.(claudeAdapter); ok {
+		cl.stream = r.Stream
+		return cl, nil
+	}
 	c, ok := ad.(copilotAdapter)
 	if !ok {
 		return ad, nil
@@ -75,7 +79,7 @@ func (r *Runner) withSession(ad Adapter, s Spec) (Adapter, error) {
 	if err != nil {
 		return nil, fmt.Errorf("copilot.credit-usd %q: %w", got.Value, err)
 	}
-	c.model, c.creditUSD = s.Model, price
+	c.model, c.creditUSD, c.hook = s.Model, price, r.HookBinary
 	return c, nil
 }
 
@@ -101,7 +105,13 @@ func AgentPreflight(name string) (found bool, problem string) {
 	return a.Preflight()
 }
 
-type claudeAdapter struct{ bin string }
+// claudeAdapter runs claude as bin. With stream set the session prints
+// stream-json (with --verbose) in place of one JSON document, and its record is
+// read from the stream's last line, the one of type result.
+type claudeAdapter struct {
+	bin    string
+	stream bool
+}
 
 func (claudeAdapter) Name() string { return AgentClaude }
 
@@ -144,7 +154,11 @@ func (a claudeAdapter) Command(s Spec, root string, env []string, p Prepared) *e
 	if bin == "" {
 		bin = "claude"
 	}
-	cmd := exec.Command(bin, WithGuidelines(Args(s, p.Fence, p.Plugin), root)...)
+	args := Args(s, p.Fence, p.Plugin)
+	if a.stream {
+		args = streamArgs(args)
+	}
+	cmd := exec.Command(bin, WithGuidelines(args, root)...)
 	cmd.Dir = root
 	cmd.Env = dropEnv(env, "VLOOP_ACTIVE_TASK", "VLOOP_GATE_TASK", PlanHashEnv)
 	if s.PlanSHA != "" {
@@ -155,7 +169,10 @@ func (a claudeAdapter) Command(s Spec, root string, env []string, p Prepared) *e
 
 // Parse maps claude's one JSON document onto an Output; anything else is not a
 // record. Fields claude did not print are zero values of the same type.
-func (claudeAdapter) Parse(stdout []byte, mask func(string) string) (Output, bool) {
+func (a claudeAdapter) Parse(stdout []byte, mask func(string) string) (Output, bool) {
+	if a.stream {
+		stdout = streamResult(stdout)
+	}
 	var raw map[string]json.RawMessage
 	if len(strings.TrimSpace(string(stdout))) == 0 || json.Unmarshal(stdout, &raw) != nil {
 		return Output{}, false
@@ -218,4 +235,38 @@ func (claudeAdapter) Parse(stdout []byte, mask func(string) string) (Output, boo
 		o.ModelsUsed[k] = usage{u.Input, u.Output, u.CacheRead, u.CacheCreation, u.Cost}
 	}
 	return o, true
+}
+
+// streamArgs is a claude argv with --output-format stream-json and --verbose in
+// place of --output-format json; the rest is as given.
+func streamArgs(args []string) []string {
+	out := make([]string, 0, len(args)+1)
+	for i, a := range args {
+		if a == "json" && i > 0 && args[i-1] == "--output-format" {
+			out = append(out, "stream-json", "--verbose")
+			continue
+		}
+		out = append(out, a)
+	}
+	return out
+}
+
+// streamResult is the last line of a stream-json output that is a result
+// object; nil when there is none.
+func streamResult(stdout []byte) []byte {
+	lines := strings.Split(string(stdout), "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		l := strings.TrimSpace(lines[i])
+		if l == "" {
+			continue
+		}
+		var head struct {
+			Type string `json:"type"`
+		}
+		if json.Unmarshal([]byte(l), &head) == nil && head.Type == "result" {
+			return []byte(l)
+		}
+		return nil
+	}
+	return nil
 }
