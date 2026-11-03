@@ -1,0 +1,29 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C2 (the xargs bullet; Unchanged: a -c string holding $)",
+      "summary": "C2 counts every word that holds xargs' replace string as expanded. The judge does not match a shell's -c string, though: it splits it again and judges what is inside, and the only -c string C2 refuses is one holding `$`. So `xargs -I % sh -c 'git %'` reaches the inner judge as `git %`, where `%` (or `{}`, which is not a brace expansion) is literal, and the command is allowed. It runs `git push`. Putting the replace string inside `sh -c '…{}…'` is the usual xargs idiom, and the contract does not say what happens to it. A task can implement C2 as written, pass every worked-example line, and leave this open.",
+      "evidence": "Binary built from ee4adf63, phase review: `echo push | xargs -I % sh -c 'git %'` → allow; `echo push | xargs -I {} sh -c 'git {} origin'` → allow; `echo x | xargs -i sh -c 'git {}'` → allow. internal/fence/judge.go, case \"sh\", \"bash\", …: shellString returns the -c string and j.shell parses it again with no memory of which words were expanded. shellString refuses only a string holding `$`.",
+      "fix": "Add to C2's xargs bullet: with a replace option, a shell's -c string that holds the replace string is refused, as one holding `$` is, with the shell's prefix. Pin the message, for example `sh: the -c string holds xargs' replace string and cannot be judged`, and add the worked-example line `review  echo push | xargs -I % sh -c 'git %'   → deny: <that message>`. C4's lists of refusals can name it with the expanded words."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest, rather than parsing the grammar (mvdan.cc/sh rejected). Agree: a compound runs only commands the splitter already cuts out, and each is judged as if sent alone.",
+    "case, select, function, coproc, [[ and function definitions stay refused. Agree; none is among the counted denials.",
+    "An expanded word ($, glob, brace) matches as any text, and the whole word stands for it. Agree, and it closes real bypasses that are allowed today (`X=push; git $X origin`, `git pu{sh,} origin`, `git pu?h origin`, `g$X push origin`, confirmed on the base). The cost is real and the brief lists it: git diff/log/show with a `$` or glob argument, `find \"$d\"`, and in work sessions `rm \"$f\"` / `rm *.tmp`. Unsure: the note's 'none of the 5 names a command a fence denies' does not show that none of them would be denied under C2 (a `git diff \"$BASE\"` would be). The kept sessions' transcripts would settle it.",
+    "A command name that expands anywhere is refused, and so is an expanded word a wrapper skips or a shell option before -c. Agree.",
+    "A redirection target holding a glob or a brace expansion is refused (new message). Agree: it closes `echo x > .vloop/*` at the hook.",
+    "xargs is matched as if it ended with one expanded word; with a replace option, the words holding the replace string count as expanded; BSD -J/-R/-S take an argument. Agree; see the finding for the -c string.",
+    "command -v / -V (literal, letters p/v/V) runs nothing; time -v does not. Agree.",
+    "Subshells are read; `((` is refused as arithmetic; let, ${a[x]} and declare -i are left for a later brief. Acceptable; they are named in Out of scope.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays denied). Agree.",
+    "C2 applies in every phase. Agree."
+  ],
+  "checked": "facts (split.go and judge.go as described: keywords, skipXargs letters, shellString, the $-refusals; today's answers of 16 forms on a base binary; rule order in the review, work and plan fences and the Copilot stems behind every pinned message; denial counts against copilot-cli-experiments.md B22.0/B24/B26/B27/terra rows and the kept-sessions section; C4 anchor sentences in configuration.md:80, fence-audit.md:22-25 and :235-239, fence.go Long help; commands.md renders Short only), consistency (every worked-example line traced through C1–C3), rules (CLAUDE.md, S-2/S-4, no new dependency), runnability (go check after each task, the existing tests that change as listed in Constraints, B34 and cli tests unaffected, vloop fence check usable in verify); vloop brief check: ok, 0 warnings",
+  "header": "Reviewed 2026-11-03: FIX, 1 finding"
+}
+

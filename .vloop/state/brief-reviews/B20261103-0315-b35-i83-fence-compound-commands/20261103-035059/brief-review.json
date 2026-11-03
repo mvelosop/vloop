@@ -1,0 +1,49 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C2 (the rule on words before the command name)",
+      "summary": "C2 refuses an expanded word that a wrapper skips, because it can become several words before the command name. The rule lists env, command, exec, nice, timeout, stdbuf and xargs, but not the option words of sh/bash/zsh/dash/ksh before the -c string. The judge handles those in shellString, not in the wrapper switch. Only the -c string holding $ is refused. An expanded option there can supply the command string, so this bypass gets through today and still gets through after B35.",
+      "evidence": "internal/fence/judge.go shellString skips any '-…' option without 'c' and the value of -o/+o, never looking for $. Base binary: `vloop fence check --phase review --tool bash 'IFS=,; sh -e$x -c ls'` → allow; `'sh -o $o -c ls'` → allow. Real shell, with a stub git on PATH: `bash -c 'x=\"c,git push\"; IFS=,; sh -e$x -c ls'` printed `RAN push`, so it ran `git push`.",
+      "fix": "Extend C2's list: a word before the -c string of sh, bash, zsh, dash or ksh (an option, or -o's/+o's value) that expands refuses the command. Write the message literally. Today shellString's errors come out as `sh: <reason>`, so pick either `sh: -e$x expands before the command name and cannot be judged` or the unprefixed form. Add a worked-example line, e.g. `review  IFS=,; sh -e$x -c ls → deny: <that message>`, under # C2."
+    },
+    {
+      "kind": "decision",
+      "section": "Out of scope / C2",
+      "summary": "xargs appends words it reads from stdin after the command it runs. The judge looks through xargs and matches only the literal words, so `echo push origin | xargs git` is allowed today and after B35, and runs `git push origin`. This is the same class C2 closes: words the judge cannot see stand where a deny rule could match. The brief neither closes it nor names it in Out of scope. A previous round treated the arithmetic contexts this way.",
+      "evidence": "Base binary, work phase: `echo push origin | xargs git` → allow; `ls | xargs -I{} git {} origin` → allow. judge.go: `case \"xargs\": rest = skipXargs(rest)`, then the command is matched as written.",
+      "fix": "Either name it in Out of scope (\"the words xargs appends from its input: matched as absent, as today; a later brief's\"), or close it: treat an xargs command as followed by an expanded word, so `xargs git` is denied wherever `git push` is. Deferring is the smaller change."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C3 / Worked example",
+      "summary": "C3 makes `command -v` run nothing, but only for `command`. In the code, `time` shares that wrapper case (`case \"command\", \"time\": rest = skipDashes(rest)`), so the obvious edit, putting the -v check in that case, also lets `time -v git push` through. GNU time -v does run the command. No worked-example line pins it.",
+      "evidence": "internal/fence/judge.go, words(): `case \"command\", \"time\":`. Base binary: `time -v git push` → deny: git push is denied by the review fence (Bash(git push:*)).",
+      "fix": "Add under # C3: `review  time -v git push → deny: git push is denied by the review fence (Bash(git push:*))`, and add \"`time -v` let through\" to the failures it must catch."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references",
+      "summary": "The domain entry cites S-2 but not S-4. S-4 is the invariant behind the new redirection rules on `}`, `done` and `)`: the worked example's `{ git status; } > .vloop/state/x` denial is S-4. The architect skill asks for every invariant that applies, by ID.",
+      "evidence": "docs/domain/domain-model.md:220 S-4; .claude/skills/vloop-architect/SKILL.md \"Bind by invariant\".",
+      "fix": "Make the entry \"the glossary's **hook** row, S-2 and S-4: …, and the writes a redirection after `}`, `done` or `)` may make\"."
+    }
+  ],
+  "decisions": [
+    "Read compounds by dropping the leading keyword, with no grammar parser (no mvdan.cc/sh). Agree: nothing inside is judged less than if it were written one command per line.",
+    "case, select, function, coproc and [[ stay refused. Agree; none appears among the counted denials.",
+    "An expanded word may be any text, the deliberate over-deny. The brief names `git diff \"$BASE\"`, `find \"$d\"` and `git diff -- src/*.go`. It does not name these two: in a work session `rm \"$f\"` and `rm *.tmp` are now denied (by `rm -r:*`), and `git log $BASE..HEAD` is denied everywhere (by `git log*--output*`). I'd keep the decision and add the rm case to the brief, so the operator sees the work-session cost.",
+    "Quoted means literal; `{}`, `@{u}` and `HEAD@{1}` are not brace expansions; `[` without `]` is not a glob. Agree.",
+    "C3 covers `command -v`/`-V` only, not type, which or hash (those are not looked through). Agree.",
+    "Subshells are read, but `((`, `$(`, `<(` and `>(` stay refused, and `((` is refused because of arithmetic. Agree.",
+    "A redirection target holding a glob is still judged as written. So `echo x > .gi?/hooks/pre-commit` is allowed in a work session, today and after B35. The driver's checks after the session, on .git/config, the hooks and .vloop/, and tee/cp being unjudged anyway, make this acceptable. It should be a conscious choice, though.",
+    "The let, ${a[x]} and declare -i arithmetic contexts stay out of scope. Agree.",
+    "Order within a command (opening keywords, then closing keywords/for/refused, then assignments and wrappers); a keyword after a wrapper is not dropped; C2 applies in every phase. Agree."
+  ],
+  "checked": "vloop brief check (ready copy): ok, 0 warnings. Facts: the 9 if / 5 for / 2 subshell counts against the design note's B22.0, B24, B26, B27 and terra rows; the kept-sessions section (uncommitted, joins with the ready merge) and its $ calls in the b32-terra61 clones; split.go refuses ( and ); keywords and words in judge.go; `command` looked through; the C4 sentences found verbatim in configuration.md, fence-audit.md and the fence check help; TestSplitRefuses `(gh x)`, the work table's for case, and the `if … gh x` case keeping *. Consistency: walked every worked-example line against the review, work and plan fences' rule order and the Copilot stems, including messages, quote removal and the first rule that matches; confirmed the 'today' claims on the base binary. Rules: CLAUDE.md, the architect skill's constraints, depends-on B34. Runnability: task order against the go check (only the two named test cases flip, both allowed by Constraints); task gates fail on the base; the close runs single-quoted lines through the built binary, which the verify fence allows.",
+  "header": "Reviewed 2026-11-03 (round 9): FIX, 4 findings"
+}
+

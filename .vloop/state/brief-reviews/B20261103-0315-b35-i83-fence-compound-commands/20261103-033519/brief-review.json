@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Why this shape, and what was rejected — An expanded word is any text",
+      "summary": "The example of a harmless command C2 denies, `vloop task show \"$id\"` under a fence that denies `vloop task done:*`, is not denied by C2: the expanded word comes after the literal `show`, so `vloop task show <any text>` can never begin with `vloop task done`. No fence has a `vloop task done:*` rule either.",
+      "evidence": "C2: a command is denied when some text in place of the expanded words makes a deny rule match; `pre:*` matches the prefix alone or followed by a space (internal/fence/judge.go patternMatch). fence/*.json hold `vloop task verify:*`, `reset`, `note`, `drop`, `set`, and no `vloop task done:*` (grep -rn 'task done' fence/ prints nothing).",
+      "fix": "Replace the example with one C2 does deny, for example `vloop task \"$verb\" T1` (denied through `Bash(vloop task verify:*)`), or delete it: the `git diff \"$BASE\" --stat` and `find \"$d\" -name x` examples that follow already make the point."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example / Shape",
+      "summary": "`env ! git status → deny: shell syntax ! cannot be judged` sits under `# C2` but pins a C1 decision (\"a keyword after a wrapper is not dropped\"), and it is already today's answer. Task 2's gate on \"its lines\" would carry a C1 line.",
+      "evidence": "Decided here: \"A keyword after a wrapper is not dropped: `env ! x` stays denied\". The base binary answers `deny: shell syntax ! cannot be judged` for this line in the work phase today.",
+      "fix": "Move the line under `# C1, what is inside is judged`, so task 1's gate pins it together with the rule it tests."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest, with no shell grammar and no mvdan.cc/sh. Sound: the splitter already cuts at every operator, so each command a compound can run reaches the judge.",
+    "case, select, function, coproc and [[ stay refused. Agreed: none of them appears among the counted denials.",
+    "An expanded word ($, glob, brace) stands for any text, and is not resolved. Agreed. The cost is measured for `$` only (5 of 52 kept calls, none denied). Unquoted globs are not counted: with them, every `git diff`, `git log`, `git show` and `find` command is denied, because of the inner-`*` rules (`git log --oneline -- docs/*.md`, `find internal -name *_test.go`). Acceptable, since a retry with quotes passes, but this is the likeliest new false denial.",
+    "A command name that expands anywhere in it is refused, not only one that starts with `$`. Agreed: it closes `g$X push` and `/usr/bin/$X push`.",
+    "An expanded word that a wrapper skips refuses the command (`nice -n $N push origin`). Agreed: it closes a real bypass.",
+    "Redirection targets holding a glob stay judged as written. Agreed: not a new hole, since `tee .git/hooks/pre-commit` is allowed in a work session today and the driver stays the boundary (S-2).",
+    "`command -v`/`-V` (and -pv, -vp) run nothing, only when written literally. Agreed.",
+    "Subshells are read too, with a redirection allowed after `)` but no word. Agreed.",
+    "The order inside a command (keywords, then assignments and wrappers) and `env ! x` staying refused. Agreed.",
+    "The decisions were taken under the operator's delegation of 2026-11-02, not seen by the operator one by one."
+  ],
+  "checked": "facts (split.go, judge.go, judge_test.go, review_brief_test.go, internal/cli fence tests, fence/*.json rules, the Copilot deny list, the doc sentences C4 rewrites in configuration.md, fence-audit.md and fence.go help, the denial counts 9 if / 5 for / 2 subshells against copilot-cli-experiments.md, the uncommitted kept-sessions section, the domain glossary row and S-2); every worked-example line walked against the contract and the real rule order, with the base binary run for the lines claimed as today's answers; consistency (the summary against the contract, C2 against C3, the test exceptions in the constraints); runnability (task order against the single go check: task 1 needs only the two named test changes, task 2 turns no existing test red, command -$v deferred to task 2; verify runs only vloop fence check); rules (no new dependency, repo-relative paths, depends-on B34 is consumed). vloop brief check on a ready copy: ok, 0 warnings.",
+  "header": "Reviewed 2026-11-03: FIX, 2 findings"
+}
+

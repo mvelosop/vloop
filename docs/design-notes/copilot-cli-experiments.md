@@ -764,3 +764,13 @@ branch's binary, `gpt-6.1-terra` on Copilot:
 | Where the run stopped | T5 blocked after two review FAILs: the model's, not the fence's (see B32's section) |
 
 No call got past the hook, and the re-judge raised no false halt.
+
+### The shell calls of the kept sessions (for B35, 2026-11-03)
+
+The 7 Copilot sessions kept in B32's and B33's acceptance clones made 52
+shell calls. The hook denied 3 for syntax it cannot judge (2 `if`, 1 `for`),
+and, in B32's brief review session, one `command -v node; …; command -v
+curl; vloop version`, because it looks through `command` to `curl` (`curl
+is denied by the review-brief fence`).
+5 of the 52 hold a `$` outside single quotes; none names a command a fence
+denies.

@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C2 (xargs); Worked example",
+      "summary": "C2 counts BSD `-J <s>` as an xargs replace option, but today's skipXargs does not know -J takes an argument, and no worked-example line pins it. A task can do the replace string for -I, -i and --replace only, pass every gate, and leave `xargs -J % git push` allowed. That command runs git push and is allowed today. BSD -R and -S also take an argument that skipXargs does not skip, so `xargs -I {} -R 1 git push` and `xargs -S 255 -I {} git push` read `1` or `255` as the command name and are allowed. This is the same bypass: a word before the name that the judge misreads.",
+      "evidence": "internal/fence/judge.go skipXargs: only the letters \"adEILnPs\" take an argument. `man xargs` on macOS lists -J replstr, -R replacements and -S replsize. On the base binary, review phase: `echo x | xargs -J % git push origin` => allow; `echo x | xargs -I {} -R 1 git push` => allow; `echo x | xargs -S 255 -I {} git push` => allow.",
+      "fix": "Add `review  echo x | xargs -J % git push   → deny: git push is denied by the review fence (Bash(git push:*))` under # C2, and say in C2's xargs bullet that -J, -R and -S take an argument (name skipXargs's letter table in the judge.go reference). If -R/-S are not wanted here, name them in Out of scope instead."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C4 (fence-audit hook bullet)",
+      "summary": "The hook bullet in fence-audit lists what the judge denies ('… a command word starting with `$`'). C4 adds only what B35 reads and the any-text matching, not the three refusals B35 adds: a command word that expands anywhere, an expanded word before the command name (or before a shell's -c string), and a redirection target holding a glob or a brace expansion. After the run the audit understates the hook's refusals. configuration.md's new text leaves out the same three.",
+      "evidence": "docs/design-notes/fence-audit.md:22-25 ('What it cannot parse it denies: … a command word starting with `$`.'). C2 introduces 'command word <word> expands…', '<word> expands before the command name…', 'a redirection target that expands cannot be resolved: …'. C4's texts for both docs mention none of them.",
+      "fix": "Extend the C4 sentence added to the hook bullet with: 'and refuses a command word, a word before it, or a redirection target that expands (B35)'. Add the same clause to the configuration.md replacement."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest, rather than parsing the grammar (no mvdan.cc/sh). Agree: nothing runs that is not judged as its own command.",
+    "case, select, function, coproc, [[ and function definitions stay refused. Agree: none appears in the counted denials.",
+    "An expanded word ($, glob, brace) matches as any text and is not resolved. This is the main trade-off: it denies common harmless calls (git diff \"$BASE\", git show \"$SHA\", find \"$d\", and in work sessions rm \"$f\" and rm *.tmp). Agree: it closes real bypasses, confirmed on the base binary (`X=push; git $X origin`, `g$X push origin`, `nice -n $N push origin`, `bash -$O -c …` are all allowed today).",
+    "A command name that expands anywhere is refused, as is an expanded word a wrapper skips or a shell option before -c. Agree.",
+    "A redirection target holding a glob or a brace expansion is refused. Agree.",
+    "xargs is matched as if it ended with an expanded word, and the replace string counts as expanded. Agree; see finding 1 for -J/-R/-S.",
+    "command -v/-V (literal option) runs nothing; time -v does not. Agree.",
+    "Subshells are read; `((` is refused as arithmetic; other arithmetic contexts (let, ${a[x]}, declare -i) are left for a later brief. Acceptable; they are named in Out of scope.",
+    "A keyword after a wrapper is not dropped (env ! x stays denied). Agree.",
+    "C2 applies in every phase. Agree."
+  ],
+  "checked": "facts (judge.go/split.go behaviour, the wrapper table, the fence rule order behind every pinned message, the denial counts against copilot-cli-experiments.md sections, S-2/S-4 and the hook glossary row, the C4 anchor texts, the fence check help and the generated commands.md), consistency (every worked-example line traced through C1–C3, including first-rule-named order in review/work fences), rules, runnability (task order against the go check, existing tests that change, gates failing on the base)",
+  "header": "Reviewed 2026-11-03: FIX, 2 findings"
+}
+

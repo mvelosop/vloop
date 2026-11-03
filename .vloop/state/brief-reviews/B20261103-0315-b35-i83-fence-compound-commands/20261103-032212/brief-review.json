@@ -1,0 +1,43 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C2 and Decided here (C2 applies to the words after every wrapper)",
+      "summary": "C2 says an expanded word may be any text, including several words, but it only matches the words after the wrappers. A word a wrapper skips (an option, timeout's duration, exec -a's name, an env NAME=value) can expand to the command's name. That bypass gets through today and still gets through after B35.",
+      "evidence": "Today's binary, review phase: `command -$x push` -> allow, `nice -n$N push` -> allow, `timeout $T push` -> allow, `exec -a $x push origin` -> allow. With T='5 git', `timeout $T push` runs `timeout 5 git push`. Likewise `env A=$x push` with x='1 git'. internal/fence/judge.go skipDashes/skipNice/skipTimeout/skipExec/skipEnv drop these words before `match` sees them, and the C2 contract and 'Decided here' never bring them back.",
+      "fix": "Add to C2: a word that a wrapper skips and that is expanded (an unquoted or double-quoted `$`, a glob or a brace) may hold the command's name, so the command is refused with C2's own `command word <word> expands and cannot be judged`. Add `review  timeout $T push   → deny: command word $T expands and cannot be judged` to the worked example and the failures it must catch. C3's line `command -$v git push` then changes to that answer too (`-$v` is skipped by `command`), or keep it by excluding that word explicitly. State which one."
+    },
+    {
+      "kind": "fact",
+      "section": "Why this shape / Subshells, not only braces",
+      "summary": "The brief says B26's run counted one subshell. B26's run recorded none. The subshell denials were in B22.0 and B24, as the executive summary itself says.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:433 (B26): '5, all shell syntax the hook cannot judge (4 `for`, 1 `$(…)`)'. Line 251 (B22.0) and line 365 (B24) each record 1 subshell. Issue 83 cites B22's acceptance.",
+      "fix": "Write 'and B22.0's and B24's runs counted one each'."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary / seeds",
+      "summary": "The brief's figures for the kept sessions (52 calls, 5 holding `$`, and the `command -v curl` denial) rest on a design-note section that is uncommitted. That section credits the `command -v` denial to 'B32's and B33's kept sessions' under the plan fence, not specifically to 'B32's plan session'. (Unsure: the attribution may be right. The session records in the acceptance clones would settle it.)",
+      "evidence": "`git diff --stat` shows docs/design-notes/copilot-cli-experiments.md modified, +9 lines: '### The shell calls of the kept sessions (for B35, 2026-11-03)'. The section reads: 'one `command -v node; …; command -v curl; vloop version` … (`curl is denied by the plan fence`)'.",
+      "fix": "Commit the note's new section with the brief's ready merge. Either say 'a plan session of B32's or B33's kept sessions' or add the run to the note."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest; no shell grammar (mvdan.cc/sh rejected). Agree: nothing inside is judged less than one per line.",
+    "case, esac, select, function, coproc and [[ stay refused. Agree: none appears among the counted denials.",
+    "An expanded word is any text, one or several words, even double-quoted (where no splitting happens). Agree, it fails closed. Costs not named in the brief: in a work session `rm \"$f\"` and `rm *.tmp` become denied (Bash(rm -rf:*) matches with $f = -rf), and so does `git log \"$BASE\"..HEAD` (Bash(git log*--output*)). Worth naming next to `git diff \"$BASE\"`.",
+    "Quoted or escaped is literal. `{}`/`@{u}` (no , or .. inside) and a `[` with no `]` after it are not expansions. Agree.",
+    "A command name holding a glob or brace is refused with the new message `command word <word> expands and cannot be judged`. Agree.",
+    "command -v / -V (with p) run nothing; type, which and hash need nothing. Agree.",
+    "Subshells are read; $(, <( and >( stay refused; a word after `)` is refused. Agree.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays `shell syntax ! cannot be judged`). Agree; this is today's answer, verified.",
+    "C2 applies in every phase, including plan and review-brief. Agree.",
+    "The C4 wording for configuration.md, fence-audit.md and fence check's help. No opinion; the anchor sentences exist verbatim."
+  ],
+  "checked": "facts (denial counts against copilot-cli-experiments.md; the C4 anchor sentences in configuration.md:80, fence-audit.md:25 and :234, internal/cli/fence.go help; the test cases named in Constraints at judge_test.go:85, :149, :285; today's answers for env ! x, command -v curl, git pu{sh,} origin; fence rules identical across all six phases), consistency (every worked-example line walked through C1–C3 against the fence and deny-list order and messages), rules (no go.mod change, no .vloop edits, repo-relative), runnability (go check after each task; C1 lines need nothing from C2; the close's single-quoted lines pass the verify hook as literal words); vloop brief check ok",
+  "header": "Reviewed 2026-11-03: FIX, 3 findings"
+}
+
