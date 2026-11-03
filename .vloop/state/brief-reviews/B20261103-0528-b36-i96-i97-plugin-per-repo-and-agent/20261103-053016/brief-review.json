@@ -1,0 +1,86 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Constraints / Shape (task 2) / P3 / P4",
+      "summary": "After task 2 the go check goes red, and the brief does not allow the test changes that would fix it. (a) Existing stubs list vloop entries with no `scope`. Under P3 such an entry is not counted, so results change, not only messages: '✓ plugin' becomes a warning. (b) The cmd/vloop harnesses put the real PATH after the stubs. On the operator's machine `copilot` is on PATH, so a new `copilot plugin` row appears, run by the REAL copilot. That changes exact doctor listings and warning counts, and breaks the brief's own rule that no test runs a real agent CLI. vloop run's preflight also calls runDoctor, so every run (and every run e2e test) would start copilot for a row that the preflight then throws away.",
+      "evidence": "No-scope fixtures: internal/cli/doctor_test.go:282-286 and 299-302; cmd/vloop/b5_e2e_test.go:118 (setPlugin); cmd/vloop/b13_e2e_test.go:97. Real PATH appended: cmd/vloop/b5_e2e_test.go:155, cmd/vloop/run_harness_test.go:312, cmd/vloop/b20261005_e2e_test.go:200. Exact listings: b5_e2e_test.go:251-252 ('✓ plugin' … '1 warning(s)'); b13_e2e_test.go:90-94 (b13After expects gate edits right after plugin, plus '2 warning(s)'). Shared function: internal/cli/run.go:186. `which copilot` → ~/.nvm/versions/node/v24.22.1/bin/copilot.",
+      "fix": "Settle what a list entry with no `scope` means. Either it counts as user, or add to the Constraints exception that test stubs gain \"scope\":\"user\". Add a constraint that every test harness shadows `copilot` (a stub, or a PATH without it), and extend the exception to cover that. Decide whether run's preflight computes the `copilot plugin` row. I recommend it does not: bare doctor only (runBrief == nil)."
+    },
+    {
+      "kind": "consistency",
+      "section": "P1 Output / Worked example (upgrade lines)",
+      "summary": "P1 says upgrade reports wrote/updated/kept and would write/update/keep 'like the other steps'. upgrade's other steps print only 'updated X' when something changed, print nothing when kept, and print only 'would update X' on dry-run and on the breaking path. upgrade also returns 'already at <v>' before any step when the stamp equals the binary. The worked example's upgrade lines don't pin the stamp or binary version, or --yes, so a test can land on 'already at' or on the breaking refusal.",
+      "evidence": "internal/cli/upgrade.go:49-52 (Same → 'already at'), 87-98 (breaking path / dry-run print only 'would update'), 100-106 (only 'updated'). cmd/vloop/b5_e2e_test.go:254-255 pin upgrade's exact lines.",
+      "fix": "Write upgrade's settings lines literally for each case. Normal: 'updated', and nothing (or 'kept') when kept. --dry-run, and the breaking path without --yes. A missing file: 'wrote' or 'updated'? Pin each upgrade line in the worked example to a version pair, e.g. 'stamp 0.1.0, binary 0.1.1'."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example / (missing) Acceptance",
+      "summary": "Every P1 line runs vloop init or vloop upgrade, which the verify session cannot run, and no line names the end-to-end test that covers it. The brief says 'The acceptance checks the second on a real run', but there is no '## Acceptance, at close (the operator's)' section. So nobody is assigned to check that Copilot sessions ignore the declaration, or that trusting the folder installs the plugin.",
+      "evidence": "plugin/skills/create-brief/guidelines.md:60-65. The brief's sections run Executive summary … Shape, with no Acceptance section.",
+      "fix": "Name a stub-agent e2e test beside each P1 line, or say task 1 writes one in cmd/vloop. Add the Acceptance section with two operator checks on a real machine: (1) a vloop run with agent.work=copilot in a repository holding the declaration installs nothing into the session's COPILOT_HOME and loads one vloop plugin; (2) trusting a fresh folder in claude and in copilot installs and enables the plugin."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary / Why (Existing values win) / P4",
+      "summary": "Unsure. The brief says the declared plugin is 'enabled in that repository only', and P4 treats `copilot plugin list --json` as per-repository. On this machine the list shows vloop enabled:true both in this repository and in /tmp, which has no declaration. That fits either a per-user install or a list that is not per-repository. If the list is not per-repository, P4's 'enabled for this repository' cases, and the 'Copilot list read from another directory' failure, mean nothing.",
+      "evidence": "In the repo: `copilot plugin list --json` → [{\"name\":\"vloop\",\"marketplace\":\"vloop\",\"version\":\"0.14.0\",\"enabled\":true,\"source\":\"installed\"},{\"name\":\"browser-use\",…}]. In /tmp: identical. `copilot plugin list --help` confirms --json exists. P4's field names match.",
+      "fix": "To settle: with a fresh COPILOT_HOME, trust repository A, run one session, then run `copilot plugin list --json` in A and in /tmp. If both say enabled:true, drop the 'for this repository' wording and the failure case from P4, and record the measurement in the brief's seeds."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary / P3 messages",
+      "summary": "Unsure, not verified. Three claims about Claude Code have no cited source. (1) Trusting the folder makes Claude install the plugin the repository declares: the brief only cites a Copilot test. (2) `claude plugin list --json` emits `scope` and `projectPath`. (3) `claude plugin update vloop@vloop` updates a project-scope install. The repository's rule is that an external tool's behaviour is taken from the tool or its docs. Related: P3 runs claude in the process's working directory ('as today'), while P4 runs copilot in the root. With -C these differ, which matters if Claude computes `enabled` from the working directory's settings.",
+      "evidence": "This review could not run `claude plugin list --json` (permission denied), so the fields are unverified. CLAUDE.md, repo guidelines: 'An external tool's format, flags and messages are taken from the tool or its docs, never from memory.' internal/cli/doctor.go:576: exec.Command with no Dir. The seeds name only 'the claude and copilot plugin list --json output on 2026-11-03'.",
+      "fix": "Put the observed `claude plugin list --json` entry (with projectPath) in the seeds. Cite the Claude Code doc, or a measurement, for install-on-trust and for the update command's scope. Run P3 with the repository root as working directory, as P4 does."
+    },
+    {
+      "kind": "consistency",
+      "section": "P2 printInitNext",
+      "summary": "The new lines aren't literal enough to compare. The fenced block sits inside a list item, so its leading spaces are ambiguous: is it 2/6/6/4, or 0/4/4/2 after the item indent? The current Claude lines use 2/4/4/2. 'After the Claude lines' also doesn't say whether the block goes before or after the closing 'then ask Claude Code for what you want…' line.",
+      "evidence": "internal/cli/init.go:334-342; cmd/vloop/b5_e2e_test.go:238-243 compare these lines exactly.",
+      "fix": "Write printInitNext's whole new output as one literal block, outside a list item, with the exact indentation."
+    },
+    {
+      "kind": "consistency",
+      "section": "P1 Merge rules",
+      "summary": "Some merge cases are not pinned. (1) `enabledPlugins` or `extraKnownMarketplaces` present but not an object (null, an array, a string): merge into it, keep it, or refuse? (2) The order of the two keys when both are added to an existing file. The worked example implies extraKnownMarketplaces first only for the no-file case. (3) Value fidelity: Go's encoder escapes &, < and > by default, so \"Bash(a && b)\" would come back as \\u0026\\u0026. That is a 'value changed' violation the review must rule on.",
+      "evidence": "Brief P1 'Merge rules'. The worked example's second line checks only key order.",
+      "fix": "Add one line each: a non-object parent is refused with the not-a-JSON-object message, or kept untouched (say which). When both keys are added, extraKnownMarketplaces comes before enabledPlugins. Existing values are re-emitted byte for byte apart from indentation, with no HTML escaping. Add a worked-example line with \"&&\" in a permission."
+    },
+    {
+      "kind": "consistency",
+      "section": "P2 concepts.md / Why (No global change in a remedy)",
+      "summary": "Two loose ends. (1) concepts.md says 'For interactive sessions, either install the plugin or pass --plugin-dir, not both.' In a repository with the declaration, every --plugin-dir alternative the brief adds loads both, and P2 doesn't say what that sentence becomes. (2) The version-mismatch remedies name only `claude plugin update` / `copilot plugin update`, which change user state. That contradicts 'a user-level install is named as one option, never as the fix'. The exact strings may be fine, but the stated rule and the messages disagree.",
+      "evidence": "docs/guide/concepts.md:374-376; the brief's P3 and P4 version rows.",
+      "fix": "Say what the 'not both' sentence becomes. Either qualify the no-global-change rule to exempt updating an install the operator already has, or reword the version messages."
+    },
+    {
+      "kind": "fact",
+      "section": "Why (vloop's own sessions are unaffected)",
+      "summary": "'this repository has had enabledPlugins[\"vloop@vloop\"] through B8–B35' is half right. The key was added in B14.",
+      "evidence": "`git log -- .claude/settings.json`: b2d2c654 (B14, 2026-10-14) adds \"enabledPlugins\": {\"vloop@vloop\": true}. The earlier commits (B12, B1) don't have it.",
+      "fix": "Change to 'since B14 (2026-10-14)'."
+    }
+  ],
+  "decisions": [
+    "Declaring in .claude/settings.json only, with no .github/copilot/settings.json: sound if Copilot reads the file as #96 reports.",
+    "Existing values win, including enabledPlugins[\"vloop@vloop\"]: false as an opt-out: sound.",
+    "The declaration installs the marketplace's version, not the binary's; doctor flags a mismatch: acceptable.",
+    "vloop's own Claude and Copilot sessions are unaffected by the declaration. The Copilot half is unproven and has no acceptance section to check it (finding 3).",
+    "The Claude row keeps the name `plugin` and the new row is `copilot plugin`: sound, since --json names are an interface.",
+    "The Copilot row appears only when copilot is on PATH. Implicitly it also runs inside vloop run's preflight: I recommend bare doctor only (finding 1).",
+    "No global change in a remedy, and `claude plugin enable` is dropped. The version messages break the rule as written (finding 8).",
+    "P3 counts user scope, or any entry whose projectPath is the root. Unstated: what 'local' and 'managed' scopes, and entries without a scope, mean.",
+    "P4 counts any plugin named `vloop`, whatever its marketplace: acceptable.",
+    "A settings file that is not a JSON object fails the whole init/upgrade with exit 1, rather than skipping the step with a warning. Defensible, but it blocks init over a file vloop treats as optional.",
+    "The P1 step runs after the CLAUDE.md step; upgrade reports `kept`, which no other upgrade step does (finding 2); the gate edits row is unchanged."
+  ],
+  "checked": "facts (doctor.go doctorPlugin, doctorGateEdits, runDoctor order; init.go runInit, mergedStep, applySteps, printInitNext; upgrade.go; section.go text; the Copilot adapter's COPILOT_HOME; copilot 1.0.105 plugin list/update/install/marketplace help and list --json output; .claude/settings.json history; concepts.md paragraphs), consistency, rules (CLAUDE.md, the create-brief guidelines, the vloop-architect constraints, C-1), runnability (the go check against every test that pins doctor, init or upgrade output, and every harness's PATH); vloop brief check on a ready copy: ok, 0 warnings",
+  "header": "Reviewed 2026-11-03: FIX, 9 findings"
+}
+

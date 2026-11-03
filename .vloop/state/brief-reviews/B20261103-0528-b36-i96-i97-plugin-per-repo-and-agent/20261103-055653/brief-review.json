@@ -1,0 +1,71 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Constraints / Shape (task 1)",
+      "summary": "After task 1 (P1), an existing test fails, and the Constraints don't let the task change it. TestDoctorGateEditsNoClaudeAndWritesNothing asserts that .claude/ does not exist in a repository where newDoctorEnv ran `vloop init`. Once init writes .claude/settings.json, the go check stays red until someone edits that test. The test pins neither a P3 message, the CLAUDE.md section, printInitNext nor an init/upgrade output line, so it falls outside every listed exception.",
+      "evidence": "internal/cli/doctor_test.go:509-521 (`os.Stat(filepath.Join(e.repo, \".claude\")); err == nil` → t.Error(\"doctor created .claude/\")); newDoctorEnv runs e.run(\"init\") at internal/cli/doctor_test.go:61; gateEditsEnv builds on newDoctorEnv (line 427).",
+      "fix": "Add an exception to Constraints: a test that assumes `vloop init` leaves no .claude/ may remove .claude/ after init, or compare .claude/ before and after doctor. Its assertion that doctor writes nothing stays."
+    },
+    {
+      "kind": "fact",
+      "section": "Why this shape — vloop's own sessions are unaffected; Acceptance 3",
+      "summary": "Unsure. The brief says the declaration is ignored in vloop's Copilot sessions because they run with no trusted folder. That is inferred, not measured. The design note records that Copilot asked for no folder trust in vloop's -p sessions (B22, B27). If -p mode with --allow-all-tools counts as trusted for the declaration, every Copilot session would fetch the plugin from GitHub (network) into its throwaway COPILOT_HOME, next to the --plugin-dir copy. The brief's own scope says 'unchanged: how vloop run loads the plugin', and acceptance step 3 would catch a violation only at close, after the build.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:459-460 and :508-509 ('Copilot asked for none there'); internal/driver/agent_copilot.go:172-199 (-p, --allow-all-tools, COPILOT_HOME=<session home>, no trust setting). The Claude side was measured on 2026-11-03; the Copilot side was not.",
+      "fix": "Before marking ready, run one Copilot -p session the way vloop does (fresh COPILOT_HOME, a clone holding the declaration) and record whether installed-plugins/ gains vloop. If it does, the operator must decide how to neutralise it (e.g. an adapter change), which reopens the scope."
+    },
+    {
+      "kind": "consistency",
+      "section": "P1 — Merge rules; Worked example (P1 lines 2-3)",
+      "summary": "The merged file's bytes are pinned only for the no-file case. 'Two-space indentation, only whitespace between tokens may change' leaves the layout open: is [\"Bash(go:*)\"] expanded to one element per line or kept inline, and how is an empty {} or [] written? Lines 2-3 of the worked example describe the result ('permissions first and unchanged') instead of giving it. Two correct implementations can produce different files, and a gate comparing bytes would accept only one. The result of `upgrade --dry-run`, and of the breaking path without --yes, on an invalid file is also not stated (exit 1 with the JSON message, or the would-update lines?).",
+      "evidence": "Brief, P1 'Merge rules' and the worked example's P1 block. Only the first line shows a literal file.",
+      "fix": "Give line 2's result as a literal file, e.g. {\\n  \"permissions\": {\\n    \"allow\": [\\n      \"Bash(go:*)\"\\n    ]\\n  },\\n  \"enabledPlugins\": {...}, ... (every member and array element on its own line, empty containers as {} and []). Also state that a non-object file fails with exit 1 and the same message under --dry-run and before --yes."
+    },
+    {
+      "kind": "consistency",
+      "section": "P2 — Copilot in the docs",
+      "summary": "The docs that list what `vloop init` writes and what `vloop upgrade` refreshes are not in P2, so after the run they no longer describe the commands.",
+      "evidence": "docs/guide/concepts.md:320-331 ('It writes .vloop/config.toml …, a starter brief, the line .vloop/tmp/ in .gitignore, and vloop's section of CLAUDE.md'; 'vloop upgrade refreshes that CLAUDE.md section and .gitignore line and rewrites the stamp'); README.md:54-55 (Quickstart step 1).",
+      "fix": "Add both to P2: init writes the plugin declaration into .claude/settings.json, keeping what is there, and upgrade adds it when missing."
+    },
+    {
+      "kind": "fact",
+      "section": "P3 — doctor's plugin row (Claude)",
+      "summary": "Half right: 'compared as doctor's trust row compares … (trustKeyMatch: separators normalised, case ignored on macOS and Windows, symlinks resolved)'. trustKeyMatch resolves no symlinks. doctorTrusted resolves the root only (it tries root and EvalSymlinks(root)), never the key.",
+      "evidence": "internal/cli/platform.go:11-18; internal/cli/doctor.go:546-556.",
+      "fix": "Say 'the root as given and with symlinks resolved, against projectPath as listed', or require resolving projectPath too if that is intended."
+    },
+    {
+      "kind": "fact",
+      "section": "P3 — 'counted entries, none enabled' message",
+      "summary": "Unsure. For an entry that is installed but disabled, the remedy is `claude plugin install vloop@vloop --scope project`. Nobody has measured whether re-installing an already-installed, disabled plugin enables it, or whether it refuses with 'already installed'. The alternative that changes only the repository's settings (`claude plugin enable vloop@vloop --scope project`) is banned by the Violations list, which forbids any `claude plugin enable` in a doctor message, scoped or not.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:819-832 measures install --scope and update --scope, not install on a disabled entry, nor enable --scope. Brief, Violations: 'A doctor message suggesting claude plugin enable'.",
+      "fix": "Measure `claude plugin install vloop@vloop --scope project` on a disabled entry. If it does not enable it, name `claude plugin enable vloop@vloop --scope project` and narrow the violation to the unscoped (user-level) form."
+    },
+    {
+      "kind": "consistency",
+      "section": "Shape / P2",
+      "summary": "P2 is mostly prose: README's sentence and paragraph and concepts.md's subsection are described, not written out. The brief doesn't say what happens when the review fails twice on wording, which the guidelines require for prose tasks.",
+      "evidence": "plugin/skills/create-brief/guidelines.md, 'Prose-only tasks'.",
+      "fix": "Add one line under Shape: if task 3's review fails twice on wording, block it and the operator finishes the text."
+    }
+  ],
+  "decisions": [
+    "Only .claude/settings.json carries the declaration; .github/copilot/settings.json rejected. Sound: Copilot reads the former, and one copy avoids drift.",
+    "Existing values win, including enabledPlugins[\"vloop@vloop\"]: false as an opt-out. Sound.",
+    "No version pin in the declaration (the marketplace has no selector); doctor's version check reports drift. Sound.",
+    "vloop's own sessions are taken to be unaffected. Measured for Claude; inferred for Copilot. See the unsure fact finding: measure before ready.",
+    "Claude row keeps the name `plugin`; new row `copilot plugin`, no rename, because scripts read --json names. Sound.",
+    "Claude's remedy becomes `claude plugin install vloop@vloop --scope project`; README and init now lead with --scope project. This changes the recommended install for every user. The operator should know it.",
+    "The copilot plugin row appears only when doctor's copilot row does (agent.* key set, agent.review-brief included); not when copilot is merely on PATH. It is not computed in vloop run's preflight. Sound.",
+    "No remedy requires a global change; `claude plugin enable` (any scope) is dropped from messages. The scoped form may be needed; see finding.",
+    "Decided here: the P1 step runs after CLAUDE.md in init and after .gitignore in upgrade; upgrade prints nothing when the file is kept; upgrade's 'already at <v>' early return stays, so the declaration arrives only with the next version. That last point means repositories already at 0.15.x get nothing until a later release. Acceptable, but worth knowing.",
+    "Version message: the first enabled counted entry's version, where today's code keeps the last. A deliberate change."
+  ],
+  "checked": "facts (doctor.go plugin/copilot/gate-edits/trust code, run.go preflight discarding rows, init.go/upgrade.go steps and output, section.go text, copilotAdapter args, design-note measurements, README and concepts.md text, every test pinning changed messages/lines); consistency (P1 rules vs worked example, P3/P4 tables vs examples, row order vs TestDoctorGateEditsFollowsPlugin, Decided-here vs contract); rules (C-1, CLI conventions, CLAUDE.md rules, guidelines); runnability (each task against the go check, existing tests the tasks may and may not change, stubs, acceptance placement of live-agent lines); decisions",
+  "header": "Reviewed 2026-11-03: FIX, 7 findings"
+}
+

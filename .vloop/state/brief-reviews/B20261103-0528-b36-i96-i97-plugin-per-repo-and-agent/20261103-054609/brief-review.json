@@ -1,0 +1,64 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Worked example (P1 lines) / Shape task 1",
+      "summary": "All nine P1 lines run vloop init or vloop upgrade. The verify session cannot run vloop init, and no end-to-end test is named beside these lines. The P3 and P4 lines need stub claude and copilot binaries that print chosen JSON, and no test is named for them either.",
+      "evidence": "plugin/skills/create-brief/guidelines.md:60-65: 'The verify session cannot run vloop init … Cover such a line with an end-to-end test the plan writes with stub agents, named beside the line, or move it to ## Acceptance'. The brief's worked example header names no test. Shape task 1 says only 'gated on its worked-example lines'.",
+      "fix": "Name the test in the worked example's header, e.g. 'cmd/vloop/b36_e2e_test.go, TestWorkedExampleB36, runs every line below with stub claude and copilot'. Have task 1 write the P1 part of that test and task 2 the P3 and P4 parts."
+    },
+    {
+      "kind": "consistency",
+      "section": "P3 table (no counted entry) / P4 table (no counted entry; counted, none enabled)",
+      "summary": "Three remedy messages assume the folder is untrusted and that .claude/settings.json declares the plugin as true. The brief itself produces repositories where neither holds, and there the messages give wrong advice.",
+      "evidence": "(a) The folder is trusted and the operator declined Claude's install offer. Doctor's trust row passes, yet the plugin row says 'trust this folder in claude to install the plugin .claude/settings.json declares'. (b) The file has enabledPlugins[\"vloop@vloop\"]: false, which P1 keeps. P4 still says 'trust this folder in copilot so the declaration in .claude/settings.json enables it'. (c) A repository stamped at the binary's version: upgrade returns 'already at <v>' (internal/cli/upgrade.go:49-51, unchanged by P1), so the file has no declaration until the next version.",
+      "fix": "Word each message so it holds in every case. For example: 'trust this folder in claude and accept the plugin its .claude/settings.json declares (vloop init and vloop upgrade write the declaration), or …'. For P4's not-enabled case: 'enabledPlugins[\"vloop@vloop\"] true in .claude/settings.json, in a trusted folder, enables it'. The alternative is to make doctor read the declaration and pick the text by case. That is a bigger contract, and it would need its own worked-example lines."
+    },
+    {
+      "kind": "consistency",
+      "section": "P3 (projectPath compared after resolving symlinks)",
+      "summary": "P3 compares projectPath to the root after resolving symlinks only. Doctor already matches a Claude project key to this repository with trustKeyMatch, which also normalises \\ to / and ignores case on macOS and Windows. A project entry that differs from the root only in case or separators, which ~/.claude.json's trust check accepts, would not count here. The trust row and the plugin row would then disagree about the same folder.",
+      "evidence": "internal/cli/platform.go:8-18 (trustKeyMatch: '/' separators, EqualFold on windows and darwin). internal/cli/doctor.go doctorTrusted applies it to root and to EvalSymlinks(root).",
+      "fix": "Write: 'a projectPath that names this repository as the trust row's key does (trustKeyMatch, against the root and the root with symlinks resolved)'."
+    },
+    {
+      "kind": "runnability",
+      "section": "P4 / Why this shape (the Copilot row's condition) / Acceptance step 2",
+      "summary": "Unsure. Doctor's checks are also run's preflight (internal/cli/run.go:186). In a repository that uses Copilot, every vloop run would therefore run `copilot plugin list --json` in the trusted repository with the operator's real COPILOT_HOME, and the preflight then discards the row. Nobody has measured whether `plugin list` in a trusted folder that has a declaration installs the plugin, as a session does. The acceptance cannot tell: step 2 starts a session before it looks at installed-plugins.",
+      "evidence": "runPreflight prints only problems, the trust warning and agent.* warnings (run.go:186-200), so a `copilot plugin` warning is computed and dropped. The design note says 'the first session installs the plugin'; it records nothing about `plugin list`. The out-of-scope item 'Installing … any plugin from vloop' would be broken if `plugin list` does install.",
+      "fix": "Say that the row is computed for the bare doctor only (runBrief == nil), which also keeps run's preflight from starting one more Node process. Add an acceptance step before step 2's session: with a fresh COPILOT_HOME in the trusted clone, `vloop doctor` leaves $COPILOT_HOME/installed-plugins/ without vloop."
+    },
+    {
+      "kind": "fact",
+      "section": "Constraints (existing stubs carry no scope)",
+      "summary": "This is half right. The doctor test env's default stub already carries scope (internal/cli/doctor_test.go:42: \"scope\":\"user\"). The table cases (doctor_test.go:283-284, 299-302) and cmd/vloop/b13_e2e_test.go:97 carry none. The conclusion still holds, because both kinds count as user.",
+      "evidence": "internal/cli/doctor_test.go:42 vs 283-302.",
+      "fix": "Write 'most existing stubs' entries carry no scope'. Nothing else changes."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary / P2 (README and concepts text)",
+      "summary": "Unsure. The claim that Claude Code offers to install a declared plugin when the folder is trusted rests on 'its documented project settings', and no document in the repository records it. Task 3 writes it into README.md and concepts.md before acceptance step 5 checks it.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md (the working-tree diff) records Copilot's behaviour and Claude's session flags, not what Claude Code does with a declaration in a trusted folder.",
+      "fix": "Add one line to the design note's new section before ready, saying what Claude Code's settings documentation states, with its URL. Or word the README and concepts text so it holds either way, and let step 5 refine it."
+    }
+  ],
+  "decisions": [
+    "Only .claude/settings.json is written, not .github/copilot/settings.json. Agree.",
+    "Existing values win, so an enabledPlugins[\"vloop@vloop\"]: false stays false. Agree.",
+    "No version pin in the declaration; doctor's version row names the update command as an option. Agree.",
+    "vloop's own sessions are unaffected by the declaration. Measured for Claude (design note, 2026-11-03); for Copilot, acceptance step 3 checks it. Agree.",
+    "The Claude row keeps the name `plugin`; the new row is `copilot plugin`. Agree.",
+    "The Copilot row appears only when an agent.* key is copilot, agent.review-brief included. Agree. Not stated: whether run's preflight computes the row. I recommend bare doctor only (finding 4).",
+    "Remedies never require a global change, and `claude plugin enable` is dropped. Agree.",
+    "The merge reformats a changed file to two-space indentation, with values kept verbatim and keys in order. Agree. It needs an order-preserving token walk with encoding/json, because no new dependency is allowed.",
+    "P1 runs after CLAUDE.md in init and after .gitignore in upgrade. Upgrade prints nothing for a kept file, and its early return at the same version is unchanged. Agree, but see finding 2 on what doctor then says.",
+    "<v> is now the first enabled counted entry's version. Today's code reports the last one (doctor.go:595-607). Fine."
+  ],
+  "checked": "facts (init.go steps, mergedStep, applySteps, printInitNext and the symlink check; upgrade.go's early return, breaking and dry-run output, and Compare 0.0.9->0.1.0 = Breaking so --yes is needed; section.go's sentence; doctor.go runDoctor order, doctorPlugin, doctorGateEdits, doctorCopilot and copilotKeys; run.go preflight filter; trustKeyMatch; concepts.md and README text; this repo's .claude/settings.json; the design-note diff), consistency (tables against the worked example, P1 output against upgrade.go, merge rules, decided-here), rules (C-1, CLI conventions, guidelines on verify-unrunnable lines), runnability (go check after each task: doctor tests' PATH-restricted stubs, the run harness copilot stub's handling of `plugin list`, init and upgrade tests' pinned lines, porcelain checks), vloop brief check: ok, 0 warnings",
+  "header": "Reviewed 2026-11-03: FIX, 6 findings"
+}
+

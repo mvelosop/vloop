@@ -1,0 +1,53 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "P2 — both agents in the docs (init's and upgrade's Long help)",
+      "summary": "P2 says init's and upgrade's `Long` help 'each gains one sentence'. Neither command has a `Long`; each has only `Use` and `Short`. If a task adds a one-sentence `Long`, cobra shows it instead of the Short, so `--help` would lose the Short's description. The brief also gives no literal text, so a reviewer cannot judge the sentence.",
+      "evidence": "internal/cli/init.go:24-28 and internal/cli/upgrade.go:18-22 set only Use, Short, Args and RunE. `git grep -n Long -- internal/cli` finds Long only in brief.go, brief_review.go, defect.go, fence.go, intervention.go, metrics.go, root.go, run.go and task.go.",
+      "fix": "Write each Long literally: the Short, then the sentence about .claude/settings.json. For example, init: 'Set a repository up for vloop. It also declares the vloop plugin in .claude/settings.json (extraKnownMarketplaces and enabledPlugins), keeping every other setting.' Or drop the Long item from P2."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary / Why this shape (Claude's remedy is a per-repository install) / P2 README and concepts text",
+      "summary": "Unsure. The brief says Claude Code 'does not act on the declaration'. The measurement behind it was taken 'with the `vloop` marketplace already known to the user'. The docs P2 writes ('while Claude Code needs the install above') generalise that to everyone, including a new user who does not know the marketplace. That is the case `extraKnownMarketplaces` exists for, and nobody measured it.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md (uncommitted addition), 'Claude Code does not act on the declaration': 'Claude Code 2.1.317, with the `vloop` marketplace already known to the user: ... no prompt'. Acceptance step 5 also runs on a machine that knows the marketplace.",
+      "fix": "Before ready, repeat the measurement with a throwaway Claude config home that does not know the vloop marketplace, trust the clone, and record the result in the design note. If Claude then prompts or installs, P2's README and concepts text and the P3 'no counted entry' message change to match. Otherwise, add 'whether or not the marketplace is known' to the note's claim."
+    },
+    {
+      "kind": "fact",
+      "section": "P4 — doctor's copilot plugin row / Violations / Acceptance step 2",
+      "summary": "Unsure. Doctor will run `copilot plugin list --json` in the repository with the operator's real COPILOT_HOME. Two things are unmeasured. (a) Whether `plugin list`, in a folder that is trusted but has a declaration not yet installed, installs the declared plugin itself. That would be a write outside the repository caused by vloop, which the violations list forbids, and it could also prompt or reach the network. (b) Whether a folder trusted before the declaration was added installs it on the next session. That is exactly the `vloop upgrade` path the goal promises ('a repository where vloop init or vloop upgrade ran'). The design note records only a fresh trust, and acceptance step 2 tests only a fresh clone with init.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md, 'A repository's plugin declaration': 'Once the folder is trusted, the first session installs the plugin'. No line covers `plugin list` before that session, or a declaration added to an already-trusted folder. Acceptance step 2 starts a session (trust dialog) before it runs `plugin list`.",
+      "fix": "Add an acceptance step, or measure before ready. In a clone trusted in Copilot with a throwaway COPILOT_HOME and no declaration, run `vloop upgrade` (which adds the declaration), then `vloop doctor` with agent.work = copilot. Check that `$COPILOT_HOME/installed-plugins/` is unchanged after doctor. Then start one session and record whether it installs vloop. If doctor's list installs, the operator decides whether that is acceptable."
+    },
+    {
+      "kind": "fact",
+      "section": "P3 — doctor's plugin row (Claude): which field means 'enabled for this repository'",
+      "summary": "Unsure. P3 reads each entry's `enabled`. The recorded `claude plugin list --json` entry also has `projectEnabled`, and nothing records which of the two reflects this repository's settings when the list runs from the root. The case this matters for: a user-scope install with `enabledPlugins[\"vloop@vloop\"]: false` in `.claude/settings.json`, the opt-out the brief deliberately preserves. If `enabled` is the user-level flag, doctor passes while the plugin is off here. The 'none enabled' remedy (`claude plugin enable vloop@vloop --scope project`) is also unmeasured against a user-scope install.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md, 'Measured on 2026-11-03': an entry shows `\"enabled\":true` and `\"projectEnabled\":true`. The brief's P3 names only `enabled` and never mentions `projectEnabled`.",
+      "fix": "Measure `claude plugin list --json`, run from the repository, for a user-scope install with the project's enabledPlugins false, and for a project-scope install. Record the result. Then pin in P3 which field counts (or both), and add a worked-example line for the opt-out case."
+    }
+  ],
+  "decisions": [
+    "Declare in .claude/settings.json only, not .github/copilot/settings.json. Agree: Copilot reads it (measured) and one copy avoids drift.",
+    "Existing values win: an enabledPlugins[\"vloop@vloop\"]: false or an existing extraKnownMarketplaces.vloop is never touched. Agree.",
+    "No version pinning in the declaration; doctor's version row covers the drift. Agree.",
+    "The Claude row keeps the name `plugin` (scripts read it); the new row is `copilot plugin`. Agree.",
+    "README's default Claude install becomes `--scope project` (per repository) instead of a user install, which stays an option. A visible change of advice for every user; agree, given the declaration.",
+    "The Copilot row appears only when an agent.* key in use is copilot, not whenever copilot is on PATH, and run's preflight never computes it. Agree: no copilot process for Claude-only repos.",
+    "Remedies never require a global change; `claude plugin enable` without `--scope project` is no longer suggested. Agree.",
+    "When init or upgrade writes the file, the whole of .claude/settings.json is re-laid out as json.MarshalIndent with two spaces, so an operator's own formatting is lost. Acceptable, but the operator should know it.",
+    "A .claude/settings.json that is not a JSON object (or has a non-object enabledPlugins/extraKnownMarketplaces) makes init and upgrade refuse entirely, rather than skipping that step with a warning. Defensible; it blocks init on a repository with a broken settings file.",
+    "Upgrade's 'already at <v>' early return is kept, so repositories get the declaration only with the next vloop version. Agree.",
+    "Step order: after CLAUDE.md in init, after .gitignore in upgrade. Agree.",
+    "P3's mismatch message names the first enabled counted entry's version; today's code names the last. A small behaviour change; agree.",
+    "A list entry with no `scope` counts as user scope, so the existing stubs keep their results. Agree."
+  ],
+  "checked": "Read the brief in full, B35 (depends-on), CLAUDE.md, .vloop/config.toml (one go check), guidelines.md, and the uncommitted design-note section. Ran vloop brief check on a ready copy: ok, 1 warning (installed-plugins/ does not resolve, a false positive). Facts: init.go (steps, mergedStep, applySteps, printInitNext, checkRepoPath), upgrade.go (early return, breaking path, output lines), section.go (the CLAUDE.md sentence, quoted verbatim), doctor.go (runDoctor order, doctorPlugin, doctorGateEdits, doctorCopilot, copilotKeys, copilotReviewBriefKey, doctorTrusted/trustKeyMatch), run.go's preflight, the agent_copilot.go home, concepts.md and README.md (the quoted sentences exist). Consistency: P1 merge order against the four worked-example files, upgrade output against upgrade.go, P3/P4 tables against the worked example, P4 placement against TestDoctorGateEditsFollowsPlugin. Runnability: walked tasks 1-3 against every test that pins init/upgrade output, doctor messages, printInitNext or the CLAUDE.md text (init_test, upgrade_test, doctor_test, doctor_copilot*_test, b11_verify_test, b5/b13/b14 e2e). Each change falls in the Constraints' exceptions; the copilot stub that exits 0 only adds a warning row that no test counts. Rules: C-1, the CLI conventions, repo guidelines (tool facts from measurement).",
+  "header": "Reviewed 2026-11-03: FIX, 4 findings (1 fact, 3 unsure facts to settle by measurement)"
+}
+

@@ -1,0 +1,35 @@
+{"schema": "brief-review/v1",
+ "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+ "verdict": "ASK",
+ "findings": [
+  {"kind": "decision", "section": "Why this shape (vloop's own sessions are unaffected) / Acceptance step 3",
+   "summary": "The brief says vloop's Claude sessions are unaffected by the declaration, but nothing has measured it. Those sessions do read .claude/settings.json, and the acceptance checks only Copilot.",
+   "evidence": "internal/driver/session.go:109-111 starts every Claude session with --setting-sources project --settings <fence> --plugin-dir, so the project's .claude/settings.json is loaded. The measurement the brief cites (B13 brief, lines 87-93, 2026-10-11) covered user-scope plugins only. It predates enabledPlugins in this repository (added by B14, commit b2d2c654, 2026-10-14) and never covered extraKnownMarketplaces, which this brief adds. Doctor's trust row makes vloop run require a trusted folder, which is the condition under which Claude acts on a declaration. The possible effects: a run or brief-review session loads the marketplace's vloop next to the --plugin-dir one (two plugins with the same name, maybe at different versions), or it fetches and installs the marketplace (network access and a write under ~/.claude). Acceptance step 3 checks this for Copilot sessions only.",
+   "fix": "Before marking the brief ready, the operator measures it. In a trusted clone that has the declaration and an older vloop@vloop installed, run claude -p with vloop run's flags and --output-format stream-json, then read the plugins and skills listed in the init event, and check that ~/.claude/plugins is unchanged. Record the result in the design note's new section and add a Claude step to the acceptance. If the declared plugin does load, the operator must decide what to do, for example have the session's --settings set enabledPlugins[\"vloop@vloop\"] to false. That changes how vloop run loads the plugin, which this brief puts out of scope."},
+  {"kind": "fact", "section": "P3 / P4 (the plugin list --json shapes) / Binding references",
+   "summary": "Unsure. Doctor will parse the output of claude and copilot `plugin list --json`. The brief says it observed that output on this machine on 2026-11-03, but no document in the repository records it. The added design-note section covers only the declaration.",
+   "evidence": "The brief relies on these unrecorded claims: Claude's entries carry scope and projectPath; Copilot's entries are {name, marketplace, version, enabled, source}; Copilot's enabled flag depends on the working directory; claude plugin update vloop@vloop updates a project-scope install. The diff of docs/design-notes/copilot-cli-experiments.md adds only 'A repository's plugin declaration'. The repository's guideline says an external tool's format comes from the tool or its docs. I could not settle this: running claude/copilot plugin list --json was denied in this session.",
+   "fix": "Add the two observed outputs, trimmed and with paths masked, to the design note's new section. Cite them from P3 and P4 so the stubs' JSON has a recorded source."},
+  {"kind": "consistency", "section": "P3 table, 'counted entries, none enabled'",
+   "summary": "The remedy '(vloop upgrade writes it)' is wrong in two cases the brief itself defines.",
+   "evidence": "Under P1's merge rules, an existing enabledPlugins[\"vloop@vloop\"]: false is kept, so upgrade does not write true. When the stamp equals the binary, upgrade returns 'already at <v>' before any step (internal/cli/upgrade.go:49-51; P1 keeps that unchanged).",
+   "fix": "Drop the parenthetical, or say it as 'vloop init and the next vloop upgrade write it unless the file already sets it'."},
+  {"kind": "consistency", "section": "Worked example, P4 header / P4",
+   "summary": "Two small gaps. 'A stub copilot … that answers … the login check' is wrong, because doctor's login check does not call copilot. And P4 does not say what happens to the row when the config cannot be read.",
+   "evidence": "copilotLoggedIn (internal/cli/doctor.go:217-227) checks the token variables and then runs gh auth token. The agent.* keys are read only when the config loads (doctor.go:116-121, inside the cerr == nil branch).",
+   "fix": "Write 'a stub copilot that answers --version, and GH_TOKEN set'. Add 'no copilot plugin row when the config check is a problem'."}
+ ],
+ "decisions": [
+  "Write only .claude/settings.json and not .github/copilot/settings.json: agree.",
+  "Existing values win, including vloop@vloop: false: agree.",
+  "No version pin in the declaration; doctor's version row names the update command as an option: agree.",
+  "vloop's own sessions are unaffected by the declaration: not established for Claude sessions (finding 1); the operator must measure it.",
+  "The Claude row keeps the name 'plugin' and the new row is 'copilot plugin': agree, because --json consumers read the name.",
+  "The copilot plugin row appears only when an agent.* key is copilot, agent.review-brief included: agree.",
+  "No remedy requires a global change, and claude plugin enable is no longer suggested: agree.",
+  "The P1 step comes after CLAUDE.md in init and after .gitignore in upgrade; upgrade prints no line when the file is kept: agree.",
+  "Doctor's plugin rows run `plugin list --json` with the repository root as the working directory: agree."
+ ],
+ "checked": "facts (init.go steps/applySteps/printInitNext, upgrade.go early return and dry-run/breaking output, section.go text, doctor.go runDoctor order, doctorPlugin, doctorCopilot, copilotKeys, run preflight filtering, agent_copilot.go COPILOT_HOME, session.go flags, concepts.md/README text, B14 enabledPlugins date), consistency (tables against worked example, P1 output against upgrade.go, merge rules), rules (C-1, CLI conventions, repo guideline on external formats), runnability (existing tests: internal/cli doctor/copilot tests, the run-harness copilot stub, upgrade_test and init_test exact lines covered by the constraint's exceptions; go check after each task), vloop brief check: ok, 0 warnings",
+ "header": "Reviewed 2026-11-03: ASK, 4 findings"}
+

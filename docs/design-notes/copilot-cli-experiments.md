@@ -785,3 +785,64 @@ all from deny to allow (3 `if`, 1 `for`, 1 `command -v … curl`); none is
 newly denied. A `gpt-6.1-terra` brief review with the new judge made 28
 calls; its one denial was a fence rule (`git branch`), none was shell
 syntax.
+
+## A repository's plugin declaration (2026-11-01, for B36)
+
+Copilot CLI 1.0.105, tested with throwaway `COPILOT_HOME`s (issue #96):
+
+- `copilot plugin marketplace add mvelosop/vloop` and `copilot plugin
+  install vloop@vloop` install per user only, under
+  `$COPILOT_HOME/installed-plugins/`, enabled in every directory; there is
+  no `--scope`.
+- A repository declares a plugin with `extraKnownMarketplaces` and
+  `enabledPlugins` in `.github/copilot/settings.json` **or in
+  `.claude/settings.json`**. Once the folder is trusted, the first session
+  installs the plugin into the user's home without a prompt, enabled only
+  in that repository (`[disabled]` elsewhere). In an untrusted folder the
+  declaration is ignored. A `.github/copilot/settings.local.json` can opt
+  one person out.
+- `--plugin-dir <dir>` loads a plugin for one session and installs
+  nothing.
+
+Measured on 2026-11-03 for B36:
+
+- **vloop's Claude sessions ignore the declaration.** In a trusted clone
+  whose `.claude/settings.json` holds both keys, a session started with
+  `vloop run`'s flags (`--setting-sources project --plugin-dir <dir>
+  --strict-mcp-config`, Claude Code 2.1.317, `--output-format stream-json`)
+  listed one vloop plugin, `vloop@inline` (the `--plugin-dir` copy), and
+  each `vloop:` skill once; `~/.claude/plugins/installed_plugins.json` was
+  unchanged.
+- **`claude plugin list --json`** entries (paths masked):
+  `{"id":"vloop@vloop","version":"0.15.0-rc.1","scope":"project","enabled":true,"installPath":"~/.claude/plugins/cache/vloop/vloop/0.15.0-rc.1","projectPath":"~/source/personal/vloop","projectEnabled":true}`;
+  a user-scoped entry has `"scope":"user"` and no `projectPath`. The same id
+  can appear once per project.
+- **`copilot plugin list --json`** entries (1.0.105):
+  `{"name":"vloop","marketplace":"vloop","version":"0.14.0","enabled":true,"source":"installed"}`
+  and `{"name":"browser-use","marketplace":"","version":"0.0.4","enabled":false,"source":"builtin"}`.
+  With a per-user install, the vloop entry is enabled in every directory.
+- `claude plugin update <plugin>` takes `--scope` (user, project, local,
+  managed; auto-detected by default); `copilot plugin update` exists.
+- **Claude Code does not act on the declaration.** Claude Code 2.1.317,
+  with the `vloop` marketplace already known to the user: in a folder
+  trusted before the declaration was added, and in a fresh folder trusted
+  with the declaration present, an interactive session showed no prompt,
+  installed nothing (`installed_plugins.json` unchanged) and offered no
+  `/vloop:` command. `claude plugin install vloop@vloop --scope project`
+  is the per-repository install (`--scope user|project|local`, default
+  `user`).
+- **vloop's Copilot sessions ignore the declaration.** A `vloop brief
+  review` on Copilot (`-p`, its own `COPILOT_HOME`) in a clone whose
+  `.claude/settings.json` declares the plugin left that home's
+  `installed-plugins/` empty; the session used the `--plugin-dir` copy.
+- `claude plugin enable` takes `--scope user|project|local` (default
+  auto-detect).
+- **Copilot CLI, with a throwaway `COPILOT_HOME`** (1.0.105): a folder
+  trusted ("remember this folder") before the declaration was added;
+  after adding it, `copilot plugin list --json` run there installed
+  nothing; the next interactive session there installed the plugin
+  (the marketplace's 0.15.0-rc.1) without a prompt. `copilot plugin list
+  --json` then showed it `"enabled": true` in that folder and `"enabled":
+  false` in another: the list is computed for the working directory.
+- What Claude Code does with the declaration for a user who does not yet
+  know the `vloop` marketplace was not measured.

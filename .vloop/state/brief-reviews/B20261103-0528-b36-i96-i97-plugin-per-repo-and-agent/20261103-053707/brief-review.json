@@ -1,0 +1,60 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "P3 / P4 tables vs Worked example",
+      "summary": "The version-mismatch message differs between the tables and the worked example. P3's table says '... is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind'. The worked example gives '... — claude plugin update vloop@vloop, or update the binary if it is the one behind', with no ellipsis, so it reads as the full message. P4's line ('— copilot plugin update vloop@vloop, …') is not a prefix of its table's text either. A gate built from the example fails against a correct implementation of the table, or the reverse.",
+      "evidence": "Brief, P3 table row 2 and P4 table row 2; worked example lines '[{\"id\":\"vloop@vloop\",\"version\":\"0.0.9\",...}]' and '[{\"name\":\"vloop\",...\"version\":\"0.0.9\"...}]'.",
+      "fix": "Make each worked-example line the table's exact text, e.g. '! plugin the vloop plugin is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind'. Do the same for the copilot line, or cut both at a true prefix and end them with '…'."
+    },
+    {
+      "kind": "consistency",
+      "section": "Decided here / P1 Output, upgrade / Worked example",
+      "summary": "Upgrade's kept case is stated two ways. 'Decided here' says upgrade, with both entries present, 'reports `kept .claude/settings.json`'. P1's upgrade output says 'nothing when it kept it', and the worked example says 'no line for .claude/settings.json'. upgrade.go prints no line for a file it keeps.",
+      "evidence": "internal/cli/upgrade.go:100-106 prints only 'updated <path>' for the files in changes; unchanged files print nothing. Brief: 'Decided here' bullet 2 vs P1 'Output, upgrade' and the worked-example line 'the file from the first line; vloop upgrade → no line ...'.",
+      "fix": "Change the 'Decided here' bullet to: '`vloop upgrade` on a repository where the two entries are present prints no line for .claude/settings.json and writes nothing.'"
+    },
+    {
+      "kind": "consistency",
+      "section": "P4 — doctor's copilot plugin row",
+      "summary": "'a row `copilot plugin` follows the `plugin` row' does not say whether it comes right after `plugin` and before `gate edits`, or after `gate edits`. Today `gate edits` comes right after `plugin`, and exact-listing tests (b13) pin that order for repositories without Copilot.",
+      "evidence": "internal/cli/doctor.go:126-132 (plugin, then gate edits, then guidelines); cmd/vloop/b13_e2e_test.go:90-94.",
+      "fix": "Write 'immediately after the `plugin` row, before `gate edits`' (or the order you want) and show it in one worked-example line that lists two adjacent rows."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary / Why this shape / P2 (concepts.md 'From Copilot CLI')",
+      "summary": "The Copilot behaviour the brief rests on is recorded only in GitHub issue #96: a trusted folder installs the declared plugin without a prompt, it is enabled per repository, an untrusted folder ignores the declaration, and .github/copilot/settings.local.json opts one person out. A loop session cannot read that issue. P2 still has sessions write these claims into the docs. A related wording gap: the summary says Claude Code 'offers to install' a declared plugin, but the P2 README paragraph says trusting the folder 'in Claude Code or Copilot CLI installs it'. Unsure whether Claude installs or only offers; acceptance step 4 settles it after the docs are written. I could not cross-check the live `plugin list --json` output (running the CLIs was denied in this session).",
+      "evidence": "grep for 'extraKnownMarketplaces|enabledPlugins|plugin list' in docs/design-notes/copilot-cli-experiments.md: no record of the 2026-11-01 test. The brief's seeds cite 'Issues 96 and 97'.",
+      "fix": "In the ready merge, add a short entry to docs/design-notes/copilot-cli-experiments.md with the 2026-11-01 results and the two 2026-11-03 list outputs, and cite it under Binding references. Word the README sentence as '...installs it in Copilot CLI; Claude Code offers to install it' (or whatever the entry records)."
+    },
+    {
+      "kind": "runnability",
+      "section": "Acceptance, at close — step 3",
+      "summary": "Step 3 asks that no session's COPILOT_HOME under .vloop/tmp/ holds an installed vloop plugin. Those homes are temporary directories that the driver deletes between sessions and at the end of the run, so after the run there is nothing left to inspect.",
+      "evidence": "internal/driver/agent_copilot.go:95-108 (home = MkdirTemp(.vloop/tmp, \"copilot-home-\"), 'emptied between sessions'); internal/driver/iterate.go:146-148, 229, 489, 969 (clearTmp).",
+      "fix": "Say how the operator observes it: e.g. 'while a work session runs, ls .vloop/tmp/copilot-home-*/installed-plugins/ shows no vloop', or a loop of that ls during the run, recorded in the design note."
+    }
+  ],
+  "decisions": [
+    "Only .claude/settings.json is written; .github/copilot/settings.json is rejected. Agree.",
+    "An existing value always wins, so enabledPlugins[\"vloop@vloop\"]: false stays false. Agree.",
+    "No version pin in the declaration, so the marketplace's version installs and doctor warns on a mismatch. Agree (no selector exists).",
+    "vloop's own sessions are assumed to ignore the declaration. Measured for Claude; for Copilot it rests on #96 and acceptance step 3.",
+    "Claude row keeps the name `plugin`; the new row is `copilot plugin`. Agree (the --json names are read by scripts).",
+    "The copilot plugin row appears only when an agent.* key is copilot. As a result, every vloop run with a copilot key runs `copilot plugin list --json` in its preflight, and the preflight then never prints the row. Opinion: harmless, but skipping it in the preflight (runBrief != nil) would save a process per run.",
+    "Remedies never require a global change, and `claude plugin enable` is dropped. Agree.",
+    "A Claude list entry with no `scope` counts as user scope. Agree; it keeps the existing stubs green.",
+    "Upgrade's 'already at <v>' early return is unchanged, so repositories at the current version (this one included) get the declaration only with the next release.",
+    "init and upgrade refuse (exit 1) on a settings file that is not a JSON object. That includes a 0-byte file, which the brief does not mention. Opinion: pin the empty-file case one way or the other.",
+    "When an entry is added, the whole file is rewritten with two-space indentation, so a user's own formatting changes. Acceptable; the operator should know.",
+    "Every `vloop init` now declares a GitHub marketplace plugin, with no flag to opt out. Copilot then installs it without a prompt in a trusted folder. This reaches every vloop user's repositories. Worth an explicit nod from the operator.",
+    "The P3 version message's <v> is the first enabled counted entry. Today's code uses the last. Fine."
+  ],
+  "checked": "facts (init.go steps/mergedStep/applySteps/printInitNext; upgrade.go output paths and early return; section.go sentence; doctor.go plugin/copilot/gate-edits/order; run.go preflight; copilot session home; concepts.md and README sentences; .claude/settings.json since B14), consistency, rules (C-1, CLI conventions, constraints' test exceptions), runnability (go check after each task; doctor/copilot stubs; e2e PATH and exact listings; preflight row filtering), vloop brief check ok",
+  "header": "Reviewed 2026-11-03: FIX, 5 findings"
+}
+
