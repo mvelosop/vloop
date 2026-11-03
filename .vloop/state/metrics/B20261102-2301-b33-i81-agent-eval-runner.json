@@ -40,26 +40,26 @@
     "rework": 1.0021551724137931
   },
   "time": {
-    "agent_ms": 467963,
-    "work_ms": 441058,
-    "review_ms": 26905,
+    "agent_ms": 520107,
+    "work_ms": 459837,
+    "review_ms": 60270,
     "plan_ms": 749588,
-    "gates_ms": 840,
-    "checks_ms": 215429,
+    "gates_ms": 4214,
+    "checks_ms": 436331,
     "gate_review_ms": 122285,
-    "wall_ms": null
+    "wall_ms": 1560000
   },
   "rate": {
-    "code_per_min": 118.98376581054485,
-    "code_test_per_min": 164.75661537343765
+    "code_per_min": 107.05489447363716,
+    "code_test_per_min": 148.2387278002411
   },
   "cost": {
-    "total_usd": 5.6572372,
+    "total_usd": 5.9224966,
     "plan_usd": 3.7949665999999995,
-    "work_usd": 1.1613265,
-    "review_usd": 0.1263052,
+    "work_usd": 1.2558346,
+    "review_usd": 0.2970565,
     "gate_review_usd": 0.5746389000000001,
-    "per_1000_code_lines_usd": 6.096160775862069
+    "per_1000_code_lines_usd": 6.382000646551724
   },
   "credits": {
     "total": 0,
@@ -69,11 +69,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 204,
-    "output": 139771,
-    "cache_read": 7830519,
-    "cache_creation": 394646,
-    "cache_hit_ratio": 0.9519960745834016
+    "input": 228,
+    "output": 144024,
+    "cache_read": 8166653,
+    "cache_creation": 441913,
+    "cache_hit_ratio": 0.9486407736089398
   },
   "models": {
     "plan": [
@@ -150,8 +150,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 4,
-  "iterations": 2,
-  "iterations_per_closed": 2,
+  "iterations": 3,
+  "iterations_per_closed": 3,
   "by_task": [
     {
       "id": "T1",
@@ -182,7 +182,7 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
         "code": 557,
         "test": 225,
@@ -195,13 +195,13 @@
           "other": 0
         }
       },
-      "agent_ms": 344899,
-      "cost_usd": 0.8423224,
+      "agent_ms": 397043,
+      "cost_usd": 1.1075818,
       "models": [
         "claude-sonnet-5-5"
       ],
       "test_code_ratio": 0.40394973070017953,
-      "per_1000_code_lines_usd": 1.512248473967684
+      "per_1000_code_lines_usd": 1.988477199281867
     },
     {
       "id": "T3",

@@ -21,6 +21,7 @@ type evalCase struct {
 type grader struct {
 	file string
 	fm   frontmatter
+	body string
 }
 
 var phases = map[string]bool{"plan": true, "work": true, "review": true, "gate-review": true, "verify": true, "review-brief": true}
@@ -75,7 +76,7 @@ func readCase(root, name string) (*evalCase, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%s/graders/%s: %s", name, base, reason(err))
 		}
-		gf, _, err := splitFrontmatter(string(gt))
+		gf, gbody, err := splitFrontmatter(string(gt))
 		if err != nil {
 			return nil, fmt.Errorf("%s/graders/%s: %v", name, base, err)
 		}
@@ -83,7 +84,7 @@ func readCase(root, name string) (*evalCase, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%s/graders/%s: %v", name, base, err)
 		}
-		c.graders = append(c.graders, grader{file: base, fm: fm})
+		c.graders = append(c.graders, grader{file: base, fm: fm, body: gbody})
 	}
 	return c, nil
 }

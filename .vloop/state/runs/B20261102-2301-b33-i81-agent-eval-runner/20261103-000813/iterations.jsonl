@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":220902,"exit":0,"name":"go"}],"ended":"2026-11-03T00:12:51Z","gate":{"duration_ms":3374,"exit":0},"iteration":3,"outcome":"done","run_id":"B20261102-2301-b33-i81-agent-eval-runner","schema":"iteration/v2","started":"2026-11-03T00:08:13Z","task":"T2"}
+{"attempt":1,"checks":[{"duration_ms":212479,"exit":0,"name":"go"}],"ended":"2026-11-03T00:20:16Z","gate":{"duration_ms":1838,"exit":0},"iteration":4,"outcome":"done","run_id":"B20261102-2301-b33-i81-agent-eval-runner","schema":"iteration/v2","started":"2026-11-03T00:12:52Z","task":"T3"}

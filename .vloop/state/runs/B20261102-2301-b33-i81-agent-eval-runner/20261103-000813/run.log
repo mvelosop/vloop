@@ -5,3 +5,10 @@
    review T2 · 0m33s · $0.17 · run $0.27 / $40.00
    review: PASS
    T2 done
+── iteration 4 (2 this run) · T3 · 2/6 done ──
+   Score the llm grader with a Claude judge voting three times
+   work T3 · 3m23s · $0.31 · run $0.57 / $40.00
+   check go
+   review T3 · 0m21s · $0.11 · run $0.69 / $40.00
+   review: PASS
+   T3 done

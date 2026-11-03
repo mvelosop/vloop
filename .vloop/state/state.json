@@ -5,9 +5,9 @@
   "base": "b9060704dd074b944832e8b31df292cc9affec6f",
   "branch": "B20261102-2301-b33-i81-agent-eval-runner",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-02T23:51:55Z",
-  "updated": "2026-11-03T00:12:51Z",
+  "updated": "2026-11-03T00:20:16Z",
   "shell": "sh",
   "checks": [
     {
@@ -156,7 +156,7 @@
         "Committed tests in tools/agent-eval cover the judge with a fake claude on a temporary PATH: the majority, a non-answer, a failing judge, each focus and a missing focus file; no test runs a real claude."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": "",
       "gate_history": [

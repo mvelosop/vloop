@@ -14,12 +14,13 @@ type graderResult struct {
 	Weight float64 `json:"weight"`
 	Score  float64 `json:"score"`
 	Reason string  `json:"reason"`
+	cost   float64 // the judge calls' cost, kept out of report.json
 }
 
 // scoreGrader scores one grader of a run. workspace is the run's repo/; events
 // and text are its trace. An error means the grader could not be asked at all
 // (the run is then an error, never a score).
-func scoreGrader(g grader, workspace string, events []event, text string) (graderResult, error) {
+func scoreGrader(g grader, workspace string, events []event, text, judgeModel string) (graderResult, error) {
 	r := graderResult{Name: strings.TrimSuffix(g.file, ".md"), Weight: 1}
 	if w, ok := g.fm.values["weight"]; ok {
 		f, err := strconv.ParseFloat(w, 64)
@@ -44,7 +45,7 @@ func scoreGrader(g grader, workspace string, events []event, text string) (grade
 		}
 		return r, nil
 	case "llm":
-		return r, fmt.Errorf("judge failed: %s: the llm grader is not built yet", r.Name)
+		return scoreLLM(g, r, judgeModel, workspace, events, text)
 	}
 	return fail(r, "unsupported grader "+typ), nil
 }

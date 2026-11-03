@@ -32,3 +32,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Copilot run end to end: scaffold, session via driver.Runner, transcript.jsonl, trace.jsonl, regex/tool_used/file_exists graders, report.json and the table.
 - **Files:** internal/driver/session.go, internal/driver/agent.go, internal/driver/agent_copilot.go, internal/driver/agent_copilot_test.go, tools/agent-eval/main.go, tools/agent-eval/runner.go, tools/agent-eval/trace.go, tools/agent-eval/graders.go, tools/agent-eval/run_test.go
 - **Notes for next iteration:** Work was done in the earlier blocked attempt; the operator replaced the gate (%.17g) and it now passes. Driver options, both defaulting to today's behaviour: Runner.Transcript and Runner.HookBinary (tested in internal/driver/agent_copilot_test.go). An llm grader makes the run an error 'judge failed: <grader>: the llm grader is not built yet' (T3 replaces it); --agent claude cases error 'claude sessions are not built yet' (T4 replaces it).
+
+## T3 — Score the llm grader with a Claude judge voting three times
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The llm grader now scores through a Claude judge asked three times (majority decides, non-answer is FAIL), with focus last text / trace / file; a judge that cannot be asked is a run error 'judge failed: <grader>: <cause>'.
+- **Files:** tools/agent-eval/judge.go, tools/agent-eval/judge_test.go, tools/agent-eval/graders.go, tools/agent-eval/cases.go, tools/agent-eval/runner.go
+- **Notes for next iteration:** judge.go: askJudge runs claude in an empty os.MkdirTemp dir with the prompt on stdin; scoreLLM picks the focus. grader now carries its body; graderResult.cost (not in JSON) is summed into runResult.JudgeCostUSD, also on a judge failure. A missing focus file scores 0 'no <path>' without calling the judge. judge_test.go uses a fake claude on a temp PATH, no real claude.

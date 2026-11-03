@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 3
+**Status:** running · **3/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:12:51Z
+**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:20:16Z
 
 ## Progress
 
 - [x] **T1** — Add tools/agent-eval's flags, its case reader and --list
 - [x] **T2** — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
-- [ ] **T3** — Score the llm grader with a Claude judge voting three times
+- [x] **T3** — Score the llm grader with a Claude judge voting three times
 - [ ] **T4** — Stream a Claude session's transcript into the same trace
 - [ ] **T5** — Document the tool, the qualifying rule and the design note's answer
 - [ ] **T6** — Close: the worked example as a committed test, every gate at once
@@ -74,7 +74,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Score the llm grader with a Claude judge voting three times
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Most of the plugin's graders are llm graders, so without them no case scores fully. The judge is always Claude, whatever agent is under test, so scores across agents compare; it is asked three times and the majority decides. A judge that cannot be asked is a run error, never a vote, so a broken judge can never pass or fail a model silently.
 

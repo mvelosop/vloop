@@ -200,7 +200,8 @@ func runOnce(o *options, c *evalCase, phase, dir, hook string, timeout time.Dura
 	}
 	text := traceText(events)
 	for _, g := range c.graders {
-		gr, err := scoreGrader(g, repo, events, text)
+		gr, err := scoreGrader(g, repo, events, text, o.judgeModel)
+		rr.JudgeCostUSD += gr.cost
 		if err != nil {
 			rr.Status, rr.Reason, rr.Graders = "error", err.Error(), []graderResult{}
 			return rr
