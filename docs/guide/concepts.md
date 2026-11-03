@@ -19,7 +19,8 @@ The **driver** is `vloop run` itself: the deterministic half of the loop. It
 plans nothing and judges nothing. It starts every session, runs every gate and
 check, owns every status change and makes every commit. It is also the boundary
 the permission fence only advises on: a session that moves a ref, a key of
-`.git/config` or the git hooks halts the run with exit 9 (see [Exit
+`.git/config` or the git hooks halts the run with exit 9, and so does a Copilot
+session that ran a call its fence denies or changed its hook's binary (see [Exit
 codes](#exit-codes)), and the driver restores what a session changed among its
 inputs.
 

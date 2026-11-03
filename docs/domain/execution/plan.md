@@ -66,7 +66,8 @@ adds the missing check and re-runs (P-8). Every check must pass on the base befo
 planning, and there must be at least one.
 
 The plan stays `planning` until acceptance passes. If the run halts during
-acceptance (a gate or the review changed `.git/config` or a ref, exit 9),
+acceptance (a gate or the review changed `.git/config` or a ref, or a Copilot session got
+past its fence, exit 9),
 `vloop run` on the same brief resumes acceptance of that run id: no second plan
 session runs, the base gates of the current round run again — a halted gate's
 evidence is not trusted — and the gate review follows. The run folder of the
