@@ -5,9 +5,9 @@
   "base": "7a7dc7dc2a3cabf529a33af6921d73e48dcf0ba6",
   "branch": "B20261103-0058-b34-i82-fence-backstop",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-03T01:43:50Z",
-  "updated": "2026-11-03T01:58:28Z",
+  "updated": "2026-11-03T02:06:01Z",
   "shell": "sh",
   "checks": [
     {
@@ -71,9 +71,9 @@
         "No fence's rules change: `fence/*.json` and the judge's decisions are as at the base."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "No committed test exercises the empty-command rule or the real CallJudge (string toolArgs, hook-parser reading), which the acceptance lists explicitly"
+      "notes": ""
     },
     {
       "id": "T2",

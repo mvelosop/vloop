@@ -16,3 +16,10 @@ committing the plan
    check go
    review T1 · 0m32s · $0.17 · run $4.59 / $40.00
    review: FAIL
+── iteration 2 (2 this run) · T1 · 0/4 done ──
+   Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1)
+   work T1 · 3m08s · $0.19 · run $4.78 / $40.00
+   check go
+   review T1 · 0m31s · $0.17 · run $4.94 / $40.00
+   review: PASS
+   T1 done
