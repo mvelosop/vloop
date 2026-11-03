@@ -1,0 +1,79 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Why this shape, and what was rejected / Out of scope",
+      "summary": "C2 closes the hole where a word is matched as written for $, but brace expansion and globs belong to the same class and stay open. The brief neither covers them nor names them out of scope.",
+      "evidence": "Today's binary: `vloop fence check --phase review --tool bash 'git pu{sh,} origin'` -> allow, and `git {push,status}` -> allow; `bash -c 'echo git pu{sh,} origin'` prints `git push pu origin`. A glob (`git pu?h` with a file named push in the cwd) expands the same way. internal/fence/judge.go `match` joins the words as written.",
+      "fix": "The operator decides: (a) widen C2 so that a word holding an unquoted `{…,…}`/`{a..b}`, `*`, `?` or `[` also stands for any text, with worked-example lines; or (b) add it to Out of scope with a new issue. Recommended: (a) for braces at least, since `git pu{sh,} origin` is a real bypass of the review fence today."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C3",
+      "summary": "The rule 'an option before the name holds v or V' also matches `-$v`, which holds a literal v. With v=p, `command -$v git push` runs git push and would be allowed.",
+      "evidence": "C3: \"an option before the name holds `v` or `V` (`-v`, `-V`, `-pv`)\"; today `command -$o git push` -> deny (looked through, judge.go skipDashes). A plain ContainsAny(opt, \"vV\") check would allow it.",
+      "fix": "Pin the option literally: a word of `-` followed only by the letters `p`, `v` and `V`, with at least one `v` or `V` (no `$`, no other letters). Add `command -$v git push` -> deny (by the review fence, Bash(git push:*)) to the worked example and to the planted failures."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example / Shape task 4",
+      "summary": "The line template `vloop fence check … \"<command>\"` breaks for lines that hold `\"` or `$`: the outer shell expands them, so the close task's run 'line for line through the built binary' tests a different command.",
+      "evidence": "`… \"git diff \"$BASE\" --stat\"` reaches the judge as `git diff  --stat` ($BASE is empty) -> allow, not the deny the line pins. The same happens to `\"$tool\"`, `\"$f\"`, `\"$x\"` and `\"$gate_status\"`.",
+      "fix": "Write the template as `vloop fence check --root <tmp> --phase <phase> --tool bash '<command>'`, with each inner `'` written as `'\\''`, or state that the command is passed as one argument exactly as shown, never through shell interpolation."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C1, `for`",
+      "summary": "The `for` bullet lists `for ((…))` among the forms answering `shell syntax for cannot be judged`, but the splitter refuses that `(` first, and the worked example pins `subshells and process substitution cannot be judged`.",
+      "evidence": "C1 subshell rule: `(` opens a subshell only after opening keywords, and `for` is not one. Worked example: `for ((i=0; i<3; i++)); do ls; done → deny: subshells and process substitution cannot be judged`. Today's binary gives the same answer.",
+      "fix": "Drop `for ((…))` from the `for` bullet, or note that it answers the subshell message because the splitter refuses it first."
+    },
+    {
+      "kind": "fact",
+      "section": "Decided here",
+      "summary": "The brief says `env ! x` is judged as a command named `!`, as today. Today it is denied as a keyword.",
+      "evidence": "`vloop fence check --phase review --tool bash 'env ! x'` -> `deny: shell syntax ! cannot be judged` (judge.go: the keywords map holds \"!\" and is checked after wrappers).",
+      "fix": "State the intended answer: either keep today's answer (`shell syntax ! cannot be judged`, which follows from the decided order) or say that it changes, and add the line to the worked example."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary / Binding references / seeds",
+      "summary": "The denial counts are credited to the wrong runs and sections of the cited document. Two other figures cannot be checked from the repository.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md: 5 `if` + 1 subshell is B24's section (line 365), not B26's; B26 (line 433) has 4 `for` + 1 `$(…)`; 1 `if` + 1 `for` matches B27 (line 477), while B29 (line 511ff) records 0 denials; 2 `if` is the gpt-6.1-terra planning section (line 568); B32's section (663ff) records no denial counts. Neither `command -v curl` nor the '52 shell calls in 7 kept sessions, 5 hold a $' figure appears in any file of the repository (grep).",
+      "fix": "Re-attribute the counts (B22.0, B24, B26, B27, the gpt-6.1-terra planning test), and cite those sections in the binding reference. Record the B32/B33 session figures (the `command -v curl` denial and the 52/5 count) in copilot-cli-experiments.md, or say where they come from."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C2",
+      "summary": "The message says 'the command as written', but the worked example shows the words joined with their quotes stripped (`git $x origin` for `git \"$x\" origin`).",
+      "evidence": "C2: \"The message is the rule's, with the command as written\"; worked example: `for x in push; do git \"$x\" origin; done → deny: git $x origin is denied …`; judge.go `match` uses strings.Join(ws, \" \").",
+      "fix": "Say \"with the command's words joined by spaces, as today\"."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C4",
+      "summary": "The new text for configuration.md gives `shell syntax case cannot be judged` as the sample answer, but a real `case` (with its `)` patterns) answers the subshell message.",
+      "evidence": "Worked example: `case x in a) ls;; esac → deny: subshells and process substitution cannot be judged`.",
+      "fix": "Use `[[` as the example: \"answering `shell syntax [[ cannot be judged` (or the syntax at hand)\"."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest instead of parsing the grammar (mvdan.cc/sh rejected). Agree: nothing inside is judged less than one command per line.",
+    "case, select, function, coproc and [[ stay refused. Agree; none appears among the recorded denials.",
+    "A $ word stands for any text, accepting over-denials. Not listed in the brief: in a work session `rm \"$f\"` becomes denied (rm -rf:* matches), and so do `git log \"$x\"`/`git show \"$x\"` in every phase. Acceptable, but the operator should know.",
+    "A $ inside single quotes is literal. Agree.",
+    "command -v / -V only (type, which and hash need nothing). Agree, provided the option is pinned (see the C3 finding).",
+    "Subshells are read, not only braces; $(, <( and >( stay refused. Agree.",
+    "Order inside a command: opening keywords dropped first, then closing keywords/for/refused words, then assignments and wrappers. Agree.",
+    "`!` after a wrapper is not a keyword. Its stated answer contradicts today's (see the fact finding).",
+    "C2 applies in every phase and after every wrapper, the command name excluded. Agree.",
+    "Whether brace expansion and globs join C2 or go out of scope: not decided in the brief (see the ASK finding).",
+    "Every decision was taken by the assistant under the operator's delegation of 2026-11-02. The operator has not seen any of them individually."
+  ],
+  "checked": "facts against internal/fence/split.go, judge.go, judge_test.go, fence/{review,work,plan}.json, internal/cli/fence.go, the docs to be edited, copilot-cli-experiments.md; today's answers probed with a built binary; existing tests that pin refusals (only internal/fence; B34's re-judge tests and the hook tests are unaffected); every worked-example line traced through the contract and the fences' rule order; the task order against the `go` check; vloop brief check (ok, 0 warnings)",
+  "header": "Reviewed 2026-11-03: ASK, 8 findings"
+}
+

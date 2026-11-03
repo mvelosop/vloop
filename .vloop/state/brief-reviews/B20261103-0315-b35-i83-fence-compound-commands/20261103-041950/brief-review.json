@@ -1,0 +1,28 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C2 (the xargs bullet); Worked example",
+      "summary": "C2 judges the command xargs runs 'as if it ended with one more expanded word, added before the judge looks through the command's wrappers', and a wrapper with nothing after it takes that word as its command name and is refused. The contract does not say what happens when xargs itself has no command. Read literally, the command is empty plus the appended word, so the word becomes the command name and bare `xargs` is refused with `command word <xargs input> expands and cannot be judged`. Real xargs with no command runs `echo`, which is harmless, and `… | xargs` (to join or trim) and `xargs -n 1` are common. Today they are allowed. This would be a new refusal of a harmless form, the kind of retry the brief exists to remove, and no worked-example line or existing test pins it either way.",
+      "evidence": "internal/fence/judge.go: words() on `xargs` with no further words: skipXargs([]) returns [], the loop finds len(ws)==0 and returns \"\" (allowed today). The brief, C2: 'a wrapper with nothing after it (`xargs env`, `xargs nohup`, `xargs timeout 5`, `xargs xargs`) has that word as its command name and is refused'. Nothing in the brief covers `xargs` alone. grep of internal/fence/judge_test.go finds no bare-xargs case.",
+      "fix": "In C2's xargs bullet, add: 'xargs with no command after its options runs `echo`: it is judged as `echo` with the input appended, and is allowed.' Add worked-example lines `review  ls | xargs   → allow` and `review  echo a b | xargs -n 1   → allow` to task 2's gated lines."
+    }
+  ],
+  "decisions": [
+    "Read compound commands by dropping the leading keyword rather than parsing the shell grammar (mvdan.cc/sh rejected). Sound: the splitter already cuts every command out of the compound.",
+    "case, select, function, coproc and [[ stay refused. Agreed: none of them appears in the recorded denials.",
+    "An expanded word ($, glob, brace) is matched as any text, never resolved. This closes a real hole (`X=push; git $X origin`, `git $'\\x70ush'`, `git pu{sh,}` are allowed today). The cost: harmless forms like `git diff \"$BASE\"`, `git log \"$x\"`, `rm \"$f\"` in a work session, and `env PATH=$P …` are now denied. The brief says so openly. I agree, but the operator should know that review and gate sessions commonly write `git diff \"$BASE\"`.",
+    "An expanded command name, or an expanded word a wrapper skips (an option, a duration, env's NAME=value), is refused outright rather than matched.",
+    "A redirection target holding a glob or a brace expansion is refused, with a new message.",
+    "xargs: BSD -J/-R/-S are taken as options with arguments; replace strings (-I, -i, --replace, -J) mark words as expanded; a -c string holding the replace string is refused. These close bypasses that exist today.",
+    "((…)) is refused; other arithmetic contexts (let, ${a[x]}, declare -i) are left to a later brief. I agree: B35 does not open them.",
+    "Only `command -v`/`-V` are looked through as lookups; `time -v` is not.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays denied)."
+  ],
+  "checked": "facts: every claim about split.go, judge.go (keywords, the command/time skip, the xargs option letters adEILnPs, the -c $ refusal, the $-prefix name refusal) and the named tests (TestSplitRefuses '(gh x)', the work table 'for f in a b…', shellCases 'if true; then gh x; fi' with '*'); the denial counts against docs/design-notes/copilot-cli-experiments.md (9 if, 5 for, 2 subshells; the new kept-sessions section); the fences' rule order (git push:* first in every phase), so each 'first rule that can match' message in the worked example is right; the C4 anchors in configuration.md:80, fence-audit.md:19-25 and :234-237, and fence.go's Long text; the domain's hook row, S-2 and S-4. consistency: walked every worked-example line through the contract and found each reachable with its exact message. rules: no conflict with CLAUDE.md or the fence audit. runnability: the single go [[check]] stays green after each task as long as task 1 rewrites the two cases the Constraints name; no other fence test in internal/cli, internal/driver or cmd/vloop holds a form C1 or C2 changes; task 1's lines need nothing from C2. vloop brief check on a ready copy: ok, 0 warnings.",
+  "header": "Reviewed 2026-11-03: FIX, 1 finding"
+}
+

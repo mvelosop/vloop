@@ -1,0 +1,37 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C3 and C2; Worked example (# C3); Shape task 1",
+      "summary": "C2 refuses a command when a word a wrapper skips is expanded, and `command` skips its options, so `command -$v git push` must answer `-$v expands before the command name and cannot be judged`. But C3 and the worked example still pin the looked-through answer `git push is denied by the review fence (Bash(git push:*))`. Both lines cannot pass. Task 1's named test for this line passes, then task 2's C2 rule breaks it.",
+      "evidence": "C2: \"a word a wrapper skips that is expanded (an option or its value, …) refuses the command: `<word> expands before the command name and cannot be judged`\". C3: \"(`command gh pr list` and `command -$v git push` stay denied)\". Worked example: `review  command -$v git push   → deny: git push is denied by the review fence (Bash(git push:*))`. internal/fence/judge.go:317-318 handles `command` with skipDashes, which drops `-$v` as an option. Today's binary: `command -$v git push` → `deny: git push is denied by the review fence (Bash(git push:*))`.",
+      "fix": "Follow C2's own rule. Change the line to `review  command -$v git push   → deny: -$v expands before the command name and cannot be judged`, move it under `# C2` so task 2 gates it, and in C3 write \"(`command gh pr list` stays denied by the deny list; `command -$v git push` is refused by C2's wrapper rule)\". If the operator prefers to keep today's answer, C2 must exempt `command`'s options explicitly. That would be a new decision, and a weaker one: with v=p the command runs git push either way."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary; Why this shape (expanded word); Binding references (copilot-cli-experiments.md)",
+      "summary": "The figures for the kept sessions (52 calls, 5 holding `$`, the `command -v … curl` denial in B32's brief review session) come from the section '### The shell calls of the kept sessions'. That section is uncommitted and is not on `ee4adf63`. A session reads only what is on its base.",
+      "evidence": "`git diff --stat` → docs/design-notes/copilot-cli-experiments.md | 10 +++. The section is at lines 768-776 of the working tree. Its content agrees with the brief.",
+      "fix": "Commit the design-note change in the same ready PR as the brief. The brief's starting point already says \"plus this brief's ready merge\", so no edit to the brief is needed if that holds."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest; no shell grammar (mvdan.cc/sh rejected). Sound: nothing inside is judged less than one per line.",
+    "case, select, function, coproc and [[ stay refused. Sound: none appears in the counted denials.",
+    "An expanded word ($, glob, brace) is matched as any text, never resolved. It accepts over-denial: `git diff \"$BASE\" --stat`, `find \"$d\" -name x` and `git diff -- src/*.go` become denied. Agree; the kept sessions show 0 of 5 `$` calls affected.",
+    "A glob is widened to any text, not to its own pattern (`pu?h` as `*`). Simpler and safe.",
+    "Quoted is literal; `{}` without `,` or `..` is not a brace expansion; `[` without a later `]` is not a glob.",
+    "A command name holding a glob or a brace is refused (a new refusal, with a new message).",
+    "An expanded word a wrapper skips refuses the whole command (a new refusal, with a new message). Needed: `nice -n $N push origin` is a real bypass today.",
+    "The first rule that can match is named, and the message gets a new suffix ': a word the shell expands may be any text'.",
+    "command -v/-V (literal, with p allowed) run nothing; type/which/hash are untouched.",
+    "Subshells are read; $(, <( and >( stay refused; `for ((…))` and `case … )` fall to the subshell refusal, not to a keyword message.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays denied); C2 applies in every phase."
+  ],
+  "checked": "facts (split.go and judge.go behaviour and line roles, the fence rule order in review, work, plan and gate-review and the deny stems, today's answers for 10 worked-example lines through a built binary, the denial counts at copilot-cli-experiments.md:251/365/433/477/568 = 9 if, 5 for, 2 subshells, the C4 anchors in configuration.md:80, fence-audit.md:15-27/234-239 and cli/fence.go:30-36), consistency (every worked-example message against the contract and the first matching rule), rules (CLAUDE.md, no new dependency), runnability (the single go check after each task, existing tests that change, base failures of each gate)",
+  "header": "Reviewed 2026-11-03: FIX, 2 findings"
+}
+

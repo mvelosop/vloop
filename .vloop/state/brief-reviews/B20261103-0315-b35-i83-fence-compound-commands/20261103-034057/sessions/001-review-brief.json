@@ -1,0 +1,32 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 1.5909342,
+  "duration_ms": 304951,
+  "effort": null,
+  "ended": "2026-11-03T03:46:03Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 75161,
+      "cache_read_input_tokens": 2124751,
+      "cost_usd": 1.5909342,
+      "input_tokens": 64,
+      "output_tokens": 28222
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json; echo exit=$?; rm -rf .vloop/tmp/rb",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261103-0315-b35-i83-fence-compound-commands",
+  "schema": "session/v5",
+  "started": "2026-11-03T03:40:57Z",
+  "turns": 34,
+  "wall_ms": 305613
+}

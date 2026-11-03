@@ -1,0 +1,51 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C2 (the xargs bullet)",
+      "summary": "C2 says xargs adds words the judge cannot see, but only covers words appended at the end. xargs's replace string (-I, -i, --replace, BSD -J) puts those words anywhere in the command, so the bypass this rule closes stays open. This is the brief's own violation: a word the judge cannot see stands where the deny rules look.",
+      "evidence": "Branch binary built from ee4adf63, vloop fence check --phase review: `echo push | xargs -I{} git {} origin` → allow; `echo push | xargs -I X git X origin` → allow; `echo push | xargs -i git {} origin` → allow. Each one runs `git push origin`. Under C2 as written, `{}` is not a brace expansion (the brief says so), X is literal, and only a trailing expanded word is appended, so `git {} origin *` and `git X origin *` match no rule and stay allowed. skipXargs (internal/fence/judge.go) does not list J among the letters that take an argument, so on macOS `xargs -J % git % origin` reaches the judge as the command `% git % origin`, which is allowed and runs git push origin.",
+      "fix": "In C2's xargs bullet: when xargs has -I/-i/--replace (or BSD -J), every word of the command holding the replace string is an expanded word. Alternatively refuse those options with a pinned message, e.g. `xargs -I cannot be judged`. Also make skipXargs's option table explicit for -J. Add a worked-example line: `review  echo push | xargs -I X git X origin   → deny: git X origin is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text`, or the refusal message, whichever is chosen."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example (# C2: `bash $O 'git status'`) / C2 (words before the command name)",
+      "summary": "The line pins `$O expands before the command name and cannot be judged`, but the contract does not produce that answer for it. `$O` is not an option word before the -c string: shellString classifies it as a script name, and today's answer is `bash: runs a script or stdin, not a literal -c string`. Today it is already denied, so the line closes no hole. Errors reached through shellString also carry a `bash: ` prefix, and the pinned message lacks one.",
+      "evidence": "vloop fence check --phase review --tool bash \"bash \\$O 'git status'\" on ee4adf63 → `deny: bash: runs a script or stdin, not a literal -c string`. Meanwhile `bash -$O -c 'git status'` → allow (the real gap). In judge.go the sh/bash case returns fmt.Sprintf(\"%s: %s\", name, e) for shellString errors.",
+      "fix": "Replace the line with `review  bash -$O -c 'git status'   → deny: -$O expands before the command name and cannot be judged`. In C2, say whether that message carries the `bash: ` prefix (pin it either way). If the `bash $O` line stays, say that every word before the -c string is checked for expansion before shellString classifies it."
+    },
+    {
+      "kind": "decision",
+      "section": "Behaviour contract / C2 (Unchanged: a redirection target holding a glob is judged as written)",
+      "summary": "The brief keeps a word the shell expands matched as written for redirection targets, which is the very fault C2 fixes. In a work session that lets a write past the S-4 boundary at the hook. The brief cites S-4 for this run's own redirections but gives no reason for keeping the gap and does not name it out of scope.",
+      "evidence": "On ee4adf63, vloop fence check --phase work: `echo x > .gi?/config` → allow; `echo x > .vl?op/state/state.json` → allow. Bash expands a pathname in a redirection word when it yields one file, so these write .git/config and .vloop/state/state.json. docs/domain/domain-model.md:220 (S-4). The driver catches part of this afterwards (a changed .git/config entry or hook halts, and .vloop/ files are restored; fence-audit.md 'driver' bullet), but the hook does not.",
+      "fix": "Either refuse an unquoted glob or brace expansion in a redirection target, as `$` is refused today, with a pinned message such as `a redirection target holding a glob cannot be resolved: <word>` and a worked-example line. Or move it to Out of scope with the reason (the driver's after-session checks cover .git/config, hooks and .vloop/) and a later issue. Under the delegation either is the author's call."
+    },
+    {
+      "kind": "decision",
+      "section": "Why this shape — An expanded word is any text",
+      "summary": "The costs listed for C2 (git diff \"$BASE\", find \"$d\", git diff -- src/*.go) leave out the most common case for a work session: `rm` of a glob or a variable. `rm *.tmp` and `rm \"$f\"` become `rm <any text>`, which `Bash(rm -rf:*)` can match, so both are denied in work sessions, where rm of a file is allowed on purpose. The same goes for `git log -- *.go` and `git show $SHA`.",
+      "evidence": "fence/work.json index 21 `Bash(rm -rf:*)`. The work phase drops the rm:* stem (judge.go New), and fence-audit.md:225 says 'rm of a file is allowed in a work session: deleting and renaming files is part of the work'. Today `rm src/*.tmp` is allowed in a work session; under C2 the word stands for any text, including `-rf x`.",
+      "fix": "Add `rm \"$f\"` / `rm src/*.tmp` in a work session to the costs paragraph, so the operator approves it knowingly. A session writes the path out instead."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest, rather than parsing the grammar with mvdan.cc/sh. Sound: nothing is judged less than one command per line.",
+    "case, select, function, coproc, [[ and function definitions stay refused. Agreed. None appears in the counted denials.",
+    "An expanded word ($, glob, brace) is any text, and the whole word stands for it, not just the expanded part. Safe, but it over-denies: git diff \"$BASE\", find \"$d\", and, unlisted, rm \"$f\" in work sessions (finding 4).",
+    "Quoting makes $, globs and braces literal, and {…} without , or .. is not a brace expansion. Agreed. The splitter must start recording per-character quoting, which it drops today.",
+    "command -v / -V run nothing (only command, not time). Agreed.",
+    "Subshells are read, `((` is refused, and the other arithmetic contexts (let, ${a[x]}, declare -i) are left out of scope. Acceptable as scoped.",
+    "xargs input counts as a trailing expanded word. Right direction, but incomplete (finding 1).",
+    "A word a wrapper skips that is expanded refuses the command, and assignments before the name do not. Agreed.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays denied). Agreed, conservative.",
+    "A redirection target holding a glob is judged as written. I would refuse it like `$` (finding 3).",
+    "Order inside a command: keywords, then closing/for/refused words, then assignments and wrappers. Agreed. It makes `X=1 if` stay denied."
+  ],
+  "checked": "facts (judge.go/split.go behaviour, fence rule order of every phase, Copilot deny stems, the denial counts and the kept-sessions section of copilot-cli-experiments.md, S-2/S-4 and the hook row, C4's target sentences in configuration.md, fence-audit.md and cli/fence.go); consistency (every worked-example line traced through the contract and the fences' rule order, including first-matching-rule names); rules (S-4, no new dependency, repo-relative paths); runnability (existing tests that change, B34's backstop tests, the go check after each task, docs gate, brief check ok with 0 warnings)",
+  "header": "Reviewed 2026-11-03 (round 10): FIX, 4 findings"
+}
+

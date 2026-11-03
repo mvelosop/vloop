@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C2 (the xargs bullet)",
+      "summary": "C2 matches the command xargs runs \"as if it ended with one more expanded word\". It does not say whether the wrappers see that word. The judge looks through wrappers before it matches, and a wrapper with nothing after it is allowed. So `echo git push | xargs env` reaches `env` with no command and is allowed, but it runs `git push`. The same goes for `xargs nohup`, `nice`, `time`, `command`, `timeout 5`, `stdbuf -oL` and `xargs xargs`. If the word is added only at the match step, a task can implement C2 as written, pass every worked-example line, and leave this open.",
+      "evidence": "Binary built from ee4adf63, phase review: `echo git push | xargs env`, `… | xargs nohup`, `… | xargs nice`, `… | xargs time`, `… | xargs command`, `echo 5 git push | xargs timeout`, `… | xargs stdbuf -oL`, `… | xargs xargs` → allow. With a stub `git` on PATH, `echo git push | xargs env` prints `RAN git push`. internal/fence/judge.go `words`: the `env` case runs skipEnv(rest) on an empty rest, and the loop returns \"\" at `len(ws) == 0` without calling match.",
+      "fix": "In the xargs bullet, say that the appended expanded word is one of the command's words from the start, before the wrappers are looked through. A wrapper left with nothing else then has the expanded word as its command name or option value, and C2's existing rules refuse it. Pin the message. The natural one is the command-name rule's, but the word has no text, so name one literally, for example `xargs: the command name comes from its input and cannot be judged`. Add the line `review  echo git push | xargs env   → deny: <that message>`, plus one for `nice -n` (`echo 5 git push | xargs nice -n` → `… expands before the command name …` or the same message)."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — C2 (Unchanged: a -c string holding $; the bullet on sh, bash, zsh, dash, ksh)",
+      "summary": "A shell's -c string that the outer shell expands (an unquoted brace or glob) is neither refused nor matched as any text. The judge splits it again with the outer quoting removed, so a brace the outer shell expands but the inner string single-quotes reads as literal. `sh -c git\\ \\'pu{sh,}\\'` is passed by bash as `sh -c \"git 'push'\" \"git 'pu'\"`, which runs `git push`. The judge splits it again as `git 'pu{sh,}'`, reads the quoted brace as literal, matches `git pu{sh,}` as written, and allows it. C2 covers option words before -c and a -c string holding `$` or xargs' replace string, but not a -c string that is itself an expanded word. That is the same hole C2 closes for `git pu{sh,} origin`.",
+      "evidence": "Binary built from ee4adf63, phase review: `sh -c git\\ \\'pu{sh,}\\'` → allow. `bash -c \"sh -c git\\\\ \\\\'pu{sh,}\\\\'\"` with a stub `git` on PATH prints `RAN git push`. internal/fence/judge.go `shellString` refuses only a string holding `$`. Then `j.shell(str, depth+1)` splits it again, with no memory of which characters the outer shell expands.",
+      "fix": "Add to the bullet on sh, bash, zsh, dash and ksh: a -c string that is an expanded word by C2's definition (an unquoted glob or brace expansion; `$` keeps today's message) is refused with the shell's prefix. Pin the message, for example `sh: the -c string expands and cannot be judged`. Add the line `review  sh -c git\\ \\'pu{sh,}\\'   → deny: sh: the -c string expands and cannot be judged` (as a Go string in the tests; check how it survives the close's single-quoting). Add the refusal to C4's lists of what is refused."
+    }
+  ],
+  "decisions": [
+    "Drop the leading keyword and judge the rest, rather than parse the grammar (mvdan.cc/sh rejected). Agree: every command a compound runs is cut out by the splitter and judged as if sent alone.",
+    "case, select, function, coproc, [[ and function definitions stay refused; ((…)) is refused as arithmetic; let, ${a[x]} and declare -i are left for a later brief. Agree; none is among the counted denials and the rest is named in Out of scope.",
+    "An expanded word ($, glob, brace) stands for any text when the deny rules are matched. Agree. It closes real bypasses (confirmed allowed today: `X=push; git $X origin`, `git pu{sh,} origin`, `g$X push origin`, `/usr/bin/$X …`, `xargs -J % git push`). The cost the brief lists is real: git diff/log/show with a `$` or glob argument, `find \"$d\"`, and in work sessions `rm \"$f\"`, `rm *.tmp` and also `… | xargs rm`.",
+    "A command name that expands anywhere in it, an expanded word a wrapper skips, and an expanded shell option before -c are refused. Agree.",
+    "A redirection target holding a glob or a brace expansion is refused, with a new message. Agree.",
+    "xargs: the input counts as one more expanded word, or goes where the replace string is; BSD -J/-R/-S take an argument. Agree, subject to finding 1.",
+    "command -v / -V (literal, letters p/v/V) runs nothing; time -v does not. Agree.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays denied). Agree.",
+    "C2 applies in every phase. Agree."
+  ],
+  "checked": "facts: split.go and judge.go as the brief describes them (keywords, words, match, patternMatch, skipXargs letters, shellString's $-only refusal); today's answers for 18 forms on a binary built from the base, including every 'today' claim (`time -v git push`, `command gh pr list`, `env ! git status`, `X=1 if …`, `xargs -J % git push`, `echo x > .vloop/*` in work, `command -v curl` in review-brief); the order of the rules in the review, work and plan fences and the Copilot stems behind every pinned rule; denial counts against copilot-cli-experiments.md (lines 251, 365, 433, 477, 568) and the uncommitted kept-sessions section. Consistency: every worked-example line traced through C1–C3 by hand, including messages, quote removal and which rule matches first. Rules: CLAUDE.md, S-2/S-4, no new dependency. Runnability: the go check after each task; the only existing tests that change are the two Constraints names (no other test outside internal/fence/judge_test.go depends on 'cannot be judged'; the B34 backstop and hook tests use unaffected commands); the C4 anchor sentences exist at docs/guide/configuration.md:80, docs/design-notes/fence-audit.md:22-25 and :234-238, and the Long help in internal/cli/fence.go; no other guide or skill text describes the refused syntax. `vloop brief check` on a ready copy: ok, 0 warnings.",
+  "header": "Reviewed 2026-11-03: FIX, 2 findings"
+}
+

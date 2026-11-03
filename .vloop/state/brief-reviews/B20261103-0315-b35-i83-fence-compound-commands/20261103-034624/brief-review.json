@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Behaviour contract, C1 (Subshells: `((` refused) / Out of scope",
+      "summary": "The brief refuses `((x))` because bash arithmetic evaluates a variable's value, and a subscript in that value can run a command substitution. Three other arithmetic contexts do the same thing and stay allowed: `let x`, `${a[x]}` and `declare -i y=x`. The brief neither closes them nor names them out of scope. The gap is not new, but it is the same class the brief's own reasoning closes, and B34's backstop re-judges with the same judge, so it would not catch them either.",
+      "evidence": "bash -c 'x='\\''a[$(echo RAN-let >&2)]'\\''; let x' prints RAN-let; the same with `a=(1); echo ${a[x]}` prints RAN-subscript, and with `declare -i y=x` prints RAN-declare (`[ x -eq 1 ]` does not: `integer expression expected`). On the base, `vloop fence check --phase review --tool bash` answers allow for each of: x='a[$(git push)]'; let x; x='a[$(git push)]'; echo ${a[x]}; x='a[$(git push)]'; declare -i y=x. After B35 they stay allowed: `let` and `declare` match no rule, and C2 only widens arguments to rules that already name the command.",
+      "fix": "Operator's call. (a) Close it here: refuse `let` as a command name, `declare`/`typeset`/`local` with an `-i` option, and a word holding `${` with a `[` inside the braces, each with a pinned message and a worked-example line. (b) Name 'arithmetic evaluation outside `((` (`let`, `${a[x]}`, `declare -i`): a gap that predates B35' under Out of scope, and open an issue for it."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract, C1 (Subshells)",
+      "summary": "The rule says a `(` opens a subshell when the current command holds 'no redirection', but it does not say whether a redirection operator still waiting for its target counts. Read literally, `<(ls) cat` opens a subshell. Ending the current command with a redirection still pending then gives `a redirection has no target`. C1 and the new C4 text say `<(…)` and `>(…)` answer `subshells and process substitution cannot be judged`, which is today's answer.",
+      "evidence": "internal/fence/split.go: `<` sets l.pend = pendRead without adding a word or a read. `end()` returns \"a redirection has no target\" while l.pend != pendNone. On the base, `vloop fence check --phase review --tool bash '<(ls) cat'` gives `deny: subshells and process substitution cannot be judged`. The worked example pins only `cat <(ls)`, where a word comes before the `(`.",
+      "fix": "In the Subshells bullet, write 'no redirection, finished or waiting for its target'. Add `review  <(ls) cat   → deny: subshells and process substitution cannot be judged` to the worked example."
+    }
+  ],
+  "decisions": [
+    "Drop a leading keyword and judge the rest, rather than parse a real shell grammar (mvdan.cc/sh rejected). Sound: the splitter already cuts at every operator the compounds use.",
+    "case, select, function, coproc and [[ stay refused. Agreed. None of them appears among the counted denials.",
+    "An expanded word ($, glob, brace) matches as any text instead of being resolved. This knowingly denies harmless forms (`git diff \"$BASE\" --stat`, `find \"$d\" -name x`, `git diff -- src/*.go`) at the cost of a retry. Agreed, but the operator should know these become new denials.",
+    "Quoted is literal; `{}`/`@{u}` are not brace expansions, and `[` with no later `]` is not a glob.",
+    "`command -v`/`-V` (any combination of p, v, V that includes v or V, written literally) run nothing. `type`, `which` and `hash` are left as they are.",
+    "Subshells are read as well as braces, while `((` is refused as arithmetic. See finding 1 for the arithmetic contexts this leaves open.",
+    "A name that expands anywhere in it is refused, with a new message: `command word <word> expands and cannot be judged`.",
+    "An expanded word that a wrapper skips refuses the command, with a new message: `<word> expands before the command name and cannot be judged`. Assignments before the first word are exempt.",
+    "Keywords after a wrapper are not dropped (`env ! x` keeps today's denial), and opening keywords are dropped before assignments are skipped (`X=1 if true` stays denied).",
+    "The C2 matching algorithm (do two patterns of literal text and `*` share a string) is left to the plan."
+  ],
+  "checked": "vloop brief check on a ready copy: ok, 0 warnings. Facts: split.go and judge.go match every claim (where `(`/`)` are refused, the keywords map, `command` looked through via skipDashes, today's messages). Probed on the base: env ! git status, X=1 if true…, g$X push origin and /usr/bin/$X push origin (allowed today), git $X origin (allowed), command -v curl (denied by curl:*). The denial counts check against copilot-cli-experiments.md: B22.0 row, B24 5 if + 1 subshell, B26 4 for, B27 if + for, gpt-6.1-terra 2 if, which make 9 if, 5 for and 2 subshells. The kept-sessions section (52 calls, 5 with $, command -v curl) is in the uncommitted diff, which the brief says lands with the ready merge. Rule names in the worked example are in fence/review.json and fence/work.json, and the first match comes first in rule order. Every C4 anchor sentence exists verbatim in configuration.md:80, fence-audit.md:25 and 234-237, and internal/cli/fence.go:31-33. Existing tests: only TestSplitRefuses `(gh x)` and TestWorkShell's `for` case change, as the Constraints say; no test outside internal/fence pins a compound refusal. Every worked-example line traced through the proposed rules. Task order is safe against the single `go` check.",
+  "header": "Reviewed 2026-11-03: ASK, 2 findings"
+}
+

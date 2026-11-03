@@ -1,0 +1,42 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C1 — Subshells",
+      "summary": "C1's subshell rule reads bash arithmetic `((…))` as two nested subshells and judges what is inside as a command. Bash arithmetic evaluates a variable's value as an expression, and an array subscript in that value runs a command substitution. So `x='a[$(git push)]'; ((x))` runs `git push`. Today the judge refuses this string. Under C1 as written it would be allowed: the assignment is single-quoted, and `x` would be judged as a command. The brief only rules out `for ((…))`, which the splitter catches because `(` follows `for`. A bare `((` at the start of a command meets every condition C1 sets for opening a subshell.",
+      "evidence": "bash -c 'x='\\''a[$(echo RAN-arith >&2)]'\\''; ((x))' prints RAN-arith. Today: vloop fence check --phase review --tool bash \"x='a[\\$(git push)]'; ((x))\" → deny: subshells and process substitution cannot be judged. internal/fence/split.go:164-165 refuses every ( today. C1: '(' opens a subshell when no word is being built and the current command holds no word but opening keywords, which is true for the second ( of '(('.",
+      "fix": "In C1 → Subshells, add: a `(` that follows an opening `(` with nothing between them (`((`) is arithmetic and is refused with `subshells and process substitution cannot be judged`; `( (ls) )` with a blank stays a nested subshell. Add worked-example lines `review  ((x))   → deny: subshells and process substitution cannot be judged` and `review  x='a[$(git push)]'; ((x))   → deny: subshells and process substitution cannot be judged`, and add 'arithmetic `((…))` allowed' to the violations list."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C4 — the docs",
+      "summary": "The replacement texts in C4 pin messages the judge does not give. In fence-audit, the new list says a backtick, `$(`, `<(`, `>(`, `eval`, `source` and `.` each answer `shell syntax … cannot be judged`. They actually answer `command substitution cannot be judged`, `subshells and process substitution cannot be judged`, `eval is not allowed`, `source is not allowed` and `. (source) is not allowed`. In configuration.md, `case` is listed with the answer `shell syntax [[ cannot be judged` (or the syntax at hand), but the brief's own worked example gives `case x in a) ls;; esac` the subshell message. The old fence-audit sentence was already imprecise. The brief rewrites it and should fix it.",
+      "evidence": "internal/fence/judge.go:304-305 ('. (source) is not allowed'), 313-314 ('eval is not allowed'), split.go:155-163 ('command substitution cannot be judged'); worked example line 'review  case x in a) ls;; esac   → deny: subshells and process substitution cannot be judged'.",
+      "fix": "In both C4 texts, have the list answer '`… cannot be judged` or `… is not allowed`', or drop the pinned message and say only that each is denied. Update the docs gate's expected text to match."
+    },
+    {
+      "kind": "fact",
+      "section": "frontmatter (seeds)",
+      "summary": "`seeds` cites the hook denials counted in the design note for (B26, B29, B32). The body counts denials from B22.0, B24, B26, B27 and the `gpt-6.1-terra` planning test. B29 recorded 0 hook denials, and B32's count comes from the kept-sessions section, not a denial row.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:251 (B22.0: if + subshell), :365 (B24: 5 if, 1 subshell), :433 (B26: 4 for), :477 (B27: if, for), :526 (B29: 0), :568 (terra: 2 if). The counts 9/5/2 check out against these rows.",
+      "fix": "Make seeds read '(B22.0, B24, B26, B27, the gpt-6.1-terra planning test; the kept sessions of B32 and B33)'."
+    }
+  ],
+  "decisions": [
+    "Drop a leading keyword and judge the rest; no shell grammar (mvdan.cc/sh rejected). Sound: it reuses the splitter and judges nothing less than one command per line would.",
+    "`case`, `select`, `function`, `coproc` and `[[` stay refused. Agreed: none appear in the counted denials.",
+    "An expanded word stands for any text as a whole. This denies harmless forms the brief lists (`git diff \"$BASE\" --stat`, `find \"$d\" -name x`, `git diff -- src/*.go`) and some it does not list, for example `rm build/*.o` in a work session (via `rm -rf:*`). Opinion: acceptable. A cheap refinement is to keep the word's literal text and turn only the expansions into `*` (`build/*.o` stays `build/*.o`). That would let `rm build/*.o` through and stay sound. It is the operator's choice.",
+    "A word a wrapper skips refuses the command when it is expanded, even when it is double-quoted and so cannot split (`timeout \"$T\" git status`, `env A=\"$B\" git status`). This is strict but simple. Fine.",
+    "Only `command -v` and `-V` count as lookups. `type`, `which` and `hash` are untouched, since they are not looked through today.",
+    "Subshells are read; `$(`, `<(` and `>(` stay refused.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays denied).",
+    "Message wording: the suffix ': a word the shell expands may be any text' and 'command word <w> expands and cannot be judged' / '<w> expands before the command name and cannot be judged'.",
+    "Not in the brief, for the operator: `let x` (and `declare -i`) already runs a command substitution hidden in a variable's value today. `x='a[$(git push)]'; let x` is allowed by the base. This hole predates B35, and B35's C2 does not close it. Suggest a separate issue, or add `let` to the refused words here."
+  ],
+  "checked": "Checked: facts (split.go and judge.go behaviour, fence rule order: git push:* first in every fence so the C2 messages name it; the Copilot deny stems; denial counts against the design note rows; the kept-sessions section; the doc anchors C4 edits; the help text in internal/cli/fence.go); every worked-example line claimed unchanged, run through today's binary; consistency between C1-C3, the shape and the violations; the repo rules (no new dependency, no .vloop edits by tasks); runnability (the existing tests that change are exactly the two the constraints name, plus `if true; then gh x; fi` staying denied; no other package's tests feed compound commands to the judge; the go check stays green per task); vloop brief check passes with 0 warnings.",
+  "header": "Reviewed 2026-11-03: FIX, 3 findings"
+}
+

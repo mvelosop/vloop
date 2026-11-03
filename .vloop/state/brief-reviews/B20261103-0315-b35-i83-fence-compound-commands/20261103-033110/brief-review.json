@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0315-b35-i83-fence-compound-commands.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C2 (the command's name); Executive summary C2; Decided here (C2 excludes the command's own name)",
+      "summary": "A command name holding a $ that is not its first character is neither refused nor expanded, so `g$X push origin` and `/usr/bin/$X push origin` are allowed today and stay allowed after B35. This is the same hole C2 closes for arguments. The brief also says a name holding $ is refused 'as one holding $ is today'. Today only a name that starts with $ is refused.",
+      "evidence": "internal/fence/judge.go, words(): `if strings.HasPrefix(w, \"$\")` is the only $ check on the command word, and baseName strips the path before match. Built from ee4adf63: `vloop fence check --root <tmp> --phase review --tool bash 'g$X push origin'` prints allow (exit 0), as do '/usr/bin/$X push origin' and 'gi\"$X\" push'. C2 refuses only a name holding a glob or a brace, and 'Decided here' excludes the name from C2, so all three stay allowed after B35. With X=it, X=git or X=t, each runs git push.",
+      "fix": "In C2, refuse a command word that is expanded in any way: a $ unquoted or in double quotes anywhere in it, a glob or a brace expansion. Check the whole word, before baseName, so /usr/bin/$X is caught. The message is `command word <word> expands and cannot be judged`; a word starting with $ keeps today's message. Correct the executive summary's 'as one holding $ is today'. Add `review  g$X push origin   → deny: command word g$X expands and cannot be judged` and `review  /usr/bin/$X push origin   → deny: command word /usr/bin/$X expands and cannot be judged` to the worked example, and 'a command name that expands, judged as written' to the violations."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / C2 (definition of a brace expansion)",
+      "summary": "'An unquoted { followed later in the word by an unquoted }, with an unquoted , or .. between them' can be read as any { and any later }. On that reading `git log HEAD@{1}..HEAD@{0}` is a brace expansion. It becomes `git log *`, and `Bash(git log*--output*)` denies it. Bash does not expand that word. A gate written to either reading would pass, and the reviews could disagree.",
+      "evidence": "`bash -c 'echo HEAD@{1}..HEAD@{0}'` prints HEAD@{1}..HEAD@{0}. `echo x{a,b}` prints xa xb. The worked example pins only `git log @{u}..HEAD`, where the .. is outside the braces, so it does not tell the readings apart.",
+      "fix": "Write it as 'a { and the } that closes it, with an unquoted , or .. directly between them (not inside a nested pair)'. Add `review  git log HEAD@{1}..HEAD@{0}   → allow` to the worked example."
+    }
+  ],
+  "decisions": [
+    "Drop leading keywords and judge the rest rather than parse the shell grammar (no mvdan.cc/sh): sound. Every command inside is judged, and nothing is judged less than one per line.",
+    "case, select, function, coproc and [[ stay refused: sound. None of them is among the counted denials, and case's ) cannot be split safely.",
+    "An expanded word stands for any text, including several words, instead of being resolved. It knowingly denies harmless forms such as `git diff \"$BASE\" --stat` and `vloop task show \"$id\"` where a fence denies `vloop task done:*`. I agree, because a denial costs only a retry.",
+    "A word a wrapper skips that is expanded refuses the whole command (`nice -n $N …`, `env A=$X …`). This tightens today's behaviour: harmless forms like `env PATH=\"$PATH:x\" go test` are now refused. I agree.",
+    "command -v and -V (with -p) run nothing and are allowed whatever follows; only the literal option counts: sound, since POSIX command -v does not run the name.",
+    "Subshells are read; $(, <( and >( stay refused: sound.",
+    "A keyword after a wrapper is not dropped (`env ! x` stays denied): sound and conservative.",
+    "A redirection target holding a glob is judged as written, as today. This is the one expansion C2 leaves open; it is low risk because only the path decides.",
+    "The redirection after a closing } or ) is judged on that closing command, not on the group: equivalent for the write rules."
+  ],
+  "checked": "facts (judge.go and split.go behaviour; review, work and plan fence rules; the Copilot deny stems; denial counts 9 if, 5 for and 2 subshells against copilot-cli-experiments.md rows 251, 365, 433, 477 and 568; the kept-sessions section in the uncommitted note diff; the C4 sentences quoted exist verbatim in configuration.md:80, fence-audit.md:25 and 233-237, and internal/cli/fence.go:31-35); consistency (every worked-example line traced through the contract with the fence order and messages; C2 and C3 now agree on `command -$v`); rules (no new dependency; repo-relative; the domain's hook row unaffected); runnability (task 1's C1 and C3 lines do not need C2; the go check stays green after each task given the two named test edits; no other test pins the changed refusals; the close's single-quoting is runnable by a verify session)",
+  "header": "Reviewed 2026-11-03: FIX, 2 findings"
+}
+
