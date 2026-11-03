@@ -508,17 +508,28 @@ func TestDoctorGateEditsOrderAndUnreadable(t *testing.T) {
 
 func TestDoctorGateEditsNoClaudeAndWritesNothing(t *testing.T) {
 	e := gateEditsEnv(t)
+	// init declares the plugin in .claude/settings.json; doctor adds nothing to it.
+	declared := `{"extraKnownMarketplaces":{"vloop":{"source":{"source":"github","repo":"mvelosop/vloop"}}},"enabledPlugins":{"vloop@vloop":true}}`
+	e.settings("project", declared)
+	assertOnlySettings := func(when string) {
+		t.Helper()
+		ents, err := os.ReadDir(filepath.Join(e.repo, ".claude"))
+		if err != nil || len(ents) != 1 || ents[0].Name() != "settings.json" {
+			t.Errorf("%s: .claude/ holds %v (err %v), want only settings.json", when, ents, err)
+		}
+		got, _ := os.ReadFile(filepath.Join(e.repo, ".claude", "settings.json"))
+		if string(got) != declared {
+			t.Errorf("%s: settings.json = %s", when, got)
+		}
+	}
 	e.claude(false)
 	e.want("gate edits", resNA)
-	if _, err := os.Stat(filepath.Join(e.repo, ".claude")); err == nil {
-		t.Error("doctor created .claude/")
-	}
+	assertOnlySettings("claude absent")
 	e.claude(true)
 	e.want("gate edits", resWarning)
-	for _, p := range []string{filepath.Join(e.home, ".claude"), filepath.Join(e.repo, ".claude")} {
-		if _, err := os.Stat(p); err == nil {
-			t.Errorf("doctor created %s", p)
-		}
+	assertOnlySettings("claude present")
+	if _, err := os.Stat(filepath.Join(e.home, ".claude")); err == nil {
+		t.Errorf("doctor created %s", filepath.Join(e.home, ".claude"))
 	}
 }
 

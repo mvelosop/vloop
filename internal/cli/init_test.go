@@ -243,3 +243,134 @@ func TestInitKeepsExistingGuidelines(t *testing.T) {
 		t.Errorf("init printed a line for the kept file:\n%s", out)
 	}
 }
+
+const (
+	settingsFresh = "{\n  \"extraKnownMarketplaces\": {\n    \"vloop\": {\n      \"source\": {\n        \"source\": \"github\",\n        \"repo\": \"mvelosop/vloop\"\n      }\n    }\n  },\n  \"enabledPlugins\": {\n    \"vloop@vloop\": true\n  }\n}\n"
+	settingsRef   = ".claude/settings.json"
+)
+
+func TestInitSettingsNoFileWritesTheDeclaration(t *testing.T) {
+	d := initRepo(t, nil)
+	out, errs, code := runPluginCLI(t, initBuild, d, "init", "--language", "en")
+	if code != 0 || errs != "" || !strings.Contains(out, "wrote CLAUDE.md\nwrote .claude/settings.json\n") {
+		t.Fatalf("code %d out %q err %q", code, out, errs)
+	}
+	if got := readFile(t, d, settingsRef); got != settingsFresh {
+		t.Errorf("settings = %q", got)
+	}
+}
+
+func TestInitSettingsDryRunWritesNothing(t *testing.T) {
+	d := initRepo(t, nil)
+	out, _, code := runPluginCLI(t, initBuild, d, "init", "--dry-run")
+	if code != 0 || !strings.Contains(out, "would write .claude/settings.json\n") {
+		t.Fatalf("code %d out %q", code, out)
+	}
+	if _, err := os.Stat(filepath.Join(d, ".claude")); err == nil {
+		t.Error(".claude/ was created on --dry-run")
+	}
+}
+
+func TestInitSettingsMergesAfterTheKeysItKeeps(t *testing.T) {
+	d := initRepo(t, map[string]string{settingsRef: `{"permissions":{"allow":["Bash(a && b)"]},"enabledPlugins":{"other@x":true}}`})
+	out, _, code := runPluginCLI(t, initBuild, d, "init")
+	if code != 0 || !strings.Contains(out, "updated .claude/settings.json\n") {
+		t.Fatalf("code %d out %q", code, out)
+	}
+	want := "{\n  \"permissions\": {\n    \"allow\": [\n      \"Bash(a && b)\"\n    ]\n  },\n  \"enabledPlugins\": {\n    \"other@x\": true,\n    \"vloop@vloop\": true\n  },\n  \"extraKnownMarketplaces\": {\n    \"vloop\": {\n      \"source\": {\n        \"source\": \"github\",\n        \"repo\": \"mvelosop/vloop\"\n      }\n    }\n  }\n}\n"
+	if got := readFile(t, d, settingsRef); got != want {
+		t.Errorf("settings = %q", got)
+	}
+}
+
+func TestInitSettingsKeepsAFileWithBothEntries(t *testing.T) {
+	in := `{"extraKnownMarketplaces":{"vloop":{"source":{"source":"directory","path":"../vloop"}}},"enabledPlugins":{"vloop@vloop":false}}`
+	for _, args := range [][]string{{"init", "--dry-run"}, {"init"}} {
+		d := initRepo(t, map[string]string{settingsRef: in})
+		out, _, code := runPluginCLI(t, initBuild, d, args...)
+		verb := map[bool]string{true: "would keep", false: "kept"}[len(args) > 1]
+		if code != 0 || !strings.Contains(out, verb+" .claude/settings.json\n") {
+			t.Errorf("%v: code %d out %q", args, code, out)
+		}
+		if got := readFile(t, d, settingsRef); got != in {
+			t.Errorf("%v: file rewritten: %q", args, got)
+		}
+	}
+}
+
+func TestInitSettingsKeepsOptOutAndOwnMarketplace(t *testing.T) {
+	d := initRepo(t, map[string]string{settingsRef: `{"extraKnownMarketplaces":{"vloop":{"source":{"source":"directory","path":"../vloop"}}},"enabledPlugins":{"vloop@vloop":false}}`})
+	// only the missing half is added: drop the plugin entry
+	os.WriteFile(filepath.Join(d, settingsRef), []byte(`{"enabledPlugins":{"vloop@vloop":false}}`), 0o644)
+	if _, _, code := runPluginCLI(t, initBuild, d, "init"); code != 0 {
+		t.Fatal(code)
+	}
+	got := readFile(t, d, settingsRef)
+	if !strings.Contains(got, `"vloop@vloop": false`) || strings.Contains(got, "true") {
+		t.Errorf("opt-out not kept: %s", got)
+	}
+}
+
+func TestInitSettingsLayoutKeepsNumbersAndText(t *testing.T) {
+	d := initRepo(t, map[string]string{settingsRef: `{"a":[],"b":{},"n":1.50,"big":12345678901234567890,"s":"a<b>&c"}`})
+	if _, _, code := runPluginCLI(t, initBuild, d, "init"); code != 0 {
+		t.Fatal(code)
+	}
+	got := readFile(t, d, settingsRef)
+	for _, want := range []string{"\"a\": [],\n", "\"b\": {},\n", "\"n\": 1.50,\n", "\"big\": 12345678901234567890,\n", "\"s\": \"a<b>&c\",\n"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("settings lacks %q:\n%s", want, got)
+		}
+	}
+	if !strings.HasSuffix(got, "}\n") {
+		t.Errorf("no final newline: %q", got)
+	}
+}
+
+func TestInitSettingsRefusesWhatIsNotAnObject(t *testing.T) {
+	const notObj = "vloop: .claude/settings.json is not a JSON object — fix it, then re-run\n"
+	cases := []struct{ in, want string }{
+		{"[1]", notObj}, {"{", notObj}, {`"x"`, notObj},
+		{`{"enabledPlugins":null}`, "vloop: .claude/settings.json's enabledPlugins is not a JSON object — fix it, then re-run\n"},
+		{`{"extraKnownMarketplaces":[]}`, "vloop: .claude/settings.json's extraKnownMarketplaces is not a JSON object — fix it, then re-run\n"},
+	}
+	for _, c := range cases {
+		for _, dry := range []bool{false, true} {
+			d := initRepo(t, map[string]string{settingsRef: c.in})
+			args := []string{"init"}
+			if dry {
+				args = append(args, "--dry-run")
+			}
+			out, errs, code := runPluginCLI(t, initBuild, d, args...)
+			if code != 1 || errs != c.want || strings.Contains(out, "would ") || strings.Contains(out, "wrote ") {
+				t.Errorf("%s dry=%v: code %d out %q err %q", c.in, dry, code, out, errs)
+			}
+			if _, err := os.Stat(filepath.Join(d, ".vloop")); err == nil {
+				t.Errorf("%s dry=%v: files were written", c.in, dry)
+			}
+			if readFile(t, d, settingsRef) != c.in {
+				t.Errorf("%s: file changed", c.in)
+			}
+		}
+	}
+}
+
+func TestInitSettingsRefusesSymlink(t *testing.T) {
+	d := initRepo(t, nil)
+	target := filepath.Join(t.TempDir(), "t.json")
+	os.WriteFile(target, []byte("{}"), 0o644)
+	os.MkdirAll(filepath.Join(d, ".claude"), 0o755)
+	if err := os.Symlink(target, filepath.Join(d, settingsRef)); err != nil {
+		t.Skip(err)
+	}
+	_, errs, code := runPluginCLI(t, initBuild, d, "init")
+	if code != 1 || !strings.Contains(errs, "symlink") {
+		t.Errorf("code %d err %q", code, errs)
+	}
+	if b, _ := os.ReadFile(target); string(b) != "{}" {
+		t.Error("wrote through the symlink")
+	}
+	if _, err := os.Stat(filepath.Join(d, ".vloop")); err == nil {
+		t.Error("files were written")
+	}
+}

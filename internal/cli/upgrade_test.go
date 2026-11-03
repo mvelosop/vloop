@@ -219,3 +219,101 @@ func TestStampModule(t *testing.T) {
 		t.Errorf("init without module wrote one: %q", got)
 	}
 }
+
+// settingsUpgradeFixture is a repository set up by 0.0.9 whose settings file is in.
+func settingsUpgradeFixture(t *testing.T, in string) string {
+	t.Helper()
+	d := upgradeFixture(t, "0.0.9")
+	os.RemoveAll(filepath.Join(d, ".claude"))
+	if in != "" {
+		os.MkdirAll(filepath.Join(d, ".claude"), 0o755)
+		os.WriteFile(filepath.Join(d, settingsRef), []byte(in), 0o644)
+	}
+	return d
+}
+
+func TestUpgradeSettingsCreatesTheFile(t *testing.T) {
+	d := settingsUpgradeFixture(t, "")
+	out, errs, code := runPluginCLI(t, Build{Version: "0.1.0", Commit: "c"}, d, "upgrade", "--yes")
+	if code != 0 || errs != "" || !strings.Contains(out, "updated .claude/settings.json\n") {
+		t.Fatalf("code %d out %q err %q", code, out, errs)
+	}
+	if got := readFile(t, d, settingsRef); got != settingsFresh {
+		t.Errorf("settings = %q", got)
+	}
+}
+
+func TestUpgradeSettingsMergesAndEscapesNothing(t *testing.T) {
+	d := settingsUpgradeFixture(t, `{"permissions":{"allow":["Bash(a && b)"]}}`)
+	out, _, code := runPluginCLI(t, Build{Version: "0.1.0", Commit: "c"}, d, "upgrade", "--yes")
+	if code != 0 || !strings.Contains(out, "updated .claude/settings.json\n") {
+		t.Fatalf("code %d out %q", code, out)
+	}
+	got := readFile(t, d, settingsRef)
+	if !strings.Contains(got, "Bash(a && b)") || strings.Index(got, "extraKnownMarketplaces") > strings.Index(got, "enabledPlugins") ||
+		strings.Index(got, "permissions") > strings.Index(got, "extraKnownMarketplaces") {
+		t.Errorf("settings = %s", got)
+	}
+}
+
+func TestUpgradeSettingsKeepsAFileWithBothEntriesSilently(t *testing.T) {
+	d := settingsUpgradeFixture(t, settingsFresh)
+	out, _, code := runPluginCLI(t, Build{Version: "0.1.0", Commit: "c"}, d, "upgrade", "--yes")
+	if code != 0 || strings.Contains(out, ".claude/settings.json") || readFile(t, d, settingsRef) != settingsFresh {
+		t.Errorf("code %d out %q", code, out)
+	}
+}
+
+func TestUpgradeSettingsDryRunAndBreakingPathOnlySayWouldUpdate(t *testing.T) {
+	for _, args := range [][]string{{"upgrade", "--dry-run"}, {"upgrade"}} {
+		d := settingsUpgradeFixture(t, "")
+		out, _, code := runPluginCLI(t, Build{Version: "0.1.0", Commit: "c"}, d, args...)
+		wantCode := map[bool]int{true: 0, false: 1}[len(args) > 1]
+		if code != wantCode || !strings.Contains(out, "would update .claude/settings.json\n") {
+			t.Errorf("%v: code %d out %q", args, code, out)
+		}
+		if _, err := os.Stat(filepath.Join(d, settingsRef)); err == nil {
+			t.Errorf("%v: settings written", args)
+		}
+	}
+}
+
+func TestUpgradeSettingsRefusesWhatIsNotAnObjectBeforeAnyWrite(t *testing.T) {
+	const notObj = "vloop: .claude/settings.json is not a JSON object — fix it, then re-run\n"
+	cases := []struct{ in, want string }{
+		{"[1]", notObj},
+		{`{"enabledPlugins":null}`, "vloop: .claude/settings.json's enabledPlugins is not a JSON object — fix it, then re-run\n"},
+		{`{"extraKnownMarketplaces":[]}`, "vloop: .claude/settings.json's extraKnownMarketplaces is not a JSON object — fix it, then re-run\n"},
+	}
+	for _, c := range cases {
+		for _, args := range [][]string{{"upgrade", "--yes"}, {"upgrade", "--dry-run"}, {"upgrade"}} {
+			d := settingsUpgradeFixture(t, c.in)
+			stamp := readFile(t, d, ".vloop/install.json")
+			cm := readFile(t, d, "CLAUDE.md")
+			out, errs, code := runPluginCLI(t, Build{Version: "0.1.0", Commit: "c"}, d, args...)
+			if code != 1 || errs != c.want || strings.Contains(out, "would update") {
+				t.Errorf("%s %v: code %d out %q err %q", c.in, args, code, out, errs)
+			}
+			if readFile(t, d, ".vloop/install.json") != stamp || readFile(t, d, "CLAUDE.md") != cm || readFile(t, d, settingsRef) != c.in {
+				t.Errorf("%s %v: files were written", c.in, args)
+			}
+		}
+	}
+}
+
+func TestUpgradeSettingsRefusesSymlink(t *testing.T) {
+	d := settingsUpgradeFixture(t, "")
+	target := filepath.Join(t.TempDir(), "t.json")
+	os.WriteFile(target, []byte("{}"), 0o644)
+	os.MkdirAll(filepath.Join(d, ".claude"), 0o755)
+	if err := os.Symlink(target, filepath.Join(d, settingsRef)); err != nil {
+		t.Skip(err)
+	}
+	_, errs, code := runPluginCLI(t, Build{Version: "0.1.0", Commit: "c"}, d, "upgrade", "--yes")
+	if code != 1 || !strings.Contains(errs, "symlink") {
+		t.Errorf("code %d err %q", code, errs)
+	}
+	if b, _ := os.ReadFile(target); string(b) != "{}" {
+		t.Error("wrote through the symlink")
+	}
+}

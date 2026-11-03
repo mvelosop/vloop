@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "vloop init and vloop upgrade now merge extraKnownMarketplaces.vloop and enabledPlugins[\"vloop@vloop\"] into .claude/settings.json (order-preserving, existing values kept, refused with exit 1 when not an object), via the new install.MergeClaudeSettings.",
+  "files": ["internal/install/settings.go", "internal/cli/init.go", "internal/cli/upgrade.go", "internal/cli/init_test.go", "internal/cli/upgrade_test.go", "internal/cli/doctor_test.go"],
+  "verified": "vloop task gate T1 equivalent (sh .vloop/state/gates/T1/gate.sh) exited 0 and printed 'gate T1: ok'; go vet, gofmt, go mod tidy -diff, linux/windows builds clean; internal/cli Init/Upgrade/Settings/DoctorGate tests pass.",
+  "notes": "install/settings.go reads the file with json.Decoder (UseNumber) into an ordered tree and writes it MarshalIndent-style with HTML escaping off; the file is rewritten only when an entry was added. Upgrade's fixtures run init, so the settings file already exists there and only tests that remove .claude/ see the 'updated' line. TestDoctorGateEditsNoClaudeAndWritesNothing changed per the brief's Constraints (it now pre-seeds the declaration and asserts .claude/ holds only settings.json unchanged). TestTaskGate* in internal/cli fail inside a work session with 'the plan was changed during this session' (environment of the session, not touched by this task); not investigated."
+}

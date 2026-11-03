@@ -72,6 +72,15 @@ func runUpgrade(b Build, g *Globals, cmd *cobra.Command, dryRun, yes bool, now t
 	if merged, changed := install.MergeGitignore(old); changed {
 		changes = append(changes, change{".gitignore", merged})
 	}
+	old, exists, err = readRepoFile(root, install.SettingsPath)
+	if err != nil {
+		return Problem(err)
+	}
+	if merged, changed, err := install.MergeClaudeSettings(old, exists); err != nil {
+		return Problem(err)
+	} else if changed {
+		changes = append(changes, change{install.SettingsPath, merged})
+	}
 	if err := checkRepoPath(root, install.Path); err != nil {
 		return Problem(err)
 	}

@@ -121,6 +121,16 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 	}
 	claude := install.MergeClaudeMD(old, exists, b.Version)
 	steps = append(steps, mergedStep("CLAUDE.md", old, exists, func() ([]byte, bool) { return claude, string(claude) != string(old) }))
+	// 6. .claude/settings.json: the plugin's declaration
+	old, exists, err = readRepoFile(root, install.SettingsPath)
+	if err != nil {
+		return Problem(err)
+	}
+	settings, settingsChanged, err := install.MergeClaudeSettings(old, exists)
+	if err != nil {
+		return Problem(err)
+	}
+	steps = append(steps, mergedStep(install.SettingsPath, old, exists, func() ([]byte, bool) { return settings, settingsChanged }))
 
 	// Every target is checked for a symlink before anything is written.
 	for _, s := range steps {

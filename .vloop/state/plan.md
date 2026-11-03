@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/4 done** · iteration 0
+**Status:** running · **0/4 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` · **Updated:** 2026-11-03T06:38:05Z
+**Brief:** `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` · **Updated:** 2026-11-03T06:47:06Z
 
 ## Progress
 
-- [ ] **T1** — Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1)
+- [ ] **T1** — Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1) · 1 attempt(s)
 - [ ] **T2** — Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4)
 - [ ] **T3** — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
@@ -17,7 +17,7 @@
 
 ### T1 — Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1)
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 A Copilot CLI session installs the vloop plugin for a repository once the folder is trusted, if .claude/settings.json declares it, and a Claude user installs it for the repository with one command. This task makes vloop init and vloop upgrade merge extraKnownMarketplaces.vloop and enabledPlugins["vloop@vloop"] into that file, adding each only when its key is absent and keeping every other key, value and order, so an operator's opt-out (false) survives. The docs (T3) and doctor's opt-out reading (T2) build on it.
 
@@ -31,6 +31,8 @@ A Copilot CLI session installs the vloop plugin for a repository once the folder
 - Nothing is written outside the repository and no `claude plugin` or `copilot plugin` command is run by init or upgrade. No new module dependency.
 - Committed tests in internal/cli's init and upgrade tests hold each P1 worked-example line as a named test on a temporary git repository (addressed with git -C), plus the merge-rule cases above; the `go` check runs them. Violation: the merge shipped with no committed test the check runs.
 - Existing tests change only where the brief's Constraints allow: tests pinning init's or upgrade's output lines gain the new .claude/settings.json line, and TestDoctorGateEditsNoClaudeAndWritesNothing asserts the only file under .claude/ is settings.json holding the two entries.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent/20261103-062225/checks/001-go.fail.log
 
 <details><summary>verify command</summary>
 

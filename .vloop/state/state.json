@@ -5,9 +5,9 @@
   "base": "27e775409fb3e38de301cd3cb1903ee8e997a36b",
   "branch": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-03T06:34:04Z",
-  "updated": "2026-11-03T06:38:05Z",
+  "updated": "2026-11-03T06:47:06Z",
   "shell": "sh",
   "checks": [
     {
@@ -65,8 +65,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent/20261103-062225/checks/001-go.fail.log"
     },
     {
       "id": "T2",
