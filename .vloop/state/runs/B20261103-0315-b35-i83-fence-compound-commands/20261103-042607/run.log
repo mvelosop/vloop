@@ -17,3 +17,8 @@ committing the plan
    review T1 · 0m26s · $0.13 · run $2.78 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/4 done ──
+   Match a word the shell expands as any text (C2)
+   work T2 · 4m38s · $0.80 · run $3.58 / $40.00
+   GATE DISPUTE T2 — blocked for the operator; no review, no attempt charged
+   T2 blocked — the operator resolves the disputed gate with vloop task verify

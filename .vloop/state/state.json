@@ -5,9 +5,9 @@
   "base": "866a9b77d79f00a5b65e5db5559df03ed3a203b0",
   "branch": "B20261103-0315-b35-i83-fence-compound-commands",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-03T04:35:57Z",
-  "updated": "2026-11-03T04:48:03Z",
+  "updated": "2026-11-03T04:52:44Z",
   "shell": "sh",
   "checks": [
     {
@@ -110,9 +110,9 @@
         "The existing tests pass unchanged (beyond the cases T1 changed); no module dependency is added to go.mod; no fence rule file under fence/ changes."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 0,
-      "notes": ""
+      "notes": "gate disputed: The gate case `review git remote $X` expects the fence rule `Bash(git remote add:*)` with the any-text suffix. The command as written already matches the Copilot stem `git remote:*`, so acceptance 3 (as-written match first, with today's rules and messages) gives the stem message. — cases.tsv row `review\\tgit remote $X` wants `git remote $X is denied by the review fence (Bash(git remote add:*)): a word the shell expands may be any text`. internal/driver/agent_copilot.go:24 lists `git remote:*` among the stems, and `git remote $X` has the prefix `git remote `, so the first pass matches it. Today's output is `git remote $X is denied by the Copilot deny list (git remote:*)`. Producing the fence message would mean skipping the as-written pass for the stems."
     },
     {
       "id": "T3",
