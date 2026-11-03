@@ -214,7 +214,7 @@ adds its own, one per way a run can end:
 | `6` | cost ceiling: `run.cost-ceiling` is reached | yes, with a higher ceiling |
 | `7` | session error: a session failed to run | no |
 | `8` | repeat blocked: a task blocked twice with nothing changed | no |
-| `9` | refs or repository configuration moved: a session or a gate changed a ref, a key of `.git/config` (other than those `run.git-config-ignore` and the built-in editor keys ignore) or the git hooks; nothing was committed. The message names the key | no — restore the refs first; during acceptance, once restored, `vloop run` resumes acceptance, and the halted run's folder is kept and committed with the plan |
+| `9` | refs or repository configuration moved, or a Copilot session got past its fence: a session or a gate changed a ref, a key of `.git/config` (other than those `run.git-config-ignore` and the built-in editor keys ignore) or the git hooks, or a Copilot session ran a call its fence denies (FENCE BYPASSED, the calls named) or the binary its fence hook runs changed (HOOK CHANGED); nothing was committed. The message names the key | no — restore the refs first; during acceptance, once restored, `vloop run` resumes acceptance, and the halted run's folder is kept and committed with the plan; after FENCE BYPASSED or HOOK CHANGED, inspect the work tree and the named calls first |
 
 While it runs, `vloop run` prints one line per finished session: its phase and
 task, how long it took, what it cost and the run's spend against the ceiling,

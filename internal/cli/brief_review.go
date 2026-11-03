@@ -33,7 +33,7 @@ the working tree's lock for the session, so it cannot run beside vloop run.
 
 Exit codes: 0 PASS; 1 FIX or ASK, or a refusal before the session; 2 usage;
 7 the session failed or left no valid report; 9 the session changed the brief,
-git refs or the repository configuration.`,
+git refs or the repository configuration, or a Copilot session got past its fence.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error { return runBriefReview(b, g, cmd, args[0]) },
 	}

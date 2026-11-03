@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -360,5 +361,35 @@ func TestRunnerStreamIsPassedToClaude(t *testing.T) {
 	ad, _ = (&Runner{Root: t.TempDir()}).withSession(claudeAdapter{}, Spec{})
 	if ad.(claudeAdapter).stream {
 		t.Errorf("stream is on by default")
+	}
+}
+
+// The hook answers in milliseconds, so its limit sits far above any stall:
+// the hooks file carries timeoutSec 120 for every phase.
+func TestCopilotHooksTimeoutSec(t *testing.T) {
+	for _, phase := range []string{PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseVerify, PhaseGateReview, PhaseReviewBrief} {
+		root := t.TempDir()
+		a := copilotAdapter{}
+		p, err := a.Prepare(root, "9.9.9", phase)
+		if err != nil {
+			t.Fatal(err)
+		}
+		data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var doc struct {
+			Hooks struct {
+				PreToolUse []struct {
+					TimeoutSec int `json:"timeoutSec"`
+				} `json:"preToolUse"`
+			} `json:"hooks"`
+		}
+		if err := json.Unmarshal(data, &doc); err != nil {
+			t.Fatal(err)
+		}
+		if len(doc.Hooks.PreToolUse) != 1 || doc.Hooks.PreToolUse[0].TimeoutSec != 120 {
+			t.Errorf("%s: hooks file %s: want one hook with timeoutSec 120", phase, data)
+		}
 	}
 }

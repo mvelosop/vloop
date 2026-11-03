@@ -30,3 +30,10 @@ committing the plan
    review T2 · 0m34s · $0.17 · run $5.91 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/4 done ──
+   Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
+   work T3 · 1m12s · $0.24 · run $6.15 / $40.00
+   check go
+   review T3 · 0m29s · $0.15 · run $6.30 / $40.00
+   review: PASS
+   T3 done

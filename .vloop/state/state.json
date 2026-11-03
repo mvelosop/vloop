@@ -5,9 +5,9 @@
   "base": "7a7dc7dc2a3cabf529a33af6921d73e48dcf0ba6",
   "branch": "B20261103-0058-b34-i82-fence-backstop",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-03T01:43:50Z",
-  "updated": "2026-11-03T02:19:07Z",
+  "updated": "2026-11-03T02:25:10Z",
   "shell": "sh",
   "checks": [
     {
@@ -177,7 +177,7 @@
         "Violation: any other sentence of those files changed, or a doc stating behaviour the driver does not have."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

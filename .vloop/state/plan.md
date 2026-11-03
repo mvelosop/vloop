@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/4 done** · iteration 3
+**Status:** running · **3/4 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T02:19:07Z
+**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T02:25:10Z
 
 ## Progress
 
 - [x] **T1** — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1) · 1 attempt(s)
 - [x] **T2** — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
-- [ ] **T3** — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
+- [x] **T3** — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -64,7 +64,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 The hook answers in milliseconds and a timeout only ever lets a call run, so its limit should be far above any stall: 120 seconds for every phase. And every place that defines exit 9 or describes the hook's fail-open must now say the driver backs it, so an operator reading a FENCE BYPASSED or HOOK CHANGED halt finds it explained and knows to inspect before resuming.
 

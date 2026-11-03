@@ -1,5 +1,7 @@
 # Fence audit: who enforces each rule in a Copilot review session
 
+*Since B34 the driver re-judges every call a Copilot session ran and halts (exit 9, FENCE BYPASSED) on one the fence denies, and (HOOK CHANGED) when the hook's binary changed: where this audit says a call the hook fails open on goes unnoticed, that predates it.*
+
 *Written for B22. It covers `fence/review.json`, the fence a review and a
 second-review session run under, and the Copilot adapter's deny list in
 `internal/driver/agent_copilot.go`.*
@@ -203,6 +205,8 @@ or followed by a space, so another form of the command can pass it.
 
 # Fence audit: who enforces each rule in a Copilot work session
 
+*Since B34 the driver re-judges every call a Copilot session ran and halts (exit 9, FENCE BYPASSED) on one the fence denies, and (HOOK CHANGED) when the hook's binary changed: where this audit says a call the hook fails open on goes unnoticed, that predates it.*
+
 *Written for B24. It covers `fence/work.json`, the fence a work session runs
 under, and the Copilot adapter's deny list for work sessions: the review list
 without `shell(rm:*)`.*
@@ -392,6 +396,8 @@ Bash deny rules. `rm` is the one pattern a work session does not carry.
 
 # Fence audit: who enforces each rule in a Copilot verify session
 
+*Since B34 the driver re-judges every call a Copilot session ran and halts (exit 9, FENCE BYPASSED) on one the fence denies, and (HOOK CHANGED) when the hook's binary changed: where this audit says a call the hook fails open on goes unnoticed, that predates it.*
+
 *Written for B25. It covers `fence/verify.json`, the fence a verify session runs
 under, and the Copilot adapter's deny list for verify sessions: the whole review
 list, `shell(rm:*)` included.*
@@ -571,6 +577,8 @@ as further Bash deny rules.
   session timeout bounds how long one can run.
 
 # Fence audit: who enforces each rule in a Copilot gate-review session
+
+*Since B34 the driver re-judges every call a Copilot session ran and halts (exit 9, FENCE BYPASSED) on one the fence denies, and (HOOK CHANGED) when the hook's binary changed: where this audit says a call the hook fails open on goes unnoticed, that predates it.*
 
 *Since B31 the driver reverts a file a gate-review or plan session changed outside `.vloop/state/` and `.vloop/tmp/`, with a warning, before the plan commit: where this audit says the driver does not revert files after such a session, or that the plan commit would commit the change, that predates it.*
 
@@ -766,6 +774,8 @@ on a moved ref or a changed `.git/config` or hook.
 
 # Fence audit: who enforces each rule in a Copilot plan session
 
+*Since B34 the driver re-judges every call a Copilot session ran and halts (exit 9, FENCE BYPASSED) on one the fence denies, and (HOOK CHANGED) when the hook's binary changed: where this audit says a call the hook fails open on goes unnoticed, that predates it.*
+
 *Since B31 the driver reverts a file a gate-review or plan session changed outside `.vloop/state/` and `.vloop/tmp/`, with a warning, before the plan commit: where this audit says the driver does not revert files after such a session, or that the plan commit would commit the change, that predates it.*
 
 *Written for B27. It covers `fence/plan.json`, the fence a plan session runs
@@ -959,6 +969,8 @@ on a moved ref or a changed `.git/config` or hook.
   session timeout bounds how long one can run.
 
 # Fence audit: who enforces each rule in a Copilot review-brief session
+
+*Since B34 the driver re-judges every call a Copilot session ran and halts (exit 9, FENCE BYPASSED) on one the fence denies, and (HOOK CHANGED) when the hook's binary changed: where this audit says a call the hook fails open on goes unnoticed, that predates it.*
 
 *Written for B29. It covers `fence/review-brief.json`, the fence a
 `vloop brief review` session runs under, and the Copilot adapter's deny list for

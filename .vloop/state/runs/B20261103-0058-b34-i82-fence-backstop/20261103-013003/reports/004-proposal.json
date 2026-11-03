@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "The Copilot hooks file now carries timeoutSec 120 (pinned by a new test across all phases), and every F4 doc, the operate skill row and both commands' help texts say a Copilot session can get past its fence (exit 9).",
+  "files": ["internal/driver/agent_copilot.go", "internal/driver/agent_copilot_test.go", "internal/cli/run.go", "internal/cli/brief_review.go", "docs/domain/domain-model.md", "docs/domain/execution/session.md", "docs/domain/execution/run.md", "docs/guide/concepts.md", "docs/guide/configuration.md", "docs/design-notes/fence-audit.md", "docs/design-notes/copilot-cli-experiments.md", "plugin/skills/operate/SKILL.md"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok; go test ./internal/driver -run TimeoutSec ok.",
+  "notes": "Fence-audit note sits on its own line after each of the six headings, with a blank line either side. No generated reference docs found that need regenerating. Run-help and brief-review-help strings were edited in Go source only."
+}

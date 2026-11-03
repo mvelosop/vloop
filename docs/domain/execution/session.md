@@ -118,7 +118,7 @@ what a session changed among them is restored (a review session that changes the
 work it judges has it reverted and fails). A plan or gate-review session's change outside
 `.vloop/state/` and `.vloop/tmp/` is reverted after the session, with a warning. A session or gate that moves any ref,
 `.git/config` or the git hooks halts the run with exit 9 and nothing is
-committed. A session writes nothing under `.git/` and nothing under `.vloop/`
+committed. For a Copilot session the driver also halts (exit 9) when a call that ran is one the fence denies, or when the binary the fence hook runs changed. A session writes nothing under `.git/` and nothing under `.vloop/`
 but `.vloop/tmp/` (S-4).
 
 ## The record it leaves — `session/v3`

@@ -43,7 +43,7 @@ work branch. Use --replan to plan a brief again deliberately.
 
 Exit codes: 0 complete; 1 preflight or failure; 2 usage or blocked; 3 stalled; 4 max
 iterations; 5 not converging; 6 cost ceiling; 7 session error; 8 repeat blocked;
-9 refs or repository configuration moved. Each is described, with whether the
+9 refs or repository configuration moved, or a Copilot session got past its fence. Each is described, with whether the
 run can resume, in docs/guide/concepts.md#exit-codes.`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -124,7 +124,7 @@ with one exit code (R-3):
 | 6 | cost ceiling | yes, with a higher ceiling |
 | 7 | session error | no |
 | 8 | repeat blocked, nothing changed | no |
-| 9 | refs or repository configuration moved; nothing committed | no — restore the refs first; during acceptance, resumable once restored, by resuming acceptance (no second plan session) |
+| 9 | refs or repository configuration moved, or a Copilot session got past its fence; nothing committed | no — restore the refs first; during acceptance, resumable once restored, by resuming acceptance (no second plan session) |
 
 ## Gaps
 

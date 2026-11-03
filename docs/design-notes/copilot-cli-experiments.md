@@ -347,7 +347,7 @@ reported with these numbers on github/copilot-cli#2893, which asks for an
 - **What remains:** a hook slow on its own (a stalled machine past
   `timeoutSec` 30), and the hook's program, which runs anew on every call: for
   vloop the `vloop` binary, outside the repository; whether a session can write
-  it is not probed.
+  it is not probed. Since B34 the driver re-judges every call a Copilot session ran and halts on one the fence denies, checks the hook's binary before and after each session, and gives the hook a timeoutSec of 120.
 
 ## Acceptance of Copilot work (B24, 2026-10-27)
 
