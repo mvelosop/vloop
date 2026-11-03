@@ -72,6 +72,8 @@ type Iterator struct {
 	User   string
 	Env    []string
 
+	Judge CallJudge // the fence judge the CLI hands in, to re-judge the calls a Copilot session ran
+
 	GateTimeout    time.Duration // test seam: replaces Budgets.GateTimeout when not zero
 	SessionTimeout time.Duration // test seam: replaces Budgets.SessionTimeout when not zero
 
@@ -172,7 +174,7 @@ func (it *Iterator) Run() (Ending, error) {
 	it.log = &lazyLog{path: filepath.Join(it.RunDir, "run.log")}
 	it.r = &Runner{Root: it.Root, Version: it.Version, RunID: plan.RunID, RunDir: it.RunDir, Log: it.log,
 		Claude: it.Claude, Now: it.Now, Home: it.Home, User: it.User, Env: it.Env,
-		Timeout: it.sessionTimeout()}
+		Timeout: it.sessionTimeout(), Judge: it.Judge}
 	if it.AwakeWarn != "" {
 		it.r.Logf("%s", AwakeWarning(it.AwakeWarn))
 	}
@@ -393,6 +395,22 @@ func (it *Iterator) haltGit(format string, a ...any) error {
 	_ = it.save()
 	_ = it.log.flush()
 	return err
+}
+
+// fenceBypassed halts when a Copilot session ran calls its fence denies: one
+// line per call, then the halt, committing nothing.
+func (it *Iterator) fenceBypassed(res Result, phase string) error {
+	if len(res.Bypassed) == 0 {
+		return nil
+	}
+	for _, c := range res.Bypassed {
+		if c.What == "" {
+			it.warn("vloop: %s — %s", c.Tool, c.Reason)
+		} else {
+			it.warn("vloop: %s %s — %s", c.Tool, c.What, c.Reason)
+		}
+	}
+	return it.haltGit("FENCE BYPASSED %s — the session ran %d call(s) its fence denies; nothing from it was used", phase, len(res.Bypassed))
 }
 
 func (it *Iterator) gitRefsMoved(before []string, task, phase string) error {
@@ -656,6 +674,9 @@ func (it *Iterator) workSession(task *state.Task, iter int) (workReport, error) 
 		return workReport{}, err
 	}
 	if _, err := it.restoreInputs(inputs, PhaseWork, wres.Path); err != nil {
+		return workReport{}, err
+	}
+	if err := it.fenceBypassed(wres, PhaseWork); err != nil {
 		return workReport{}, err
 	}
 	if err := it.gitChanged(gguard, PhaseWork); err != nil {

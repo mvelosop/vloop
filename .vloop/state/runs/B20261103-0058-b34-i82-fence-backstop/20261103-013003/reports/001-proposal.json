@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "After a Copilot work session the driver re-judges every call that ran, using the hook's own parser and judge handed in by the CLI, and halts with exit 9 and FENCE BYPASSED work after one stderr line per denied call.",
+  "files": ["internal/driver/fencecheck.go", "internal/driver/fencecheck_test.go", "internal/driver/session.go", "internal/driver/iterate.go", "internal/cli/fence.go", "internal/cli/run.go", "cmd/vloop/run_harness_test.go", "cmd/vloop/run_fencecheck_test.go"],
+  "verified": "vloop task gate T1 equivalent (sh .vloop/state/gates/T1/gate.sh) exited 0 and printed gate T1: ok; go vet, gofmt, go test ./... pass (internal/cli TaskGate tests need VLOOP_PLAN_SHA256 unset, which the session sets).",
+  "notes": "Seam: driver.CallJudge (fencecheck.go) is set on Iterator.Judge by cli/run.go (cli.CallJudge builds a payload and runs parseHookPayload, then decideCall, which the hook now shares incl. the empty-command rule). Runner.Judge is opt-in, so tools/agent-eval is unchanged. Runner.Run fills Result.Bypassed for Copilot sessions before Parse, so a session with no result event is judged too. Iterator.fenceBypassed is called in workSession after restoreInputs and before gitChanged/gitRefsMoved; T2 can call it from the other phases, and F2 (HOOK CHANGED) must go before it. Harness stub copilot now takes every phase prompt and STUB_CALLS; TestRunHarnessCopilot only changed its refused prompt to /vloop:bogus T1."
+}

@@ -10,3 +10,9 @@ planned: B20261103-0058-b34-i82-fence-backstop — 4 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 0m59s · $0.26 · run $3.77 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/4 done ──
+   Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1)
+   work T1 · 7m39s · $0.65 · run $4.42 / $40.00
+   check go
+   review T1 · 0m32s · $0.17 · run $4.59 / $40.00
+   review: FAIL

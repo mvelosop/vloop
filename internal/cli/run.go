@@ -127,7 +127,7 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 				return nil
 			}
 			it := &driver.Iterator{Root: root, Version: b.Version, RunDir: res.RunDir, Budgets: budget,
-				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn}
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn, Judge: CallJudge(root)}
 			end, err := it.Run()
 			if err != nil {
 				var h *driver.Halt

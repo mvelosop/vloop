@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvelosop/vloop/internal/driver"
 	"github.com/mvelosop/vloop/internal/fence"
 )
 
@@ -114,12 +115,8 @@ error. It reads nothing but the payload and writes nothing.`,
 			if err != nil {
 				return failed(err.Error())
 			}
-			if t := strings.ToLower(tool); (t == "bash" || t == "powershell") && strings.TrimSpace(command) == "" {
-				reply(false, "the "+tool+" call has no command the hook can read")
-				return nil
-			}
-			d := j.Decide(tool, path, command)
-			reply(d.Allow, d.Reason)
+			allow, reason := decideCall(j, tool, path, command)
+			reply(allow, reason)
 			return nil
 		},
 	}
@@ -191,4 +188,37 @@ func parseHookPayload(raw []byte) (tool, path, command string, err error) {
 		}
 	}
 	return tool, path, command, nil
+}
+
+// decideCall is the hook's decision for one call: its own rule first (a shell
+// call with no command is denied), then the judge.
+func decideCall(j *fence.Judge, tool, path, command string) (allow bool, reason string) {
+	if t := strings.ToLower(tool); (t == "bash" || t == "powershell") && strings.TrimSpace(command) == "" {
+		return false, "the " + tool + " call has no command the hook can read"
+	}
+	d := j.Decide(tool, path, command)
+	return d.Allow, d.Reason
+}
+
+// CallJudge is the driver's re-judge of the calls a Copilot session ran: the
+// hook's own reading of a call and its own decision, for the phase's fence.
+func CallJudge(root string) driver.CallJudge {
+	home, _ := os.UserHomeDir()
+	abs, absErr := filepath.Abs(root)
+	return func(phase, tool string, args json.RawMessage) driver.CallVerdict {
+		if absErr != nil {
+			return driver.CallVerdict{Reason: absErr.Error()}
+		}
+		j, err := fence.New(phase, abs, home)
+		if err != nil {
+			return driver.CallVerdict{Reason: err.Error()}
+		}
+		payload, _ := json.Marshal(map[string]any{"toolName": tool, "toolArgs": args})
+		t, path, command, err := parseHookPayload(payload)
+		if err != nil {
+			return driver.CallVerdict{Reason: err.Error()}
+		}
+		allow, reason := decideCall(j, t, path, command)
+		return driver.CallVerdict{Allow: allow, Reason: reason, Path: path, Command: command}
+	}
 }

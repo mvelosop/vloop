@@ -5,9 +5,9 @@
   "base": "7a7dc7dc2a3cabf529a33af6921d73e48dcf0ba6",
   "branch": "B20261103-0058-b34-i82-fence-backstop",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-03T01:43:50Z",
-  "updated": "2026-11-03T01:46:15Z",
+  "updated": "2026-11-03T01:58:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -72,8 +72,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "No committed test exercises the empty-command rule or the real CallJudge (string toolArgs, hook-parser reading), which the acceptance lists explicitly"
     },
     {
       "id": "T2",

@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/4 done** · iteration 0
+**Status:** running · **0/4 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T01:46:15Z
+**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T01:58:28Z
 
 ## Progress
 
-- [ ] **T1** — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1)
+- [ ] **T1** — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1) · 1 attempt(s)
 - [ ] **T2** — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
 - [ ] **T3** — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
 - [ ] **T4** — Close the run: every gate at once, and the worked example line for line
@@ -17,7 +17,7 @@
 
 ### T1 — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1)
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 A Copilot session is fenced by the preToolUse hook, which fails open when it misbehaves; nothing behind it notices. This task adds the driver's re-judge of every call a Copilot session ran — read from its JSON Lines, judged by the same fence judge the hook uses — and wires it, with its stderr lines and the FENCE BYPASSED exit-9 halt, into the work phase. T2 extends the same after-session check to every other phase and adds the binary check.
 
@@ -30,6 +30,8 @@ A Copilot session is fenced by the preToolUse hook, which fails open when it mis
 - The check runs as soon as the work session ends, whatever its exit, before the phase's own checks (so before REFS MOVED); the phase still makes its restores of the driver's inputs before exiting 9; the halt comes before the proposal is used or anything is committed, and the work tree is otherwise left as the session left it. With no call denied nothing changes and nothing is printed. A Claude session's handling is unchanged (violation: any change to how a Claude session is run, parsed or halted).
 - Committed tests: the worked example's first three lines as one `cmd/vloop` test each (a work session's bash `git commit -m x` completed without error -&gt; the two stderr lines, exit 9, no new commit; the same call completed `denied` -&gt; the iteration goes on; a bash `ls` only -&gt; the iteration goes on), with the harness's stub `copilot` gaining, in test code, the prompts of every phase (`/vloop:<phase>` with or without an argument) and the tool events a test's copilot-script.sh asks for; and tests of the reading of fixture JSON Lines (a call with no completion, a denied completion, the path / first-line / 200-rune / nothing forms of `<what>`, the empty-command rule). `TestRunHarnessCopilot`'s refusal of `/vloop:work T1` changes only to pin a prompt the stub still refuses; no other existing test changes.
 - No fence's rules change: `fence/*.json` and the judge's decisions are as at the base.
+
+**From the last attempt:** No committed test exercises the empty-command rule or the real CallJudge (string toolArgs, hook-parser reading), which the acceptance lists explicitly
 
 <details><summary>verify command</summary>
 

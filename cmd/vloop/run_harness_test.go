@@ -104,6 +104,10 @@ exit "$STUB_EXIT"
 //	STUB_DURATION usage.sessionDurationMs (default 18000)
 //	STUB_TURNS    assistant.turn_start events (default 3)
 //	STUB_SILENT=1 print no result event
+//	STUB_CALLS    JSON Lines of tool events, printed after the first turn (default none)
+//
+// The prompts are those of every phase, /vloop:<phase> with or without an
+// argument; the script also sees PHASE.
 const runCopilotStubSource = `#!/bin/sh
 dir=$(dirname "$0")
 {
@@ -125,13 +129,16 @@ while [ $# -gt 0 ]; do
 done
 cmd="${prompt%% *}"
 TASK="${prompt#* }"
-if [ "$cmd" != /vloop:review ] || [ "$TASK" = "$prompt" ]; then
-  echo "stub copilot: unrecognised prompt: $prompt" >&2; exit 64
-fi
+PHASE="${cmd#/vloop:}"
+[ "$TASK" = "$prompt" ] && TASK=""
+case "$PHASE" in
+  plan|work|review|verify|gate-review|review-brief) ;;
+  *) echo "stub copilot: unrecognised prompt: $prompt" >&2; exit 64;;
+esac
 n=$(cat "$dir/count.copilot.$TASK" 2>/dev/null || echo 0)
 ATTEMPT=$((n + 1))
 echo "$ATTEMPT" > "$dir/count.copilot.$TASK"
-STUB_NANOAIU=14200000000; STUB_EXIT=0; STUB_DURATION=18000; STUB_TURNS=3; STUB_SILENT=0
+STUB_NANOAIU=14200000000; STUB_EXIT=0; STUB_DURATION=18000; STUB_TURNS=3; STUB_SILENT=0; STUB_CALLS=""
 if [ -f "$dir/copilot-script.sh" ]; then . "$dir/copilot-script.sh"; fi
 printf '{"type":"session.start","data":{"sessionId":"stub"}}\n'
 i=1
@@ -139,6 +146,7 @@ while [ "$i" -le "$STUB_TURNS" ]; do
   printf '{"type":"assistant.turn_start","data":{"turnId":"%s"}}\n' "$i"
   i=$((i + 1))
 done
+[ -n "$STUB_CALLS" ] && printf '%s\n' "$STUB_CALLS"
 printf '{"type":"session.usage_checkpoint","data":{"totalNanoAiu":%s}}\n' "$STUB_NANOAIU"
 if [ "$STUB_SILENT" != 1 ]; then
   printf '{"type":"result","sessionId":"stub","exitCode":%s,"usage":{"premiumRequests":1,"sessionDurationMs":%s}}\n' "$STUB_EXIT" "$STUB_DURATION"
@@ -396,8 +404,8 @@ func TestRunHarnessCopilot(t *testing.T) {
 	if len(r.argv()) != 0 {
 		t.Errorf("the stub copilot wrote to argv.log: %v", r.argv())
 	}
-	if bad := r.copilot("-p", "/vloop:work T1"); bad.code != 64 {
-		t.Errorf("a non-review prompt: %+v", bad)
+	if bad := r.copilot("-p", "/vloop:bogus T1"); bad.code != 64 {
+		t.Errorf("a prompt of no phase: %+v", bad)
 	}
 }
 
