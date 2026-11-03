@@ -1,0 +1,44 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / P3",
+      "summary": "P3 reads .claude/settings.json and .claude/settings.local.json for the opt-out (enabledPlugins[\"vloop@vloop\"] = false), but does not say what the plugin row does when one of them is unreadable or not a JSON object, or when its enabledPlugins is not an object. P1 pins this case for init and upgrade; P3 does not. One task could warn in the plugin row and another could ignore the file. Existing tests write exactly such a file: cmd/vloop/b13_e2e_test.go:121 writes an invalid project settings file and runs doctor, after an enabled stub at the binary's version.",
+      "evidence": "Brief lines 293-297 (the opt-out rule) give no error case. internal/cli/doctor.go:646-683: doctorGateEdits already reports an unreadable file in its own row ('cannot read .claude/settings.json: …'). cmd/vloop/b13_e2e_test.go:120-126.",
+      "fix": "Add one sentence to P3, for example: 'A settings file that is missing, unreadable or not a JSON object, or whose enabledPlugins is not an object, sets no opt-out; the gate edits row reports an unreadable file, as today.' Add a worked-example line for it."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / P1",
+      "summary": "P1 pins what upgrade --dry-run does with a .claude/settings.json that is not a JSON object: it fails with exit 1 before any 'would update' line. It does not pin the same case for init --dry-run. The worked example has only 'vloop init --dry-run (no file)'.",
+      "evidence": "Brief lines 187-194 say 'for init before any other step writes'. Lines 205-208 cover only upgrade's --dry-run. Line 425 is the only init dry-run line. internal/cli/init.go:313-330: applySteps prints 'would …' lines, so the refusal must come before them to match upgrade.",
+      "fix": "Say that init --dry-run reads the file like the real run and fails the same way (exit 1, the same message, no 'would' line). Add a worked-example line: '.claude/settings.json = [1]; vloop init --dry-run → exit 1, …; no \"would write\" line'."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / P3 table, 'counted entries, none enabled'",
+      "summary": "Unsure. The remedy is 'claude plugin enable vloop@vloop --scope project'. After this brief, every initialised repository already has enabledPlugins[\"vloop@vloop\"]: true in .claude/settings.json. Take a user-scoped entry that the user disabled. If claude plugin list --json reports `enabled` from the user's settings only, the row warns in that repository, and the remedy writes true where true already is. The warning would then never clear. If the list merges in the project setting, the case never shows and the remedy is right. The brief says which flag reflects project settings is not recorded, but it does not consider what that means for this remedy.",
+      "evidence": "Brief lines 293-297 and 303. The design note (docs/design-notes/copilot-cli-experiments.md, 'Measured on 2026-11-03') records `enabled` and `projectEnabled` for a project entry only. No user-scoped disabled entry was measured in a repository that declares true.",
+      "fix": "Settle it by measurement in a throwaway clone with the declaration and a user-scope install. Run claude plugin disable vloop@vloop --scope user, then claude plugin list --json from the clone, and record `enabled` in the design note. If it reads false, add to the message the user-scope option ('or claude plugin enable vloop@vloop for every repository'), named as an option, as the 'no global change required' decision allows."
+    }
+  ],
+  "decisions": [
+    "vloop now writes .claude/settings.json, a file it never wrote before, in every repository, at init and at upgrade. It is on by default and the opt-out is `false`. The file is committed, so every collaborator who trusts the folder in Copilot CLI gets the plugin installed. This is the main thing to approve.",
+    "Only .claude/settings.json gets the declaration; .github/copilot/settings.json is rejected. Sound: Copilot reads the former, and the measurement is recorded.",
+    "Existing values win, including `false` and an extraKnownMarketplaces.vloop that points elsewhere (a fork). Sound.",
+    "When vloop adds an entry, it rewrites the whole file in MarshalIndent layout. An operator's compact or hand-formatted file gets reformatted, though keys, order and values are kept. Acceptable, but the operator should know.",
+    "A .claude/settings.json that is not an object, or whose enabledPlugins or extraKnownMarketplaces is not an object, makes the whole init or upgrade fail, not just skip the declaration. It is strict, and since nothing is written, it is defensible.",
+    "No version is pinned in the declaration; doctor warns on a mismatch and names the agent's update command.",
+    "The doctor row keeps the name `plugin`; the new row is `copilot plugin`. Sound: --json consumers keep working.",
+    "Claude's main remedy and README's main install become `claude plugin install vloop@vloop --scope project`; the user-level install stays as an option.",
+    "The `copilot plugin` row appears only when doctor's `copilot` row does; it is `n/a` when the `copilot` row is a problem; vloop run's preflight does not compute it.",
+    "An opt-out in .claude/settings.json or .claude/settings.local.json overrides what claude plugin list says.",
+    "Step order: after CLAUDE.md in init, after .gitignore in upgrade."
+  ],
+  "checked": "facts (init.go steps, mergedStep, applySteps, printInitNext; upgrade.go change list, the early return, the breaking and dry-run paths; section.go MergeClaudeMD; doctor.go runDoctor order, doctorPlugin's messages, doctorGateEdits, doctorTrusted and trustKeyMatch, doctorCopilot and copilotKeys; run.go preflight reusing runDoctor; the copilot home under .vloop/tmp/; the design-note diff; concepts.md and README text; C-1 and the CLI conventions), consistency (tables against the worked example, the merge rules, the output lines), rules (CLAUDE.md, guidelines.md, the architect's constraints), runnability (task order against the go check; existing tests the tasks break and whether the Constraints allow each change: init_test, b5, b13, b14, the run harness, the copilot doctor tests, TestDoctorGateEditsNoClaudeAndWritesNothing); vloop brief check on a ready copy: ok, 2 warnings (two paths in prose that are not repository files)",
+  "header": "Reviewed 2026-11-03: FIX, 3 findings"
+}
+

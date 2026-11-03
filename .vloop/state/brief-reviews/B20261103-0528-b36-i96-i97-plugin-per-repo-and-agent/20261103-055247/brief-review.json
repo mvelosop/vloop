@@ -1,0 +1,51 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Worked example / P3 / P4",
+      "summary": "'The failures it must catch' lists 'a Copilot list read from another directory', but no worked-example line catches it. P3 also newly requires the repository root as claude's working directory, and no line tests that either. Every stub prints fixed JSON whatever its working directory, so an implementation that leaves cmd.Dir unset passes every line.",
+      "evidence": "internal/cli/doctor_test.go:41 (the stub prints e.plugins unconditionally); doctor tests call runDoctor in-process, so the stub's working directory is the test's (internal/cli), not R. doctor.go:576 runs claude today with no Dir.",
+      "fix": "Add one line under P3 and one under P4: the stub prints the vloop entry only when `pwd -P` is R and `[]` otherwise → ✓ plugin / ✓ copilot plugin."
+    },
+    {
+      "kind": "consistency",
+      "section": "P4 / Why this shape (the Copilot row's condition)",
+      "summary": "The row's condition is stated two ways that disagree. 'When an agent.* key is copilot' includes agent.verify = copilot with run.verify = false, and agent.second-review = copilot with run.second-review = off. 'The keys doctor's copilot row reads' (copilotKeys plus agent.review-brief) excludes both. In those cases there is no copilot row, so 'n/a when the copilot row is a problem' has nothing to read, and doctor would run copilot without checking it first.",
+      "evidence": "internal/cli/doctor.go:255-261 (copilotVerify returns false when run.verify is false), 273-276 (copilotSecond needs the mode not off), 118-120 (the copilot row only when the keys are non-empty).",
+      "fix": "State one condition: 'exactly when doctor shows the copilot row (copilotKeys plus agent.review-brief)'. Use it in both P4 and 'Why this shape'."
+    },
+    {
+      "kind": "consistency",
+      "section": "P2 (README)",
+      "summary": "The README's new Claude line is `claude plugin install vloop@vloop --scope project`, but the brief doesn't say to run it inside the repository. A project-scoped install applies to the directory it runs in. The README section sits before the Quickstart's vloop init, so a reader may run it from anywhere. init's closing lines don't have this problem, because they are printed in the repository.",
+      "evidence": "README.md:35-48 (the install section, read before any repository is set up); docs/design-notes/copilot-cli-experiments.md (the 2026-11-03 list shows projectPath per project entry).",
+      "fix": "Make P2's README sentence 'run it inside the repository; it installs the plugin for that repository (without --scope project, for every repository)'. Make the concepts.md plugin paragraph say the same."
+    },
+    {
+      "kind": "fact",
+      "section": "Why this shape (`.claude/settings.json` only)",
+      "summary": "Unsure. 'For Claude it records the marketplace and the enabled flag that `claude plugin install --scope project` also writes there': the design note records `--scope project` as the per-repository install, but not which keys it writes to .claude/settings.json. Writing enabledPlugins is likely. Writing extraKnownMarketplaces is not recorded anywhere. This is rationale only; no gate depends on it.",
+      "evidence": "docs/design-notes/copilot-cli-experiments.md, 'Measured on 2026-11-03', last bullet: only the scope values are recorded.",
+      "fix": "Either drop 'the marketplace' from the sentence or record it. To settle it, run the install in acceptance step 5 and diff .claude/settings.json before and after into the design note."
+    }
+  ],
+  "decisions": [
+    "Declare the plugin in .claude/settings.json only, not .github/copilot/settings.json — agree.",
+    "Existing values win, including enabledPlugins[\"vloop@vloop\"]: false — agree.",
+    "No version pin in the declaration; doctor warns on a version mismatch — agree.",
+    "vloop's Copilot sessions are assumed not to act on the declaration (own COPILOT_HOME, -p mode, no trusted folder). This is not measured, since -p mode may not consult trust at all. Only acceptance step 3 checks it, and the brief has no fallback if it fails (a session would install the marketplace vloop beside the --plugin-dir copy). Worth knowing before approving.",
+    "The Claude row keeps the name `plugin`, and the new row is `copilot plugin` — agree.",
+    "Claude's remedy becomes `--scope project`, and `claude plugin enable` is dropped — agree. A user-level install stays an option.",
+    "The Copilot row only when Copilot is configured, and not computed in run's preflight — agree. The condition needs one wording (finding 2).",
+    "Remedies change nothing global unless the operator chooses to — agree.",
+    "<v> is the first enabled counted entry, where today's code takes the last — a small behaviour change; fine.",
+    "Writing .claude/settings.json re-indents it to two spaces — fine, since it only happens when an entry is added.",
+    "Decided here: the P1 step comes after CLAUDE.md in init and after .gitignore in upgrade; upgrade stays silent when the file is kept; the gate edits row is unchanged — agree."
+  ],
+  "checked": "facts (init.go steps/mergedStep/applySteps/printInitNext, upgrade.go order/early return/dry-run/breaking path, doctor.go runDoctor order, doctorPlugin, doctorCopilot, copilotKeys, trustKeyMatch, runPreflight discarding rows, section.go sentence, README and concepts.md quoted text, Copilot adapter's COPILOT_HOME and flags, design note added in the working tree); consistency (tables vs worked example messages, merge rules vs P1 lines, output verbs per command); rules (C-1, CLI conventions, constraints on tests); runnability (the go check after each task: tests that pin init/upgrade output, the CLAUDE.md section and doctor messages are all within the stated exceptions; existing copilot doctor tests pin no full output, so the new row does not break them; no task edits .vloop/ or .claude/); vloop brief check on a ready copy: ok, 0 warnings",
+  "header": "Reviewed 2026-11-03: FIX, 4 findings"
+}
+

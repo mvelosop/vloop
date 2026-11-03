@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 1.8435526000000002,
+  "duration_ms": 310276,
+  "effort": null,
+  "ended": "2026-11-03T06:02:04Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 83588,
+      "cache_read_input_tokens": 3012103,
+      "cost_usd": 1.8435526000000002,
+      "input_tokens": 82,
+      "output_tokens": 28605
+    }
+  },
+  "permission_denials": [],
+  "phase": "review-brief",
+  "run_id": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent",
+  "schema": "session/v5",
+  "started": "2026-11-03T05:56:53Z",
+  "turns": 45,
+  "wall_ms": 310813
+}
