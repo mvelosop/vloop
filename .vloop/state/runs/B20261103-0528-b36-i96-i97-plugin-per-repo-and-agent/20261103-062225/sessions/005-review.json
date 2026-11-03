@@ -1,0 +1,28 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.139817,
+  "duration_ms": 30615,
+  "effort": null,
+  "ended": "2026-11-03T06:55:47Z",
+  "is_error": false,
+  "iteration": 2,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 22596,
+      "cache_read_input_tokens": 156690,
+      "cost_usd": 0.139817,
+      "input_tokens": 12,
+      "output_tokens": 3374
+    }
+  },
+  "permission_denials": [],
+  "phase": "review",
+  "run_id": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent",
+  "schema": "session/v3",
+  "started": "2026-11-03T06:55:15Z",
+  "task": "T1",
+  "turns": 7,
+  "wall_ms": 31236
+}
