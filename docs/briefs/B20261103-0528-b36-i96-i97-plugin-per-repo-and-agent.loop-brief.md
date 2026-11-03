@@ -109,7 +109,7 @@ Decided by the assistant on 2026-11-03 under the operator's delegation.
   session with `vloop run`'s flags loaded one vloop, the `--plugin-dir`
   copy, and installed nothing (`docs/design-notes/copilot-cli-experiments.md`). Copilot sessions run with
   their own `COPILOT_HOME`, and a `vloop brief review` on Copilot in a
-  clone holding the declaration left that home's `installed-plugins/`
+  clone holding the declaration left that home's installed-plugins/ folder
   empty (measured 2026-11-03, the design note). The acceptance checks it
   again on a run.
 - **The Claude row keeps its name, `plugin`.** Its `--json` name is read by
@@ -305,7 +305,7 @@ case ignored on macOS and Windows; the entry's path itself is not
 resolved). Other entries are ignored, and so is an entry with an empty
 or missing `version` (a declared plugin that is not installed, should
 the list show one). A counted entry is enabled when its `enabled` is
-true and neither `.claude/settings.json` nor `.claude/settings.local.json`
+true and neither `.claude/settings.json` nor .claude/settings.local.json
 in the repository sets `enabledPlugins["vloop@vloop"]` to `false`: the
 repository's opt-out wins whatever the list says, since which of the
 list's flags (`enabled`, `projectEnabled`) reflects it is not recorded.
