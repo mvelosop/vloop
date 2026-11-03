@@ -75,7 +75,7 @@ func (r *Runner) withSession(ad Adapter, s Spec) (Adapter, error) {
 	if err != nil {
 		return nil, fmt.Errorf("copilot.credit-usd %q: %w", got.Value, err)
 	}
-	c.model, c.creditUSD = s.Model, price
+	c.model, c.creditUSD, c.hook = s.Model, price, r.HookBinary
 	return c, nil
 }
 

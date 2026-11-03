@@ -47,6 +47,9 @@ type Runner struct {
 
 	Timeout time.Duration // a session still running after this is killed with its group; none when zero
 
+	Transcript string // when set, the session's stdout is also kept, as printed, in this file
+	HookBinary string // when set, a Copilot session's fence hook runs this binary, not os.Executable()
+
 	n int // sessions started in this run folder
 }
 
@@ -418,6 +421,12 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	errName := filepath.Join(r.RunDir, fmt.Sprintf("%s-%d.stderr", s.Phase, s.Iteration))
 	if err := os.WriteFile(errName, []byte(r.Mask(stderr.String())), 0o644); err != nil {
 		return res, err
+	}
+
+	if r.Transcript != "" {
+		if err := os.WriteFile(r.Transcript, stdout.Bytes(), 0o644); err != nil {
+			return res, err
+		}
 	}
 
 	out, ok := ad.Parse(stdout.Bytes(), r.Mask)

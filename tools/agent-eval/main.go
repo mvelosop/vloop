@@ -112,8 +112,9 @@ func run(args []string, dir string, stdout, stderr io.Writer) int {
 		tw.Flush()
 		return 0
 	}
-	fmt.Fprintln(stderr, "agent-eval: running cases is not built yet")
-	return 1
+	runs, _ := strconv.Atoi(o.runs)
+	timeout, _ := time.ParseDuration(o.timeout)
+	return execute(&o, runs, timeout, cases, stdout, stderr)
 }
 
 // checkFlags returns the first refusal among the flags, in the order the brief fixes.

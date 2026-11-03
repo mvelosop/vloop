@@ -5,9 +5,9 @@
   "base": "b9060704dd074b944832e8b31df292cc9affec6f",
   "branch": "B20261102-2301-b33-i81-agent-eval-runner",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-02T23:51:55Z",
-  "updated": "2026-11-03T00:01:10Z",
+  "updated": "2026-11-03T00:06:57Z",
   "shell": "sh",
   "checks": [
     {
@@ -119,9 +119,9 @@
         "Committed tests in tools/agent-eval cover a Copilot run end to end with a fake copilot and fake vloop scripts on a temporary PATH and fixture cases in a temporary directory (scored, scaffold error, skipped, no result, timeout), the trace read from testdata/observed/copilot-events.jsonl, each grader type and the table; any driver option added has a test in internal/driver; no test runs a real claude or copilot."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 0,
-      "notes": ""
+      "notes": "gate disputed: The gate compares the score to awk's six-digit print of 7/11 with a 1e-9 tolerance, which an unrounded score cannot meet; the brief requires the unrounded mean. — Clause near \"$(q \"$R\" \"$RUN | .score\")\" \"$(awk 'BEGIN { print 7 / 11 }')\" fails: awk prints 0.636364, the report holds 0.6363636363636364, and |difference| = 3.6e-7 > 1e-9."
     },
     {
       "id": "T3",

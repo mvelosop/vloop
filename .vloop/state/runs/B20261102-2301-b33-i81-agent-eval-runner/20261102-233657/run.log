@@ -19,3 +19,8 @@ committing the plan
    review T1 · 0m27s · $0.13 · run $4.81 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/6 done ──
+   Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
+   work T2 · 5m45s · $0.84 · run $5.66 / $40.00
+   GATE DISPUTE T2 — blocked for the operator; no review, no attempt charged
+   T2 blocked — the operator resolves the disputed gate with vloop task verify

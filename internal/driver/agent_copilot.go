@@ -66,6 +66,7 @@ type copilotAdapter struct {
 	bin       string
 	model     string  // the session's model, the one entry of models_used
 	creditUSD float64 // dollars per credit, for the estimated cost
+	hook      string  // the binary the fence hook runs; os.Executable() when empty
 }
 
 func (copilotAdapter) Name() string { return AgentCopilot }
@@ -94,7 +95,7 @@ func (a copilotAdapter) Preflight() (bool, string) {
 // Prepare extracts the plugin and makes, for this session alone, an empty
 // Copilot home and, when the repository has guidelines, the directory holding
 // them; both live under .vloop/tmp/, which is emptied between sessions.
-func (copilotAdapter) Prepare(root, version, phase string) (Prepared, error) {
+func (a copilotAdapter) Prepare(root, version, phase string) (Prepared, error) {
 	plugin, err := ExtractPlugin(root, version)
 	if err != nil {
 		return Prepared{}, err
@@ -108,7 +109,7 @@ func (copilotAdapter) Prepare(root, version, phase string) (Prepared, error) {
 		return Prepared{}, err
 	}
 	p := Prepared{Plugin: plugin, Home: home}
-	if err := writeCopilotHooks(home, root, phase); err != nil {
+	if err := writeCopilotHooks(home, root, phase, a.hook); err != nil {
 		return Prepared{}, err
 	}
 	src := filepath.Join(root, filepath.FromSlash(GuidelinesFile))
@@ -132,10 +133,12 @@ func (copilotAdapter) Prepare(root, version, phase string) (Prepared, error) {
 
 // writeCopilotHooks puts in the session's home the hooks file that runs this
 // binary's `fence hook` before every tool call, in both command forms.
-func writeCopilotHooks(home, root, phase string) error {
-	exe, err := os.Executable()
-	if err != nil {
-		return err
+func writeCopilotHooks(home, root, phase, exe string) error {
+	if exe == "" {
+		var err error
+		if exe, err = os.Executable(); err != nil {
+			return err
+		}
 	}
 	absRoot, err := filepath.Abs(root)
 	if err != nil {

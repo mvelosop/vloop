@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 1
+**Status:** running · **1/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:01:10Z
+**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:06:57Z
 
 ## Progress
 
 - [x] **T1** — Add tools/agent-eval's flags, its case reader and --list
-- [ ] **T2** — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
+- [ ] **T2** — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders · **blocked**
 - [ ] **T3** — Score the llm grader with a Claude judge voting three times
 - [ ] **T4** — Stream a Claude session's transcript into the same trace
 - [ ] **T5** — Document the tool, the qualifying rule and the design note's answer
@@ -44,7 +44,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
 
-`pending` · depends on: T1
+`blocked` · **blocked** · depends on: T1
 
 This is the core of the runner: one run of a case scaffolds a workspace, starts one session exactly as vloop starts that phase on that agent, keeps the transcript, normalises it into a trace with Claude's tool names, scores the case's graders and writes report.json and the table. It is built and judged on Copilot first, with every grader type except llm (the next task's). The driver may gain options for this (keeping the transcript, naming the fence hook's binary), but every vloop session's argv, record and output must stay exactly as they are: what is being qualified is how vloop really runs the agent.
 
@@ -63,6 +63,8 @@ This is the core of the runner: one run of a case scaffolds a workspace, starts 
 - stdout is a header CASE PHASE RUNS MEAN COST NOTES, one line per case in name order (text/tabwriter, padding 2; RUNS the runs started, MEAN two decimals or `-`, COST the sessions' and judge's dollars with two decimals, NOTES a skipped or errored case's reason, else the names of graders below 1 in any run, each once, in name order, joined by ", "), then `<c> case(s) · <s> skipped · <e> error(s) · $<total>`. Exit 0 when no case is error, 1 when any is.
 - The argv, record and output of every vloop session are unchanged, and TestSessionArgs (internal/driver/session_test.go) and TestRunClaudeInvocations (cmd/vloop/run_agent_test.go) pass unmodified — a change to either test file, or to any file under plugin/evals, is a violation the review rules against.
 - Committed tests in tools/agent-eval cover a Copilot run end to end with a fake copilot and fake vloop scripts on a temporary PATH and fixture cases in a temporary directory (scored, scaffold error, skipped, no result, timeout), the trace read from testdata/observed/copilot-events.jsonl, each grader type and the table; any driver option added has a test in internal/driver; no test runs a real claude or copilot.
+
+**From the last attempt:** gate disputed: The gate compares the score to awk's six-digit print of 7/11 with a 1e-9 tolerance, which an unrounded score cannot meet; the brief requires the unrounded mean. — Clause near "$(q "$R" "$RUN | .score")" "$(awk 'BEGIN { print 7 / 11 }')" fails: awk prints 0.636364, the report holds 0.6363636363636364, and |difference| = 3.6e-7 &gt; 1e-9.
 
 <details><summary>verify command</summary>
 

@@ -276,3 +276,52 @@ func TestCopilotReviewBriefArgvAndHooks(t *testing.T) {
 		t.Errorf("hooks file %s: %v", data, err)
 	}
 }
+
+func TestCopilotHookBinaryOption(t *testing.T) {
+	root := t.TempDir()
+	a := copilotAdapter{hook: "/opt/it's/vloop"}
+	p, err := a.Prepare(root, "9.9.9", PhaseReview)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if err != nil || !strings.Contains(string(data), `'/opt/it'\\''s/vloop' fence hook --phase review --root `) {
+		t.Errorf("the hook does not run the named binary: %s %v", data, err)
+	}
+	exe, _ := os.Executable()
+	p, err = copilotAdapter{}.Prepare(t.TempDir(), "9.9.9", PhaseReview)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, _ = os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
+	if !strings.Contains(string(data), "'"+exe+"' fence hook") {
+		t.Errorf("by default the hook runs os.Executable(): %s", data)
+	}
+}
+
+func TestRunnerKeepsTranscriptOnlyWhenAsked(t *testing.T) {
+	bin := t.TempDir()
+	fake := filepath.Join(bin, "claude")
+	script := "#!/bin/sh\nprintf '{\"type\":\"x\"}\\n{\"total_cost_usd\":0.5,\"num_turns\":1}\\n'\n"
+	if err := os.WriteFile(fake, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, keep := range []bool{false, true} {
+		root, dir := t.TempDir(), t.TempDir()
+		r := &Runner{Root: root, Version: "9.9.9", RunID: "r", RunDir: dir, Claude: fake, Env: []string{"PATH=" + os.Getenv("PATH")}}
+		tr := filepath.Join(dir, "transcript.jsonl")
+		if keep {
+			r.Transcript = tr
+		}
+		if _, err := r.Run(Spec{Phase: PhaseReview, Arg: "T1", Model: "m", Iteration: 1}); err != nil {
+			t.Fatal(err)
+		}
+		data, err := os.ReadFile(tr)
+		if keep && (err != nil || string(data) != "{\"type\":\"x\"}\n{\"total_cost_usd\":0.5,\"num_turns\":1}\n") {
+			t.Errorf("transcript = %q, %v", data, err)
+		}
+		if !keep && err == nil {
+			t.Errorf("a transcript was kept without being asked")
+		}
+	}
+}
