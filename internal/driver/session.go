@@ -47,9 +47,10 @@ type Runner struct {
 
 	Timeout time.Duration // a session still running after this is killed with its group; none when zero
 
-	Transcript string // when set, the session's stdout is also kept, as printed, in this file
-	Stream     bool   // a Claude session prints stream-json with --verbose; its record is read from the stream's result line
-	HookBinary string // when set, a Copilot session's fence hook runs this binary, not os.Executable()
+	Transcript string    // when set, the session's stdout is also kept, as printed, in this file
+	Stream     bool      // a Claude session prints stream-json with --verbose; its record is read from the stream's result line
+	Judge      CallJudge // when set, the calls a Copilot session ran are judged by it and the verdicts come back in Result.Bypassed
+	HookBinary string    // when set, a Copilot session's fence hook runs this binary, not os.Executable()
 
 	n int // sessions started in this run folder
 }
@@ -78,6 +79,11 @@ type Result struct {
 	Denials  int
 	TimedOut bool          // the session was killed for running past the timeout
 	Wall     time.Duration // how long the session ran, by the driver's clock
+
+	Bypassed []BypassedCall // calls a Copilot session ran that its fence denies; only with Runner.Judge
+
+	HookChanged bool   // the binary the fence hook runs differs after the session, or is gone; only with Runner.Judge
+	HookPath    string // that binary as the hooks file names it, masked
 }
 
 // Prompt is the slash command a session of the phase starts with.
@@ -398,6 +404,11 @@ func (r *Runner) Run(s Spec) (Result, error) {
 	updateLock(r.Root, func(l *lockRecord) {
 		l.Phase, l.Task, l.SessionStarted, l.Spent = s.Phase, task, started.Format(time.RFC3339), spent
 	})
+	hookPath, hookBefore := "", ""
+	if r.Judge != nil && ad.Name() == AgentCopilot {
+		hookPath = hookBinaryPath(r.HookBinary)
+		hookBefore = fileHash(hookPath)
+	}
 	timedOut, runErr := state.RunGroup(cmd, r.Timeout)
 	ended := r.now().Round(0).UTC()
 	// However it ended, the session is over: record the spend, clear the session.
@@ -428,6 +439,13 @@ func (r *Runner) Run(s Spec) (Result, error) {
 		if err := os.WriteFile(r.Transcript, stdout.Bytes(), 0o644); err != nil {
 			return res, err
 		}
+	}
+
+	if r.Judge != nil && ad.Name() == AgentCopilot {
+		if fileHash(hookPath) != hookBefore || hookBefore == "" {
+			res.HookChanged, res.HookPath = true, r.Mask(hookPath)
+		}
+		res.Bypassed = bypassedCalls(stdout.Bytes(), s.Phase, r.Judge)
 	}
 
 	out, ok := ad.Parse(stdout.Bytes(), r.Mask)

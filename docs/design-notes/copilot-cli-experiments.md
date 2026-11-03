@@ -347,7 +347,7 @@ reported with these numbers on github/copilot-cli#2893, which asks for an
 - **What remains:** a hook slow on its own (a stalled machine past
   `timeoutSec` 30), and the hook's program, which runs anew on every call: for
   vloop the `vloop` binary, outside the repository; whether a session can write
-  it is not probed.
+  it is not probed. Since B34 the driver re-judges every call a Copilot session ran and halts on one the fence denies, checks the hook's binary before and after each session, and gives the hook a timeoutSec of 120.
 
 ## Acceptance of Copilot work (B24, 2026-10-27)
 
@@ -749,3 +749,18 @@ B33's branch on `PATH`.
   directory's absolute path; Terra flagged it twice. An artefact of the script.
 - **`gpt-5.6-terra` retires from GitHub Copilot on 2026-11-16**, with Claude
   Opus 5. Repeats and the second-reviewer work need another model.
+
+## The fence backstop on real Copilot sessions (B34, 2026-11-03)
+
+B34's driver re-judges every call a Copilot session ran and halts (exit 9,
+FENCE BYPASSED or HOOK CHANGED) on one its fence denies or a changed hook
+binary. Acceptance on a fresh clone of the URL-shortener template, the
+branch's binary, `gpt-6.1-terra` on Copilot:
+
+| What | Result |
+| --- | --- |
+| `vloop brief review` | 24 calls, 1 denied by the hook; verdict ASK; no halt |
+| `vloop run` (plan on Claude; work, review on Copilot) | 16 Copilot sessions, 5 hook denials, no FENCE BYPASSED, no HOOK CHANGED |
+| Where the run stopped | T5 blocked after two review FAILs: the model's, not the fence's (see B32's section) |
+
+No call got past the hook, and the re-judge raised no false halt.

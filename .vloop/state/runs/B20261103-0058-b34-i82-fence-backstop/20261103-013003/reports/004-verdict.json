@@ -1,0 +1,13 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "The hooks file the driver writes has `\"timeoutSec\": 120` for every phase; a new test reads the hooks file the driver writes and pins it.", "met": true, "evidence": "internal/driver/agent_copilot.go:157 sets 120; TestCopilotHooksTimeoutSec in agent_copilot_test.go loops over all seven phases, reads the written hooks file and asserts timeoutSec == 120"},
+    {"criterion": "Every F4 edit is made word for word as the brief gives it, wrapped in the file's style: domain-model.md's S-2 (the sentence after `It halts (exit 9) if a ref …`) and R-3; docs/domain/execution/session.md's sentence after `halts the run with exit 9 and nothing is committed.`; concepts.md's row `9` (its first cell, the `, or a Copilot session ran …` insertion straight after `or the git hooks` and before `; nothing was committed`, and its last cell); configuration.md's sentence; the fence audit's note under each of its six headings, on a line of its own; docs/domain/execution/run.md's row `9` first cell; copilot-cli-experiments.md's `**What remains:**` paragraph; the operate skill's row `9`.", "met": true, "evidence": "I compared each hunk of git diff HEAD with the F4 text in the brief. All match, including the six audit notes (one under each heading, on its own line), the concepts.md insertion position, and the operate row's second and last cells."},
+    {"criterion": "`vloop run --help` reads `9 refs or repository configuration moved, or a Copilot session got past its fence` (internal/cli/run.go) and `vloop brief review --help` reads `9 the session changed the brief, git refs or the repository configuration, or a Copilot session got past its fence.` (internal/cli/brief_review.go); the generated reference docs, if any, follow whatever regenerates them today.", "met": true, "evidence": "internal/cli/run.go and internal/cli/brief_review.go diffs carry the exact strings. No other file in the repo holds the old help text, so no generated docs need regenerating."},
+    {"criterion": "Violation: any other sentence of those files changed, or a doc stating behaviour the driver does not have.", "met": true, "evidence": "The diff touches only the F4 sentences, so nothing else in those files changed. The behaviour the docs state (a re-judge after each session, FENCE BYPASSED, HOOK CHANGED) is what T1 and T2 built, and both are already committed (946bae8e, 573b23ea)."}
+  ],
+  "findings": [],
+  "notes": "copilot-cli-experiments.md:348 still says `timeoutSec` 30 in B22.3's historical text. The brief asks for no change there and the appended sentence states the new 120, so I left it. The check log for `go` passed."
+}

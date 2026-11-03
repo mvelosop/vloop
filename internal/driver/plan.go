@@ -64,6 +64,8 @@ type Planner struct {
 	Now    func() time.Time // the driver's clock
 	Home   string
 	User   string
+
+	Judge CallJudge // the fence judge the CLI hands in, as Iterator's
 }
 
 // PlanResult says what the plan phase did.
@@ -273,7 +275,7 @@ func (p *Planner) Plan() (*PlanResult, error) {
 	}
 	defer logFile.Close()
 	r = &Runner{Root: root, Version: p.Version, RunID: runID, RunDir: runDir, Log: logFile,
-		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout}
+		Claude: p.Claude, Now: p.Now, Home: p.Home, User: p.User, Timeout: p.SessionTimeout, Judge: p.Judge}
 	t := term{p, r}
 
 	shell, err := config.Get(root, "shell")
@@ -545,6 +547,9 @@ func (p *Planner) planSession(t term, r *Runner, runDir, briefPath, model, effor
 		return halt(ExitPreflight, "planning session failed: %v", err)
 	}
 	t.sessionDone(Spec{Phase: PhasePlan}, res)
+	if h := res.backstop(PhasePlan, t.warn); h != nil {
+		return h
+	}
 	if what := gguard.changed(); what != "" {
 		return halt(ExitRefsMoved, "plan changed %s — nothing was committed; restore it, then re-run", what)
 	}

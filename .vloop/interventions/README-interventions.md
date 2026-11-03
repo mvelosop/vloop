@@ -145,6 +145,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | ceremony | partly | no-options | [I20261102-203254-acceptance-the-plan-phase-s-edges-on-a-f](I20261102-203254-acceptance-the-plan-phase-s-edges-on-a-f.md) |
 | verify | ceremony | partly | no-options | [I20261102-230009-acceptance-the-plan-and-gate-review-eval](I20261102-230009-acceptance-the-plan-and-gate-review-eval.md) |
 | verify | ceremony | partly | no-options | [I20261103-005741-acceptance-tools-agent-eval-on-the-gate](I20261103-005741-acceptance-tools-agent-eval-on-the-gate.md) |
+| verify | ceremony | partly | no-options | [I20261103-031502-acceptance-real-copilot-sessions-on-a-fr](I20261103-031502-acceptance-real-copilot-sessions-on-a-fr.md) |
+| verify | context-supply | partly | no-options | [I20261103-031501-trust-acceptance-for-the-b34-acceptance](I20261103-031501-trust-acceptance-for-the-b34-acceptance.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
@@ -200,6 +202,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261027-232635-vloop-doctor-and-the-run-preflight-refus](I20261027-232635-vloop-doctor-and-the-run-preflight-refus.md) |
 | verify | verification-finding | partly | no-options | [I20261102-112848-review-brief-s-report-step-said-brief-is](I20261102-112848-review-brief-s-report-step-said-brief-is.md) |
 | verify | verification-finding | partly | no-options | [I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph](I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph.md) |
+| verify | verification-finding | partly | no-options | [I20261103-005742-the-design-note-s-two-hard-parts-still-c](I20261103-005742-the-design-note-s-two-hard-parts-still-c.md) |
+| verify | verification-finding | partly | no-options | [I20261103-031508-f4-s-list-missed-three-sentences-that-li](I20261103-031508-f4-s-list-missed-three-sentences-that-li.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

@@ -50,7 +50,7 @@ and the blocked task's `notes` (`vloop task show <id>`).
 | 6 | cost ceiling | resumable with a higher ceiling; the operator sets it |
 | 7 | session error | report; do not retry blindly |
 | 8 | repeat blocked | report; the same block twice with nothing changed needs a human |
-| 9 | a session moved git refs | **do not re-run.** Compare `git branch -vv`, `git reflog` and `git show-ref` with what the log says; nothing was committed; restore the refs and tell the operator. An editor's key alone in `.git/config` means no session moved anything. A halt during plan acceptance drops that session's cost from `vloop metrics`: note it from the log |
+| 9 | a session moved git refs, or got past its fence | **do not re-run.** Compare `git branch -vv`, `git reflog` and `git show-ref` with what the log says; nothing was committed; restore the refs and tell the operator. An editor's key alone in `.git/config` means no session moved anything. A halt during plan acceptance drops that session's cost from `vloop metrics`: note it from the log. For FENCE BYPASSED or HOOK CHANGED, inspect the work tree and the named calls before anything else; do not resume until the operator decides. |
 
 ### 2a. A disputed gate
 

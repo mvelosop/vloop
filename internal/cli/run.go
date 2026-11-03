@@ -43,7 +43,7 @@ work branch. Use --replan to plan a brief again deliberately.
 
 Exit codes: 0 complete; 1 preflight or failure; 2 usage or blocked; 3 stalled; 4 max
 iterations; 5 not converging; 6 cost ceiling; 7 session error; 8 repeat blocked;
-9 refs or repository configuration moved. Each is described, with whether the
+9 refs or repository configuration moved, or a Copilot session got past its fence. Each is described, with whether the
 run can resume, in docs/guide/concepts.md#exit-codes.`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -114,7 +114,7 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 			pl := &driver.Planner{Root: root, Version: b.Version, Brief: briefPath,
 				PlanOnly: planOnly, Replan: replan,
 				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn,
-				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute, CostCeiling: budget.CostCeiling}
+				SessionTimeout: time.Duration(budget.SessionTimeout) * time.Minute, CostCeiling: budget.CostCeiling, Judge: CallJudge(root)}
 			res, err := pl.Plan()
 			if err != nil {
 				var h *driver.Halt
@@ -127,7 +127,7 @@ run can resume, in docs/guide/concepts.md#exit-codes.`,
 				return nil
 			}
 			it := &driver.Iterator{Root: root, Version: b.Version, RunDir: res.RunDir, Budgets: budget,
-				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn}
+				Out: cmd.OutOrStdout(), Err: cmd.ErrOrStderr(), Quiet: g.Quiet, AwakeWarn: awakeWarn, Judge: CallJudge(root)}
 			end, err := it.Run()
 			if err != nil {
 				var h *driver.Halt

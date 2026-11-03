@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Every Copilot phase (plan, gate-review, work, review, second-review, verify, review-brief) now runs one shared after-session check: HOOK CHANGED (SHA-256 of the hook binary before/after) first, then FENCE BYPASSED, both exit 9, masked, in the run log where there is one.",
+  "files": ["internal/driver/fencecheck.go", "internal/driver/fencecheck_test.go", "internal/driver/session.go", "internal/driver/iterate.go", "internal/driver/plan.go", "internal/driver/gatereview.go", "internal/driver/briefreview.go", "internal/cli/run.go", "internal/cli/brief_review.go", "cmd/vloop/run_fencebackstop_test.go"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go test ./internal/driver ./cmd/vloop pass; go vet, gofmt, go mod tidy -diff, GOOS=linux/windows build clean.",
+  "notes": "Result.backstop(phase, warn) in fencecheck.go is the shared check (F2 then F1, returns the exit 9 Halt). Runner.Run hashes the hook binary (r.HookBinary or os.Executable(), the one writeCopilotHooks writes) before and after, only with Runner.Judge set and a Copilot session, so tools/agent-eval is unchanged; Result.HookPath is masked. Iterator.afterSession wraps it after restoreInputs and reports a failed restore after the halt lines; Planner and BriefReview gained a Judge field set by the CLI. Brief review has no run log, so stderr only. internal/cli TestTaskGate* fail inside a live run only because they see the driver-held plan as changed (environmental, as T1 noted)."
+}

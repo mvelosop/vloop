@@ -72,6 +72,8 @@ type Iterator struct {
 	User   string
 	Env    []string
 
+	Judge CallJudge // the fence judge the CLI hands in, to re-judge the calls a Copilot session ran
+
 	GateTimeout    time.Duration // test seam: replaces Budgets.GateTimeout when not zero
 	SessionTimeout time.Duration // test seam: replaces Budgets.SessionTimeout when not zero
 
@@ -172,7 +174,7 @@ func (it *Iterator) Run() (Ending, error) {
 	it.log = &lazyLog{path: filepath.Join(it.RunDir, "run.log")}
 	it.r = &Runner{Root: it.Root, Version: it.Version, RunID: plan.RunID, RunDir: it.RunDir, Log: it.log,
 		Claude: it.Claude, Now: it.Now, Home: it.Home, User: it.User, Env: it.Env,
-		Timeout: it.sessionTimeout()}
+		Timeout: it.sessionTimeout(), Judge: it.Judge}
 	if it.AwakeWarn != "" {
 		it.r.Logf("%s", AwakeWarning(it.AwakeWarn))
 	}
@@ -393,6 +395,23 @@ func (it *Iterator) haltGit(format string, a ...any) error {
 	_ = it.save()
 	_ = it.log.flush()
 	return err
+}
+
+// afterSession is the check every Copilot session gets once it ends and its
+// inputs are restored: the hook's binary, then the calls its fence denies. A
+// halt is exit 9 and commits nothing; a failed restore is reported after it.
+func (it *Iterator) afterSession(res Result, phase string, restoreErr error) error {
+	h := res.backstop(phase, it.warn)
+	if h == nil {
+		return restoreErr
+	}
+	if restoreErr != nil {
+		it.warn("%v", restoreErr)
+	}
+	it.plan.Status = "halted"
+	_ = it.save()
+	_ = it.log.flush()
+	return h
 }
 
 func (it *Iterator) gitRefsMoved(before []string, task, phase string) error {
@@ -655,7 +674,8 @@ func (it *Iterator) workSession(task *state.Task, iter int) (workReport, error) 
 	if err != nil {
 		return workReport{}, err
 	}
-	if _, err := it.restoreInputs(inputs, PhaseWork, wres.Path); err != nil {
+	_, rerr := it.restoreInputs(inputs, PhaseWork, wres.Path)
+	if err := it.afterSession(wres, PhaseWork, rerr); err != nil {
 		return workReport{}, err
 	}
 	if err := it.gitChanged(gguard, PhaseWork); err != nil {
@@ -786,7 +806,7 @@ func (it *Iterator) reviewRun(task *state.Task, iter int, phase string) (reviewR
 		return reviewResult{}, err
 	}
 	inputsChanged, err := it.restoreInputs(inputs, phase, rres.Path)
-	if err != nil {
+	if err = it.afterSession(rres, phase, err); err != nil {
 		return reviewResult{}, err
 	}
 	if err := it.gitChanged(gguard, phase); err != nil {
@@ -960,7 +980,8 @@ func (it *Iterator) verifySession() error {
 		return nil
 	}
 	it.sessionDone(Spec{Phase: PhaseVerify}, res)
-	if _, err := it.restoreInputs(inputs, PhaseVerify, res.Path); err != nil {
+	_, rerr := it.restoreInputs(inputs, PhaseVerify, res.Path)
+	if err := it.afterSession(res, PhaseVerify, rerr); err != nil {
 		return err
 	}
 	if err := it.gitChanged(gguard, PhaseVerify); err != nil {

@@ -216,7 +216,7 @@ marked.
 
 - **S-1** A session is a fresh process; sessions share nothing but files.
 - **S-2** Sessions never commit, never set status and never move git refs. The
-  fence denies the commands. The fence is advisory; the driver is the boundary. It halts (exit 9) if a ref, a key of `.git/config` or the git hooks change during a session or a gate — a key of `.git/config` changes, other than those `run.git-config-ignore` and the built-in editor keys ignore — and restores what a session changed among the driver's inputs.
+  fence denies the commands. The fence is advisory; the driver is the boundary. It halts (exit 9) if a ref, a key of `.git/config` or the git hooks change during a session or a gate — a key of `.git/config` changes, other than those `run.git-config-ignore` and the built-in editor keys ignore — and restores what a session changed among the driver's inputs. For a Copilot session it also halts (exit 9) when a call that ran is one the fence denies, or when the binary the fence hook runs changed.
 - **S-4** A session writes nothing under `.git/` and nothing under `.vloop/` but `.vloop/tmp/` — the plan session also writes the plan and its gate folders.
 - **S-3** A work session does exactly one task. A review session judges it
   independently, from the diff and the acceptance, not from the proposal's
@@ -230,7 +230,7 @@ marked.
   default branch. *(Enforced by `vloop run`, which creates the work branch.)*
 - **R-3** A run ends with one of the driver's exit codes: 0 complete, 1
   preflight, 2 blocked, 3 stalled, 4 max iterations, 5 not converging, 6 cost
-  ceiling, 7 session error, 8 repeat blocked, 9 refs or repository configuration moved.
+  ceiling, 7 session error, 8 repeat blocked, 9 refs or repository configuration moved, or a Copilot session got past its fence.
   Exit 2 also covers a plan the gate review failed twice and a final check pass
   that failed.
 - **R-4** A run plans only a `ready` brief that passes the check, with its dependencies consumed, from a clean tree; every gate and session runs under a timeout and leaves no process behind.

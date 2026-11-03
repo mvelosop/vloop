@@ -154,7 +154,7 @@ func writeCopilotHooks(home, root, phase, exe string) error {
 				"type":       "command",
 				"bash":       sq(exe) + tail + sq(absRoot),
 				"powershell": "& " + ps(exe) + tail + ps(absRoot),
-				"timeoutSec": 30,
+				"timeoutSec": 120,
 			}},
 		},
 	}

@@ -36,6 +36,8 @@ type BriefReview struct {
 	Now    func() time.Time
 	Home   string
 	User   string
+
+	Judge CallJudge // the fence judge the CLI hands in, as Iterator's
 }
 
 type briefReviewReport struct {
@@ -92,7 +94,7 @@ func (b *BriefReview) Run() (string, error) {
 	}
 	rel := strings.TrimSuffix(relRunDir(root, dir), "/")
 	r := &Runner{Root: root, Version: b.Version, RunID: runID, RunDir: dir,
-		Claude: b.Claude, Now: b.Now, Home: b.Home, User: b.User, Timeout: b.Timeout}
+		Claude: b.Claude, Now: b.Now, Home: b.Home, User: b.User, Timeout: b.Timeout, Judge: b.Judge}
 
 	fmt.Fprintf(b.Err, "reviewing %s using %s (agent %s)\n", b.Brief, model, agent)
 	before := refsState(root)
@@ -103,11 +105,19 @@ func (b *BriefReview) Run() (string, error) {
 	}
 
 	changed := false
+	var restoreErr error
 	if now, err := os.ReadFile(briefAbs); err != nil || !bytes.Equal(now, orig) {
 		changed = true
-		if err := os.WriteFile(briefAbs, orig, mode); err != nil {
-			return "", err
+		restoreErr = os.WriteFile(briefAbs, orig, mode)
+	}
+	if h := res.backstop(PhaseReviewBrief, func(f string, a ...any) { fmt.Fprintln(b.Err, r.Mask(fmt.Sprintf(f, a...))) }); h != nil {
+		if restoreErr != nil {
+			fmt.Fprintln(b.Err, r.Mask(restoreErr.Error()))
 		}
+		return "", h
+	}
+	if restoreErr != nil {
+		return "", restoreErr
 	}
 	if what := guard.changed(); what != "" {
 		return "", halt(ExitRefsMoved, "the brief review changed %s — nothing was committed; restore it, then re-run", what)

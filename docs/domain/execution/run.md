@@ -33,7 +33,7 @@ both plan sessions.
 The driver buffers `run.log` and writes it only just before each commit, and
 the metrics snapshot into the next commit, so no tracked file is dirty while a
 session or a gate runs. Before each commit it checks that HEAD is where it was
-(a session or gate that moved refs, a key of `.git/config` outside `run.git-config-ignore` and the built-in editor keys, or the git hooks halts the run, exit 9). A gate that disputes itself
+(a session or gate that moved refs, a key of `.git/config` outside `run.git-config-ignore` and the built-in editor keys, or the git hooks halts the run, exit 9; so does a Copilot session that ran a call its fence denies, FENCE BYPASSED, or whose fence hook's binary changed, HOOK CHANGED). A gate that disputes itself
 (`gate_dispute` in a proposal) blocks its task at once and charges no attempt.
 
 Before planning, the preflight requires a `ready` brief that passes the check,
@@ -124,7 +124,7 @@ with one exit code (R-3):
 | 6 | cost ceiling | yes, with a higher ceiling |
 | 7 | session error | no |
 | 8 | repeat blocked, nothing changed | no |
-| 9 | refs or repository configuration moved; nothing committed | no — restore the refs first; during acceptance, resumable once restored, by resuming acceptance (no second plan session) |
+| 9 | refs or repository configuration moved, or a Copilot session got past its fence; nothing committed | no — restore the refs first; during acceptance, resumable once restored, by resuming acceptance (no second plan session) |
 
 ## Gaps
 

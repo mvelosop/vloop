@@ -1,0 +1,21 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "docs/domain/execution/run.md:36: \"(a session or gate that moved refs, a key of `.git/config` outside `run.git-config-ignore` and the built-in editor keys, or the git hooks halts the run, exit 9)\"",
+      "observed": "The run page's table row 9 and the S-2/session/concepts/configuration pages now say a Copilot session that got past its fence also halts with exit 9. This sentence on the same page lists the causes of exit 9 without FENCE BYPASSED or HOOK CHANGED. docs/guide/concepts.md:22 and docs/domain/execution/plan.md:69 do the same for the driver boundary and for acceptance halts, and plan sessions can now halt with FENCE BYPASSED plan. The brief's F4 list does not name these three places.",
+      "where": "brief F4 (list of places that define exit 9); docs/domain/execution/run.md:36, docs/guide/concepts.md:22, docs/domain/execution/plan.md:69"
+    }
+  ],
+  "not_run": [
+    {
+      "line": "vloop run --help and vloop brief review --help (reading the exit-code help of the built binary)",
+      "reason": "the command was denied by the verify fence; the help text was read in internal/cli/run.go:46 and internal/cli/brief_review.go instead"
+    }
+  ],
+  "checked": { "example_lines": 8, "sentences": 12, "surfaces": 12 },
+  "notes": "Worked example: the 8 test lines are the named tests, which I ran (TestRunFenceBackstopBypassed, DeniedByHook, AllowedCall, TestBackstopHookChanged, TestBackstopTimedOutSession, TestCopilotHooksTimeoutSec, TestRunFenceBackstopEveryPhase with 6 subtests). All pass. The Bypassed test asserts only the prefix 'vloop: bash git commit -m x — ' on stderr; the full reason text 'git commit -m x is denied by the work fence (Bash(git commit:*))' matches what 'vloop fence check --phase work --tool bash \"git commit -m x\"' prints, and 'git push' prints the plan fence line for the plan phase. Not checked: seven-phase tests were run as a group, not read one by one for 'no plan commit' / 'brief restored' assertions. The doc insertions (S-2, session, concepts, configuration, fence-audit x6, B22.3, operate, run.go and brief_review.go help) were read in the diff and match F4's text. In the code, backstop runs after restoreInputs and before gitChanged/REFS MOVED in work, review and verify; in plan and gate-review it runs before the guard check; in review-brief it runs after the brief restore. The hook binary's hash is checked only when Runner.Judge is set; a binary unreadable before the session counts as changed."
+}
+
