@@ -749,3 +749,18 @@ B33's branch on `PATH`.
   directory's absolute path; Terra flagged it twice. An artefact of the script.
 - **`gpt-5.6-terra` retires from GitHub Copilot on 2026-11-16**, with Claude
   Opus 5. Repeats and the second-reviewer work need another model.
+
+## The fence backstop on real Copilot sessions (B34, 2026-11-03)
+
+B34's driver re-judges every call a Copilot session ran and halts (exit 9,
+FENCE BYPASSED or HOOK CHANGED) on one its fence denies or a changed hook
+binary. Acceptance on a fresh clone of the URL-shortener template, the
+branch's binary, `gpt-6.1-terra` on Copilot:
+
+| What | Result |
+| --- | --- |
+| `vloop brief review` | 24 calls, 1 denied by the hook; verdict ASK; no halt |
+| `vloop run` (plan on Claude; work, review on Copilot) | 16 Copilot sessions, 5 hook denials, no FENCE BYPASSED, no HOOK CHANGED |
+| Where the run stopped | T5 blocked after two review FAILs: the model's, not the fence's (see B32's section) |
+
+No call got past the hook, and the re-judge raised no false halt.
