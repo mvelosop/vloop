@@ -697,6 +697,30 @@ judge through the surface the brief names. Fresh clones of
   review, the second review and brief review. Plan and gate review stay on
   Claude; verify is still to qualify.
 
+## The gate-review cases on both agents through `tools/agent-eval` (B33, 2026-11-03)
+
+B33's acceptance, the first runs of `go run ./tools/agent-eval`: the three
+gate-review cases, one run each, judged by Claude Sonnet, with `vloop` from
+B33's branch on `PATH`.
+
+| Case | Claude `sonnet` | Copilot `gpt-6.1-terra` |
+| --- | --- | --- |
+| `gate-review-coverage` | 1.00 | 0.80 (`covered-task-passes`) |
+| `gate-review-planted-gates` | 1.00 | 1.00 |
+| `gate-review-real-misses` | 0.88 (`finds-toml-key-after-table`) | 1.00 |
+| Sessions | ≈ $0.33 | 19.3 credits, ≈ $0.13 |
+| Judge (Claude) | ≈ $1.52 | ≈ $1.62 |
+
+- Every session ran under its phase's fence; Copilot's hook ran the
+  installed `vloop`. Traces of 22–32 events each.
+- **The cases do not catch what failed 6.1's gate review in B32**: there it
+  missed gates that import implementation names, and failed sound gates for
+  failing on the base before an earlier task's scaffold exists. No
+  gate-review case plants either; until one does, these scores do not
+  qualify 6.1 for gate review.
+- One run each is below the guide's qualifying rule (3 runs); these are the
+  tool's acceptance, not a qualification.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts

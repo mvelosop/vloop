@@ -135,6 +135,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | partly | no-options | [I20261015-215305-t9-stalled-on-a-check-the-fence-forbids](I20261015-215305-t9-stalled-on-a-check-the-fence-forbids.md) |
 | halt | repair | yes | no-options | [I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s](I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s.md) |
 | halt | verification-finding | no | recommended | [I20261102-112835-t2-s-gate-disputed-its-loop-variable-was](I20261102-112835-t2-s-gate-disputed-its-loop-variable-was.md) |
+| halt | verification-finding | partly | no-options | [I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi](I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi.md) |
 | verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261101-230340-acceptance-on-the-real-cli-the-url-short](I20261101-230340-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261102-004526-acceptance-on-the-real-cli-the-url-short](I20261102-004526-acceptance-on-the-real-cli-the-url-short.md) |
@@ -143,6 +144,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | ceremony | partly | no-options | [I20261102-151340-acceptance-the-two-verify-evals-on-a-bin](I20261102-151340-acceptance-the-two-verify-evals-on-a-bin.md) |
 | verify | ceremony | partly | no-options | [I20261102-203254-acceptance-the-plan-phase-s-edges-on-a-f](I20261102-203254-acceptance-the-plan-phase-s-edges-on-a-f.md) |
 | verify | ceremony | partly | no-options | [I20261102-230009-acceptance-the-plan-and-gate-review-eval](I20261102-230009-acceptance-the-plan-and-gate-review-eval.md) |
+| verify | ceremony | partly | no-options | [I20261103-005741-acceptance-tools-agent-eval-on-the-gate](I20261103-005741-acceptance-tools-agent-eval-on-the-gate.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
@@ -197,6 +199,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261027-232634-acceptance-on-the-real-cli-t6-s-retry-on](I20261027-232634-acceptance-on-the-real-cli-t6-s-retry-on.md) |
 | verify | verification-finding | partly | no-options | [I20261027-232635-vloop-doctor-and-the-run-preflight-refus](I20261027-232635-vloop-doctor-and-the-run-preflight-refus.md) |
 | verify | verification-finding | partly | no-options | [I20261102-112848-review-brief-s-report-step-said-brief-is](I20261102-112848-review-brief-s-report-step-said-brief-is.md) |
+| verify | verification-finding | partly | no-options | [I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph](I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
