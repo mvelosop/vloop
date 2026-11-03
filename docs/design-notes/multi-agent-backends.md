@@ -62,7 +62,8 @@ Runner (unchanged: masking, lock, timeout/RunGroup, session/v1 record, stderr fi
 2. **Skill quality on other models.** Skills are tuned on Claude. The
    `plugin/evals` suites (hollow test, gate gaming, scope creep, …) are how to
    qualify a model, but run via `claude plugin eval`. Needed: a backend-agnostic
-   eval runner replaying the same cases and graders.
+   eval runner replaying the same cases and graders: `tools/agent-eval` since
+   B33.
 
 ## Copilot vs Grok
 
