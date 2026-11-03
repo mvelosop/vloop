@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.2595053,
+  "duration_ms": 58572,
+  "effort": null,
+  "ended": "2026-11-03T01:46:15Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 42697,
+      "cache_read_input_tokens": 513953,
+      "cost_usd": 0.2595053,
+      "input_tokens": 26,
+      "output_tokens": 3727
+    }
+  },
+  "permission_denials": [],
+  "phase": "gate-review",
+  "run_id": "B20261103-0058-b34-i82-fence-backstop",
+  "schema": "session/v3",
+  "started": "2026-11-03T01:45:16Z",
+  "turns": 14,
+  "wall_ms": 59134
+}

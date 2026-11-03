@@ -1,0 +1,6 @@
+GATE FAIL: a work session that ran 'git commit -m x': want exit 9, got exit 0; stderr:
+  ! agent.plan is copilot: experimental (docs/guide/configuration.md)
+  ! agent.work is copilot: experimental (docs/guide/configuration.md)
+  ! agent.gate-review is copilot: experimental (docs/guide/configuration.md)
+  ! agent.review is copilot: experimental (docs/guide/configuration.md)
+  ! agent.verify is copilot: experimental (docs/guide/configuration.md)

@@ -1,7 +1,0 @@
-[
-  {"kind": "tool", "tool": "Bash", "input": "{\"command\":\"vloop schema validate verdict/v1 .vloop/tmp/verdict.json\"}", "output": ".vloop/tmp/verdict.json: ok"},
-  {"kind": "tool", "tool": "Read", "input": "{\"path\":\"notes<1>&2.txt\"}", "output": "no such file"},
-  {"kind": "tool", "tool": "Write", "input": "{\"file_text\":\"{\\\"verdict\\\": \\\"FAIL\\\"}\",\"path\":\".vloop/tmp/verdict.json\"}", "output": "Created file .vloop/tmp/verdict.json"},
-  {"kind": "tool", "tool": "report_intent", "input": "{\"intent\":\"Reviewing\"}", "output": ""},
-  {"kind": "text", "text": "Verdict written: FAIL."}
-]

@@ -1,38 +1,35 @@
-# Plan — B20261102-2301-b33-i81-agent-eval-runner
+# Plan — B20261103-0058-b34-i82-fence-backstop
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **6/6 done** · iteration 7
+**Status:** running · **0/4 done** · iteration 0
 
-**Brief:** `docs/briefs/B20261102-2301-b33-i81-agent-eval-runner.loop-brief.md` · **Updated:** 2026-11-03T00:41:52Z
+**Brief:** `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` · **Updated:** 2026-11-03T01:46:15Z
 
 ## Progress
 
-- [x] **T1** — Add tools/agent-eval's flags, its case reader and --list
-- [x] **T2** — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
-- [x] **T3** — Score the llm grader with a Claude judge voting three times
-- [x] **T4** — Stream a Claude session's transcript into the same trace
-- [x] **T5** — Document the tool, the qualifying rule and the design note's answer
-- [x] **T6** — Close: the worked example as a committed test, every gate at once
+- [ ] **T1** — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1)
+- [ ] **T2** — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
+- [ ] **T3** — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
+- [ ] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
-### T1 — Add tools/agent-eval's flags, its case reader and --list
+### T1 — Re-judge every call a Copilot work session ran, and halt the run on one its fence denies (F1)
 
-`done` · depends on: none
+`pending` · depends on: none
 
-Issue #81 needs a repository tool, `go run ./tools/agent-eval`, that replays the plugin's eval cases on Claude or Copilot with any model. This task builds its front door: the flags and their refusals (A1), the reading of a cases directory (each case's prompt.md and graders/*.md frontmatter, read by hand with no new module dependency), and `--list`, which prints the selected cases and runs nothing. Every later task runs cases through what this one reads, so the frontmatter subset and the refusal order must be exactly the brief's.
+A Copilot session is fenced by the preToolUse hook, which fails open when it misbehaves; nothing behind it notices. This task adds the driver's re-judge of every call a Copilot session ran — read from its JSON Lines, judged by the same fence judge the hook uses — and wires it, with its stderr lines and the FENCE BYPASSED exit-9 halt, into the work phase. T2 extends the same after-session check to every other phase and adds the binary check.
 
 **Acceptance**
 
-- tools/agent-eval is package main, run as `go run ./tools/agent-eval` from the repository root, with the flags --agent, --model, --out, --cases (default plugin/evals), --case (a path.Match glob, repeatable, a case runs when any matches; every case when absent), --runs (default 1), --judge-model (default sonnet), --timeout (a Go duration, default 20m), --vloop (default the vloop on PATH) and --list.
-- The cases are the directories of --cases whose name does not start with `_`, in name order.
-- Before running anything, the first condition that holds, in this order, prints one line on stderr, nothing on stdout, and exits 2: --agent, --model, --out missing (in that order) → `agent-eval: --<flag> is required`; an agent other than claude or copilot → `agent-eval: unknown agent <a>`; --runs below 1 or not a number → `agent-eval: --runs must be 1 or more`; --timeout not a Go duration → `agent-eval: --timeout <v> is not a duration`; --out exists and is not empty → `agent-eval: <dir> is not empty` (the dir as given); no case matches → `agent-eval: no case matches`; --agent copilot and no vloop binary found (--vloop naming no file, or no vloop on PATH) → `agent-eval: no vloop binary for the fence hook`. A refusal writes nothing into an existing --out.
-- --list needs no --agent, --model or --out; it prints a header CASE, PHASE, GRADERS and one line per selected case (its name; its phase, `-` when it has none; its number of graders/*.md), columns aligned with text/tabwriter, padding 2, and exits 0. The phase is the first word of prompt.md's body, `/vloop:<skill>`, when the skill is plan, work, review, gate-review, verify or review-brief; any other skill has none.
-- `go run ./tools/agent-eval --list` over plugin/evals exits 0 with a line for every case and nothing on stderr; no file under plugin/evals is changed to make it so (a violation the review rules against).
-- A case without prompt.md, or a grader file whose frontmatter cannot be read, prints `agent-eval: <case>/<file>: <reason>` on stderr and exits 1, with or without --list, before anything runs.
-- Frontmatter is the text between the first two `---` lines, read by hand, no module added to go.mod: top-level `key: value`; a key with no value followed by lines indented two spaces, each `key: value`, read as a one-level map; values plain, single-quoted (`''` an escaped quote) or double-quoted, otherwise kept as written, backslashes included; a `[...]` value read as a string and unused. Anything else, including a frontmatter that is never closed, is a reading error.
-- Committed tests in tools/agent-eval (run by the configured go check under `go test ./...`) cover each refusal and its order, --list over a fixture cases directory built in a temporary directory, and the frontmatter reader's forms and errors; a task that adds this behaviour without such tests fails review.
+- After every Copilot work session the driver reads the session's JSON Lines; a call that ran is a `tool.execution_start` whose `tool.execution_complete` of the same `data.toolCallId` does not carry `data.error.code` `denied`, or that has no completion.
+- Each call that ran is judged by `fence.New(phase, root, home)` and `Decide` — the hook's own judge — with tool, path and command read from `data.toolName` and `data.arguments` exactly as `parseHookPayload` reads `toolName` and `toolArgs` (an object, or a JSON string holding one; `path`; a skill's `skill` or `name`; apply_patch's `input`, `patch` or `command`), and with the hook's rule first: a `bash` or `powershell` call with an empty command is denied with `the <tool> call has no command the hook can read`. Violation: a second argument parser that can diverge from the hook's, or any judge or rule list other than the hook's.
+- The driver does not import `internal/fence` (which imports `internal/driver`); the judge reaches the driver another way (for example as a function the CLI hands it). The check is the phases', not `Runner.Run`'s: `tools/agent-eval` and its tests are unchanged.
+- With one or more denied, stderr has one line per denied call, `vloop: <tool> <what> — <the judge's reason>`, `<what>` the call's path, else the first line of its command cut to 200 runes with `…` added when cut, else nothing (`vloop: <tool> — <reason>`); then the run halts with exit 9 and `FENCE BYPASSED work — the session ran <n> call(s) its fence denies; nothing from it was used`. Every line is masked (`$HOME` as `~`) and written to the run log too, as `REFS MOVED`'s warnings are.
+- The check runs as soon as the work session ends, whatever its exit, before the phase's own checks (so before REFS MOVED); the phase still makes its restores of the driver's inputs before exiting 9; the halt comes before the proposal is used or anything is committed, and the work tree is otherwise left as the session left it. With no call denied nothing changes and nothing is printed. A Claude session's handling is unchanged (violation: any change to how a Claude session is run, parsed or halted).
+- Committed tests: the worked example's first three lines as one `cmd/vloop` test each (a work session's bash `git commit -m x` completed without error -&gt; the two stderr lines, exit 9, no new commit; the same call completed `denied` -&gt; the iteration goes on; a bash `ls` only -&gt; the iteration goes on), with the harness's stub `copilot` gaining, in test code, the prompts of every phase (`/vloop:<phase>` with or without an argument) and the tool events a test's copilot-script.sh asks for; and tests of the reading of fixture JSON Lines (a call with no completion, a denied completion, the path / first-line / 200-rune / nothing forms of `<what>`, the empty-command rule). `TestRunHarnessCopilot`'s refusal of `/vloop:work T1` changes only to pin a prompt the stub still refuses; no other existing test changes.
+- No fence's rules change: `fence/*.json` and the judge's decisions are as at the base.
 
 <details><summary>verify command</summary>
 
@@ -42,27 +39,20 @@ sh .vloop/state/gates/T1/gate.sh
 
 </details>
 
-### T2 — Run a case on Copilot end to end and score its regex, tool_used and file_exists graders
+### T2 — Halt every Copilot phase on a bypassed fence, and on a changed hook binary (F1 everywhere, F2)
 
-`done` · depends on: T1
+`pending` · depends on: T1
 
-This is the core of the runner: one run of a case scaffolds a workspace, starts one session exactly as vloop starts that phase on that agent, keeps the transcript, normalises it into a trace with Claude's tool names, scores the case's graders and writes report.json and the table. It is built and judged on Copilot first, with every grader type except llm (the next task's). The driver may gain options for this (keeping the transcript, naming the fence hook's binary), but every vloop session's argv, record and output must stay exactly as they are: what is being qualified is how vloop really runs the agent.
+T1's re-judge halts only the work phase; a call can get past the hook in any phase. This task runs the same after-session check after every Copilot session of plan, gate-review, review, second-review, verify and review-brief, adds the SHA-256 check of the hook's binary before and after each session (HOOK CHANGED, exit 9, checked before F1), and makes Runner.Run hand the phase the session's stdout even when no result event was printed, so a killed session is re-judged.
 
 **Acceptance**
 
-- A case whose skill is plan, work, review, gate-review or verify starts as vloop run starts that phase, and review-brief as vloop brief review starts it, with the case's argument (the rest of prompt.md's first body line) as the session's, the --model given, no effort, killed at --timeout; any other skill skips the case with reason `no phase` (phase "" in report.json, `-` in the table, 0 runs), starting nothing.
-- Run k of a case uses `<out>/<case>/run-<k>/repo/`, created empty, where the case's scaffold.sh runs as `bash <absolute path of the script>`; a non-zero exit makes the run an error with reason `scaffold exited <code>: <the scaffold's last stderr line>` and starts no session.
-- The session's run folder is `<out>/<case>/run-<k>/` (its record under sessions/, its stderr file), outside repo/; the plugin is the tool's embedded copy, extracted into the workspace's .vloop/tmp/ as vloop extracts it under the version name `agent-eval`; the tool takes no lock and does not clear the workspace's .vloop/tmp/.
-- A Copilot session's fence hook runs --vloop's binary (`'<vloop path>' fence hook --phase <phase> --root ...`); vloop's own Copilot sessions still run os.Executable()'s.
-- A work, review or verify session gets VLOOP_PLAN_SHA256 computed as vloop run computes it (state.PlanDigest over the scaffold's .vloop/state/state.json and its gate files) when the scaffold left a plan, none otherwise; plan, gate-review and review-brief sessions get none.
-- `<out>/<case>/run-<k>/transcript.jsonl` holds Copilot's JSON Lines exactly as printed; `trace.jsonl` holds one object per event in order: `{"kind":"text","text":...}` for an assistant.message with non-empty content, `{"kind":"tool","tool":...,"input":...,"output":...}` for a tool.execution_start paired by toolCallId with its tool.execution_complete — input the arguments as compact JSON without HTML escaping, output the result's content ("" when none), the tool name mapped by the brief's table, any other name unchanged.
-- The trace text is each event on its own line: a text event's text; a tool event's `<tool> <input>` and, on the next line, its output.
-- regex searches the trace text (target: trace) or a workspace file (target source: file, path) with a Go regular expression, match contains or not_contains, a missing file scoring 0 with reason `no <path>`; tool_used counts tool events whose tool equals `tool` and, when input_match is given, whose input matches it as a Go regular expression, scoring 1 when the count is at least min (default 1) and at most max (unbounded when absent); file_exists scores 1 when path exists in the workspace; any other type except llm scores 0 with reason `unsupported grader <type>` — never as passing. A run's score is the weighted mean of its graders' scores.
-- A session that leaves no result is an error with reason `no session result`; one killed at --timeout is `timed out after <d>` as Go prints the duration (`2s`, `20m0s`), the timeout's reason winning when both hold.
-- report.json is `{agent, model, judge_model, runs, cases: [{name, phase, status scored|skipped|error, reason, mean, runs: [{status, reason, score, graders: [{name, weight, score, reason}], cost_usd, credits, judge_cost_usd, wall_ms}]}]}`: a grader's name is its file name without .md; an errored run has score null and no graders; a case is error when any run errored, skipped when skipped, scored otherwise; mean is the unrounded mean of its scored runs' scores, null when none; credits is the session's Copilot credits.
-- stdout is a header CASE PHASE RUNS MEAN COST NOTES, one line per case in name order (text/tabwriter, padding 2; RUNS the runs started, MEAN two decimals or `-`, COST the sessions' and judge's dollars with two decimals, NOTES a skipped or errored case's reason, else the names of graders below 1 in any run, each once, in name order, joined by ", "), then `<c> case(s) · <s> skipped · <e> error(s) · $<total>`. Exit 0 when no case is error, 1 when any is.
-- The argv, record and output of every vloop session are unchanged, and TestSessionArgs (internal/driver/session_test.go) and TestRunClaudeInvocations (cmd/vloop/run_agent_test.go) pass unmodified — a change to either test file, or to any file under plugin/evals, is a violation the review rules against.
-- Committed tests in tools/agent-eval cover a Copilot run end to end with a fake copilot and fake vloop scripts on a temporary PATH and fixture cases in a temporary directory (scored, scaffold error, skipped, no result, timeout), the trace read from testdata/observed/copilot-events.jsonl, each grader type and the table; any driver option added has a test in internal/driver; no test runs a real claude or copilot.
+- After every Copilot session of every phase (plan, gate-review, work, review, second-review, verify, review-brief) the re-judge of T1 runs with that phase's judge (`second-review` judged as the hook judges it, by the review fence), and a denied call that ran halts with exit 9 and `FENCE BYPASSED <phase> — the session ran <n> call(s) its fence denies; nothing from it was used`, preceded by the per-call lines. The halt comes where REFS MOVED halts for that phase: a plan or gate-review halt leaves no plan commit and starts no work; a review or second-review halt commits nothing; a verify halt keeps no reports/verify.json; a review-brief halt prints no verdict and its brief is restored.
+- Before each Copilot session the driver takes the SHA-256 of the binary the hook runs (the one writeCopilotHooks writes into the hooks file); after it, again. A difference, or the binary gone, halts with exit 9 and `HOOK CHANGED <phase> — the binary the fence hook runs changed during the session: <path>; nothing from it was used`, `<path>` as the hooks file names it, masked. F2 is checked before F1, both as soon as the session ends and before the phase's own checks, so a call that got past the hook and also moved a ref is named before REFS MOVED; the phase's restores (the driver's inputs; a review-brief session's brief) are still made, and a restore that fails is reported after the halt's lines.
+- The lines and halts are masked and written to the run log too where the phase has one; `vloop brief review` has no run log, so there stderr only.
+- `Runner.Run` hands the phase the session's stdout whether or not it printed a result event, so a session killed at its timeout, or one that died, is re-judged; a call with no completion counts as run. Claude sessions and `tools/agent-eval`'s scoring are unchanged.
+- Committed tests: the worked example's seven phase lines, one `cmd/vloop` test each (agent.&lt;phase&gt; = "copilot", a session that runs a bash `git push`; second-review with `run.second-review = "record"`; verify with the last task done; review-brief through `vloop brief review`), each asserting the `vloop: bash git push — …` line, the halt, exit 9 and what was not used; a driver test of the phases' shared after-session check, phase work, whose hook binary is a copy of a file the test changes between the check's before and after (the HOOK CHANGED halt); and a driver test of a stub Copilot session run through `Runner.Run` with a Timeout of 1 s that prints a started bash `git commit -m x` and sleeps, whose result handed to the shared check gives the FENCE BYPASSED work halt.
+- No fence's rules change, and no judge but the hook's is used.
 
 <details><summary>verify command</summary>
 
@@ -72,20 +62,18 @@ sh .vloop/state/gates/T2/gate.sh
 
 </details>
 
-### T3 — Score the llm grader with a Claude judge voting three times
+### T3 — Give the hook a timeoutSec of 120 and document the backstop (F3, F4)
 
-`done` · depends on: T2
+`pending` · depends on: T2
 
-Most of the plugin's graders are llm graders, so without them no case scores fully. The judge is always Claude, whatever agent is under test, so scores across agents compare; it is asked three times and the majority decides. A judge that cannot be asked is a run error, never a vote, so a broken judge can never pass or fail a model silently.
+The hook answers in milliseconds and a timeout only ever lets a call run, so its limit should be far above any stall: 120 seconds for every phase. And every place that defines exit 9 or describes the hook's fail-open must now say the driver backs it, so an operator reading a FENCE BYPASSED or HOOK CHANGED halt finds it explained and knows to inspect before resuming.
 
 **Acceptance**
 
-- An llm grader's focus is the trace's last text event (default), the trace text (`focus: trace`) or a workspace file (focus source: file, path); a missing file scores 0 with reason `no <path>` and calls no judge.
-- The judge is `claude -p --model <--judge-model> --output-format json --strict-mcp-config --setting-sources project`, started in an empty temporary directory outside the workspace and --out, with no --plugin-dir, its prompt on stdin holding the grader's body and the focus and asking for PASS or FAIL on the last line; the answer is the JSON's `result`, its cost `total_cost_usd`.
-- It is asked three times and the majority decides 1 or 0; an answer whose last line is neither PASS nor FAIL counts as FAIL; the three calls' cost is the run's judge_cost_usd, and COST in the table adds it to the session's.
-- A judge call that does not run, exits non-zero or prints no JSON with a `result` is not a vote: the run is an error with reason `judge failed: <grader>: <cause>`, and the tool exits 1.
-- The judge is Claude whatever --agent is; report.json's judge_model is the --judge-model given (sonnet by default).
-- Committed tests in tools/agent-eval cover the judge with a fake claude on a temporary PATH: the majority, a non-answer, a failing judge, each focus and a missing focus file; no test runs a real claude.
+- The hooks file the driver writes has `"timeoutSec": 120` for every phase; a new test reads the hooks file the driver writes and pins it.
+- Every F4 edit is made word for word as the brief gives it, wrapped in the file's style: domain-model.md's S-2 (the sentence after `It halts (exit 9) if a ref …`) and R-3; docs/domain/execution/session.md's sentence after `halts the run with exit 9 and nothing is committed.`; concepts.md's row `9` (its first cell, the `, or a Copilot session ran …` insertion straight after `or the git hooks` and before `; nothing was committed`, and its last cell); configuration.md's sentence; the fence audit's note under each of its six headings, on a line of its own; docs/domain/execution/run.md's row `9` first cell; copilot-cli-experiments.md's `**What remains:**` paragraph; the operate skill's row `9`.
+- `vloop run --help` reads `9 refs or repository configuration moved, or a Copilot session got past its fence` (internal/cli/run.go) and `vloop brief review --help` reads `9 the session changed the brief, git refs or the repository configuration, or a Copilot session got past its fence.` (internal/cli/brief_review.go); the generated reference docs, if any, follow whatever regenerates them today.
+- Violation: any other sentence of those files changed, or a doc stating behaviour the driver does not have.
 
 <details><summary>verify command</summary>
 
@@ -95,65 +83,22 @@ sh .vloop/state/gates/T3/gate.sh
 
 </details>
 
-### T4 — Stream a Claude session's transcript into the same trace
+### T4 — Close the run: every gate at once, and the worked example line for line
 
-`done` · depends on: T3
+`pending` · depends on: T3
 
-A Claude session normally prints one JSON result, which says nothing of the tools it called, so the graders cannot be applied. Only this tool runs Claude with `--output-format stream-json --verbose`, whose last line carries the result the record is read from; the stream becomes the same normalised trace a Copilot session gives, so one case's graders score both agents alike. vloop's own Claude sessions keep `--output-format json`.
+Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate or a committed test, or named as a gap.
 
 **Acceptance**
 
-- A Claude session of the tool is started as vloop starts that phase (fence, plugin, adapter command and environment) with `--output-format stream-json --verbose` in place of `--output-format json`; no vloop session's argv, record or output changes, and TestSessionArgs and TestRunClaudeInvocations pass unmodified (a change to either test file is a violation the review rules against).
-- transcript.jsonl is the stream as printed; the session's record is read from its last line (type result), so cost_usd, turns and duration_ms are the result's; a stream without that line is an error with reason `no session result`.
-- trace.jsonl: each `type: assistant` line's message.content items — `text` a text event, `tool_use` a tool call paired by id with the `type: user` line's `tool_result` of the same tool_use_id, whose content is a string or a list of `{type: text, text}` items; thinking items and system, rate_limit_event and result lines are not events. The same session on Claude and on Copilot gives the same trace events.
-- credits is null in report.json for a Claude run.
-- Committed tests in tools/agent-eval cover a Claude run with a fake claude streaming on a temporary PATH and the trace read from testdata/observed/claude-stream.jsonl; any driver option added has a test in internal/driver; no test runs a real claude.
+- Gates T1, T2 and T3 all pass on the final tree, run together by this task's gate.
+- The work session's notes walk the brief's worked example line for line (the three work lines, the HOOK CHANGED driver test, the killed-session driver test, the timeoutSec test, the seven phase lines) and name the committed test, and the gate, that covers each; a line nothing covers is fixed in this task (a test added) or reported, not skipped.
+- Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds).
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T4/gate.sh
-```
-
-</details>
-
-### T5 — Document the tool, the qualifying rule and the design note's answer
-
-`done` · depends on: T4
-
-The tool is only useful if an operator knows how to run it and what its scores mean: when a model qualifies for a phase on an agent. The README says what the tool is and how it differs from `claude plugin eval`; the evals guide gains the qualifying rule; the design note that deferred the runner says it now exists.
-
-**Acceptance**
-
-- tools/agent-eval/README.md says what the tool is, lists every flag (--agent, --model, --out, --cases, --case, --runs, --judge-model, --timeout, --vloop, --list), gives the layout under --out (report.json; &lt;case&gt;/run-&lt;k&gt;/ with repo/, transcript.jsonl, trace.jsonl and the session record), and what differs from `claude plugin eval`: one arm, the phase's fence instead of allowed_tools and max_turns, a Claude judge, skipped cases, --vloop.
-- docs/guide/evals.md has a section `## Other agents` right after `## Running`'s content and right before `## vloop's suites`, giving the command `go run ./tools/agent-eval`, a link to tools/agent-eval/README.md, and the rule: a model qualifies for a phase on an agent when, at 3 runs, every case of that phase scores a mean no lower than the phase's default Claude model scores on the same tool with the same runs.
-- docs/design-notes/multi-agent-backends.md reads `It is tools/agent-eval since B33.` right after the sentence ending `another agent needs it first.` and before `The fence audit is worth doing`; nothing else in it changes.
-- Docs only: no Go file changes; the configured go check stays green.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T5/gate.sh
-```
-
-</details>
-
-### T6 — Close: the worked example as a committed test, every gate at once
-
-`done` · depends on: T1, T2, T3, T4, T5
-
-Each earlier task was judged on its own slice; the close shows the whole tool does what the brief's worked example says, line for line, with every earlier gate still passing together. It leaves the worked example behind as a committed test, so the configured go check keeps holding the tool to it after the run's gates are archived.
-
-**Acceptance**
-
-- A committed test in tools/agent-eval runs every line of the brief's worked example (o1, o2, o3, o4, --list over the fixture cases, --list over plugin/evals, --agent nope, a non-empty --out, o6) against fixture cases fixture-review (graders a, b, c, d as the brief gives them) and fixture-operate under tools/agent-eval/testdata, with fake copilot, claude and vloop scripts on a temporary PATH, asserting each line's exit code, report fields and messages as the brief states them.
-- Every earlier task's gate passes in the same tree.
-- No test runs a real claude or copilot, or the network; no file under plugin/evals and neither testdata/observed sample changes; the configured go check is green.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T6/gate.sh
+sh .vloop/state/gates/T1/gate.sh && sh .vloop/state/gates/T2/gate.sh && sh .vloop/state/gates/T3/gate.sh
 ```
 
 </details>
