@@ -1,0 +1,12 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "Gates T1, T2 and T3 all pass on the final tree, run together by this task's gate.", "met": true, "evidence": ".vloop/state/gates/T4/gate.sh chains the T1, T2 and T3 gates with &&; the T4 gate log ends with 'gate T1: ok', 'gate T2: ok', 'gate T3: ok'."},
+    {"criterion": "The work session's notes walk the brief's worked example line for line (P1, P3, P4) and name, for each, the committed test in internal/cli (init, upgrade or doctor tests) and the gate (T1 or T2) that covers it; a line no committed test covers is fixed in this task (a test added) or reported, not skipped.", "met": true, "evidence": "proposal.json notes map P1 to T1 with init and upgrade tests, P3 and P4 to T2 with doctor tests, and P2 to T3. I grepped internal/cli/*_test.go and every named test function exists. No gap was reported and the diff has no product changes, which fits 'nothing new built'."},
+    {"criterion": "Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds).", "met": true, "evidence": ".vloop/tmp/checks.json lists the check 'go' with exit 0."}
+  ],
+  "findings": [],
+  "notes": "The task changed no product files, which fits a closing task. The work session says TestTaskGate* fail only inside a work session because of the plan guard; the driver-run check is green."
+}

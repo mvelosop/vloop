@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/4 done** · iteration 5
+**Status:** running · **4/4 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` · **Updated:** 2026-11-03T07:21:01Z
+**Brief:** `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` · **Updated:** 2026-11-03T07:30:59Z
 
 ## Progress
 
 - [x] **T1** — Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1) · 1 attempt(s)
 - [x] **T2** — Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4) · 1 attempt(s)
 - [x] **T3** — Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)
-- [ ] **T4** — Close the run: every gate at once, and the worked example line for line
+- [x] **T4** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
@@ -91,7 +91,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Close the run: every gate at once, and the worked example line for line
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap. Nothing new is built here unless a worked-example line turns out to have no committed test.
 
