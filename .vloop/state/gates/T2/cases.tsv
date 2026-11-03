@@ -58,7 +58,7 @@ review	echo $HOME *.go {a,b}	allow
 review	git $X	deny: git $X is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
 review	git "$sub" --help	deny: git $sub --help is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
 review	git $A $B	deny: git $A $B is denied by the review fence (Bash(git push:*)): a word the shell expands may be any text
-review	git remote $X	deny: git remote $X is denied by the review fence (Bash(git remote add:*)): a word the shell expands may be any text
+review	git remote $X	deny: git remote $X is denied by the Copilot deny list (git remote:*)
 review	find "$d" -name x	deny: find $d -name x is denied by the review fence (Bash(find*-delete*)): a word the shell expands may be any text
 review	git show "$SHA"	deny: git show $SHA is denied by the review fence (Bash(git show*--output*)): a word the shell expands may be any text
 review	git diff -- src/*.go	deny: git diff -- src/*.go is denied by the review fence (Bash(git diff*--output*)): a word the shell expands may be any text
