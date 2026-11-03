@@ -1,0 +1,63 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261103-0058-b34-i82-fence-backstop.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Worked example; Shape task 2",
+      "summary": "F1 covers seven phases, but only work and plan have a worked-example line, and the work and plan lines are `vloop run` lines with no test named beside them. Gate-review (internal/driver/gatereview.go) and review-brief (internal/driver/briefreview.go, under `vloop brief review`) halt from their own code paths. Review, second-review and verify go through reviewRun and the verify function in iterate.go. No line pins any of those, and task 2's gate covers only work and plan, so a task can leave four of the seven sites unwired and still pass its gate.",
+      "evidence": "Halt sites: internal/driver/plan.go:548-557, internal/driver/gatereview.go:57-61, internal/driver/briefreview.go:112-119, internal/driver/iterate.go:661-665 (work), 792-796 (review/second-review), 966-970 (verify). Worked example: lines for work (3), plan (1), a driver test (F2) and the hooks file; nothing for the others. guidelines.md:60-65: a line the verify session cannot run (`vloop run`, `vloop brief review`) needs an end-to-end test with stub agents named beside it.",
+      "fix": "Name the cmd/vloop end-to-end test beside each `vloop run` line. Add lines with literal values for gate-review (agent.gate-review = \"copilot\"), review-brief (`vloop brief review` with agent.review-brief = \"copilot\", for example a bash call `git push` -> `FENCE BYPASSED review-brief — …`, exit 9, the brief restored) and one of review/verify. Let the stub learn those prompts. Gate task 2 on all of them."
+    },
+    {
+      "kind": "consistency",
+      "section": "Binding references (Runner.Run); Out of scope",
+      "summary": "tools/agent-eval runs sessions through driver.Runner.Run directly, and the brief does not say whether its Copilot sessions get the backstop. Its worked fixture holds a report_intent call that completes with success, and the judge denies that call. If the re-judge or the HOOK CHANGED check turns into an error inside Runner.Run (the binding reference points there as 'where a session's stdout is parsed'), agent-eval's tests change, against the constraint that existing tests pass unchanged.",
+      "evidence": "tools/agent-eval/runner.go:167-169 (`r := &driver.Runner{... HookBinary: hook ...}; res, err := r.Run(spec)`); tools/agent-eval/testdata/worked/copilot-session.jsonl call_4 report_intent `success:true`; `vloop fence check --phase review --root . --tool report_intent` -> `deny: tool report_intent is not allowed in a review session`, exit 1; tools/agent-eval/worked_test.go:39 reads that fixture.",
+      "fix": "Add to Out of scope (or Unchanged): `tools/agent-eval`'s sessions. The halt lives at the phase call sites, and Runner.Run at most reports the calls and the hash in its Result. Or decide the opposite and say so."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F4 (docs/domain/execution/session.md)",
+      "summary": "The anchor sentence is wrapped across two lines (`…halts the run with exit 9 and nothing is` / `committed.`), so a gate that greps the literal on one line misses it. The added sentence also reads wrong there. Its preceding subject is 'A session or gate that moves any ref', so 'For a Copilot session it also halts' says the session halts. In domain-model.md 'It' is the driver.",
+      "evidence": "docs/domain/execution/session.md:119-121; docs/domain/domain-model.md:219 (`The fence is advisory; the driver is the boundary. It halts (exit 9) if…`).",
+      "fix": "For session.md, write `For a Copilot session the driver also halts the run (exit 9) when a call that ran is one the fence denies, or when the binary the fence hook runs changed.` Tell the gates to match the docs' sentences with line breaks folded (for example `tr '\\n' ' '`)."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F1, F2 (literal values)",
+      "summary": "Two values a test will compare are not literal. HOOK CHANGED's `<path>` (and the worked example's `<the copy's path>`) does not say whether the path is printed raw or masked. A temp copy is absolute (`/var/folders/…`), and the driver masks $HOME/$TMPDIR in what it persists. And 'cut to 200 characters' does not say runes or bytes.",
+      "evidence": "Brief F2 message and the worked example's F2 line; internal/driver/session.go Runner.Mask/TempDir ('masked to \"$TMPDIR\"').",
+      "fix": "State that the path is printed masked as other driver lines are (`~/…`, `$TMPDIR/…`), and pin the worked example to that form. Say '200 runes'."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / F4 (concepts.md, operate SKILL.md)",
+      "summary": "F4 appends to exit 9's rows but leaves their other cells, which then contradict the new cases. In concepts.md: 'refs or repository configuration moved', 'The message names the key', 'no — restore the refs first'. In operate's row 9: 'a session moved git refs'.",
+      "evidence": "docs/guide/concepts.md:217; plugin/skills/operate/SKILL.md:53.",
+      "fix": "Give literal text for those cells too, for example concepts' action cell gains `; for FENCE BYPASSED or HOOK CHANGED, inspect the work tree and the named calls` and operate's cause cell becomes `a session moved git refs, or a Copilot session's fence was bypassed or its hook binary changed`."
+    },
+    {
+      "kind": "fact",
+      "section": "Why this shape (re-judge the calls); Review header",
+      "summary": "The claim holds, but its evidence is outside the repository and uncited. I checked it: 7 events.jsonl, 140 tool.execution_start, every toolCallId inside a preToolUse hook.start batch (79 batched invocations), 8 denied, 132 ran. Re-judging those 132 with `vloop fence check` under each session's phase gives 0 denials, so F1 would have halted none of those runs. The only Copilot traces in the repository (tools/agent-eval/testdata/worked/, .vloop/state/gates/T*/) are hand-made, and they show the opposite: report_intent running.",
+      "evidence": "~/source/personal/url-shortener-tests/{b27-plan,b27-plan-terra61,b32-terra61,b32-terra61-work,i79-copilot-verify}/.vloop/tmp/copilot-home-*/session-state/*/events.jsonl (Copilot's own copies). Script .vloop/tmp/rev/rejudge.py -> {'calls': 140, 'hooked': 140, 'ran': 132, 'falsehalt': 0}.",
+      "fix": "Commit one real masked trace (for example the b32-terra61-work session) as task 1's fixture, and assert that the re-judge finds 0 calls in it. That is the real-data check the repository's architect skill asks for, and it pins the real argument shapes (apply_patch as a raw string, skill's `skill`, absolute view paths)."
+    }
+  ],
+  "decisions": [
+    "Re-judge the logged calls rather than have the hook log its decisions — agree; a hook log would sit where a bypassing session can write.",
+    "Reuse exit 9 (not a new code, not a failed attempt) — agree; it already means 'a guard tripped, restore before resuming'.",
+    "SHA-256 of the hook binary before and after each Copilot session — agree, but note: a legitimate `go install`/`brew upgrade` of the running vloop during a Copilot session will halt the run too.",
+    "timeoutSec 30 -> 120 — fine; fail-open on timeout means only an upper bound matters.",
+    "A call with no completion counts as having run — accepted risk: a session killed by vloop's session timeout while a hook is pending can yield a false FENCE BYPASSED.",
+    "The check runs whatever the session's exit (timed out, failed, no record) — agree; implies the re-judge needs stdout even when Parse finds no result event.",
+    "On halt the work tree is left as the session left it (no revert) — the operator decides; consistent with REFS MOVED.",
+    "No `## Acceptance` section with a live Copilot run — acceptable given the 0/132 re-judge above; optionally add one line: a real Copilot work session finishes without FENCE BYPASSED.",
+    "Every decision was taken by the assistant under the 2026-11-02 delegation, not seen by the operator."
+  ],
+  "checked": "facts (agent_copilot.go writeCopilotHooks/Parse, timeoutSec only at agent_copilot.go:157 and pinned by no test, fence.New/Decide deterministic with no filesystem reads, internal/fence imports internal/driver, harness stub copilot answers only /vloop:review, HookBinary set only by agent-eval, six fence-audit headings, F4 anchors in domain-model.md/concepts.md/configuration.md/operate SKILL.md exist); worked-example reasons reproduced with vloop fence check (work git commit, plan git push, ls allowed); consistency; rules (CLAUDE.md, BSD-tools/refs/git -C constraints, exit-code test TestGuideExitCodesMatchDriver unaffected); runnability against .vloop/config.toml's single go check; vloop brief check: ok, 1 warning (copilot-script.sh is a test-time file); the author's 140-call claim re-run on the kept traces",
+  "header": "Reviewed 2026-11-03: FIX, 6 findings"
+}
+

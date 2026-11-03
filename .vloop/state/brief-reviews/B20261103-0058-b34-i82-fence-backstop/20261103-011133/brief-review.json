@@ -1,0 +1,34 @@
+{"schema": "brief-review/v1",
+ "brief": "B20261103-0058-b34-i82-fence-backstop.loop-brief",
+ "verdict": "FIX",
+ "findings": [
+  {"kind": "consistency", "section": "Constraints; Worked example (the stub's growth)",
+   "summary": "The worked example needs the stub copilot to accept a work prompt, but an existing test pins that it rejects one. 'The existing tests pass unchanged' and 'without changing what it does for today's tests' therefore cannot both hold.",
+   "evidence": "cmd/vloop/run_harness_test.go:399-401: `if bad := r.copilot(\"-p\", \"/vloop:work T1\"); bad.code != 64 { t.Errorf(\"a non-review prompt: %+v\", bad) }` in TestRunHarnessCopilot. The stub (run_harness_test.go:126-130) exits 64 on any prompt other than `/vloop:review <arg>`.",
+   "fix": "In Constraints, name the one exception: TestRunHarnessCopilot's rejected-prompt assertion moves to a prompt the stub still rejects (for example `/vloop:nope T1`, exit 64). Every other existing test stays unchanged."},
+  {"kind": "runnability", "section": "Worked example (seven phase lines); Constraints",
+   "summary": "The brief says the stub copilot gains 'work and plan prompts', but the seven phase lines also need gate-review, verify and review-brief prompts. Two of those carry no argument, and the stub rejects any prompt without one.",
+   "evidence": "internal/driver/session.go:84-92 Prompt: second-review becomes `/vloop:review <id>`, which the stub already takes. Gate-review and verify have no Arg, so the prompt is `/vloop:gate-review` and `/vloop:verify`. Review-brief is `/vloop:review-brief <path>`. Stub, run_harness_test.go:128: `if [ \"$cmd\" != /vloop:review ] || [ \"$TASK\" = \"$prompt\" ]; then ... exit 64`. It also counts attempts per `$TASK`, which is the whole prompt when there is no argument.",
+   "fix": "In the Worked example's preamble and in Constraints, write: 'gains, in test code, the prompts of every phase (plan, work, gate-review, verify, review-brief; second-review is the review prompt), argument or none, and the tool events a test's copilot-script.sh asks for'."},
+  {"kind": "consistency", "section": "Behaviour contract / F1 ('as the hook judges it')",
+   "summary": "The hook's verdict is not only Decide. The hook itself denies a bash or powershell call whose command it cannot read, while the judge allows that call. The brief does not say whether the re-judge applies that rule, and the two readings disagree on a call that ran with an unreadable or empty command.",
+   "evidence": "internal/cli/fence.go:117-120: `if t := strings.ToLower(tool); (t == \"bash\" || t == \"powershell\") && strings.TrimSpace(command) == \"\" { reply(false, \"the \"+tool+\" call has no command the hook can read\") }`, which runs before `j.Decide`. `vloop fence check --phase work --root . --tool bash \"\"` prints `allow`.",
+   "fix": "Add to F1: 'a bash or powershell call with no command the driver can read is denied, with the hook's reason `the <tool> call has no command the hook can read`'. The cleanest way is to share that check with the hook, and the mechanics stay the plan's. Alternatively, state that the re-judge is Decide alone, and accept the gap."},
+  {"kind": "consistency", "section": "Worked example (F2 line); Behaviour contract / F1 ('belongs to vloop's phases, not to Runner.Run')",
+   "summary": "The F2 line expects the halt `HOOK CHANGED work — …` from 'a Runner with HookBinary …'. The brief puts the check in the phases, not in Runner.Run, and no driver test today runs a work phase with a Copilot stub. A Runner alone cannot produce that halt. This is unsure: a planner may well read 'a driver test' as one that calls the phases' shared after-session check with phase work, which would be fine.",
+   "evidence": "internal/driver/session.go:52 (HookBinary is a Runner field). No internal/driver/*_test.go mentions copilot except the adapter's parse and unit tests (agent_copilot_parse_test.go, agent_copilot_test.go). The halts are raised in iterate.go, plan.go, gatereview.go and briefreview.go.",
+   "fix": "Reword the F2 line: 'a driver test: the check the phases share, given phase work and a Runner whose HookBinary is a copy of a file, around a stub session that appends a byte to that copy -> the halt …, exit 9'. That names what the test calls."}
+ ],
+ "decisions": [
+  "Re-judge every call from the session's JSON Lines rather than match a hook decision log. Sound: the log would be writable by the session it guards.",
+  "Reuse exit 9 for FENCE BYPASSED and HOOK CHANGED rather than a new code. Agreed: same operator action (inspect, restore, decide).",
+  "The backstop lives in vloop's phases, not in Runner.Run, so tools/agent-eval's Copilot sessions are not backstopped. Acceptable, because they are scored, not committed.",
+  "Hash the hook's binary before and after each session rather than probe its writability once. Agreed.",
+  "timeoutSec 30 -> 120. Harmless: a timeout only ever lets the call run, and now the driver catches that.",
+  "A call with no completion counts as having run, and the check runs whatever the session's exit. Agreed: both err toward halting.",
+  "HOOK CHANGED prints the binary's path unmasked on stderr. That path is absolute and outside the repo, though the persisted run log is masked. Worth a glance against rule 2.",
+  "A bypassing session's work tree is left as is, with no revert. The operator decides. Agreed."
+ ],
+ "checked": "facts (agent_copilot.go writeCopilotHooks/Parse/timeoutSec 30; internal/fence imports internal/driver; fence.go parseHookPayload; judge.go New/Decide and reasons; Runner.HookBinary only set by tools/agent-eval; REFS MOVED sites in iterate.go, plan.go, gatereview.go, briefreview.go and their order relative to report use and commits; the plan commit after gate review; copilot-events.jsonl shape), consistency (every worked-example reason reproduced with `vloop fence check` for all seven phases and for git commit -m x / ls; F4 anchors found in domain-model.md, session.md, concepts.md row 9, configuration.md, six fence-audit headings, operate SKILL.md row 9), rules, runnability (the go check after each task; the stub copilot's reach)",
+ "header": "Reviewed 2026-11-03 (round 3): FIX, 4 findings"}
+
