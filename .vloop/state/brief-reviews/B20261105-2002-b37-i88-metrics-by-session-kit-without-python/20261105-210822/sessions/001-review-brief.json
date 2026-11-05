@@ -1,0 +1,32 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 2.7995786,
+  "duration_ms": 480302,
+  "effort": null,
+  "ended": "2026-11-05T21:16:23Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 111413,
+      "cache_read_input_tokens": 5326713,
+      "cost_usd": 2.7995786,
+      "input_tokens": 118,
+      "output_tokens": 42123
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop; go run ./cmd/vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json; rm -rf .vloop/tmp/bc",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
+  "schema": "session/v5",
+  "started": "2026-11-05T21:08:22Z",
+  "turns": 60,
+  "wall_ms": 481009
+}

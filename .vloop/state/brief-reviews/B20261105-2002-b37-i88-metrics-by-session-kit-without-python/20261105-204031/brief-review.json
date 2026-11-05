@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Constraints; Decided here (the golden generator); P3 (calls); Shape 2 and 6",
+      "summary": "The brief never says where the `calls` golden comes from. The `calls` Python is not a file: it is the heredoc inside bypass.sh's `calls()`. The constraint names only report.py and hook.py as the files task 2's gate takes from the base, and gen.sh runs 'the Python in <python dir>'. Neither the generator nor its gate has a defined source for the calls Python, and after task 5 removes the heredoc, bypass.sh in the tree no longer contains it. So a session will either paste a copy into gen.sh, which nothing checks against the base, or write the golden some other way. The close re-run of task 2's gate then proves nothing for `calls`, the one command where a hand-made or Go-made golden goes undetected.",
+      "evidence": "tools/copilot-acceptance/bypass.sh:42-58 (`python3 - \"$d/out.jsonl\" <<'PY'` … `PY`). The brief's Constraints say 'Task 2's gate takes both from the base (`git show <base>:tools/copilot-acceptance/report.py`, and `hook.py`)'. The worked example's P3 line lists `calls` among the goldens.",
+      "fix": "Have task 2's gate also take `git show <base>:tools/copilot-acceptance/bypass.sh`. Have gen.sh extract the lines strictly between `python3 - \"$d/out.jsonl\" <<'PY'` and the closing `PY` into `<python dir>/calls.py` and run it as `python3 calls.py <out.jsonl>`. Say so in the 'golden generator' bullet and in the Constraints."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / P2; Decided here (the `second` fixture)",
+      "summary": "In the `second` report's kept sections (the run-log lines and the dissents), the order across run folders is not pinned. The Python joins two unsorted `glob` lists (`runs/*/*/run.log` + `runs/*/run.log`, likewise for iterations.jsonl), and their order depends on the filesystem. The brief sidesteps this in the fixture (one folder) but never says what the Go program does when a real run has several folders. Whatever the session picks passes every gate.",
+      "evidence": "tools/copilot-acceptance/report.py second_report: `glob.glob(...run.log) + glob.glob(...)` with no sorted(), unlike every other glob in the file.",
+      "fix": "Pin the order: each of the two globs in sorted path order, the `*/*/` list before the `*/` list, as the Python's concatenation orders them. Add one line to P2."
+    }
+  ],
+  "decisions": [
+    "The per-session view is `--by session` on `vloop metrics`, not a new command: agree, it reads the same records and stays in step with the sums.",
+    "`by_session` joins metrics/v4 as an optional property instead of a metrics/v5, emitted on every --json document (workspace included) and deleted from export: agree. It is additive, and the schema has no additionalProperties restriction to break.",
+    "The kit becomes one Go program, `go run ./tools/copilot-acceptance/kit`, not a vloop subcommand and not jq: agree.",
+    "The reports' session tables are replaced, not ported. This changes what the reports say: rows are per brief, not every record under runs/, and each record is validated against its own `schema`, not a fixed session/v3 or session/v4. So the `second` report no longer filters to session/v4, and `work`/`verify`/`plan`/`gate-review` no longer filter to their phase: their per-phase view becomes the full session table. The operator should know this narrows nothing and widens the tables.",
+    "The Go program is byte-for-byte with the Python everywhere else, gated on Python-made goldens that outlive the Python: agree; it is the only way to keep the reference after deletion.",
+    "A denial's `text` takes the first non-empty of message, command, file_path, tool_input.command and tool_input.file_path. This covers the denial shapes found in this repo's records (command, file_path, tool_input, tool_name only).",
+    "`#` is three digits; credits print `-` when absent and `0.00` when zero; a second-review row has phase `second-review`.",
+    "Brief-review sessions stay outside the rows, as they are outside metrics' sums.",
+    "Acceptance item 3 uses the B34 acceptance clone, which holds Copilot records with credits and `estimated` (checked: .vloop/state/runs/B20261022-1234-url-shortener-api/20261103-024734/)."
+  ],
+  "checked": "facts, consistency, rules, runnability. Facts checked: main at 300d0903; go.mod pins go 1.27.1. internal/cli/metrics.go has the `--by` refusals, the `--interventions` message and the usage string; no test pins `want task`. internal/runs has the folder order, the seq sort and agent defaulting to claude. internal/metrics/time.go has the six phases, the denial and cost sums, and total = sum of phases. PrintByTask is a tabwriter with padding 2; minSec rounds. The B36 real-data row values are right: 13 records, 9m42s, $2.89, 44 turns, 3 denials; the last row is 1m38s, $0.30, 18 turns, 2 denials; total 5.6702516, denials 8. Export deletes by_task. metrics.v4 has no additionalProperties restriction. Session v1/v2 lack agent/cost_source/credits; v3+ have them. Legacy records carry num_turns and tool_input denials. report.py's six kinds and table headers are as described, and gate-review's `| round | record |` disambiguates it from its kept-verdict table. hook.py has FORMS/SKILL/MODES/FAIL_CALL and VLOOP_HOOK_PHASE, and writes its hooks file with json.dump indent=2. bypass.sh uses perl for time. hook.sh and bypass.sh do not compute `top`; the other scripts do. The scratch repos put the brief at docs/briefs/<run id>.loop-brief.md, so run ids qualify. `vloop schema validate` needs no git root, so the Python goldens' validity column matches the Go run's. The fence's .vloop/ write rule is anchored at the root, so committed fixtures under testdata/ are writable. `go generate` regenerates docs/guide/commands.md. `vloop brief check` on a ready copy: ok, 0 warnings.",
+  "header": "Reviewed 2026-11-05: FIX, 2 findings"
+}
+

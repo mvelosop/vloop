@@ -1,0 +1,30 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract › P3 — the kit's probes in Go (and P2's record lines)",
+      "summary": "The kit's error paths outside `report` are not pinned. P2 defines `report` with a missing argument or an unknown kind (exit 1, a message on stderr). P3 does not define an unknown top-level command, an unknown `hook failure` mode, or a missing argument to `probe`, `summary`, `hook …` or `calls`. 'Reproducing the starting point's Python' gives no answer here: hook.py raises a KeyError traceback on `MODES[mode]`, and report.py/hook.py raise IndexError or TypeError on missing argv. Likewise, P2 does not say what the Session-records line does with a session file that is not JSON. The Python crashes on it, so no golden pins it. Minor: no gate and no worked-example line exercises these cases, so the loop will not trip. The implementer simply picks a behaviour the brief never stated.",
+      "evidence": "tools/copilot-acceptance/hook.py:99-105 (`MODES[mode]` evaluated with no check); hook.py:157-165 and report.py:291-308 (positional `sys.argv[2:n]` with no length check); report.py:49-50 (`json.load(open(f))` with no try). Brief P3: 'Each command exits 0 when it ran', and the only failure it names is the c5 one. Worked example: only 'report with no kind → exit 1'.",
+      "fix": "Add one sentence to P3: 'An unknown command or `hook failure` mode, or a missing argument, exits 1 with a one-line message on stderr, as `report` does.' Optionally add to P2: 'a session file that is not JSON counts in <n>, not in <k>, and is listed as `- <folder>/sessions/<file>: unreadable`.' Alternatively, accept both as left to the implementer, and say so."
+    }
+  ],
+  "decisions": [
+    "Per-session view as `--by session` on `vloop metrics`, not a new `vloop sessions` command. Agree.",
+    "`by_session` as an optional property of metrics/v4, no v5. Agree. Side effect not stated in the brief: close snapshots written after B37 carry every session row, including each denial's text (already masked in the records), so snapshots grow.",
+    "`--by session` refused with `--workspace` (exit 2), while `--workspace --by task` stays silently accepted today. Fine. The asymmetry is pre-existing.",
+    "The kit as one Go program, tools/copilot-acceptance/kit, run with `go -C \"$top\" run`, not a vloop subcommand, no jq. Agree, following tools/agent-eval.",
+    "Byte-for-byte reproduction of the Python, gated on Python-made goldens that task 2's gate regenerates from the base files. Agree. This is what keeps the port honest after the deletion.",
+    "The reports' own session tables are replaced by `vloop metrics --by session` plus a self-schema count. This weakens one check: the Python validated each record against the expected version (session/v3 for C5.1, v4 elsewhere, and `second` skipped non-v4 records). A wrong-version record now shows only in the per-version counts and is not flagged INVALID. Acceptable, but the operator should accept it knowingly.",
+    "Denial `text` precedence: message, command, file_path, tool_input.command, tool_input.file_path. Agree.",
+    "Text conventions: three-digit `#`; credits `-` vs `0.00` (this needs the runs reader to tell absent from 0, since runs.Session.Credits is a plain float64 today); turns falling back to num_turns; error `yes` or `-`. Fine.",
+    "The scripts make <dir> absolute with `mkdir -p` in a command substitution. As a side effect, hook.sh creates <dir> before it dies with 'run run.sh first'. Harmless.",
+    "The .gitignore entry `__pycache__/` is left in place after the Python is gone. Harmless; removing it is out of this brief's scope as written.",
+    "Acceptance only at close, by the operator, on the real CLI, with python3 masked. Agree."
+  ],
+  "checked": "vloop brief check on a status-ready copy: ok, 0 warnings. Facts: internal/cli/metrics.go (the --by refusals and their order, interventions first; the existing messages verbatim; the cobra usage backtick giving `--by view`); internal/metrics/print.go (PrintByTask, the tabwriter, minSec); internal/metrics/time.go:182-212 and :277 (the six phases summed and Total = their sum, so the rows sum to total_usd); internal/runs/runs.go (folder order: shell then vloop, each by start time; seq sort; task from iterations except plan; the fields read today; Credits a plain float); internal/cli/export.go:190 (delete by_task); schemas/metrics.v4.json (by_task required, no additionalProperties). B36 real data via a freshly built vloop: total_usd 5.6702516, permission_denials 8, 13 records 001-013 in 20261103-062225, row 1 opus 581901ms → 9m42s $2.89 reported 44 turns, row 13 sonnet 97992ms → 1m38s $0.30 18 turns. report.py: six kinds, every session table first and followed by a blank line, the gate-review `| round | record |` header, the unsorted run.log and iterations.jsonl globs in `second`. hook.py: FORMS, SKILL, MODES, FAIL_CALL, VLOOP_HOOK_PHASE default review, json.dump indent=2, the c5 exit. bypass.sh: the `python3 - \"$d/out.jsonl\" <<'PY'` heredoc and perl. Every script's dir/here/top/die order; hook.sh and bypass.sh lack top. fail-open.sh has no Python. The README's report.py/hook.py/python3 mentions. go.mod go 1.27.1. .gitignore covers __pycache__. Also: consistency (P1 text vs JSON vs worked example; the P2 block vs the test's comparison rule; Shape vs gates), rules (CLAUDE.md, repo-relative paths, BSD-tool constraints, git -C, no new deps, roadmap row present in the working tree), runnability (the go check after each task, with task 2 adding only testdata; the task-2 gate needs python3, as B24 T5 did; the P4 gate can drive hook.sh with the committed stub).",
+  "header": "Reviewed 2026-11-05: FIX, 1 finding (minor: the kit's error paths outside `report` unpinned)"
+}
+

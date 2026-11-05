@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract › P2 — the kit's reports in Go",
+      "summary": "The order and source of the record and denial lines are only defined relative to the rows ('in folder order, then sequence order, as the rows'). When `vloop metrics` exits non-zero there are no rows, yet the brief says 'the rest of the block follows as usual'. internal/runs orders folders by their earliest record timestamp, not by name. So the kit must either reimplement that ordering or pick name order, and the brief does not say which.",
+      "evidence": "internal/runs/runs.go:190-210 (sortFolders: timestamp first, then path); the P2 sentence 'Record lines and denial lines come in folder order, then sequence order, as the rows', next to 'When it exits non-zero … the rest of the block follows as usual'. The failing fixture (most likely a bad iterations.jsonl line, which runs.Load rejects and report.py skips) also stops the kit from using runs.Load.",
+      "fix": "Pin it literally. For example: 'the kit reads the records itself; folders in name order, records in sequence order; fixtures name their folders in the order of their timestamps', or 'in by_session order from `vloop metrics <run id> --by session --json`, and in folder-name order when that command fails'. Also say where the denial lines come from when metrics fails: the kit applies P1's `text` rule to the records itself."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract › P2 — the kit's reports in Go",
+      "summary": "The 'Session records: <n>, schema-valid <k> (<schema> <c>, …).' line has no literal form for a brief whose run folders hold no session file. An acceptance run that halts before the plan session's record is written produces that case.",
+      "evidence": "The P2 block defines the parenthesis only by its entries ('session/v3 2, session/v4 3', 'no schema <c>'). Nothing says whether n = 0 prints '()', drops the parenthesis, or prints something else.",
+      "fix": "Add one sentence, for example: 'with no record, the line is `Session records: 0.`'. Unsure whether any fixture will hit this; if none does, the sentence still keeps the program and the test from diverging."
+    }
+  ],
+  "decisions": [
+    "Per-session view as `--by session` on `vloop metrics`, not a new `vloop sessions` command. Agree.",
+    "`by_session` added to metrics/v4 as an optional property, no v5. Agree. Not stated: close snapshots (.vloop/state/metrics/<run id>.json) written after B37 will carry by_session, including each denial's text (masked commands, already in the session records). The operator should know snapshots grow.",
+    "The kit as one Go program under tools/copilot-acceptance/kit/ run with `go run`, not a vloop subcommand, and no jq. Agree, following the tools/agent-eval precedent.",
+    "Byte-for-byte reproduction of the Python, gated on Python-made goldens that task 2's gate regenerates from the base. Agree; this is the strongest part of the brief.",
+    "The reports' own session tables replaced by `vloop metrics --by session`, plus a per-record self-schema check with per-version counts. This replaces the Python's check against the expected version (session/v3 for C5.1, v4 elsewhere): a record of the wrong version now shows in the counts but is not flagged INVALID. Acceptable, but it is a weaker check the operator should accept knowingly.",
+    "The denial `text` precedence (message, command, file_path, tool_input.command, tool_input.file_path). Agree; it matches the Claude, Copilot and shell-loop shapes (internal/driver/agent.go:200-213, agent_copilot.go:246-252).",
+    "Text-table conventions: `#` with three digits, credits `-` versus `0.00`, turns falling back to num_turns, `error` as yes or -. Fine.",
+    "The scripts make their dir argument absolute, with `mkdir -p`. As a side effect hook.sh now creates <dir> before it dies with 'run run.sh first'. Harmless.",
+    "Acceptance only at close on the real CLI (work.sh, run.sh, the B34 clone, a clean `git status --ignored`). Agree."
+  ],
+  "checked": "facts (B36 real-data rows: 13 records, model opus/sonnet, 9m42s, $2.89, 1m38s, $0.30, denials 3+2+1+2=8, cost sum 5.6702516; internal/runs reader and folder order; metrics phase switch and Total; the --by refusals in internal/cli/metrics.go; export's delete of by_task; metrics.v4.json has no additionalProperties; report.py's six kinds and table shapes; hook.py's VLOOP_HOOK_PHASE, MODES and exit paths; bypass.sh's calls heredoc and perl; every script's dir/here/top/die order; the denial shapes the driver writes), consistency, rules (CLAUDE.md, the architect additions, BSD and git -C constraints, roadmap row present in the working tree), runnability (the go check after each task; testdata paths not ignored by .gitignore and outside the root-anchored .vloop fence; schema validate needs no repo root; a loop session has run python3 before (B24 T5))",
+  "header": "Reviewed 2026-11-05: FIX, 2 findings (minor: P2 line order when metrics fails; empty record count)"
+}
+

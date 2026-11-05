@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 3.1132022000000004,
+  "duration_ms": 506054,
+  "effort": null,
+  "ended": "2026-11-05T21:00:45Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 132386,
+      "cache_read_input_tokens": 5984191,
+      "cost_usd": 3.1132022000000004,
+      "input_tokens": 124,
+      "output_tokens": 42839
+    }
+  },
+  "permission_denials": [],
+  "phase": "review-brief",
+  "run_id": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
+  "schema": "session/v5",
+  "started": "2026-11-05T20:52:18Z",
+  "turns": 63,
+  "wall_ms": 507175
+}

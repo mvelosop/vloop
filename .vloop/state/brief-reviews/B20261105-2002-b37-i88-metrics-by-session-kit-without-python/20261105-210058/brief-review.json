@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / P3; Decided here (the golden generator); Worked example (P3)",
+      "summary": "The brief pins stdout byte for byte for the probe commands, but not their exit status or stderr. The scripts depend on both. The Python ends `probe`, `hook forms` and `hook failure` with `sys.exit(\"c5: no review session in the copilot log\")` (stderr, exit 1) when the log holds no review session. run.sh and hook.sh rely on that non-zero exit (`|| die \"the probe failed to start\"`). A Go port that prints the message and exits 0 passes every golden. run.sh would then go on to `summary`, which reads a probe.rc that does not exist.",
+      "evidence": "tools/copilot-acceptance/report.py:66-68 and hook.py:44-46 (sys.exit with the message); run.sh:105-106 and hook.sh:30-35 (`|| die`). P3 says only 'its stdout byte for byte'. P2 pins exit 0/1 for the reports, but P3 has no such line.",
+      "fix": "In P3, add: each command exits 0 when it ran. When copilot-argv.log holds no `/vloop:review` session, it prints `c5: no review session in the copilot log` on stderr and exits 1, as the Python does. Add a worked-example line for that case, for example `probe on a log without a review session → exit 1, c5: no review session in the copilot log`."
+    },
+    {
+      "kind": "consistency",
+      "section": "Decided here (the golden generator; fixture paths); Worked example (P3)",
+      "summary": "The brief does not say where the stub `copilot` lives. That matters because the generator and the test must use the same stub. 'The stub saw the argv, working directory and environment the Python passed' needs the stub's record from the Python run as a golden, so gen.sh must run the Python probes against the same stub the Go tests use. gen.sh's signature (`<python dir> <vloop> <out dir>`) takes no copilot. A test that writes its stub from Go code would leave gen.sh with nothing to run. A gen.sh with a stub of its own could record differently, for example sorted or unsorted env, or with or without PWD and SHLVL.",
+      "evidence": "Decided here: 'gen.sh <python dir> <vloop> <out dir> … runs the Python in <python dir> on the fixtures'; 'Tests start no real copilot …: a stub copilot records its argv, working directory and environment and prints canned JSON Lines'. Worked example P3: 'the stub saw the argv, working directory and environment the Python passed'.",
+      "fix": "Pin the stub as a committed file, for example tools/copilot-acceptance/kit/testdata/copilot (a POSIX sh script). gen.sh passes it as `<copilot>` to the Python, and the Go tests pass it to the program. Its record files are among the goldens: what they hold (argv lines, cwd, `env` output sorted) and where they are written, under @DIR@."
+    }
+  ],
+  "decisions": [
+    "The per-session view is `--by session` on `vloop metrics`, not a new `vloop sessions` command. Sound: one reader of the session records.",
+    "`by_session` is an optional property of metrics/v4, emitted on every --json document including the snapshots written at close, not a metrics/v5. Sound, though snapshots grow by one row per session.",
+    "`--by session --workspace` is refused (exit 2), but `--workspace --json` carries by_session. `--workspace --by task` is still silently ignored, as it is today. The asymmetry is acceptable.",
+    "The kit becomes one Go program (package main, tools/copilot-acceptance/kit) run with `go -C \"$top\" run`, not a vloop subcommand and not jq. bypass.sh now compiles once per case, cached.",
+    "The six reports stay, ported byte for byte, but each report's phase-filtered session table becomes the full `--by session` table. The work report now lists plan and review sessions too, and the second report no longer filters to session/v4. Issue #88 said the per-session view 'replaces' the run, second and work reports. The brief keeps them all and replaces only their tables. The operator should confirm this reading of the issue.",
+    "Schema checks validate each record against its own `schema` field and count records per version, instead of against the version the acceptance expects. This also rejects the issue's 'run vloop schema validate from the scripts'. Reasonable, now that the per-version counts show the version.",
+    "The Python output is frozen as goldens, generated from the base's report.py, hook.py and bypass.sh heredoc. Task 2's gate regenerates them with python3 at close. The loop's machine needs python3 until close, the operator's does not.",
+    "The `denials` text is the first of message, command, file_path, tool_input.command or tool_input.file_path, else \"\". This covers every denial shape in this repository's records. 40 entries carry only tool_name and get \"\".",
+    "Minor choices: `#` has three digits, credits shows `-` when absent and `0.00` when zero, and second-review sessions show phase `second-review`.",
+    "Acceptance at close shadows python3 with a stub that exits 127 and compares `git status --porcelain --ignored`. Note that tools/copilot-acceptance/__pycache__/ already exists in the operator's tree (ignored) and survives task 5. Delete it before the 'before' snapshot."
+  ],
+  "checked": "facts (CLI --by refusals and messages, internal/runs session reader and phases, metrics Aggregate over all folders, PrintByTask/minSec rounding, export deleting by_task, workspace JSON, metrics.v4 schema with no additionalProperties limit, session schemas' turns/cost_source/credits, go.mod 1.27.1, agent-eval precedent, B24 .pyc record, issue #88); the real-data line against B36's 13 records (9m42s, 1m38s, turns 44 and 18, denials 3 and 2, total 5.6702516, 8 denials); report.py's six tables and what follows each, hook.py and the bypass.sh heredoc; denial shapes across all records; fence/work.json allows python3, sh scripts and go run for task 2; task order against the go check (commands.md regenerated in task 1, goldens before P2/P3, task 2's gate surviving task 5's deletion); vloop brief check on a ready copy: ok, 0 warnings",
+  "header": "Reviewed 2026-11-05: FIX, 2 findings"
+}
+

@@ -1,0 +1,29 @@
+{"schema": "brief-review/v1",
+ "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+ "verdict": "FIX",
+ "findings": [
+  {"kind": "runnability", "section": "Behaviour contract — P4",
+   "summary": "The prescribed line `dir=$(mkdir -p \"$dir\" && cd \"$dir\" && pwd -P) || die …`, placed 'right after reading it', calls a function that does not exist there. In every script `die()` is defined after the `dir=` line, and bypass.sh defines no `die` at all. If a session follows the brief literally, a failed mkdir or cd prints 'die: not found' and the script carries on with an empty directory. In bypass.sh, `d=$work/$1` then becomes `/par-fast`, and the next command is `rm -rf \"$d\"`. No gate exercises this failure path.",
+   "evidence": "tools/copilot-acceptance/run.sh:22 dir=, :25 die(); hook.sh:19 dir=, :21 die(); second.sh:14/:17; work.sh, verify.sh, plan.sh, gatereview.sh:17/:20; bypass.sh:14 work= and no die() anywhere in the file; bypass.sh:22 setup() runs `d=$work/$1; rm -rf \"$d\"`",
+   "fix": "Say that the line goes after `die` is defined, moving `die()` above it where needed. Have bypass.sh define a `die` of its own, or use `|| exit 1` there."},
+  {"kind": "consistency", "section": "Acceptance, at close — item 4",
+   "summary": "`git status` cannot see the artefact this check exists for. The `.pyc` that motivated it lands in `tools/copilot-acceptance/__pycache__/`, which .gitignore ignores since B24, and plain `git status` omits ignored files. Item 4 would pass even if the kit still wrote one.",
+   "evidence": "`git check-ignore -v tools/copilot-acceptance/__pycache__` → `.gitignore:4:__pycache__/`; intervention I20261027-232633 ('__pycache__/ ignored at close'); an empty, ignored tools/copilot-acceptance/__pycache__/ exists in the working tree today",
+   "fix": "Use `git status --porcelain --ignored` and compare it with the same command before the scripts ran, or check that no file under tools/copilot-acceptance/ is newer than the start of the acceptance."}
+ ],
+ "decisions": [
+  "Per-session view as `--by session` on `vloop metrics`, not a new command — agree.",
+  "by_session added to metrics/v4 as an optional property, with no metrics/v5. This departs from precedent: v3 to v4 was bumped to add second_review. C-3 (unknown keys allowed) supports it, so agree, but the operator should know.",
+  "by_session emitted in every --json document, including --workspace --json, and deleted from export — agree.",
+  "The kit becomes one Go `package main` under tools/copilot-acceptance/kit, run with `go run`, not a vloop subcommand — agree (B33 precedent).",
+  "Byte-for-byte parity with the Python, gated on goldens the Python produces from the base's files — agree. It costs python3 at the gate, not in go test.",
+  "The reports' session tables are replaced by `vloop metrics --by session`. The `second` report then shows every session instead of only session/v4 records, and `run` validates against each record's own schema instead of a hard-coded session/v3 — an intended change of what the reports show.",
+  "Schema checks per record use the record's own `schema` field — agree.",
+  "The `second` report's cross-folder order is pinned as sorted paths with the `*/*/` list first — fine.",
+  "`#` has three digits; credits print `-` vs `0.00`; a second-review row has phase `second-review` — fine.",
+  "Goldens, fixtures and gen.sh live under kit/testdata/, with @DIR@ substitution — fine.",
+  "report.py and hook.py are deleted outright, and the design notes' past results that cite them stay as written (out of scope) — fine."
+ ],
+ "checked": "facts (runs.go reader, phase filter and second-review in cost.total, minSec rounding, PrintByTask, --by refusals, export deleting by_task, metrics.v4 schema, report.py/hook.py/bypass.sh structure and glob order, scripts' dir/here/top/die lines, B36's 13 records against every literal real-data value, the b34-backstop clone's Copilot credits), consistency, rules (C-3, M-1, repo-relative paths), runnability (task order against the go check, gen.sh/python3 at the gate only, task 5 gate feasible with a stub copilot)",
+ "header": "Reviewed 2026-11-05: FIX, 2 findings"}
+
