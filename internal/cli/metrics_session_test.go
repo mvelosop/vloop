@@ -156,3 +156,56 @@ func TestMetricsBySessionRefusals(t *testing.T) {
 		})
 	}
 }
+
+// TestMetricsBySessionRealB36 is the worked example's real-data line: this
+// repository's own B36 records, read through the CLI.
+func TestMetricsBySessionRealB36(t *testing.T) {
+	const b36 = "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent"
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(root, ".vloop", "state", "runs", b36)); err != nil {
+		t.Skipf("B36 records not in this checkout: %v", err)
+	}
+	code, out, errs := runCLI(t, root, "metrics", b36, "--by", "session")
+	if code != 0 {
+		t.Fatalf("%d %s", code, errs)
+	}
+	lines := strings.Split(strings.TrimSpace(collapse(out)), "\n")
+	if len(lines) != 14 {
+		t.Fatalf("want header and 13 rows, got %d:\n%s", len(lines), out)
+	}
+	if want := "20261103-062225 001 plan - claude opus 9m42s $2.89 reported - 44 3 -"; lines[1] != want {
+		t.Errorf("first row %q, want %q", lines[1], want)
+	}
+	if want := "20261103-062225 013 verify - claude sonnet 1m38s $0.30 reported - 18 2 -"; lines[13] != want {
+		t.Errorf("last row %q, want %q", lines[13], want)
+	}
+	code, out, errs = runCLI(t, root, "--json", "metrics", b36)
+	if code != 0 {
+		t.Fatalf("%d %s", code, errs)
+	}
+	var doc struct {
+		Cost struct {
+			Total float64 `json:"total_usd"`
+		} `json:"cost"`
+		Denials int `json:"permission_denials"`
+		Rows    []struct {
+			CostUSD float64 `json:"cost_usd"`
+			Denied  int     `json:"permission_denials"`
+		} `json:"by_session"`
+	}
+	if err := json.Unmarshal([]byte(out), &doc); err != nil {
+		t.Fatal(err)
+	}
+	var cost float64
+	var den int
+	for _, r := range doc.Rows {
+		cost += r.CostUSD
+		den += r.Denied
+	}
+	if len(doc.Rows) != 13 || math.Abs(cost-doc.Cost.Total) > 1e-9 || den != doc.Denials || den != 8 {
+		t.Errorf("rows %d cost %v vs %v denials %d vs %d", len(doc.Rows), cost, doc.Cost.Total, den, doc.Denials)
+	}
+}

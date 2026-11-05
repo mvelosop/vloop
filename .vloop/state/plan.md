@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 6
+**Status:** running · **6/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:40:01Z
+**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:53:39Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
 - [x] **T4** — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
 - [x] **T5** — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
-- [ ] **T6** — Close the run: every gate at once, and the worked example line for line
+- [x] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
 
@@ -142,7 +142,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Close the run: every gate at once, and the worked example line for line
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap. Nothing new is built here unless a worked-example line turns out to have no committed test.
 
