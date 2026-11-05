@@ -1,0 +1,28 @@
+ok  	github.com/mvelosop/vloop	0.174s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	0.936s
+ok  	github.com/mvelosop/vloop/cmd/vloop	223.589s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/budget	(cached)
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	109.393s
+--- FAIL: TestSnapshotWrite (0.01s)
+    closing_test.go:112: snapshot does not validate: <nil> [{/by_session got null, want array}]
+FAIL
+FAIL	github.com/mvelosop/vloop/internal/closing	0.193s
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	2.360s
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	22.648s
+ok  	github.com/mvelosop/vloop/internal/fence	0.352s
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	0.177s
+ok  	github.com/mvelosop/vloop/internal/metrics	3.577s
+ok  	github.com/mvelosop/vloop/internal/runs	2.885s
+ok  	github.com/mvelosop/vloop/internal/schema	0.396s
+ok  	github.com/mvelosop/vloop/internal/state	1.381s
+ok  	github.com/mvelosop/vloop/tools/agent-eval	6.931s
+ok  	github.com/mvelosop/vloop/tools/release	(cached)
+FAIL

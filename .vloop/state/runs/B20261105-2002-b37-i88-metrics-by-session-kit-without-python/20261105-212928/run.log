@@ -12,3 +12,8 @@ planned: B20261105-2002-b37-i88-metrics-by-session-kit-without-python — 6 task
 reviewing the gates using sonnet (round 1)
    gate review · 1m11s · $0.21 · run $5.93 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/6 done ──
+   Add `vloop metrics --by session` and `by_session` to metrics/v4
+   work T1 · 6m11s · $0.61 · run $6.53 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python/20261105-212928/checks/001-go.fail.log; review skipped

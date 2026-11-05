@@ -43,8 +43,11 @@ Lines.`,
 				}
 				return interventionMetrics(g, cmd.OutOrStdout(), by)
 			}
-			if by != "" && by != "task" {
-				return Usage(fmt.Errorf("unknown --by %q: want task", by))
+			if by != "" && by != "task" && by != "session" {
+				return Usage(fmt.Errorf("unknown --by %q: want task or session", by))
+			}
+			if by == "session" && workspace != "" {
+				return Usage(errors.New("--by session reports one repository's briefs; it takes no --workspace"))
 			}
 			out := cmd.OutOrStdout()
 			if workspace != "" {
@@ -89,6 +92,13 @@ Lines.`,
 			switch {
 			case len(args) == 0:
 				metrics.PrintBriefTable(out, reports)
+			case by == "session":
+				for i, r := range reports {
+					if i > 0 {
+						fmt.Fprintln(out)
+					}
+					metrics.PrintBySession(out, r)
+				}
 			case by == "task":
 				for i, r := range reports {
 					if i > 0 {
@@ -107,7 +117,7 @@ Lines.`,
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&by, "by", "", "break the summary down by `task`")
+	cmd.Flags().StringVar(&by, "by", "", "break the summary down by `view`: task or session")
 	cmd.Flags().BoolVar(&interventions, "interventions", false, "report agreement with the recommended option, by kind (or phase, with --by phase), from the intervention records")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "show every repository the workspace `file` lists, with a repo column")
 	cmd.AddCommand(newMetricsStacks(g), newMetricsClassify(g), newMetricsExport(g))

@@ -23,6 +23,7 @@ at close as a snapshot (`metrics/v4`; v1 to v3 snapshots stay readable). *Part o
 | defects | in-loop, operator (recorded operator defects before release plus verification-finding interventions with an origin), escaped (by time against release), removal efficiency; a `check_failed` iteration derives a `work` defect found by the gate, counted apart as check failures | — |
 | instructions | words each session kind starts with (skill + `.vloop/repo-guidelines.md` + `CLAUDE.md`) and the guidelines' rule count; `n/a` for a kind with no skill | — |
 | records | session records that should exist and do not | — |
+| sessions | one row per session record the brief's metrics count (`by_session`, `vloop metrics --by session`; see the metrics guide's per-session section) | — |
 | lead time | created → planned → completed → merged | — |
 
 ## Lines

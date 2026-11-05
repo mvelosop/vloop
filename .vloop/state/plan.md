@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **0/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T21:53:28Z
+**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:03:28Z
 
 ## Progress
 
-- [ ] **T1** — Add `vloop metrics --by session` and `by_session` to metrics/v4
+- [ ] **T1** — Add `vloop metrics --by session` and `by_session` to metrics/v4 · 1 attempt(s)
 - [ ] **T2** — Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
 - [ ] **T3** — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
 - [ ] **T4** — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
@@ -19,7 +19,7 @@
 
 ### T1 — Add `vloop metrics --by session` and `by_session` to metrics/v4
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 Nothing today shows a brief's sessions one by one: metrics only sums them per phase and per task. This task adds the per-session view (P1) as a `--by` value of `vloop metrics`, reading the same session records metrics already sums through internal/runs, so its rows are exactly the sessions the brief's metrics count and their costs sum to cost.total_usd. The kit's reports (T3) print this view in place of their own session tables, so its text form is what the acceptance kit will show operators.
 
@@ -35,6 +35,8 @@ Nothing today shows a brief's sessions one by one: metrics only sums them per ph
 - The flag's usage string is ``break the summary down by `view`: task or session`` (help line `--by view   break the summary down by view: task or session`); docs/guide/commands.md is regenerated with `go generate ./...`; docs/guide/metrics.md gains the usage line and a section with the columns and keys; docs/domain/measurement/metrics.md's table says per-session rows exist and points to that section.
 - Every other `vloop metrics` output is unchanged, and the existing tests pass unedited.
 - Committed tests (internal/metrics and/or internal/cli) cover every P1 line of the brief's worked example: the row order across two folders, a Copilot record's credits and estimated source, a session/v1 record, a legacy shell-loop record's num_turns, a record with neither turns field, both denial-text examples, is_error, a brief-review session not listed, the three refusals (each its own test), the JSON sums, and a metrics/v4 snapshot without by_session validating. Tests build their fixtures in temporary directories and address them with `git -C`; no test runs a real agent CLI, touches `~/.claude` or `~/.copilot`, or needs the network. A task that ships this behaviour without such tests fails review.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python/20261105-212928/checks/001-go.fail.log
 
 <details><summary>verify command</summary>
 

@@ -5,9 +5,9 @@
   "base": "d7b9cbb579f82f8626c9211e5ce8f2f7e8f720aa",
   "branch": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-05T21:50:17Z",
-  "updated": "2026-11-05T21:53:28Z",
+  "updated": "2026-11-05T22:03:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -79,8 +79,8 @@
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python/20261105-212928/checks/001-go.fail.log"
     },
     {
       "id": "T2",

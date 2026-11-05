@@ -222,6 +222,40 @@
           "per_1000_code_lines_usd": { "type": ["number", "null"], "minimum": 0, "description": "the task's cost per 1,000 of its code+ lines; null when code+ is 0" }
         }
       }
+    },
+    "by_session": {
+      "type": "array",
+      "description": "one row per session record the brief's metrics count, in the run folders' order and then by sequence number",
+      "items": {
+        "type": "object",
+        "required": ["folder", "seq", "schema", "phase", "iteration", "task", "agent", "model", "effort", "time_ms", "cost_usd", "cost_source", "credits", "turns", "permission_denials", "denials", "is_error"],
+        "properties": {
+          "folder": { "type": "string", "description": "the run folder, repo-relative" },
+          "seq": { "type": "integer", "minimum": 0 },
+          "schema": { "type": ["string", "null"] },
+          "phase": { "type": "string" },
+          "iteration": { "type": "integer", "minimum": 0 },
+          "task": { "type": ["string", "null"] },
+          "agent": { "type": "string" },
+          "model": { "type": ["string", "null"] },
+          "effort": { "type": ["string", "null"] },
+          "time_ms": { "type": "integer", "minimum": 0 },
+          "cost_usd": { "type": "number", "minimum": 0 },
+          "cost_source": { "type": ["string", "null"] },
+          "credits": { "type": ["number", "null"] },
+          "turns": { "type": ["integer", "null"] },
+          "permission_denials": { "type": "integer", "minimum": 0 },
+          "denials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["tool_name", "text"],
+              "properties": { "tool_name": { "type": "string" }, "text": { "type": "string" } }
+            }
+          },
+          "is_error": { "type": "boolean" }
+        }
+      }
     }
   },
   "$defs": {
