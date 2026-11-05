@@ -846,3 +846,42 @@ Measured on 2026-11-03 for B36:
   false` in another: the list is computed for the working directory.
 - What Claude Code does with the declaration for a user who does not yet
   know the `vloop` marketplace was not measured.
+
+## The plugin declared per repository, at close (B36, 2026-11-05)
+
+On fresh clones of the URL-shortener template, with the branch's binary,
+Claude Code 2.1.317 and Copilot CLI 1.0.105:
+
+- **`vloop init`** wrote `.claude/settings.json` with the two entries,
+  byte for byte as the brief's worked example. The P1 lines run by hand
+  through the binary on temporary repositories all matched (a user's
+  `false` kept, key order kept, `&&` not escaped, exit 1 on a file or key
+  that is not an object, the dry-run lines, a kept file not rewritten).
+- **Copilot, throwaway `COPILOT_HOME`:** accepting the trust dialog in the
+  initialized clone installed vloop into `installed-plugins/`, with no
+  prompt. `copilot plugin list --json` showed it enabled there and
+  disabled in a directory outside. Doctor's `copilot plugin` row
+  passed (plugin and binary both 0.15.0-rc.1).
+- **The upgrade path:** a second clone was trusted in the same home
+  before `vloop init`; the list showed vloop disabled there, and enabled
+  as soon as `vloop init` wrote the declaration. That home already held
+  the plugin, so this does not re-measure a fresh install from the
+  declaration; the 2026-11-03 measurement above does.
+- **vloop's Copilot sessions:** in a `vloop run` with work on Copilot
+  (gpt-6.1-terra), both session homes under `.vloop/tmp/` kept an empty
+  `installed-plugins/` throughout, polled every 5 seconds.
+- **vloop's Claude sessions:** a `vloop run` on Claude in the trusted
+  clone completed (1 task, verify clean). A session started with the
+  run's flags there listed one vloop plugin, the `--plugin-dir` copy,
+  and each `vloop:` skill once. `installed_plugins.json` was unchanged.
+- **Claude, `claude plugin install vloop@vloop --scope project`:**
+  `/vloop:operate` was offered in that clone and not in another one.
+  Doctor's `plugin` row passed there, ignoring the user's project entries
+  for two other repositories. In those two repositories the row had warned
+  before B36. Claude rewrote the clone's
+  `.claude/settings.json` with `enabledPlugins` first; the content is the
+  same, and `vloop upgrade` keeps such a file as it is.
+- **Not B36's, seen on the way:** the Copilot work session ran its test
+  as `sh scripts/greet_test.sh`, which the work fence denies while
+  `./scripts/greet_test.sh` is allowed. It reported the task blocked
+  twice while the gate passed, and the run stalled (#130).

@@ -148,7 +148,10 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | ceremony | partly | no-options | [I20261103-005741-acceptance-tools-agent-eval-on-the-gate](I20261103-005741-acceptance-tools-agent-eval-on-the-gate.md) |
 | verify | ceremony | partly | no-options | [I20261103-031502-acceptance-real-copilot-sessions-on-a-fr](I20261103-031502-acceptance-real-copilot-sessions-on-a-fr.md) |
 | verify | ceremony | partly | no-options | [I20261103-052614-acceptance-the-b35-judge-on-real-data-an](I20261103-052614-acceptance-the-b35-judge-on-real-data-an.md) |
+| verify | ceremony | yes | no-options | [I20261105-195353-worked-example-run-by-hand-verify-s-sand](I20261105-195353-worked-example-run-by-hand-verify-s-sand.md) |
+| verify | ceremony | partly | no-options | [I20261105-195354-acceptance-the-plugin-declared-per-repos](I20261105-195354-acceptance-the-plugin-declared-per-repos.md) |
 | verify | context-supply | partly | no-options | [I20261103-031501-trust-acceptance-for-the-b34-acceptance](I20261103-031501-trust-acceptance-for-the-b34-acceptance.md) |
+| verify | context-supply | partly | no-options | [I20261105-195352-trust-acceptance-for-the-b36-acceptance](I20261105-195352-trust-acceptance-for-the-b36-acceptance.md) |
 | verify | decision | partly | no-options | [I20260929-2246-the-brief-contradicted-itself-on-clearin](I20260929-2246-the-brief-contradicted-itself-on-clearin.md) |
 | verify | decision | no | no-options | [I20260930-0028-a-work-session-created-the-repo-s-own-vl](I20260930-0028-a-work-session-created-the-repo-s-own-vl.md) |
 | verify | decision | no | adjusted | [I20261015-151134-bare-close-shows-the-verify-report-dry-r](I20261015-151134-bare-close-shows-the-verify-report-dry-r.md) |
