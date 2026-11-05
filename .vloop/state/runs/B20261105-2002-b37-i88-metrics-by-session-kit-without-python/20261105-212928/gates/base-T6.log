@@ -1,0 +1,2 @@
+GATE FAIL: metrics fx1 --by session: exit 2, want 0: vloop: unknown --by "session": want task
+GATE FAIL: gate T1

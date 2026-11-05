@@ -1,0 +1,1 @@
+{"schema": "state/v2", "run_id": "B20260201-0000-ka", "tasks": [{"id": "T1", "kind": "feature", "status": "done", "title": "Build the thing — café"}, {"id": "T2", "status": "pending", "title": "Tab\there <&>"}, {"id": "T3", "kind": "docs", "status": "blocked", "title": null}]}

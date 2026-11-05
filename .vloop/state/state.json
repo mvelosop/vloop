@@ -1,13 +1,13 @@
 {
   "schema": "state/v2",
-  "run_id": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent",
-  "brief": "docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md",
-  "base": "27e775409fb3e38de301cd3cb1903ee8e997a36b",
-  "branch": "B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent",
-  "status": "complete",
-  "iteration": 6,
-  "created": "2026-11-03T06:34:04Z",
-  "updated": "2026-11-03T07:36:18Z",
+  "run_id": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
+  "brief": "docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md",
+  "base": "d7b9cbb579f82f8626c9211e5ce8f2f7e8f720aa",
+  "branch": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
+  "status": "running",
+  "iteration": 0,
+  "created": "2026-11-05T21:50:17Z",
+  "updated": "2026-11-05T21:53:28Z",
   "shell": "sh",
   "checks": [
     {
@@ -26,116 +26,112 @@
   "tasks": [
     {
       "id": "T1",
-      "title": "Declare the plugin in .claude/settings.json from vloop init and vloop upgrade (P1)",
-      "goal": "A Copilot CLI session installs the vloop plugin for a repository once the folder is trusted, if .claude/settings.json declares it, and a Claude user installs it for the repository with one command. This task makes vloop init and vloop upgrade merge extraKnownMarketplaces.vloop and enabledPlugins[\"vloop@vloop\"] into that file, adding each only when its key is absent and keeping every other key, value and order, so an operator's opt-out (false) survives. The docs (T3) and doctor's opt-out reading (T2) build on it.",
+      "title": "Add `vloop metrics --by session` and `by_session` to metrics/v4",
+      "goal": "Nothing today shows a brief's sessions one by one: metrics only sums them per phase and per task. This task adds the per-session view (P1) as a `--by` value of `vloop metrics`, reading the same session records metrics already sums through internal/runs, so its rows are exactly the sessions the brief's metrics count and their costs sum to cost.total_usd. The kit's reports (T3) print this view in place of their own session tables, so its text form is what the acceptance kit will show operators.",
       "kind": "feature",
-      "fixtures": "9404a0d4335d9e8d4de2abf2b13ae7d89a02fa9aa3974c958d2983fdb78cf6cc",
+      "fixtures": "12323576ee8068a1e51a6bae2bedab392e1585e3bb4bbbc47aaa022ed46ca70c",
       "references": [
         {
-          "path": "internal/cli/init.go",
-          "why": "runInit's steps (the new step goes after the CLAUDE.md step, and the symlink check is where an invalid file is refused before anything is written), mergedStep and applySteps (the wrote / updated / kept lines and --dry-run's would-lines the new step must report like the others)"
-        },
-        {
-          "path": "internal/cli/upgrade.go",
-          "why": "runUpgrade: the new file joins the changes after the .gitignore merge, reports `updated` only when written and `would update` on --dry-run and the breaking path, and must be read (and refused when invalid) before any file is written or any would-line printed; the `already at` early return stays as it is"
-        },
-        {
-          "path": "internal/install/section.go",
-          "why": "MergeClaudeMD and the package's merge helpers: where MergeClaudeSettings sits beside them"
-        },
-        {
           "path": "docs/domain/domain-model.md",
-          "why": "C-1, configuration lives in the repository: the declaration is a repository file and vloop writes nothing outside it"
+          "why": "M-1: metrics are recomputed from raw sources and sums use unrounded values — a row's cost_usd is the record's own value, unrounded in JSON"
         },
         {
-          "path": "docs/domain/platform/platform-context.md",
-          "why": "CLI conventions: an invalid settings file is a problem, exit 1, refused as one `vloop: ` line on stderr"
+          "path": "docs/domain/measurement/metrics.md",
+          "why": "what is measured per brief and per task; its table must gain a line saying per-session rows exist and where they are described"
+        },
+        {
+          "path": "docs/domain/execution/session.md",
+          "why": "the session kinds and the record each leaves, which the rows read (phase, agent, model, cost_source, credits, turns, permission_denials)"
+        },
+        {
+          "path": "docs/guide/metrics.md",
+          "why": "the `--by task` view, the metrics/v4 keys and the summary this view sits beside; it gains the usage line and a section with the columns and keys"
+        },
+        {
+          "path": "internal/runs/runs.go",
+          "why": "the one reader of session records: which folders a brief owns (legacy shell-loop folders included), their order, a session's seq, phase, task and agent defaults — the rows must come from here, extended with the fields a row needs"
+        },
+        {
+          "path": "internal/metrics/print.go",
+          "why": "PrintByTask and its helpers (minSec, the dash for a missing value, the tabwriter settings): the session table follows that style"
+        },
+        {
+          "path": "internal/cli/metrics.go",
+          "why": "the --by flag, its usage string and refusals, and how --workspace and --interventions branch — the new refusals go here"
+        },
+        {
+          "path": "schemas/metrics.v4.json",
+          "why": "the schema by_session joins as an optional property, so snapshots written before B37 stay valid"
         }
       ],
       "depends_on": [],
       "acceptance": [
-        "Every P1 line of the brief's worked example holds through the built binary, on temporary git repositories: the exact file bytes, the `wrote` / `updated` / `would write` / `would update` lines, no line and unchanged bytes when both entries are present, and exit 1 with `.claude/settings.json is not a JSON object — fix it, then re-run` (or `.claude/settings.json's <key> is not a JSON object — fix it, then re-run`, naming enabledPlugins or extraKnownMarketplaces) with no file changed.",
-        "Merge rules: each entry is added only when its key is absent; an existing value is kept whatever it is (an `enabledPlugins[\"vloop@vloop\"]: false` stays false, an existing `extraKnownMarketplaces.vloop` stays as it is); every other key at every level keeps its value and order; a new key goes at the end of its object, extraKnownMarketplaces before enabledPlugins when both are new at the top level. Violation: a key or value other than the two entries changed, reordered or dropped, or an existing false turned true.",
-        "When written, the file is laid out as json.MarshalIndent with \"\" and two spaces lays it out (an empty {} or [] inline), with HTML escaping off (`&`, `<`, `>` written as themselves), numbers keeping their digits (1.50 stays 1.50, 12345678901234567890 stays as is), and a final newline; a file that is kept is not rewritten, so its bytes do not change.",
-        "No file: it is created holding the two entries and nothing else, with .claude/ created if missing. init reports `wrote`, `updated` or `kept .claude/settings.json` after the CLAUDE.md step (`would write` / `would update` / `would keep` on --dry-run, which writes nothing); upgrade reports `updated .claude/settings.json` when it wrote the file, nothing when it kept it, and `would update .claude/settings.json` on --dry-run and on the breaking path before --yes; upgrade's `already at <v>` return is unchanged.",
-        "A file that is not a JSON object (invalid JSON, an array, a string), or whose enabledPlugins or extraKnownMarketplaces is present but not an object, is refused with exit 1 and the message above: by init before any step writes and before any would-line on --dry-run; by upgrade before any file is written, on --dry-run and on the breaking path too, before any `would update` line. A symlinked .claude/settings.json is refused as the other targets are (checkRepoPath).",
-        "Nothing is written outside the repository and no `claude plugin` or `copilot plugin` command is run by init or upgrade. No new module dependency.",
-        "Committed tests in internal/cli's init and upgrade tests hold each P1 worked-example line as a named test on a temporary git repository (addressed with git -C), plus the merge-rule cases above; the `go` check runs them. Violation: the merge shipped with no committed test the check runs.",
-        "Existing tests change only where the brief's Constraints allow: tests pinning init's or upgrade's output lines gain the new .claude/settings.json line, and TestDoctorGateEditsNoClaudeAndWritesNothing asserts the only file under .claude/ is settings.json holding the two entries."
+        "`vloop metrics <brief> --by session` prints one table per brief named (a blank line between briefs, as `--by task`), with the header `run  #  phase  task  agent  model  time  cost  source  credits  turns  denied  error` and columns separated as PrintByTask's; with no brief named it prints the brief table, as `--by task` does.",
+        "There is one row per session record the brief's metrics count: the records in the folders internal/runs assigns to the brief (legacy shell-loop folders included) whose phase is plan, work, review, second-review, gate-review or verify, in the folders' order and then by sequence number. A brief-review session (`.vloop/state/brief-reviews/`) or a record of any other phase is not a row; the rows' cost_usd sum to cost.total_usd within 1e-9 and their permission_denials to the report's permission_denials.",
+        "No second reader of the session records: the rows are built from the folders and sessions internal/runs already loads for metrics (its Session extended with what a row needs, e.g. schema, cost_source, turns/num_turns, the denial entries), not from a separate walk or glob of `sessions/*.json`.",
+        "Text cells are exactly as the brief's P1 says: `run` the folder's last path element; `#` three digits; `task` `-` for none; `agent` `claude` for records with none; `model` `-` when absent; `time` wall_ms else duration_ms in minSec's form; `cost` `$` and two decimals; `source` the record's cost_source or `-`; `credits` two decimals or `-` when the record has none (`0.00` for a 0); `turns` the record's turns, else num_turns, else `-`; `denied` the denial count; `error` `yes` when is_error is true, else `-`.",
+        "Every metrics/v4 `--json` document (with or without `--by`, and each document of `--workspace --json`) carries `by_session`: rows with exactly the keys folder (repo-relative), seq, schema, phase, iteration, task, agent, model, effort, time_ms, cost_usd (unrounded), cost_source, credits, turns, permission_denials (the count), denials and is_error, with null where the brief says null. Each denial is `{\"tool_name\": <string>, \"text\": <string>}`: text the first non-empty string of message, command, file_path, tool_input.command, tool_input.file_path, else \"\"; tool_name \"\" when absent.",
+        "schemas/metrics.v4.json declares by_session as an optional array of those rows: a snapshot without it validates, a document whose by_session is not an array is rejected. `vloop metrics export` deletes by_session from its brief records as it deletes by_task; the `--workspace` text table is unchanged.",
+        "Refusals, each exit 2 with nothing on stdout: `--by <other>` outside --interventions → `unknown --by \"<v>\": want task or session`; `--by session --workspace <f>` → `--by session reports one repository's briefs; it takes no --workspace`; `--interventions --by session` → `--by takes kind or phase with --interventions`.",
+        "The flag's usage string is ``break the summary down by `view`: task or session`` (help line `--by view   break the summary down by view: task or session`); docs/guide/commands.md is regenerated with `go generate ./...`; docs/guide/metrics.md gains the usage line and a section with the columns and keys; docs/domain/measurement/metrics.md's table says per-session rows exist and points to that section.",
+        "Every other `vloop metrics` output is unchanged, and the existing tests pass unedited.",
+        "Committed tests (internal/metrics and/or internal/cli) cover every P1 line of the brief's worked example: the row order across two folders, a Copilot record's credits and estimated source, a session/v1 record, a legacy shell-loop record's num_turns, a record with neither turns field, both denial-text examples, is_error, a brief-review session not listed, the three refusals (each its own test), the JSON sums, and a metrics/v4 snapshot without by_session validating. Tests build their fixtures in temporary directories and address them with `git -C`; no test runs a real agent CLI, touches `~/.claude` or `~/.copilot`, or needs the network. A task that ships this behaviour without such tests fails review."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "done",
-      "attempts": 1,
+      "status": "pending",
+      "attempts": 0,
       "notes": ""
     },
     {
       "id": "T2",
-      "title": "Report the plugin per agent in vloop doctor: the plugin row for this repository, and a copilot plugin row (P3, P4)",
-      "goal": "Doctor's plugin row counts a plugin enabled in another repository as enabled here, and its disabled warning names a command that changes the user's global settings, which a Copilot session once ran. This task makes the Claude row count only entries for this repository (user scope or absent, or a projectPath matching the root as the trust row matches it), honour the repository's own opt-out, and say what each case means for a run; and adds a `copilot plugin` row, only where doctor's `copilot` row appears, from `copilot plugin list --json` run in the root. Both lists are computed for the working directory, so running them anywhere else gives the wrong answer.",
-      "kind": "feature",
-      "fixtures": "ab252f3da437d4db47926ce0c070defafe1e0d3e1df3c5f034ec4f6927a43f4c",
+      "title": "Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens",
+      "goal": "The kit's Go program (T3, T4) must reproduce the Python's output byte for byte, and the Python is deleted in T5; the goldens keep it as the reference after that. This task writes the fixtures, the stub copilot and the generator that runs the starting point's Python on them, and commits the goldens it prints. Nothing here is Go: the goldens must be the Python's own output, so that T3 and T4 are judged against the reference rather than against themselves.",
+      "kind": "test",
+      "fixtures": "1c0309811c136c9676aa94356b3946b56a1bea27250702283c91ceb46d61bf29",
       "references": [
         {
-          "path": "internal/cli/doctor.go",
-          "why": "runDoctor's order (the copilot plugin row goes right after plugin, before gate edits), doctorPlugin (today's messages, replaced by P3's), doctorCopilot and copilotKeys/copilotReviewBriefKey (when the copilot row appears, and when it is a problem), doctorTrusted and trustKeyMatch (how a projectPath is compared with the root), doctorGateEdits (which keeps reading .claude/settings.json as today); runPreflight in internal/cli/run.go reuses runDoctor and must not run `copilot plugin list`"
+          "path": "tools/copilot-acceptance/report.py",
+          "why": "the six reports, the deny probe and its summary — every code path the report and probe fixtures must exercise (session tables, verdicts, kept reports, the plan, second-review lines and dissents)"
         },
         {
-          "path": "internal/cli/doctor_test.go",
-          "why": "the stub claude on PATH and TestDoctorPlugin / TestDoctorPluginMessages, which pin today's messages and change only to P3's text; stub entries with no scope count as user-scoped, so their results do not change"
+          "path": "tools/copilot-acceptance/hook.py",
+          "why": "the hook probes (forms, each failure mode) and their summary, and the hooks file it writes with json.dump(indent=2) — what the probe fixtures must exercise"
         },
         {
-          "path": "docs/design-notes/copilot-cli-experiments.md",
-          "why": "\"A repository's plugin declaration\", \"Measured on 2026-11-03\": the shapes of `claude plugin list --json` (id, version, scope, projectPath, enabled) and `copilot plugin list --json` (name, version, enabled, source) the rows parse, and why each list must run with the root as its working directory"
-        },
-        {
-          "path": "docs/domain/domain-model.md",
-          "why": "C-1: doctor reads the repository's settings for the opt-out and changes nothing; no remedy may present a user-level change as required"
+          "path": "tools/copilot-acceptance/bypass.sh",
+          "why": "its `calls` heredoc, which gen.sh extracts verbatim (the lines strictly between `python3 - \"$d/out.jsonl\" <<'PY'` and the closing `PY`) and runs as `python3 calls.py <out.jsonl>`"
         }
       ],
-      "depends_on": [
-        "T1"
-      ],
+      "depends_on": [],
       "acceptance": [
-        "Every P3 and P4 line of the brief's worked example holds through the built binary with stub claude and copilot on PATH, doctor started with -C <root> from another directory: the row's result and its message exactly as the brief's tables give them.",
-        "P3: `claude plugin list --json` runs with the repository root as its working directory. An entry counts when its id starts with `vloop@`, its version is not empty or missing, and it is for this repository: scope user or absent, or a projectPath matching the root or its symlink-resolved path by trustKeyMatch (the entry's path is not resolved). A counted entry is enabled when its enabled is true and neither .claude/settings.json nor .claude/settings.local.json sets enabledPlugins[\"vloop@vloop\"] to false; a settings file that is missing, unreadable, not an object, or whose enabledPlugins is not an object, is ignored for this. `<v>` is the version of the first enabled counted entry in the list's order. Violation: a project entry of another repository counted here.",
-        "P3's messages are exactly the brief's table: pass with no message; the version warning naming `claude plugin update vloop@vloop`; `installed but not enabled for this repository — …` naming `claude plugin enable vloop@vloop --scope project`; `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop --scope project …`; `cannot read claude plugin list --json: <error>` (stderr's text when there is one). The row stays where it is and is n/a without claude. Violation: a message that suggests `claude plugin enable` without a --scope, or presents a user-level change as required.",
-        "P4: a `copilot plugin` row appears exactly when doctor's `copilot` row does (copilotKeys plus agent.review-brief; not agent.verify with run.verify false, nor agent.second-review with run.second-review off), right after the plugin row and before gate edits (also when plugin is n/a for want of claude); it is n/a when the copilot row is a problem; no row when no key is copilot or the config cannot be read, and then copilot is never run. It runs `copilot plugin list --json` in the root with the environment as given (COPILOT_HOME included); an entry counts when its name is `vloop`; its messages are exactly the brief's P4 table.",
-        "vloop run's preflight does not compute the copilot plugin row: no `copilot plugin` command runs at a run's start, while the preflight keeps checking copilot as today.",
-        "doctor runs no `claude plugin` or `copilot plugin` command other than `list --json` and writes nothing. No new module dependency.",
-        "Committed tests in internal/cli/doctor_test.go hold every P3 and P4 worked-example line as a named test, with stub claude and copilot on PATH that print the JSON shown and record their working directory, each test checking it was the repository root (doctor run with -C <root> from another directory); a test shows the preflight runs no copilot plugin list. The `go` check runs them. Violation: the rows shipped with no committed test the check runs.",
-        "Existing tests change only where the brief's Constraints allow (messages P3 changes); the stubs' scope-less entries in internal/cli/doctor_test.go and cmd/vloop's harnesses and end-to-end tests keep their results, and no test runs a real claude or copilot or touches the real ~/.claude or ~/.copilot."
+        "tools/copilot-acceptance/kit/testdata/gen.sh `<python dir> <vloop> <out dir>` is a shell script that runs the Python in `<python dir>` (report.py, hook.py, and calls.py, which it extracts from `<python dir>/bypass.sh` as the brief says) on the fixtures and writes the goldens into `<out dir>`; the goldens it writes are, file for file and byte for byte, the ones committed under tools/copilot-acceptance/kit/testdata/golden/ (the gate runs it with the base's three files and diffs the two trees).",
+        "A golden is the Python's stdout (or a file the Python wrote) on a fixture, unedited, except that the fixture's directory as the Python saw it (resolved with `pwd -P`) is replaced by `@DIR@`, and, in the stub's log, the lines of PWD, OLDPWD, SHLVL and `_` are dropped. No golden holds a machine path; VLOOP_HOOK_PHASE is unset when the goldens are generated. A golden written or edited by hand, or produced by anything but the Python, is a violation.",
+        "Fixture files hold `@DIR@` where the temporary directory goes; gen.sh copies each into a temporary directory resolved with symlinks followed, substitutes that path, and passes it as `<dir>` or `<repo>`. gen.sh writes nothing into the repository tree and leaves no `.pyc` or `__pycache__` anywhere in it.",
+        "There is a report fixture and golden for each of run, second, work, verify, gate-review and plan, each a repository `vloop metrics <run id> --by session` can read with at least 2 rows (the run folder under `.vloop/state/runs/<run id>/` and `docs/briefs/<run id>.loop-brief.md`, folders named in the order of their timestamps); plus a `work` fixture on which vloop metrics exits 1 and a `run` fixture with no run folder. The `second` fixture has one run folder (one run.log, one iterations.jsonl).",
+        "There are probe fixtures and goldens for probe, summary, hook forms, hook failure in each mode (missing, exit1, notjson, timeout), hook summary and calls: their stdout, the files they write (probe.argv, probe.rc, the hook-<x>.argv and .rc files, hooks/vloop-fence.json) and the stub's log.",
+        "tools/copilot-acceptance/kit/testdata/copilot is a committed POSIX sh script, mode 100755, that appends to `$STUB_LOG` its argv (one `arg <a>` line each), `cwd <pwd -P>` and its environment (`env | LC_ALL=C sort`, each line prefixed `env `), then prints the JSON Lines file `$STUB_OUT` names. Each probe fixture's logged review block carries `env STUB_LOG=@DIR@/<file>`, `env STUB_OUT=@DIR@/<file>`, `env PATH=/usr/bin:/bin` and a `cwd` naming a directory the fixture holds.",
+        "Between them the fixtures hold a float, an integral float, non-ASCII text, an emoji, a string with a newline and a tab, `<&>` in a string, and two distinct event types in one probe file, each reaching an output the goldens record (a json.dumps rendering, a repr, a slice).",
+        "This task adds no Go code and no go test; the goldens and gen.sh are the committed test data T3's and T4's tests run against, and gen.sh is how they are regenerated."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "done",
-      "attempts": 1,
+      "status": "pending",
+      "attempts": 0,
       "notes": ""
     },
     {
       "id": "T3",
-      "title": "Document using vloop from Claude Code and Copilot CLI: init's closing lines, the CLAUDE.md section, README and the concepts guide (P2)",
-      "goal": "Nothing tells a Copilot CLI user how to get /vloop:operate, and the docs still give Claude's per-user install as the way. With the declaration (T1) and doctor's per-agent rows (T2) in place, this task makes init's closing lines, the CLAUDE.md section, README.md and docs/guide/concepts.md give both agents' ways: the declaration and trusting the folder in Copilot, Claude Code's per-repository install, and --plugin-dir for one session. Prose is judged on the facts P2 lists, not on wording.",
-      "kind": "docs",
-      "fixtures": "9a8715e9b841b7df9f1181764f42a40051bba03061a780646364b96bf75fb4cc",
+      "title": "Port the kit's six reports to a Go program under tools/copilot-acceptance/kit",
+      "goal": "The acceptance kit needs python3 only because its reports and probes are Python. This task creates the kit's Go program (package main in this module, run as `go run ./tools/copilot-acceptance/kit <command>` like tools/agent-eval) with its `report` command (P2): the six reports report.py prints, byte for byte, except that each report's session table becomes the P1 view (`vloop metrics <run id> --by session`, fenced) plus the record checks and denial lines the kit reads itself. T4 adds the probe commands to the same program and T5 switches the scripts to it.",
+      "kind": "feature",
+      "fixtures": "e18277ea31c592c04fac8aa8a12984818a8131823cabdce5e69dc73aad798241",
       "references": [
         {
-          "path": "internal/cli/init.go",
-          "why": "printInitNext prints exactly the brief's \"init's closing lines\" block, leading spaces as shown"
+          "path": "tools/copilot-acceptance/report.py",
+          "why": "the reference: every line of every report outside the session table (verdicts, task outcomes, the kept verify report, the kept gate verdicts, the plan, second-review lines and dissents) must be printed exactly as this Python prints it, schema-validation results included"
         },
         {
-          "path": "internal/install/section.go",
-          "why": "the CLAUDE.md section's sentence on loading the plugin, replaced by the brief's text verbatim; init and upgrade write it into every repository"
-        },
-        {
-          "path": "README.md",
-          "why": "the install section's plugin commands and Quickstart step 1, which P2 changes"
-        },
-        {
-          "path": "docs/guide/concepts.md",
-          "why": "\"Setting up a repository\": the init and upgrade paragraphs, the vloop doctor paragraph, the plugin paragraph after it and the sentence on install or --plugin-dir, which P2 changes, and where \"From Copilot CLI\" goes"
-        },
-        {
-          "path": "docs/design-notes/copilot-cli-experiments.md",
-          "why": "\"A repository's plugin declaration\": what Copilot CLI does with the declaration (installs on trust, ignored untrusted, settings.local.json opt-out) and what Claude Code does not — the docs claim nothing beyond it"
+          "path": "tools/agent-eval/main.go",
+          "why": "the precedent for a Go tool under tools/, package main in this module, run with go run — follow its shape for argument handling and exit codes"
         }
       ],
       "depends_on": [
@@ -143,36 +139,111 @@
         "T2"
       ],
       "acceptance": [
-        "vloop init's closing lines are exactly the brief's \"init's closing lines\" block, after the step lines; the CLAUDE.md section's sentence is exactly the brief's new text (in Claude Code … --scope project …; in Copilot CLI, trust this folder …), and the old \"give the user the two ways to load it\" is gone.",
-        "README.md: the install section's Claude install line is `claude plugin install vloop@vloop --scope project`, with a sentence that it runs inside the repository and installs for that repository (without --scope project, for every repository); a paragraph says vloop init declares the plugin in .claude/settings.json, so trusting the folder in Copilot CLI installs it for that repository, and in Claude Code to run the install above; then the Copilot block `copilot plugin marketplace add mvelosop/vloop` / `copilot plugin install vloop@vloop` and `copilot --plugin-dir \"$(vloop plugin path)\"` for one session. Quickstart step 1 names .claude/settings.json (the plugin's declaration).",
-        "docs/guide/concepts.md, \"Setting up a repository\": the init and upgrade paragraphs name .claude/settings.json; the vloop doctor paragraph names the `copilot plugin` row; the plugin paragraph gives the declaration, that Copilot CLI installs it on trust, Claude Code's per-repository install and both agents' commands; the sentence \"either install the plugin or pass `--plugin-dir`, not both\" becomes the brief's \"For interactive sessions, use one of them: where the plugin is enabled for the repository (installed for it, or per user), do not also pass `--plugin-dir`.\"",
-        "A new subsection \"From Copilot CLI\" after the plugin paragraph says: trust the folder (the declaration then installs the plugin for this repository on the first session; it is ignored in an untrusted folder; a .github/copilot/settings.local.json can opt one person out, a file that exists only in a repository that adds it); or install per user (the two commands); or `copilot --plugin-dir \"$(vloop plugin path)\"` for one session; and that vloop run's Copilot sessions load the plugin with --plugin-dir whatever is installed.",
-        "No doc makes a claim about what Claude Code does with the declaration (it was measured not to act on it for a user who knows the marketplace, and not measured otherwise). Violation: text saying Claude Code installs or enables the declared plugin. The commands' help (vloop init, upgrade, doctor) is unchanged.",
-        "Committed tests that pin printInitNext's lines and the CLAUDE.md section's text change only to the new text, and pin it (the `go` check runs them); docs/guide/commands.md stays in step with the help (unchanged). This repository's own CLAUDE.md section is left to vloop upgrade, not hand-edited, unless a committed test requires it.",
-        "The prose is judged on the facts each item lists, not on wording."
+        "`go run ./tools/copilot-acceptance/kit report <kind> <repo> <vloop> <exit code>`, kind one of run, second, work, verify, gate-review, plan, prints what `report.py <kind> …` printed at the starting point, byte for byte, except the session table; it exits 0 when it printed the report, and 1 with a one-line message on stderr and nothing on stdout when an argument is missing, the kind is unknown, or no command is given.",
+        "The session table of each kind (gate-review's `| round | record | …` one included), from its header row through the blank line after it, is replaced by one Sessions block per qualifying run id (in name order; a run id qualifies when `<repo>/.vloop/state/runs/<id>/` and `<repo>/docs/briefs/<id>.loop-brief.md` both exist), each exactly the P2 block: the heading line with the literal command, a fenced copy of `<vloop> metrics <id> --by session`'s stdout run in `<repo>` (or the one line `vloop metrics exited <code>: <stderr trimmed, newlines as spaces>`), the `Session records: <n>, schema-valid <k> (<schema> <c>, …).` line (`Session records: 0.` with none; records without a schema last as `no schema <c>`), one `- <folder>/sessions/<file>: <schema> INVALID`, `: no schema` or `: unreadable` line per record so marked, and, only when a row has denials, the `Permission denials:` part with one `- <run>/<#> <phase> <tool_name>: <text>` line per denial (P1's text rule, newlines as spaces); each block ends with one empty line. With no qualifying run id the table is replaced by `Sessions: no brief with runs.` and a blank line.",
+        "The record lines and counts come from the kit reading the record files itself (folders in name order, records in sequence order) and running `<vloop> schema validate <the record's own schema> <file>` in `<repo>`, so they do not depend on vloop metrics succeeding; a session file that is not JSON counts in n only and is listed as unreadable.",
+        "Wherever the Python renders a value, the Go program renders it the same way: json.dumps with the input's key order (sorted where the Python passes sort_keys), `\", \"` and `\": \"` separators, non-ASCII as lowercase `\\uXXXX` (surrogate pairs outside the BMP), no HTML escaping, control characters as the Python escapes them, floats as Python's repr; str()/f-string values as Python writes them (a list's repr, None, True, False, `4.0`, `1e+16`). Where the Python joins two unsorted glob lists (second's run.log and iterations.jsonl), each list is taken in sorted path order, the `*/*/` list first.",
+        "Committed Go tests in the kit compare each report kind on its T2 fixture with its golden, building the expected output from the golden by replacing its first table with the Sessions block(s) the test composes: the fenced stdout of `vloop metrics <run id> --by session` from a vloop built from this tree, run on the same fixture copied into a temporary git repository (`git -C`), and the record and denial lines written literally. The test fails when its own vloop metrics call exits non-zero or prints fewer rows than it pins (at least 2), except on the metrics-exits-1 and no-run-folder fixtures, which have tests of their own; `report` with no kind has a test (exit 1, stderr message). Tests build their fixtures in temporary directories and address them with `git -C`; no test runs a real agent CLI, touches `~/.claude` or `~/.copilot`, or needs the network. No go test needs python3; tests that need a shell skip on Windows.",
+        "The diff changes nothing under tools/copilot-acceptance/kit/testdata/ — the goldens and fixtures are T2's, the Python's output; a golden that seems wrong is reported in the notes, not edited or regenerated from the Go program.",
+        "The kit builds with GOOS=linux and GOOS=windows, adds no module dependency, and writes nothing to the repository tree when run."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
-      "status": "done",
+      "status": "pending",
       "attempts": 0,
       "notes": ""
     },
     {
       "id": "T4",
-      "title": "Close the run: every gate at once, and the worked example line for line",
-      "goal": "Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap. Nothing new is built here unless a worked-example line turns out to have no committed test.",
-      "kind": "test",
-      "fixtures": "c5fb9fce71d567509926242c2296656172d136dcb6650569563824e7b72d8cf0",
-      "references": [],
+      "title": "Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls",
+      "goal": "The kit's live probes (report.py probe and summary, hook.py, and bypass.sh's inline calls) are the rest of its Python. This task adds them to the kit's Go program (P3), each reproducing the starting point's Python exactly: the files read and written, the session started (argv, working directory, environment, only the prompt replaced), the prompts and form lists verbatim, and stdout byte for byte. Operators compare these probe results with past ones in the design notes, so any drift in prompts or rendering silently changes what the probes test.",
+      "kind": "feature",
+      "fixtures": "8f9c8eec1f149d8e89ae94475b2d13f01eac4286a2106ca8eeb0710691ed686d",
+      "references": [
+        {
+          "path": "tools/copilot-acceptance/report.py",
+          "why": "probe and summary: FORMS and PROMPT verbatim, the logged review session it restarts (last `/vloop:review` block, the shims first on PATH, the directories it creates), the files it writes and the summary's matching rules"
+        },
+        {
+          "path": "tools/copilot-acceptance/hook.py",
+          "why": "forms, failure and summary: FORMS, SKILL, MODES, FAIL_CALL and both prompts verbatim, the hooks file it writes (json.dump indent=2, VLOOP_HOOK_PHASE, the sq quoting), outcome()'s rendering and its slices"
+        },
+        {
+          "path": "tools/copilot-acceptance/bypass.sh",
+          "why": "the `calls` heredoc the `calls` command replaces: its timestamp slices, json.dumps of the command, the `{state:6}` padding and the [:70] and [:60] cuts"
+        }
+      ],
       "depends_on": [
+        "T2",
         "T3"
       ],
       "acceptance": [
-        "Gates T1, T2 and T3 all pass on the final tree, run together by this task's gate.",
-        "The work session's notes walk the brief's worked example line for line (P1, P3, P4) and name, for each, the committed test in internal/cli (init, upgrade or doctor tests) and the gate (T1 or T2) that covers it; a line no committed test covers is fixed in this task (a test added) or reported, not skipped.",
-        "Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds)."
+        "The kit has the commands `probe <dir> <copilot>`, `summary <dir>`, `hook forms <dir> <copilot>`, `hook failure <dir> <copilot> <mode>`, `hook summary <dir>` and `calls <out.jsonl>`, each doing what the Python it replaces does: the same files read and written (probe.argv, probe.jsonl, probe.stderr, probe.rc; hook-<x>.argv, .jsonl, .stderr, .rc; `<COPILOT_HOME>/hooks/vloop-fence.json`; the directories created), the same session started (argv, working directory and the logged environment plus the shims' PATH, with only the prompt replaced), and stdout byte for byte.",
+        "FORMS, PROMPT (report.py's and both of hook.py's), SKILL, MODES (commands and timeouts) and FAIL_CALL are the Python's verbatim; a reworded prompt or a changed form list is a violation the review rules on by comparing with the base's report.py and hook.py.",
+        "`hook forms` and `hook failure` read VLOOP_HOOK_PHASE as hook.py does (default review) and write it into the hooks file's `--phase`; the hooks file is rendered as Python's json.dump(…, indent=2) renders it.",
+        "When copilot-argv.log holds no `/vloop:review` session, probe, hook forms and hook failure print `c5: no review session in the copilot log` on stderr and exit 1. An unknown command or hook failure mode, or a missing argument, exits 1 with a one-line message on stderr and starts no session; otherwise each command exits 0.",
+        "Values are rendered as the brief's P3 list says (json.dumps key order, separators, `\\uXXXX`, surrogate pairs, control escapes, Python float repr; json.dump indent=2; repr of a list, None, True, False), and a slice counts characters, not bytes.",
+        "Committed Go tests run each command on the T2 fixtures with the committed stub copilot and compare stdout, the files written and the stub's log (after the @DIR@ substitution and dropping PWD, OLDPWD, SHLVL and `_`) with the goldens; plus a test for the no-review-session case and one for VLOOP_HOOK_PHASE=second-review (the hooks file's bash and powershell commands hold `--phase second-review`). Tests build their fixtures in temporary directories and address them with `git -C`; no test runs a real agent CLI, touches `~/.claude` or `~/.copilot`, or needs the network. No go test needs python3; tests that need the shell stub skip on Windows.",
+        "The diff changes nothing under tools/copilot-acceptance/kit/testdata/; the kit still builds with GOOS=linux and GOOS=windows and adds no module dependency."
       ],
       "verify": "sh .vloop/state/gates/T4/gate.sh",
-      "status": "done",
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T5",
+      "title": "Switch the kit's scripts and README to the Go program and delete report.py and hook.py",
+      "goal": "With the Go program complete, the kit's scripts can stop needing python3 (P4). Every script calls `go -C \"$top\" run ./tools/copilot-acceptance/kit …` where it called python3, with the same arguments and absolute paths, the Python files are deleted, and the README says what the kit needs. The scripts make the call from scratch repositories outside the module, which is why `-C` and absolute directories matter.",
+      "kind": "chore",
+      "fixtures": "8d0be33ad2d21d1583c8d1eea30ee814cf4ede59306a1ab4f9f43ad193c0e7ff",
+      "references": [
+        {
+          "path": "tools/copilot-acceptance/README.md",
+          "why": "the kit's documentation: it must name go, copilot and gh (claude for the scripts that run Claude sessions, perl for bypass.sh), no Python, the Go command wherever it named report.py or hook.py, and say the session tables are `vloop metrics --by session`"
+        },
+        {
+          "path": "tools/copilot-acceptance/bypass.sh",
+          "why": "its inline Python becomes a `calls` call to the kit; its header must name perl, and its `work` directory must be made absolute with `|| exit 1` (it defines no die())"
+        }
+      ],
+      "depends_on": [
+        "T3",
+        "T4"
+      ],
+      "acceptance": [
+        "run.sh, second.sh, work.sh, verify.sh, gatereview.sh, plan.sh, hook.sh and bypass.sh call `go -C \"$top\" run ./tools/copilot-acceptance/kit …` where they called python3, with the same arguments, and write the same files; `top` is computed in every one of them as run.sh computes it (hook.sh and bypass.sh included).",
+        "Every script makes its directory argument absolute right after reading it, in a command substitution that leaves its working directory unchanged — `dir=$(mkdir -p \"$dir\" && cd \"$dir\" && pwd -P) || die …` (the same for `work` in bypass.sh, with `|| exit 1`), placed after die() is defined (die() moved up where it came later).",
+        "No script tests for or runs python3; their header comments say what each needs without python3, and bypass.sh's header names perl.",
+        "tools/copilot-acceptance/report.py and hook.py are deleted; fail-open.sh is unchanged.",
+        "tools/copilot-acceptance/README.md says the kit needs go, copilot and gh on PATH (claude for the scripts that run Claude sessions, perl for bypass.sh, whose timestamps it takes with `perl -MTime::HiRes`), names no Python, names the Go command (`go run ./tools/copilot-acceptance/kit …`) where it named report.py or hook.py, and says the session tables are `vloop metrics --by session`.",
+        "The scripts carry no committed test of their own (the operator's acceptance runs them against the real CLIs); the kit's Go tests from T3 and T4 stay green."
+      ],
+      "verify": "sh .vloop/state/gates/T5/gate.sh",
+      "status": "pending",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T6",
+      "title": "Close the run: every gate at once, and the worked example line for line",
+      "goal": "Each gate proved its task when it ran; the close proves them together on the final tree and accounts for the brief's worked example line by line, so the verify session and the operator find every line covered by a gate and a committed test, or named as a gap. Nothing new is built here unless a worked-example line turns out to have no committed test.",
+      "kind": "test",
+      "fixtures": "3fb7fb7d1f1f486a779f691edeb6cd3aafc664fa6f91c095754ae74b5b1f2f4b",
+      "references": [],
+      "depends_on": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5"
+      ],
+      "acceptance": [
+        "Gates T1 to T5 all pass on the final tree, run together by this task's gate.",
+        "The work session's notes walk the brief's worked example line for line (P1, the real-data B36 line, P2 and P3) and name, for each, the committed test and the gate (T1–T5) that covers it; a line no committed test covers is fixed in this task (a test added) or reported, not skipped.",
+        "Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds)."
+      ],
+      "verify": "sh .vloop/state/gates/T6/gate.sh",
+      "status": "pending",
       "attempts": 0,
       "notes": ""
     }

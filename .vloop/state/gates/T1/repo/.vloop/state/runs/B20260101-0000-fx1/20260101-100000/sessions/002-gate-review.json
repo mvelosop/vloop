@@ -1,0 +1,1 @@
+{"schema":"session/v3","run_id":"B20260101-0000-fx1","phase":"gate-review","iteration":0,"agent":"claude","model":"sonnet","effort":null,"started":"2026-01-01T10:10:00Z","ended":"2026-01-01T10:11:01Z","duration_ms":60000,"wall_ms":61000,"cost_usd":0.3141,"cost_source":"reported","turns":9,"is_error":false,"models_used":{},"permission_denials":[]}

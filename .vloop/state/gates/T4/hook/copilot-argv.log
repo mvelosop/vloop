@@ -1,0 +1,49 @@
+=== copilot
+arg -p
+arg /vloop:work T1
+arg --model
+arg gpt-5.1
+arg --no-ask-user
+cwd @DIR@/it's repo
+env PATH=/usr/bin:/bin
+env STUB_LOG=@DIR@/wrong.log
+=== copilot
+arg -p
+arg /vloop:review T1
+arg --model
+arg gpt-5.1
+cwd @DIR@/it's repo
+env PATH=/usr/bin:/bin
+env STUB_LOG=@DIR@/wrong.log
+=== copilot
+arg --model
+arg gpt-5.1
+arg -p
+arg /vloop:review T2
+arg --no-ask-user
+arg --output-format
+arg json
+arg --allow-tool
+arg shell(git status)
+arg --add-dir
+arg @DIR@/it's repo
+cwd @DIR@/it's repo
+env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=@DIR@/instr
+env COPILOT_HOME=@DIR@/it's repo/.vloop/tmp/home
+env HOME=@DIR@/home
+env NOEQUALS
+env NOTE=café <&> a=b
+env PATH=/usr/bin:/bin
+env STUB_LOG=@DIR@/stub.log
+env STUB_OUT=@DIR@/stub-out.jsonl
+env STUB_RC=3
+env VLOOP_SESSION=review
+=== copilot
+arg -p
+arg /vloop:work T1
+arg --model
+arg gpt-5.1
+arg --no-ask-user
+cwd @DIR@/it's repo
+env PATH=/usr/bin:/bin
+env STUB_LOG=@DIR@/wrong.log

@@ -1,0 +1,27 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.21061770000000002,
+  "duration_ms": 70120,
+  "effort": null,
+  "ended": "2026-11-05T21:53:28Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 34534,
+      "cache_read_input_tokens": 372477,
+      "cost_usd": 0.21061770000000002,
+      "input_tokens": 22,
+      "output_tokens": 3519
+    }
+  },
+  "permission_denials": [],
+  "phase": "gate-review",
+  "run_id": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
+  "schema": "session/v3",
+  "started": "2026-11-05T21:52:17Z",
+  "turns": 12,
+  "wall_ms": 70685
+}

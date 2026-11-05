@@ -1,0 +1,9 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 125000,
+  "num_turns": 7,
+  "total_cost_usd": 0.05,
+  "permission_denials": []
+}
