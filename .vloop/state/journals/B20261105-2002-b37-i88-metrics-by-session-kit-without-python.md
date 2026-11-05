@@ -55,3 +55,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Gates T1-T5 pass together on the final tree. The worked example is accounted for line by line; the one uncovered line (P1 real-data B36) now has a committed test, TestMetricsBySessionRealB36.
 - **Files:** internal/cli/metrics_session_test.go
 - **Notes for next iteration:** Worked example coverage. P1 real data B36 (13 rows, first/last row, --json sums 1e-9, 8 denials): gate T1 plus new TestMetricsBySessionRealB36 (internal/cli/metrics_session_test.go; skips if B36 records are absent). P1 fixtures: TestMetricsBySessionText and TestMetricsBySessionJSON (rows, copilot credits/estimated, session/v1 agent claude, legacy num_turns 7, no-turns null, denials normalisation, is_error yes) with gate T1; TestMetricsBySessionRefusals (unknown --by, --workspace, --interventions) with gate T1; TestMetricsV4WithoutBySessionValidates with gate T1. P2: kit TestReports, TestReportMetricsFails (exit 1 fence line), TestReportNoBriefWithRuns (no run folder), TestReportRefusals (no kind) in tools/copilot-acceptance/kit/report_test.go, with gates T2 (goldens) and T3. P3: TestProbe, TestSummary, TestHookForms, TestHookFailure, TestHookPhase (second-review), TestHookSummary, TestCalls, TestNoReviewSession (c5 message), TestProbeRefusals in probe_test.go, with gate T4. P4 (scripts and README switched, report.py/hook.py deleted): gate T5. Environment: VLOOP_PLAN_SHA256 is set inside work sessions and makes unrelated internal/cli task-gate tests fail when running go test ./... there; unset it for the suite.
+
+## Run ended — complete
+
+- **Run:** `B20261105-2002-b37-i88-metrics-by-session-kit-without-python` · 7 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked

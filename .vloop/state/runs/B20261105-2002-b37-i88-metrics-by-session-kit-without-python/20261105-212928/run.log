@@ -59,3 +59,11 @@ committing the plan
    review T6 · 0m28s · $0.08 · run $10.05 / $40.00
    review: PASS
    T6 done
+   check go
+   verify · 4m24s · $0.28 · run $10.34 / $40.00
+verify: 1 finding(s); 3 example line(s) not run — see .vloop/state/runs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python/20261105-212928/reports/verify.json
+
+═══ complete ═══
+run:    B20261105-2002-b37-i88-metrics-by-session-kit-without-python/20261105-212928  (7 iteration(s) this run)
+plan:   6/6 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.md
