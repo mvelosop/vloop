@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 4
+**Status:** running · **4/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:25:37Z
+**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:33:23Z
 
 ## Progress
 
 - [x] **T1** — Add `vloop metrics --by session` and `by_session` to metrics/v4 · 1 attempt(s)
 - [x] **T2** — Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
 - [x] **T3** — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
-- [ ] **T4** — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
+- [x] **T4** — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
 - [ ] **T5** — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
 
@@ -95,7 +95,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
 
-`pending` · depends on: T2, T3
+`done` · depends on: T2, T3
 
 The kit's live probes (report.py probe and summary, hook.py, and bypass.sh's inline calls) are the rest of its Python. This task adds them to the kit's Go program (P3), each reproducing the starting point's Python exactly: the files read and written, the session started (argv, working directory, environment, only the prompt replaced), the prompts and form lists verbatim, and stdout byte for byte. Operators compare these probe results with past ones in the design notes, so any drift in prompts or rendering silently changes what the probes test.
 

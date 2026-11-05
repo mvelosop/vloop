@@ -38,3 +38,10 @@ committing the plan
    review T3 · 0m36s · $0.21 · run $8.50 / $40.00
    review: PASS
    T3 done
+── iteration 5 (5 this run) · T4 · 3/6 done ──
+   Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
+   work T4 · 3m06s · $0.58 · run $9.08 / $40.00
+   check go
+   review T4 · 0m42s · $0.24 · run $9.32 / $40.00
+   review: PASS
+   T4 done

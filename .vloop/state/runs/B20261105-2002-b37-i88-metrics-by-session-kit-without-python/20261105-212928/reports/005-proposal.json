@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "The kit's Go program now has probe, summary, hook forms|failure|summary and calls, ported from report.py, hook.py and bypass.sh's heredoc, with Go tests against the T2 goldens.",
+  "files": ["tools/copilot-acceptance/kit/probe.go", "tools/copilot-acceptance/kit/probe_test.go", "tools/copilot-acceptance/kit/main.go", "tools/copilot-acceptance/kit/pyval.go"],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: ok; go test ./tools/copilot-acceptance/kit passes; GOOS=linux and GOOS=windows build.",
+  "notes": "pyval.go dumpStr fix: DEL (0x7f) is now escaped as \\u007f like Python's ensure_ascii (it was written raw). Python crashes (non-dict event, non-string type/message) are exit 1 with a one-line message; calls writes the lines found before the bad event, as the Python printed them. Child exit by signal reports -1, not Python's negative signal number. Unchanged: testdata/."
+}

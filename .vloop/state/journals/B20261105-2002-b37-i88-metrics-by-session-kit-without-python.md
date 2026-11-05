@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added the kit's Go program (tools/copilot-acceptance/kit) with its `report` command: the six reports as report.py printed them, with each session table replaced by the Sessions block(s), plus Go tests against the T2 goldens.
 - **Files:** tools/copilot-acceptance/kit/main.go, tools/copilot-acceptance/kit/pyval.go, tools/copilot-acceptance/kit/report.go, tools/copilot-acceptance/kit/sessions.go, tools/copilot-acceptance/kit/report_test.go
 - **Notes for next iteration:** pyval.go holds a small Python-compatible JSON model (ordered dict, int vs float, str()/repr()/json.dumps with ensure_ascii) for T4 to reuse. Known deviations only on inputs the Python crashes on or never meets: NaN/Infinity literals and lone surrogates are not accepted/kept. Every report ends with an empty line because the Python printed its joined text plus a newline. Tests build vloop with go build into a temp dir and use git -C on temp copies of testdata/reports; the golden for r3 pins the metrics error text, which is vloop's own message. run() in main.go is the dispatch T4 extends with probe commands.
+
+## T4 — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The kit's Go program now has probe, summary, hook forms|failure|summary and calls, ported from report.py, hook.py and bypass.sh's heredoc, with Go tests against the T2 goldens.
+- **Files:** tools/copilot-acceptance/kit/probe.go, tools/copilot-acceptance/kit/probe_test.go, tools/copilot-acceptance/kit/main.go, tools/copilot-acceptance/kit/pyval.go
+- **Notes for next iteration:** pyval.go dumpStr fix: DEL (0x7f) is now escaped as \u007f like Python's ensure_ascii (it was written raw). Python crashes (non-dict event, non-string type/message) are exit 1 with a one-line message; calls writes the lines found before the bad event, as the Python printed them. Child exit by signal reports -1, not Python's negative signal number. Unchanged: testdata/.

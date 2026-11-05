@@ -517,7 +517,7 @@ func dumpStr(b *strings.Builder, s string) {
 			b.WriteString(`\f`)
 		case r < 0x20:
 			b.WriteString(`\u` + hex(int(r), 4))
-		case r < 0x7f || r == 0x7f:
+		case r < 0x7f:
 			b.WriteRune(r)
 		case r < 0x10000:
 			b.WriteString(`\u` + hex(int(r), 4))
