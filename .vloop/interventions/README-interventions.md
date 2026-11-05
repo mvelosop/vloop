@@ -209,6 +209,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph](I20261102-230010-the-eval-case-s-brief-md-left-out-two-ph.md) |
 | verify | verification-finding | partly | no-options | [I20261103-005742-the-design-note-s-two-hard-parts-still-c](I20261103-005742-the-design-note-s-two-hard-parts-still-c.md) |
 | verify | verification-finding | partly | no-options | [I20261103-031508-f4-s-list-missed-three-sentences-that-li](I20261103-031508-f4-s-list-missed-three-sentences-that-li.md) |
+| verify | verification-finding | partly | no-options | [I20261105-232221-doc-fix-for-verify-s-finding-by-session](I20261105-232221-doc-fix-for-verify-s-finding-by-session.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
@@ -223,7 +224,10 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | close | ceremony | partly | no-options | [I20261026-092947-v0-13-0-released-after-the-two-hardening](I20261026-092947-v0-13-0-released-after-the-two-hardening.md) |
 | close | ceremony | partly | no-options | [I20261028-115709-v0-14-0-released-after-b24](I20261028-115709-v0-14-0-released-after-b24.md) |
 | close | ceremony | no | no-options | [I20261102-091451-the-brief-s-close-edits-this-repository](I20261102-091451-the-brief-s-close-edits-this-repository.md) |
+| close | ceremony | partly | no-options | [I20261105-232224-acceptance-metrics-by-session-and-the-ki](I20261105-232224-acceptance-metrics-by-session-and-the-ki.md) |
+| close | context-supply | partly | no-options | [I20261105-232222-trust-acceptance-for-the-b37-kit-s-scrat](I20261105-232222-trust-acceptance-for-the-b37-kit-s-scrat.md) |
 | close | repair | yes | no-options | [I20260929-2048-local-main-reset-to-the-pre-merge-commit](I20260929-2048-local-main-reset-to-the-pre-merge-commit.md) |
+| close | repair | yes | no-options | [I20261105-232223-run-sh-gatereview-sh-and-verify-sh-are-n](I20261105-232223-run-sh-gatereview-sh-and-verify-sh-are-n.md) |
 | next | carry-forward | no | no-options | [I20260930-0900-the-shell-loop-fixed-so-sessions-cannot](I20260930-0900-the-shell-loop-fixed-so-sessions-cannot.md) |
 | next | carry-forward | partly | no-options | [I20260930-0950-the-operator-role-written-down-claude-md](I20260930-0950-the-operator-role-written-down-claude-md.md) |
 | next | ceremony | yes | no-options | [I20260930-1010-the-b4-draft-reached-main-inside-an-unre](I20260930-1010-the-b4-draft-reached-main-inside-an-unre.md) |

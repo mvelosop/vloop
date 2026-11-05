@@ -885,3 +885,36 @@ Claude Code 2.1.317 and Copilot CLI 1.0.105:
   as `sh scripts/greet_test.sh`, which the work fence denies while
   `./scripts/greet_test.sh` is allowed. It reported the task blocked
   twice while the gate passed, and the run stalled (#130).
+
+## Metrics per session, and the kit without Python, at close (B37, 2026-11-05)
+
+With the branch's tree, Copilot CLI 1.0.105 (gpt-6.1-terra) and a
+directory first on `PATH` whose `python3` exits 127:
+
+- **`vloop metrics --by session`** on B36's run gave 13 rows, plan first
+  (9m42s, $2.89, 44 turns, 3 denied) and verify last (1m38s, $0.30). The
+  costs sum to `cost.total_usd`, 5.6702516, and the rows hold 8 denials.
+  On the B34 acceptance clone (`b34-backstop`) each Copilot session
+  shows its credits and `estimated`, and each Claude session shows
+  `reported`. The three refusals exit 2 with the brief's messages.
+- **The goldens:** `kit/testdata/gen.sh`, run again on the base commit's
+  `report.py`, `hook.py` and `bypass.sh`, wrote the 51 committed goldens
+  byte for byte.
+- **`work.sh`:** the run completed (1 task, first pass). The summary's
+  Sessions block lists 5 records, all schema-valid (`session/v3` 4,
+  `session/v4` 1), and the 3 permission denials, among them the work
+  session's `sh <script>` (#130). Before any run, the empty case printed
+  `Sessions: no brief with runs.`.
+- **`run.sh`:** the summary holds the run report and the deny probe's
+  table (12 forms denied or not run, web fetch failed). The run itself
+  blocked: the Copilot reviewer failed T1 three times on "repo-relative
+  paths only", reading `/dev/null`, a `/tmp` fallback and `$TMPDIR` in the
+  test script as absolute paths. That is the reviewer model's reading,
+  not the kit's.
+- **No file written:** `git status --porcelain --ignored` in this
+  repository was the same before and after both scripts, with the old
+  `__pycache__/` deleted first.
+- **Seen on the way:** `run.sh`, `gatereview.sh` and `verify.sh` were
+  mode 644, so the README's `tools/copilot-acceptance/run.sh` failed with
+  "Permission denied". They are 755 now. Claude's trust dialog defaults
+  to "No, exit", so an Enter alone declines it.
