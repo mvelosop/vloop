@@ -1,0 +1,41 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract / Decided here (the stub copilot)",
+      "summary": "The brief says the caller sets STUB_LOG and STUB_OUT, and that gen.sh and the Go tests pass them to the stub. That cannot work for probe, hook forms and hook failure. The Python starts the stub with the environment parsed from copilot-argv.log (plus PATH) and nothing else, so a variable the caller sets never reaches the stub. The stub then writes its log to an empty path and prints no output. The same replacement also leaves the stub without the tools it runs (env, sort) unless the logged block carries a PATH that holds them.",
+      "evidence": "tools/copilot-acceptance/report.py:72-81 (env = dict of the logged `env ` lines; subprocess.run(..., env=env)); tools/copilot-acceptance/hook.py:50-52 and 83 (same). PATH becomes `<d>/shims:` + env.get(\"PATH\", \"\"), so with no logged PATH line it is just `<d>/shims:`. The brief: 'it appends to `$STUB_LOG` (a file under @DIR@ the caller sets)' and 'gen.sh passes it ... and the Go tests pass it to the program, with the same `STUB_LOG` and `STUB_OUT`'.",
+      "fix": "Say that the review block of each probe fixture's copilot-argv.log carries `env STUB_LOG=@DIR@/<file>`, `env STUB_OUT=@DIR@/<file>` and `env PATH=/usr/bin:/bin` (or whatever holds env and sort), so the stub receives them through the logged environment, as the real Copilot receives its own. Its `cwd` line must name a directory the fixture holds: git keeps no empty directory, so either a placeholder file or `cwd @DIR@`. The stub must be committed executable (mode 100755), because the Python and the Go program exec it directly."
+    },
+    {
+      "kind": "rule",
+      "section": "Header / roadmap",
+      "summary": "No roadmap row points at B37. The repository's architect additions require the brief's row in the roadmap, pointed at the brief at hand-over. The roadmap that holds B33–B36 ends at B36, and its title says '(B18–B36)'.",
+      "evidence": "grep for 'B37' and '#88' in docs/design-notes/*.md finds nothing. docs/design-notes/vloop-roadmap-b18-b21.md:43 is the last row (B36). .claude/skills/vloop-architect/SKILL.md:17-19 requires the row. B36's brief commit 27e77540 changed docs/design-notes/vloop-roadmap-b18-b21.md (3 +-).",
+      "fix": "Add a B37 row (issue #88, Owns: `vloop metrics --by session` and `by_session`; the Copilot acceptance kit in Go, without python3; depends on B36) to docs/design-notes/vloop-roadmap-b18-b21.md, and widen its title, in the brief's commit."
+    },
+    {
+      "kind": "consistency",
+      "section": "Acceptance, at close (item 4)",
+      "summary": "Acceptance 4 compares `git status --porcelain --ignored` before and after. The operator's tree already holds an ignored tools/copilot-acceptance/__pycache__/ from earlier runs, so the 'before' output lists it and the comparison cannot tell whether the kit wrote it. After P4 it is also a stale leftover next to the deleted .py files.",
+      "evidence": "`git check-ignore -v tools/copilot-acceptance/__pycache__` → .gitignore:4:__pycache__/ (the directory exists, untracked, in this working tree).",
+      "fix": "In acceptance 4, delete tools/copilot-acceptance/__pycache__/ before taking the 'before' snapshot (an operator step, not a loop task)."
+    }
+  ],
+  "decisions": [
+    "The per-session view is `--by session` on `vloop metrics`, not a new `vloop sessions` command. Sound: one reader of the records.",
+    "`by_session` joins metrics/v4 as an optional property, with no metrics/v5. Consistent with C-3 (unknown keys allowed). Close snapshots written from B37 on will carry it, denial texts included.",
+    "`--by session` is refused with --workspace, and `metrics export` omits by_session.",
+    "The kit becomes a Go program run with `go run`, not a vloop subcommand, because the probes spend credits. Sound, and B33's tools/agent-eval is the precedent.",
+    "The Go program reproduces the Python byte for byte, with goldens generated from the base's Python, and the Python is then deleted. This is the costliest part of the brief: it re-implements Python's json.dumps/repr rendering in Go for a tool the operator runs a few times. It is acceptable, but simply changing the non-session sections to Go-native rendering was an option the brief rejects only implicitly.",
+    "The report session tables change shape. Each kind used to show only its own phase (work, verify, plan…) with its own columns. It now shows every session of the brief through `--by session`, plus per-record schema validation by the record's own schema (`run` used to validate everything against session/v3).",
+    "Text formats: `#` is three digits; credits print `-` when absent and `0.00` when 0; a second-review row has phase `second-review`.",
+    "A small behaviour change in hook.sh: the absolutizing line runs `mkdir -p` on the dir, so hook.sh now creates a missing dir before it dies with 'no logged copilot session'. Harmless."
+  ],
+  "checked": "facts: runs.go (folder order, seq sort, task assignment, agent default, the TotalCost override), metrics/time.go (the six phases summed, denials, Cost.Total), print.go (minSec rounding, PrintByTask), cli/metrics.go (refusal messages and order, the usage string), export.go:190; the B36 real-data line recomputed from the records (13 rows; first row 9m42s $2.89 44 3; last 1m38s $0.30 18 2; total 5.6702516; denials 8); report.py, hook.py and bypass.sh line by line against P2/P3 (the table boundaries, the glob order, sys.exit to stderr with exit 1, VLOOP_HOOK_PHASE, the heredoc markers); the scripts' dir/die/top lines against P4; go.mod at 1.27.1; go:generate for commands.md. consistency: the worked example against the contract and the refusal texts. rules: CLAUDE.md, C-3 schema evolution, no existing test pins 'want task' or the metrics key set, fence work.json (python3 is not denied; nested testdata .vloop/ paths are not caught by the anchored deny rules or by the driver's HasPrefix checks). runnability: every check stays green after each task in order (testdata-only task 2 adds no package; task 2's gate regenerates from `git show <base>:`, so it survives task 5's deletions). `vloop brief check` on a ready copy: ok, 0 warnings.",
+  "header": "Reviewed 2026-11-05: FIX, 3 findings"
+}
+

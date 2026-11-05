@@ -5,7 +5,7 @@ kind: design-note
 status: draft
 created: 2026-10-25
 ---
-# vloop — the roadmap after v0.12.0 (B18–B36)
+# vloop — the roadmap after v0.12.0 (B18–B37)
 
 v0.12.0 (tag `v0.12.0`) is B1–B17; B12–B17 are
 `docs/design-notes/vloop-roadmap-b12-b17.md`. This series starts with the
@@ -41,6 +41,7 @@ in `depends-on:`. Candidates not yet placed are GitHub issues (for example
 | B34 | `docs/briefs/B20261103-0058-b34-i82-fence-backstop.loop-brief.md` — **consumed** (issue #82) | **A backstop for the Copilot hook's fail-open**: after every Copilot session the driver re-judges every call that ran with the phase's fence and halts with exit 9 (FENCE BYPASSED) on one it denies; it halts (HOOK CHANGED) when the hook's binary changed during the session; `timeoutSec` 30 → 120; every definition of exit 9 updated | B33 |
 | B35 | `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` — **consumed** (issue #83) | **The fence judges the compound commands it can read**: `if`, `while`, `until`, `for … in`, `!`, `{ … }` and subshells judged through; a word the shell expands (a `$`, a glob, a brace expansion) matched as any text and refused where it is structure; `command -v` a lookup; `xargs`' input and BSD options | B34 |
 | B36 | `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` — **consumed** (issues #96, #97) | **The plugin per repository and per agent**: `vloop init`/`upgrade` declare the plugin in `.claude/settings.json` (Copilot installs it on trust; Claude installs it with `--scope project`); the docs cover Copilot CLI; doctor's `plugin` row counts this repository's entries only, and a new `copilot plugin` row | B35 |
+| B37 | `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` — ready (issue #88) | **Metrics per session, and the acceptance kit without Python**: `vloop metrics --by session` and `by_session` in `metrics/v4`; the Copilot acceptance kit's reports and probes in a Go program run with `go run`, so it needs no `python3` | B36 |
 
 **Before the fence: hardening (decided by the operator on 2026-10-25).** B19's
 acceptance on the real CLI (`docs/design-notes/copilot-cli-experiments.md` →

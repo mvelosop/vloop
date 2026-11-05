@@ -1,0 +1,31 @@
+{"schema": "brief-review/v1",
+ "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+ "verdict": "FIX",
+ "findings": [
+  {"kind": "runnability",
+   "section": "Behaviour contract / P4",
+   "summary": "The instruction to make the directory argument absolute ('created if missing, then `cd` there and `pwd -P`', right after reading it) does not say to do it in a subshell. In every script `dir=` comes before `here=$(cd \"$(dirname \"$0\")\" && pwd -P)`. A top-level `cd \"$dir\"` there breaks `here`, and so `top`, whenever the script is started by a relative path. That is the form the README and acceptance items 1 and 2 use (`tools/copilot-acceptance/work.sh <model>`). Task 5's gate runs one `go -C` call from outside the module, so it would not catch this; only the operator's acceptance would.",
+   "evidence": "tools/copilot-acceptance/run.sh:22-24 (dir, then here, then top); hook.sh:19-20; work.sh, verify.sh, plan.sh, gatereview.sh, second.sh: dir= on the line before here=. Acceptance step 1 runs `tools/copilot-acceptance/work.sh <copilot model>`, where $0 is relative.",
+   "fix": "Pin the form: `dir=$(mkdir -p \"$dir\" && cd \"$dir\" && pwd -P) || die …` (the same for `work` in bypass.sh). That leaves the working directory unchanged. Optionally, have task 5's gate start one script by a relative path."},
+  {"kind": "consistency",
+   "section": "Behaviour contract / P2; Decided here (how a report is compared)",
+   "summary": "'The session table, from its heading line through the blank line after it' can be read as the report's `## …` Markdown heading, not the table's header row. Under that reading the title and the '`vloop run` exit N.' line are dropped too. The test and the program use the same phrase, so a session that reads it this way on both sides passes its own golden comparison and still loses the title.",
+   "evidence": "tools/copilot-acceptance/report.py:46-48: each report opens with `## …`, a blank line, '`vloop run` exit {rc}.', a blank line, and then the table header `| record | …` (gate-review's is `| round | record | …`, line 205).",
+   "fix": "Say 'from the table's header row (`| record | …`, or `| round | record | …` for gate-review) through the blank line after it; the `##` heading and the exit line before it stay'."}
+ ],
+ "decisions": [
+  "The per-session view is `--by session` on vloop metrics; a separate `vloop sessions` command was rejected. Sound: it reads the same records.",
+  "by_session is an optional property of metrics/v4, not a v5. It is emitted on every --json document, so close snapshots written from B37 on carry it, denial text included. Sound, but the snapshots grow.",
+  "`--by session` with --workspace is refused (exit 2), and export leaves by_session out.",
+  "Brief-review sessions stay out of the rows, as they stay out of metrics.",
+  "The kit becomes one Go program run with `go -C \"$top\" run`, not a vloop subcommand; jq was rejected. Sound: the probes spend credits.",
+  "The Go port reproduces the Python byte for byte, checked against goldens the Python generates, including emulating json.dumps and repr. This costs a lot to build for an acceptance tool. It is the only way to prove 'unchanged' without restating every table.",
+  "The reports' own session tables are replaced by the P1 view. This loses gate-review's per-folder round numbering, the per-record session/v3 'ok' column (now a count plus the invalid records) and the raw permission_denials JSON (now 'tool: text' lines).",
+  "The run report now validates each record against its own schema field, where it validated every record as session/v3.",
+  "Formatting choices: `#` has three digits; credits print '-' when absent and '0.00' when zero; a second-review row's phase is 'second-review'.",
+  "The goldens are regenerated from the base's Python in task 2's gate, so the gate needs python3 on the gate host while no go test does.",
+  "perl stays a dependency of bypass.sh."
+ ],
+ "checked": "facts (runs.go folder order, phases and fields; metrics phase switch and denial sum; the --by refusals and messages in internal/cli/metrics.go; minSec rounding; the export deletion of by_task; metrics.v4 schema has no additionalProperties; B36's 13 records, first/last row values, total 5.670251600000001 and 8 denials against `vloop metrics --json`; the denial entry shapes in every record in this repo; report.py's six kinds and table layouts; hook.py VLOOP_HOOK_PHASE; bypass.sh's calls and perl; the .pyc in B24's T5 review; go.mod 1.27.1 for go -C; agent-eval precedent), consistency, rules (CLAUDE.md, repo architect constraints), runnability (task order against the single go check, help-text regeneration of docs/guide/commands.md, no existing test pins 'want task', task 2's gate surviving task 5)",
+ "header": "Reviewed 2026-11-05: FIX, 2 findings"}
+

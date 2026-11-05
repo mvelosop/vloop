@@ -1,0 +1,38 @@
+{"schema": "brief-review/v1",
+ "brief": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief",
+ "verdict": "FIX",
+ "findings": [
+  {"kind": "runnability", "section": "Decided here / How a report is compared with its golden; Fixture paths",
+   "summary": "A report-kind test can pass without a session table ever being printed. The test builds its expected Sessions block by running the same `vloop metrics <run id> --by session` the program runs. Nothing requires the copied fixture to be a git repository, or the command to succeed. Without a repository, both sides hold the same `vloop metrics exited 1: …` block and the test passes.",
+   "evidence": "internal/cli/metrics.go:53 calls g.gitRoot() before anything else. In a temp dir with docs/briefs/B1-x.loop-brief.md and one session record, `vloop metrics B1-x` exits 0 after `git init` (no commit needed). The 'Fixture paths' decision only says the fixtures are copied into a resolved temp dir. The P2 worked-example line ('each report kind … equal to its golden') does not assert a table.",
+   "fix": "Under 'Fixture paths', say the test runs `git init` in the copied report fixture. Under 'How a report is compared', say the test fails when `vloop metrics` exits non-zero, or prints no row, on any report fixture other than the two dedicated lines (metrics exits 1; no run folder)."},
+  {"kind": "consistency", "section": "Behaviour contract / P2 (the Sessions block)",
+   "summary": "Two literal forms of the block are not pinned. (1) A denial line is '- <run>/<#> <phase> <tool_name>: <text>', one per denial, but nothing says how a <text> with newlines prints. (2) When `vloop metrics` fails, 'the block holds `vloop metrics exited <code>: …` instead of the table' does not say whether the line replaces the fenced stdout inside the fence or the heading and the fence. It also does not say whether the 'Session records' and denial lines still follow.",
+   "evidence": "Of the 266 permission denials in this repository's session records, 44 have a command containing a newline (heredocs, multi-line scripts). The Python printed denials with json.dumps, which escapes them. The P1 JSON `text` keeps them raw.",
+   "fix": "Pin both forms. For example: in a denial line, <text> has each newline replaced by a space (or is printed as a JSON string). On failure, the line stands inside the fence in place of the stdout, and the record lines follow as usual. Add a fixture denial with a multi-line command."},
+  {"kind": "consistency", "section": "Worked example / P3; Decided here (goldens)",
+   "summary": "The P3 worked-example line checks only stdout and what the stub saw. The files the probes write have no named check, although P3 requires them reproduced: probe.argv, <name>.argv, the .rc files and hooks/vloop-fence.json. The hooks file is the only output the `json.dump(…, indent=2)` rule governs, so that rule is untested.",
+   "evidence": "hook.py start() writes COPILOT_HOME/hooks/vloop-fence.json with indent=2 and <name>.argv/.rc. report.py probe() writes probe.argv and probe.rc. The worked-example line reads '→ stdout equal to the Python's golden; the stub saw the argv, working directory and environment the Python passed'.",
+   "fix": "Extend the line: '… and the files written (probe.argv, probe.rc, hook-<x>.argv/.rc, hooks/vloop-fence.json) equal the Python's goldens, after the @DIR@ substitution'."},
+  {"kind": "consistency", "section": "Behaviour contract / P3 (json.dumps rendering); fixtures",
+   "summary": "The json.dumps rules leave out two things the Python does. Characters outside the BMP are written as a surrogate pair (`\\ud83d\\ude00`), not one \\uXXXX. Control characters use the short escapes (`\\n`, `\\t`, `\\b`, `\\f`, `\\r`) and lowercase `\\u001f` for the others. The listed fixtures exercise neither, so a Go renderer can pass every golden and still differ on real Copilot events, which carry emoji and newlines in messages.",
+   "evidence": "Python's json.dumps(ensure_ascii=True) behaves this way. P3 lists 'non-ASCII as \\uXXXX with lowercase hex' and the fixture list 'a float, an integral float, non-ASCII text, <&> …'.",
+   "fix": "Add both rules to the json.dumps bullet. Add an emoji and a string with a newline and a tab to the fixtures."},
+  {"kind": "runnability", "section": "Behaviour contract / P1 Docs",
+   "summary": "P1's Docs bullet omits docs/guide/commands.md. That file is generated from the cobra tree, and a test fails when it is stale. Changing the --by flag's usage text, which P1 implies but does not pin, turns that test red until `go generate ./...` is run.",
+   "evidence": "internal/cli/metrics.go:110 has the usage text 'break the summary down by `task`'. docs/guide/commands.md:285 has '- `--by task`: break the summary down by task'. internal/cli/commands_doc_test.go:20 reports 'docs/guide/commands.md is out of date: run `go generate ./...`'.",
+   "fix": "Pin the new usage text (for example 'break the summary down by `task` or `session`') and add 'docs/guide/commands.md regenerated with go generate ./...' to P1's Docs."}
+ ],
+ "decisions": [
+  "--by session on vloop metrics, not a new `vloop sessions` command: sound, one reader of the records.",
+  "by_session is an optional property of metrics/v4, with no v5. It appears on every --json document, close snapshots and --workspace --json included. Sound: the top-level schema is open, and older snapshots stay valid.",
+  "The kit becomes a Go program under tools/copilot-acceptance/kit, run with `go -C $top run`, rather than a vloop subcommand or jq. Sound, with tools/agent-eval as precedent.",
+  "The reports' session tables are replaced by the P1 view. The work, verify, plan and gate-review reports now show every session of the brief, not only their own phase. Each record's schema check moves to a count, and the per-row permission_denials JSON moves to denial lines. Results in the design notes written from the old tables will no longer compare row for row. The operator should accept this knowingly.",
+  "Each record is validated against its own `schema` field, not the fixed session/v3 (run) or session/v4 (the rest). This weakens what the acceptance asserts: a record that validates as an older version used to show INVALID and now counts as valid. Worth an explicit yes.",
+  "Goldens are generated from the base's Python by gen.sh. Task 2's gate re-derives them through `git show <base>:…`, so python3 is needed at gate time on the operator's machine but by no go test. Sound.",
+  "Small choices: `#` has three digits; credits print `-` when absent and `0.00` when zero; a second-review row has phase second-review. The denial text is the first of message, command, file_path, tool_input.command and tool_input.file_path. All sound.",
+  "report.py and hook.py are deleted outright, not kept as references. Sound, since the goldens keep their output."
+ ],
+ "checked": "facts (B36 real-data rows, costs 5.6702516, denials 8, minSec rounding; refusal messages and exit 2 run live; runs.go ordering, task assignment, phase set; cost.total_usd composition; export deletes by_task; workspace JSON; scripts' python3 uses, top computation, fail-open.sh; go 1.27.1; B36 records tracked), consistency (exec summary vs contract, out of scope vs refusals, violations vs tasks, P2 block literals), rules (CLAUDE.md, architect constraints, M-1), runnability (the go check after each task, task 2 gate after task 5, task 5 grep scope vs gen.sh, fixtures needing git); vloop brief check: ok, 0 warnings",
+ "header": "Reviewed 2026-11-05: FIX, 5 findings"}
+
