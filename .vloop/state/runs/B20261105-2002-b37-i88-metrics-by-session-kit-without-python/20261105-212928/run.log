@@ -24,3 +24,10 @@ committing the plan
    review T1 · 0m35s · $0.16 · run $6.83 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/6 done ──
+   Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
+   work T2 · 2m51s · $0.52 · run $7.35 / $40.00
+   check go
+   review T2 · 0m40s · $0.15 · run $7.51 / $40.00
+   review: PASS
+   T2 done

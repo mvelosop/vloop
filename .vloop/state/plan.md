@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 2
+**Status:** running · **2/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:08:49Z
+**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:15:59Z
 
 ## Progress
 
 - [x] **T1** — Add `vloop metrics --by session` and `by_session` to metrics/v4 · 1 attempt(s)
-- [ ] **T2** — Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
+- [x] **T2** — Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
 - [ ] **T3** — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
 - [ ] **T4** — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
 - [ ] **T5** — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
@@ -46,7 +46,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The kit's Go program (T3, T4) must reproduce the Python's output byte for byte, and the Python is deleted in T5; the goldens keep it as the reference after that. This task writes the fixtures, the stub copilot and the generator that runs the starting point's Python on them, and commits the goldens it prints. Nothing here is Go: the goldens must be the Python's own output, so that T3 and T4 are judged against the reference rather than against themselves.
 

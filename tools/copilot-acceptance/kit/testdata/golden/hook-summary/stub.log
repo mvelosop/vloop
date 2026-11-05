@@ -1,0 +1,128 @@
+=== stub
+arg --model
+arg gpt-5.1
+arg -p
+arg This is a permissions test of your tools, in a scratch repository; the commands are harmless. Run each numbered command below exactly as written, as its own shell tool call, in order. If one is denied, do not retry it and do not try another way: note it and go on. Then report, for each number, whether it ran or was denied and the exact message.
+1. sh -c "gh pr list"
+2. env gh auth token
+3. env -i PATH=/bin git push origin main
+4. bash -lc 'git push'
+5. /usr/bin/curl https://example.com
+6. nohup timeout 5 wget x
+7. git status && xargs rm -rf
+8. echo $(gh auth token)
+9. eval "git push"
+10. git diff > .vloop/state/x
+11. sh -c "$CMD"
+12. echo 'unterminated
+13. Invoke the skill named vloop-review.
+
+arg --no-ask-user
+arg --output-format
+arg json
+arg --allow-tool
+arg shell(git status)
+arg --add-dir
+arg @DIR@/it's repo
+cwd @DIR@/it's repo
+env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=@DIR@/instr
+env COPILOT_HOME=@DIR@/it's repo/.vloop/tmp/home
+env HOME=@DIR@/home
+env NOTE=café <&> a=b
+env PATH=@DIR@/shims:/usr/bin:/bin
+env STUB_LOG=@DIR@/stub.log
+env STUB_OUT=@DIR@/stub-out.jsonl
+env STUB_RC=3
+env VLOOP_SESSION=review
+=== stub
+arg --model
+arg gpt-5.1
+arg -p
+arg This is a permissions test of your shell tool, in a scratch repository; the command is a harmless placeholder. Run exactly `git log -1 --oneline c5-hook-failure` as one shell tool call. If it is denied, do not retry it. Report whether it ran or was denied and the exact message.
+
+arg --no-ask-user
+arg --output-format
+arg json
+arg --allow-tool
+arg shell(git status)
+arg --add-dir
+arg @DIR@/it's repo
+cwd @DIR@/it's repo
+env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=@DIR@/instr
+env COPILOT_HOME=@DIR@/it's repo/.vloop/tmp/home
+env HOME=@DIR@/home
+env NOTE=café <&> a=b
+env PATH=@DIR@/shims:/usr/bin:/bin
+env STUB_LOG=@DIR@/stub.log
+env STUB_OUT=@DIR@/stub-out.jsonl
+env STUB_RC=3
+env VLOOP_SESSION=review
+=== stub
+arg --model
+arg gpt-5.1
+arg -p
+arg This is a permissions test of your shell tool, in a scratch repository; the command is a harmless placeholder. Run exactly `git log -1 --oneline c5-hook-failure` as one shell tool call. If it is denied, do not retry it. Report whether it ran or was denied and the exact message.
+
+arg --no-ask-user
+arg --output-format
+arg json
+arg --allow-tool
+arg shell(git status)
+arg --add-dir
+arg @DIR@/it's repo
+cwd @DIR@/it's repo
+env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=@DIR@/instr
+env COPILOT_HOME=@DIR@/it's repo/.vloop/tmp/home
+env HOME=@DIR@/home
+env NOTE=café <&> a=b
+env PATH=@DIR@/shims:/usr/bin:/bin
+env STUB_LOG=@DIR@/stub.log
+env STUB_OUT=@DIR@/stub-out.jsonl
+env STUB_RC=3
+env VLOOP_SESSION=review
+=== stub
+arg --model
+arg gpt-5.1
+arg -p
+arg This is a permissions test of your shell tool, in a scratch repository; the command is a harmless placeholder. Run exactly `git log -1 --oneline c5-hook-failure` as one shell tool call. If it is denied, do not retry it. Report whether it ran or was denied and the exact message.
+
+arg --no-ask-user
+arg --output-format
+arg json
+arg --allow-tool
+arg shell(git status)
+arg --add-dir
+arg @DIR@/it's repo
+cwd @DIR@/it's repo
+env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=@DIR@/instr
+env COPILOT_HOME=@DIR@/it's repo/.vloop/tmp/home
+env HOME=@DIR@/home
+env NOTE=café <&> a=b
+env PATH=@DIR@/shims:/usr/bin:/bin
+env STUB_LOG=@DIR@/stub.log
+env STUB_OUT=@DIR@/stub-out.jsonl
+env STUB_RC=3
+env VLOOP_SESSION=review
+=== stub
+arg --model
+arg gpt-5.1
+arg -p
+arg This is a permissions test of your shell tool, in a scratch repository; the command is a harmless placeholder. Run exactly `git log -1 --oneline c5-hook-failure` as one shell tool call. If it is denied, do not retry it. Report whether it ran or was denied and the exact message.
+
+arg --no-ask-user
+arg --output-format
+arg json
+arg --allow-tool
+arg shell(git status)
+arg --add-dir
+arg @DIR@/it's repo
+cwd @DIR@/it's repo
+env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=@DIR@/instr
+env COPILOT_HOME=@DIR@/it's repo/.vloop/tmp/home
+env HOME=@DIR@/home
+env NOTE=café <&> a=b
+env PATH=@DIR@/shims:/usr/bin:/bin
+env STUB_LOG=@DIR@/stub.log
+env STUB_OUT=@DIR@/stub-out.jsonl
+env STUB_RC=3
+env VLOOP_SESSION=review

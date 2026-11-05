@@ -5,9 +5,9 @@
   "base": "d7b9cbb579f82f8626c9211e5ce8f2f7e8f720aa",
   "branch": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-05T21:50:17Z",
-  "updated": "2026-11-05T22:08:49Z",
+  "updated": "2026-11-05T22:15:59Z",
   "shell": "sh",
   "checks": [
     {
@@ -114,7 +114,7 @@
         "This task adds no Go code and no go test; the goldens and gen.sh are the committed test data T3's and T4's tests run against, and gen.sh is how they are regenerated."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

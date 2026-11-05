@@ -1,0 +1,12 @@
+{"type": "session.start", "timestamp": "2026-11-05T21:30:00.000Z", "data": {"model": "gpt-5.1"}}
+{"type": "tool.execution_start", "timestamp": "2026-11-05T21:30:01.123Z", "data": {"toolCallId": "a1", "toolName": "bash", "arguments": {"command": "echo 'é ü 😀 <&>\tTab\nnew line' && a long command that runs past ninety characters of escaped text", "description": "x"}}}
+{"type": "tool.execution_complete", "timestamp": "2026-11-05T21:30:02.456Z", "data": {"toolCallId": "a1", "success": false, "error": {"code": "denied", "message": "Denied by vloop fence hook — café 😀 <&>: this message is long enough to be cut at one hundred and twenty characters, surely, yes"}}}
+{"type": "tool.execution_start", "timestamp": "2026-11-05T21:30:03.000Z", "data": {"toolCallId": "a2", "toolName": "view", "arguments": {"path": "x", "n": 1.0, "f": 2.5, "tiny": 1e-05, "big": 1e+16, "ok": true, "none": null}}}
+{"type": "tool.execution_complete", "timestamp": "2026-11-05T21:30:03.500Z", "data": {"toolCallId": "a2", "success": true}}
+{"type": "tool.execution_start", "timestamp": "2026-11-05T21:30:04.000Z", "data": {"toolCallId": "a3", "toolName": "web_fetch"}}
+{"type": "tool.execution_complete", "timestamp": "2026-11-05T21:30:05.000Z", "data": {"toolCallId": "a3", "success": false, "error": {"code": "timeout", "message": "timed out"}}}
+{"type": "tool.execution_complete", "timestamp": "2026-11-05T21:30:06.000Z", "data": {"toolCallId": "zz", "success": false, "error": null}}
+not json
+{"type": "assistant.message", "timestamp": "2026-11-05T21:30:09.000Z", "data": {"content": "dénied é 😀 <&>"}}
+{"type": "tool.execution_start", "timestamp": "2026-11-05T21:31:00.000Z", "data": {"toolCallId": "c1", "arguments": {"command": "touch m01"}}}
+{"type": "tool.execution_complete", "timestamp": "2026-11-05T21:31:00.250Z", "data": {"toolCallId": "c1", "success": true}}

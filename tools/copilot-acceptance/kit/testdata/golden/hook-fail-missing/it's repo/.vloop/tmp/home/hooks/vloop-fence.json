@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "/nonexistent/vloop-hook",
+        "powershell": "/nonexistent/vloop-hook",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}

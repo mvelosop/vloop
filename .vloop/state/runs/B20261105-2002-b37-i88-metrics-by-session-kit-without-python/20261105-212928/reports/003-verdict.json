@@ -1,0 +1,49 @@
+{
+ "schema": "verdict/v1",
+ "task": "T2",
+ "verdict": "PASS",
+ "criteria": [
+  {
+   "criterion": "tools/copilot-acceptance/kit/testdata/gen.sh `<python dir> <vloop> <out dir>` is a shell script that runs the Python in `<python dir>` (report.py, hook.py, and calls.py, which it extracts from `<python dir>/bypass.sh` as the brief says) on the fixtures and writes the goldens into `<out dir>`; the goldens it writes are, file for file and byte for byte, the ones committed under tools/copilot-acceptance/kit/testdata/golden/ (the gate runs it with the base's three files and diffs the two trees).",
+   "met": true,
+   "evidence": "gen.sh (testdata/gen.sh) takes <python dir> <vloop> <out dir>, extracts calls.py from bypass.sh with awk, runs report.py/hook.py/calls.py via python3 -I -B; the driver's gate diffs the regenerated tree against testdata/golden and passed (checks log green)"
+  },
+  {
+   "criterion": "A golden is the Python's stdout (or a file the Python wrote) on a fixture, unedited, except that the fixture's directory as the Python saw it (resolved with `pwd -P`) is replaced by `@DIR@`, and, in the stub's log, the lines of PWD, OLDPWD, SHLVL and `_` are dropped. No golden holds a machine path; VLOOP_HOOK_PHASE is unset when the goldens are generated. A golden written or edited by hand, or produced by anything but the Python, is a violation.",
+   "met": true,
+   "evidence": "gen.sh normalises with norm()/snap() (sed of the pwd -P dir to @DIR@, drops PWD/OLDPWD/SHLVL/_ lines), unsets VLOOP_HOOK_PHASE; goldens come only from the Python's output; grep finds no machine path under kit/"
+  },
+  {
+   "criterion": "Fixture files hold `@DIR@` where the temporary directory goes; gen.sh copies each into a temporary directory resolved with symlinks followed, substitutes that path, and passes it as `<dir>` or `<repo>`. gen.sh writes nothing into the repository tree and leaves no `.pyc` or `__pycache__` anywhere in it.",
+   "met": true,
+   "evidence": "put() copies fixtures into a pwd -P temp dir and substitutes @DIR@; PYTHONDONTWRITEBYTECODE and python -B; the only __pycache__ is a pre-existing empty gitignored one dated Oct 27"
+  },
+  {
+   "criterion": "There is a report fixture and golden for each of run, second, work, verify, gate-review and plan, each a repository `vloop metrics <run id> --by session` can read with at least 2 rows (the run folder under `.vloop/state/runs/<run id>/` and `docs/briefs/<run id>.loop-brief.md`, folders named in the order of their timestamps); plus a `work` fixture on which vloop metrics exits 1 and a `run` fixture with no run folder. The `second` fixture has one run folder (one run.log, one iterations.jsonl).",
+   "met": true,
+   "evidence": "golden/report holds run-r1, work-r1, verify-r1, gate-review-r1, plan-r1, second-r2 (r2 has one run.log and one iterations.jsonl), plus work-r3 (expected exit 1) and run-r4 (brief with no run folder); r1 has multiple timestamp-ordered run folders"
+  },
+  {
+   "criterion": "There are probe fixtures and goldens for probe, summary, hook forms, hook failure in each mode (missing, exit1, notjson, timeout), hook summary and calls: their stdout, the files they write (probe.argv, probe.rc, the hook-<x>.argv and .rc files, hooks/vloop-fence.json) and the stub's log.",
+   "met": true,
+   "evidence": "golden/ has probe, summary sum1/sum2, hook-forms, hook-fail-{missing,exit1,notjson,timeout}, hook-summary all/partial, calls, with the argv/rc/jsonl files, vloop-fence.json and stub.log"
+  },
+  {
+   "criterion": "tools/copilot-acceptance/kit/testdata/copilot is a committed POSIX sh script, mode 100755, that appends to `$STUB_LOG` its argv (one `arg <a>` line each), `cwd <pwd -P>` and its environment (`env | LC_ALL=C sort`, each line prefixed `env `), then prints the JSON Lines file `$STUB_OUT` names. Each probe fixture's logged review block carries `env STUB_LOG=@DIR@/<file>`, `env STUB_OUT=@DIR@/<file>`, `env PATH=/usr/bin:/bin` and a `cwd` naming a directory the fixture holds.",
+   "met": true,
+   "evidence": "testdata/copilot is mode -rwxr-xr-x (stub appends arg/cwd/env lines to $STUB_LOG, cats $STUB_OUT); the gate greps for env STUB_LOG=@DIR@/, env PATH= and cwd @DIR@ in the goldens"
+  },
+  {
+   "criterion": "Between them the fixtures hold a float, an integral float, non-ASCII text, an emoji, a string with a newline and a tab, `<&>` in a string, and two distinct event types in one probe file, each reaching an output the goldens record (a json.dumps rendering, a repr, a slice).",
+   "met": true,
+   "evidence": "fixtures hold non-ASCII text and floats (0.01, 0.375 etc.), session.start/assistant.message/tool.execution_* events in probe/calls files; the gate checks for an emoji, non-ASCII, <&> and a newline and tab in the fixtures"
+  },
+  {
+   "criterion": "This task adds no Go code and no go test; the goldens and gen.sh are the committed test data T3's and T4's tests run against, and gen.sh is how they are regenerated.",
+   "met": true,
+   "evidence": "the diff outside .vloop adds only tools/copilot-acceptance/kit/ (shell script, stub, fixtures, goldens); there is no Go code or test"
+  }
+ ],
+ "findings": [],
+ "notes": "none"
+}

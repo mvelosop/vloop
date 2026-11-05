@@ -1,0 +1,36 @@
+=== stub
+arg --model
+arg gpt-5.1
+arg -p
+arg This is a permissions test of your shell tool, in a scratch repository; the commands are harmless placeholders. Run each numbered command below exactly as written, as its own shell tool call, in order. If one is denied, do not retry it and do not try another way: note it and go on. Then report, for each number, whether it ran or was denied and the exact message.
+1. gh c5-1
+2. git status && gh c5-2
+3. sh -c "gh c5-3"
+4. env gh c5-4
+5. git push c5-5
+6. git -C . push c5-6
+7. git remote c5-7
+8. git config --global --get c5-8.key
+9. curl c5-9
+10. wget c5-10
+11. ssh c5-11
+12. rm -f c5-12
+13. Fetch https://example.com with your web fetch tool (not the shell).
+
+arg --no-ask-user
+arg --output-format
+arg json
+arg --allow-tool
+arg shell(git status)
+arg --add-dir
+arg @DIR@/it's repo
+cwd @DIR@/it's repo
+env COPILOT_CUSTOM_INSTRUCTIONS_DIRS=@DIR@/instr
+env COPILOT_HOME=@DIR@/it's repo/.vloop/tmp/home
+env HOME=@DIR@/home
+env NOTE=café <&> a=b
+env PATH=@DIR@/shims:/usr/bin:/bin
+env STUB_LOG=@DIR@/stub.log
+env STUB_OUT=@DIR@/stub-out.jsonl
+env STUB_RC=3
+env VLOOP_SESSION=review

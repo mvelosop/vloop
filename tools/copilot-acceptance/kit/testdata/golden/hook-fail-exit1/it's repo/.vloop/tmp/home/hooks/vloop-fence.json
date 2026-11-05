@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "sh -c 'exit 1'",
+        "powershell": "sh -c 'exit 1'",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}

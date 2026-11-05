@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "sh -c 'sleep 60'",
+        "powershell": "sh -c 'sleep 60'",
+        "timeoutSec": 3
+      }
+    ]
+  }
+}

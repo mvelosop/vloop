@@ -1,0 +1,37 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.5207631000000001,
+  "duration_ms": 170087,
+  "effort": null,
+  "ended": "2026-11-05T22:11:40Z",
+  "is_error": false,
+  "iteration": 3,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 70250,
+      "cache_read_input_tokens": 1013651,
+      "cost_usd": 0.5207631000000001,
+      "input_tokens": 34,
+      "output_tokens": 13833
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop; f=tools/copilot-acceptance/kit/testdata/gen.sh\nperl -0pi -e 's/hook\\(\\) \\{ # hook NAME.*?\\n\\}\\nhook forms forms\\n/D=\\$t\\/hook-forms; put \"\\$here\\/probes\\/hook\" \"\\$D\"\\n(cd \"…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "cd ~/source/personal/vloop; TD=tools/copilot-acceptance/kit/testdata; rm -rf .vloop/tmp/pyd .vloop/tmp/vl; find . -name __pycache__ -newer $TD/gen.sh -not -path './.git/*' | head; git add -N $TD; git …",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
+  "schema": "session/v3",
+  "started": "2026-11-05T22:08:49Z",
+  "task": "T2",
+  "turns": 21,
+  "wall_ms": 170708
+}

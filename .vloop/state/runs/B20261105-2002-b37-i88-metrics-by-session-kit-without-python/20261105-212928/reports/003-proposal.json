@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Added tools/copilot-acceptance/kit/testdata with report and probe fixtures, the stub copilot (mode 755), gen.sh and the goldens that gen.sh printed from the base commit's Python.",
+  "files": ["tools/copilot-acceptance/kit/testdata/gen.sh", "tools/copilot-acceptance/kit/testdata/copilot", "tools/copilot-acceptance/kit/testdata/reports", "tools/copilot-acceptance/kit/testdata/probes", "tools/copilot-acceptance/kit/testdata/golden"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok.",
+  "notes": "Layout: reports/r1 (run, work, verify, gate-review, plan), r2 (second), r3 (work, metrics exits 1), r4 (run, no run folder); probes/{probe,sum1,sum2,hook,hsum,calls,noreview}. Fixtures are copies of the T3/T4 gate fixtures. Goldens: golden/report/<kind>-<fixture>.md, golden/probe/{stdout,probe.*,stub.log}, golden/summary/<sum>.md, golden/hook-<step>/ (each step on a fresh copy of probes/hook: written files, stub.log, the hooks file under it's repo/.vloop/tmp/home/hooks/), golden/hook-summary/{all,partial}.md, golden/calls/stdout. Regenerate: sh gen.sh <python dir> <vloop> <out dir> with base d7b9cbb5's report.py, hook.py, bypass.sh. The stub copilot logs an `=== stub` header per session and honours STUB_RC; it prints `stub stderr` on stderr. noreview has no golden (the Python exits 1 there, T4's gate compares it live). No Go code was added."
+}

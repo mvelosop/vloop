@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "sh -c 'echo this is not JSON'",
+        "powershell": "sh -c 'echo this is not JSON'",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}
