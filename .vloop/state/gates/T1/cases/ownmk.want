@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "vloop": {
+      "source": {
+        "source": "directory",
+        "path": "../vloop"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "vloop@vloop": true
+  }
+}

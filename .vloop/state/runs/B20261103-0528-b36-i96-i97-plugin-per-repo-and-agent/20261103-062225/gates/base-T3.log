@@ -1,0 +1,8 @@
+GATE FAIL: init's closing lines are not, byte for byte, .vloop/state/gates/T3/next.want:
+next:
+  vloop doctor
+  get /vloop:operate for your Claude Code sessions, once:
+    claude plugin marketplace add mvelosop/vloop
+    claude plugin install vloop@vloop
+  or, for one session: claude --plugin-dir "$(vloop plugin path)"
+  then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop

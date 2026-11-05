@@ -1,0 +1,1 @@
+GATE FAIL: P3 [{"id":"vloop@vloop","version":"@V@","scope":"user","enabled":true}] (settings -, local -): claude was run as other than `plugin list --json` in the root $TMPDIR/gate.5emelJ/r: $TMPDIR/gate.5emelJ/elsewhere|$TMPDIR/gate.5emelJ/chome|plugin list --json

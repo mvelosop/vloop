@@ -1,0 +1,8 @@
+{"schema":"verify/v2","complete":true,"findings":[],
+"not_run":[
+{"line":"P1 worked-example lines (vloop init, vloop upgrade, with and without --dry-run)","reason":"running the built vloop was denied by the sandbox (init is on the verify fence; a built-binary upgrade was refused by the classifier); not retried. Covered by named tests in internal/cli, whose passing the run's checks record"},
+{"line":"P3 and P4 worked-example lines (doctor with stub claude and copilot)","reason":"the built binary could not be run; covered by internal/cli/doctor_test.go. Checked by reading internal/cli/doctor.go instead"},
+{"line":"Acceptance, at close (items 1-5)","reason":"the operator's, at close; needs a live model"}],
+"checked":{"example_lines":0,"sentences":14,"surfaces":9},
+"notes":"The binary built fine into .vloop/tmp/vfy, but the sandbox refused to run it, so no example line was run. The contract was checked by reading internal/install/settings.go, init.go, upgrade.go and doctor.go against the brief. Merge rules and key order, the not-an-object messages, the exact printInitNext block, the P3/P4 message texts, the working directory, the preflight exclusion and the n/a rule all match. The surfaces read were README, concepts.md (init, upgrade, doctor, plugin and Copilot paragraphs), the CLAUDE.md section text and the doctor messages. Not checked: the exact bytes of the written JSON (only the layout code was read) and the symlink refusal in upgrade, which I assumed readRepoFile handles."}
+

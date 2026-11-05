@@ -41,7 +41,7 @@ func TestShortsFollowListAndShow(t *testing.T) {
 func TestInitPointsAtBothWaysToLoadThePlugin(t *testing.T) {
 	d := initRepo(t, map[string]string{"go.mod": "module a\n"})
 	out, _, _ := runPluginCLI(t, initBuild, d, "init")
-	for _, want := range []string{"claude plugin marketplace add mvelosop/vloop", "claude plugin install vloop@vloop", `claude --plugin-dir "$(vloop plugin path)"`} {
+	for _, want := range []string{"claude plugin marketplace add mvelosop/vloop", "claude plugin install vloop@vloop --scope project", "copilot plugin install vloop@vloop", `claude --plugin-dir "$(vloop plugin path)"`} {
 		if !strings.Contains(out, want) {
 			t.Errorf("init's next steps lack %q:\n%s", want, out)
 		}

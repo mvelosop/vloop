@@ -34,17 +34,31 @@ The file to put that line in, per shell, is in
 
 The plugin ships inside the binary, and `vloop run` hands it to its own sessions.
 For an interactive Claude Code session with the plugin, install it from this
-repository's marketplace:
+repository's marketplace, run inside the repository:
 
 ```
 claude plugin marketplace add mvelosop/vloop
-claude plugin install vloop@vloop
+claude plugin install vloop@vloop --scope project
 ```
 
-or, without installing it, from inside a repository where you ran `vloop init`:
+That installs the plugin for that repository (without `--scope project`, for
+every repository).
+
+`vloop init` declares the plugin in `.claude/settings.json`, so trusting the
+folder in Copilot CLI installs it for that repository; in Claude Code, run the
+install above. To install it for Copilot CLI per user instead:
+
+```
+copilot plugin marketplace add mvelosop/vloop
+copilot plugin install vloop@vloop
+```
+
+Or, without installing it, from inside a repository where you ran `vloop init`,
+for one session:
 
 ```
 claude --plugin-dir "$(vloop plugin path)"
+copilot --plugin-dir "$(vloop plugin path)"
 ```
 
 ## Quickstart
@@ -52,7 +66,8 @@ claude --plugin-dir "$(vloop plugin path)"
 In a git repository, on a clean tree:
 
 1. `vloop init` sets the repository up: config with the stacks it detects, a
-   starter brief, and vloop's section of `CLAUDE.md`. It never commits.
+   starter brief, vloop's section of `CLAUDE.md`, and the plugin's declaration in
+   `.claude/settings.json`. It never commits.
 2. Add a `[[check]]` to `.vloop/config.toml`: a command that must keep passing
    after every task, such as your test suite.
 3. `vloop doctor` verifies git, config, `claude`, trust and the rest. Fix what it

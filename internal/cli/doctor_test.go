@@ -86,7 +86,7 @@ func (e *doctorEnv) claude(present bool) {
 		if e.pluginErr != "" {
 			list = "echo '" + e.pluginErr + "' >&2; exit 3"
 		}
-		script := "#!/bin/sh\nif [ \"$*\" = \"--version\" ]; then echo 2.1.0; exit 0; fi\n" +
+		script := "#!/bin/sh\nif [ \"$*\" = \"plugin list --json\" ]; then pwd -P >> '" + e.stub + "/claude.cwd'; fi\nif [ \"$*\" = \"--version\" ]; then echo 2.1.0; exit 0; fi\n" +
 			"if [ \"$*\" = \"plugin list --json\" ]; then " + list + "; fi\nexit 3\n"
 		if err := os.WriteFile(filepath.Join(e.stub, "claude"), []byte(script), 0o755); err != nil {
 			e.t.Fatal(err)
@@ -293,13 +293,142 @@ func TestDoctorPlugin(t *testing.T) {
 	e.want("plugin", resNA)
 }
 
+const (
+	noPluginMsg    = `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop --scope project installs it for this repository (after claude plugin marketplace add mvelosop/vloop if claude does not know the marketplace), or claude --plugin-dir "$(vloop plugin path)" for one session`
+	notEnabledMsg  = `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, claude plugin enable vloop@vloop --scope project (or with --scope user, if you disabled it for every repository), or start claude --plugin-dir "$(vloop plugin path)"`
+	oldPluginMsg   = "the vloop plugin is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind"
+	noCopilotMsg   = `/vloop:operate is not available in your copilot sessions — trusting this folder in copilot installs it when .claude/settings.json declares it (vloop init writes the declaration), or copilot plugin install vloop@vloop (after copilot plugin marketplace add mvelosop/vloop), or copilot --plugin-dir "$(vloop plugin path)" for one session`
+	notEnabledCopi = `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, set enabledPlugins["vloop@vloop"] to true in .claude/settings.json and trust this folder in copilot, or start copilot --plugin-dir "$(vloop plugin path)"`
+	oldCopilotMsg  = "the vloop plugin for copilot is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; copilot plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind"
+)
+
+// claudeCwds is the working directories the stub claude ran plugin list in.
+func (e *doctorEnv) claudeCwds() []string {
+	b, _ := os.ReadFile(filepath.Join(e.stub, "claude.cwd"))
+	return strings.Fields(string(b))
+}
+
+// copilot installs a stub copilot printing list for plugin list --json (or
+// failing with stderr text when errText is set), logging its directory.
+func (e *doctorEnv) copilotList(list, errText string) {
+	e.t.Helper()
+	body := "echo '" + list + "'; exit 0"
+	if errText != "" {
+		body = "echo '" + errText + "' >&2; exit 3"
+	}
+	script := "#!/bin/sh\nif [ \"$*\" = \"--version\" ]; then echo 1.0.105; exit 0; fi\n" +
+		"if [ \"$*\" = \"plugin list --json\" ]; then pwd -P >> '" + e.stub + "/copilot.cwd'; " + body + "; fi\nexit 3\n"
+	if err := os.WriteFile(filepath.Join(e.stub, "copilot"), []byte(script), 0o755); err != nil {
+		e.t.Fatal(err)
+	}
+	os.Remove(filepath.Join(e.stub, "copilot.cwd"))
+	e.t.Setenv("GH_TOKEN", "x")
+	e.write(".vloop/config.toml", "[agent]\nwork = \"copilot\"\n\n"+doctorCheckConfig)
+}
+
+func (e *doctorEnv) copilotCwds() []string {
+	b, _ := os.ReadFile(filepath.Join(e.stub, "copilot.cwd"))
+	return strings.Fields(string(b))
+}
+
+func TestDoctorPluginScopeP3(t *testing.T) {
+	e := newDoctorEnv(t)
+	other := t.TempDir()
+	R := e.repo
+	for _, c := range []struct{ list, settings, want string }{
+		{`[{"id":"vloop@vloop","version":"0.1.0","scope":"user","enabled":true}]`, "", ""},
+		{`[{"id":"vloop@vloop","version":"0.1.0","scope":"project","projectPath":"` + R + `","enabled":true}]`, "", ""},
+		{`[{"id":"vloop@vloop","version":"0.1.0","scope":"project","projectPath":"` + other + `","enabled":true}]`, "", noPluginMsg},
+		{`[{"id":"vloop@vloop","version":"0.0.9","scope":"user","enabled":true}]`, "", oldPluginMsg},
+		{`[{"id":"vloop@vloop","version":"0.1.0","scope":"user","enabled":false}]`, "", notEnabledMsg},
+		{`[{"id":"vloop@vloop","version":"0.1.0","scope":"user","enabled":true}]`, `{"enabledPlugins":{"vloop@vloop":false}}`, notEnabledMsg},
+		{`[{"id":"vloop@vloop","version":"0.1.0","scope":"user","enabled":true}]`, `[1]`, ""},
+		{`[{"id":"vloop@vloop","version":"","scope":"project","projectPath":"` + R + `","enabled":true}]`, "", noPluginMsg},
+	} {
+		e.plugins = c.list
+		e.claude(true)
+		if c.settings != "" {
+			e.write(".claude/settings.json", c.settings)
+		}
+		got, _ := e.check("plugin")
+		if c.want == "" && got.Result != resPass || c.want != "" && (got.Result != resWarning || got.Message != c.want) {
+			t.Errorf("%s with %q: %s %q, want %q", c.list, c.settings, got.Result, got.Message, c.want)
+		}
+		os.Remove(filepath.Join(e.repo, ".claude", "settings.json"))
+	}
+	cwds := e.claudeCwds()
+	if len(cwds) == 0 {
+		t.Fatal("claude plugin list never ran")
+	}
+	for _, d := range cwds {
+		if d != e.repo {
+			t.Errorf("claude plugin list ran in %s, want %s", d, e.repo)
+		}
+	}
+}
+
+func TestDoctorCopilotPluginP4(t *testing.T) {
+	e := newDoctorEnv(t)
+	for _, c := range []struct{ list, errText, want string }{
+		{`[{"name":"vloop","marketplace":"vloop","version":"0.1.0","enabled":true,"source":"installed"}]`, "", ""},
+		{`[{"name":"vloop","marketplace":"vloop","version":"0.0.9","enabled":true,"source":"installed"}]`, "", oldCopilotMsg},
+		{`[{"name":"vloop","marketplace":"vloop","version":"0.1.0","enabled":false,"source":"installed"}]`, "", notEnabledCopi},
+		{`[{"name":"browser-use","marketplace":"","version":"0.0.4","enabled":false,"source":"builtin"}]`, "", noCopilotMsg},
+		{`[]`, "boom", "cannot read copilot plugin list --json: boom"},
+	} {
+		e.copilotList(c.list, c.errText)
+		got, _ := e.check("copilot plugin")
+		if c.want == "" && got.Result != resPass || c.want != "" && (got.Result != resWarning || got.Message != c.want) {
+			t.Errorf("%s: %s %q, want %q", c.list, got.Result, got.Message, c.want)
+		}
+	}
+	for _, d := range e.copilotCwds() {
+		if d != e.repo {
+			t.Errorf("copilot plugin list ran in %s, want %s", d, e.repo)
+		}
+	}
+	// no claude: the row still appears, after plugin n/a
+	os.Remove(filepath.Join(e.stub, "claude"))
+	e.want("plugin", resNA)
+	e.want("copilot plugin", resWarning)
+	// the copilot row a problem: n/a
+	os.Remove(filepath.Join(e.stub, "copilot"))
+	e.want("copilot plugin", resNA)
+}
+
+func TestDoctorNoCopilotPluginRow(t *testing.T) {
+	e := newDoctorEnv(t)
+	os.WriteFile(filepath.Join(e.stub, "copilot"), []byte("#!/bin/sh\necho x >> '"+e.stub+"/copilot.cwd'\nexit 3\n"), 0o755)
+	out, _ := e.run("--json", "doctor")
+	if strings.Contains(out, `"copilot plugin"`) {
+		t.Errorf("a copilot plugin row with no copilot key:\n%s", out)
+	}
+	if len(e.copilotCwds()) != 0 {
+		t.Error("copilot ran with no copilot key")
+	}
+}
+
+func TestPreflightRunsNoCopilotPluginList(t *testing.T) {
+	e := newDoctorEnv(t)
+	e.copilotList(`[]`, "")
+	checks := runDoctor(e.build, e.repo, new(string))
+	for _, c := range checks {
+		if c.Name == "copilot plugin" {
+			t.Errorf("preflight computed the copilot plugin row: %+v", c)
+		}
+	}
+	if len(e.copilotCwds()) != 0 {
+		t.Error("copilot plugin list ran in the preflight")
+	}
+}
+
 func TestDoctorPluginMessages(t *testing.T) {
 	e := newDoctorEnv(t)
 	for plugins, want := range map[string]string{
-		`[]`: `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`,
-		`[{"id":"other@x","version":"0.1.0","enabled":true}]`:      `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop (after claude plugin marketplace add mvelosop/vloop), or claude --plugin-dir "$(vloop plugin path)" for one session`,
-		`[{"id":"vloop@vloop","version":"0.1.0","enabled":false}]`: "installed but disabled — claude plugin enable vloop@vloop",
-		`[{"id":"vloop@vloop","version":"0.0.9","enabled":true}]`:  "the vloop plugin is 0.0.9 but this binary is 0.1.0 — update the one that is behind",
+		`[]`: noPluginMsg,
+		`[{"id":"other@x","version":"0.1.0","enabled":true}]`:      noPluginMsg,
+		`[{"id":"vloop@vloop","version":"0.1.0","enabled":false}]`: notEnabledMsg,
+		`[{"id":"vloop@vloop","version":"0.0.9","enabled":true}]`:  oldPluginMsg,
 	} {
 		e.plugins = plugins
 		e.claude(true)
@@ -508,17 +637,28 @@ func TestDoctorGateEditsOrderAndUnreadable(t *testing.T) {
 
 func TestDoctorGateEditsNoClaudeAndWritesNothing(t *testing.T) {
 	e := gateEditsEnv(t)
+	// init declares the plugin in .claude/settings.json; doctor adds nothing to it.
+	declared := `{"extraKnownMarketplaces":{"vloop":{"source":{"source":"github","repo":"mvelosop/vloop"}}},"enabledPlugins":{"vloop@vloop":true}}`
+	e.settings("project", declared)
+	assertOnlySettings := func(when string) {
+		t.Helper()
+		ents, err := os.ReadDir(filepath.Join(e.repo, ".claude"))
+		if err != nil || len(ents) != 1 || ents[0].Name() != "settings.json" {
+			t.Errorf("%s: .claude/ holds %v (err %v), want only settings.json", when, ents, err)
+		}
+		got, _ := os.ReadFile(filepath.Join(e.repo, ".claude", "settings.json"))
+		if string(got) != declared {
+			t.Errorf("%s: settings.json = %s", when, got)
+		}
+	}
 	e.claude(false)
 	e.want("gate edits", resNA)
-	if _, err := os.Stat(filepath.Join(e.repo, ".claude")); err == nil {
-		t.Error("doctor created .claude/")
-	}
+	assertOnlySettings("claude absent")
 	e.claude(true)
 	e.want("gate edits", resWarning)
-	for _, p := range []string{filepath.Join(e.home, ".claude"), filepath.Join(e.repo, ".claude")} {
-		if _, err := os.Stat(p); err == nil {
-			t.Errorf("doctor created %s", p)
-		}
+	assertOnlySettings("claude present")
+	if _, err := os.Stat(filepath.Join(e.home, ".claude")); err == nil {
+		t.Errorf("doctor created %s", filepath.Join(e.home, ".claude"))
 	}
 }
 
