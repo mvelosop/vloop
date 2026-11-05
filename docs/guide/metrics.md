@@ -258,7 +258,7 @@ and a `total` row. Columns: `n` (records), `recommended`, `share`,
 `automatable-partly`. **share** = `recommended` / (`n` − `no-options`), a whole
 percentage, rounded half up, or `n/a` when no record has options: a record with
 no options cannot agree or disagree. `--json` prints the rows with snake_case
-keys. `--by task` is refused, exit 2. With `--workspace` the table has a
+keys. `--by task` and `--by session` are refused, exit 2. With `--workspace` the table has a
 leading `repo` column, each repository's kind rows in turn, then one `total`
 row over all of them.
 
