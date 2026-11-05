@@ -11,18 +11,18 @@
 # state/v2 validity) and the gate review's verdict per round, to be recorded in
 # docs/design-notes/copilot-cli-experiments.md before the brief is closed. Spends
 # Copilot credits (the plan sessions) and Claude money (gate review, work, review,
-# verify). Needs copilot, claude and gh on PATH, claude and gh logged in, go and python3.
+# verify). Needs copilot, claude and gh on PATH, claude and gh logged in, and go.
 set -u
 model=${1:?usage: plan.sh <copilot model id> [dir]}
 dir=${2:-$HOME/vloop-copilot-acceptance}
 here=$(cd "$(dirname "$0")" && pwd -P)
 top=$(cd "$here/../.." && pwd -P)
 die() { echo "b27: $*" >&2; exit 1; }
+dir=$(mkdir -p "$dir" && cd "$dir" && pwd -P) || die "cannot create $dir"
 
 command -v copilot >/dev/null || die "copilot is not on PATH"
 command -v claude >/dev/null || die "claude is not on PATH"
 command -v gh >/dev/null || die "gh is not on PATH: Copilot sessions log in through it"
-command -v python3 >/dev/null || die "python3 is not on PATH"
 
 mkdir -p "$dir/bin" || die "cannot create $dir"
 (cd "$top" && go build -o "$dir/bin/vloop" ./cmd/vloop) || die "build of vloop failed"
@@ -57,7 +57,7 @@ echo "b27: vloop run (plan on copilot $model, the rest on claude) ..."
 "$V" run "docs/briefs/$name.md" >"$dir/run-plan.log" 2>&1
 rc=$?
 tail -14 "$dir/run-plan.log"
-python3 "$here/report.py" plan "$repo" "$V" "$rc" >"$dir/b27-plan-summary.md" || die "the report failed"
+go -C "$top" run ./tools/copilot-acceptance/kit report plan "$repo" "$V" "$rc" >"$dir/b27-plan-summary.md" || die "the report failed"
 cat "$dir/b27-plan-summary.md"
 echo
 echo "b27: written $dir/b27-plan-summary.md; record it in docs/design-notes/copilot-cli-experiments.md"

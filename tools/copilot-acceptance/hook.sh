@@ -14,25 +14,26 @@
 #
 # Writes <dir>/b22-hook-summary.md, to be recorded in
 # docs/design-notes/copilot-cli-experiments.md before the brief is closed.
-# Spends Copilot credits. Needs copilot and python3 on PATH.
+# Spends Copilot credits. Needs copilot, go and gh on PATH.
 set -u
 dir=${1:-$HOME/vloop-copilot-acceptance}
 here=$(cd "$(dirname "$0")" && pwd -P)
+top=$(cd "$here/../.." && pwd -P)
 die() { echo "b22: $*" >&2; exit 1; }
+dir=$(mkdir -p "$dir" && cd "$dir" && pwd -P) || die "cannot create $dir"
 
 real=$(command -v copilot) || die "copilot is not on PATH"
-command -v python3 >/dev/null || die "python3 is not on PATH"
 [ -s "$dir/copilot-argv.log" ] || die "no logged copilot session in $dir: run run.sh first"
 [ -d "$dir/shims" ] || die "no shims in $dir: run run.sh first"
 
 : >"$dir/probe-hits.log"
 echo "b22: hook probe of the worked example's deny forms ..."
-python3 "$here/hook.py" forms "$dir" "$real" || die "the hook probe failed to start"
+go -C "$top" run ./tools/copilot-acceptance/kit hook forms "$dir" "$real" || die "the hook probe failed to start"
 for mode in missing exit1 notjson timeout; do
   echo "b22: hook failure: $mode ..."
-  python3 "$here/hook.py" failure "$dir" "$real" "$mode" || die "the $mode probe failed to start"
+  go -C "$top" run ./tools/copilot-acceptance/kit hook failure "$dir" "$real" "$mode" || die "the $mode probe failed to start"
 done
-python3 "$here/hook.py" summary "$dir" >"$dir/b22-hook-summary.md" || die "the report failed"
+go -C "$top" run ./tools/copilot-acceptance/kit hook summary "$dir" >"$dir/b22-hook-summary.md" || die "the report failed"
 cat "$dir/b22-hook-summary.md"
 echo
 echo "b22: written $dir/b22-hook-summary.md; record it in docs/design-notes/copilot-cli-experiments.md"

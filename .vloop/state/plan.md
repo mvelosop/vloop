@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 5
+**Status:** running · **5/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:33:23Z
+**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:40:01Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
 - [x] **T3** — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
 - [x] **T4** — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
-- [ ] **T5** — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
+- [x] **T5** — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
 
 ## Tasks
@@ -119,7 +119,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
 
-`pending` · depends on: T3, T4
+`done` · depends on: T3, T4
 
 With the Go program complete, the kit's scripts can stop needing python3 (P4). Every script calls `go -C "$top" run ./tools/copilot-acceptance/kit …` where it called python3, with the same arguments and absolute paths, the Python files are deleted, and the README says what the kit needs. The scripts make the call from scratch repositories outside the module, which is why `-C` and absolute directories matter.
 

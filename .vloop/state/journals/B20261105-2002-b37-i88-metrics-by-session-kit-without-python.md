@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The kit's Go program now has probe, summary, hook forms|failure|summary and calls, ported from report.py, hook.py and bypass.sh's heredoc, with Go tests against the T2 goldens.
 - **Files:** tools/copilot-acceptance/kit/probe.go, tools/copilot-acceptance/kit/probe_test.go, tools/copilot-acceptance/kit/main.go, tools/copilot-acceptance/kit/pyval.go
 - **Notes for next iteration:** pyval.go dumpStr fix: DEL (0x7f) is now escaped as \u007f like Python's ensure_ascii (it was written raw). Python crashes (non-dict event, non-string type/message) are exit 1 with a one-line message; calls writes the lines found before the bad event, as the Python printed them. Child exit by signal reports -1, not Python's negative signal number. Unchanged: testdata/.
+
+## T5 — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The kit's scripts now call the Go program (`go -C "$top" run ./tools/copilot-acceptance/kit …`) instead of python3, make their directory argument absolute, and report.py and hook.py are deleted. The README names go, copilot, gh, claude, perl, and `vloop metrics --by session`.
+- **Files:** tools/copilot-acceptance/run.sh, tools/copilot-acceptance/second.sh, tools/copilot-acceptance/work.sh, tools/copilot-acceptance/verify.sh, tools/copilot-acceptance/gatereview.sh, tools/copilot-acceptance/plan.sh, tools/copilot-acceptance/hook.sh, tools/copilot-acceptance/bypass.sh, tools/copilot-acceptance/README.md, tools/copilot-acceptance/report.py, tools/copilot-acceptance/hook.py
+- **Notes for next iteration:** die() moved above the dir-absolute line in each script; hook.sh gained a top= line. bypass.sh uses `|| exit 1` and computes here/top after work. An untracked tools/copilot-acceptance/__pycache__ may remain (rm of directories was denied); it is not part of the work.

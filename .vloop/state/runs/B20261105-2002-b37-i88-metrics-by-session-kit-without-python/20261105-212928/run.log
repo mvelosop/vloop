@@ -45,3 +45,10 @@ committing the plan
    review T4 · 0m42s · $0.24 · run $9.32 / $40.00
    review: PASS
    T4 done
+── iteration 6 (6 this run) · T5 · 4/6 done ──
+   Switch the kit's scripts and README to the Go program and delete report.py and hook.py
+   work T5 · 1m55s · $0.28 · run $9.60 / $40.00
+   check go
+   review T5 · 0m44s · $0.16 · run $9.75 / $40.00
+   review: PASS
+   T5 done

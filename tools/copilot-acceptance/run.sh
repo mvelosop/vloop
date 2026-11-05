@@ -16,17 +16,17 @@
 # Writes <dir>/c5-summary.md, to be recorded in
 # docs/design-notes/copilot-cli-experiments.md. Spends Claude money (plan and
 # work) and Copilot credits (reviews and the probe). Needs copilot, claude and
-# gh on PATH, claude and gh logged in, go and python3.
+# gh on PATH, claude and gh logged in, and go.
 set -u
 model=${1:?usage: run.sh <copilot model id> [dir]}
 dir=${2:-$HOME/vloop-copilot-acceptance}
 here=$(cd "$(dirname "$0")" && pwd -P)
 top=$(cd "$here/../.." && pwd -P)
 die() { echo "c5: $*" >&2; exit 1; }
+dir=$(mkdir -p "$dir" && cd "$dir" && pwd -P) || die "cannot create $dir"
 
 real=$(command -v copilot) || die "copilot is not on PATH"
 command -v claude >/dev/null || die "claude is not on PATH"
-command -v python3 >/dev/null || die "python3 is not on PATH"
 echo "c5: copilot $("$real" --version 2>&1 | head -1)"
 
 mkdir -p "$dir/bin" || die "cannot create $dir"
@@ -74,7 +74,7 @@ echo "c5: vloop run (plan and work on claude, reviews on copilot $model) ..."
 PATH=$dir/shim-copilot:$PATH "$V" run "docs/briefs/$name.md" >"$dir/run.log" 2>&1
 rc=$?
 tail -14 "$dir/run.log"
-python3 "$here/report.py" run "$repo" "$V" "$rc" >"$dir/c5-run.md" || die "the run report failed"
+go -C "$top" run ./tools/copilot-acceptance/kit report run "$repo" "$V" "$rc" >"$dir/c5-run.md" || die "the run report failed"
 
 # The probe: the last review session exactly as the adapter started it, with
 # only the prompt replaced and the shims first on PATH.
@@ -102,8 +102,8 @@ GIT
 chmod +x "$dir/shims/"*
 : >"$dir/probe-hits.log"
 echo "c5: deny probe ..."
-python3 "$here/report.py" probe "$dir" "$real" || die "the probe failed to start"
-python3 "$here/report.py" summary "$dir" >"$dir/c5-probe.md" || die "the probe report failed"
+go -C "$top" run ./tools/copilot-acceptance/kit probe "$dir" "$real" || die "the probe failed to start"
+go -C "$top" run ./tools/copilot-acceptance/kit summary "$dir" >"$dir/c5-probe.md" || die "the probe report failed"
 
 cat "$dir/c5-run.md" "$dir/c5-probe.md" >"$dir/c5-summary.md"
 echo

@@ -15,10 +15,10 @@ dir=${2:-$HOME/vloop-copilot-acceptance}
 here=$(cd "$(dirname "$0")" && pwd -P)
 top=$(cd "$here/../.." && pwd -P)
 die() { echo "b22: $*" >&2; exit 1; }
+dir=$(mkdir -p "$dir" && cd "$dir" && pwd -P) || die "cannot create $dir"
 
 command -v copilot >/dev/null || die "copilot is not on PATH"
 command -v claude >/dev/null || die "claude is not on PATH"
-command -v python3 >/dev/null || die "python3 is not on PATH"
 
 mkdir -p "$dir/bin" || die "cannot create $dir"
 (cd "$top" && go build -o "$dir/bin/vloop" ./cmd/vloop) || die "build of vloop failed"
@@ -55,7 +55,7 @@ echo "b22: vloop run (second review on copilot $model, feedback mode) ..."
 "$V" run "docs/briefs/$name.md" >"$dir/run-second.log" 2>&1
 rc=$?
 tail -14 "$dir/run-second.log"
-python3 "$here/report.py" second "$repo" "$V" "$rc" >"$dir/b22-second-summary.md" || die "the report failed"
+go -C "$top" run ./tools/copilot-acceptance/kit report second "$repo" "$V" "$rc" >"$dir/b22-second-summary.md" || die "the report failed"
 cat "$dir/b22-second-summary.md"
 echo
 echo "b22: written $dir/b22-second-summary.md; record it in docs/design-notes/copilot-cli-experiments.md"

@@ -9,10 +9,14 @@
 #
 # One scratch repo per case, COPILOT_HOME inside it (as vloop puts it under
 # .vloop/tmp/). Every hook invocation is logged with its start and end time.
+#
+# Needs copilot, go, git and perl on PATH (perl for the hook timestamps, `perl -MTime::HiRes`).
 set -u
 model=${1:?usage: bypass.sh <model> [workdir]}
 work=${2:-$(mktemp -d)}
-mkdir -p "$work"
+work=$(mkdir -p "$work" && cd "$work" && pwd -P) || exit 1
+here=$(cd "$(dirname "$0")" && pwd -P)
+top=$(cd "$here/../.." && pwd -P)
 copilot --version | head -1
 now='perl -MTime::HiRes=time -e "printf q(%.3f), time"'
 deny='{"permissionDecision":"deny","permissionDecisionReason":"blocked by test"}'
@@ -40,21 +44,7 @@ session() {
 
 # The tool calls Copilot started and how each ended: timestamp, ran/denied, command.
 calls() {
-  python3 - "$d/out.jsonl" <<'PY'
-import json, sys
-start, rows = {}, []
-for line in open(sys.argv[1]):
-    try: e = json.loads(line)
-    except ValueError: continue
-    t, data = e.get("type"), e.get("data", {})
-    if t == "tool.execution_start":
-        start[data["toolCallId"]] = (e["timestamp"][11:23], json.dumps(data.get("arguments", {}).get("command", data.get("arguments"))))
-    elif t == "tool.execution_complete":
-        ts, cmd = start.get(data.get("toolCallId"), ("?", "?"))
-        err = data.get("error") or {}
-        state = "ran" if data.get("success") else ("denied" if err.get("code") == "denied" else "failed")
-        print(f"  {ts} -> {e['timestamp'][11:23]}  {state:6} {cmd[:70]}  {err.get('message','')[:60]}")
-PY
+  go -C "$top" run ./tools/copilot-acceptance/kit calls "$d/out.jsonl"
 }
 
 report() {

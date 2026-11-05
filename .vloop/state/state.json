@@ -5,9 +5,9 @@
   "base": "d7b9cbb579f82f8626c9211e5ce8f2f7e8f720aa",
   "branch": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-05T21:50:17Z",
-  "updated": "2026-11-05T22:33:23Z",
+  "updated": "2026-11-05T22:40:01Z",
   "shell": "sh",
   "checks": [
     {
@@ -219,7 +219,7 @@
         "The scripts carry no committed test of their own (the operator's acceptance runs them against the real CLIs); the kit's Go tests from T3 and T4 stay green."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

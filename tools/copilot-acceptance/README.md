@@ -9,6 +9,12 @@ gh auth status                     # vloop's Copilot sessions log in through gh
 tools/copilot-acceptance/run.sh <copilot model id> [dir]
 ```
 
+The kit needs `go`, `copilot` and `gh` on `PATH` (`claude` too for the scripts that
+run Claude sessions, and `perl` for `bypass.sh`, whose timestamps it takes with
+`perl -MTime::HiRes`). Its reports and probes are a Go program, run as
+`go run ./tools/copilot-acceptance/kit …`. The session tables in the
+reports are `vloop metrics --by session`.
+
 Each vloop Copilot session has its own `COPILOT_HOME`, which holds no login, so
 Copilot logs in with `gh auth token`: the GitHub CLI must be logged in. The `gh`
 shim of the probe passes that one form through.
@@ -49,14 +55,14 @@ tools/copilot-acceptance/hook.sh [dir]                       # the hook probe + 
 tools/copilot-acceptance/second.sh <copilot model id> [dir]  # the feedback-mode run
 ```
 
-1. **The hook probe** (`hook.sh`, `hook.py forms`). The review session runs
+1. **The hook probe** (`hook.sh`, `go run ./tools/copilot-acceptance/kit hook forms`). The review session runs
    under `vloop fence hook`, with the hooks file vloop wrote in its
    `COPILOT_HOME`, and is asked to run each deny form of the worked example's
    shell table (`sh -c "gh pr list"`, `env gh auth token`, ... through
    `echo 'unterminated`) and to invoke a skill other than vloop's
    (`vloop-review`). The summary records, per call, whether Copilot ran it or
    the hook denied it, with the message.
-2. **The hook's failure modes** (`hook.sh`, `hook.py failure`). The same
+2. **The hook's failure modes** (`hook.sh`, `go run ./tools/copilot-acceptance/kit hook failure`). The same
    session with the hook command replaced by one that is missing, exits 1 (`exit 1`),
    prints output that is not JSON, or exceeds its timeout. Each is asked to run one call
    the shims record; the summary says whether Copilot then ran it (fails open)
@@ -110,15 +116,14 @@ tools/copilot-acceptance/work.sh <copilot model id> [dir]
 ```
 
 It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
-(logged in, with folder trust accepted for `<dir>/repo-work`), `go` and
-`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+(logged in, with folder trust accepted for `<dir>/repo-work`), and `go`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
 repository with `agent.work = copilot` and `model.work` the model given; plan
 and review stay on Claude. A first run may stop at `vloop doctor`, as above.
 
 It spends Copilot credits for the work sessions and Claude money for the plan
 and the reviews.
 
-It writes `<dir>/b24-work-summary.md` (`report.py work`): one row per work
+It writes `<dir>/b24-work-summary.md` (`go run ./tools/copilot-acceptance/kit report work`): one row per work
 session record with agent, model, credits, estimated cost, `session/v4` validity
 and its `permission_denials`; then each task's outcome from the run's
 iteration records and the review verdicts.
@@ -138,8 +143,7 @@ tools/copilot-acceptance/verify.sh <copilot model id> [dir]
 ```
 
 It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
-(logged in, with folder trust accepted for `<dir>/repo-verify`), `go` and
-`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+(logged in, with folder trust accepted for `<dir>/repo-verify`), and `go`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
 repository with `agent.verify = copilot` and `model.verify` the model given,
 `run.verify` on; plan, work and review stay on Claude. A first run may stop at
 `vloop doctor`, as above.
@@ -147,7 +151,7 @@ repository with `agent.verify = copilot` and `model.verify` the model given,
 It spends Claude money for the plan, work and review sessions and Copilot
 credits for the one verify session.
 
-It writes `<dir>/b25-verify-summary.md` (`report.py verify`): the verify session
+It writes `<dir>/b25-verify-summary.md` (`go run ./tools/copilot-acceptance/kit report verify`): the verify session
 record with agent, model, credits, estimated cost, `session/v4` validity and its
 `permission_denials`; then the kept report: present or not, its validity against the schema its own `schema` field
 names (`verify/v1` or `verify/v2`) and its number of findings.
@@ -167,8 +171,7 @@ tools/copilot-acceptance/gatereview.sh <copilot model id> [dir]
 ```
 
 It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
-(logged in, with folder trust accepted for `<dir>/repo-gatereview`), `go` and
-`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+(logged in, with folder trust accepted for `<dir>/repo-gatereview`), and `go`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
 repository with `agent.gate-review = copilot` and `model.gate-review` the model
 given; plan, work, review and verify stay on Claude. A first run may stop at
 `vloop doctor`, as above.
@@ -176,7 +179,7 @@ given; plan, work, review and verify stay on Claude. A first run may stop at
 It spends Claude money for the plan, work, review and verify sessions and
 Copilot credits for the gate-review session of each round.
 
-It writes `<dir>/b26-gatereview-summary.md` (`report.py gate-review`): one row
+It writes `<dir>/b26-gatereview-summary.md` (`go run ./tools/copilot-acceptance/kit report gate-review`): one row
 per gate-review session record, by round, with agent, model, credits, estimated
 cost, `session/v4` validity and its `permission_denials`; then each kept
 verdict by round: present or not, `gate-verdict/v2` validity, the verdict and
@@ -197,8 +200,7 @@ tools/copilot-acceptance/plan.sh <copilot model id> [dir]
 ```
 
 It needs `copilot` (logged in through a logged-in `gh`, as above), `claude`
-(logged in, with folder trust accepted for `<dir>/repo-plan`), `go` and
-`python3`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
+(logged in, with folder trust accepted for `<dir>/repo-plan`), and `go`. It runs the fixture brief (`greet.loop-brief.md`) in a scratch
 repository with `agent.plan = copilot` and `model.plan` the model given; gate
 review, work, review and verify stay on Claude. A first run may stop at
 `vloop doctor`, as above.
@@ -206,7 +208,7 @@ review, work, review and verify stay on Claude. A first run may stop at
 It spends Copilot credits for the plan sessions and Claude money for the gate
 review, work, review and verify sessions.
 
-It writes `<dir>/b27-plan-summary.md` (`report.py plan`): one row per plan
+It writes `<dir>/b27-plan-summary.md` (`go run ./tools/copilot-acceptance/kit report plan`): one row per plan
 session record with agent, model, credits, estimated cost, `session/v4`
 validity and its `permission_denials`; then the plan: present or not,
 `state/v2` validity and its tasks; then the gate review's verdict per round

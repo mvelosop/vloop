@@ -11,18 +11,18 @@
 # report (present, verify/v1 or verify/v2 validity, findings), to be recorded in docs/design-notes/copilot-cli-experiments.md
 # before the brief is closed. Spends Claude money (plan, work and reviews) and Copilot
 # credits (verify). Needs copilot, claude and gh on PATH, claude and gh logged in,
-# go and python3.
+# and go.
 set -u
 model=${1:?usage: verify.sh <copilot model id> [dir]}
 dir=${2:-$HOME/vloop-copilot-acceptance}
 here=$(cd "$(dirname "$0")" && pwd -P)
 top=$(cd "$here/../.." && pwd -P)
 die() { echo "b25: $*" >&2; exit 1; }
+dir=$(mkdir -p "$dir" && cd "$dir" && pwd -P) || die "cannot create $dir"
 
 command -v copilot >/dev/null || die "copilot is not on PATH"
 command -v claude >/dev/null || die "claude is not on PATH"
 command -v gh >/dev/null || die "gh is not on PATH: Copilot sessions log in through it"
-command -v python3 >/dev/null || die "python3 is not on PATH"
 
 mkdir -p "$dir/bin" || die "cannot create $dir"
 (cd "$top" && go build -o "$dir/bin/vloop" ./cmd/vloop) || die "build of vloop failed"
@@ -57,7 +57,7 @@ echo "b25: vloop run (verify on copilot $model, plan, work and reviews on claude
 "$V" run "docs/briefs/$name.md" >"$dir/run-verify.log" 2>&1
 rc=$?
 tail -14 "$dir/run-verify.log"
-python3 "$here/report.py" verify "$repo" "$V" "$rc" >"$dir/b25-verify-summary.md" || die "the report failed"
+go -C "$top" run ./tools/copilot-acceptance/kit report verify "$repo" "$V" "$rc" >"$dir/b25-verify-summary.md" || die "the report failed"
 cat "$dir/b25-verify-summary.md"
 echo
 echo "b25: written $dir/b25-verify-summary.md; record it in docs/design-notes/copilot-cli-experiments.md"
