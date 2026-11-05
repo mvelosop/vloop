@@ -5,9 +5,9 @@
   "base": "d7b9cbb579f82f8626c9211e5ce8f2f7e8f720aa",
   "branch": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-05T21:50:17Z",
-  "updated": "2026-11-05T22:03:28Z",
+  "updated": "2026-11-05T22:08:49Z",
   "shell": "sh",
   "checks": [
     {
@@ -78,9 +78,9 @@
         "Committed tests (internal/metrics and/or internal/cli) cover every P1 line of the brief's worked example: the row order across two folders, a Copilot record's credits and estimated source, a session/v1 record, a legacy shell-loop record's num_turns, a record with neither turns field, both denial-text examples, is_error, a brief-review session not listed, the three refusals (each its own test), the JSON sums, and a metrics/v4 snapshot without by_session validating. Tests build their fixtures in temporary directories and address them with `git -C`; no test runs a real agent CLI, touches `~/.claude` or `~/.copilot`, or needs the network. A task that ships this behaviour without such tests fails review."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python/20261105-212928/checks/001-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T2",

@@ -116,7 +116,11 @@ const SnapshotDir = ".vloop/state/metrics"
 // WriteSnapshot saves r as `.vloop/state/metrics/<run id>.json` under root and
 // returns the repo-relative path with `/` separators.
 func WriteSnapshot(root string, r *metrics.Report) (string, error) {
-	data, err := json.MarshalIndent(r, "", "  ")
+	snap := *r
+	if snap.BySession == nil {
+		snap.BySession = []metrics.ReportSession{}
+	}
+	data, err := json.MarshalIndent(&snap, "", "  ")
 	if err != nil {
 		return "", err
 	}
