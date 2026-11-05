@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 3
+**Status:** running · **3/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:15:59Z
+**Brief:** `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` · **Updated:** 2026-11-05T22:25:37Z
 
 ## Progress
 
 - [x] **T1** — Add `vloop metrics --by session` and `by_session` to metrics/v4 · 1 attempt(s)
 - [x] **T2** — Commit the kit's fixtures, the stub copilot, gen.sh and the Python's goldens
-- [ ] **T3** — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
+- [x] **T3** — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
 - [ ] **T4** — Port the kit's probes to Go: probe, summary, hook forms|failure|summary, calls
 - [ ] **T5** — Switch the kit's scripts and README to the Go program and delete report.py and hook.py
 - [ ] **T6** — Close the run: every gate at once, and the worked example line for line
@@ -71,7 +71,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
 
-`pending` · depends on: T1, T2
+`done` · depends on: T1, T2
 
 The acceptance kit needs python3 only because its reports and probes are Python. This task creates the kit's Go program (package main in this module, run as `go run ./tools/copilot-acceptance/kit <command>` like tools/agent-eval) with its `report` command (P2): the six reports report.py prints, byte for byte, except that each report's session table becomes the P1 view (`vloop metrics <run id> --by session`, fenced) plus the record checks and denial lines the kit reads itself. T4 adds the probe commands to the same program and T5 switches the scripts to it.
 

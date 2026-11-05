@@ -31,3 +31,10 @@ committing the plan
    review T2 · 0m40s · $0.15 · run $7.51 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/6 done ──
+   Port the kit's six reports to a Go program under tools/copilot-acceptance/kit
+   work T3 · 5m05s · $0.79 · run $8.29 / $40.00
+   check go
+   review T3 · 0m36s · $0.21 · run $8.50 / $40.00
+   review: PASS
+   T3 done
