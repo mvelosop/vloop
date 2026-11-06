@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "release prepare now builds the module zip of HEAD with zip.CreateFromVCS right after the main-is-origin check and before the configured checks, refusing with the rejected paths or the one-line error. go.mod retracts v0.15.0-rc.2 and the README lists the new check.",
+  "files": ["tools/release/prepare.go", "tools/release/prepare_test.go", "tools/release/README.md", "go.mod", "go.sum"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: ok; go test ./tools/release passes; go mod tidy -diff and gofmt -l print nothing.",
+  "notes": "zipCheck in prepare.go replaces the repository's absolute dir (and its symlink-resolved form) with . in non-FileErrorList errors. go.sum gained golang.org/x/tools entries because x/mod/zip needs them (go mod tidy). TestPrepareRefusals gained the it's repo/.keep case, removed again afterwards so later cases are unchanged."
+}

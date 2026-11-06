@@ -22,7 +22,7 @@ failure exits 1. `TestRepositoryPaths` runs it on this repository.
 
 `prepare <version> [--dry-run]` makes every check before writing anything:
 module major, retraction, version after the latest tag, tag absent locally and
-on origin, `main` clean and equal to origin, the config's checks, and
+on origin, `main` clean and equal to origin, the module zip of `HEAD`, the config's checks, and
 `claude plugin validate`. It then creates `release/<version>`, commits the
 version change to `plugin.json` and opens the PR. `--dry-run` makes the checks
 and prints what it would do.

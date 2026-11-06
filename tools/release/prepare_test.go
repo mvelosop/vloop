@@ -129,6 +129,25 @@ func TestPrepareRefusals(t *testing.T) {
 	no(1, "release: main is not origin/main — pull or push first", "v0.12.0")
 	g("push", "-q", "origin", "main")
 
+	// A committed and pushed path the module zip rejects: it is named, counted,
+	// and neither the checks nor claude run.
+	if err := os.MkdirAll(filepath.Join(dir, "it's repo"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "it's repo", ".keep"), nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	g("add", "-A")
+	g("commit", "-q", "-m", "Keep")
+	g("push", "-q", "origin", "main")
+	no(1, "it's repo/.keep: malformed file path \"it's repo/.keep\": invalid char '\\''\nrelease: the module zip rejects 1 path(s)", "v0.12.0")
+	if _, err := os.Stat(filepath.Join(os.Getenv("STUBS"), "claude.log")); err == nil {
+		t.Error("claude plugin validate ran after the module zip was rejected")
+	}
+	g("rm", "-rq", "it's repo")
+	g("commit", "-q", "-m", "Drop keep")
+	g("push", "-q", "origin", "main")
+
 	// The checks, then claude plugin validate; neither runs after a refusal above.
 	if err := os.WriteFile(filepath.Join(filepath.Dir(dir), "check-fail"), nil, 0o644); err != nil {
 		t.Fatal(err)

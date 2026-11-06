@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/3 done** · iteration 2
+**Status:** running · **3/3 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md` · **Updated:** 2026-11-06T21:22:37Z
+**Brief:** `docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md` · **Updated:** 2026-11-06T21:28:30Z
 
 ## Progress
 
 - [x] **T1** — Move the kit's it's repo fixtures and goldens under @REPO@, mapped back to it's repo at test time
 - [x] **T2** — Add release paths and TestRepositoryPaths: fail on any repository file path Go's module rules reject
-- [ ] **T3** — Make release prepare refuse a module that does not zip, and retract v0.15.0-rc.2 in go.mod
+- [x] **T3** — Make release prepare refuse a module that does not zip, and retract v0.15.0-rc.2 in go.mod
 
 ## Tasks
 
@@ -63,7 +63,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Make release prepare refuse a module that does not zip, and retract v0.15.0-rc.2 in go.mod
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Only the module proxy built the zip, after the tag was pushed, so the defect showed up at the public install. This task makes `release prepare` build the module zip of HEAD with zip.CreateFromVCS before anything is written, right after the "main is not origin/main" check and before the configured checks, so a release whose module does not zip is never opened. It also retracts v0.15.0-rc.2 in go.mod, written now so it is not forgotten though it only takes effect once v0.15.0 is out.
 
