@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/3 done** · iteration 0
+**Status:** running · **1/3 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md` · **Updated:** 2026-11-06T21:11:52Z
+**Brief:** `docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md` · **Updated:** 2026-11-06T21:17:26Z
 
 ## Progress
 
-- [ ] **T1** — Move the kit's it's repo fixtures and goldens under @REPO@, mapped back to it's repo at test time
+- [x] **T1** — Move the kit's it's repo fixtures and goldens under @REPO@, mapped back to it's repo at test time
 - [ ] **T2** — Add release paths and TestRepositoryPaths: fail on any repository file path Go's module rules reject
 - [ ] **T3** — Make release prepare refuse a module that does not zip, and retract v0.15.0-rc.2 in go.mod
 
@@ -16,7 +16,7 @@
 
 ### T1 — Move the kit's it's repo fixtures and goldens under @REPO@, mapped back to it's repo at test time
 
-`pending` · depends on: none
+`done` · depends on: none
 
 The module proxy cannot zip v0.15.0-rc.2 because the copilot-acceptance kit commits 8 paths under a directory named `it's repo`, and Go rejects ' in a module file path. This task renames that directory to `@REPO@` in the committed tree, the way `@DIR@` stands for the temporary directory, while the kit's tests and gen.sh still create and check a real directory named `it's repo` at run time, because quoting that name is exactly what the fixture exists to test. It must land first: T2's repository test fails while any such path is tracked.
 

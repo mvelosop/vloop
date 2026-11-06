@@ -9,3 +9,10 @@ planned: B20261106-2013-b38-i140-module-zips — 3 tasks
 reviewing the gates using sonnet (round 1)
    gate review · 1m25s · $0.29 · run $2.04 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/3 done ──
+   Move the kit's it's repo fixtures and goldens under @REPO@, mapped back to it's repo at test time
+   work T1 · 1m23s · $0.18 · run $2.22 / $40.00
+   check go
+   review T1 · 0m25s · $0.12 · run $2.34 / $40.00
+   review: PASS
+   T1 done

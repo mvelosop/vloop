@@ -3,8 +3,8 @@
 #
 #   gen.sh <python dir> <vloop> <out dir>
 #
-# <python dir> holds report.py, hook.py and bypass.sh (the base commit's, for
-# instance: `git show <base>:tools/copilot-acceptance/<file>`). The `calls`
+# <python dir> holds report.py, hook.py and bypass.sh (take d7b9cbb5's, the commit whose Python this is, for
+# instance: `git show d7b9cbb5:tools/copilot-acceptance/<file>`). The `calls`
 # heredoc of bypass.sh is extracted into <python dir>/calls.py. The Python runs
 # on the fixtures of this folder, each copied into a temporary directory
 # resolved with symlinks followed, @DIR@ replaced by that path; what it prints
@@ -37,9 +37,13 @@ py() { python3 -I -B "$@"; }
 # esc STRING: STRING made safe in the pattern or the replacement of a sed s||| command.
 esc() { printf '%s' "$1" | sed 's/[][\.*^$|&/]/\\&/g'; }
 
-# put SRC DEST: a copy of the fixture SRC at DEST, @DIR@ replaced by DEST.
+# put SRC DEST: a copy of the fixture SRC at DEST, @DIR@ replaced by DEST and
+# each directory named @REPO@ renamed it's repo (the committed tree cannot hold ').
 put() {
   rm -rf "$2"; mkdir -p "$2" && cp -R "$1/." "$2/" || die "copy $1"
+  find "$2" -depth -type d -name '@REPO@' | while IFS= read -r d; do
+    mv "$d" "$(dirname "$d")/it's repo" || exit 1
+  done || die "rename @REPO@ in $2"
   r=$(esc "$2")
   find "$2" -type f | while IFS= read -r f; do
     if grep -q '@DIR@' "$f"; then sed "s|@DIR@|$r|g" "$f" >"$f.sub" && mv "$f.sub" "$f" || exit 1; fi
@@ -55,10 +59,11 @@ snap() {
   n=$1; shift; mkdir -p "$out/$n" || die mkdir
   for f in "$@"; do
     [ -f "$D/$f" ] || continue
-    mkdir -p "$out/$n/$(dirname "$f")" || die mkdir
+    g=$(printf '%s' "$f" | sed "s|it's repo|@REPO@|g")   # the committed name
+    mkdir -p "$out/$n/$(dirname "$g")" || die mkdir
     case $f in
-    stub.log) grep -Ev '^env (PWD|OLDPWD|SHLVL|_)=' "$D/$f" | norm "$out/$n/$f" ;;
-    *) norm "$out/$n/$f" <"$D/$f" ;;
+    stub.log) grep -Ev '^env (PWD|OLDPWD|SHLVL|_)=' "$D/$f" | norm "$out/$n/$g" ;;
+    *) norm "$out/$n/$g" <"$D/$f" ;;
     esac
   done
 }
