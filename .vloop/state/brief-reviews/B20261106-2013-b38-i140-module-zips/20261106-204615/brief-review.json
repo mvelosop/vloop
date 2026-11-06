@@ -1,0 +1,34 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261106-2013-b38-i140-module-zips.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Shape, task 1 (the gen.sh gate)",
+      "summary": "The gate runs the starting point's gen.sh from `git show 56bf0155:.../gen.sh`, but that script finds its fixtures and the stub copilot through its own folder (`here=$(cd \"$(dirname \"$0\")\" && pwd -P)`, then `$here/reports/…`, `$here/probes/…`, `$here/copilot`). A gate that writes the script alone to a temporary file dies on the first `put` ('gen.sh: copy …'), so a correct task fails. The gate also compares with 'the committed goldens', but gates run on the working tree before the driver's commit.",
+      "evidence": "tools/copilot-acceptance/kit/testdata/gen.sh lines 16-24 and 41-46. Run here: `git archive 56bf0155 tools/copilot-acceptance/kit/testdata | tar -x -C <tmp>/tree`, then `sh <tmp>/tree/tools/copilot-acceptance/kit/testdata/gen.sh <py> <vloop> <out>` with report.py, hook.py and bypass.sh from d7b9cbb5 gives rc=0 in 4.6 s, and `diff -r <out> tools/copilot-acceptance/kit/testdata/golden` prints nothing.",
+      "fix": "In Shape task 1, say how to run it: extract the starting point's testdata tree with `git archive 56bf0155 tools/copilot-acceptance/kit/testdata | tar -x -C <tmp>`, run that gen.sh from the extracted tree, and compare with the goldens in the working tree (`tools/copilot-acceptance/kit/testdata/golden`), not with HEAD."
+    },
+    {
+      "kind": "consistency",
+      "section": "Frontmatter description; Z2 heading; Executive summary (the goal)",
+      "summary": "The brief says the Z2 test 'fails on any repository path the Go module zip rejects'. Z2 only applies module.CheckFilePath. The zip also rejects case-fold collisions, a non-lowercase go.mod and files over the size limits, and only Z3 catches those, at release time. 'Why this shape' admits this ('the zip adds case-fold collisions and size limits'), so the brief contradicts itself.",
+      "evidence": "golang.org/x/mod@v0.37.0 zip/zip.go checkFiles: CheckFilePath, then errGoModCase, collisions.check and the size limits as separate rejections.",
+      "fix": "Write 'a path Go's file-path rule (module.CheckFilePath) rejects' in the description, the Z2 heading and the goal, and leave the zip's other rules to Z3 as they already are."
+    }
+  ],
+  "decisions": [
+    "Fix forward with v0.15.0-rc.3 and retract rc.2 now, knowing the retraction only takes effect once v0.15.0 is the latest release. Agree.",
+    "In the committed tree the directory is `@REPO@`, and tests turn it back into `it's repo` at run time, so the quoting case is still tested. Agree.",
+    "Go's own rules come from golang.org/x/mod v0.37.0, added as a direct requirement of the shipped module, not as a hand-written character list. Agree: cmd/vloop does not import it, so installs only see it in the module graph.",
+    "The guard is a test in `go test ./...`, not a new [[check]]. Agree.",
+    "The test also lists untracked, not ignored files, so a stray bad name in a developer's checkout fails `go test ./...`. Intended and acceptable, but the operator should know.",
+    "The test skips outside this repository's checkout (module cache, foreign top directory). Agree.",
+    "The three `.vloop/state/gates/` paths get no task and rely on the plan commit's resetPlan. Verified: internal/driver/plan.go:480-486 removes state.GatesDir when the current plan (B37's) belongs to another brief.",
+    "No module-zip check in publish, doctor or CI (out of scope). Fine for an RC fix. A CI check would catch this before the tag, so it is a candidate for a later issue."
+  ],
+  "checked": "facts (the 11 paths; CheckFilePath messages run on x/mod v0.37.0; @REPO@ accepted; no other current path rejected; CreateFromVCS wraps FileErrorList in *zipError, so errors.As works; prepareChecks order and the retraction check coming before the tag checks; README wording; usage line; probe_test fixture/wantFiles; offline `go mod tidy` with x/mod works; resetPlan clears the gates; P-4/P-7/P-8/S-2/S-4 exist), consistency, rules, runnability (base gen.sh reproduces the goldens; gates fail on the base for the right reasons; go check green after each task)",
+  "header": "Reviewed 2026-11-06: FIX, 2 findings"
+}
+

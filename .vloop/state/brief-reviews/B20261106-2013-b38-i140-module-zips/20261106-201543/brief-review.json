@@ -1,0 +1,68 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261106-2013-b38-i140-module-zips.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Acceptance, at close (the operator's) item 2; Z4; Executive summary",
+      "summary": "Retracting rc.2 in rc.3's go.mod has no effect while a release version exists: Go reads retractions from the go.mod of the 'latest' version, and 'latest' prefers the highest release over any pre-release. v0.14.0 is a release (and v1.0.0 may still be listed), so after publishing rc.3, `go list -m -versions` still lists v0.15.0-rc.2 and acceptance 2 fails. The summary's 'v0.15.0-rc.2 is retracted, so v0.15.0-rc.3 installs' also links two unrelated things: rc.3 installs because its zip is valid, not because of the retraction.",
+      "evidence": "$(go env GOROOT)/src/cmd/go/internal/modload/modfile.go:828 queryLatestVersionIgnoringRetractions calls Query(..., \"latest\", ...); query.go:359-365 returns releases[len-1] when any release exists, prereleases only otherwise. The module cache ~/go/pkg/mod/cache/download/github.com/mvelosop/vloop/@v/ holds v0.14.0 and v1.0.0 (.info and .mod).",
+      "fix": "Keep Z4, which takes effect with v0.15.0 final. Reword the summary so rc.3 installs because of Z1, and move the `go list -m -versions` check to the v0.15.0 release, or drop it. The operator decides whether that is acceptable or whether rc.2 needs another remedy."
+    },
+    {
+      "kind": "fact",
+      "section": "Worked example (gen.sh line); Z1 Required; Shape task 1",
+      "summary": "The base 56bf0155 has no report.py or hook.py, because B37 deleted them. `git show 56bf0155:tools/copilot-acceptance/report.py` fails and gen.sh dies with 'no report.py'. Its bypass.sh no longer holds the `calls` heredoc either. The Python that gen.sh needs is at B37's base, d7b9cbb5.",
+      "evidence": "git ls-tree -r --name-only 56bf0155 | grep -E '(report\\.py|hook\\.py|bypass\\.sh)$' -> only tools/copilot-acceptance/bypass.sh, with no `python3 -` line. The same at d7b9cbb5 lists all three, and bypass.sh:43 holds `python3 - \"$d/out.jsonl\" <<'PY'`. .vloop/state/state.json:5 base = d7b9cbb5...",
+      "fix": "Name d7b9cbb5 (B37's base, the last commit that has the Python) wherever the brief says 'the base's Python' or `git show 56bf0155:...`, in Z1, the worked example and the shape."
+    },
+    {
+      "kind": "runnability",
+      "section": "Constraints; Shape (gates of T1-T3)",
+      "summary": "Nothing stops this run's own gate folders from committing a path with a `'`, and that is exactly how B37 produced 3 of the 11 paths. The Z2/Z3 planted cases (a committed `it's repo/.keep`) and the T1 check ('a probe still runs in `it's repo`') invite a planner to write such a fixture under .vloop/state/gates/T*/. If one does, the repository test turns the `go` check red from T2 on, and sessions cannot edit .vloop/ to fix it. The merge would also ship the defect again, and Z3 would refuse rc.3.",
+      "evidence": "The 3 paths .vloop/state/gates/T4/hook/it's repo/.keep, T4/probe/..., and T5/hook/... came from B37's gates. CreateFromVCS on HEAD lists them among the 11. internal/driver/plan.go:479-486 (resetPlan) only removes another brief's gates.",
+      "fix": "Add a constraint: no file in a gate folder may have a path that module.CheckFilePath rejects; a gate that needs `it's repo` creates it at run time in a temporary directory."
+    },
+    {
+      "kind": "runnability",
+      "section": "Shape task 1 (gate)",
+      "summary": "The gate `git ls-files tools/copilot-acceptance | grep -c \"'\"` reads the index. Gates run before the driver's `git add -A`, so a session that renames with plain `mv` (the session never stages) leaves the 8 old paths in the index, the gate prints 8, and a correct task fails.",
+      "evidence": "internal/driver/iterate.go: runGates (line 740) runs before commit (line 594 -> 1313, which runs `git add -A` at 1325). `git ls-files` lists cached entries even when the file is gone from the working tree.",
+      "fix": "Gate on the working tree instead, for instance `find tools/copilot-acceptance -name \"*'*\" | grep -c .` printing 0, or on `git ls-files --cached --others --exclude-standard` combined with `test -e`. Keep `git ls-files | grep -c` only in the worked example, which runs after the commit."
+    },
+    {
+      "kind": "consistency",
+      "section": "Z1 Required (last bullet); Violations",
+      "summary": "Z1 says 'every other file of testdata/ keeps its path and its bytes', and Violations forbids 'a fixture file other than the 8 paths that moved or changed'. But tools/copilot-acceptance/kit/testdata/gen.sh is in testdata/ and Shape task 1 requires changing it, since it hard-codes `hooks_home=\"it's repo/...\"`.",
+      "evidence": "tools/copilot-acceptance/kit/testdata/gen.sh: `hooks_home=\"it's repo/.vloop/tmp/home/hooks/vloop-fence.json\"` and `put` copies fixtures verbatim.",
+      "fix": "Write 'every other file of testdata/ but gen.sh' in Z1 and in Violations."
+    },
+    {
+      "kind": "consistency",
+      "section": "Z3 Required",
+      "summary": "'When the error is a zip.FileErrorList' misleads: CreateFromVCS never returns one directly. It wraps it in *zipError ('create zip from version control system <repoRoot>: create zip: ...'), so a type assertion fails and the rejection falls into the 'any other error' branch. That branch's message is not pinned by any planted case, and 'with the repository's absolute directory removed' leaves 'version control system : ...'.",
+      "evidence": "~/go/pkg/mod/golang.org/x/mod@v0.37.0/zip/zip.go:516-520 (Create wraps), 619-625 (CreateFromVCS wraps again), 1016-1031 (zipError with Unwrap). A probe on HEAD gave: direct assertion false, errors.As true.",
+      "fix": "Say 'when errors.As finds a zip.FileErrorList'. For the other branch, pin a literal (for instance replace the directory with `.`) and give it a planted case, such as a version CreateFromVCS refuses, or say plainly that it has none."
+    },
+    {
+      "kind": "decision",
+      "section": "Z2; Decided here",
+      "summary": "Unsure: the repository test's behaviour outside a git checkout is not stated. `go test all` from a dependent module runs it from the module cache, where `git rev-parse --show-toplevel` fails or finds an unrelated repository. Also, any untracked file with a bad name on a developer's machine fails `go test ./...`. That is intended by the brief, but the operator should know.",
+      "evidence": "Z2 and 'Decided here': the top directory is found with `git rev-parse --show-toplevel`; nothing says what happens when it fails.",
+      "fix": "Say whether the test skips (t.Skip) or fails when the package directory is not inside this repository's git worktree."
+    }
+  ],
+  "decisions": [
+    "Fix forward with rc.3 and retract rc.2 instead of re-tagging: agree; but see finding 1, the retraction takes effect only from v0.15.0 final.",
+    "Keep `it's repo` at run time, with the committed placeholder name and the mapping left to the run: agree.",
+    "Use golang.org/x/mod (CheckFilePath, CreateFromVCS) instead of a hand-written rule, so x/mod v0.37.0 becomes a direct requirement of the CLI module: agree. It also adds golang.org/x/tools v0.45.0's go.mod to the module graph (verified tidy works offline).",
+    "The guard is a test in go test ./..., not a [[check]]; it includes untracked, not ignored files: agree, but state what it does outside a git checkout (finding 7).",
+    "The prepare check sits after 'main is not origin/main' and before the configured checks: agree.",
+    "The three .vloop/state/gates paths are left to the plan commit (resetPlan): verified, correct.",
+    "Out of scope: module-zip check in publish, doctor or CI; retracting rc.1: reasonable."
+  ],
+  "checked": "facts: 11 paths (git ls-files and an x/mod CreateFromVCS run on HEAD: exactly those 11, nothing else rejected), CheckFilePath messages verbatim, x/mod v0.37.0 in the cache and tidy offline, probe_test.go fixture/wantFiles/TestHookPhase, gen.sh, prepare.go order and refusal output, prepare_test.go fixture, README paragraph, go.mod, resetPlan; consistency; rules; runnability against the go check; vloop brief check ok with 0 warnings",
+  "header": "Reviewed 2026-11-06: ASK, 7 findings"
+}
+

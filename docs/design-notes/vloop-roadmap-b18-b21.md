@@ -5,7 +5,7 @@ kind: design-note
 status: draft
 created: 2026-10-25
 ---
-# vloop — the roadmap after v0.12.0 (B18–B37)
+# vloop — the roadmap after v0.12.0 (B18–B38)
 
 v0.12.0 (tag `v0.12.0`) is B1–B17; B12–B17 are
 `docs/design-notes/vloop-roadmap-b12-b17.md`. This series starts with the
@@ -42,6 +42,7 @@ in `depends-on:`. Candidates not yet placed are GitHub issues (for example
 | B35 | `docs/briefs/B20261103-0315-b35-i83-fence-compound-commands.loop-brief.md` — **consumed** (issue #83) | **The fence judges the compound commands it can read**: `if`, `while`, `until`, `for … in`, `!`, `{ … }` and subshells judged through; a word the shell expands (a `$`, a glob, a brace expansion) matched as any text and refused where it is structure; `command -v` a lookup; `xargs`' input and BSD options | B34 |
 | B36 | `docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md` — **consumed** (issues #96, #97) | **The plugin per repository and per agent**: `vloop init`/`upgrade` declare the plugin in `.claude/settings.json` (Copilot installs it on trust; Claude installs it with `--scope project`); the docs cover Copilot CLI; doctor's `plugin` row counts this repository's entries only, and a new `copilot plugin` row | B35 |
 | B37 | `docs/briefs/B20261105-2002-b37-i88-metrics-by-session-kit-without-python.loop-brief.md` — **consumed** (issue #88) | **Metrics per session, and the acceptance kit without Python**: `vloop metrics --by session` and `by_session` in `metrics/v4`; the Copilot acceptance kit's reports and probes in a Go program run with `go run`, so it needs no `python3` | B36 |
+| B38 | `docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md` — ready (issue #140) | **A module that zips**: the kit's fixtures without `'` in a path (`@REPO@`), `go run ./tools/release paths` and a test in `go test ./...` that fail on a path Go's module rules reject, `release prepare` refusing a module whose zip of `HEAD` fails, and `retract v0.15.0-rc.2`, so v0.15.0-rc.3 installs | B37 |
 
 **Before the fence: hardening (decided by the operator on 2026-10-25).** B19's
 acceptance on the real CLI (`docs/design-notes/copilot-cli-experiments.md` →

@@ -1,0 +1,49 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261106-2013-b38-i140-module-zips.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "Shape (also What it is, Executive summary Z2, Constraints, Binding references)",
+      "summary": "The Shape gates every task on the tests the task writes or edits (T1: go test ./tools/copilot-acceptance/kit, whose probe_test.go fixture/wantFiles the task changes; T2: 'its package's tests', the Z2 tests themselves; T3: go test ./tools/release, including the new refusal test). P-8 forbids that: a gate never runs the repository's suite, a check, or a test a task writes. The gate review rules this 'task-reach' and the plan loops until it halts. T1's 'gen.sh regenerating the goldens equal' also runs a script the task edits, against goldens the task moves. The brief does not cite P-8 among its references, and twice calls the go test guard a gate guard ('one at every gate (go test ./...)', 'it closes the blind spot at the gate'), when the check runs it (P-7).",
+      "evidence": "docs/domain/domain-model.md P-8 (line ~212); plugin/skills/gate-review/SKILL.md:100-103 ('A gate that runs the repository's suite, a check or a task's test is this kind too (P-8)'); plugin/skills/plan/SKILL.md:444 ('No verify runs the repository's suite or reads anything a task writes'); .vloop/config.toml has no run.gate-scratch, so gates cannot carry oracle tests and must judge with command assertions (plan/SKILL.md:58-61).",
+      "fix": "Cite P-8 (and P-7) and rewrite the Shape gates to judge from outside the work. T1: no path under tools/copilot-acceptance holds a quote mark (find); `git diff -M100% --name-status <base> -- tools/copilot-acceptance/kit/testdata` shows only R100 renames of the 8 paths plus M gen.sh, so the goldens' bytes are the base's. The kit's tests and gen.sh stay with the go check, the review and the worked example. T2: its behaviour is judged by the go check (the tests it leaves behind, named in the acceptance) and the review; its gate is whatever outside fact remains (for instance `git ls-files -z --cached --others --exclude-standard` has no path with a quote mark, and go.mod requires golang.org/x/mod v0.37.0). T3: a fixture repository built in a temporary directory by the gate (a bare origin, main pushed, a committed `it's repo/.keep`) and `go run ./tools/release prepare v0.12.0` from it, plus the retracted dry run. Reword 'at every gate' and 'at the gate' to 'at every check'."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example (closing paragraph)",
+      "summary": "'The planted cases of Z2 and Z3 are tests that ship with the change; each must be seen to fail against the starting point's code' names no one who can do it. A work, review or verify session cannot check out the base (no ref moves), and the Z2 tests do not even compile there.",
+      "evidence": "S-2 (docs/domain/domain-model.md:218); the Z2 function does not exist at 56bf0155.",
+      "fix": "Say who sees it: the task gates fail on the base (P-4 already checks this), and the review judges from the diff that each planted test asserts the refusal. Or drop the sentence."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example (last line)",
+      "summary": "`go run ./tools/release prepare v0.15.0-rc.2 --dry-run` prints a second stderr line, `exit status 1`, which go run adds. The example shows only the release: line.",
+      "evidence": "Run on the base: `go run ./tools/release prepare v1.0.0 --dry-run` printed 'release: v1.0.0 is retracted in go.mod' then 'exit status 1', exit=1.",
+      "fix": "Add the `exit status 1` line (go run's), or say the stderr's first line, so a gate that compares stderr exactly is not written from the example."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example (the Z2 function line)",
+      "summary": "'the Z2 function on a fixture repository with a committed it's repo/.keep' is not a command the verify session can run. Only a test reaches the function (tools/release is package main), and the line names none.",
+      "evidence": "plugin/skills/create-brief/guidelines.md:60-65 (cover such a line with a test named beside it).",
+      "fix": "Name the test beside the line (for instance 'covered by the Z2 fixture test in tools/release, run by the go check')."
+    }
+  ],
+  "decisions": [
+    "Fix forward with v0.15.0-rc.3 and retract rc.2 now, though the retraction only takes effect once v0.15.0 is the latest release. Sound: a seen tag cannot be replaced.",
+    "Keep testing a directory named `it's repo`, made at test time by mapping a committed stand-in name in fixture/wantFiles and gen.sh (the name is the run's choice). Sound, and it keeps the quoting case.",
+    "golang.org/x/mod v0.37.0 becomes a direct dependency. Sound: verified that it is in the module cache and that a fresh module tidies offline with only its two go.sum lines.",
+    "The guard is a Go test, not a [[check]]. Consequence: an untracked, not ignored, badly named file in a developer checkout fails go test ./...; the brief says it is intended.",
+    "Z2 checks every path with CheckFilePath, including files the real zip would omit (vendor/, nested modules). Stricter than the proxy; harmless today, because none exist.",
+    "Z3 sits after the origin fetch and before the configured checks, so a bad module is refused before the 30-minute check, not after it.",
+    "The three .vloop/state/gates paths are left to the plan commit (resetPlan, internal/driver/plan.go:480-486). Verified to happen.",
+    "gen.sh's header pins d7b9cbb5 as the commit whose Python to take.",
+    "No module-zip check in publish, doctor or CI; rc.1 is not retracted (it predates B37's paths, and its install works)."
+  ],
+  "checked": "facts, consistency, rules, runnability, decisions",
+  "header": "Reviewed 2026-11-06: FIX, 4 findings"
+}
+

@@ -1,0 +1,56 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261106-2013-b38-i140-module-zips.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract, Z2 (the listing command)",
+      "summary": "Z2 pins `git ls-files --cached --others --exclude-standard` without `-z`. By default git quotes paths that hold non-ASCII bytes, `\"` or `\\` (core.quotePath). A valid name such as `docs/es/guía.md` comes out as `\"docs/es/gu\\303\\255a.md\"`, which CheckFilePath rejects because of the `\"` and `\\`. The repository test would fail on a file the module zip accepts, and the rejected line would print git's quoted form instead of the path.",
+      "evidence": "git-config(1) core.quotePath; module.fileNameOK (golang.org/x/mod@v0.37.0/module/module.go:278-295) allows unicode letters but not `\"` or `\\`. The repository has no non-ASCII path today: `git ls-files | LC_ALL=C grep '[^A-Za-z0-9._/+~-]'` lists only the 11 `it's repo` paths. Its `es` language support makes accented names a realistic addition.",
+      "fix": "Write `git ls-files -z --cached --others --exclude-standard` (split on NUL) in Z2. Optionally add a planted case: an untracked `ñ.txt` produces no line."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary (the goal); Why this shape (fix forward, retract rc.2)",
+      "summary": "UNSURE. The claim that the retraction 'takes effect once v0.15.0 is out' holds only if v0.15.0 becomes Go's 'latest', the highest release the proxy lists, retractions ignored. go.mod says the v1.0.0 tag was removed, but the module proxy usually keeps versions it has served. If the proxy still lists v1.0.0, Go reads retractions from v1.0.0's go.mod. Then neither `retract v1.0.0` nor the new `retract v0.15.0-rc.2` ever takes effect from a v0.x release.",
+      "evidence": "go.mod:16-18 (the v1.0.0 retraction and its comment). cmd/go modload queryLatestVersionIgnoringRetractions queries 'latest', which prefers the highest release. I could not list the module's versions in this session: reading the module cache and `git tag` were denied.",
+      "fix": "Settle it with `go list -m github.com/mvelosop/vloop@latest`; v0.14.0 confirms the claim. If it shows v1.0.0, reword the summary and the 'Why' bullet: Z4 records the intent but takes effect only once a v1.0.x that retracts itself is published. Z4 itself does not change."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references (docs/domain/domain-model.md)",
+      "summary": "The repository's architect skill requires domain invariants to be cited by ID. The entry says only 'the invariants on the run's state; sessions never edit .vloop/'. The invariants that apply are S-4 (sessions write nothing under .vloop/ but .vloop/tmp/; the plan session writes the gate folders), S-2 (sessions never commit or move refs) and P-4 (gates are authored before the work, by the plan session). P-4 and S-4 are the ones behind the constraint that no gate fixture may hold a `'` path.",
+      "evidence": ".claude/skills/vloop-architect/SKILL.md, 'Bind by invariant'; docs/domain/domain-model.md:197, 218, 220.",
+      "fix": "`docs/domain/domain-model.md` — S-2, S-4 and P-4: sessions never edit .vloop/ or move refs; gate folders are the plan session's, and no fixture there may hold a path the module zip rejects."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract, Z1 (gen.sh bullet)",
+      "summary": "The header of gen.sh says the Python is 'the base commit's, for instance: git show <base>:tools/copilot-acceptance/<file>'. After this run the base is 56bf0155 or later, and none of those commits has report.py or hook.py. Z1 pins d7b9cbb5 but does not ask for the header to say so. An earlier draft of this brief made exactly that mistake.",
+      "evidence": "tools/copilot-acceptance/kit/testdata/gen.sh:5-7. `git ls-tree -r --name-only 56bf0155 | grep report.py` finds nothing. Running gen.sh with d7b9cbb5's report.py, hook.py and bypass.sh and HEAD's vloop gives `diff -r` against golden empty, exit 0 (checked in this review).",
+      "fix": "Add to Z1: gen.sh's header names d7b9cbb5 as the commit whose report.py, hook.py and bypass.sh it runs."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example (second line)",
+      "summary": "`go test ./tools/copilot-acceptance/kit ./tools/release` does not run the Z2 tests unless the run puts them in one of those two packages, and Z2's location is the run's choice. The Z2 lines of the worked example are then exercised by no command the verify session is told to run.",
+      "evidence": "Decided here, second bullet ('Where the Z2 test and its function live is the run's choice'); Worked example, lines 2 and 4.",
+      "fix": "Write `go test ./tools/copilot-acceptance/kit ./tools/release <Z2's package>` in the worked example."
+    }
+  ],
+  "decisions": [
+    "Fix forward with v0.15.0-rc.3 and retract rc.2 instead of re-pushing the tag. Agree; see the unsure fact about when the retraction takes effect.",
+    "golang.org/x/mod v0.37.0 becomes a direct requirement of the vloop module itself, used only by a test and tools/release. Acceptable: it brings in only x/tools' go.mod, and the modules are in the cache.",
+    "The guard is a Go test, not a [[check]]. It also fails a developer's `go test ./...` on any untracked, not ignored file with a rejected name. Agree; worth knowing.",
+    "Z2 checks untracked files as well as committed ones, which is stricter than the module zip. Agree: it catches the defect before the commit.",
+    "The prepare check goes after 'main is not origin/main' and before the configured checks. Its 'other error' message is pinned (absolute directory replaced by `.`) but has no planted case. Acceptable.",
+    "The kit keeps a run-time `it's repo`; the committed stand-in name and the mapping are left to the run.",
+    "The three .vloop/state/gates/ paths are not a task; this run's plan commit removes them. Verified: internal/driver/plan.go:303-304 calls resetPlan, and :480-487 removes the whole gates directory.",
+    "Out of scope: a zip check in publish, doctor or CI. Retracting only rc.2, not rc.1.",
+    "All of the above were taken by the assistant under the operator's standing delegation (brief header), not one by one."
+  ],
+  "checked": "facts (the 11 paths at 56bf0155 and HEAD, probe_test.go fixture/wantFiles/TestHookPhase, gen.sh mapping and its regeneration from d7b9cbb5 giving an empty diff, prepareChecks order and refusal printing, readGoMod handling a single-version retract, the current rc.2 dry-run message, the CreateFromVCS/FileErrorList/zipError wrapping and the error formats in x/mod v0.37.0, resetPlan removing the gates, x/mod and x/tools v0.45.0 present in the module cache, no other zip-rejected path, case collision or oversized tree in HEAD), consistency, rules (CLAUDE.md, architect skill, domain invariants), runnability (task order against the go check, gates failing on base for the right reason, the verify fence)",
+  "header": "Reviewed 2026-11-06: FIX, 5 findings"
+}
+
