@@ -6,7 +6,7 @@ the run folders, git, the plan stored in git and the defect files. Defects are
 explained in [defects.md](defects.md).
 
 ```
-vloop metrics [<brief>…] [--by task] [--interventions] [--by kind|phase] [--json]
+vloop metrics [<brief>…] [--by task|session] [--interventions] [--by kind|phase] [--json]
 vloop metrics --workspace <file> [--json]
 vloop metrics export
 vloop metrics stacks [name]
@@ -15,7 +15,7 @@ vloop metrics classify <path>…
 
 A `<brief>` is a loop brief's path or name. With none, one row per brief that
 has runs is printed. A brief with no runs is `vloop: no runs for <name>`, exit 1.
-`--by task` prints one row per task in plan order; `--json` prints one
+`--by task` prints one row per task in plan order and `--by session` one row per session (see [Sessions, one by one](#sessions-one-by-one)); `--json` prints one
 `metrics/v4` document per brief (an array when several). `vloop schema show
 metrics/v4` prints the schema; every key below is a property of it.
 
@@ -183,6 +183,35 @@ before `session/v3` carry none and count as `claude`. `agents["second-review"]` 
 `kind` (`-` or `null` when missing), `attempts` (its iterations), `churn`,
 `agent_ms`, `cost_usd` and `models`, with `test_code_ratio` (the task's test / code lines churned) and `per_1000_code_lines_usd` (`$/kloc`: its cost per 1,000 churned code lines), `null` where it churned no code. The text table has the same two as columns, `test:code` and `$/kloc`, between `other+` and `agent`, `-` for such a task.
 
+## Sessions, one by one
+
+`--by session` prints one table per brief named (a blank line between briefs;
+with none named, the brief table, as `--by task`), one row per session record
+the brief's metrics count: the records in the run folders the brief owns
+(shell-loop folders included) whose phase is `plan`, `work`, `review`,
+`second-review`, `gate-review` or `verify`, in the folders' order and then by
+sequence number. A brief-review session is not a row. The rows' cost sums to
+`cost.total_usd` and their denials to `permission_denials`. It takes no
+`--workspace`, exit 2.
+
+Columns: `run` (the folder's last path element), `#` (sequence, three digits),
+`phase`, `task` (`-` for none), `agent` (`claude` where the record has none),
+`model` (`-`), `time` (`wall_ms`, else `duration_ms`, as `3m07s`), `cost`
+(`$` and two decimals), `source` (the record's `cost_source`, `-`), `credits`
+(two decimals, `-` when the record has none), `turns` (`turns`, else the shell
+loop's `num_turns`, `-`), `denied` (permission denials) and `error` (`yes` when
+the session errored).
+
+Every `--json` document, with or without `--by`, carries `by_session`, an
+optional property of `metrics/v4` (snapshots written before it stay valid),
+with the keys `folder` (repo-relative), `seq`, `schema`, `phase`, `iteration`,
+`task`, `agent`, `model`, `effort`, `time_ms`, `cost_usd` (unrounded),
+`cost_source`, `credits`, `turns`, `permission_denials`, `denials` and
+`is_error`; `null` where the record has none. Each denial is `{"tool_name",
+"text"}`, `text` being the first non-empty of `message`, `command`,
+`file_path`, `tool_input.command` and `tool_input.file_path`, else `""`.
+`vloop metrics export` leaves it out, as it leaves out `by_task`.
+
 ## Missing records
 
 An iteration whose outcome means a review ran (`done`, `review_fail`,
@@ -229,7 +258,7 @@ and a `total` row. Columns: `n` (records), `recommended`, `share`,
 `automatable-partly`. **share** = `recommended` / (`n` − `no-options`), a whole
 percentage, rounded half up, or `n/a` when no record has options: a record with
 no options cannot agree or disagree. `--json` prints the rows with snake_case
-keys. `--by task` is refused, exit 2. With `--workspace` the table has a
+keys. `--by task` and `--by session` are refused, exit 2. With `--workspace` the table has a
 leading `repo` column, each repository's kind rows in turn, then one `total`
 row over all of them.
 

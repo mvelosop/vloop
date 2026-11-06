@@ -138,6 +138,64 @@ type ReportTask struct {
 	Per1000CodeUSD *float64 `json:"per_1000_code_lines_usd"`
 }
 
+// ReportDenial is one permission denial of a `by_session` row.
+type ReportDenial struct {
+	ToolName string `json:"tool_name"`
+	Text     string `json:"text"`
+}
+
+// ReportSession is one `by_session` row: a session record the brief's
+// metrics count.
+type ReportSession struct {
+	Folder            string         `json:"folder"`
+	Seq               int            `json:"seq"`
+	Schema            *string        `json:"schema"`
+	Phase             string         `json:"phase"`
+	Iteration         int            `json:"iteration"`
+	Task              *string        `json:"task"`
+	Agent             string         `json:"agent"`
+	Model             *string        `json:"model"`
+	Effort            *string        `json:"effort"`
+	TimeMS            int64          `json:"time_ms"`
+	CostUSD           float64        `json:"cost_usd"`
+	CostSource        *string        `json:"cost_source"`
+	Credits           *float64       `json:"credits"`
+	Turns             *int           `json:"turns"`
+	PermissionDenials int            `json:"permission_denials"`
+	Denials           []ReportDenial `json:"denials"`
+	IsError           bool           `json:"is_error"`
+}
+
+// bySession lists the sessions the brief's metrics count, in the folders'
+// order and then by sequence number.
+func bySession(m *runs.Model) []ReportSession {
+	out := []ReportSession{}
+	for _, f := range m.Folders {
+		for _, s := range f.Sessions {
+			switch s.Phase {
+			case PhasePlan, PhaseWork, PhaseReview, PhaseSecondReview, PhaseGateReview, PhaseVerify:
+			default:
+				continue
+			}
+			agent := s.Agent
+			if agent == "" {
+				agent = "claude"
+			}
+			den := []ReportDenial{}
+			for _, d := range s.DenialList {
+				den = append(den, ReportDenial{d.ToolName, d.Text})
+			}
+			out = append(out, ReportSession{
+				Folder: f.Path, Seq: s.Seq, Schema: strp(s.Schema), Phase: s.Phase, Iteration: s.Iteration,
+				Task: strp(s.Task), Agent: agent, Model: strp(s.Model), Effort: strp(s.Effort),
+				TimeMS: s.TimeMS(), CostUSD: s.CostUSD, CostSource: strp(s.CostSource), Credits: s.CreditsSet,
+				Turns: s.Turns, PermissionDenials: s.Denials, Denials: den, IsError: s.IsError,
+			})
+		}
+	}
+	return out
+}
+
 // Report is the metrics/v4 document for one brief.
 type Report struct {
 	Schema  string             `json:"schema"`
@@ -174,6 +232,8 @@ type Report struct {
 	Iterations          int          `json:"iterations"`
 	IterationsPerClosed *float64     `json:"iterations_per_closed"`
 	ByTask              []ReportTask `json:"by_task"`
+	// BySession is one row per session record the metrics count.
+	BySession []ReportSession `json:"by_session"`
 }
 
 // ReportTasks is the `tasks` object.
@@ -321,6 +381,7 @@ func Build(root, brief string, c *classify.Classifier) (*Report, error) {
 	}
 
 	r.ByTask = byTask(m, plan, size)
+	r.BySession = bySession(m)
 	return r, nil
 }
 

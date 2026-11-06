@@ -1,0 +1,8 @@
+{"schema":"verdict/v1","task":"T6","verdict":"PASS",
+"criteria":[
+{"criterion":"Gates T1 to T5 all pass on the final tree, run together by this task's gate.","met":true,"evidence":"The driver ran gate T6 (.vloop/state/gates/T6/gate.sh loops T1–T5); gates/T6.log exists and the proposal reports 'gate T6: ok'. The diff touches no gate."},
+{"criterion":"The work session's notes walk the brief's worked example line for line (P1, the real-data B36 line, P2 and P3) and name, for each, the committed test and the gate (T1–T5) that covers it; a line no committed test covers is fixed in this task (a test added) or reported, not skipped.","met":true,"evidence":"proposal.json notes list P1, real B36, P2, P3 and P4 with test names and gates. The uncovered B36 line got TestMetricsBySessionRealB36 (internal/cli/metrics_session_test.go), which asserts 13 rows, the first and last row, the JSON cost sum and 8 denials."},
+{"criterion":"Every configured check is green on the final tree (the `go` check: go test, vet, gofmt, mod tidy, linux and windows builds).","met":true,"evidence":".vloop/tmp/checks.json: go exit 0; go.log shows all packages ok."}
+],
+"findings":[],
+"notes":"The new test skips if the B36 records are missing from the checkout. That is acceptable, since they are committed here."}

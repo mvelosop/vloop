@@ -1,0 +1,1 @@
+{"schema": "gate-verdict/v2", "verdict": "REVISE", "tasks": [{"id": "T1", "findings": [{"kind": "weak", "summary": "x"}, {"kind": "reach", "summary": "y"}, {"kind": "weak", "summary": "z"}]}, {"id": "T2", "findings": [{"kind": "kïnd <&>", "summary": "😀"}]}, {"id": "T3"}]}

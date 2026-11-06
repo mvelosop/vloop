@@ -1,0 +1,1 @@
+GATE FAIL: go build ./tools/copilot-acceptance/kit: stat ~/source/personal/vloop/tools/copilot-acceptance/kit: directory not found

@@ -1,0 +1,32 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 5.714695,
+  "duration_ms": 1135985,
+  "effort": null,
+  "ended": "2026-11-05T21:52:13Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 212066,
+      "cache_read_input_tokens": 8379755,
+      "cost_usd": 5.714695,
+      "input_tokens": 124,
+      "output_tokens": 117086
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop; t=$(mktemp -d \"${TMPDIR:-/tmp}/gate.XXXXXX\"); R=$t/r; mkdir -p $R \u0026\u0026 git -C $R init -q -b main \u0026\u0026 git -C $R -c user.name=t -c user.email=t@e commit -q --allow-empty -m base…",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "plan",
+  "run_id": "B20261105-2002-b37-i88-metrics-by-session-kit-without-python",
+  "schema": "session/v3",
+  "started": "2026-11-05T21:33:16Z",
+  "turns": 79,
+  "wall_ms": 1136772
+}

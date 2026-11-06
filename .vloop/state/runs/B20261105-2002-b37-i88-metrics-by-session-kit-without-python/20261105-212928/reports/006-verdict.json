@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "run.sh, second.sh, work.sh, verify.sh, gatereview.sh, plan.sh, hook.sh and bypass.sh call `go -C \"$top\" run ./tools/copilot-acceptance/kit …` where they called python3, with the same arguments, and write the same files; `top` is computed in every one of them as run.sh computes it (hook.sh and bypass.sh included).", "met": true, "evidence": "Every python3 call in the diff is replaced by go -C \"$top\" run ./tools/copilot-acceptance/kit with the same arguments and redirects. The subcommands (report, probe, summary, hook forms/failure/summary, calls) exist in kit/main.go. hook.sh and bypass.sh now compute top the same way."},
+    {"criterion": "Every script makes its directory argument absolute right after reading it, in a command substitution that leaves its working directory unchanged — `dir=$(mkdir -p \"$dir\" && cd \"$dir\" && pwd -P) || die …` (the same for `work` in bypass.sh, with `|| exit 1`), placed after die() is defined (die() moved up where it came later).", "met": true, "evidence": "All seven scripts with die() have the line after die(). bypass.sh has work=$(mkdir -p \"$work\" && cd \"$work\" && pwd -P) || exit 1."},
+    {"criterion": "No script tests for or runs python3; their header comments say what each needs without python3, and bypass.sh's header names perl.", "met": true, "evidence": "grep for python in tools/copilot-acceptance/*.sh and *.md finds nothing; the command -v python3 checks are gone; the bypass.sh header says 'copilot, go, git and perl'."},
+    {"criterion": "tools/copilot-acceptance/report.py and hook.py are deleted; fail-open.sh is unchanged.", "met": true, "evidence": "git status shows both files deleted; fail-open.sh is absent from the diff."},
+    {"criterion": "tools/copilot-acceptance/README.md says the kit needs go, copilot and gh on PATH (claude for the scripts that run Claude sessions, perl for bypass.sh, whose timestamps it takes with `perl -MTime::HiRes`), names no Python, names the Go command (`go run ./tools/copilot-acceptance/kit …`) where it named report.py or hook.py, and says the session tables are `vloop metrics --by session`.", "met": true, "evidence": "README.md diff adds the paragraph on required tools, replaces every report.py/hook.py mention with the go run command, and says the session tables are `vloop metrics --by session`. grep finds no Python."},
+    {"criterion": "The scripts carry no committed test of their own (the operator's acceptance runs them against the real CLIs); the kit's Go tests from T3 and T4 stay green.", "met": true, "evidence": "The diff adds no test files. checks/go.log shows ok for tools/copilot-acceptance/kit."}
+  ],
+  "findings": [],
+  "notes": "An untracked __pycache__ directory in tools/copilot-acceptance is ignored by git and harmless. The README's one-sentence wording about the tools is slightly long but acceptable."
+}

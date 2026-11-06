@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Added the kit's Go program (tools/copilot-acceptance/kit) with its `report` command: the six reports as report.py printed them, with each session table replaced by the Sessions block(s), plus Go tests against the T2 goldens.",
+  "files": ["tools/copilot-acceptance/kit/main.go", "tools/copilot-acceptance/kit/pyval.go", "tools/copilot-acceptance/kit/report.go", "tools/copilot-acceptance/kit/sessions.go", "tools/copilot-acceptance/kit/report_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; go test ./tools/copilot-acceptance/kit passes; GOOS=linux and GOOS=windows builds, gofmt and go mod tidy -diff are clean.",
+  "notes": "pyval.go holds a small Python-compatible JSON model (ordered dict, int vs float, str()/repr()/json.dumps with ensure_ascii) for T4 to reuse. Known deviations only on inputs the Python crashes on or never meets: NaN/Infinity literals and lone surrogates are not accepted/kept. Every report ends with an empty line because the Python printed its joined text plus a newline. Tests build vloop with go build into a temp dir and use git -C on temp copies of testdata/reports; the golden for r3 pins the metrics error text, which is vloop's own message. run() in main.go is the dispatch T4 extends with probe commands."
+}

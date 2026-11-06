@@ -1,0 +1,1 @@
+{"schema":"session/v4","run_id":"B20260103-0000-fx2","phase":"plan","iteration":0,"agent":"claude","model":"opus","started":"2026-01-03T00:00:00Z","duration_ms":60000,"wall_ms":60000,"cost_usd":1,"cost_source":"reported","turns":2,"is_error":false,"permission_denials":[]}

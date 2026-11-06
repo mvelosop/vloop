@@ -1,0 +1,5 @@
+  21:30:01.123 -> 21:30:02.456  denied "echo '\u00e9 \u00fc \ud83d\ude00 <&>\tTab\nnew line' && a long comman  Denied by vloop fence hook — café 😀 <&>: this message is lon
+  21:30:03.000 -> 21:30:03.500  ran    {"path": "x", "n": 1.0, "f": 2.5, "tiny": 1e-05, "big": 1e+16, "ok": t  
+  21:30:04.000 -> 21:30:05.000  failed null  timed out
+  ? -> 21:30:06.000  failed ?  
+  21:31:00.000 -> 21:31:00.250  ran    "touch m01"  

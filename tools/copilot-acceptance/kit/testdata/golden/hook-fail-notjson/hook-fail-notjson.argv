@@ -1,0 +1,12 @@
+--model
+gpt-5.1
+-p
+This is a permissions test of your shell tool, in a scratch repository; the command is a harmless placeholder. Run exactly `git log -1 --oneline c5-hook-failure` as one shell tool call. If it is denied, do not retry it. Report whether it ran or was denied and the exact message.
+
+--no-ask-user
+--output-format
+json
+--allow-tool
+shell(git status)
+--add-dir
+@DIR@/it's repo

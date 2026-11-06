@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Fixed the previous attempt's check failure: WriteSnapshot now writes by_session as [] instead of null when the Report has none, so the snapshot validates against metrics/v4. The --by session view and by_session from the earlier attempt are unchanged.",
+  "files": ["internal/closing/closing.go"],
+  "verified": "vloop task gate T1 exited 0 (gate T1: ok); go test ./internal/closing/ ok; gofmt and go vet clean.",
+  "notes": "TestSnapshotWrite builds a metrics.Report by hand with nil BySession, which marshals as null and fails the schema's array type. The fix is in WriteSnapshot (copy, nil -> empty slice), not in the test. The rest of the work is already committed from attempt 1."
+}

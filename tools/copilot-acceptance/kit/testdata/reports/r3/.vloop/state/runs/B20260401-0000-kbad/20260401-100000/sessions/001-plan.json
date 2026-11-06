@@ -1,0 +1,1 @@
+{"schema": "session/v4", "run_id": "B20260401-0000-kbad", "iteration": 0, "phase": "plan", "agent": "claude", "model": "opus", "effort": null, "models_used": {}, "started": "2026-04-01T10:00:00Z", "ended": "2026-04-01T10:01:00Z", "duration_ms": 59500, "wall_ms": 60000, "cost_usd": 0.5, "cost_source": "reported", "turns": 5, "is_error": false, "permission_denials": []}

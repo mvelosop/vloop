@@ -188,6 +188,7 @@ func exportRecords(root string, repo exportRepo, r *metrics.Report) ([]any, erro
 		return nil, err
 	}
 	delete(doc, "by_task")
+	delete(doc, "by_session")
 	doc["schema"], doc["type"], doc["repo"] = exportSchema, "brief", repo
 	recs := []any{doc}
 

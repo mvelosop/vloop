@@ -11,18 +11,18 @@
 # verdict (round, present, gate-verdict/v2 validity, verdict, findings by kind), to be recorded in docs/design-notes/copilot-cli-experiments.md
 # before the brief is closed. Spends Claude money (plan, work, reviews, verify) and Copilot
 # credits (the gate reviews). Needs copilot, claude and gh on PATH, claude and gh logged in,
-# go and python3.
+# and go.
 set -u
 model=${1:?usage: gatereview.sh <copilot model id> [dir]}
 dir=${2:-$HOME/vloop-copilot-acceptance}
 here=$(cd "$(dirname "$0")" && pwd -P)
 top=$(cd "$here/../.." && pwd -P)
 die() { echo "b26: $*" >&2; exit 1; }
+dir=$(mkdir -p "$dir" && cd "$dir" && pwd -P) || die "cannot create $dir"
 
 command -v copilot >/dev/null || die "copilot is not on PATH"
 command -v claude >/dev/null || die "claude is not on PATH"
 command -v gh >/dev/null || die "gh is not on PATH: Copilot sessions log in through it"
-command -v python3 >/dev/null || die "python3 is not on PATH"
 
 mkdir -p "$dir/bin" || die "cannot create $dir"
 (cd "$top" && go build -o "$dir/bin/vloop" ./cmd/vloop) || die "build of vloop failed"
@@ -57,7 +57,7 @@ echo "b26: vloop run (gate review on copilot $model, the rest on claude) ..."
 "$V" run "docs/briefs/$name.md" >"$dir/run-gatereview.log" 2>&1
 rc=$?
 tail -14 "$dir/run-gatereview.log"
-python3 "$here/report.py" gate-review "$repo" "$V" "$rc" >"$dir/b26-gatereview-summary.md" || die "the report failed"
+go -C "$top" run ./tools/copilot-acceptance/kit report gate-review "$repo" "$V" "$rc" >"$dir/b26-gatereview-summary.md" || die "the report failed"
 cat "$dir/b26-gatereview-summary.md"
 echo
 echo "b26: written $dir/b26-gatereview-summary.md; record it in docs/design-notes/copilot-cli-experiments.md"

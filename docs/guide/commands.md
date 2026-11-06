@@ -282,7 +282,7 @@ Show what a brief cost and delivered, from its runs and commits
 vloop metrics [<brief>…] [flags]
 ```
 
-- `--by task`: break the summary down by task
+- `--by view`: break the summary down by view: task or session
 - `--interventions`: report agreement with the recommended option, by kind (or phase, with --by phase), from the intervention records
 - `--workspace file`: show every repository the workspace file lists, with a repo column
 

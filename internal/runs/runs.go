@@ -65,6 +65,20 @@ type Session struct {
 	Denials    int
 	Models     map[string]Tokens
 	IsError    bool
+
+	Schema     string   // the record's schema; empty when absent
+	CostSource string   // the record's cost_source; empty when absent
+	CreditsSet *float64 // credits as recorded; nil when the record has none
+	Turns      *int     // turns, else num_turns (the shell loop's records); nil with neither
+	DenialList []Denial // the permission denials, in order
+}
+
+// Denial is one permission denial of a session: the tool and the first
+// non-empty string among message, command, file_path, tool_input.command and
+// tool_input.file_path.
+type Denial struct {
+	ToolName string
+	Text     string
 }
 
 // TimeMS is the session's time: wall_ms where the record has it, the CLI's
@@ -404,20 +418,24 @@ func parseTime(s string) time.Time {
 
 // rawSession accepts both the shell loop's claude result and session/v1.
 type rawSession struct {
-	Phase      string  `json:"phase"`
-	Iteration  int     `json:"iteration"`
-	Task       string  `json:"task"`
-	Model      string  `json:"model"`
-	Effort     *string `json:"effort"`
-	Agent      string  `json:"agent"`
-	Started    string  `json:"started"`
-	DurationMS int64   `json:"duration_ms"`
-	WallMS     *int64  `json:"wall_ms"`
-	TotalCost  float64 `json:"total_cost_usd"`
-	CostUSD    float64 `json:"cost_usd"`
-	Credits    float64 `json:"credits"`
-	IsError    bool    `json:"is_error"`
-	Denials    []any   `json:"permission_denials"`
+	Phase      string   `json:"phase"`
+	Iteration  int      `json:"iteration"`
+	Task       string   `json:"task"`
+	Model      string   `json:"model"`
+	Effort     *string  `json:"effort"`
+	Agent      string   `json:"agent"`
+	Started    string   `json:"started"`
+	DurationMS int64    `json:"duration_ms"`
+	WallMS     *int64   `json:"wall_ms"`
+	TotalCost  float64  `json:"total_cost_usd"`
+	CostUSD    float64  `json:"cost_usd"`
+	Credits    *float64 `json:"credits"`
+	IsError    bool     `json:"is_error"`
+	Schema     string   `json:"schema"`
+	CostSource string   `json:"cost_source"`
+	Turns      *int     `json:"turns"`
+	NumTurns   *int     `json:"num_turns"`
+	Denials    []any    `json:"permission_denials"`
 	ModelUsage map[string]struct {
 		Input         int64   `json:"inputTokens"`
 		Output        int64   `json:"outputTokens"`
@@ -442,7 +460,17 @@ func readSession(p string) (Session, error) {
 	s := Session{
 		Phase: r.Phase, Iteration: r.Iteration, Task: r.Task, Model: r.Model,
 		Started: parseTime(r.Started), DurationMS: r.DurationMS, WallMS: r.WallMS, IsError: r.IsError,
-		CostUSD: r.CostUSD, Credits: r.Credits, Denials: len(r.Denials), Models: map[string]Tokens{},
+		CostUSD: r.CostUSD, CreditsSet: r.Credits, Denials: len(r.Denials), Models: map[string]Tokens{},
+		Schema: r.Schema, CostSource: r.CostSource, Turns: r.Turns,
+	}
+	if r.Credits != nil {
+		s.Credits = *r.Credits
+	}
+	if s.Turns == nil {
+		s.Turns = r.NumTurns
+	}
+	for _, d := range r.Denials {
+		s.DenialList = append(s.DenialList, denial(d))
 	}
 	s.Agent = r.Agent
 	if s.Agent == "" {
@@ -544,4 +572,23 @@ func readVerdict(p string) (Verdict, error) {
 		v.Findings = append(v.Findings, Finding{Summary: o.Summary, Kind: o.Kind})
 	}
 	return v, nil
+}
+
+// denial reads one permission_denials entry; a non-object entry is a denial
+// with no tool and no text.
+func denial(v any) Denial {
+	m, _ := v.(map[string]any)
+	str := func(m map[string]any, k string) string {
+		s, _ := m[k].(string)
+		return s
+	}
+	d := Denial{ToolName: str(m, "tool_name")}
+	ti, _ := m["tool_input"].(map[string]any)
+	for _, c := range []string{str(m, "message"), str(m, "command"), str(m, "file_path"), str(ti, "command"), str(ti, "file_path")} {
+		if c != "" {
+			d.Text = c
+			break
+		}
+	}
+	return d
 }

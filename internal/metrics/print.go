@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"path"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -168,6 +169,27 @@ func PrintByTask(out io.Writer, r *Report) {
 		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t$%.2f\t%s\n", t.ID, dashPtr(t.Area), dashPtr(t.Kind), t.Attempts,
 			thousands(t.Churn.Code), thousands(t.Churn.Test), thousands(t.Churn.Docs), thousands(t.Churn.Other),
 			dashFloat(t.TestCodeRatio), dashFloat(t.Per1000CodeUSD), minSec(t.AgentMS), t.CostUSD, joinModels(t.Models))
+	}
+	w.Flush()
+}
+
+// PrintBySession prints the brief's sessions one per row.
+func PrintBySession(out io.Writer, r *Report) {
+	w := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "run\t#\tphase\ttask\tagent\tmodel\ttime\tcost\tsource\tcredits\tturns\tdenied\terror")
+	for _, s := range r.BySession {
+		credits, turns, errc := "-", "-", "-"
+		if s.Credits != nil {
+			credits = fmt.Sprintf("%.2f", *s.Credits)
+		}
+		if s.Turns != nil {
+			turns = strconv.Itoa(*s.Turns)
+		}
+		if s.IsError {
+			errc = "yes"
+		}
+		fmt.Fprintf(w, "%s\t%03d\t%s\t%s\t%s\t%s\t%s\t$%.2f\t%s\t%s\t%s\t%d\t%s\n", path.Base(s.Folder), s.Seq, s.Phase,
+			dashPtr(s.Task), s.Agent, dashPtr(s.Model), minSec(s.TimeMS), s.CostUSD, dashPtr(s.CostSource), credits, turns, s.PermissionDenials, errc)
 	}
 	w.Flush()
 }

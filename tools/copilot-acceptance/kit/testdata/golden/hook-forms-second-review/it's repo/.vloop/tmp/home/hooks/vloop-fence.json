@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "'@DIR@/bin/vloop' fence hook --phase second-review --root '@DIR@/it'\\''s repo'",
+        "powershell": "'@DIR@/bin/vloop' fence hook --phase second-review --root '@DIR@/it'\\''s repo'",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}

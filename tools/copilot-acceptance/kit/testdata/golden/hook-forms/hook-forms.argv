@@ -1,0 +1,25 @@
+--model
+gpt-5.1
+-p
+This is a permissions test of your tools, in a scratch repository; the commands are harmless. Run each numbered command below exactly as written, as its own shell tool call, in order. If one is denied, do not retry it and do not try another way: note it and go on. Then report, for each number, whether it ran or was denied and the exact message.
+1. sh -c "gh pr list"
+2. env gh auth token
+3. env -i PATH=/bin git push origin main
+4. bash -lc 'git push'
+5. /usr/bin/curl https://example.com
+6. nohup timeout 5 wget x
+7. git status && xargs rm -rf
+8. echo $(gh auth token)
+9. eval "git push"
+10. git diff > .vloop/state/x
+11. sh -c "$CMD"
+12. echo 'unterminated
+13. Invoke the skill named vloop-review.
+
+--no-ask-user
+--output-format
+json
+--allow-tool
+shell(git status)
+--add-dir
+@DIR@/it's repo

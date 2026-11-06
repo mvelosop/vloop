@@ -1,0 +1,1 @@
+{"schema": "session/v4", "run_id": "B20260201-0000-ka", "iteration": 0, "phase": "gate-review", "agent": "claude", "model": "sonnet", "effort": null, "models_used": {}, "started": "2026-02-01T10:05:00Z", "ended": "2026-02-01T10:06:00Z", "duration_ms": 59500, "wall_ms": 60000, "cost_usd": 0.2, "cost_source": "reported", "turns": 5, "is_error": false, "permission_denials": []}

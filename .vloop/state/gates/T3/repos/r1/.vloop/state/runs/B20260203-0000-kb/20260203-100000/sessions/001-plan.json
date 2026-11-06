@@ -1,0 +1,1 @@
+{"schema": "session/v4", "run_id": "B20260203-0000-kb", "iteration": 0, "phase": "plan", "agent": "claude", "model": "opus", "effort": null, "models_used": {}, "started": "2026-02-03T10:00:00Z", "ended": "2026-02-03T10:04:00Z", "duration_ms": 239500, "wall_ms": 240000, "cost_usd": 0.9, "cost_source": "reported", "turns": 5, "is_error": false, "permission_denials": []}

@@ -1,0 +1,1 @@
+{"type": "result", "phase": "review", "iteration": 2, "duration_ms": 45000, "total_cost_usd": 0.07, "num_turns": 3, "is_error": false, "permission_denials": [{"tool_name": "Bash", "tool_input": {"command": "rm -rf\tx"}}]}

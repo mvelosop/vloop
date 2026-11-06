@@ -1,0 +1,20 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "docs/guide/metrics.md:261: \"`--by task` is refused, exit 2.\" (in the --interventions section)",
+      "observed": "`vloop metrics --interventions --by session` is also refused, exit 2, 'vloop: --by takes kind or phase with --interventions'; the section names only `--by task`, so the refusal of the newly added value is not stated there",
+      "where": "brief P1 Flag (--by session with --interventions is exit 2); docs/guide/metrics.md:261; internal/cli/metrics.go:39"
+    }
+  ],
+  "not_run": [
+    {"line": "each report kind on a fixture repository → equal to its golden (and the other P2/P3 fixture lines)", "reason": "covered by go test ./tools/copilot-acceptance/kit (passes)"},
+    {"line": "tools/copilot-acceptance/work.sh / run.sh acceptance (Acceptance, at close)", "reason": "the operator's, at close; needs a live model"},
+    {"line": "P1 fixture lines (credits, v1 record, denials, is_error, snapshot without by_session)", "reason": "covered by internal/cli TestMetricsBySession* and TestMetricsV4WithoutBySessionValidates (pass)"}
+  ],
+  "checked": { "example_lines": 7, "sentences": 14, "surfaces": 9 },
+  "notes": "Real B36 data: 13 rows, first and last row equal the brief's fields; cost sum equals cost.total_usd (5.6702516), denials 8=8. Refusal messages and exit 2 verified by running the built binary; --by help text matches. Scripts all use go -C \"$top\" run, make dir absolute, mention no python3/report.py/hook.py; report.py and hook.py are gone; unknown kit command and missing kind exit 1 on stderr. Not checked line by line: the byte-for-byte golden comparisons (relied on the passing kit tests). Some internal/cli TestTaskGate* tests fail when run inside this live session because the driver holds the plan ('plan was changed during this session'); that is environmental, not examined further. An ignored tools/copilot-acceptance/__pycache__ directory exists from earlier runs; not tracked."
+}
+
