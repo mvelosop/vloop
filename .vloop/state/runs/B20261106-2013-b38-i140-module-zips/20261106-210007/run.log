@@ -30,3 +30,11 @@ committing the plan
    review T3 · 0m36s · $0.12 · run $2.93 / $40.00
    review: PASS
    T3 done
+   check go
+   verify · 1m01s · $0.19 · run $3.12 / $40.00
+verify: 2 finding(s); 2 example line(s) not run — see .vloop/state/runs/B20261106-2013-b38-i140-module-zips/20261106-210007/reports/verify.json
+
+═══ complete ═══
+run:    B20261106-2013-b38-i140-module-zips/20261106-210007  (3 iteration(s) this run)
+plan:   3/3 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261106-2013-b38-i140-module-zips.md

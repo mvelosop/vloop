@@ -1,0 +1,12 @@
+{"schema":"verify/v2","complete":true,
+"findings":[
+{"kind":"surface","claim":"docs/guide/concepts.md:299-301: \"makes the checks (module major, retraction, version after the latest tag, tag absent, `main` clean and equal to origin, the config's checks, `claude plugin validate`)\"","observed":"La lista no nombra el nuevo chequeo del zip del módulo de HEAD, que prepare ahora hace antes de los checks configurados; tools/release/README.md sí lo nombra.","where":"brief Z3 (cambia el comportamiento de prepare); docs/guide/concepts.md:299-301"},
+{"kind":"contract","claim":"Z2: \"When git fails (started outside a repository, for instance), stderr holds `release: <git's error on one line>`, exit 1.\"","observed":"Desde / el stderr es `release: git rev-parse: fatal: not a git repository (or any of the parent directories): .git`, exit 1; lleva el prefijo `git rev-parse: ` además del error de git.","where":"brief Z2; `(cd / && .vloop/tmp/vf/release paths)`"}
+],
+"not_run":[
+{"line":"<F> plus a committed it's repo/.keep; <rel> paths in <F>","reason":"needs git commit, denied; covered by TestPaths. Equivalent ran with an untracked file in a scratch repo: same line, exit 1"},
+{"line":"<F> plus a committed and pushed it's repo/.keep; <rel> prepare v0.1.0 --dry-run in <F>","reason":"needs git commit and push; covered by TestPrepareRefusals"}
+],
+"checked":{"example_lines":5,"sentences":9,"surfaces":5},
+"notes":"Ejecuté: paths en este repo (exit 0), paths con a'b.txt sin seguimiento (exit 1, mensaje exacto), con .gitignore (exit 0), prepare v0.15.0-rc.2 --dry-run (mensaje de retractación, exit 1), gen.sh con el Python de d7b9cbb5 y diff -r (sin salida, exit 0). Sin 'find' de rutas con apóstrofe en tools/copilot-acceptance ni en git ls-files. go.mod termina con la retractación tal como se pide; uso y README de paths coinciden. Las pruebas de Go no se re-ejecutaron. Los mensajes de zip fuera de FileErrorList y el caso de worktree enlazado no se ejecutaron."}
+
