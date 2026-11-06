@@ -1,9 +1,0 @@
-run # phase task agent model time cost source credits turns denied error
-20251231-235900 001 plan - claude - 2m05s $0.05 - - 7 0 -
-20260101-100000 001 plan - claude opus 9m42s $2.89 reported - 44 2 -
-20260101-100000 002 gate-review - claude sonnet 1m01s $0.31 reported - 9 0 -
-20260101-100000 003 work T1 copilot gpt-5.1 2m05s $0.40 estimated 1.50 12 0 -
-20260101-100000 004 review T1 claude sonnet 0m30s $0.25 reported - 5 2 yes
-20260101-100000 005 second-review T1 copilot gpt-5.1 0m45s $0.00 estimated 0.00 3 0 -
-20260101-100000 006 verify - claude sonnet 1m38s $0.30 reported - 18 1 -
-20260102-000000 001 work T2 claude sonnet 10m00s $0.12 - - - 0 -

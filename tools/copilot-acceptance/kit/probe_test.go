@@ -9,8 +9,13 @@ import (
 	"testing"
 )
 
+// repoDir is the directory the kit's fixtures quote: its name holds a '.
+// Go refuses ' in a module file path, so the committed tree spells it @REPO@.
+const repoDir = "it's repo"
+
 // fixture copies testdata/probes/NAME into a temporary directory, @DIR@
-// replaced by its path, and returns the path (symlinks resolved).
+// replaced by its path and a path component @REPO@ by it's repo, and returns
+// the path (symlinks resolved).
 func fixture(t *testing.T, name string) string {
 	t.Helper()
 	dir, err := filepath.EvalSymlinks(t.TempDir())
@@ -23,7 +28,7 @@ func fixture(t *testing.T, name string) string {
 			return err
 		}
 		rel, _ := filepath.Rel(src, p)
-		dst := filepath.Join(dir, rel)
+		dst := filepath.Join(dir, strings.ReplaceAll(rel, "@REPO@", repoDir))
 		info, err := d.Info()
 		if err != nil {
 			return err
@@ -60,7 +65,7 @@ func stubCopilot(t *testing.T) string {
 // stub's log, without the variables that differ between two runs.
 func normalised(t *testing.T, dir, rel string) string {
 	t.Helper()
-	b, err := os.ReadFile(filepath.Join(dir, rel))
+	b, err := os.ReadFile(filepath.Join(dir, strings.ReplaceAll(rel, "@REPO@", repoDir)))
 	if err != nil {
 		t.Fatalf("%s was not written: %v", rel, err)
 	}
@@ -178,7 +183,7 @@ func TestHookPhase(t *testing.T) {
 	dir := fixture(t, "hook")
 	okRun(t, "hook", "forms", dir, cop)
 	wantFiles(t, "hook-forms-second-review", dir)
-	b, err := os.ReadFile(filepath.Join(dir, "it's repo", ".vloop", "tmp", "home", "hooks", "vloop-fence.json"))
+	b, err := os.ReadFile(filepath.Join(dir, repoDir, ".vloop", "tmp", "home", "hooks", "vloop-fence.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

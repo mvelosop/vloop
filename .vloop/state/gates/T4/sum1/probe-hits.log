@@ -1,6 +1,0 @@
-gh c5-1
-git -C . push c5-6
-rm -f c5-12
-curl c5-9x
-wget c5-10.
-git config --global --get c5-8.key

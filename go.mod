@@ -8,6 +8,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.9
+	golang.org/x/mod v0.37.0
 	golang.org/x/sys v0.46.0
 	golang.org/x/text v0.14.0
 )
@@ -17,3 +18,7 @@ require github.com/inconshreveable/mousetrap v1.1.0 // indirect
 // v1.0.0 and the v2.0.0 tags were the numbering before the repository went
 // public, and were removed; this line continues as v0.8.0.
 retract v1.0.0
+
+// v0.15.0-rc.2 holds file paths the module zip rejects and cannot be
+// downloaded.
+retract v0.15.0-rc.2

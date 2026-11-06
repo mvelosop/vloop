@@ -2,16 +2,20 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
 
 	"github.com/mvelosop/vloop/internal/config"
+	modver "golang.org/x/mod/module"
+	"golang.org/x/mod/zip"
 )
 
 // refusal is a failed check: its message is printed as "release: <msg>" and
@@ -180,6 +184,36 @@ func runChecked(dir string, cmd *exec.Cmd) (string, error) {
 	return buf.String(), err
 }
 
+// zipCheck builds the module zip of HEAD into io.Discard, as the module proxy
+// will, and refuses when it cannot. It writes nothing to the repository.
+func zipCheck(dir, module, version string) *refusal {
+	err := zip.CreateFromVCS(io.Discard, modver.Version{Path: module, Version: version}, dir, "HEAD", "")
+	if err == nil {
+		return nil
+	}
+	var list zip.FileErrorList
+	if errors.As(err, &list) {
+		var b strings.Builder
+		for _, fe := range list {
+			b.WriteString(fe.Path + ": " + fe.Err.Error() + "\n")
+		}
+		r := refuse(1, "the module zip rejects %d path(s)", len(list))
+		r.out = b.String()
+		return r
+	}
+	msg := err.Error()
+	abs, _ := filepath.Abs(dir)
+	for _, d := range []string{abs, dir} {
+		if real, e := filepath.EvalSymlinks(d); e == nil && real != d {
+			msg = strings.ReplaceAll(msg, real, ".")
+		}
+		if d != "" {
+			msg = strings.ReplaceAll(msg, d, ".")
+		}
+	}
+	return refuse(1, "the module does not zip: %s", oneLine(msg))
+}
+
 // prepareChecks makes every check of `prepare <version>`, in the brief's
 // order, and writes nothing to the repository. The one thing it touches is
 // the remote-tracking ref of origin/main, by the fetch.
@@ -243,6 +277,10 @@ func prepareChecks(dir, version string) (latest string, ref *refusal) {
 	origin, err2 := gitOut(dir, "rev-parse", "refs/remotes/origin/main")
 	if err1 != nil || err2 != nil || head != origin {
 		return latest, refuse(1, "main is not origin/main — pull or push first")
+	}
+
+	if r := zipCheck(dir, module, version); r != nil {
+		return latest, r
 	}
 
 	checks, err := config.Checks(dir)

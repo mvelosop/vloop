@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Added release paths: rejectedPaths lists git files (cached and untracked, not ignored) from the top directory and checks each with module.CheckFilePath. Usage line, doc comment, README section, TestPaths, TestRepositoryPaths and golang.org/x/mod v0.37.0 as a direct requirement are in.",
+  "files": ["tools/release/paths.go", "tools/release/paths_test.go", "tools/release/main.go", "tools/release/README.md", "go.mod", "go.sum"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: ok; go test ./tools/release, go vet, gofmt -l and go mod tidy pass.",
+  "notes": "rejectedPaths(dir) finds the top with git rev-parse --show-toplevel, then runs git -C top ls-files -z. The fixture tests build repos with the existing newRepo helper; no ' path is written into the tree."
+}

@@ -1,0 +1,5 @@
+{"schema":"proposal/v1","task":"T1","outcome":"done",
+"summary":"The 8 it's repo paths under the kit's testdata are now @REPO@ (git mv, bytes unchanged). The kit's fixture and normalised helpers map @REPO@ to it's repo at run time; gen.sh renames @REPO@ to it's repo when copying fixtures and writes goldens at @REPO@ paths. Its header names d7b9cbb5.",
+"files":["tools/copilot-acceptance/kit/probe_test.go","tools/copilot-acceptance/kit/testdata/gen.sh"],
+"verified":"vloop task gate T1 equivalent (sh .vloop/state/gates/T1/gate.sh) printed gate T1: ok; go test ./tools/copilot-acceptance/... ok; edited gen.sh on d7b9cbb5 Python gave diff -r empty against committed goldens.",
+"notes":"probe_test.go gained const repoDir = \"it's repo\"; no assertion removed. Tests still run probes in it's repo."}

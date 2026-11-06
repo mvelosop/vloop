@@ -1,2 +1,0 @@
-{"type": "session.start", "data": {}}
-{"type": "tool.execution_start", "data": {"toolCallId": "w1", "toolName": "web_fetch"}}

@@ -1,0 +1,9 @@
+GATE FAIL: paths under tools/copilot-acceptance still hold ':
+tools/copilot-acceptance/kit/testdata/probes/hook/it's repo
+tools/copilot-acceptance/kit/testdata/probes/probe/it's repo
+tools/copilot-acceptance/kit/testdata/golden/hook-fail-missing/it's repo
+tools/copilot-acceptance/kit/testdata/golden/hook-fail-timeout/it's repo
+tools/copilot-acceptance/kit/testdata/golden/hook-fail-notjson/it's repo
+tools/copilot-acceptance/kit/testdata/golden/hook-forms-second-review/it's repo
+tools/copilot-acceptance/kit/testdata/golden/hook-fail-exit1/it's repo
+tools/copilot-acceptance/kit/testdata/golden/hook-forms/it's repo

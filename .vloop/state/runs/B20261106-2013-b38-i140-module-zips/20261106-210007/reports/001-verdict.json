@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "No path under tools/copilot-acceptance/ holds the character ' (the gate checks the working tree with find).", "met": true, "evidence": "find tools/copilot-acceptance -name \"*'*\" prints nothing"},
+    {"criterion": "The 8 files moved to probes/hook/@REPO@/.keep, probes/probe/@REPO@/.keep and golden/<case>/@REPO@/.vloop/tmp/home/hooks/vloop-fence.json for hook-forms, hook-forms-second-review, hook-fail-missing, hook-fail-exit1, hook-fail-notjson and hook-fail-timeout, with their bytes unchanged; every other file of tools/copilot-acceptance/kit/testdata/ except gen.sh keeps its path and its bytes. A golden whose bytes changed, or any other testdata/ file changed, is a violation.", "met": true, "evidence": "git diff HEAD -M shows 8 renames at 100% similarity; the only other changed files are probe_test.go and gen.sh"},
+    {"criterion": "The kit's `fixture` copy turns a path component @REPO@ into a directory named exactly `it's repo`, so the probes still run in `@DIR@/it's repo`; a kit test that no longer runs a probe in a directory named it's repo, or that stops asserting something it asserted before, is a violation.", "met": true, "evidence": "probe_test.go:31 maps @REPO@ to repoDir = \"it's repo\"; no assertion was removed from the diff"},
+    {"criterion": "The hooks file the kit writes, hooks/vloop-fence.json in it's repo/.vloop/tmp/home, is still compared byte for byte with the committed golden for each of the six hook cases (wantFiles and TestHookPhase map @REPO@ to it's repo or the reverse); the kit's tests in tools/copilot-acceptance/kit pass under the go check (`go test ./...`).", "met": true, "evidence": "wantFiles passes the golden's relative path, with @REPO@, to normalised (probe_test.go:109), which maps it to it's repo (line 68); TestHookPhase uses repoDir; go.log shows the kit package ok"},
+    {"criterion": "gen.sh, run on the Python of d7b9cbb5, writes the hooks goldens at their @REPO@ paths and its output equals the committed goldens (`diff -r` prints nothing); its header names d7b9cbb5 as the commit whose Python to take, in place of \"the base commit's\". The gate runs the starting point's gen.sh, not this one, so the review rules on the edited gen.sh from the diff.", "met": true, "evidence": "gen.sh diff: put renames @REPO@ to it's repo, snap maps it's repo back to @REPO@ in the output path; the header names d7b9cbb5 in both places. I did not run gen.sh, so this is judged from reading the diff."},
+    {"criterion": "The kit's commands, their output and the other fixtures do not change; nothing under .vloop/ is edited.", "met": true, "evidence": "The diff touches only probe_test.go, gen.sh and the 8 renames; the .vloop/ entries are untracked run records written by the driver"}
+  ],
+  "findings": [],
+  "notes": "None."
+}

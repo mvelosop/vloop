@@ -298,7 +298,8 @@ Release steps, as vloop's own releases are made with `tools/release`:
 
 1. **Prepare**: `go run ./tools/release prepare <version>` makes the checks
    (module major, retraction, version after the latest tag, tag absent, `main`
-   clean and equal to origin, the config's checks, `claude plugin validate`),
+   clean and equal to origin, the module zip of `HEAD`, the config's checks,
+   `claude plugin validate`),
    then opens a `release/<version>` branch and PR that changes only the version
    in `plugin.json`. `--dry-run` writes nothing.
 2. **Merge**: the operator squash-merges the PR to the default branch.

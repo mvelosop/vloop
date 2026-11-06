@@ -1,1 +1,0 @@
-{"schema":"session/v4","run_id":"B20260101-0000-fx1","phase":"second-review","iteration":1,"task":"T1","agent":"copilot","model":"gpt-5.1","effort":null,"started":"2026-01-01T10:16:00Z","ended":"2026-01-01T10:16:45Z","duration_ms":44000,"wall_ms":45000,"cost_usd":0,"cost_source":"estimated","credits":0,"turns":3,"is_error":false,"models_used":{},"permission_denials":[]}
