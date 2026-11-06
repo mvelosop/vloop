@@ -1,0 +1,48 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261106-2013-b38-i140-module-zips.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / Z3",
+      "summary": "zip.CreateFromVCS only recognises a repository whose git dir is exactly <repoRoot>/.git. In a linked worktree (`git worktree add`, which vloop itself recommends for parallel runs) it returns UnrecognizedVCSError, so `prepare` would refuse a valid module with `release: the module does not zip: could not find a recognized version control system at \".\"`. The brief does not mention this. It does not affect the run: every fixture is a plain repository, and the operator's checkout has a .git directory.",
+      "evidence": "golang.org/x/mod@v0.37.0 zip/zip.go:730-745 (isGitRepo: `git rev-parse --git-dir` must equal filepath.Join(dir, \".git\")); zip.go:633-641 (otherwise UnrecognizedVCSError); internal/driver/safety.go:185 suggests `git worktree add` for parallel runs.",
+      "fix": "In Z3 and in the README's prepare paragraph, say that prepare runs in the main checkout and that a linked worktree is refused with that message. If the operator wants worktrees supported, that is a new decision (for example, run CreateFromVCS on the main worktree's directory) and should be asked."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / Z2",
+      "summary": "`release paths` pins only two outcomes: rejected paths (exit 1) and none (exit 0). It does not say what is printed when git fails (started outside a repository) or when `paths` is given an argument. A test or gate cannot compare a value the contract does not state.",
+      "evidence": "Z2 contract and worked example; tools/release/main.go:35-40 shows the style for notes (a usage line with exit 2; `release: <error on one line>` with exit 1).",
+      "fix": "Add: `paths` with any argument prints `usage: release paths` on stderr and exits 2; a failing git prints `release: <git's error on one line>` and exits 1. Optionally add the not-a-repository case to the worked example."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example",
+      "summary": "The four `<F>` lines need `git commit`, `git remote add` and `git push` to build the fixture repository. The verify session's fence denies all three, so verify cannot replay these lines by hand. Only the prepare case names its covering test (TestPrepareRefusals). The Z2 tests are not named.",
+      "evidence": "fence/verify.json deny: Bash(git commit:*), Bash(git push:*), Bash(git remote add:*), Bash(git -C:*). The brief says only 'The same Z2 and Z3 cases are also tests in tools/release'.",
+      "fix": "Name the Z2 tests in the brief (for example TestPaths for the four fixture cases and TestPathsRepository for this repository), and map each `<F>` line to its test or to the T2/T3 gate, which verify can run with `vloop task gate`."
+    },
+    {
+      "kind": "fact",
+      "section": "Out of scope",
+      "summary": "The brief says the release notes' missing-briefs matter is 'recorded in .claude/skills/vloop-operator/SKILL.md'. That edit is uncommitted in the working tree and is not in 56bf0155.",
+      "evidence": "`git status`: ` M .claude/skills/vloop-operator/SKILL.md`; `git diff` adds the `Vloop-Brief:` trailer paragraph.",
+      "fix": "Commit the SKILL.md change with the brief's ready merge, so the cited record exists at the run's starting point."
+    }
+  ],
+  "decisions": [
+    "Fix forward with v0.15.0-rc.3 and retract rc.2 now, knowing the retraction only takes effect at v0.15.0. Sound: v1.0.0's cached go.mod does not retract itself, so `@latest` = v0.14.0 shows the proxy no longer lists v1.0.0.",
+    "The placeholder directory is named `@REPO@`, mapped back to `it's repo` at test time and in gen.sh. Sound: `@` is allowed by CheckFilePath, and the probe still runs in a quoted directory.",
+    "Adds golang.org/x/mod v0.37.0 as a direct dependency, using CheckFilePath for the test and CreateFromVCS for prepare. Sound; it brings the worktree limitation in finding 1.",
+    "The guard is a test in `go test ./...`, not a [[check]]. It also fails a developer's checkout that holds an untracked, not ignored file with a rejected name; the brief says this is intended. Agreed.",
+    "Adds a new `release paths` subcommand, a public surface of the tool. Fine, but its error outcomes need pinning (finding 2).",
+    "The zip check runs only in `prepare`, not in `publish`, `doctor` or CI. Acceptable, since `prepare` gates every release.",
+    "The three `.vloop/state/gates/` paths are left to the plan commit's reset. Verified: resetPlan (internal/driver/plan.go:479-486) removes .vloop/state/gates.",
+    "The repository test skips outside this module's checkout (no toplevel, or a go.mod for a different module). Agreed."
+  ],
+  "checked": "facts (11 paths with ' in git ls-files: 8 kit + 3 gates, no others; golden case names; probe_test.go fixture/wantFiles and the it's repo hooks read at line 181; gen.sh hooks_home and its header; prepareChecks order and messages; usage line; go.mod retract; d7b9cbb5 holds report.py, hook.py and bypass.sh, 56bf0155 does not; x/mod v0.37.0 and x/tools v0.45.0 .mod in the module cache; CheckFilePath's message, which gives exactly `malformed file path \"it's repo/.keep\": invalid char '\\''`; CreateFromVCS wraps FileErrorList in zipError, so errors.As is right; FileError.Path is relative to the repository; the retraction reasoning, against the cached v1.0.0.mod and list); consistency (Z1 vs violations vs Shape on gen.sh; worked example vs contract; usage line); rules (domain-model S-2, S-4, P-4, P-7, P-8 as cited; the architect's verbatim constraints are present); runnability (go check after each task; T2/T3 gates fail on the base for the right reason, since the retraction refusal precedes the tag checks; the T1 gate's premise runs green: the base gen.sh from git archive 56bf0155 on d7b9cbb5's Python gives `diff -r` empty against today's goldens; the verify fence). vloop brief check: ok, 0 warnings.",
+  "header": "Reviewed 2026-11-06: FIX, 4 findings"
+}
+

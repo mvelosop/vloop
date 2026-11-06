@@ -44,6 +44,11 @@ operator; it may belong in `domain-model.md`.
   `docs/design-notes/vloop-roadmap.md` consumed.
 - After recording interventions, refresh their index:
   `tools/interventions-index.sh --write` (`--check` when verifying).
+- The squash-merge body's `Vloop-Brief:` line goes in the same paragraph
+  as any other trailer (`Co-Authored-By:`…), with no blank line between:
+  git reads only the last paragraph as trailers, and `tools/release` finds
+  the briefs by that trailer. Check after the merge with
+  `git log -1 --format='%(trailers:key=Vloop-Brief,valueonly)'`.
 
 ## Releasing
 
