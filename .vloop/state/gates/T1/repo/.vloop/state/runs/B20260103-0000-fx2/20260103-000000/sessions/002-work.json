@@ -1,1 +1,0 @@
-{"schema":"session/v4","run_id":"B20260103-0000-fx2","phase":"work","iteration":1,"task":"T1","agent":"claude","model":"sonnet","started":"2026-01-03T00:05:00Z","duration_ms":61000,"wall_ms":61500,"cost_usd":0.5,"cost_source":"reported","turns":4,"is_error":false,"permission_denials":[]}

@@ -1,9 +1,0 @@
-{"type": "session.start", "data": {"model": "gpt-5.1"}}
-{"type": "tool.execution_start", "data": {"toolCallId": "a1", "toolName": "bash", "arguments": {"command": "gh c5-1"}}}
-{"type": "tool.execution_complete", "data": {"toolCallId": "a1", "success": false, "error": {"code": "denied", "message": "Denied by the fence ✗"}}}
-{"type": "Permission.Request", "data": {}}
-{"data": {"note": "was DENIED"}}
-{"type": "tool.execution_start", "data": {"toolCallId": "w1", "toolName": "web_fetch", "arguments": {"url": "https://example.com"}}}
-{"type": "tool.execution_complete", "data": {"toolCallId": "w1", "toolName": "web_fetch", "success": true}}
-not json
-{"type": "assistant.message", "data": {"content": "dénied é 😀 <&>"}}

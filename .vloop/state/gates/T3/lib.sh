@@ -1,40 +1,65 @@
-# Shared harness for B37's gates (the same file in every gate folder). The
-# sourcing gate sets G, its own folder. The binary, the fake home and every
-# fixture repository live under $t, a temporary directory removed on exit;
-# nothing touches this repository's tree or refs, and no real agent CLI runs.
+# Shared harness for B38's gates (the same file in every gate folder). The
+# sourcing gate sets G, its own folder. Every build and every fixture
+# repository lives under $t, a temporary directory removed on exit; nothing
+# touches this repository's tree or refs. No path holding ' is ever written
+# into the repository: such paths are made under $t, at run time.
 set -u
 fail() { printf 'GATE FAIL: %s\n' "$*" >&2; exit 1; }
-for v in $(env | sed -n 's/^\(VLOOP_[A-Z0-9_]*\)=.*/\1/p'); do unset "$v"; done
-unset GOFLAGS GOBIN GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE COPILOT_GITHUB_TOKEN GH_TOKEN GITHUB_TOKEN COPILOT_HOME STUB_LOG STUB_OUT STUB_RC
+unset GOFLAGS GOBIN GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_CEILING_DIRECTORIES
 export LC_ALL=C GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
-export PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8
 top=$(pwd -P)
-[ -f "$top/go.mod" ] && [ -d "$top/cmd/vloop" ] || fail "run from the repository root"
+[ -f "$top/go.mod" ] && [ -d "$top/tools/release" ] || fail "run from the repository root"
 t=$(mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX") && t=$(cd "$t" && pwd -P) || fail mktemp
 trap 'rm -rf "$t"' EXIT
-mkdir -p "$t/home" "$t/elsewhere" || fail mkdir
-go build -buildvcs=false -o "$t/vloop" ./cmd/vloop >"$t/build.out" 2>&1 || fail "go build ./cmd/vloop: $(tail -n 5 "$t/build.out")"
-S=$t/vloop
-# vl ARGS: the built vloop with the fake home, run from a directory outside
-# every fixture repository (each call names its repository with -C).
-vl() { (cd "$t/elsewhere" && HOME="$t/home" "$S" "$@"); }
+mkdir -p "$t/elsewhere" || fail mkdir
 
-# py ARGS: python3, isolated, writing no bytecode. Used only to parse JSON and,
-# in the kit's gates, to run the starting point's reference Python.
-py() { python3 -I -B "$@"; }
-command -v python3 >/dev/null || fail "python3 is needed by this gate (to parse JSON / run the reference Python)"
-
-# newrepo NAME: a fresh git repository $t/NAME with one empty commit; sets R.
-newrepo() {
-  R=$t/$1
-  mkdir -p "$R" && git -C "$R" init -q -b main && git -C "$R" -c user.name=t -c user.email=t@example.com commit -q --allow-empty -m base || fail "git init $1"
+# buildrel: the release tool built from this tree, at $t/release.
+buildrel() {
+  go build -buildvcs=false -o "$t/release" ./tools/release >"$t/build.out" 2>&1 ||
+    fail "go build ./tools/release: $(tail -n 5 "$t/build.out")"
 }
 
-# commitall DIR: commit everything in the fixture repository DIR.
-commitall() { git -C "$1" add -A && git -C "$1" -c user.name=t -c user.email=t@example.com commit -q -m fixtures || fail "commit in $1"; }
+# commitall DIR MSG: commit everything in the fixture repository DIR.
+commitall() {
+  git -C "$1" add -A && git -C "$1" -c user.name=t -c user.email=t@example.com -c commit.gpgsign=false commit -q -m "$2" ||
+    fail "commit in $1"
+}
 
-# hasline FILE LINE: FILE holds LINE as a whole line.
-hasline() { grep -Fxq -- "$2" "$1"; }
+# newmod NAME: a fixture repository $t/NAME on main holding go.mod
+# (module example.com/m, go 1.27), one commit; sets F.
+newmod() {
+  F=$t/$1
+  mkdir -p "$F" && git -C "$F" init -q -b main && printf 'module example.com/m\n\ngo 1.27\n' >"$F/go.mod" || fail "init $1"
+  commitall "$F" init
+}
 
-# norm FILE: FILE with every run of blanks collapsed and leading/trailing blanks dropped.
-norm() { awk '{$1=$1; print}' "$1"; }
+# withorigin: a bare repository $t/<name of F>.git as F's origin, main pushed.
+withorigin() {
+  o=$F.git
+  git init -q --bare "$o" && git -C "$F" remote add origin "$o" && git -C "$F" push -q origin main 2>"$t/push.err" ||
+    fail "origin for $F: $(cat "$t/push.err")"
+}
+
+# runin DIR ARGS: the built release tool run with DIR as its working directory;
+# stdout in $t/out, stderr in $t/err, the exit code in rc.
+runin() { d=$1; shift; (cd "$d" && "$t/release" "$@") >"$t/out" 2>"$t/err"; rc=$?; }
+
+# want NAME RC OUT ERR: the last runin exited RC, and its stdout and stderr
+# equal the files OUT and ERR byte for byte (/dev/null for nothing).
+want() {
+  [ "$rc" = "$2" ] || fail "$1: exit $rc, want $2
+stdout:
+$(cat "$t/out")
+stderr:
+$(cat "$t/err")"
+  cmp -s "$t/out" "$3" || fail "$1: stdout differs.
+got:
+$(cat "$t/out")
+want:
+$(cat "$3")"
+  cmp -s "$t/err" "$4" || fail "$1: stderr differs.
+got:
+$(cat "$t/err")
+want:
+$(cat "$4")"
+}

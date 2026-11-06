@@ -1,1 +1,0 @@
-{"schema": "session/v4", "run_id": "B20260201-0000-ka", "iteration": 2, "phase": "work", "task": "T1", "agent": "claude", "model": "sonnet", "cost_usd": 0.5, "duration_ms": 90000, "is_error": true, "permission_denials": []}

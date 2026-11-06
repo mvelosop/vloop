@@ -1,0 +1,5 @@
+GATE FAIL: release (no arguments): stderr differs.
+got:
+usage: release notes <from> <to> | prepare <version> [--dry-run] | publish <version> [--wait <duration>] [--dry-run]
+want:
+usage: release notes <from> <to> | paths | prepare <version> [--dry-run] | publish <version> [--wait <duration>] [--dry-run]

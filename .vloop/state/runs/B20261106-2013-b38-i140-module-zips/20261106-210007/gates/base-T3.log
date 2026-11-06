@@ -1,0 +1,6 @@
+GATE FAIL: prepare --dry-run in a linked worktree: exit 0, want 1
+stdout:
+dry run: every check passed for v0.1.0; nothing written
+would create release/v0.1.0, set plugin.json's version, commit "Release v0.1.0", push it and open a PR
+stderr:
+
