@@ -16,3 +16,10 @@ committing the plan
    review T1 · 0m25s · $0.12 · run $2.34 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/3 done ──
+   Add release paths and TestRepositoryPaths: fail on any repository file path Go's module rules reject
+   work T2 · 0m57s · $0.17 · run $2.51 / $40.00
+   check go
+   review T2 · 0m26s · $0.11 · run $2.62 / $40.00
+   review: PASS
+   T2 done

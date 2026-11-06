@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/3 done** · iteration 1
+**Status:** running · **2/3 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md` · **Updated:** 2026-11-06T21:17:26Z
+**Brief:** `docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md` · **Updated:** 2026-11-06T21:22:37Z
 
 ## Progress
 
 - [x] **T1** — Move the kit's it's repo fixtures and goldens under @REPO@, mapped back to it's repo at test time
-- [ ] **T2** — Add release paths and TestRepositoryPaths: fail on any repository file path Go's module rules reject
+- [x] **T2** — Add release paths and TestRepositoryPaths: fail on any repository file path Go's module rules reject
 - [ ] **T3** — Make release prepare refuse a module that does not zip, and retract v0.15.0-rc.2 in go.mod
 
 ## Tasks
@@ -39,7 +39,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Add release paths and TestRepositoryPaths: fail on any repository file path Go's module rules reject
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Nothing before the tag looked at the module zip, so a path Go rejects reached a release. This task adds a function in tools/release that lists every tracked or untracked, not ignored, file with git and checks each with module.CheckFilePath from golang.org/x/mod v0.37.0, the `release paths` subcommand that prints its findings, and a test that runs it on this repository, so `go test ./...` (the go check, after every iteration of every run) fails the day such a path is added. It uses Go's own rules, never a hand-written list of characters, because those rules also cover cases (reserved Windows names) a copy would drift from.
 

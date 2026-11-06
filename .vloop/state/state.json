@@ -5,9 +5,9 @@
   "base": "2624cb7a1816fe68beb077a8b8594184fa292644",
   "branch": "B20261106-2013-b38-i140-module-zips",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-06T21:08:50Z",
-  "updated": "2026-11-06T21:17:26Z",
+  "updated": "2026-11-06T21:22:37Z",
   "shell": "sh",
   "checks": [
     {
@@ -91,7 +91,7 @@
         "tools/release/README.md has a `## paths` section saying what paths prints and when it exits 1. Nothing under .vloop/ is edited."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

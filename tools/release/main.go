@@ -2,6 +2,7 @@
 // It is a repository-owned program, not a vloop subcommand.
 //
 //	release notes <from> <to>   the release notes for the range from..to, on stdout
+//	release paths               fail on a repository file path the module zip rejects
 //	release prepare <version>   check a release; --dry-run writes nothing
 //	release publish <version>   tag the merged release commit and create the GitHub release
 package main
@@ -21,6 +22,9 @@ func main() {
 // run executes one invocation against the repository at dir and returns the
 // exit code: 0 done, 1 refused or failed, 2 usage.
 func run(args []string, dir string, stdout, stderr io.Writer) int {
+	if len(args) > 0 && args[0] == "paths" {
+		return paths(dir, args[1:], stdout, stderr)
+	}
 	if len(args) > 0 && args[0] == "prepare" {
 		return prepare(dir, args[1:], stdout, stderr)
 	}
@@ -28,7 +32,7 @@ func run(args []string, dir string, stdout, stderr io.Writer) int {
 		return publish(dir, args[1:], stdout, stderr)
 	}
 	if len(args) == 0 || args[0] != "notes" {
-		fmt.Fprintln(stderr, "usage: release notes <from> <to> | prepare <version> [--dry-run] | publish <version> [--wait <duration>] [--dry-run]")
+		fmt.Fprintln(stderr, "usage: release notes <from> <to> | paths | prepare <version> [--dry-run] | publish <version> [--wait <duration>] [--dry-run]")
 		return 2
 	}
 	if len(args) != 3 {

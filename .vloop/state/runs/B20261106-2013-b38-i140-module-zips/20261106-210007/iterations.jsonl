@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":220174,"exit":0,"name":"go"}],"ended":"2026-11-06T21:17:26Z","gate":{"duration_ms":4673,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261106-2013-b38-i140-module-zips","schema":"iteration/v2","started":"2026-11-06T21:11:52Z","task":"T1"}
+{"attempt":1,"checks":[{"duration_ms":219751,"exit":0,"name":"go"}],"ended":"2026-11-06T21:22:37Z","gate":{"duration_ms":983,"exit":0},"iteration":2,"outcome":"done","run_id":"B20261106-2013-b38-i140-module-zips","schema":"iteration/v2","started":"2026-11-06T21:17:26Z","task":"T2"}

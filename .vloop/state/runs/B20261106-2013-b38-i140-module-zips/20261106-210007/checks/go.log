@@ -1,6 +1,6 @@
 ok  	github.com/mvelosop/vloop	(cached)
 ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	217.200s
+ok  	github.com/mvelosop/vloop/cmd/vloop	217.152s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
@@ -21,5 +21,5 @@ ok  	github.com/mvelosop/vloop/internal/runs	(cached)
 ok  	github.com/mvelosop/vloop/internal/schema	(cached)
 ok  	github.com/mvelosop/vloop/internal/state	(cached)
 ok  	github.com/mvelosop/vloop/tools/agent-eval	(cached)
-ok  	github.com/mvelosop/vloop/tools/copilot-acceptance/kit	5.416s
-ok  	github.com/mvelosop/vloop/tools/release	(cached)
+ok  	github.com/mvelosop/vloop/tools/copilot-acceptance/kit	(cached)
+ok  	github.com/mvelosop/vloop/tools/release	19.527s

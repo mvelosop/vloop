@@ -9,6 +9,15 @@ It is not a vloop subcommand. The version lives in
 `notes <from> <to>` prints the release notes for the range `from..to` on
 stdout: the briefs merged in the range and the other changes.
 
+## paths
+
+`paths` lists the repository's files, tracked or untracked and not ignored,
+and checks each path with `module.CheckFilePath` from `golang.org/x/mod`. It
+prints one `<path>: <error>` line on stdout per rejected path, then
+`release: the module zip rejects <n> path(s)` on stderr, and exits 1; with none
+it prints nothing and exits 0. Any argument is a usage error (exit 2); a git
+failure exits 1. `TestRepositoryPaths` runs it on this repository.
+
 ## prepare
 
 `prepare <version> [--dry-run]` makes every check before writing anything:
