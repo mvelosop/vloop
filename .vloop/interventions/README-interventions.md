@@ -210,6 +210,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261103-005742-the-design-note-s-two-hard-parts-still-c](I20261103-005742-the-design-note-s-two-hard-parts-still-c.md) |
 | verify | verification-finding | partly | no-options | [I20261103-031508-f4-s-list-missed-three-sentences-that-li](I20261103-031508-f4-s-list-missed-three-sentences-that-li.md) |
 | verify | verification-finding | partly | no-options | [I20261105-232221-doc-fix-for-verify-s-finding-by-session](I20261105-232221-doc-fix-for-verify-s-finding-by-session.md) |
+| verify | verification-finding | partly | no-options | [I20261106-213845-docs-guide-concepts-md-did-not-list-prep](I20261106-213845-docs-guide-concepts-md-did-not-list-prep.md) |
+| verify | verification-finding | partly | no-options | [I20261106-213846-z2-pinned-git-s-error-as-release-git-s-e](I20261106-213846-z2-pinned-git-s-error-as-release-git-s-e.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
@@ -237,6 +239,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | next | ceremony | partly | no-options | [I20261006-1748-vloop-made-public-and-verified-from-outs](I20261006-1748-vloop-made-public-and-verified-from-outs.md) |
 | next | ceremony | partly | no-options | [I20261102-210121-release-v0-15-0-rc-1-a-pre-release-for-t](I20261102-210121-release-v0-15-0-rc-1-a-pre-release-for-t.md) |
 | next | ceremony | partly | no-options | [I20261106-213844-release-v0-15-0-rc-2-published-but-its-p](I20261106-213844-release-v0-15-0-rc-2-published-but-its-p.md) |
+| next | ceremony | partly | no-options | [I20261109-194753-release-v0-15-0-rc-3-and-this-repository](I20261109-194753-release-v0-15-0-rc-3-and-this-repository.md) |
 | next | decision | no | recommended | [I20261006-1237-renumbered-to-0-8-0-before-going-public](I20261006-1237-renumbered-to-0-8-0-before-going-public.md) |
 | next | decision | no | recommended | [I20261014-1110-defects-narrowed-to-escapes-operator-fin](I20261014-1110-defects-narrowed-to-escapes-operator-fin.md) |
 | next | direction | no | no-options | [I20260929-2130-the-metrics-and-defects-design-before-b2](I20260929-2130-the-metrics-and-defects-design-before-b2.md) |
