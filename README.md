@@ -80,6 +80,41 @@ In a git repository, on a clean tree:
    problem you found) records the run, marks the brief `consumed` and makes the
    closing commit. It never merges or pushes; that is yours.
 
+## Running sessions on GitHub Copilot
+
+Each session kind can run on the GitHub Copilot CLI instead of Claude Code
+(experimental). Choose the agent and a Copilot model id per session kind:
+
+```
+vloop config set agent.work copilot
+vloop config set model.work gpt-6.1-terra
+```
+
+The keys are `agent.<kind>` and `model.<kind>` for `plan`, `gate-review`,
+`work`, `review`, `second-review`, `verify` and `review-brief`. A Copilot
+session needs a Copilot model id, never a Claude alias such as `sonnet`;
+`vloop run` refuses one. So far `gpt-6.1-terra` is qualified for work, review,
+the second review and brief review; keep plan and gate review on Claude, and
+verify is not yet tried.
+
+- **Requirements:** `copilot` on PATH, and a GitHub login its sessions can use
+  (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, else `gh auth login`).
+  `vloop run` still needs `claude` on PATH and the folder trusted in Claude,
+  even when every session is on Copilot.
+- **Safety:** each session gets its own Copilot home under `.vloop/tmp/` with a
+  hook that runs vloop's fence before every tool call, and the driver re-judges
+  the calls afterwards.
+- **Cost** is estimated from Copilot credits at `copilot.credit-usd` dollars each.
+- **Windows:** the hook has a PowerShell form and gates run in `pwsh`, but a
+  whole Copilot run on Windows is untested.
+- **Overriding locally:** an environment variable beats `.vloop/config.toml`.
+  To run Claude while the shared file says `copilot`, set `VLOOP_AGENT_WORK=claude`
+  and `VLOOP_MODEL_WORK=sonnet` (likewise for each kind); `vloop config list`
+  shows where each value came from.
+
+Every key and what `vloop doctor` checks are in
+[docs/guide/configuration.md](docs/guide/configuration.md).
+
 ## The loop in one paragraph
 
 A **plan** session splits the brief into tasks, each with acceptance criteria and
