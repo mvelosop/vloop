@@ -73,6 +73,10 @@ Runner (unchanged: masking, lock, timeout/RunGroup, session/v1 record, stderr fi
   details in the findings note.
 - Grok: not tried. A multi-provider harness pointed at xAI's API remains the
   likely route; avoid writing our own Go agent loop.
+- Gemini: explored 2026-11-19 from the docs, not run —
+  `docs/design-notes/google-agents-exploration.md`. Gemini models through the
+  Copilot adapter now; a native adapter would target Antigravity CLI (`agy`),
+  pending probes of per-session isolation and the hook.
 
 ## The sequence, as briefs
 
