@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/8 done** · iteration 4
+**Status:** running · **3/8 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:27:32Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:36:36Z
 
 ## Progress
 
 - [x] **T1** — Add the local config layer to resolution, with source local
 - [x] **T2** — Add vloop config set --local, config path --local and the override notice · 1 attempt(s)
-- [ ] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight · 1 attempt(s)
+- [x] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight · 1 attempt(s)
 - [ ] **T4** — Keep sessions off the local file: the input guard and the fences
 - [ ] **T5** — Check Claude only where a session in use runs on it
 - [ ] **T6** — Price a Copilot credit at GitHub's $0.01 by default
@@ -70,7 +70,7 @@ sh .vloop/state/gates/T2/gate.sh
 
 ### T3 — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight
 
-`pending` · 1 attempt(s) · depends on: T2
+`done` · 1 attempt(s) · depends on: T2
 
 A local file that git would commit is not local, and one that silently overrides shared values surprises its owner (L3, first half). This task makes vloop init and vloop upgrade keep .vloop/config.local.toml in .gitignore, adds doctor's config.local row (problem when tracked or not ignored, a warning naming the overridden keys), and makes vloop run's preflight refuse on those problems by name and print the warning, before anything runs. The driver's tree-clean refusal stays as it is; this refusal comes first and says why.
 
@@ -83,8 +83,6 @@ A local file that git would commit is not local, and one that silently overrides
 - Untracked and ignored: `! config.local overrides model.work, agent.work — on this machine only`, the keys with source local in config list's order; with none, `✓ config.local`.
 - vloop run's preflight counts either config.local problem like any other (exit 1, `vloop: preflight failed — N problem(s), nothing has run`, no session, no commit, no branch) and prints the warning; both on stderr with two spaces before the symbol.
 - Committed end-to-end tests in cmd/vloop, with stub agents on a temporary PATH and repositories in temporary directories (the pattern of cmd/vloop/e2e_test.go), cover each planted failure of the worked example: not ignored and tracked, in doctor and in the run's refusal; plus tests of the row's other cases. No test touches this repository's .vloop/ or .gitignore. The go check runs them.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036/checks/004-go.fail.log
 
 <details><summary>verify command</summary>
 

@@ -16,53 +16,53 @@
   },
   "size": {
     "delivered": {
-      "code": 108,
-      "test": 174,
+      "code": 162,
+      "test": 275,
       "docs": 5,
       "other": 0,
       "deleted": {
-        "code": 38,
-        "test": 0,
+        "code": 48,
+        "test": 2,
         "docs": 3,
         "other": 0
       }
     },
     "churn": {
-      "code": 109,
-      "test": 174,
+      "code": 163,
+      "test": 275,
       "docs": 6,
       "other": 0,
       "deleted": {
-        "code": 39,
-        "test": 0,
+        "code": 49,
+        "test": 2,
         "docs": 4,
         "other": 0
       }
     },
-    "test_code_ratio": 1.6111111111111112,
-    "rework": 1.0092592592592593
+    "test_code_ratio": 1.6975308641975309,
+    "rework": 1.0061728395061729
   },
   "time": {
-    "agent_ms": 814049,
-    "work_ms": 773801,
+    "agent_ms": 1346030,
+    "work_ms": 1305782,
     "review_ms": 40248,
     "plan_ms": 799376,
-    "gates_ms": 3684,
-    "checks_ms": 675573,
+    "gates_ms": 7145,
+    "checks_ms": 898963,
     "gate_review_ms": 108997,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 7.960208783500748,
-    "code_test_per_min": 20.784989601363062
+    "code_per_min": 7.221235782263397,
+    "code_test_per_min": 19.479506400303116
   },
   "cost": {
-    "total_usd": 5.516269200000002,
+    "total_usd": 5.979542700000002,
     "plan_usd": 4.138317400000002,
-    "work_usd": 0.6681222,
+    "work_usd": 1.1313957000000001,
     "review_usd": 0.24985210000000002,
     "gate_review_usd": 0.4599775,
-    "per_1000_code_lines_usd": 51.076566666666686
+    "per_1000_code_lines_usd": 36.910757407407424
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 230,
-    "output": 112626,
-    "cache_read": 8409705,
-    "cache_creation": 369855,
-    "cache_hit_ratio": 0.9578480806488537
+    "input": 278,
+    "output": 123171,
+    "cache_read": 9639340,
+    "cache_creation": 428546,
+    "cache_hit_ratio": 0.9574079246226025
   },
   "models": {
     "plan": [
@@ -122,10 +122,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 1,
+    "in_loop": 2,
     "operator": 0,
     "escaped": 0,
-    "total": 1,
+    "total": 2,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 3,
-  "iterations_per_closed": 1.5,
+  "iterations": 4,
+  "iterations_per_closed": 2,
   "by_task": [
     {
       "id": "T1",
@@ -210,24 +210,26 @@
       "id": "T3",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 54,
+        "test": 101,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 10,
+          "test": 2,
           "docs": 0,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "agent_ms": 531981,
+      "cost_usd": 0.46327350000000006,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "test_code_ratio": 1.8703703703703705,
+      "per_1000_code_lines_usd": 8.57913888888889
     },
     {
       "id": "T4",
@@ -501,6 +503,25 @@
       "cost_source": "reported",
       "credits": null,
       "turns": 6,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 8,
+      "schema": "session/v3",
+      "phase": "work",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 531981,
+      "cost_usd": 0.46327350000000006,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 3,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "vloop init and upgrade keep .vloop/config.local.toml in .gitignore; doctor has a config.local row (tracked and not-ignored problems, a warning naming overridden keys); vloop run's preflight refuses on those problems and prints the warning. Fixed the previous check failure in two init tests.",
+  "files": ["internal/install/section.go", "internal/cli/doctor.go", "internal/cli/run.go", "internal/cli/init_test.go", "internal/cli/upgrade_test.go", "cmd/vloop/b39_local_config_test.go"],
+  "verified": "vloop task gate T3 exited 0 and printed ok; go test of internal/cli init/upgrade/doctor tests, internal/install and cmd/vloop pass.",
+  "notes": "Previous check failure: TestInitWritesEverything now expects the local line in .gitignore; TestInitKeepsConfigAndBriefs fixture now already holds both lines so 'kept .gitignore' still holds (both pin the contract item that init adds the new line). MergeGitignore writes the local line before .vloop/tmp/ when both are missing, which the gate needs. Five TestTaskGate* tests fail only inside a live session (plan guard), not from this change."
+}

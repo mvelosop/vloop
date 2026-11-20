@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop init and upgrade keep .vloop/config.local.toml in .gitignore; doctor has a config.local row (tracked / not ignored problems, warning naming overridden keys); vloop run's preflight refuses on the problems and prints the warning.
 - **Files:** internal/install/section.go, internal/cli/doctor.go, internal/cli/run.go, internal/cli/init_test.go, internal/cli/upgrade_test.go, cmd/vloop/b39_local_config_test.go
 - **Notes for next iteration:** MergeGitignore adds config.local line BEFORE .vloop/tmp/ when both are missing: the gate commits a .gitignore of tmp then local right after init, which fails with 'nothing to commit' if init already wrote exactly that order. Order is otherwise arbitrary. Two existing tests (TestInitClaudeMarkers, TestUpgradeMarkerOnlyAndGitignore) changed only to include the new line. TestTaskGate* fail inside a live session (plan guard), not this change.
+
+## T3 — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight
+
+- **Outcome:** done (review: PASS)
+- **Summary:** vloop init and upgrade keep .vloop/config.local.toml in .gitignore; doctor has a config.local row (tracked and not-ignored problems, a warning naming overridden keys); vloop run's preflight refuses on those problems and prints the warning. Fixed the previous check failure in two init tests.
+- **Files:** internal/install/section.go, internal/cli/doctor.go, internal/cli/run.go, internal/cli/init_test.go, internal/cli/upgrade_test.go, cmd/vloop/b39_local_config_test.go
+- **Notes for next iteration:** Previous check failure: TestInitWritesEverything now expects the local line in .gitignore; TestInitKeepsConfigAndBriefs fixture now already holds both lines so 'kept .gitignore' still holds (both pin the contract item that init adds the new line). MergeGitignore writes the local line before .vloop/tmp/ when both are missing, which the gate needs. Five TestTaskGate* tests fail only inside a live session (plan guard), not from this change.
