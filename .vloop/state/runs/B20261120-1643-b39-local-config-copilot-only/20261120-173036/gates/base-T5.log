@@ -1,0 +1,24 @@
+GATE FAIL: doctor, every agent on copilot: no line
+- claude no session in use runs on claude
+in:
+✓ git
+✓ install
+✓ config
+✗ claude claude is not on PATH
+✓ copilot
+✓ copilot login
+! agent.plan is copilot: experimental (docs/guide/configuration.md)
+! agent.work is copilot: experimental (docs/guide/configuration.md)
+! agent.gate-review is copilot: experimental (docs/guide/configuration.md)
+! agent.review is copilot: experimental (docs/guide/configuration.md)
+! agent.review-brief is copilot: experimental (docs/guide/configuration.md)
+! trust this folder is not marked trusted in the Claude settings — run claude here once and accept the trust dialog
+✓ gate shell
+- plan
+- branch
+- plugin
+! copilot plugin cannot read copilot plugin list --json: invalid character '{' after top-level value
+- gate edits
+✓ guidelines 0 rule(s)
+- self-hosting
+doctor: 1 problem(s), 7 warning(s)

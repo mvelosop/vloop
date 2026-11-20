@@ -1,0 +1,6 @@
+GATE FAIL: config list | grep -E '^(agent|model)\.work=' printed
+model.work=gpt-6.1-terra (file)
+agent.work=copilot (file)
+want
+model.work=sonnet (local)
+agent.work=claude (local)

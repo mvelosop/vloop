@@ -1,0 +1,1 @@
+GATE FAIL: fence/gate-review.json: denies Edit(.vloop/config.toml) but not Edit(.vloop/config.local.toml)

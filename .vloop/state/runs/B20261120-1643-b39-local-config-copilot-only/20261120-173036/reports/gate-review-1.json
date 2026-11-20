@@ -1,0 +1,16 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {"task": "T1", "verdict": "PASS", "findings": []},
+    {"task": "T2", "verdict": "PASS", "findings": []},
+    {"task": "T3", "verdict": "PASS", "findings": []},
+    {"task": "T4", "verdict": "PASS", "findings": []},
+    {"task": "T5", "verdict": "PASS", "findings": []},
+    {"task": "T6", "verdict": "PASS", "findings": []},
+    {"task": "T7", "verdict": "PASS", "findings": []},
+    {"task": "T8", "verdict": "PASS", "findings": []}
+  ],
+  "notes": "Every gate fails on the base at a behavioural assertion (T1 source local, T2/T8 unknown flag --local, T3 missing ignore line, T4 fence deny entries, T5 the n/a rows, T6 default 0.01, T7 docs naming the file). T4's run section was exercised on the base by splicing it: the harness reaches the local-file restore assertion. Matchers were run against the pinned output (config list --json shape, guide row awk, C-1/roadmap/README paragraph extractors). Criteria left to the review: T4's removed-file restore, the committed-test criteria of T1-T6 and T8, and T7's concepts.md/Prerequisites wording."
+}
+
