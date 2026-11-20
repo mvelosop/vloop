@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/8 done** · iteration 1
+**Status:** running · **1/8 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:02:17Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:07:30Z
 
 ## Progress
 
 - [x] **T1** — Add the local config layer to resolution, with source local
-- [ ] **T2** — Add vloop config set --local, config path --local and the override notice
+- [ ] **T2** — Add vloop config set --local, config path --local and the override notice · 1 attempt(s)
 - [ ] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight
 - [ ] **T4** — Keep sessions off the local file: the input guard and the fences
 - [ ] **T5** — Check Claude only where a session in use runs on it
@@ -47,7 +47,7 @@ sh .vloop/state/gates/T1/gate.sh
 
 ### T2 — Add vloop config set --local, config path --local and the override notice
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 With the local layer resolving (T1), a developer needs to write it without editing TOML by hand, and to be told when a shared value they just set will not apply on their machine (L2). This task adds --local to config set and config path, and the one-line stderr notice config set prints when the local file or the environment still overrides the key it wrote. docs/guide/commands.md is generated from the commands and must be regenerated.
 
@@ -59,6 +59,8 @@ With the local layer resolving (T1), a developer needs to write it without editi
 - vloop config path --local prints .vloop/config.local.toml; config path alone prints .vloop/config.toml.
 - docs/guide/commands.md is regenerated with go generate ./... and its existing test passes under the go check.
 - Committed tests cover set --local (write, layout kept, create only on a write, remove, absent remove, validation), each notice case and path --local; the go check runs them.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036/checks/002-go.fail.log
 
 <details><summary>verify command</summary>
 

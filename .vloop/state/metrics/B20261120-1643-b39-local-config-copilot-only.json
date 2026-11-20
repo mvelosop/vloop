@@ -1,0 +1,450 @@
+{
+  "schema": "metrics/v4",
+  "brief": "B20261120-1643-b39-local-config-copilot-only.loop-brief",
+  "run_id": "B20261120-1643-b39-local-config-copilot-only",
+  "status": "ready",
+  "merged": null,
+  "tasks": {
+    "planned": 8,
+    "done": 1,
+    "blocked": 0,
+    "first_pass": 1,
+    "estimate": {
+      "min": 6,
+      "max": 8
+    }
+  },
+  "size": {
+    "delivered": {
+      "code": 70,
+      "test": 106,
+      "docs": 0,
+      "other": 0,
+      "deleted": {
+        "code": 28,
+        "test": 0,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "churn": {
+      "code": 70,
+      "test": 106,
+      "docs": 0,
+      "other": 0,
+      "deleted": {
+        "code": 28,
+        "test": 0,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 1.5142857142857142,
+    "rework": 1
+  },
+  "time": {
+    "agent_ms": 516900,
+    "work_ms": 495969,
+    "review_ms": 20931,
+    "plan_ms": 799376,
+    "gates_ms": 1467,
+    "checks_ms": 227449,
+    "gate_review_ms": 108997,
+    "wall_ms": null
+  },
+  "rate": {
+    "code_per_min": 8.12536273940801,
+    "code_test_per_min": 20.429483459082995
+  },
+  "cost": {
+    "total_usd": 5.0424570000000015,
+    "plan_usd": 4.138317400000002,
+    "work_usd": 0.3122333,
+    "review_usd": 0.1319288,
+    "gate_review_usd": 0.4599775,
+    "per_1000_code_lines_usd": 72.03510000000001
+  },
+  "credits": {
+    "total": 0,
+    "plan": 0,
+    "work": 0,
+    "review": 0,
+    "gate_review": 0
+  },
+  "tokens": {
+    "input": 178,
+    "output": 103068,
+    "cache_read": 7596543,
+    "cache_creation": 295652,
+    "cache_hit_ratio": 0.9625169768332034
+  },
+  "models": {
+    "plan": [
+      "claude-opus-5-5"
+    ],
+    "work": [
+      "claude-sonnet-5-5"
+    ],
+    "review": [
+      "claude-sonnet-5-5"
+    ],
+    "gate-review": [
+      "claude-sonnet-5-5"
+    ]
+  },
+  "agents": {
+    "plan": [
+      "claude"
+    ],
+    "work": [
+      "claude"
+    ],
+    "review": [
+      "claude"
+    ],
+    "second-review": [],
+    "gate-review": [
+      "claude"
+    ]
+  },
+  "second_review": {
+    "mode": "off",
+    "sessions": 0,
+    "dissents": 0,
+    "dissent_tasks": [],
+    "cost_usd": 0,
+    "time_ms": 0
+  },
+  "effort": {
+    "plan": null,
+    "work": null,
+    "review": null,
+    "gate-review": null
+  },
+  "defects": {
+    "in_loop": 0,
+    "operator": 0,
+    "escaped": 0,
+    "total": 0,
+    "removal_efficiency": null
+  },
+  "interventions": {
+    "total": 0,
+    "by_agreement": {
+      "recommended": 0,
+      "other-option": 0,
+      "adjusted": 0,
+      "different": 0,
+      "no-options": 0
+    }
+  },
+  "instructions": {
+    "plan": 4732,
+    "gate_review": 2377,
+    "work": 2474,
+    "review": 2495,
+    "verify": 2148,
+    "guidelines_rules": 2
+  },
+  "records": {
+    "missing": []
+  },
+  "lead_time": {
+    "plan_to_merge_ms": null
+  },
+  "permission_denials": 6,
+  "iterations": 1,
+  "iterations_per_closed": 1,
+  "by_task": [
+    {
+      "id": "T1",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 70,
+        "test": 106,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 28,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 516900,
+      "cost_usd": 0.4441621,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "test_code_ratio": 1.5142857142857142,
+      "per_1000_code_lines_usd": 6.345172857142857
+    },
+    {
+      "id": "T2",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T3",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T4",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T5",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T6",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T7",
+      "area": null,
+      "kind": "docs",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T8",
+      "area": null,
+      "kind": "test",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    }
+  ],
+  "by_session": [
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 1,
+      "schema": "session/v3",
+      "phase": "plan",
+      "iteration": 0,
+      "task": null,
+      "agent": "claude",
+      "model": "opus",
+      "effort": null,
+      "time_ms": 799376,
+      "cost_usd": 4.138317400000002,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 55,
+      "permission_denials": 4,
+      "denials": [
+        {
+          "tool_name": "Bash",
+          "text": "set -e; t=$(mktemp -d \"${TMPDIR:-/tmp}/plan.XXXXXX\"); go build -buildvcs=false -o $t/vloop ./cmd/vloop; cd $t; mkdir r; cd r; git init -q -b main; export HOME=$t GIT_CONFIG_GLOBAL=/dev/null; $t/vloop …"
+        },
+        {
+          "tool_name": "Bash",
+          "text": "mkdir -p .vloop/tmp/probe \u0026\u0026 cat \u003e .vloop/tmp/probe/p1.sh \u003c\u003c'EOF'\nt=$(mktemp -d \"${TMPDIR:-/tmp}/plan.XXXXXX\")\ngo build -buildvcs=false -o \"$t/vloop\" ./cmd/vloop || exit 1\nmkdir \"$t/r\" \"$t/home\"\nexpor…"
+        },
+        {
+          "tool_name": "Bash",
+          "text": "d=.vloop/tmp/gtest \u0026\u0026 {\n  echo 'G=.vloop/tmp/gtest'; echo '. \"$G/lib.sh\"'\n  sed -n '/^# 2. vloop upgrade/,/^wantrc \"vloop upgrade --yes\" 0$/p' .vloop/state/gates/T3/gate.sh\n  echo 'cat \"$t/out\"; echo …"
+        },
+        {
+          "tool_name": "Bash",
+          "text": "rm -r .vloop/tmp/gtest; vloop schema validate state/v2 .vloop/state/state.json \u0026\u0026 vloop task validate \u0026\u0026 grep -rn \"/Users/\" .vloop/state/state.json .vloop/state/gates/ ; echo \"abs-path grep rc=$?\""
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 2,
+      "schema": "session/v3",
+      "phase": "gate-review",
+      "iteration": 0,
+      "task": null,
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 108997,
+      "cost_usd": 0.4599775,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 21,
+      "permission_denials": 2,
+      "denials": [
+        {
+          "tool_name": "Bash",
+          "text": "cat .vloop/state/gates/T3/gate.sh; grep -n 'config.toml' docs/design-notes/fence-audit.md | head; grep -rn 'Language\\b' internal/cli/*.go | grep -v _test | head -5; go build -o /tmp/vl ./cmd/vloop \u0026\u0026 …"
+        },
+        {
+          "tool_name": "Bash",
+          "text": "go build -o .vloop/tmp/vl ./cmd/vloop \u0026\u0026 d=$(mktemp -d) \u0026\u0026 cd $d \u0026\u0026 git init -q \u0026\u0026 \"$OLDPWD/.vloop/tmp/vl\" config list --json | python3 -I -c 'import json,sys;d=json.load(sys.stdin);print(d[\"agent.wor…"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 3,
+      "schema": "session/v3",
+      "phase": "work",
+      "iteration": 1,
+      "task": "T1",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 495969,
+      "cost_usd": 0.3122333,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 13,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 4,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 1,
+      "task": "T1",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 20931,
+      "cost_usd": 0.1319288,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 6,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    }
+  ]
+}

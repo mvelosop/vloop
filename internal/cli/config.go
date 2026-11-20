@@ -135,28 +135,53 @@ func newConfig(g *Globals) *cobra.Command {
 		},
 	})
 
-	cmd.AddCommand(&cobra.Command{
+	var setLocal bool
+	set := &cobra.Command{
 		Use:   "set <key> <value>",
-		Short: "Set one key in .vloop/config.toml: any key config list shows ('' removes it)",
+		Short: "Set one key in .vloop/config.toml, or in .vloop/config.local.toml with --local ('' removes it)",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()
 			if err != nil {
 				return err
 			}
-			return configErr(g, cmd.OutOrStdout(), config.Set(root, args[0], args[1]))
+			write := config.Set
+			if setLocal {
+				write = config.SetLocal
+			}
+			if err := write(root, args[0], args[1]); err != nil {
+				return configErr(g, cmd.OutOrStdout(), err)
+			}
+			if v, err := config.Get(root, args[0]); err == nil {
+				switch {
+				case v.Source == config.SourceEnv:
+					fmt.Fprintf(cmd.ErrOrStderr(), "! %s stays %s on this machine: %s overrides it\n", v.Key, v.Value, config.EnvVar(v.Key))
+				case v.Source == config.SourceLocal && !setLocal:
+					fmt.Fprintf(cmd.ErrOrStderr(), "! %s stays %s on this machine: %s overrides it\n", v.Key, v.Value, config.LocalFilePath)
+				}
+			}
+			return nil
 		},
-	})
+	}
+	set.Flags().BoolVar(&setLocal, "local", false, "write "+config.LocalFilePath+", this machine's overrides, instead of the shared file")
+	cmd.AddCommand(set)
 
-	cmd.AddCommand(&cobra.Command{
+	var pathLocal bool
+	path := &cobra.Command{
 		Use:   "path",
 		Short: "Show the config file path, relative to the repo root",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			fmt.Fprintln(cmd.OutOrStdout(), config.FilePath)
+			p := config.FilePath
+			if pathLocal {
+				p = config.LocalFilePath
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), p)
 			return nil
 		},
-	})
+	}
+	path.Flags().BoolVar(&pathLocal, "local", false, "show the local file's path instead")
+	cmd.AddCommand(path)
 	return cmd
 }
 

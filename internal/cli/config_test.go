@@ -234,3 +234,74 @@ func TestConfigBadCheckExit1(t *testing.T) {
 		t.Fatalf("code %d out %q err %q", code, out, errs)
 	}
 }
+
+func TestConfigSetLocal(t *testing.T) {
+	d := scratchRepo(t)
+	local := filepath.Join(d, ".vloop", "config.local.toml")
+	if code, _, _ := run(t, "-C", d, "config", "set", "--local", "agent.work", ""); code != 0 {
+		t.Fatalf("absent remove: %d", code)
+	}
+	if _, err := os.Stat(filepath.Join(d, ".vloop")); err == nil {
+		t.Fatal("absent remove created .vloop")
+	}
+	if code, _, errOut := run(t, "-C", d, "config", "set", "--local", "agent.work", "nope"); code != 2 || !strings.Contains(errOut, `invalid value "nope" for agent.work`) {
+		t.Fatalf("invalid: %d %q", code, errOut)
+	}
+	if code, _, _ := run(t, "-C", d, "config", "set", "--local", "colour", "red"); code != 2 {
+		t.Fatalf("unknown: %d", code)
+	}
+	if _, err := os.Stat(local); err == nil {
+		t.Fatal("refused set wrote the file")
+	}
+	if err := os.MkdirAll(filepath.Dir(local), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	os.WriteFile(local, []byte("# mine\nrun.max-iterations = 9\n"), 0o644)
+	if code, out, errOut := run(t, "-C", d, "config", "set", "--local", "agent.work", "copilot"); code != 0 || out != "" || errOut != "" {
+		t.Fatalf("set: %d %q %q", code, out, errOut)
+	}
+	b, _ := os.ReadFile(local)
+	if !strings.Contains(string(b), "# mine") || !strings.Contains(string(b), "run.max-iterations = 9") || !strings.Contains(string(b), "copilot") {
+		t.Fatalf("layout lost: %q", b)
+	}
+	if _, err := os.Stat(filepath.Join(d, ".vloop", "config.toml")); err == nil {
+		t.Fatal("created shared file")
+	}
+	run(t, "-C", d, "config", "set", "--local", "agent.work", "")
+	b, _ = os.ReadFile(local)
+	if strings.Contains(string(b), "agent") {
+		t.Fatalf("not removed: %q", b)
+	}
+}
+
+func TestConfigSetOverrideNotice(t *testing.T) {
+	d := scratchRepo(t)
+	run(t, "-C", d, "config", "set", "--local", "agent.work", "claude")
+	code, out, errOut := run(t, "-C", d, "config", "set", "agent.work", "copilot")
+	if code != 0 || out != "" || errOut != "! agent.work stays claude on this machine: .vloop/config.local.toml overrides it\n" {
+		t.Fatalf("local notice: %d %q %q", code, out, errOut)
+	}
+	t.Setenv("VLOOP_AGENT_WORK", "copilot")
+	_, out, errOut = run(t, "-C", d, "config", "set", "agent.work", "claude")
+	if out != "" || errOut != "! agent.work stays copilot on this machine: VLOOP_AGENT_WORK overrides it\n" {
+		t.Fatalf("env notice: %q %q", out, errOut)
+	}
+	_, _, errOut = run(t, "-C", d, "config", "set", "--local", "agent.work", "claude")
+	if !strings.Contains(errOut, "VLOOP_AGENT_WORK overrides it") {
+		t.Fatalf("local env notice: %q", errOut)
+	}
+	t.Setenv("VLOOP_AGENT_WORK", "")
+	if _, _, errOut = run(t, "-C", d, "config", "set", "language", "es"); errOut != "" {
+		t.Fatalf("unexpected notice %q", errOut)
+	}
+}
+
+func TestConfigPathLocal(t *testing.T) {
+	d := scratchRepo(t)
+	if _, out, _ := run(t, "-C", d, "config", "path", "--local"); out != ".vloop/config.local.toml\n" {
+		t.Fatalf("%q", out)
+	}
+	if _, out, _ := run(t, "-C", d, "config", "path"); out != ".vloop/config.toml\n" {
+		t.Fatalf("%q", out)
+	}
+}

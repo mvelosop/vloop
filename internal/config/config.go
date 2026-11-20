@@ -646,7 +646,12 @@ func Check(root, name, value string) error {
 // Set validates and writes name=value into the config file under root,
 // preserving every other key. An empty value removes the key. The file is not
 // touched (nor created) when the result would not change the key.
-func Set(root, name, value string) error {
+func Set(root, name, value string) error { return setAt(root, FilePath, name, value) }
+
+// SetLocal is Set for the local file, .vloop/config.local.toml.
+func SetLocal(root, name, value string) error { return setAt(root, LocalFilePath, name, value) }
+
+func setAt(root, rel, name, value string) error {
 	k, err := Lookup(name)
 	if err != nil {
 		return err
@@ -661,7 +666,7 @@ func Set(root, name, value string) error {
 			}
 		}
 	}
-	file, raw, err := readFile(root)
+	file, raw, err := readPath(root, rel)
 	if err != nil {
 		return err
 	}
@@ -730,7 +735,7 @@ func Set(root, name, value string) error {
 	if raw != nil && bytes.Equal(raw, out) {
 		return nil
 	}
-	p := filePath(root)
+	p := filepath.Join(root, filepath.FromSlash(rel))
 	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
 		return err
 	}

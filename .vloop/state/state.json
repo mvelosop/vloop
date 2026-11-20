@@ -5,9 +5,9 @@
   "base": "05d546c5009a15b86470816eaa2e386fedf9453c",
   "branch": "B20261120-1643-b39-local-config-copilot-only",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-20T17:45:00Z",
-  "updated": "2026-11-20T18:02:17Z",
+  "updated": "2026-11-20T18:07:30Z",
   "shell": "sh",
   "checks": [
     {
@@ -98,8 +98,8 @@
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036/checks/002-go.fail.log"
     },
     {
       "id": "T3",

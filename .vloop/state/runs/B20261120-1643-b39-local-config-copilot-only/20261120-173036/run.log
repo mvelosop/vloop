@@ -21,3 +21,8 @@ committing the plan
    review T1 · 0m21s · $0.13 · run $5.04 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/8 done ──
+   Add vloop config set --local, config path --local and the override notice
+   work T2 · 1m26s · $0.22 · run $5.26 / $40.00
+   check go
+   CHECK FAIL T2 — check go failed — see .vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036/checks/002-go.fail.log; review skipped
