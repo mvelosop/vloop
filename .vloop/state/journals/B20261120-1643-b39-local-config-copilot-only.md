@@ -55,3 +55,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** doctor's claude, trust, plugin and gate edits rows are n/a (no session in use runs on claude) unless a session in use resolves to claude, so vloop run's preflight passes on a machine with no claude. An unreadable config counts Claude as in use.
 - **Files:** internal/cli/doctor.go, cmd/vloop/b39_local_config_test.go
 - **Notes for next iteration:** claudeInUse(root, withReviewBrief) in doctor.go mirrors copilotKeys; agent.review-brief counts only for the bare doctor (runBrief == nil), so vloop run ignores it. No earlier test needed changing. New e2e tests in cmd/vloop/b39_local_config_test.go use a PATH of the stub copilot plus symlinks to a few tools, with no claude. Five TestTaskGate* tests in internal/cli fail only inside a live session (plan guard), not from this change.
+
+## T6 — Price a Copilot credit at GitHub's $0.01 by default
+
+- **Outcome:** done (review: PASS)
+- **Summary:** copilot.credit-usd now defaults to 0.01; the configuration guide's row and every test that pins the default say 0.01.
+- **Files:** internal/config/config.go, internal/config/config_test.go, internal/cli/config_test.go, cmd/vloop/e2e_test.go, docs/guide/configuration.md
+- **Notes for next iteration:** Only the default literal changed in tests. In internal/cli, TestTaskGate* tests fail inside a work session with 'the plan was changed during this session' (the session guard, unrelated to this change); the other cli tests pass. 0.0066667 remains only in docs/briefs, .vloop/state and docs/design-notes.

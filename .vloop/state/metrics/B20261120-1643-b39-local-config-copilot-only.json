@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 8,
-    "done": 4,
+    "done": 5,
     "blocked": 0,
-    "first_pass": 2,
+    "first_pass": 3,
     "estimate": {
       "min": 6,
       "max": 8
@@ -16,53 +16,53 @@
   },
   "size": {
     "delivered": {
-      "code": 163,
-      "test": 327,
+      "code": 205,
+      "test": 417,
       "docs": 15,
       "other": 10,
       "deleted": {
-        "code": 49,
+        "code": 53,
         "test": 4,
         "docs": 3,
         "other": 0
       }
     },
     "churn": {
-      "code": 164,
-      "test": 327,
+      "code": 206,
+      "test": 417,
       "docs": 16,
       "other": 10,
       "deleted": {
-        "code": 50,
+        "code": 54,
         "test": 4,
         "docs": 4,
         "other": 0
       }
     },
-    "test_code_ratio": 2.0061349693251533,
-    "rework": 1.0061349693251533
+    "test_code_ratio": 2.0341463414634147,
+    "rework": 1.0048780487804878
   },
   "time": {
-    "agent_ms": 1959753,
-    "work_ms": 1878838,
-    "review_ms": 80915,
+    "agent_ms": 2394033,
+    "work_ms": 2292961,
+    "review_ms": 101072,
     "plan_ms": 799376,
-    "gates_ms": 16671,
-    "checks_ms": 1349066,
+    "gates_ms": 20823,
+    "checks_ms": 1573480,
     "gate_review_ms": 108997,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 4.990424813739282,
-    "code_test_per_min": 15.00189054436962
+    "code_per_min": 5.1377737900856,
+    "code_test_per_min": 15.588757548454845
   },
   "cost": {
-    "total_usd": 6.566798200000002,
+    "total_usd": 6.977568300000002,
     "plan_usd": 4.138317400000002,
-    "work_usd": 1.4794331000000003,
-    "review_usd": 0.4890702,
+    "work_usd": 1.7799329000000004,
+    "review_usd": 0.5993405,
     "gate_review_usd": 0.4599775,
-    "per_1000_code_lines_usd": 40.287105521472405
+    "per_1000_code_lines_usd": 34.03691853658538
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 336,
-    "output": 134278,
-    "cache_read": 10510875,
-    "cache_creation": 525775,
-    "cache_hit_ratio": 0.952332004407725
+    "input": 382,
+    "output": 143427,
+    "cache_read": 11359236,
+    "cache_creation": 584363,
+    "cache_hit_ratio": 0.951042705108121
   },
   "models": {
     "plan": [
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 6,
-  "iterations_per_closed": 1.5,
+  "iterations": 7,
+  "iterations_per_closed": 1.4,
   "by_task": [
     {
       "id": "T1",
@@ -260,24 +260,26 @@
       "id": "T5",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 42,
+        "test": 90,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
+          "code": 4,
           "test": 0,
           "docs": 0,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "agent_ms": 434280,
+      "cost_usd": 0.4107701,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "test_code_ratio": 2.142857142857143,
+      "per_1000_code_lines_usd": 9.780240476190476
     },
     {
       "id": "T6",
@@ -597,6 +599,44 @@
       "effort": null,
       "time_ms": 16251,
       "cost_usd": 0.10762000000000001,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 5,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 13,
+      "schema": "session/v3",
+      "phase": "work",
+      "iteration": 7,
+      "task": "T5",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 414123,
+      "cost_usd": 0.30049980000000004,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 18,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 14,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 7,
+      "task": "T5",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 20157,
+      "cost_usd": 0.11027029999999999,
       "cost_source": "reported",
       "credits": null,
       "turns": 5,

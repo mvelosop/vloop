@@ -39,7 +39,7 @@ environment and in `config set`.
 | `agent.gate-review` | `claude` | `claude`, `copilot` (experimental) | `VLOOP_AGENT_GATE_REVIEW` | agent CLI of the gate-review session |
 | `agent.verify` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_VERIFY` | agent CLI of the verify session (`copilot` is experimental) |
 | `agent.review-brief` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_REVIEW_BRIEF` | agent CLI of the session `vloop brief review` runs |
-| `copilot.credit-usd` | `0.0066667` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot credit, for the estimated cost of a copilot session |
+| `copilot.credit-usd` | `0.01` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot AI credit; GitHub's price is $0.01 on every plan; a developer whose plan makes included credits cheaper sets their own in the local file |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
 | `metrics.stacks` | unset | a list of preset names (below) | `VLOOP_METRICS_STACKS` | presets that classify changed lines as code, test, docs or excluded |

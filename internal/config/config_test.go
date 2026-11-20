@@ -44,7 +44,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
 		{"model.review", "sonnet", true}, {"model.second-review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"model.review-brief", "opus", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.second-review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"effort.review-brief", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.second-review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"agent.review-brief", "claude", true}, {"copilot.credit-usd", "0.0066667", true}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"effort.review", "", false}, {"effort.second-review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"effort.review-brief", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.second-review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"agent.review-brief", "claude", true}, {"copilot.credit-usd", "0.01", true}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
@@ -762,7 +762,7 @@ func TestAgentKeys(t *testing.T) {
 func TestCopilotCreditKey(t *testing.T) {
 	root := scratch(t)
 	k := "copilot.credit-usd"
-	if v, err := Get(root, k); err != nil || v.Value != "0.0066667" || v.Source != SourceDefault {
+	if v, err := Get(root, k); err != nil || v.Value != "0.01" || v.Source != SourceDefault {
 		t.Fatalf("default: %+v %v", v, err)
 	}
 	if EnvVar(k) != "VLOOP_COPILOT_CREDIT_USD" {

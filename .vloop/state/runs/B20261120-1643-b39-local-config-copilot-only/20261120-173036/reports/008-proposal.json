@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "copilot.credit-usd now defaults to 0.01; the configuration guide's row and every test that pins the default say 0.01.",
+  "files": ["internal/config/config.go", "internal/config/config_test.go", "internal/cli/config_test.go", "cmd/vloop/e2e_test.go", "docs/guide/configuration.md"],
+  "verified": "vloop task gate T6 exited 0 and printed ok; go test ./internal/config and ./cmd/... pass.",
+  "notes": "Only the default literal changed in tests. In internal/cli, TestTaskGate* tests fail inside a work session with 'the plan was changed during this session' (the session guard, unrelated to this change); the other cli tests pass. 0.0066667 remains only in docs/briefs, .vloop/state and docs/design-notes."
+}

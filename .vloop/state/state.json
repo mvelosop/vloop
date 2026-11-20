@@ -5,9 +5,9 @@
   "base": "05d546c5009a15b86470816eaa2e386fedf9453c",
   "branch": "B20261120-1643-b39-local-config-copilot-only",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-11-20T17:45:00Z",
-  "updated": "2026-11-20T18:56:54Z",
+  "updated": "2026-11-20T19:08:54Z",
   "shell": "sh",
   "checks": [
     {
@@ -269,7 +269,7 @@
         "No session record is recomputed."
       ],
       "verify": "sh .vloop/state/gates/T6/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

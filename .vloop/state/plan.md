@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/8 done** · iteration 7
+**Status:** running · **6/8 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:56:54Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T19:08:54Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight · 1 attempt(s)
 - [x] **T4** — Keep sessions off the local file: the input guard and the fences
 - [x] **T5** — Check Claude only where a session in use runs on it
-- [ ] **T6** — Price a Copilot credit at GitHub's $0.01 by default
+- [x] **T6** — Price a Copilot credit at GitHub's $0.01 by default
 - [ ] **T7** — Document the local file, Claude only where used, and the credit price
 - [ ] **T8** — Close: the worked example line for line, and every gate at once
 
@@ -140,7 +140,7 @@ sh .vloop/state/gates/T5/gate.sh
 
 ### T6 — Price a Copilot credit at GitHub's $0.01 by default
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Copilot's estimated cost uses 0.0066667 dollars a credit, Copilot Pro's average, while GitHub now prices one AI credit at $0.01 on every plan (L5). This task moves the default of copilot.credit-usd to 0.01 and updates every place that states the default, while records of what already happened keep their numbers. A developer whose plan makes credits cheaper sets their own, now possible per machine in the local file.
 

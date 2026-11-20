@@ -104,7 +104,7 @@ var Keys = []Key{
 	{Name: "agent.gate-review", Default: "claude", Valid: agents},
 	{Name: "agent.verify", Default: "claude", Valid: agents},
 	{Name: "agent.review-brief", Default: "claude", Valid: agents},
-	{Name: "copilot.credit-usd", Default: "0.0066667", Num: true, MinOpen: true},
+	{Name: "copilot.credit-usd", Default: "0.01", Num: true, MinOpen: true},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
 	{Name: "metrics.stacks", List: true, Stacks: true},

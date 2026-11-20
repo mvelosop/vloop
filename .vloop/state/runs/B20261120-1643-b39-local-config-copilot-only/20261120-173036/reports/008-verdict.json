@@ -1,0 +1,7 @@
+{"schema":"verdict/v1","task":"T6","verdict":"PASS","criteria":[
+{"criterion":"copilot.credit-usd defaults to 0.01: `vloop config get copilot.credit-usd` prints 0.01 with no file setting it, and config list shows `copilot.credit-usd=0.01 (default)`. Its validation is unchanged.","met":true,"evidence":"internal/config/config.go Keys: Default 0.01, Num and MinOpen unchanged; tests pin config list output"},
+{"criterion":"The configuration guide's row has default `0.01` and says: dollars per GitHub Copilot AI credit; GitHub's price is $0.01 on every plan; a developer whose plan makes included credits cheaper sets their own in the local file.","met":true,"evidence":"docs/guide/configuration.md:42 row has default 0.01 and the required text"},
+{"criterion":"Every test that pins the default (the expected config list in internal/config, internal/cli and cmd/vloop/e2e_test.go) is changed to 0.01 and nothing else in it changes; the go check runs them.","met":true,"evidence":"Diffs in config_test.go (2 spots), cli/config_test.go (2), e2e_test.go (1) change only the value; the go check exited 0"},
+{"criterion":"Violation: 0.0066667 left anywhere a default is stated, outside the files that record or quote what already happened (docs/briefs/, .vloop/state/, docs/design-notes/), which keep it.","met":true,"evidence":"grep outside those directories finds no 0.0066667"},
+{"criterion":"No session record is recomputed.","met":true,"evidence":"The diff touches no session record outside the driver's own run files"}
+],"findings":[],"notes":"none"}
