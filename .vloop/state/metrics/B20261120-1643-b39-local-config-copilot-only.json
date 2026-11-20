@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 8,
-    "done": 5,
+    "done": 6,
     "blocked": 0,
-    "first_pass": 3,
+    "first_pass": 4,
     "estimate": {
       "min": 6,
       "max": 8
@@ -16,53 +16,53 @@
   },
   "size": {
     "delivered": {
-      "code": 205,
-      "test": 417,
-      "docs": 15,
-      "other": 10,
-      "deleted": {
-        "code": 53,
-        "test": 4,
-        "docs": 3,
-        "other": 0
-      }
-    },
-    "churn": {
       "code": 206,
-      "test": 417,
+      "test": 422,
       "docs": 16,
       "other": 10,
       "deleted": {
         "code": 54,
-        "test": 4,
+        "test": 9,
         "docs": 4,
         "other": 0
       }
     },
-    "test_code_ratio": 2.0341463414634147,
-    "rework": 1.0048780487804878
+    "churn": {
+      "code": 207,
+      "test": 422,
+      "docs": 17,
+      "other": 10,
+      "deleted": {
+        "code": 55,
+        "test": 9,
+        "docs": 5,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 2.0485436893203883,
+    "rework": 1.0048543689320388
   },
   "time": {
-    "agent_ms": 2394033,
-    "work_ms": 2292961,
-    "review_ms": 101072,
+    "agent_ms": 2866335,
+    "work_ms": 2750995,
+    "review_ms": 115340,
     "plan_ms": 799376,
-    "gates_ms": 20823,
-    "checks_ms": 1573480,
+    "gates_ms": 21588,
+    "checks_ms": 1802856,
     "gate_review_ms": 108997,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 5.1377737900856,
-    "code_test_per_min": 15.588757548454845
+    "code_per_min": 4.3121268100204615,
+    "code_test_per_min": 13.145706974237136
   },
   "cost": {
-    "total_usd": 6.977568300000002,
+    "total_usd": 7.232498600000002,
     "plan_usd": 4.138317400000002,
-    "work_usd": 1.7799329000000004,
-    "review_usd": 0.5993405,
+    "work_usd": 1.9316946000000004,
+    "review_usd": 0.7025091000000001,
     "gate_review_usd": 0.4599775,
-    "per_1000_code_lines_usd": 34.03691853658538
+    "per_1000_code_lines_usd": 35.10921650485438
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 382,
-    "output": 143427,
-    "cache_read": 11359236,
-    "cache_creation": 584363,
-    "cache_hit_ratio": 0.951042705108121
+    "input": 408,
+    "output": 146959,
+    "cache_read": 11735259,
+    "cache_creation": 629852,
+    "cache_hit_ratio": 0.9490308494127905
   },
   "models": {
     "plan": [
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 7,
-  "iterations_per_closed": 1.4,
+  "iterations": 8,
+  "iterations_per_closed": 1.3333333333333333,
   "by_task": [
     {
       "id": "T1",
@@ -285,24 +285,26 @@
       "id": "T6",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
-        "docs": 0,
+        "code": 1,
+        "test": 5,
+        "docs": 1,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
-          "docs": 0,
+          "code": 1,
+          "test": 5,
+          "docs": 1,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "agent_ms": 472302,
+      "cost_usd": 0.2549303,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "test_code_ratio": 5,
+      "per_1000_code_lines_usd": 254.9303
     },
     {
       "id": "T7",
@@ -640,6 +642,44 @@
       "cost_source": "reported",
       "credits": null,
       "turns": 5,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 15,
+      "schema": "session/v3",
+      "phase": "work",
+      "iteration": 8,
+      "task": "T6",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 458034,
+      "cost_usd": 0.1517617,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 16,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 8,
+      "task": "T6",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 14268,
+      "cost_usd": 0.1031686,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 4,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

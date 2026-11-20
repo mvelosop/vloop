@@ -44,8 +44,9 @@ evidence, not the driver.
   is the shell loop that builds vloop and stays as the evidence of it, and a
   consumer repo migrating from the shell loop can hold both. Config, state,
   journals, metrics, defects and transient files all go under `.vloop/`.
-- **Config lives in the repo only**: `.vloop/config.toml`, overridden by
-  `VLOOP_*` environment variables, overridden by flags. Nothing is read from or
+- **Config lives in the repo only**: `.vloop/config.toml`, overridden by the
+  untracked `.vloop/config.local.toml`, overridden by `VLOOP_*` environment
+  variables (order: environment, local file, shared file, default), overridden by flags. Nothing is read from or
   written to `~/.config` or any global location.
 - **Language.** One `language` per repo, `en` or `es`. It selects the heading set
   a brief is written in, the templates `vloop` generates, and (from B5) the

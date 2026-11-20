@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/8 done** · iteration 8
+**Status:** running · **7/8 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T19:08:54Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T19:15:57Z
 
 ## Progress
 
@@ -14,7 +14,7 @@
 - [x] **T4** — Keep sessions off the local file: the input guard and the fences
 - [x] **T5** — Check Claude only where a session in use runs on it
 - [x] **T6** — Price a Copilot credit at GitHub's $0.01 by default
-- [ ] **T7** — Document the local file, Claude only where used, and the credit price
+- [x] **T7** — Document the local file, Claude only where used, and the credit price
 - [ ] **T8** — Close: the worked example line for line, and every gate at once
 
 ## Tasks
@@ -162,7 +162,7 @@ sh .vloop/state/gates/T6/gate.sh
 
 ### T7 — Document the local file, Claude only where used, and the credit price
 
-`pending` · depends on: T4, T5, T6
+`done` · depends on: T4, T5, T6
 
 The behaviour of T1–T6 has to be findable where a developer looks: the configuration guide, the domain's C-1, the platform context, the concepts guide, the README's Copilot section and the roadmap's inherited decisions. This task writes those passages and nothing else; the generated commands guide is already T2's. If its review fails twice on wording alone, it is blocked and the operator finishes it.
 

@@ -12,9 +12,11 @@ not every step.
 
 - **Go**, at the version pinned in `go.mod`, to install vloop.
 - **git**, with the repository you want to work in.
-- The **`claude` CLI**, signed in. vloop starts it for every session.
-- **Workspace trust**: open the repository once with `claude` and accept the trust
-  prompt, or sessions started by vloop cannot work. `vloop doctor` checks it.
+- The **`claude` CLI**, signed in, when a session runs on Claude (the default).
+  vloop starts it for those sessions.
+- **Workspace trust**, when a session runs on Claude: open the repository once with
+  `claude` and accept the trust prompt, or sessions started by vloop cannot work.
+  `vloop doctor` checks it.
 
 ## Install
 
@@ -99,18 +101,18 @@ verify is not yet tried.
 
 - **Requirements:** `copilot` on PATH, and a GitHub login its sessions can use
   (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, else `gh auth login`).
-  `vloop run` still needs `claude` on PATH and the folder trusted in Claude,
-  even when every session is on Copilot.
+  `claude` is needed only while a session in use runs on Claude.
 - **Safety:** each session gets its own Copilot home under `.vloop/tmp/` with a
   hook that runs vloop's fence before every tool call, and the driver re-judges
   the calls afterwards.
 - **Cost** is estimated from Copilot credits at `copilot.credit-usd` dollars each.
 - **Windows:** the hook has a PowerShell form and gates run in `pwsh`, but a
   whole Copilot run on Windows is untested.
-- **Overriding locally:** an environment variable beats `.vloop/config.toml`.
-  To run Claude while the shared file says `copilot`, set `VLOOP_AGENT_WORK=claude`
-  and `VLOOP_MODEL_WORK=sonnet` (likewise for each kind); `vloop config list`
-  shows where each value came from.
+- **Overriding locally:** `.vloop/config.local.toml` is git-ignored and beats
+  `.vloop/config.toml`. To run Claude while the shared file says `copilot`, run
+  `vloop config set --local agent.work claude` and `vloop config set --local
+  model.work sonnet` (likewise for each kind); `vloop config list` shows where
+  each value came from.
 
 Every key and what `vloop doctor` checks are in
 [docs/guide/configuration.md](docs/guide/configuration.md).

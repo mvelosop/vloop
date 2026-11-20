@@ -1,0 +1,15 @@
+{
+  "schema": "verdict/v1",
+  "task": "T7",
+  "verdict": "PASS",
+  "criteria": [
+    {"criterion": "docs/guide/configuration.md: the resolution paragraph names .vloop/config.local.toml in the order environment, local file, shared file, default; a short section covers the local file (any key but [[check]], config set --local and config path --local, the ignore line, the run's refusal, doctor's warning); the config set --local example is there.", "met": true, "evidence": "configuration.md diff: resolution paragraph reordered; new 'The local file' section covers [[check]] exclusion, set/path --local, .gitignore, run refusal, doctor warning, and the example block"},
+    {"criterion": "docs/domain/domain-model.md C-1 and docs/domain/platform/platform-context.md Configuration state the order environment, local file, shared file, default.", "met": true, "evidence": "both diffs state env, else local, else shared, else default"},
+    {"criterion": "docs/guide/concepts.md names the new .gitignore line where it lists what init writes and what is git-ignored, and its vloop doctor paragraph says the claude, workspace trust, plugin and gate edits rows apply when a session in use runs on Claude and are n/a otherwise.", "met": true, "evidence": "concepts.md diff: init lists both ignore lines, file list adds config.local.toml, doctor paragraph adds the applicability sentence"},
+    {"criterion": "README.md: the Copilot section's Overriding locally bullet names .vloop/config.local.toml and vloop config set --local in place of the environment variables; the requirements bullet no longer says vloop run still needs claude on PATH when every session is on Copilot; the Prerequisites' claude and workspace-trust bullets say they apply when a session runs on Claude; the README stays at or under 200 lines (its test, under the go check, passes).", "met": true, "evidence": "README diff covers all three bullets; wc -l gives 195; go check exit 0"},
+    {"criterion": "docs/design-notes/vloop-roadmap.md's Config lives in the repo only line names the local file and its place in the order.", "met": true, "evidence": "roadmap diff names config.local.toml and the order"},
+    {"criterion": "No passage contradicts the behaviour shipped in T1–T6 (exact messages quoted match the worked example); docs under docs/briefs/ and the other design notes are untouched.", "met": true, "evidence": "quoted messages match internal/config/config.go:328, internal/cli/config.go:158-160, internal/cli/doctor.go:232 and :377; no diff under docs/briefs or other notes"}
+  ],
+  "findings": [],
+  "notes": "Docs-only task; the README line-cap test under the go check covers the cap. Some lines in concepts.md and the roadmap are long (unwrapped), which is cosmetic only."
+}

@@ -66,3 +66,10 @@ committing the plan
    review T6 · 0m14s · $0.10 · run $7.23 / $40.00
    review: PASS
    T6 done
+── iteration 9 (9 this run) · T7 · 6/8 done ──
+   Document the local file, Claude only where used, and the credit price
+   work T7 · 2m41s · $0.25 · run $7.49 / $40.00
+   check go
+   review T7 · 0m20s · $0.11 · run $7.60 / $40.00
+   review: PASS
+   T7 done

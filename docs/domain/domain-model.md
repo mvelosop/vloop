@@ -265,8 +265,10 @@ marked.
 
 ### Configuration — C
 
-- **C-1** Config lives in the repo only (`.vloop/config.toml`), overridden by
-  `VLOOP_<KEY>` environment variables. Nothing is global.
+- **C-1** Config lives in the repo only: `.vloop/config.toml`, shared, and the
+  untracked `.vloop/config.local.toml`. Each key resolves as the `VLOOP_<KEY>`
+  environment variable, else the local file, else the shared file, else the
+  default. Nothing is global.
 - **C-2** The repo root is the nearest ancestor (the start directory included)
   holding `.vloop/` or `.git`, whichever is found first; else the start
   directory. Every path vloop prints is relative to it, with `/`.

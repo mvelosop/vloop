@@ -62,3 +62,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** copilot.credit-usd now defaults to 0.01; the configuration guide's row and every test that pins the default say 0.01.
 - **Files:** internal/config/config.go, internal/config/config_test.go, internal/cli/config_test.go, cmd/vloop/e2e_test.go, docs/guide/configuration.md
 - **Notes for next iteration:** Only the default literal changed in tests. In internal/cli, TestTaskGate* tests fail inside a work session with 'the plan was changed during this session' (the session guard, unrelated to this change); the other cli tests pass. 0.0066667 remains only in docs/briefs, .vloop/state and docs/design-notes.
+
+## T7 — Document the local file, Claude only where used, and the credit price
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Documented the local config file in the configuration guide (resolution order, new section, config set --local example), C-1, the platform context, the concepts guide, the README and the roadmap line; Claude-only-where-used is in the concepts doctor paragraph and README.
+- **Files:** README.md, docs/domain/domain-model.md, docs/domain/platform/platform-context.md, docs/design-notes/vloop-roadmap.md, docs/guide/concepts.md, docs/guide/configuration.md
+- **Notes for next iteration:** The copilot.credit-usd row in configuration.md already said 0.01 (T6), so it was not touched. I did not run go test ./... (it passed the 120s foreground limit); the README line-cap test was not run separately, but wc -l gives 195.

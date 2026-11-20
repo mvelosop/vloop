@@ -321,13 +321,13 @@ vloop with a released one.
 `vloop init` sets a git repository up and never commits. It writes
 `.vloop/config.toml` with the stacks it detects (a stack in a subdirectory is
 scoped to it, like `csharp@services/api`), the **stamp** `.vloop/install.json`
-(which vloop version set the repository up), a starter brief, the line
-`.vloop/tmp/` in `.gitignore`, and vloop's section of `CLAUDE.md`, between
+(which vloop version set the repository up), a starter brief, the lines
+`.vloop/tmp/` and `.vloop/config.local.toml` in `.gitignore`, and vloop's section of `CLAUDE.md`, between
 `<!-- vloop:begin -->` and `<!-- vloop:end -->` markers; text outside the markers
 is kept; it also declares the plugin in `.claude/settings.json` (a marketplace
 entry and an enabled plugin, merged into what is there). It refuses a repository already set up. `--dry-run` writes nothing.
 
-`vloop upgrade` refreshes that `CLAUDE.md` section and `.gitignore` line, adds
+`vloop upgrade` refreshes that `CLAUDE.md` section and the `.gitignore` lines, adds
 what is missing of the plugin's declaration in `.claude/settings.json`, and
 rewrites the stamp. It refuses a repository set up by a newer vloop, and a
 breaking jump (a new major version, or a new minor while 0.x) or a pre-release
@@ -354,13 +354,15 @@ place is the user `Path` variable. The Go MSI installer usually adds
 This is preferred over `$PROFILE`, which reaches PowerShell only.
 
 `vloop doctor` checks the setup without writing anything: git, the install stamp,
-the config, the `[[check]]` entries (`checks`), `claude`, workspace trust, the
+the config, `config.local` (when `.vloop/config.local.toml` exists), the `[[check]]` entries (`checks`), `claude`, workspace trust, the
 gate shell, the plan, the branch, the `plugin` row (a warning when no vloop plugin
 is installed for this repository or per user), a `copilot plugin` row (where
 the copilot row appears; the same for Copilot CLI), `gate edits` (a warning, with the rule to add, unless the
 operator's settings let a session edit `.vloop/state/gates/`), the scoped
 `stacks` (printed only when `metrics.stacks` has scoped entries) and
-`self-hosting`. It exits 1 on a problem.
+`self-hosting`. The `claude`, workspace trust, `plugin` and `gate edits` rows apply
+when a session in use runs on Claude, and are `n/a` (`no session in use runs on
+claude`) otherwise. It exits 1 on a problem.
 
 The plugin ships inside the binary: `vloop plugin path` extracts it to
 `.vloop/tmp/plugin/<version>/`, and refuses outside a repository where `vloop
@@ -420,6 +422,7 @@ vloop keeps its files under `.vloop/` in the repository root:
 
 - `.vloop/config.toml`: the settings, written by `vloop config set`.
 - `.vloop/install.json`: the install stamp, written by `vloop init` and `vloop upgrade`.
+- `.vloop/config.local.toml`: your own overrides of the settings, git-ignored.
 - `.vloop/tmp/`: scratch space, git-ignored.
 - `.vloop/state/state.json`: the plan.
 - `.vloop/state/runs/<run id>/`: a run's folders, sessions and iteration records.
