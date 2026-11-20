@@ -104,7 +104,7 @@ vloop config path [flags]
 
 ## vloop config set
 
-Set one key in .vloop/config.toml, or in .vloop/config.local.toml with --local ('' removes it)
+Set any key config list shows, in .vloop/config.toml or with --local in .vloop/config.local.toml ('' removes it)
 
 ```
 vloop config set <key> <value> [flags]

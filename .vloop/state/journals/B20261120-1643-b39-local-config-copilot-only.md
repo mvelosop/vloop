@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** config set gains --local (writes .vloop/config.local.toml with the same validation and layout preservation) and prints a one-line stderr notice when the local file or a VLOOP_* variable still overrides the key; config path --local added; commands.md regenerated.
 - **Files:** internal/config/config.go, internal/cli/config.go, internal/cli/config_test.go, docs/guide/commands.md
 - **Notes for next iteration:** Set is now a wrapper over setAt(root, rel, ...); SetLocal uses the local path. Notice is computed in the CLI from config.Get after the write: env source wins over local in the message; with --local only the env notice can appear. Get errors after a successful write are ignored for the notice.
+
+## T2 — Add vloop config set --local, config path --local and the override notice
+
+- **Outcome:** done (review: PASS)
+- **Summary:** config set --local, config path --local and the stderr override notice exist; the check failure is fixed by wording config set's Short to name 'config list' again; commands.md regenerated.
+- **Files:** internal/config/config.go, internal/cli/config.go, internal/cli/config_test.go, docs/guide/commands.md
+- **Notes for next iteration:** Previous check failure was TestShortsFollowListAndShow requiring config set's Short to contain 'config list'. TestTaskGate* failures inside a live session are the plan guard, not this change.
