@@ -6,7 +6,7 @@
   "merged": null,
   "tasks": {
     "planned": 8,
-    "done": 1,
+    "done": 2,
     "blocked": 0,
     "first_pass": 1,
     "estimate": {
@@ -28,41 +28,41 @@
       }
     },
     "churn": {
-      "code": 108,
+      "code": 109,
       "test": 174,
-      "docs": 5,
+      "docs": 6,
       "other": 0,
       "deleted": {
-        "code": 38,
+        "code": 39,
         "test": 0,
-        "docs": 3,
+        "docs": 4,
         "other": 0
       }
     },
     "test_code_ratio": 1.6111111111111112,
-    "rework": 1
+    "rework": 1.0092592592592593
   },
   "time": {
-    "agent_ms": 602492,
-    "work_ms": 581561,
-    "review_ms": 20931,
+    "agent_ms": 814049,
+    "work_ms": 773801,
+    "review_ms": 40248,
     "plan_ms": 799376,
-    "gates_ms": 2570,
-    "checks_ms": 451105,
+    "gates_ms": 3684,
+    "checks_ms": 675573,
     "gate_review_ms": 108997,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 10.755329531346474,
-    "code_test_per_min": 28.083360442960238
+    "code_per_min": 7.960208783500748,
+    "code_test_per_min": 20.784989601363062
   },
   "cost": {
-    "total_usd": 5.261608400000002,
+    "total_usd": 5.516269200000002,
     "plan_usd": 4.138317400000002,
-    "work_usd": 0.5313847,
-    "review_usd": 0.1319288,
+    "work_usd": 0.6681222,
+    "review_usd": 0.24985210000000002,
     "gate_review_usd": 0.4599775,
-    "per_1000_code_lines_usd": 48.71859629629631
+    "per_1000_code_lines_usd": 51.076566666666686
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 202,
-    "output": 108706,
-    "cache_read": 8011817,
-    "cache_creation": 325951,
-    "cache_hit_ratio": 0.9608834044737508
+    "input": 230,
+    "output": 112626,
+    "cache_read": 8409705,
+    "cache_creation": 369855,
+    "cache_hit_ratio": 0.9578480806488537
   },
   "models": {
     "plan": [
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 2,
-  "iterations_per_closed": 2,
+  "iterations": 3,
+  "iterations_per_closed": 1.5,
   "by_task": [
     {
       "id": "T1",
@@ -185,26 +185,26 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
-        "code": 38,
+        "code": 39,
         "test": 68,
-        "docs": 5,
+        "docs": 6,
         "other": 0,
         "deleted": {
-          "code": 10,
+          "code": 11,
           "test": 0,
-          "docs": 3,
+          "docs": 4,
           "other": 0
         }
       },
-      "agent_ms": 85592,
-      "cost_usd": 0.2191514,
+      "agent_ms": 297149,
+      "cost_usd": 0.4738122,
       "models": [
         "claude-sonnet-5-5"
       ],
-      "test_code_ratio": 1.7894736842105263,
-      "per_1000_code_lines_usd": 5.767142105263158
+      "test_code_ratio": 1.7435897435897436,
+      "per_1000_code_lines_usd": 12.14903076923077
     },
     {
       "id": "T3",
@@ -463,6 +463,44 @@
       "cost_source": "reported",
       "credits": null,
       "turns": 12,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 6,
+      "schema": "session/v3",
+      "phase": "work",
+      "iteration": 3,
+      "task": "T2",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 192240,
+      "cost_usd": 0.1367375,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 7,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 3,
+      "task": "T2",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 19317,
+      "cost_usd": 0.11792330000000001,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 6,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

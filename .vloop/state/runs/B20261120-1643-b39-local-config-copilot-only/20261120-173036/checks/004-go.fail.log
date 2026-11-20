@@ -1,0 +1,52 @@
+ok  	github.com/mvelosop/vloop	(cached)
+ok  	github.com/mvelosop/vloop/cmd/gendocs	0.897s
+ok  	github.com/mvelosop/vloop/cmd/vloop	222.690s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/budget	(cached)
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+--- FAIL: TestInitWritesEverything (0.00s)
+    init_test.go:49: .gitignore = "x/\n.vloop/config.local.toml\n.vloop/tmp/\n"
+--- FAIL: TestInitKeepsConfigAndBriefs (0.00s)
+    init_test.go:101: lacks "kept .gitignore\n":
+        detected stacks: go
+        suggest check: go: go test ./... && go vet ./... (paths: **)
+        suggest metrics.stacks: go
+        kept .vloop/config.toml
+        wrote .vloop/install.json
+        wrote .vloop/repo-guidelines.md
+        kept docs/briefs/
+        updated .gitignore
+        wrote CLAUDE.md
+        wrote .claude/settings.json
+        next:
+          vloop doctor
+          get /vloop:operate for your Claude Code sessions in this repository, once:
+            claude plugin marketplace add mvelosop/vloop
+            claude plugin install vloop@vloop --scope project
+          or, for one session: claude --plugin-dir "$(vloop plugin path)"
+          for Copilot CLI: trust this folder in copilot (the plugin is declared in .claude/settings.json), or once:
+            copilot plugin marketplace add mvelosop/vloop
+            copilot plugin install vloop@vloop
+          or, for one session: copilot --plugin-dir "$(vloop plugin path)"
+          then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate drives vloop
+FAIL
+FAIL	github.com/mvelosop/vloop/internal/cli	105.130s
+ok  	github.com/mvelosop/vloop/internal/closing	(cached)
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	(cached)
+ok  	github.com/mvelosop/vloop/internal/fence	(cached)
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/state	(cached)
+ok  	github.com/mvelosop/vloop/tools/agent-eval	(cached)
+ok  	github.com/mvelosop/vloop/tools/copilot-acceptance/kit	(cached)
+ok  	github.com/mvelosop/vloop/tools/release	(cached)
+FAIL

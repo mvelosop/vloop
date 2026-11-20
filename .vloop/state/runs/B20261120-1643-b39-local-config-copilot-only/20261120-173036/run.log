@@ -33,3 +33,8 @@ committing the plan
    review T2 · 0m19s · $0.12 · run $5.52 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/8 done ──
+   Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight
+   work T3 · 8m52s · $0.46 · run $5.98 / $40.00
+   check go
+   CHECK FAIL T3 — check go failed — see .vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036/checks/004-go.fail.log; review skipped

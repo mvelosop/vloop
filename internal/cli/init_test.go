@@ -122,7 +122,7 @@ func TestInitClaudeMarkers(t *testing.T) {
 	if !strings.HasPrefix(got, "# Rules\nmine\n\n<!-- vloop:begin -->\n") || !strings.HasSuffix(got, "<!-- vloop:end -->\n") {
 		t.Errorf("appended: %q", got)
 	}
-	if readFile(t, d, ".gitignore") != "keep\n.vloop/tmp/\n" {
+	if readFile(t, d, ".gitignore") != "keep\n.vloop/config.local.toml\n.vloop/tmp/\n" {
 		t.Error("gitignore")
 	}
 }

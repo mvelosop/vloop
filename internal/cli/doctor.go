@@ -110,6 +110,7 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 	}
 
 	if cerr == nil {
+		doctorConfigLocal(root, vals, isRepo, add)
 		doctorConfig(root, vals, isRepo, add)
 	}
 
@@ -187,6 +188,36 @@ func doctorInstall(b Build, root string, add func(name, result, msg string)) {
 			add("install", resWarning, fmt.Sprintf("set up by vloop %s, this binary is %s — run vloop upgrade", stamp.Version, b.Version))
 		}
 	}
+}
+
+// doctorConfigLocal adds the config.local row: nothing without a local file; a
+// problem when git tracks it or would commit it; else a warning naming the keys
+// it overrides, or a pass when it overrides none.
+func doctorConfigLocal(root string, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
+	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(config.LocalFilePath))); err != nil {
+		return
+	}
+	if isRepo {
+		if gitrun.At(root, "ls-files", "--error-unmatch", "--", config.LocalFilePath).Run() == nil {
+			add("config.local", resProblem, config.LocalFilePath+" is tracked by git — it is shared with everyone who clones: run git rm --cached "+config.LocalFilePath+" and add it to .gitignore")
+			return
+		}
+		if gitrun.At(root, "check-ignore", "-q", "--no-index", "--", config.LocalFilePath).Run() != nil {
+			add("config.local", resProblem, config.LocalFilePath+" is not git-ignored — the next git add -A would commit it: add it to .gitignore")
+			return
+		}
+	}
+	var keys []string
+	for _, v := range vals {
+		if v.Source == config.SourceLocal {
+			keys = append(keys, v.Key)
+		}
+	}
+	if len(keys) == 0 {
+		add("config.local", resPass, "")
+		return
+	}
+	add("config.local", resWarning, "overrides "+strings.Join(keys, ", ")+" — on this machine only")
 }
 
 // doctorConfig adds the checks and gate-scratch findings of a readable config.

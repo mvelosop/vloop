@@ -108,7 +108,7 @@ func TestUpgradeMarkerOnlyAndGitignore(t *testing.T) {
 	if !strings.HasPrefix(got, "TOP\n\n<!-- vloop:begin -->\n") || !strings.HasSuffix(got, "<!-- vloop:end -->\n\nbelow  \nno newline") || !strings.Contains(got, "vloop 0.1.1") {
 		t.Errorf("CLAUDE.md = %q", got)
 	}
-	if readFile(t, d, ".gitignore") != "x/\n.vloop/tmp/\n" || readFile(t, d, ".vloop/config.toml") != cfg {
+	if readFile(t, d, ".gitignore") != "x/\n.vloop/config.local.toml\n.vloop/tmp/\n" || readFile(t, d, ".vloop/config.toml") != cfg {
 		t.Error("gitignore or config wrong")
 	}
 }
