@@ -1,0 +1,44 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 1.4812125999999999,
+  "duration_ms": 281182,
+  "effort": null,
+  "ended": "2026-11-20T17:02:37Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "opus",
+  "models_used": {
+    "claude-opus-5-5": {
+      "cache_creation_input_tokens": 67157,
+      "cache_read_input_tokens": 2391203,
+      "cost_usd": 1.4812125999999999,
+      "input_tokens": 74,
+      "output_tokens": 23271
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "d=$(mktemp -d); cd $d \u0026\u0026 git init -q \u0026\u0026 vloop init \u003e/dev/null 2\u003e\u00261; vloop config set agent.work nope; echo \"exit $?\"; printf '[agent]\\nwork = \"nope\"\\n' \u003e\u003e .vloop/config.toml; vloop config get agent.wo…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "cd ~/source/personal/vloop/.vloop/tmp \u0026\u0026 rm -rf b39scratch \u0026\u0026 mkdir b39scratch \u0026\u0026 cd b39scratch \u0026\u0026 git init -q \u0026\u0026 vloop init \u003e/dev/null 2\u003e\u00261; vloop config set agent.work nope; echo \"exit $?\"; printf '…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "cd ~/source/personal/vloop/.vloop/tmp \u0026\u0026 rm -rf b39scratch \u0026\u0026 mkdir b39scratch \u0026\u0026 cd b39scratch \u0026\u0026 git init -q \u0026\u0026 vloop init \u003e/dev/null 2\u003e\u00261; vloop config set agent.work nope; echo \"exit $?\"; VLOOP_AG…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "cd ~/source/personal/vloop; vloop schema validate brief-review/v1 .vloop/tmp/brief-review.json; echo \"exit $?\"; rm -rf .vloop/tmp/bc .vloop/tmp/b39scratch",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261120-1643-b39-local-config-copilot-only",
+  "schema": "session/v5",
+  "started": "2026-11-20T16:57:55Z",
+  "turns": 38,
+  "wall_ms": 281807
+}

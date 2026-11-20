@@ -1,0 +1,58 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261120-1643-b39-local-config-copilot-only.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract — L3 (doctor row config.local) and Decided here (the git-ignored test)",
+      "summary": "The refusal checks only whether git ignores the path. A local file that is already tracked is committed by git add -A even when .gitignore lists it, so the guard misses the very case it exists for. The obvious helper to reuse, driver.GitIgnored, is built for directories and makes this worse.",
+      "evidence": "internal/driver/plan.go:896-899: GitIgnored adds '/.vloop-probe' to the path and runs 'git check-ignore -q --no-index'. With --no-index, check-ignore reports a tracked file as ignored. internal/driver/iterate.go:1325 and internal/driver/plan.go:506 stage with 'git add -A', which stages changes to tracked files whatever .gitignore says (gitignore(5): ignore rules do not apply to tracked files). The case is real: a teammate commits config.local.toml before the ignore line exists, then 'vloop upgrade' adds the line. Doctor shows ✓ and the run commits every later change to the file. I could not run the git experiment in this session (the sandbox denied it); this rests on git's documented behaviour.",
+      "fix": "In L3, add a row case: the file is tracked (git ls-files --error-unmatch .vloop/config.local.toml exits 0) → problem, with a literal message, e.g. '✗ config.local .vloop/config.local.toml is tracked by git — vloop run would commit it: git rm --cached it'. In 'Decided here', state the test as 'not tracked, and ignored without --no-index', and say that driver.GitIgnored's directory probe is not that test. Add the planted case to the worked example's failures."
+    },
+    {
+      "kind": "consistency",
+      "section": "Constraints — 'No task may weaken a check to pass'",
+      "summary": "The list of earlier tests a task may change has two entries: the credit default and doctor's Claude rows. Task 3 must also change the tests that pin the exact .gitignore that init and upgrade write. A reviewer who reads the list as complete would fail task 3.",
+      "evidence": "internal/cli/init_test.go:48 ('x/\\n.vloop/tmp/\\n'), :93 ('.vloop/tmp/\\n') and :125 ('keep\\n.vloop/tmp/\\n'); internal/cli/upgrade_test.go:111 ('x/\\n.vloop/tmp/\\n'). All four pin today's .gitignore, which L3 changes.",
+      "fix": "Add 'the .gitignore that init and upgrade write' to the parenthesis, or reword it as examples ('such as …') rather than a closed list."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract — Documents (docs/guide/concepts.md)",
+      "summary": "The bullet tells task 7 to change concepts.md 'where it says vloop run needs claude'. No such passage exists. The passages that do need changing are worded differently.",
+      "evidence": "grep -rn -i 'needs claude\\|claude` on PATH' docs/guide docs/domain README.md matches only README.md:102. In concepts.md, :356-363 is doctor's row list (claude, workspace trust, plugin, gate edits, with no condition); :322-326 says init writes 'the line .vloop/tmp/ in .gitignore'; :330 says upgrade refreshes 'that … .gitignore line'.",
+      "fix": "Name the real passages: the doctor paragraph (:356-363) gains the config.local row and says the claude, trust, plugin and gate edits rows apply when a session in use runs on Claude; the init and upgrade paragraphs (:322-333) name both ignore lines."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — L4",
+      "summary": "L4 does not say what happens to the four Claude rows when the config cannot be read. Today they always run. Mirroring copilotKeys literally (err == nil && value == …) would make them n/a, so a broken config would also hide a missing claude.",
+      "evidence": "internal/cli/doctor.go:105-116: doctorClaude runs whatever cerr is; the copilot rows are added only when cerr == nil (:118-130). copilotPlan and the other key helpers (:249-303) return false on a read error. The executive summary's 'Unchanged' line covers only 'no local file exists and some session uses Claude'.",
+      "fix": "Add one line to L4: when the config cannot be read, the four rows are as today (Claude is treated as in use). The other choice is that they are n/a, but then say so."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example — the planted 'not git-ignored' failure",
+      "summary": "The run-refusal line uses placeholders ('that line', '<n> problem(s)') where the contract asks for pinned error values. The preflight also prints the row as an indented stderr line, not doctor's stdout form.",
+      "evidence": "internal/cli/run.go:192-193 prints '  ✗ %s %s' to stderr, and :203 prints 'preflight failed — %d problem(s), nothing has run'. The e2e scenario fixes n, because the stub PATH and config are known.",
+      "fix": "Write the two stderr lines literally for the e2e setup, e.g. '  ✗ config.local .vloop/config.local.toml is not git-ignored — vloop run would commit it: add it to .gitignore' and 'vloop: preflight failed — 1 problem(s), nothing has run' (with the actual count), exit 1."
+    }
+  ],
+  "decisions": [
+    "Local file between the environment and the shared file (env > local > shared > default): sound, matches C-1's intent.",
+    "Any key may be overridden locally, never [[check]]. This includes keys whose effects land in committed output or in the run's safety: metrics.*, areas, language, run.gate-scratch, run.git-config-ignore, run.verify, run.second-review. Opinion: acceptable because doctor and the preflight name them, but nothing in a run's records says a value came from the local file, so a teammate cannot tell from the branch afterwards. Consider at least logging the local keys in the run log.",
+    "A list key is replaced, not merged: sound.",
+    "The run refuses an un-ignored local file instead of the driver leaving it out of its commits: sound (see finding 1 for the tracked case).",
+    "The local file is a session input: guard and fence entries; the Copilot hook is unchanged.",
+    "One brief for L1–L5.",
+    "Claude 'in use' mirrors copilotKeys: agent.plan and agent.gate-review always count; verify and second-review only while their switches are on; review-brief only for doctor.",
+    "The four Claude rows become n/a with the message 'no session in use runs on claude', rather than being skipped when claude is not on PATH.",
+    "copilot.credit-usd default 0.0066667 → 0.01, earlier records not recomputed. This rests on an external page read on 2026-11-20 that the brief cites from outside the repository. Sessions do not need it (the value is literal in the contract), so it is not a finding, but the operator should confirm the figure.",
+    "Scope consequence the operator should see: a Copilot-only machine must run plan and gate review on Copilot, which README.md:96-97 says are not yet qualified ('keep plan and gate review on Claude'). The brief lets that machine get past preflight; it does not make those sessions qualified. Acceptance 1 acknowledges this ('for the preflight only').",
+    "Decided here: the [[check]] refusal applies to every command; an empty or unknown-keys-only local file passes with ✓; the ignored test asks about the path itself; the config set notice goes to stderr. All reasonable."
+  ],
+  "checked": "facts (config.go resolve at :373, resolveList, readFile, SourceError, Get/List/Set; root.go FilePath; doctor.go :116 claude, :132-135 trust, :309 copilotKeys, plugin and gate edits n/a only when claude is missing; run.go :192 preflight treats trust as a failure; iterate.go:1325 and plan.go:506 git add -A; safety.go:298 input roots; the five fences deny Edit/Write(.vloop/config.toml) and plan.json does not; fence-audit rows; install IgnoreLine/MergeGitignore; the 0.0066667 sites the violations list names, all three present; design note's 19.3 credits, 19.3×0.01 = 0.193 and ×0.0066667 ≈ 0.129; README at 193 lines with the two bullets the brief rewrites; roadmap 'Decisions every brief in the series inherits'; C-1; platform-context Configuration and CLI conventions), consistency (worked-example order matches Keys (model.work before agent.work); config get --json shape; SourceError and InvalidValueError messages; empty local file → ✓), rules (C-1 and the roadmap line amended in the same run; repo-relative paths), runnability (the single go check against tasks 1-8: task 2 regenerates commands.md, task 6 updates every default pin together, task 4 fence edits are allowed to work sessions; the lines no session can run are covered by named e2e tests); vloop brief check on a ready copy: ok, 0 warning(s)",
+  "header": "Reviewed 2026-11-20: FIX, 5 findings"
+}
+

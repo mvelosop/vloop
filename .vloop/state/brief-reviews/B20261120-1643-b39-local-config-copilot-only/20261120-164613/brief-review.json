@@ -1,0 +1,72 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261120-1643-b39-local-config-copilot-only.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Worked example (first block); Behaviour contract L3 (doctor row config.local)",
+      "summary": "The key order is wrong. config list prints model.* before agent.*, so the grep of config list prints model.work first, and the doctor warning ('in the order config list prints them') must read 'model.work, agent.work'. The example has both the other way round, so a test copied from it contradicts the contract's own rule.",
+      "evidence": "internal/config/config.go:84-105: Keys lists language, model.* (lines 85-91), effort.*, then agent.* (lines 99-105); List iterates Keys in order (config.go:568-586); internal/cli/config_test.go:28 shows the same order in expected output.",
+      "fix": "In the worked example, swap the two config list lines (model.work=sonnet (local) first) and write the doctor line as '! config.local overrides model.work, agent.work — on this machine only'. The alternative is to change the rule's order, but keeping config list's order is simpler."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract L1 — 'Read once per run, as today'",
+      "summary": "The claim that vloop run resolves the configuration once at its start (ResolveRun), so a change to the local file during the run changes nothing, is false today. ResolveRun only covers model, effort and agent for work, review, second-review and verify. The driver reads other keys again during the run. A reviewer or test that holds the run to this sentence would need work no task plans.",
+      "evidence": "internal/driver/resolve.go:74-90 (ResolveRun: model/effort/agent for four phases only); internal/driver/agent.go:74 reads copilot.credit-usd per session; internal/driver/iterate.go:891 (run.second-review) and :962 (run.verify) read during iterations; internal/driver/budgets.go:32, internal/driver/plan.go:281/285/448/456 read at their point of use.",
+      "fix": "Reword to: 'Read as the shared file is read today: each session's model, effort and agent at the run's start (ResolveRun), every other key where it is read today. Sessions cannot change it (L3).' Or drop the bullet."
+    },
+    {
+      "kind": "consistency",
+      "section": "Shape task 5; Violations ('old default left anywhere a default is stated')",
+      "summary": "Task 5's gate covers only internal/config and internal/cli, but cmd/vloop/e2e_test.go also pins the old default. The violation's exception (session records and design notes) leaves out other history files that hold 0.0066667.",
+      "evidence": "grep -rln 0.0066667: cmd/vloop/e2e_test.go:145 (expected config list), internal/config/config_test.go, internal/cli/config_test.go, docs/guide/configuration.md:42; history: docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md, .vloop/state/journals/…b19…, .vloop/state/runs/…/checks/*.fail.log and reports/*.json.",
+      "fix": "Name cmd/vloop/e2e_test.go:145 in task 5 (the go check catches it anyway, at the cost of an attempt). Widen the exception to 'session records, design notes, earlier briefs and everything under .vloop/state/'."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract L3 — doctor's config.local problem message",
+      "summary": "The message says '(vloop upgrade does)', but vloop upgrade does nothing when the install stamp equals the binary: it prints 'already at <version>' and returns. That covers a repository initialised by this version whose line was later removed, so the advice can be false.",
+      "evidence": "internal/cli/upgrade.go:47-50: case install.Same prints 'already at %s' and returns before MergeGitignore (upgrade.go:72).",
+      "fix": "End the message at 'add it to .gitignore', or say 'vloop init adds it to a new repository, vloop upgrade on the next version'. Keep the worked example's literal in step."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract L3 (doctor row) and L2 (config set notice)",
+      "summary": "The contract leaves three cases unstated. (a) The config.local row when the directory is not a git repository; doctor's gate-scratch check skips git there (isRepo). (b) The config.local row when the config row is itself a problem, e.g. a [[check]] or bad value in the local file; today doctorConfig is skipped when config.List fails. (c) The L2 notice when both the local file and the environment override; presumably the environment, which wins, is named. A session will pick for each of them.",
+      "evidence": "internal/cli/doctor.go:104-113 (config row, doctorConfig only when cerr == nil) and :193-205 (gitIgnored only when isRepo).",
+      "fix": "Add one line each: (a) outside a git repository no config.local row (or n/a); (b) with a config problem the row is still computed from the file's presence and git (or omitted, as you prefer); (c) the notice names the layer that wins, the environment first."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references / hand-over",
+      "summary": "The roadmap has no B39 row, which the repository's architect rules require: the brief's row says what it owns and points at the brief at hand-over. The roadmap's inherited decision 'Config lives in the repo only: .vloop/config.toml, overridden by VLOOP_* environment variables' also names only the shared file. The brief amends C-1 but not this line.",
+      "evidence": ".claude/skills/vloop-architect/SKILL.md:15-19; docs/design-notes/vloop-roadmap-b18-b21.md ends at B38 (line 45); docs/design-notes/vloop-roadmap.md:44-46 (inherited config decision).",
+      "fix": "At hand-over (operator, not a task), add a B39 row to the current roadmap. Either add the roadmap's config line to the documents task 6 updates, or state that C-1 supersedes it."
+    },
+    {
+      "kind": "runnability",
+      "section": "Shape task 3",
+      "summary": "Task 3 is the largest by far. It covers the ignore line in init and upgrade, a new doctor row, the preflight refusal and warning, the input guard, five fence files and their fence-audit rows (several per fence section). One work session may not finish all of it, and its gate lists five test groups. This is a risk, not a defect.",
+      "evidence": "Shape, task 3; fence/{work,review,verify,gate-review,review-brief}.json:79-81; docs/design-notes/fence-audit.md:104,298,483,674,1064.",
+      "fix": "Optionally split it: 3a (ignore line, doctor row, preflight) and 3b (input guard, fence entries, fence-audit rows). That gives 6-8 tasks; update the count in Shape."
+    }
+  ],
+  "decisions": [
+    "Order: environment > local file > shared file > default. Sound; it keeps C-1's meaning of the environment.",
+    "Path and name .vloop/config.local.toml, following the *.local.* convention. Sound.",
+    "Any key may be overridden locally, never [[check]]; a list key is replaced, not merged. Sound.",
+    "vloop run refuses an un-ignored local file rather than leaving it out of the driver's commits. Sound; it is the only option that also protects interactive commits.",
+    "The local file is a guarded session input with fence entries. Sound.",
+    "One brief for L1-L5. Acceptable. L5 is independent and could ship alone, but it is small.",
+    "Claude 'in use' mirrors copilotKeys; doctor also counts agent.review-brief and run does not. Sound, and consistent with the Copilot rows.",
+    "Copilot credit default 0.01. It rests on GitHub's billing page, which this review could not check (no web) and which is not in the repository. The operator should confirm the figures before ready.",
+    "Decided here: the [[check]] refusal on every command that reads config; an empty local file gets ✓; the git-ignore test on the path itself (global excludes count); the config set notice on stderr. All sound.",
+    "Implicit: the overrides finding is a warning that never stops a run, and the notice is given only for a shared write, not for config set --local when an environment variable overrides it. Worth an explicit yes.",
+    "The four n/a rows carry the message 'no session in use runs on claude'. When Claude is in use and claude is missing, plugin and gate edits keep today's empty n/a. Fine."
+  ],
+  "checked": "facts (config.go resolve/List/Keys/SourceError, doctor.go:116/:132/:309, run.go:192 preflight, iterate.go:1325 and plan.go:506 git add -A, safety.go snapshotInputs, fence deny entries in five fences, the Copilot hook's .vloop rule in internal/fence/judge.go, brief_review.go preflight, error and exit mapping in internal/cli/root.go, MergeGitignore, README:100-113 and its 193 lines, B33's 19.3 credits), consistency, rules (CLAUDE.md, architect skill, roadmaps, C-1), runnability against the go check; vloop brief check on a ready copy: ok, 0 warnings",
+  "header": "Reviewed 2026-11-20: FIX, 7 findings"
+}
+

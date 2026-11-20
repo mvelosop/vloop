@@ -1,0 +1,53 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261120-1643-b39-local-config-copilot-only.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Worked example — the Claude-not-in-use block",
+      "summary": "The block shows `$ vloop doctor` followed by the four n/a rows in a row, as if that were the whole output. Doctor does not print them together. With every agent on copilot, other rows come between them: second review and the copilot rows after claude, the plan rows after trust, copilot plugin after plugin. A doctor: summary line comes last. A test copied from the block as literal output fails, and a gate that greps for four consecutive lines fails too.",
+      "evidence": "internal/cli/doctor.go:116 (claude), :118-130 (doctorSecondReview, copilot rows when copilot keys exist), :132-136 (trust), :138-139 (plan rows), :141-145 (plugin), :147-152 (copilot plugin), :154-158 (gate edits); :85 prints the doctor: summary.",
+      "fix": "Write the command as `vloop doctor | grep 'no session in use runs on claude'`, followed by the four lines in that order. Or say that the four rows are shown among the others, in this order."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — L1 (resolution: 'when it sets the key'; 'A list key takes the whole list of the layer that wins')",
+      "summary": "The contract does not say whether an empty list in the local file (for example `metrics.code = []`) sets the key. Today an empty array in the shared file does not set it: the value stays the default. If that rule carries over, a developer cannot clear a shared list on their machine. `config set --local metrics.code ''` removes the key and cannot write an empty list. A session will choose one reading.",
+      "evidence": "internal/config/config.go:340-370: resolveList calls set(text, SourceFile) only when len(names) > 0, so an empty array falls through to the default; config.go:631-633 and :660-663: '' removes the key.",
+      "fix": "Add one line to L1. Either 'an empty list in the local file is treated as in the shared file: it does not set the key, so a shared list cannot be emptied locally' or 'an empty list in the local file sets the key to empty, overriding the shared list'. Then pin it in a test."
+    },
+    {
+      "kind": "consistency",
+      "section": "Violations the review must rule on — the copilot.credit-usd exception",
+      "summary": "The exception spares 'session records and run folders under .vloop/state/, briefs' run records, design notes'. B19's brief states the old default in its behaviour contract and its worked example, not in its run record, and this brief states it too. A literal reviewer could flag either one.",
+      "evidence": "grep -rln 0.0066667 (outside .vloop/state): docs/briefs/B20261025-1307-b19-copilot-review.loop-brief.md:118 and :273 (contract and worked example, before its ## Run record at :341); docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md.",
+      "fix": "Replace 'briefs' run records' with 'earlier briefs and this one'."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references",
+      "summary": "The brief cites only C-1 by ID. This repository's architect rules ask a brief to cite every invariant it touches. L3 extends S-2's driver restore of 'the driver's inputs' to a new file, and relies on S-4: sessions write nothing under .vloop/ except .vloop/tmp/, which is why the Copilot hook needs no change.",
+      "evidence": ".claude/skills/vloop-architect/SKILL.md ('Bind by invariant … cite the invariants that apply by ID'); docs/domain/domain-model.md:218-221 (S-2: '… restores what a session changed among the driver's inputs') and :222 (S-4).",
+      "fix": "Extend the domain-model reference: '`docs/domain/domain-model.md` — C-1 …; S-2 and S-4: the driver restores the inputs it guards, now including the local file, and the Copilot hook's write rule already covers it'."
+    }
+  ],
+  "decisions": [
+    "Precedence is environment, then local file, then shared file, then default. Sound; C-1's meaning of the environment is kept.",
+    "The local file is .vloop/config.local.toml, beside the shared file, following the *.local.* convention. Sound.",
+    "Any key may be set locally, never [[check]]; a list key is replaced, not merged. Sound. This includes keys that shape committed output or safety (metrics.*, areas, language, run.gate-scratch, run.git-config-ignore, run.verify, run.second-review), and nothing in the run's records says a value came from the local file. Consider logging the local keys in the run log; the brief does not.",
+    "The run refuses a local file that git would commit, tracked or un-ignored, rather than the driver leaving it out of its commits. Sound: only the refusal also protects interactive commits.",
+    "The local file is a session input: the input guard and the five fences gain it; plan.json and the Copilot hook do not change. Sound (plan.json has no config.toml entry today either).",
+    "One brief covers L1–L5. Acceptable; L5 is independent but small.",
+    "'Claude in use' mirrors copilotKeys; doctor also counts agent.review-brief and run does not; an unreadable config counts as in use. Sound.",
+    "When Claude is not in use, the four rows are n/a with the message 'no session in use runs on claude'. When Claude is in use and claude is missing, plugin and gate edits keep today's empty n/a. Fine.",
+    "copilot.credit-usd goes from 0.0066667 to 0.01. It rests on GitHub's billing page as the author read it on 2026-11-20, which is not in the repository and which I could not check (no web). The operator should confirm the figures. The literal value is in the contract, so sessions do not need the page.",
+    "Decided here: the [[check]] refusal applies on every command that reads config; an empty or unknown-keys-only local file gets ✓; the ignore test asks about the path itself (global excludes count); the config set notice goes to stderr. All reasonable.",
+    "Left implicit: the config.local overrides warning never stops a run; `config set --local` prints no notice when an environment variable overrides the key it writes. Worth an explicit yes.",
+    "Starting point: the run branch starts from main plus the README branch (efde799d) plus the ready commit. That is the operator's call, and this checkout already sits on efde799d.",
+    "Acceptance 1 runs plan and gate review on Copilot, which README.md:96-97 says are not yet qualified. The brief only promises to get past the preflight ('for the preflight only'). The operator should know it does not qualify them."
+  ],
+  "checked": "facts (config.go Keys order, resolve/resolveList/readFile/SourceError formats, Get/List/Set; doctor.go:116/:132/:141/:154 rows and copilotKeys at :309; run.go:192 preflight form and failure line; git add -A at iterate.go:1325 and plan.go:506; GitIgnored's directory probe at plan.go:896; snapshotInputs roots; the five fences' config.toml deny entries and plan.json's absence; fence-audit rows; judge.go write rules; MergeGitignore/IgnoreLine; init/upgrade .gitignore tests; 0.0066667 occurrences; B33's 19.3 credits and $0.129; README 193/200 lines and its Copilot bullets; concepts.md doctor/init passages; C-1, platform-context Configuration, roadmap inherited line; test names TestWorkedExampleEnglishSession, TestReadme*, TestGuide*), consistency, rules (CLAUDE.md, architect additions, domain invariants), runnability (checks after each task, gates, e2e coverage of lines no session can run); vloop brief check passes with 0 warnings. Running vloop in a scratch repository was denied by this session's sandbox, so the CLI messages were checked against the code and its tests.",
+  "header": "Reviewed 2026-11-20: FIX, 4 findings"
+}
+
