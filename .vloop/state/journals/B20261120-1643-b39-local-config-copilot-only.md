@@ -76,3 +76,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added an end-to-end test that walks the worked example's first block in order, through the last config.local row and config get copilot.credit-usd printing 0.01. No product discrepancy found.
 - **Files:** cmd/vloop/b39_worked_example_test.go
 - **Notes for next iteration:** New test TestWorkedExampleLocalConfigFirstBlock uses the scratch helper in e2e_test.go. The other blocks (planted failures, Claude not in use) are covered by T3/T5 tests in cmd/vloop/b39_local_config_test.go.
+
+## Run ended — complete
+
+- **Run:** `B20261120-1643-b39-local-config-copilot-only` · 10 iteration(s) this run
+- **Plan:** 8/8 done, 0 blocked

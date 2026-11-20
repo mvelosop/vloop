@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 8,
-    "done": 7,
+    "done": 8,
     "blocked": 0,
-    "first_pass": 5,
+    "first_pass": 6,
     "estimate": {
       "min": 6,
       "max": 8
@@ -17,7 +17,7 @@
   "size": {
     "delivered": {
       "code": 206,
-      "test": 422,
+      "test": 497,
       "docs": 67,
       "other": 10,
       "deleted": {
@@ -29,7 +29,7 @@
     },
     "churn": {
       "code": 207,
-      "test": 422,
+      "test": 497,
       "docs": 68,
       "other": 10,
       "deleted": {
@@ -39,30 +39,30 @@
         "other": 0
       }
     },
-    "test_code_ratio": 2.0485436893203883,
+    "test_code_ratio": 2.412621359223301,
     "rework": 1.0048543689320388
   },
   "time": {
-    "agent_ms": 3047187,
-    "work_ms": 2912335,
-    "review_ms": 134852,
+    "agent_ms": 3126566,
+    "work_ms": 2970098,
+    "review_ms": 156468,
     "plan_ms": 799376,
-    "gates_ms": 21639,
-    "checks_ms": 2025450,
+    "gates_ms": 42131,
+    "checks_ms": 2244438,
     "gate_review_ms": 108997,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 4.05620002973234,
-    "code_test_per_min": 12.365503003261697
+    "code_per_min": 3.9532189629133048,
+    "code_test_per_min": 13.49083947052453
   },
   "cost": {
-    "total_usd": 7.598244900000003,
+    "total_usd": 7.863856300000002,
     "plan_usd": 4.138317400000002,
-    "work_usd": 2.1844794000000003,
-    "review_usd": 0.8154706,
+    "work_usd": 2.3387745000000004,
+    "review_usd": 0.9267869000000001,
     "gate_review_usd": 0.4599775,
-    "per_1000_code_lines_usd": 36.88468398058254
+    "per_1000_code_lines_usd": 38.17405970873788
   },
   "credits": {
     "total": 0,
@@ -72,11 +72,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 438,
-    "output": 153645,
-    "cache_read": 12251322,
-    "cache_creation": 691657,
-    "cache_hit_ratio": 0.946529189316855
+    "input": 472,
+    "output": 158485,
+    "cache_read": 12731476,
+    "cache_creation": 733939,
+    "cache_hit_ratio": 0.9454613721324113
   },
   "models": {
     "plan": [
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 9,
-  "iterations_per_closed": 1.2857142857142858,
+  "iterations": 10,
+  "iterations_per_closed": 1.25,
   "by_task": [
     {
       "id": "T1",
@@ -335,10 +335,10 @@
       "id": "T8",
       "area": null,
       "kind": "test",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
+        "test": 75,
         "docs": 0,
         "other": 0,
         "deleted": {
@@ -348,9 +348,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 79379,
+      "cost_usd": 0.26561140000000005,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     }
@@ -720,6 +722,44 @@
       "cost_source": "reported",
       "credits": null,
       "turns": 6,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 19,
+      "schema": "session/v3",
+      "phase": "work",
+      "iteration": 10,
+      "task": "T8",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 57763,
+      "cost_usd": 0.15429510000000002,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
+      "seq": 20,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 10,
+      "task": "T8",
+      "agent": "claude",
+      "model": "sonnet",
+      "effort": null,
+      "time_ms": 21616,
+      "cost_usd": 0.1113163,
+      "cost_source": "reported",
+      "credits": null,
+      "turns": 9,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

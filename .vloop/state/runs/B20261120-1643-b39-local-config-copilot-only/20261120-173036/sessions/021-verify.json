@@ -1,0 +1,40 @@
+{
+  "agent": "claude",
+  "cost_source": "reported",
+  "cost_usd": 0.23546389999999998,
+  "duration_ms": 76988,
+  "effort": null,
+  "ended": "2026-11-20T19:26:33Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "sonnet",
+  "models_used": {
+    "claude-sonnet-5-5": {
+      "cache_creation_input_tokens": 33692,
+      "cache_read_input_tokens": 535759,
+      "cost_usd": 0.23546389999999998,
+      "input_tokens": 30,
+      "output_tokens": 4706
+    }
+  },
+  "permission_denials": [
+    {
+      "command": "cd ~/source/personal/vloop/.vloop/tmp/v/ex1 \u0026\u0026 export PATH=~/source/personal/vloop/.vloop/tmp/v:$PATH \u0026\u0026 mkdir .vloop \u0026\u0026 printf '[[check]]\\nname=\"go\"\\npaths=[\"**\"]\\nrun=\"true\"\\n' \u003e .vloop/config.toml …",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "cd ~/source/personal/vloop/.vloop/tmp/v/ex1 \u0026\u0026 export PATH=$PWD/..:$PATH \u0026\u0026 vloop config set agent.work copilot; echo $?; vloop config set model.work gpt-6.1-terra; echo $?; vloop config set --local a…",
+      "tool_name": "Bash"
+    },
+    {
+      "command": "cd ~/source/personal/vloop/.vloop/tmp/v/ex1 \u0026\u0026 ../vloop config set agent.work copilot",
+      "tool_name": "Bash"
+    }
+  ],
+  "phase": "verify",
+  "run_id": "B20261120-1643-b39-local-config-copilot-only",
+  "schema": "session/v3",
+  "started": "2026-11-20T19:25:15Z",
+  "turns": 19,
+  "wall_ms": 77611
+}

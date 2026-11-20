@@ -1,0 +1,14 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [],
+  "not_run": [
+    {"line": "vloop config set agent.work copilot (and every other line of the worked example's first block, the planted failures and the Claude-not-in-use block)", "reason": "running the built vloop binary in the scratch directory was denied; not retried in another form"},
+    {"line": "vloop init", "reason": "denied by the verify fence"},
+    {"line": "vloop run <brief>", "reason": "denied by the verify fence; covered by the end-to-end tests the brief names"},
+    {"line": "Acceptance 1-3 at close", "reason": "the operator's, at close"}
+  ],
+  "checked": { "example_lines": 0, "sentences": 8, "surfaces": 9 },
+  "notes": "The built binary built fine, but the sandbox denied every run of it, so no example line was run and pass 1 is empty. Pass 2 was done by reading code, not by running it: the local-file refusal text, the config set stderr notice (env named before the local file), the doctor config.local messages (tracked, not ignored, warning, pass), the n/a message constant, the credit default of 0.01, and the fence entries (config.local appears twice in work, review, verify, gate-review and review-brief; plan.json has none, and the brief does not list it). Pass 3 read the README Copilot section and prerequisites, concepts.md, configuration.md's credit row, domain-model.md C-1 and the fence files. No stale 0.0066667 default is left outside the records the brief exempts. Not checked: the exact order of keys in doctor's warning, the exit codes, the driver's input guard and the run preflight's output."
+}
+
