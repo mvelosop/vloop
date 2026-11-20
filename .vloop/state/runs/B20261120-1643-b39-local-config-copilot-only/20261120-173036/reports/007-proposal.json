@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "doctor's claude, trust, plugin and gate edits rows are n/a (no session in use runs on claude) unless a session in use resolves to claude, so vloop run's preflight passes on a machine with no claude. An unreadable config counts Claude as in use.",
+  "files": [
+    "internal/cli/doctor.go",
+    "cmd/vloop/b39_local_config_test.go"
+  ],
+  "verified": "sh .vloop/state/gates/T5/gate.sh printed 'gate T5: ok'; go test ./internal/cli ./cmd/... passes except the TestTaskGate* live-session plan guard failures.",
+  "notes": "claudeInUse(root, withReviewBrief) in doctor.go mirrors copilotKeys; agent.review-brief counts only for the bare doctor (runBrief == nil), so vloop run ignores it. No earlier test needed changing. New e2e tests in cmd/vloop/b39_local_config_test.go use a PATH of the stub copilot plus symlinks to a few tools, with no claude. Five TestTaskGate* tests in internal/cli fail only inside a live session (plan guard), not from this change."
+}

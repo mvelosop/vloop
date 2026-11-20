@@ -5,9 +5,9 @@
   "base": "05d546c5009a15b86470816eaa2e386fedf9453c",
   "branch": "B20261120-1643-b39-local-config-copilot-only",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-11-20T17:45:00Z",
-  "updated": "2026-11-20T18:45:37Z",
+  "updated": "2026-11-20T18:56:54Z",
   "shell": "sh",
   "checks": [
     {
@@ -234,7 +234,7 @@
         "A committed end-to-end test in cmd/vloop, on a temporary PATH holding a stub copilot and no claude, every agent.* key copilot with a Copilot model id and run.verify = false, asserts each of the four n/a lines on its own (not as one block) and that vloop run gets past its preflight; with agent.review set back to claude it asserts `✗ claude claude is not on PATH` and the preflight's refusal. No test depends on what is installed on the machine. The go check runs it."
       ],
       "verify": "sh .vloop/state/gates/T5/gate.sh",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

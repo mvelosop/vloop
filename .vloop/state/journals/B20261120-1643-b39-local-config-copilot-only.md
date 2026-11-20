@@ -48,3 +48,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The input guard now holds .vloop/config.local.toml like config.toml (changed, created, removed are put back); the five fences that deny config.toml deny Edit/Write of the local file too; fence-audit has matching rows in each section.
 - **Files:** internal/driver/safety.go, internal/driver/safety_test.go, fence/work.json, fence/review.json, fence/verify.json, fence/gate-review.json, fence/review-brief.json, docs/design-notes/fence-audit.md
 - **Notes for next iteration:** Guard change is one added root in snapshotInputs. New test TestInputGuardRestoresLocalConfig covers changed/removed/created. Five TestTaskGate* tests in internal/cli fail only inside a live session (plan guard), not from this change.
+
+## T5 — Check Claude only where a session in use runs on it
+
+- **Outcome:** done (review: PASS)
+- **Summary:** doctor's claude, trust, plugin and gate edits rows are n/a (no session in use runs on claude) unless a session in use resolves to claude, so vloop run's preflight passes on a machine with no claude. An unreadable config counts Claude as in use.
+- **Files:** internal/cli/doctor.go, cmd/vloop/b39_local_config_test.go
+- **Notes for next iteration:** claudeInUse(root, withReviewBrief) in doctor.go mirrors copilotKeys; agent.review-brief counts only for the bare doctor (runBrief == nil), so vloop run ignores it. No earlier test needed changing. New e2e tests in cmd/vloop/b39_local_config_test.go use a PATH of the stub copilot plus symlinks to a few tools, with no claude. Five TestTaskGate* tests in internal/cli fail only inside a live session (plan guard), not from this change.

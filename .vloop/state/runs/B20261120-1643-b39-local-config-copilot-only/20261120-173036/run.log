@@ -52,3 +52,10 @@ committing the plan
    review T4 · 0m16s · $0.11 · run $6.57 / $40.00
    review: PASS
    T4 done
+── iteration 7 (7 this run) · T5 · 4/8 done ──
+   Check Claude only where a session in use runs on it
+   work T5 · 6m54s · $0.30 · run $6.87 / $40.00
+   check go
+   review T5 · 0m20s · $0.11 · run $6.98 / $40.00
+   review: PASS
+   T5 done

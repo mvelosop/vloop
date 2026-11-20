@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/8 done** · iteration 6
+**Status:** running · **5/8 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:45:37Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:56:54Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Add vloop config set --local, config path --local and the override notice · 1 attempt(s)
 - [x] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight · 1 attempt(s)
 - [x] **T4** — Keep sessions off the local file: the input guard and the fences
-- [ ] **T5** — Check Claude only where a session in use runs on it
+- [x] **T5** — Check Claude only where a session in use runs on it
 - [ ] **T6** — Price a Copilot credit at GitHub's $0.01 by default
 - [ ] **T7** — Document the local file, Claude only where used, and the credit price
 - [ ] **T8** — Close: the worked example line for line, and every gate at once
@@ -117,7 +117,7 @@ sh .vloop/state/gates/T4/gate.sh
 
 ### T5 — Check Claude only where a session in use runs on it
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 A machine with no claude cannot run vloop today even when every session is on Copilot, because doctor's claude row and an untrusted-folder warning stop the run's preflight (L4). This task makes doctor's claude, trust, plugin and gate edits rows apply only when a session in use resolves to the claude agent, by the same rule copilotKeys already follows for Copilot, and n/a otherwise, so the run's preflight passes them. A config that cannot be read counts Claude as in use, so a broken config never hides a missing claude.
 
