@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** vloop init and upgrade keep .vloop/config.local.toml in .gitignore; doctor has a config.local row (tracked and not-ignored problems, a warning naming overridden keys); vloop run's preflight refuses on those problems and prints the warning. Fixed the previous check failure in two init tests.
 - **Files:** internal/install/section.go, internal/cli/doctor.go, internal/cli/run.go, internal/cli/init_test.go, internal/cli/upgrade_test.go, cmd/vloop/b39_local_config_test.go
 - **Notes for next iteration:** Previous check failure: TestInitWritesEverything now expects the local line in .gitignore; TestInitKeepsConfigAndBriefs fixture now already holds both lines so 'kept .gitignore' still holds (both pin the contract item that init adds the new line). MergeGitignore writes the local line before .vloop/tmp/ when both are missing, which the gate needs. Five TestTaskGate* tests fail only inside a live session (plan guard), not from this change.
+
+## T4 — Keep sessions off the local file: the input guard and the fences
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The input guard now holds .vloop/config.local.toml like config.toml (changed, created, removed are put back); the five fences that deny config.toml deny Edit/Write of the local file too; fence-audit has matching rows in each section.
+- **Files:** internal/driver/safety.go, internal/driver/safety_test.go, fence/work.json, fence/review.json, fence/verify.json, fence/gate-review.json, fence/review-brief.json, docs/design-notes/fence-audit.md
+- **Notes for next iteration:** Guard change is one added root in snapshotInputs. New test TestInputGuardRestoresLocalConfig covers changed/removed/created. Five TestTaskGate* tests in internal/cli fail only inside a live session (plan guard), not from this change.

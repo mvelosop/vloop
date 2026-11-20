@@ -79,6 +79,8 @@
       "Write(.vloop/state/**)",
       "Edit(.vloop/config.toml)",
       "Write(.vloop/config.toml)",
+      "Edit(.vloop/config.local.toml)",
+      "Write(.vloop/config.local.toml)",
       "Edit(.vloop/defects/**)",
       "Write(.vloop/defects/**)",
       "Edit(.vloop/interventions/**)",

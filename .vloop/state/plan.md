@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/8 done** · iteration 5
+**Status:** running · **4/8 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:36:36Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:45:37Z
 
 ## Progress
 
 - [x] **T1** — Add the local config layer to resolution, with source local
 - [x] **T2** — Add vloop config set --local, config path --local and the override notice · 1 attempt(s)
 - [x] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight · 1 attempt(s)
-- [ ] **T4** — Keep sessions off the local file: the input guard and the fences
+- [x] **T4** — Keep sessions off the local file: the input guard and the fences
 - [ ] **T5** — Check Claude only where a session in use runs on it
 - [ ] **T6** — Price a Copilot credit at GitHub's $0.01 by default
 - [ ] **T7** — Document the local file, Claude only where used, and the credit price
@@ -94,7 +94,7 @@ sh .vloop/state/gates/T3/gate.sh
 
 ### T4 — Keep sessions off the local file: the input guard and the fences
 
-`pending` · depends on: T3
+`done` · depends on: T3
 
 Sessions must not change the configuration the driver runs under, and an ignored file is exactly what the driver's tree checks do not see (L3, second half). This task makes the driver's input guard hold .vloop/config.local.toml as it holds .vloop/config.toml, adds the matching deny entries to every fence that denies the shared file, and records them in the fence audit. The Copilot hook already denies every write under .vloop/ but .vloop/tmp/ and does not change.
 

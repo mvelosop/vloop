@@ -243,3 +243,57 @@ func TestInputGuardRestoresGuidelines(t *testing.T) {
 		t.Fatalf("a guidelines file the session created was kept: %v", err)
 	}
 }
+
+// The local config file is a driver input like the shared one: changed, created
+// and removed by a session, it is put back.
+func TestInputGuardRestoresLocalConfig(t *testing.T) {
+	root := t.TempDir()
+	const rel = ".vloop/config.local.toml"
+	loc := filepath.Join(root, filepath.FromSlash(rel))
+	runDir := filepath.Join(root, ".vloop", "runs", "r")
+	if err := os.MkdirAll(filepath.Dir(loc), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	const orig = "run.max-iterations = 9\n"
+	if err := os.WriteFile(loc, []byte(orig), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	g := snapshotInputs(root, runDir)
+
+	// changed
+	if err := os.WriteFile(loc, []byte("run.cost-ceiling = 1\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if changed, failed := g.restore(""); len(failed) != 0 || !slices.Equal(changed, []string{rel}) {
+		t.Fatalf("restore of a changed file = %v, %v", changed, failed)
+	}
+	if got, _ := os.ReadFile(loc); string(got) != orig {
+		t.Fatalf("after restore = %q", got)
+	}
+
+	// removed
+	if err := os.Remove(loc); err != nil {
+		t.Fatal(err)
+	}
+	if changed, failed := g.restore(""); len(failed) != 0 || !slices.Equal(changed, []string{rel}) {
+		t.Fatalf("restore of a removed file = %v, %v", changed, failed)
+	}
+	if got, _ := os.ReadFile(loc); string(got) != orig {
+		t.Fatalf("after restore of a removed file = %q", got)
+	}
+
+	// created
+	if err := os.Remove(loc); err != nil {
+		t.Fatal(err)
+	}
+	g = snapshotInputs(root, runDir)
+	if err := os.WriteFile(loc, []byte("planted = 1\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if changed, failed := g.restore(""); len(failed) != 0 || !slices.Equal(changed, []string{rel}) {
+		t.Fatalf("restore of a created file = %v, %v", changed, failed)
+	}
+	if _, err := os.Stat(loc); !os.IsNotExist(err) {
+		t.Fatalf("a created local file was kept: %v", err)
+	}
+}
