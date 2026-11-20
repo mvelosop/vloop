@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/8 done** · iteration 0
+**Status:** running · **1/8 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T17:49:50Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T18:02:17Z
 
 ## Progress
 
-- [ ] **T1** — Add the local config layer to resolution, with source local
+- [x] **T1** — Add the local config layer to resolution, with source local
 - [ ] **T2** — Add vloop config set --local, config path --local and the override notice
 - [ ] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight
 - [ ] **T4** — Keep sessions off the local file: the input guard and the fences
@@ -21,7 +21,7 @@
 
 ### T1 — Add the local config layer to resolution, with source local
 
-`pending` · depends on: none
+`done` · depends on: none
 
 A developer's own settings live in an untracked .vloop/config.local.toml that wins over the shared .vloop/config.toml, while a VLOOP_* variable still wins over both (L1). This task puts that layer into the config package's resolution, so every later task (config set --local, doctor's row, the run's guards) builds on one resolver. The checks are the repository's contract, so a [[check]] in the local file is refused wherever the config is read, never read.
 

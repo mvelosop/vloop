@@ -26,6 +26,7 @@ import (
 const (
 	SourceDefault = "default"
 	SourceFile    = "file"
+	SourceLocal   = "local"
 	SourceEnv     = "env"
 )
 
@@ -296,20 +297,52 @@ func checkScopeDirs(root, value string) error {
 
 func filePath(root string) string { return filepath.Join(root, filepath.FromSlash(FilePath)) }
 
-// readFile parses the config file into a nested map; a missing file is empty.
-func readFile(root string) (map[string]any, []byte, error) {
-	raw, err := os.ReadFile(filePath(root))
+// readPath parses the config file at rel (repo-relative) into a nested map; a
+// missing file is empty. Errors name rel.
+func readPath(root, rel string) (map[string]any, []byte, error) {
+	raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
 	if errors.Is(err, os.ErrNotExist) {
 		return map[string]any{}, nil, nil
 	}
 	if err != nil {
-		return nil, nil, &SourceError{FilePath, err}
+		return nil, nil, &SourceError{rel, err}
 	}
 	m := map[string]any{}
 	if _, err := toml.Decode(string(raw), &m); err != nil {
-		return nil, nil, &SourceError{FilePath, err}
+		return nil, nil, &SourceError{rel, err}
 	}
 	return m, raw, nil
+}
+
+// readFile parses the shared config file; a missing file is empty.
+func readFile(root string) (map[string]any, []byte, error) { return readPath(root, FilePath) }
+
+// readLocal parses the local config file. A [[check]] in it is refused: the
+// checks are the repository's.
+func readLocal(root string) (map[string]any, error) {
+	m, _, err := readPath(root, LocalFilePath)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := m["check"]; ok {
+		return nil, &SourceError{LocalFilePath, errors.New("[[check]] belongs in " + FilePath + " — the checks are the repository's, not one machine's")}
+	}
+	return m, nil
+}
+
+// readLayers reads both files; a bad shared [[check]] or any [[check]] in the
+// local file is an error.
+func readLayers(root string) (file, local map[string]any, err error) {
+	if file, _, err = readFile(root); err != nil {
+		return nil, nil, err
+	}
+	if _, err = parseChecks(file); err != nil {
+		return nil, nil, err
+	}
+	if local, err = readLocal(root); err != nil {
+		return nil, nil, err
+	}
+	return file, local, nil
 }
 
 // fileValue finds a dotted key in the parsed file.
@@ -337,28 +370,39 @@ func sourceErr(source string, err error) error {
 	return &SourceError{source, err}
 }
 
-func resolveList(k Key, file map[string]any) (Value, error) {
+// layer is one config file's parsed content, with the source it reports.
+type layer struct {
+	m      map[string]any
+	path   string
+	source string
+}
+
+func resolveList(k Key, layers []layer) (Value, error) {
 	v := Value{Key: k.Name, Source: SourceDefault, List: []string{}}
 	set := func(text, source string) { v = Value{k.Name, text, true, source, strings.Split(text, ",")} }
-	if fv, ok := fileValue(file, k.Name); ok {
+	for _, l := range layers { // lowest priority first
+		fv, ok := fileValue(l.m, k.Name)
+		if !ok {
+			continue
+		}
 		arr, isArr := fv.([]any)
 		if !isArr {
-			return v, &SourceError{FilePath, fmt.Errorf("%s must be an array of strings", k.Name)}
+			return v, &SourceError{l.path, fmt.Errorf("%s must be an array of strings", k.Name)}
 		}
 		var names []string
 		for _, e := range arr {
 			s, isStr := e.(string)
 			if !isStr {
-				return v, &SourceError{FilePath, fmt.Errorf("%s must be an array of strings", k.Name)}
+				return v, &SourceError{l.path, fmt.Errorf("%s must be an array of strings", k.Name)}
 			}
 			names = append(names, s)
 		}
 		if len(names) > 0 {
 			text := strings.Join(names, ",")
 			if err := k.Validate(text); err != nil {
-				return v, sourceErr(FilePath, err)
+				return v, sourceErr(l.path, err)
 			}
-			set(text, SourceFile)
+			set(text, l.source)
 		}
 	}
 	if ev := os.Getenv(EnvVar(k.Name)); ev != "" {
@@ -370,12 +414,17 @@ func resolveList(k Key, file map[string]any) (Value, error) {
 	return v, nil
 }
 
-func resolve(k Key, file map[string]any) (Value, error) {
+func resolve(k Key, file, local map[string]any) (Value, error) {
+	layers := []layer{{file, FilePath, SourceFile}, {local, LocalFilePath, SourceLocal}}
 	if k.List {
-		return resolveList(k, file)
+		return resolveList(k, layers)
 	}
 	v := Value{Key: k.Name, Value: k.Default, Set: k.Default != "", Source: SourceDefault}
-	if fv, ok := fileValue(file, k.Name); ok {
+	for _, l := range layers {
+		fv, ok := fileValue(l.m, k.Name)
+		if !ok {
+			continue
+		}
 		s, isStr := fv.(string)
 		switch n := fv.(type) {
 		case int64:
@@ -394,12 +443,12 @@ func resolve(k Key, file map[string]any) (Value, error) {
 			} else if k.Num {
 				want = "a number"
 			}
-			return v, &SourceError{FilePath, fmt.Errorf("%s must be %s", k.Name, want)}
+			return v, &SourceError{l.path, fmt.Errorf("%s must be %s", k.Name, want)}
 		}
 		if err := k.Validate(s); err != nil {
-			return v, &SourceError{FilePath, err}
+			return v, &SourceError{l.path, err}
 		}
-		v = Value{Key: k.Name, Value: s, Set: true, Source: SourceFile}
+		v = Value{Key: k.Name, Value: s, Set: true, Source: l.source}
 	}
 	if ev := os.Getenv(EnvVar(k.Name)); ev != "" {
 		if err := k.Validate(ev); err != nil {
@@ -488,7 +537,7 @@ func parseChecks(file map[string]any) ([]CheckDef, error) {
 
 // Checks reads the [[check]] tables under root, in config order.
 func Checks(root string) ([]CheckDef, error) {
-	file, _, err := readFile(root)
+	file, _, err := readLayers(root)
 	if err != nil {
 		return nil, err
 	}
@@ -554,28 +603,22 @@ func Get(root, name string) (Value, error) {
 	if err != nil {
 		return Value{}, err
 	}
-	file, _, err := readFile(root)
+	file, local, err := readLayers(root)
 	if err != nil {
 		return Value{}, err
 	}
-	if _, err := parseChecks(file); err != nil {
-		return Value{}, err
-	}
-	return resolve(k, file)
+	return resolve(k, file, local)
 }
 
 // List resolves every key under root.
 func List(root string) ([]Value, error) {
-	file, _, err := readFile(root)
+	file, local, err := readLayers(root)
 	if err != nil {
-		return nil, err
-	}
-	if _, err := parseChecks(file); err != nil {
 		return nil, err
 	}
 	out := make([]Value, 0, len(Keys))
 	for _, k := range Keys {
-		v, err := resolve(k, file)
+		v, err := resolve(k, file, local)
 		if err != nil {
 			return nil, err
 		}

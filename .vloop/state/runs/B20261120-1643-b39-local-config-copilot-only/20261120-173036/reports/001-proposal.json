@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The config package now resolves four layers: VLOOP_* variable, .vloop/config.local.toml, .vloop/config.toml, default. Values from the local file report source local. A [[check]] in the local file is refused with exit 1 by Get, List and Checks.",
+  "files": ["internal/config/config.go", "internal/config/root.go", "internal/config/local_test.go"],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: ok; go test ./internal/config passes; go vet and gofmt clean.",
+  "notes": "readLayers is the one read point, used by Get, List and Checks; ResolveRun reads through Get, so it is covered with no read point added. AddChecks and Set still read only the shared file. resolve(k, file, local) iterates layers lowest first, so a later layer overwrites; an empty list sets nothing in either layer. LocalFilePath sits beside FilePath in root.go. go test ./internal/cli: five TestTaskGate* tests fail inside this session with 'the plan was changed during this session' because the live session's plan guard trips them. That is the session environment, not this change; the config tests all pass."
+}

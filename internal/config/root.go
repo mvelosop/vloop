@@ -9,6 +9,10 @@ import (
 // separators on every OS.
 const FilePath = ".vloop/config.toml"
 
+// LocalFilePath is the untracked per-machine config file, beside FilePath and
+// in the same form. It wins over FilePath; a VLOOP_* variable wins over both.
+const LocalFilePath = ".vloop/config.local.toml"
+
 // Root resolves the repo root from start: the nearest ancestor (start
 // included) containing .vloop or .git, checking both at each level before
 // moving up, else start (C-2).

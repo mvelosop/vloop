@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":227449,"exit":0,"name":"go"}],"ended":"2026-11-20T18:02:17Z","gate":{"duration_ms":1467,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261120-1643-b39-local-config-copilot-only","schema":"iteration/v2","started":"2026-11-20T17:49:50Z","task":"T1"}
