@@ -69,3 +69,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Documented the local config file in the configuration guide (resolution order, new section, config set --local example), C-1, the platform context, the concepts guide, the README and the roadmap line; Claude-only-where-used is in the concepts doctor paragraph and README.
 - **Files:** README.md, docs/domain/domain-model.md, docs/domain/platform/platform-context.md, docs/design-notes/vloop-roadmap.md, docs/guide/concepts.md, docs/guide/configuration.md
 - **Notes for next iteration:** The copilot.credit-usd row in configuration.md already said 0.01 (T6), so it was not touched. I did not run go test ./... (it passed the 120s foreground limit); the README line-cap test was not run separately, but wc -l gives 195.
+
+## T8 — Close: the worked example line for line, and every gate at once
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Added an end-to-end test that walks the worked example's first block in order, through the last config.local row and config get copilot.credit-usd printing 0.01. No product discrepancy found.
+- **Files:** cmd/vloop/b39_worked_example_test.go
+- **Notes for next iteration:** New test TestWorkedExampleLocalConfigFirstBlock uses the scratch helper in e2e_test.go. The other blocks (planted failures, Claude not in use) are covered by T3/T5 tests in cmd/vloop/b39_local_config_test.go.

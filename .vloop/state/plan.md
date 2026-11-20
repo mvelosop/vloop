@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **7/8 done** · iteration 9
+**Status:** running · **8/8 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T19:15:57Z
+**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T19:21:36Z
 
 ## Progress
 
@@ -15,7 +15,7 @@
 - [x] **T5** — Check Claude only where a session in use runs on it
 - [x] **T6** — Price a Copilot credit at GitHub's $0.01 by default
 - [x] **T7** — Document the local file, Claude only where used, and the credit price
-- [ ] **T8** — Close: the worked example line for line, and every gate at once
+- [x] **T8** — Close: the worked example line for line, and every gate at once
 
 ## Tasks
 
@@ -185,7 +185,7 @@ sh .vloop/state/gates/T7/gate.sh
 
 ### T8 — Close: the worked example line for line, and every gate at once
 
-`pending` · depends on: T7
+`done` · depends on: T7
 
 Each earlier task was judged on its own; this one proves the brief's worked example holds as written, in its order, with everything in place, and leaves it behind as a committed end-to-end test. It also runs every earlier gate together. A discrepancy it finds is fixed here, in the product, never by changing what the worked example says.
 
