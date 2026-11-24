@@ -65,6 +65,36 @@ environment and in `config set`.
 
 **`agent.review-brief = "copilot"` is experimental too, and is read by `vloop brief review`, not by `vloop run`.** `vloop brief review <brief>` warns `! agent.review-brief is copilot: experimental (docs/guide/configuration.md)` and refuses, with nothing run, when `copilot` is not on PATH, when a project skill has the name of a plugin skill, when no GitHub login reaches Copilot (`agent.review-brief is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login`) and while `model.review-brief` is still the default (`agent.review-brief is copilot but model.review-brief is the default "opus", a Claude alias: set model.review-brief to a Copilot model id`). `vloop run` ignores the key.
 
+### Copilot model ids
+
+A Copilot session's `model.<kind>` takes the exact id Copilot's `--model` takes.
+The Copilot CLI does not list them, and an unknown id fails with only
+`Model "<id>" from --model flag is not available.` The list comes from the
+Copilot API, which answers your `gh` login:
+
+```
+curl -s -H "Authorization: Bearer $(gh auth token)" \
+     -H "Copilot-Integration-Id: copilot-developer-cli" \
+     https://api.githubcopilot.com/models \
+  | jq -r '.data[] | select(.model_picker_enabled) | [.id, (.policy.state // "-")] | @tsv'
+```
+
+In PowerShell:
+
+```powershell
+$h = @{ Authorization = "Bearer $(gh auth token)"; 'Copilot-Integration-Id' = 'copilot-developer-cli' }
+(Invoke-RestMethod https://api.githubcopilot.com/models -Headers $h).data |
+  Where-Object model_picker_enabled |
+  Select-Object id, @{ n = 'policy'; e = { $_.policy.state ?? '-' } }
+```
+
+The first column is the id. The second is your account's policy for the model:
+`enabled`, `disabled` (the model exists and the policy blocks it) or `-` (no
+policy applies; such a model can still run). The list carries no prices: cost is
+estimated from the credits each session uses (`copilot.credit-usd`). The ids
+vloop has qualified for each session kind are in the README; how they were
+found is in `docs/design-notes/copilot-cli-experiments.md`.
+
 ### The fence hook
 
 Copilot does not read the plan, review, work, verify or gate-review fence, so each Copilot session has its own home (`COPILOT_HOME`, under `.vloop/tmp/`, emptied between sessions) holding a hooks file whose `preToolUse` entry runs `vloop fence hook --phase <review|second-review|work|verify|gate-review|plan> --root <repository root>` before every tool call. The hook reads one payload on stdin and prints one line, `{"permissionDecision":"allow"}` or `{"permissionDecision":"deny","permissionDecisionReason":"vloop fence: …"}`. It reads the phase's fence (`fence/review.json`, `fence/work.json` for a work session, `fence/verify.json` for a verify session, or `fence/gate-review.json` for a gate-review session, or `fence/plan.json` for a plan session): its own Bash deny rules and the adapter's deny-list stems, not a copy, with the fence's matching (`pre:*` is the prefix alone or followed by a space, `*` elsewhere any run of characters).

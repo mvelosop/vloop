@@ -93,7 +93,8 @@ vloop config set model.work gpt-6.1-terra
 The keys are `agent.<kind>` and `model.<kind>` for `plan`, `gate-review`,
 `work`, `review`, `second-review`, `verify` and `review-brief`. A Copilot
 session needs a Copilot model id, never a Claude alias such as `sonnet`;
-`vloop run` refuses one. So far `gpt-6.1-terra` is qualified for work, review,
+`vloop run` refuses one. To list the ids your account can use, see
+[Copilot model ids](docs/guide/configuration.md#copilot-model-ids). So far `gpt-6.1-terra` is qualified for work, review,
 the second review and brief review; keep plan and gate review on Claude, and
 verify is not yet tried.
 
