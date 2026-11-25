@@ -159,7 +159,13 @@ func (j *Judge) expand(p string) string {
 		p = filepath.Join(j.home, p[1:])
 	}
 	if !filepath.IsAbs(p) {
-		p = filepath.Join(j.root, p)
+		if (strings.HasPrefix(p, "/") || strings.HasPrefix(p, `\`)) && filepath.VolumeName(p) == "" {
+			// On Windows a path rooted without a drive (/etc/hosts) is on the
+			// root's drive, not under the root.
+			p = filepath.VolumeName(j.root) + p
+		} else {
+			p = filepath.Join(j.root, p)
+		}
 	}
 	return filepath.Clean(p)
 }

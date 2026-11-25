@@ -35,6 +35,7 @@ GOOS=linux go build ./...   GOOS=windows go build ./...
 ```
 
 `gofmt -l .` and `go mod tidy -diff` print nothing on success.
+`go run ./tools/check` runs them all, in any shell; it is the `[[check]]`.
 `.vloop/config.toml` is this repo's own vloop config (`metrics.stacks = ["go"]`);
 `.vloop/defects/` holds its recorded defects.
 

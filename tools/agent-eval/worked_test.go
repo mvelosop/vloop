@@ -15,6 +15,7 @@ import (
 // first on PATH and returns the fixture cases, the state dir and the vloop path.
 func workedEnv(t *testing.T) (cases, st, vloop string) {
 	t.Helper()
+	skipPOSIXStubs(t)
 	if _, err := exec.LookPath("bash"); err != nil {
 		t.Skip("bash is needed for the fixture scaffolds")
 	}

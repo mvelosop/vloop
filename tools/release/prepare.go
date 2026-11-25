@@ -9,11 +9,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"strconv"
 	"strings"
 
 	"github.com/mvelosop/vloop/internal/config"
+	gatestate "github.com/mvelosop/vloop/internal/state"
 	modver "golang.org/x/mod/module"
 	"golang.org/x/mod/zip"
 )
@@ -167,12 +167,14 @@ func gitOut(dir string, args ...string) (string, error) {
 	return strings.TrimSpace(out), err
 }
 
-// shellCmd builds the command that runs script in the platform shell.
-func shellCmd(script string) *exec.Cmd {
-	if runtime.GOOS == "windows" {
-		return exec.Command("pwsh", "-NoProfile", "-Command", script)
+// shellCmd builds the command that runs script in the configured shell, as
+// the driver runs a [[check]].
+func shellCmd(dir, script string) (*exec.Cmd, error) {
+	shell, err := config.Get(dir, "shell")
+	if err != nil {
+		return nil, err
 	}
-	return exec.Command("sh", "-c", script)
+	return gatestate.GateCommand(dir, shell.Value, script, nil)
 }
 
 // runChecked runs cmd in dir; on failure it returns the combined output.
@@ -288,7 +290,11 @@ func prepareChecks(dir, version string) (latest string, ref *refusal) {
 		return latest, refuse(1, "%s", oneLine(err.Error()))
 	}
 	for _, c := range checks {
-		if out, err := runChecked(dir, shellCmd(c.Run)); err != nil {
+		cmd, err := shellCmd(dir, c.Run)
+		if err != nil {
+			return latest, refuse(1, "check %s: %s", c.Name, oneLine(err.Error()))
+		}
+		if out, err := runChecked(dir, cmd); err != nil {
 			r := refuse(1, "check %s failed", c.Name)
 			r.out = out
 			return latest, r

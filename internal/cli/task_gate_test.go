@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -39,16 +40,15 @@ func TestTaskGateShPassFail(t *testing.T) {
 	if planBytes(t, root) != before {
 		t.Fatal("task gate wrote the plan")
 	}
-	setVerify(t, root, "pwd >pwd.txt")
+	// A relative redirect lands where the gate runs; pwd would print an MSYS
+	// path under Git for Windows' sh.
+	setVerify(t, root, "echo here >here.txt")
 	code, out, _ = run(t, "-C", root, "task", "gate", "T2")
 	if code != 0 || !regexp.MustCompile(`^gate T2: pass \([^)]+\)\n$`).MatchString(out) {
 		t.Fatalf("code %d out %q", code, out)
 	}
-	got, _ := os.ReadFile(filepath.Join(root, "pwd.txt"))
-	want, _ := filepath.EvalSymlinks(root)
-	have, _ := filepath.EvalSymlinks(strings.TrimSpace(string(got)))
-	if have != want {
-		t.Fatalf("gate ran in %q, want repo root %q", have, want)
+	if _, err := os.Stat(filepath.Join(root, "here.txt")); err != nil {
+		t.Fatalf("the gate did not run in the repo root: %v", err)
 	}
 }
 
@@ -95,6 +95,9 @@ func TestTaskGateShellMissing(t *testing.T) {
 // TestTaskGateShellInvocation uses a PATH test double for each shell and
 // checks the arguments it was given.
 func TestTaskGateShellInvocation(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("the shell test doubles are POSIX scripts, which Windows cannot start")
+	}
 	if _, err := exec.LookPath("sh"); err != nil {
 		t.Skip("sh is not on PATH, so the shell test doubles cannot run")
 	}

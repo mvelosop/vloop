@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -20,6 +21,7 @@ const fakeSession = `{"type":"assistant.message","data":{"content":"hello","tool
 // pathWith installs fake copilot and vloop scripts first on PATH and returns the vloop path.
 func pathWith(t *testing.T, copilot string) string {
 	t.Helper()
+	skipPOSIXStubs(t)
 	bin := t.TempDir()
 	write(t, filepath.Join(bin, "copilot"), "#!/bin/sh\n"+copilot)
 	write(t, filepath.Join(bin, "vloop"), "#!/bin/sh\nexit 0\n")
@@ -197,6 +199,7 @@ func TestObservedClaudeTrace(t *testing.T) {
 }
 
 func TestClaudeRunEndToEnd(t *testing.T) {
+	skipPOSIXStubs(t)
 	bin := t.TempDir()
 	stream := `{"type":"system","subtype":"init"}
 {"type":"assistant","message":{"content":[{"type":"thinking","thinking":"hm"},{"type":"tool_use","id":"t1","name":"Bash","input":{"command":"echo a<b"}}]}}
@@ -230,5 +233,14 @@ func TestClaudeRunEndToEnd(t *testing.T) {
 	argv, _ := os.ReadFile(filepath.Join(out, "rev", "run-1", "argv"))
 	if !strings.Contains(string(argv), "stream-json\n--verbose") {
 		t.Errorf("argv = %s", argv)
+	}
+}
+
+// skipPOSIXStubs skips a test whose fake agents are POSIX shell scripts:
+// Windows cannot start them, and PATH would then find the real CLI.
+func skipPOSIXStubs(t *testing.T) {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		t.Skip("the fake agents are POSIX shell scripts")
 	}
 }

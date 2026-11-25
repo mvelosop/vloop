@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -295,12 +296,16 @@ func TestCopilotHookBinaryOption(t *testing.T) {
 		t.Fatal(err)
 	}
 	data, _ = os.ReadFile(filepath.Join(p.Home, "hooks", "vloop-fence.json"))
-	if !strings.Contains(string(data), "'"+exe+"' fence hook") {
+	quoted, _ := json.Marshal("'" + exe + "' fence hook")
+	if !strings.Contains(string(data), strings.Trim(string(quoted), `"`)) {
 		t.Errorf("by default the hook runs os.Executable(): %s", data)
 	}
 }
 
 func TestRunnerKeepsTranscriptOnlyWhenAsked(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("stub claude is a POSIX script")
+	}
 	bin := t.TempDir()
 	fake := filepath.Join(bin, "claude")
 	script := "#!/bin/sh\nprintf '{\"type\":\"x\"}\\n{\"total_cost_usd\":0.5,\"num_turns\":1}\\n'\n"
