@@ -1,0 +1,16 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief",
+  "verdict": "PASS",
+  "findings": [],
+  "decisions": [
+    "Any two distinct declared platforms, including linux+macos, require pwsh. This is the simpler rule and matches the stated BSD/GNU portability problem.",
+    "platforms is always shared-only, while shell overrides are refused only for a mixed team. The literal error messages and config-set exit codes are appropriate.",
+    "Shared-only errors apply wherever the config is read; an accepted plan retains its recorded shell and is not re-linted if platforms is added later. This preserves C-1 and P-5.",
+    "Gate portability is enforced by a fixed driver list plus skill guidance; vloop task verify, existing plans, and non-.ps1 gate scripts remain outside the lint. This is a deliberate, bounded enforcement surface.",
+    "A missing pwsh is a mixed-team problem only when no plan is in use, while the checks' implicit-shell condition remains a warning. This preserves upgrades for single-OS repositories."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-25: PASS, 0 findings"
+}
+

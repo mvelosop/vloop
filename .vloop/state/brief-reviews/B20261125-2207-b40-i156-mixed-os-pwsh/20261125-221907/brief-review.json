@@ -1,0 +1,28 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "M4 - doctor's other findings / The default shell",
+      "summary": "The warning can claim checks use the OS default when B39's local or environment layer actually selects an explicit shell.",
+      "evidence": "M4 at docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md:252-256 warns exactly 'checks run in this OS's default shell' whenever no shared shell is set, even though docs/domain/domain-model.md:268-271 and internal/config/config.go:417-461 resolve a VLOOP_SHELL or local shell before the OS default. The brief also explicitly keeps those overrides working for non-mixed repositories at lines 60-61.",
+      "fix": "Define the warning against the resolved shell source. Either emit this literal only when shell resolves from the default and pin separate literal messages for local and environment sources, or replace it with a literal message that is true for every source. Cover at least local and environment shell cases in task 2 and the worked example."
+    }
+  ],
+  "decisions": [
+    "Any two distinct declared platforms, including linux plus macos, require pwsh.",
+    "The shared-only key is platforms with values linux, macos, and windows; duplicates are deduplicated for messages.",
+    "When mixed, shell must be pwsh in the shared config; local and VLOOP_SHELL overrides are errors, including an override to pwsh.",
+    "Portability is enforced by a driver lint of a fixed command list and taught by the plan and gate-review skills.",
+    "The default-shell check is a warning for non-mixed repositories, and a missing mixed-team pwsh is a problem.",
+    "Accepted plans retain their recorded shell; platforms is not added to the plan schema or used to re-lint existing plans.",
+    "Shared-only errors apply to every config-reading command.",
+    "The vloop task verify replacement is not linted.",
+    "The file lint scans .ps1 gate scripts only."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-25: FIX, 1 finding"
+}
+
