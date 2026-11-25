@@ -38,6 +38,7 @@ var agents = []string{"claude", "copilot"}
 var SecondReviewModes = []string{"off", "record", "feedback", "on-pass", "both-pass"}
 
 var efforts = []string{"low", "medium", "high", "xhigh", "max"}
+var platformNames = []string{"linux", "macos", "windows"}
 
 // Key describes one configuration key. Valid is nil when any non-empty string
 // is accepted.
@@ -105,6 +106,7 @@ var Keys = []Key{
 	{Name: "agent.verify", Default: "claude", Valid: agents},
 	{Name: "agent.review-brief", Default: "claude", Valid: agents},
 	{Name: "copilot.credit-usd", Default: "0.01", Num: true, MinOpen: true},
+	{Name: "platforms", List: true, Valid: platformNames},
 	{Name: "shell", Default: defaultShell(), Valid: []string{"sh", "bash", "pwsh", "powershell", "cmd"}},
 	{Name: "areas", List: true},
 	{Name: "metrics.stacks", List: true, Stacks: true},
@@ -202,6 +204,29 @@ func Lookup(name string) (Key, error) {
 // EnvVar is the environment variable overriding a key.
 func EnvVar(name string) string {
 	return "VLOOP_" + strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(name))
+}
+
+// DistinctPlatforms returns valid platform names once, in their display order.
+func DistinctPlatforms(values []string) []string {
+	seen := make(map[string]bool, len(values))
+	out := make([]string, 0, len(values))
+	for _, value := range platformNames {
+		if slices.Contains(values, value) && !seen[value] {
+			seen[value] = true
+			out = append(out, value)
+		}
+	}
+	return out
+}
+
+// MixedPlatforms reports whether values contain two or more distinct platforms.
+func MixedPlatforms(values []string) bool {
+	return len(DistinctPlatforms(values)) >= 2
+}
+
+// FormatPlatforms joins distinct platform names in their display order.
+func FormatPlatforms(values []string) string {
+	return strings.Join(DistinctPlatforms(values), ", ")
 }
 
 func (k Key) numWant() string {
@@ -342,6 +367,9 @@ func readLayers(root string) (file, local map[string]any, err error) {
 	if local, err = readLocal(root); err != nil {
 		return nil, nil, err
 	}
+	if err = checkSharedOnly(file, local); err != nil {
+		return nil, nil, err
+	}
 	return file, local, nil
 }
 
@@ -377,31 +405,79 @@ type layer struct {
 	source string
 }
 
+func fileListValue(k Key, l layer) ([]string, bool, error) {
+	fv, ok := fileValue(l.m, k.Name)
+	if !ok {
+		return nil, false, nil
+	}
+	arr, isArr := fv.([]any)
+	if !isArr {
+		return nil, true, &SourceError{l.path, fmt.Errorf("%s must be an array of strings", k.Name)}
+	}
+	names := make([]string, 0, len(arr))
+	for _, e := range arr {
+		s, isStr := e.(string)
+		if !isStr {
+			return nil, true, &SourceError{l.path, fmt.Errorf("%s must be an array of strings", k.Name)}
+		}
+		names = append(names, s)
+	}
+	if len(names) > 0 {
+		if err := k.Validate(strings.Join(names, ",")); err != nil {
+			return nil, true, sourceErr(l.path, err)
+		}
+	}
+	return names, true, nil
+}
+
+func sharedOnlyError(name string, platforms []string) error {
+	switch name {
+	case "platforms":
+		return errors.New("platforms belongs in " + FilePath + " — the platforms are the repository's, not one machine's")
+	case "shell":
+		return fmt.Errorf("shell belongs in %s while platforms lists %s — the checks and the gates are written for one shell", FilePath, FormatPlatforms(platforms))
+	default:
+		return nil
+	}
+}
+
+func checkSharedOnly(file, local map[string]any) error {
+	if _, ok := fileValue(local, "platforms"); ok {
+		return &SourceError{LocalFilePath, sharedOnlyError("platforms", nil)}
+	}
+	if os.Getenv(EnvVar("platforms")) != "" {
+		return &SourceError{EnvVar("platforms"), sharedOnlyError("platforms", nil)}
+	}
+	k, _ := Lookup("platforms")
+	platforms, _, err := fileListValue(k, layer{m: file, path: FilePath, source: SourceFile})
+	if err != nil {
+		return err
+	}
+	if !MixedPlatforms(platforms) {
+		return nil
+	}
+	if _, ok := fileValue(local, "shell"); ok {
+		return &SourceError{LocalFilePath, sharedOnlyError("shell", platforms)}
+	}
+	if os.Getenv(EnvVar("shell")) != "" {
+		return &SourceError{EnvVar("shell"), sharedOnlyError("shell", platforms)}
+	}
+	return nil
+}
+
 func resolveList(k Key, layers []layer) (Value, error) {
 	v := Value{Key: k.Name, Source: SourceDefault, List: []string{}}
 	set := func(text, source string) { v = Value{k.Name, text, true, source, strings.Split(text, ",")} }
 	for _, l := range layers { // lowest priority first
-		fv, ok := fileValue(l.m, k.Name)
+		names, ok, err := fileListValue(k, l)
+		if err != nil {
+			return v, err
+		}
 		if !ok {
 			continue
 		}
-		arr, isArr := fv.([]any)
-		if !isArr {
-			return v, &SourceError{l.path, fmt.Errorf("%s must be an array of strings", k.Name)}
-		}
-		var names []string
-		for _, e := range arr {
-			s, isStr := e.(string)
-			if !isStr {
-				return v, &SourceError{l.path, fmt.Errorf("%s must be an array of strings", k.Name)}
-			}
-			names = append(names, s)
-		}
 		if len(names) > 0 {
 			text := strings.Join(names, ",")
-			if err := k.Validate(text); err != nil {
-				return v, sourceErr(l.path, err)
-			}
 			set(text, l.source)
 		}
 	}
@@ -654,6 +730,35 @@ func SetLocal(root, name, value string) error { return setAt(root, LocalFilePath
 func setAt(root, rel, name, value string) error {
 	k, err := Lookup(name)
 	if err != nil {
+		return err
+	}
+	if rel == LocalFilePath && name == "platforms" {
+		return &UsageError{fmt.Errorf("%s: %w", LocalFilePath, sharedOnlyError(name, nil))}
+	}
+	if rel == LocalFilePath && name == "shell" {
+		file, _, err := readFile(root)
+		if err != nil {
+			return err
+		}
+		local, err := readLocal(root)
+		if err != nil {
+			return err
+		}
+		if _, ok := fileValue(local, "platforms"); ok {
+			return &SourceError{LocalFilePath, sharedOnlyError("platforms", nil)}
+		}
+		if os.Getenv(EnvVar("platforms")) != "" {
+			return &SourceError{EnvVar("platforms"), sharedOnlyError("platforms", nil)}
+		}
+		platformKey, _ := Lookup("platforms")
+		platforms, _, err := fileListValue(platformKey, layer{m: file, path: FilePath, source: SourceFile})
+		if err != nil {
+			return err
+		}
+		if MixedPlatforms(platforms) {
+			return &UsageError{fmt.Errorf("%s: %w", LocalFilePath, sharedOnlyError(name, platforms))}
+		}
+	} else if _, _, err := readLayers(root); err != nil {
 		return err
 	}
 	if value != "" {

@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **1/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-25T23:20:31Z
+**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-25T23:31:31Z
 
 ## Progress
 
-- [ ] **T1** — Add mixed-team platform configuration
+- [x] **T1** — Add mixed-team platform configuration
 - [ ] **T2** — Report mixed-team health and block unsafe runs
 - [ ] **T3** — Lint mixed-team gates for portable commands
 - [ ] **T4** — Teach skills to write portable mixed-team gates
@@ -19,7 +19,7 @@
 
 ### T1 — Add mixed-team platform configuration
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Give repositories a shared-only declaration of their supported platforms and enforce the mixed-team shell ownership rules at every config entry point. This establishes the configuration contract that doctor, preflight and the portability lint build on.
 

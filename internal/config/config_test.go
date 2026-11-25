@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -44,7 +45,7 @@ func TestDefaultsEveryRow(t *testing.T) {
 	}{
 		{"language", "en", true}, {"model.plan", "opus", true}, {"model.work", "sonnet", true},
 		{"model.review", "sonnet", true}, {"model.second-review", "sonnet", true}, {"model.gate-review", "sonnet", true}, {"model.verify", "sonnet", true}, {"model.review-brief", "opus", true}, {"effort.plan", "", false}, {"effort.work", "", false},
-		{"effort.review", "", false}, {"effort.second-review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"effort.review-brief", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.second-review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"agent.review-brief", "claude", true}, {"copilot.credit-usd", "0.01", true}, {"shell", defaultShell(), true}, {"areas", "", false},
+		{"effort.review", "", false}, {"effort.second-review", "", false}, {"effort.gate-review", "", false}, {"effort.verify", "", false}, {"effort.review-brief", "", false}, {"agent.plan", "claude", true}, {"agent.work", "claude", true}, {"agent.review", "claude", true}, {"agent.second-review", "claude", true}, {"agent.gate-review", "claude", true}, {"agent.verify", "claude", true}, {"agent.review-brief", "claude", true}, {"copilot.credit-usd", "0.01", true}, {"platforms", "", false}, {"shell", defaultShell(), true}, {"areas", "", false},
 		{"metrics.stacks", "", false}, {"metrics.code", "", false}, {"metrics.test", "", false},
 		{"metrics.docs", "", false}, {"metrics.excluded", "", false},
 		{"run.max-iterations", "30", true}, {"run.cost-ceiling", "40", true}, {"run.max-attempts", "3", true},
@@ -229,6 +230,38 @@ func TestShellKey(t *testing.T) {
 	t.Setenv("VLOOP_SHELL", "cmd")
 	if v, _ := Get(root, "shell"); v.Value != "cmd" || v.Source != SourceEnv {
 		t.Errorf("env: %+v", v)
+	}
+}
+
+func TestPlatformsKey(t *testing.T) {
+	root := scratch(t)
+	v, err := Get(root, "platforms")
+	if err != nil || v.Set || v.Value != "" || len(v.List) != 0 || v.Source != SourceDefault {
+		t.Fatalf("default: %+v %v", v, err)
+	}
+	if err := Set(root, "platforms", "windows,macos,windows"); err != nil {
+		t.Fatal(err)
+	}
+	if got := readCfg(t, root); got != "platforms = [\"windows\", \"macos\", \"windows\"]\n" {
+		t.Errorf("file: %q", got)
+	}
+	v, err = Get(root, "platforms")
+	if err != nil || v.Value != "windows,macos,windows" || !reflect.DeepEqual(v.List, []string{"windows", "macos", "windows"}) {
+		t.Errorf("value order: %+v %v", v, err)
+	}
+	err = Set(root, "platforms", "macos,beos")
+	want := `invalid value "macos,beos" for platforms: want a comma-separated list of linux, macos, windows`
+	if err == nil || err.Error() != want {
+		t.Errorf("invalid: %v", err)
+	}
+	if got := DistinctPlatforms(v.List); !reflect.DeepEqual(got, []string{"macos", "windows"}) {
+		t.Errorf("distinct: %v", got)
+	}
+	if !MixedPlatforms(v.List) || FormatPlatforms(v.List) != "macos, windows" {
+		t.Errorf("mixed: %v %q", MixedPlatforms(v.List), FormatPlatforms(v.List))
+	}
+	if MixedPlatforms([]string{"macos", "macos"}) {
+		t.Error("duplicate platforms are not distinct")
 	}
 }
 

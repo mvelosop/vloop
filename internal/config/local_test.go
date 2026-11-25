@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -109,5 +110,85 @@ func TestLocalCheckRefused(t *testing.T) {
 	}
 	if _, err := List(root); err == nil || err.Error() != want {
 		t.Errorf("List: %v", err)
+	}
+}
+
+func TestPlatformsAndMixedShellAreSharedOnly(t *testing.T) {
+	root := scratch(t)
+	platformErr := "platforms belongs in .vloop/config.toml — the platforms are the repository's, not one machine's"
+	writeLocal(t, root, "platforms = [\"linux\"]\n")
+	for _, get := range []func() error{
+		func() error { _, err := Get(root, "language"); return err },
+		func() error { _, err := List(root); return err },
+	} {
+		if err := get(); err == nil || err.Error() != LocalFilePath+": "+platformErr {
+			t.Errorf("local platforms: %v", err)
+		}
+	}
+	writeLocal(t, root, "")
+	t.Setenv(EnvVar("platforms"), "linux")
+	if _, err := Get(root, "language"); err == nil || err.Error() != EnvVar("platforms")+": "+platformErr {
+		t.Errorf("environment platforms: %v", err)
+	}
+	t.Setenv(EnvVar("platforms"), "")
+
+	writeCfg(t, root, "platforms = [\"windows\", \"macos\", \"macos\"]\n")
+	shellErr := "shell belongs in .vloop/config.toml while platforms lists macos, windows — the checks and the gates are written for one shell"
+	writeLocal(t, root, "shell = \"pwsh\"\n")
+	if _, err := Get(root, "language"); err == nil || err.Error() != LocalFilePath+": "+shellErr {
+		t.Errorf("local shell: %v", err)
+	}
+	writeLocal(t, root, "")
+	t.Setenv(EnvVar("shell"), "pwsh")
+	if _, err := Get(root, "language"); err == nil || err.Error() != EnvVar("shell")+": "+shellErr {
+		t.Errorf("environment shell: %v", err)
+	}
+	t.Setenv(EnvVar("shell"), "")
+
+	writeCfg(t, root, "platforms = [\"windows\"]\n")
+	if err := SetLocal(root, "shell", "sh"); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv(EnvVar("shell"), "bash")
+	if v, err := Get(root, "shell"); err != nil || v.Value != "bash" || v.Source != SourceEnv {
+		t.Errorf("single platform shell overrides: %+v %v", v, err)
+	}
+}
+
+func TestSetLocalRefusesSharedOnlyKeysWithoutWriting(t *testing.T) {
+	root := scratch(t)
+	for _, tc := range []struct {
+		key, value, config, want string
+	}{
+		{"platforms", "linux", "", LocalFilePath + ": platforms belongs in " + FilePath},
+		{"shell", "pwsh", "platforms = [\"macos\", \"windows\"]\n", LocalFilePath + ": shell belongs in " + FilePath + " while platforms lists macos, windows"},
+	} {
+		if tc.config != "" {
+			writeCfg(t, root, tc.config)
+		}
+		before, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(LocalFilePath)))
+		err := SetLocal(root, tc.key, tc.value)
+		var usage *UsageError
+		if err == nil || !errors.As(err, &usage) || !strings.HasPrefix(err.Error(), tc.want) {
+			t.Errorf("SetLocal(%s): %v", tc.key, err)
+		}
+		after, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(LocalFilePath)))
+		if string(after) != string(before) {
+			t.Errorf("SetLocal(%s) wrote %q", tc.key, after)
+		}
+	}
+}
+
+func TestSetLocalShellHonoursPlatformsOwnership(t *testing.T) {
+	root := scratch(t)
+	t.Setenv(EnvVar("platforms"), "linux")
+	err := SetLocal(root, "shell", "pwsh")
+	want := EnvVar("platforms") + ": platforms belongs in " + FilePath
+	var source *SourceError
+	if err == nil || !errors.As(err, &source) || !strings.HasPrefix(err.Error(), want) {
+		t.Errorf("environment platforms: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(LocalFilePath))); !errors.Is(err, os.ErrNotExist) {
+		t.Errorf("refusal wrote local file: %v", err)
 	}
 }

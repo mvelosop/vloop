@@ -5,9 +5,9 @@
   "base": "04c5526e85ea6a6483b153c55a4f8f241a85006c",
   "branch": "B20261125-2207-b40-i156-mixed-os-pwsh",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-25T23:09:54Z",
-  "updated": "2026-11-25T23:20:31Z",
+  "updated": "2026-11-25T23:31:31Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -58,7 +58,7 @@
         "The configuration guide's keys table contains platforms with VLOOP_PLATFORMS, and its shell row says that a mixed team requires shared pwsh; no alternative spelling of the platform names is documented."
       ],
       "verify": "$o = go test ./.vloop/state/gates/T1 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
