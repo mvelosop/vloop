@@ -240,6 +240,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | next | ceremony | partly | no-options | [I20261102-210121-release-v0-15-0-rc-1-a-pre-release-for-t](I20261102-210121-release-v0-15-0-rc-1-a-pre-release-for-t.md) |
 | next | ceremony | partly | no-options | [I20261106-213844-release-v0-15-0-rc-2-published-but-its-p](I20261106-213844-release-v0-15-0-rc-2-published-but-its-p.md) |
 | next | ceremony | partly | no-options | [I20261109-194753-release-v0-15-0-rc-3-and-this-repository](I20261109-194753-release-v0-15-0-rc-3-and-this-repository.md) |
+| next | ceremony | partly | no-options | [I20261125-214929-release-v0-15-0-rc-4-and-this-repository](I20261125-214929-release-v0-15-0-rc-4-and-this-repository.md) |
 | next | decision | no | recommended | [I20261006-1237-renumbered-to-0-8-0-before-going-public](I20261006-1237-renumbered-to-0-8-0-before-going-public.md) |
 | next | decision | no | recommended | [I20261014-1110-defects-narrowed-to-escapes-operator-fin](I20261014-1110-defects-narrowed-to-escapes-operator-fin.md) |
 | next | direction | no | no-options | [I20260929-2130-the-metrics-and-defects-design-before-b2](I20260929-2130-the-metrics-and-defects-design-before-b2.md) |
