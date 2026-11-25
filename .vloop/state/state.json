@@ -1,13 +1,13 @@
 {
   "schema": "state/v2",
-  "run_id": "B20261106-2013-b38-i140-module-zips",
-  "brief": "docs/briefs/B20261106-2013-b38-i140-module-zips.loop-brief.md",
-  "base": "2624cb7a1816fe68beb077a8b8594184fa292644",
-  "branch": "B20261106-2013-b38-i140-module-zips",
+  "run_id": "B20261120-1643-b39-local-config-copilot-only",
+  "brief": "docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md",
+  "base": "05d546c5009a15b86470816eaa2e386fedf9453c",
+  "branch": "B20261120-1643-b39-local-config-copilot-only",
   "status": "complete",
-  "iteration": 3,
-  "created": "2026-11-06T21:08:50Z",
-  "updated": "2026-11-06T21:33:11Z",
+  "iteration": 10,
+  "created": "2026-11-20T17:45:00Z",
+  "updated": "2026-11-20T19:26:33Z",
   "shell": "sh",
   "checks": [
     {
@@ -26,36 +26,39 @@
   "tasks": [
     {
       "id": "T1",
-      "title": "Move the kit's it's repo fixtures and goldens under @REPO@, mapped back to it's repo at test time",
-      "goal": "The module proxy cannot zip v0.15.0-rc.2 because the copilot-acceptance kit commits 8 paths under a directory named `it's repo`, and Go rejects ' in a module file path. This task renames that directory to `@REPO@` in the committed tree, the way `@DIR@` stands for the temporary directory, while the kit's tests and gen.sh still create and check a real directory named `it's repo` at run time, because quoting that name is exactly what the fixture exists to test. It must land first: T2's repository test fails while any such path is tracked.",
-      "kind": "fix",
-      "fixtures": "1a0673fed0e502ba81b3a326f61bf401e388c991139ff9c885c36bd6051551d4",
+      "title": "Add the local config layer to resolution, with source local",
+      "goal": "A developer's own settings live in an untracked .vloop/config.local.toml that wins over the shared .vloop/config.toml, while a VLOOP_* variable still wins over both (L1). This task puts that layer into the config package's resolution, so every later task (config set --local, doctor's row, the run's guards) builds on one resolver. The checks are the repository's contract, so a [[check]] in the local file is refused wherever the config is read, never read.",
+      "kind": "feature",
+      "fixtures": "101cd15c4c367ac7916ac7bd87f822cd71cb7e180bd3a292d0ba72dce95d7b29",
       "references": [
         {
-          "path": "tools/copilot-acceptance/kit/probe_test.go",
-          "why": "`fixture` (the copy that must turn a path component @REPO@ into it's repo), `wantFiles` and the hook tests that compare hooks/vloop-fence.json in it's repo/.vloop/tmp/home against the goldens"
+          "path": "internal/config/config.go",
+          "why": "resolve, resolveList, readFile, SourceError, Get, List, Checks and ResolveRun's reads: the local layer goes into these, and no new read point is added"
         },
         {
-          "path": "tools/copilot-acceptance/kit/testdata/gen.sh",
-          "why": "writes the goldens, the hooks file under it's repo among them; it must now write them at their @REPO@ paths and its header must name d7b9cbb5 as the commit whose Python to take"
-        },
-        {
-          "path": "tools/copilot-acceptance/kit/testdata/probes/hook/copilot-argv.log",
-          "why": "the logged session's working directory is @DIR@/it's repo, so the copied fixture must still hold a directory of exactly that name; this file's bytes must not change"
+          "path": "internal/config/root.go",
+          "why": "FilePath, the shared file's repo-relative path with / on every OS; the local file's path belongs beside it, in the same form"
         },
         {
           "path": "docs/domain/domain-model.md",
-          "why": "S-4: a session writes nothing under .vloop/ (the old gate fixtures there are not this task's); P-8: the gate never runs the tests or gen.sh this task edits, so the kit's tests are the go check's to run"
+          "why": "C-1, config in the repository only and overridden by the environment: the local file is a second in-repo layer below the environment, never a global one"
+        },
+        {
+          "path": "docs/domain/platform/platform-context.md",
+          "why": "Configuration (the resolution order this extends) and CLI conventions: exit 1 on a problem, one 'vloop: ' line on stderr"
         }
       ],
       "depends_on": [],
       "acceptance": [
-        "No path under tools/copilot-acceptance/ holds the character ' (the gate checks the working tree with find).",
-        "The 8 files moved to probes/hook/@REPO@/.keep, probes/probe/@REPO@/.keep and golden/<case>/@REPO@/.vloop/tmp/home/hooks/vloop-fence.json for hook-forms, hook-forms-second-review, hook-fail-missing, hook-fail-exit1, hook-fail-notjson and hook-fail-timeout, with their bytes unchanged; every other file of tools/copilot-acceptance/kit/testdata/ except gen.sh keeps its path and its bytes. A golden whose bytes changed, or any other testdata/ file changed, is a violation.",
-        "The kit's `fixture` copy turns a path component @REPO@ into a directory named exactly `it's repo`, so the probes still run in `@DIR@/it's repo`; a kit test that no longer runs a probe in a directory named it's repo, or that stops asserting something it asserted before, is a violation.",
-        "The hooks file the kit writes, hooks/vloop-fence.json in it's repo/.vloop/tmp/home, is still compared byte for byte with the committed golden for each of the six hook cases (wantFiles and TestHookPhase map @REPO@ to it's repo or the reverse); the kit's tests in tools/copilot-acceptance/kit pass under the go check (`go test ./...`).",
-        "gen.sh, run on the Python of d7b9cbb5, writes the hooks goldens at their @REPO@ paths and its output equals the committed goldens (`diff -r` prints nothing); its header names d7b9cbb5 as the commit whose Python to take, in place of \"the base commit's\". The gate runs the starting point's gen.sh, not this one, so the review rules on the edited gen.sh from the diff.",
-        "The kit's commands, their output and the other fixtures do not change; nothing under .vloop/ is edited."
+        "Per key, the value is the VLOOP_<KEY> variable when set and not empty, else .vloop/config.local.toml when it sets the key, else .vloop/config.toml when it sets the key, else the default.",
+        "A list key takes the whole list of the layer that wins (never a merge of two files); an empty list (metrics.code = []) in either file sets nothing, so the next layer decides.",
+        "A value from the local file has source local: `agent.work=claude (local)` in config list, \"source\":\"local\" in config list --json and config get --json; the sources default, file and env keep their names. Violation: a key resolved from the local file whose source prints as file.",
+        "An empty local file, or one holding only keys vloop does not know, changes nothing and is no error.",
+        "A bad value or malformed TOML in the local file is reported like the shared file's, with the local path, exit 1: `vloop: .vloop/config.local.toml: invalid value \"nope\" for agent.work: want one of claude, copilot`.",
+        "A [[check]] in the local file is an error, exit 1, on every command that reads the config (config list and config get included), with exactly `vloop: .vloop/config.local.toml: [[check]] belongs in .vloop/config.toml — the checks are the repository's, not one machine's`. Violation: any path (Checks, the planner's check copy, doctor) that returns or runs a check defined in the local file.",
+        "The local file is read wherever and whenever .vloop/config.toml is read today, ResolveRun at a run's start included; no read point is added or moved. With no local file, every output is byte-identical to before.",
+        "The config package's committed tests cover, in temporary directories: the precedence of all four layers, the list rule and the empty list, source local, the local bad-value and malformed-TOML errors, and the [[check]] refusal; the go check runs them. A task that ships this behaviour and leaves no such test behind fails.",
+        "No new dependency: the TOML library in use stays the only one."
       ],
       "verify": "sh .vloop/state/gates/T1/gate.sh",
       "status": "done",
@@ -64,77 +67,284 @@
     },
     {
       "id": "T2",
-      "title": "Add release paths and TestRepositoryPaths: fail on any repository file path Go's module rules reject",
-      "goal": "Nothing before the tag looked at the module zip, so a path Go rejects reached a release. This task adds a function in tools/release that lists every tracked or untracked, not ignored, file with git and checks each with module.CheckFilePath from golang.org/x/mod v0.37.0, the `release paths` subcommand that prints its findings, and a test that runs it on this repository, so `go test ./...` (the go check, after every iteration of every run) fails the day such a path is added. It uses Go's own rules, never a hand-written list of characters, because those rules also cover cases (reserved Windows names) a copy would drift from.",
+      "title": "Add vloop config set --local, config path --local and the override notice",
+      "goal": "With the local layer resolving (T1), a developer needs to write it without editing TOML by hand, and to be told when a shared value they just set will not apply on their machine (L2). This task adds --local to config set and config path, and the one-line stderr notice config set prints when the local file or the environment still overrides the key it wrote. docs/guide/commands.md is generated from the commands and must be regenerated.",
       "kind": "feature",
-      "fixtures": "c3629c8d5f5208e80cbcaa8f30ec8fb2538f53970e12d1d6007b7dfa650317e3",
+      "fixtures": "8a9784110ca9f642e5826f3c8c4bef3f9cb4ebc927ed52ce94832427e8508e1f",
       "references": [
         {
-          "path": "tools/release/README.md",
-          "why": "gains a `## paths` section saying what paths prints and when it exits 1"
+          "path": "internal/cli/config.go",
+          "why": "config set and config path, their text output and the configErr mapping: --local extends these, and stdout stays silent for set"
         },
         {
-          "path": "docs/domain/domain-model.md",
-          "why": "P-7: the go check runs TestRepositoryPaths after every iteration, which is the guard this task exists to add; P-8: the gate only builds and runs the tool, never the tests this task writes"
+          "path": "internal/config/config.go",
+          "why": "Set and Keys: the local write validates exactly as Set does and preserves the file's other keys and layout as Set does for the shared file"
+        },
+        {
+          "path": "docs/domain/platform/platform-context.md",
+          "why": "CLI conventions: exit 2 on a usage error (unknown key, invalid value), one 'vloop: ' line on stderr"
         }
       ],
       "depends_on": [
         "T1"
       ],
       "acceptance": [
-        "A function in tools/release takes the directory as a parameter, lists files with `git -C <top directory> ls-files -z --cached --others --exclude-standard` and checks each path with `module.CheckFilePath` from golang.org/x/mod; it fails with one line `<path>: <the error CheckFilePath returns>` per rejected path, in the order git lists them. A check that skips untracked files, or a hand-written character rule in place of CheckFilePath, is a violation.",
-        "`release paths` prints those lines on stdout, then `release: the module zip rejects <n> path(s)` on stderr, exit 1; with none it prints nothing, exit 0; given any argument it prints `usage: release paths` on stderr, exit 2; when git fails it prints `release: <git's error on one line>` on stderr, exit 1. Paths are the top directory's even when started in a subdirectory.",
-        "The usage line of tools/release is exactly `usage: release notes <from> <to> | paths | prepare <version> [--dry-run] | publish <version> [--wait <duration>] [--dry-run]`, and the command's doc comment lists paths.",
-        "`TestPaths` in tools/release holds the four cases of the brief, each a fixture repository in a temporary directory addressed with git -C: a committed `it's repo/.keep` gives its line; an untracked, not ignored `a'b.txt` gives its line; the same a'b.txt listed in .gitignore gives no line; a fixture with only go.mod and x.go gives no line. No ' path is written into the repository's tree, and no test touches the network.",
-        "`TestRepositoryPaths` in tools/release runs the function on this repository and fails with the same lines; it skips, saying why, when `git rev-parse --show-toplevel` fails or the top directory's go.mod does not declare `module github.com/mvelosop/vloop`. It passes on this repository under the go check.",
-        "golang.org/x/mod is a direct requirement of the module at v0.37.0 and go.sum is what `go mod tidy` writes for it (the go check's `go mod tidy -diff` prints nothing).",
-        "tools/release/README.md has a `## paths` section saying what paths prints and when it exits 1. Nothing under .vloop/ is edited."
+        "vloop config set --local <key> <value> validates as config set does (exit 2 and the same message on an unknown key or an invalid value, nothing written) and writes the key into .vloop/config.local.toml, keeping the file's other keys, comments and layout.",
+        "config set --local creates the file (and .vloop/) only when it writes a value, and never creates .vloop/config.toml; '' removes the key; removing a key that is not there writes nothing and creates nothing.",
+        "Without --local, config set writes the shared file as today. When, after the write, the key's value still comes from the local file or the environment, it prints one line on stderr and exits 0: `! agent.work stays claude on this machine: .vloop/config.local.toml overrides it`, or `: VLOOP_AGENT_WORK overrides it`; when both override, the line names the variable. config set --local prints the variable's line when a VLOOP_* variable still overrides the key after its write. No notice when nothing overrides; stdout stays empty in every case.",
+        "vloop config path --local prints .vloop/config.local.toml; config path alone prints .vloop/config.toml.",
+        "docs/guide/commands.md is regenerated with go generate ./... and its existing test passes under the go check.",
+        "Committed tests cover set --local (write, layout kept, create only on a write, remove, absent remove, validation), each notice case and path --local; the go check runs them."
       ],
       "verify": "sh .vloop/state/gates/T2/gate.sh",
       "status": "done",
-      "attempts": 0,
+      "attempts": 1,
       "notes": ""
     },
     {
       "id": "T3",
-      "title": "Make release prepare refuse a module that does not zip, and retract v0.15.0-rc.2 in go.mod",
-      "goal": "Only the module proxy built the zip, after the tag was pushed, so the defect showed up at the public install. This task makes `release prepare` build the module zip of HEAD with zip.CreateFromVCS before anything is written, right after the \"main is not origin/main\" check and before the configured checks, so a release whose module does not zip is never opened. It also retracts v0.15.0-rc.2 in go.mod, written now so it is not forgotten though it only takes effect once v0.15.0 is out.",
+      "title": "Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight",
+      "goal": "A local file that git would commit is not local, and one that silently overrides shared values surprises its owner (L3, first half). This task makes vloop init and vloop upgrade keep .vloop/config.local.toml in .gitignore, adds doctor's config.local row (problem when tracked or not ignored, a warning naming the overridden keys), and makes vloop run's preflight refuse on those problems by name and print the warning, before anything runs. The driver's tree-clean refusal stays as it is; this refusal comes first and says why.",
       "kind": "feature",
-      "fixtures": "322e9e7330ed2ff756e8ab6e477b264eed400160d7757c320e29db8926e87ff0",
+      "fixtures": "c940415efb402be1d66892c84f46679e53bd7487b3b4ac9e95dfb4edccc2c25c",
       "references": [
         {
-          "path": "tools/release/prepare.go",
-          "why": "`prepareChecks`: the new check goes after \"main is not origin/main\" and before the configured checks; every other refusal and its order stay as they are"
+          "path": "internal/install/section.go",
+          "why": "IgnoreLine and MergeGitignore: the new line follows the same rules (added once, on a line of its own, nothing else changed)"
         },
         {
-          "path": "tools/release/prepare_test.go",
-          "why": "`TestPrepareRefusals` and its fixture repository (stub claude, a logging [[check]]), which the new refusal case extends"
+          "path": "internal/cli/init.go",
+          "why": "vloop init's .gitignore step, which must keep reporting as today"
         },
         {
-          "path": "tools/release/README.md",
-          "why": "the prepare paragraph's list of checks gains \"the module zip of `HEAD`\" between main clean and equal to origin and the config's checks"
+          "path": "internal/cli/upgrade.go",
+          "why": "vloop upgrade's .gitignore merge, extended the same way"
         },
         {
-          "path": "go.mod",
-          "why": "the existing retract and its comment, the style the v0.15.0-rc.2 retraction follows"
+          "path": "internal/cli/doctor.go",
+          "why": "runDoctor's rows and their order (the new row goes right after config, and is skipped when config is a problem, like doctor's other config rows); gitIgnored is built for directories and is not reused as it stands"
         },
         {
-          "path": "docs/domain/domain-model.md",
-          "why": "P-8: the gate builds and runs the tool in its own fixtures, never the tests this task writes"
+          "path": "internal/cli/run.go",
+          "why": "runPreflight: which rows fail a run and which warnings it prints, in the form '  ✗ name message' and '  ! name message'"
+        },
+        {
+          "path": "docs/domain/platform/platform-context.md",
+          "why": "CLI conventions: the refusal is exit 1 with one 'vloop: ' line"
         }
       ],
       "depends_on": [
         "T2"
       ],
       "acceptance": [
-        "`prepareChecks` builds the module zip of HEAD for the module path go.mod names and the version asked, with `zip.CreateFromVCS` from golang.org/x/mod v0.37.0, written to io.Discard, after \"main is not origin/main\" and before the configured checks; it writes nothing to the repository. A zip check that runs after the configured checks, or one that writes a file, is a violation.",
-        "When errors.As finds a zip.FileErrorList in the error, stderr holds one line `<path>: <error>` per rejected file with the path relative to the repository, then `release: the module zip rejects <n> path(s)`, exit 1; neither the configured checks nor `claude plugin validate` run after it, and the fixture's refs, HEAD and status are unchanged.",
-        "Any other error refuses with `release: the module does not zip: <the error on one line, every occurrence of the repository's absolute directory replaced by .>`, exit 1; in a linked worktree that is exactly `release: the module does not zip: create zip from version control system .: could not find a recognized version control system at \".\"`. A module that zips still passes `--dry-run`, which runs the check like every other.",
-        "`TestPrepareRefusals` in tools/release gains the case of a committed and pushed `it's repo/.keep`, made in a temporary directory, asserting both stderr lines, exit 1, and that the configured check and claude did not run; it passes under the go check.",
-        "go.mod ends with the existing retraction, a blank line, then `// v0.15.0-rc.2 holds file paths the module zip rejects and cannot be`, `// downloaded.`, `retract v0.15.0-rc.2`; `release prepare v0.15.0-rc.2 --dry-run` in this repository refuses with `release: v0.15.0-rc.2 is retracted in go.mod`, exit 1.",
-        "tools/release/README.md's prepare paragraph reads \"…`main` clean and equal to origin, the module zip of `HEAD`, the config's checks…\". `release publish` and every other refusal of prepare are unchanged; nothing under .vloop/ is edited."
+        "vloop init and vloop upgrade keep .vloop/config.local.toml in .gitignore on a line of its own, beside .vloop/tmp/, with that line's rules: added once, nothing else in the file changed, reported as today's .gitignore step. Earlier tests that pin the exact .gitignore change only to include the new line.",
+        "doctor's config.local row comes right after the config row: no row when there is no local file or when the config row is a problem; outside a git repository the ignore test is skipped.",
+        "Tracked (in git's index, ignored or not): `✗ config.local .vloop/config.local.toml is tracked by git — it is shared with everyone who clones: run git rm --cached .vloop/config.local.toml and add it to .gitignore`.",
+        "Untracked and not ignored as the driver's git sees it: `✗ config.local .vloop/config.local.toml is not git-ignored — the next git add -A would commit it: add it to .gitignore`. The test asks git about the file path itself, so any rule that covers it (a .vloop/*.local.toml pattern, the global excludes file) satisfies it.",
+        "Untracked and ignored: `! config.local overrides model.work, agent.work — on this machine only`, the keys with source local in config list's order; with none, `✓ config.local`.",
+        "vloop run's preflight counts either config.local problem like any other (exit 1, `vloop: preflight failed — N problem(s), nothing has run`, no session, no commit, no branch) and prints the warning; both on stderr with two spaces before the symbol.",
+        "Committed end-to-end tests in cmd/vloop, with stub agents on a temporary PATH and repositories in temporary directories (the pattern of cmd/vloop/e2e_test.go), cover each planted failure of the worked example: not ignored and tracked, in doctor and in the run's refusal; plus tests of the row's other cases. No test touches this repository's .vloop/ or .gitignore. The go check runs them."
       ],
       "verify": "sh .vloop/state/gates/T3/gate.sh",
+      "status": "done",
+      "attempts": 1,
+      "notes": ""
+    },
+    {
+      "id": "T4",
+      "title": "Keep sessions off the local file: the input guard and the fences",
+      "goal": "Sessions must not change the configuration the driver runs under, and an ignored file is exactly what the driver's tree checks do not see (L3, second half). This task makes the driver's input guard hold .vloop/config.local.toml as it holds .vloop/config.toml, adds the matching deny entries to every fence that denies the shared file, and records them in the fence audit. The Copilot hook already denies every write under .vloop/ but .vloop/tmp/ and does not change.",
+      "kind": "feature",
+      "fixtures": "eed325d2a45e3b84581061529127d22a3a6ed947446bc4e519232d46edd14f99",
+      "references": [
+        {
+          "path": "internal/driver/safety.go",
+          "why": "snapshotInputs: the files a session must leave alone and the driver puts back"
+        },
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "S-2 (the driver puts back the inputs a session changed) and S-4 (a session writes nothing under .vloop/ but .vloop/tmp/, which is why the Copilot hook needs no change)"
+        },
+        {
+          "path": "fence/work.json",
+          "why": "its deny entries Edit(.vloop/config.toml) and Write(.vloop/config.toml), which gain the local file's twins"
+        },
+        {
+          "path": "fence/review.json",
+          "why": "the same deny entries, extended the same way"
+        },
+        {
+          "path": "fence/verify.json",
+          "why": "the same deny entries, extended the same way"
+        },
+        {
+          "path": "fence/gate-review.json",
+          "why": "the same deny entries, extended the same way"
+        },
+        {
+          "path": "fence/review-brief.json",
+          "why": "the same deny entries, extended the same way"
+        },
+        {
+          "path": "docs/design-notes/fence-audit.md",
+          "why": "the rule-by-rule table: every fence rule has a row in its fence's section, so each new entry gets one, worded like its config.toml row"
+        }
+      ],
+      "depends_on": [
+        "T3"
+      ],
+      "acceptance": [
+        "The input guard holds .vloop/config.local.toml like .vloop/config.toml: a session that changes it, creates it or removes it has it put back (changed: original bytes; created: removed; removed: restored), after work and review sessions alike, as the guard does today for the shared file.",
+        "Each fence whose deny list names Edit(.vloop/config.toml) and Write(.vloop/config.toml) (work, review, verify, gate-review, review-brief) names Edit(.vloop/config.local.toml) and Write(.vloop/config.local.toml) the same way; fence/plan.json and the Copilot hook are unchanged.",
+        "docs/design-notes/fence-audit.md has a row for each new entry in each of those fences' sections, saying what enforces it as the config.toml row beside it does.",
+        "The open fence issues (#129, #130, #134, #136) are not touched, even in the fence files this task edits.",
+        "Violation: the local file staged or committed by any driver commit in a test run.",
+        "Committed tests cover the guard for the local file changed, created and removed (driver safety tests), and any existing test that enumerates the fences' rules or their audit rows passes with the new entries; the go check runs them."
+      ],
+      "verify": "sh .vloop/state/gates/T4/gate.sh",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T5",
+      "title": "Check Claude only where a session in use runs on it",
+      "goal": "A machine with no claude cannot run vloop today even when every session is on Copilot, because doctor's claude row and an untrusted-folder warning stop the run's preflight (L4). This task makes doctor's claude, trust, plugin and gate edits rows apply only when a session in use resolves to the claude agent, by the same rule copilotKeys already follows for Copilot, and n/a otherwise, so the run's preflight passes them. A config that cannot be read counts Claude as in use, so a broken config never hides a missing claude.",
+      "kind": "feature",
+      "fixtures": "ff4b523064d3258b18ece3d73a0889e68e760108d911df787101e7415c7236bc",
+      "references": [
+        {
+          "path": "internal/cli/doctor.go",
+          "why": "runDoctor's rows and order, doctorClaude, doctorTrusted, doctorPlugin, doctorGateEdits, and copilotKeys, whose rule for agent.verify (run.verify not false) and agent.second-review (run.second-review not off) this mirrors"
+        },
+        {
+          "path": "internal/cli/run.go",
+          "why": "runPreflight: the claude rows and the trust warning that fail a run today"
+        }
+      ],
+      "depends_on": [
+        "T3"
+      ],
+      "acceptance": [
+        "Claude is in use for vloop run when any of agent.plan, agent.gate-review, agent.work, agent.review resolves to claude, or agent.verify does while run.verify is not false, or agent.second-review does while run.second-review is not off; for vloop doctor the same, or agent.review-brief resolves to claude.",
+        "When the config row is a problem, Claude counts as in use and the four rows run as today.",
+        "When Claude is in use the claude, trust, plugin and gate edits rows are exactly as today. When it is not, each is n/a with the message `no session in use runs on claude` (`- claude no session in use runs on claude`, and the same for trust, plugin and gate edits), runs nothing (no claude --version, no plugin list) and reads nothing (no ~/.claude.json, no settings file); vloop run's preflight passes them.",
+        "Violation: a Claude row skipped on a repository where some session in use is on Claude, or a Claude row still run when none is.",
+        "vloop brief review's preflight is unchanged. Earlier doctor tests change only where they pin rows for Claude not in use.",
+        "A committed end-to-end test in cmd/vloop, on a temporary PATH holding a stub copilot and no claude, every agent.* key copilot with a Copilot model id and run.verify = false, asserts each of the four n/a lines on its own (not as one block) and that vloop run gets past its preflight; with agent.review set back to claude it asserts `✗ claude claude is not on PATH` and the preflight's refusal. No test depends on what is installed on the machine. The go check runs it."
+      ],
+      "verify": "sh .vloop/state/gates/T5/gate.sh",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T6",
+      "title": "Price a Copilot credit at GitHub's $0.01 by default",
+      "goal": "Copilot's estimated cost uses 0.0066667 dollars a credit, Copilot Pro's average, while GitHub now prices one AI credit at $0.01 on every plan (L5). This task moves the default of copilot.credit-usd to 0.01 and updates every place that states the default, while records of what already happened keep their numbers. A developer whose plan makes credits cheaper sets their own, now possible per machine in the local file.",
+      "kind": "feature",
+      "fixtures": "5c2a2bca75e13fad59b51d42bd7a604d55e0afc1afe1b9da3e292ff7793afe72",
+      "references": [
+        {
+          "path": "internal/config/config.go",
+          "why": "the copilot.credit-usd key: its default changes, its validation (a number greater than 0) does not"
+        },
+        {
+          "path": "docs/guide/configuration.md",
+          "why": "the key table's copilot.credit-usd row, whose default and description change"
+        },
+        {
+          "path": "cmd/vloop/e2e_test.go",
+          "why": "TestWorkedExampleEnglishSession pins the full config list output, the default included"
+        }
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "acceptance": [
+        "copilot.credit-usd defaults to 0.01: `vloop config get copilot.credit-usd` prints 0.01 with no file setting it, and config list shows `copilot.credit-usd=0.01 (default)`. Its validation is unchanged.",
+        "The configuration guide's row has default `0.01` and says: dollars per GitHub Copilot AI credit; GitHub's price is $0.01 on every plan; a developer whose plan makes included credits cheaper sets their own in the local file.",
+        "Every test that pins the default (the expected config list in internal/config, internal/cli and cmd/vloop/e2e_test.go) is changed to 0.01 and nothing else in it changes; the go check runs them.",
+        "Violation: 0.0066667 left anywhere a default is stated, outside the files that record or quote what already happened (docs/briefs/, .vloop/state/, docs/design-notes/), which keep it.",
+        "No session record is recomputed."
+      ],
+      "verify": "sh .vloop/state/gates/T6/gate.sh",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T7",
+      "title": "Document the local file, Claude only where used, and the credit price",
+      "goal": "The behaviour of T1–T6 has to be findable where a developer looks: the configuration guide, the domain's C-1, the platform context, the concepts guide, the README's Copilot section and the roadmap's inherited decisions. This task writes those passages and nothing else; the generated commands guide is already T2's. If its review fails twice on wording alone, it is blocked and the operator finishes it.",
+      "kind": "docs",
+      "fixtures": "741e5af015778e69e10f292d6f5e69afe01130d4edd11f72d254b5c3be8dc834",
+      "references": [
+        {
+          "path": "docs/guide/configuration.md",
+          "why": "the resolution paragraph and a short section on the local file (L1–L3, [[check]] excluded, the ignore line, the refusal, the warning) and the config set --local example"
+        },
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "C-1's sentence is rewritten to name the order environment, local file, shared file, default"
+        },
+        {
+          "path": "docs/domain/platform/platform-context.md",
+          "why": "its Configuration section states the same order"
+        },
+        {
+          "path": "docs/guide/concepts.md",
+          "why": "where it lists what init writes to .gitignore and what is git-ignored, and its vloop doctor paragraph (the claude, trust, plugin and gate edits rows apply when a session in use runs on Claude, n/a otherwise)"
+        },
+        {
+          "path": "README.md",
+          "why": "the Copilot section's Overriding locally bullet and requirements bullet, and the Prerequisites' claude and workspace-trust bullets; the README's 200-line cap"
+        },
+        {
+          "path": "docs/design-notes/vloop-roadmap.md",
+          "why": "\"Decisions every brief in the series inherits\": the Config lives in the repo only line is amended to name the local file and its place in the order"
+        }
+      ],
+      "depends_on": [
+        "T4",
+        "T5",
+        "T6"
+      ],
+      "acceptance": [
+        "docs/guide/configuration.md: the resolution paragraph names .vloop/config.local.toml in the order environment, local file, shared file, default; a short section covers the local file (any key but [[check]], config set --local and config path --local, the ignore line, the run's refusal, doctor's warning); the config set --local example is there.",
+        "docs/domain/domain-model.md C-1 and docs/domain/platform/platform-context.md Configuration state the order environment, local file, shared file, default.",
+        "docs/guide/concepts.md names the new .gitignore line where it lists what init writes and what is git-ignored, and its vloop doctor paragraph says the claude, workspace trust, plugin and gate edits rows apply when a session in use runs on Claude and are n/a otherwise.",
+        "README.md: the Copilot section's Overriding locally bullet names .vloop/config.local.toml and vloop config set --local in place of the environment variables; the requirements bullet no longer says vloop run still needs claude on PATH when every session is on Copilot; the Prerequisites' claude and workspace-trust bullets say they apply when a session runs on Claude; the README stays at or under 200 lines (its test, under the go check, passes).",
+        "docs/design-notes/vloop-roadmap.md's Config lives in the repo only line names the local file and its place in the order.",
+        "No passage contradicts the behaviour shipped in T1–T6 (exact messages quoted match the worked example); docs under docs/briefs/ and the other design notes are untouched."
+      ],
+      "verify": "sh .vloop/state/gates/T7/gate.sh",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T8",
+      "title": "Close: the worked example line for line, and every gate at once",
+      "goal": "Each earlier task was judged on its own; this one proves the brief's worked example holds as written, in its order, with everything in place, and leaves it behind as a committed end-to-end test. It also runs every earlier gate together. A discrepancy it finds is fixed here, in the product, never by changing what the worked example says.",
+      "kind": "test",
+      "fixtures": "3ef831fde21e7ecb79915915008b4185bf10dd998fe2d192366fee0f6c30827b",
+      "references": [
+        {
+          "path": "cmd/vloop/e2e_test.go",
+          "why": "the pattern the end-to-end tests follow: the built binary, a scratch repository, exact stdout, stderr and exit code per line"
+        }
+      ],
+      "depends_on": [
+        "T7"
+      ],
+      "acceptance": [
+        "A committed end-to-end test in cmd/vloop walks the worked example's first block in order, in a fresh repository in a temporary directory (vloop init, a [[check]] added): each line's stdout, stderr and exit code exactly as the brief gives them, through the last `✓ config.local`; and config get copilot.credit-usd printing 0.01. The go check runs it.",
+        "Together with the tests T3 and T5 left, every block of the worked example is covered by an end-to-end test: the local-file block, each planted failure (the run refusal included) and the Claude-not-in-use block.",
+        "Every earlier task's gate passes in the same tree.",
+        "Any fix this task makes is to the product or its tests; no expected line of the worked example is changed to match the product."
+      ],
+      "verify": "sh .vloop/state/gates/T8/gate.sh",
       "status": "done",
       "attempts": 0,
       "notes": ""

@@ -1,8 +1,9 @@
 # Configuration guide
 
 vloop's settings are per repository, in `.vloop/config.toml` under the repo root.
-Nothing is read from your home directory. An environment variable overrides the
-file, and the file overrides the default. `vloop config list` shows every key
+Nothing is read from your home directory. Each key resolves as: environment
+variable, else `.vloop/config.local.toml`, else `.vloop/config.toml`, else the
+default. `vloop config list` shows every key
 with its value and where it came from; `vloop config set <key> <value>` writes
 one (`''` removes it); `vloop config get <key>` prints one.
 
@@ -39,7 +40,7 @@ environment and in `config set`.
 | `agent.gate-review` | `claude` | `claude`, `copilot` (experimental) | `VLOOP_AGENT_GATE_REVIEW` | agent CLI of the gate-review session |
 | `agent.verify` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_VERIFY` | agent CLI of the verify session (`copilot` is experimental) |
 | `agent.review-brief` | `claude` | `claude`, `copilot` | `VLOOP_AGENT_REVIEW_BRIEF` | agent CLI of the session `vloop brief review` runs |
-| `copilot.credit-usd` | `0.0066667` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot credit, for the estimated cost of a copilot session |
+| `copilot.credit-usd` | `0.01` | a number greater than 0 | `VLOOP_COPILOT_CREDIT_USD` | dollars per GitHub Copilot AI credit; GitHub's price is $0.01 on every plan; a developer whose plan makes included credits cheaper sets their own in the local file |
 | `shell` | `sh` (`pwsh` on Windows) | `sh`, `bash`, `pwsh`, `powershell`, `cmd` | `VLOOP_SHELL` | shell `vloop task gate` runs a verify command in |
 | `areas` | unset | a list of names of lower-case letters, digits and hyphens | `VLOOP_AREAS` | the names a task's `area` may take; when set, `vloop task validate` reports any other |
 | `metrics.stacks` | unset | a list of preset names (below) | `VLOOP_METRICS_STACKS` | presets that classify changed lines as code, test, docs or excluded |
@@ -64,6 +65,30 @@ environment and in `config set`.
 **Copilot plan, work, review, verify and gate-review sessions are experimental.** `agent.plan = "copilot"` runs the plan session, `agent.work = "copilot"` runs the work sessions, and `agent.review = "copilot"` (or `agent.second-review`) the review sessions, and `agent.verify = "copilot"` the verify session, and `agent.gate-review = "copilot"` the gate-review session, on the GitHub Copilot CLI. Every Copilot session runs under the fence hook, and the adapter's deny list is also on its command line. `vloop doctor` and `vloop run` warn `! agent.review is copilot: experimental (docs/guide/configuration.md)` (and `! agent.plan is copilot: experimental (docs/guide/configuration.md)` for the plan session, the same for `agent.work`, `agent.gate-review`, `agent.second-review` and `agent.verify`, the last only while `run.verify` is not `false`; `agent.plan` and `agent.gate-review` have no switch, so they warn whenever they are `copilot`, also on a resume that will not plan), check that `copilot` is on PATH and that `copilot --version` runs, and that a GitHub login reaches Copilot sessions (a Copilot session logs in through `COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, set and not empty, else `gh auth token`: run `gh auth login`; an interactive `/login` does not reach vloop's sessions; the token is never printed or kept). `vloop run` refuses to start while `model.work` (or `model.plan`, `model.gate-review`, `model.review`, `model.second-review` or `model.verify`, when that agent is in use) is still the default (`sonnet`; for `model.plan`, `opus`), a Claude alias: `agent.work is copilot but model.work is the default "sonnet", a Claude alias: set model.work to a Copilot model id` (`agent.verify is copilot but model.verify is the default "sonnet", a Claude alias: set model.verify to a Copilot model id` for the verify session; `agent.gate-review is copilot but model.gate-review is the default "sonnet", a Claude alias: set model.gate-review to a Copilot model id` for the gate-review session; `agent.plan is copilot but model.plan is the default "opus", a Claude alias: set model.plan to a Copilot model id` for the plan session). A plan session that exits non-zero halts with `planning session failed (copilot exited <code>) — see <run folder>`.
 
 **`agent.review-brief = "copilot"` is experimental too, and is read by `vloop brief review`, not by `vloop run`.** `vloop brief review <brief>` warns `! agent.review-brief is copilot: experimental (docs/guide/configuration.md)` and refuses, with nothing run, when `copilot` is not on PATH, when a project skill has the name of a plugin skill, when no GitHub login reaches Copilot (`agent.review-brief is copilot but no GitHub login reaches its sessions: set COPILOT_GITHUB_TOKEN, GH_TOKEN or GITHUB_TOKEN, or run gh auth login`) and while `model.review-brief` is still the default (`agent.review-brief is copilot but model.review-brief is the default "opus", a Claude alias: set model.review-brief to a Copilot model id`). `vloop run` ignores the key.
+
+### The local file
+
+`.vloop/config.local.toml` is your own, untracked layer: the same format and keys as
+`.vloop/config.toml`, any key but `[[check]]` (the checks are the repository's; a
+`[[check]]` there is exit 1: `vloop: .vloop/config.local.toml: [[check]] belongs in
+.vloop/config.toml — the checks are the repository's, not one machine's`). It wins
+over the shared file and loses to the environment; a list key is replaced, not
+merged. `vloop config list` and `--json` show its values with source `local`.
+
+```
+vloop config set --local agent.work claude
+vloop config set --local model.work sonnet
+vloop config path --local        # .vloop/config.local.toml
+```
+
+`config set --local` writes only that file (`''` removes a key). `config set` without
+`--local` prints `! model.work stays sonnet on this machine: .vloop/config.local.toml
+overrides it` on stderr when the local file (or a `VLOOP_*` variable) still decides the key.
+
+`vloop init` and `vloop upgrade` add `.vloop/config.local.toml` to `.gitignore`. `vloop
+run` refuses, and `vloop doctor` shows `✗ config.local`, while the file is tracked or
+not git-ignored; when it overrides keys, both warn `! config.local overrides model.work,
+agent.work — on this machine only`. A session cannot change it: the driver puts it back.
 
 ### Copilot model ids
 

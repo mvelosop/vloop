@@ -97,16 +97,20 @@ vloop config list
 Show the config file path, relative to the repo root
 
 ```
-vloop config path
+vloop config path [flags]
 ```
+
+- `--local`: show the local file's path instead
 
 ## vloop config set
 
-Set one key in .vloop/config.toml: any key config list shows ('' removes it)
+Set any key config list shows, in .vloop/config.toml or with --local in .vloop/config.local.toml ('' removes it)
 
 ```
-vloop config set <key> <value>
+vloop config set <key> <value> [flags]
 ```
+
+- `--local`: write .vloop/config.local.toml, this machine's overrides, instead of the shared file
 
 ## vloop defect
 

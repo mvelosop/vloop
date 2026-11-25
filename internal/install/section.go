@@ -60,17 +60,32 @@ func MergeClaudeMD(existing []byte, exists bool, version string) []byte {
 	return []byte(s + sec)
 }
 
-// MergeGitignore returns .gitignore holding IgnoreLine once, on a line of its
-// own, changing nothing else.
+// LocalIgnoreLine is the .gitignore line the per-machine config file needs.
+const LocalIgnoreLine = ".vloop/config.local.toml"
+
+// MergeGitignore returns .gitignore holding IgnoreLine and LocalIgnoreLine
+// once each, on lines of their own, changing nothing else.
 func MergeGitignore(existing []byte) (out []byte, changed bool) {
-	for _, l := range strings.Split(string(existing), "\n") {
-		if strings.TrimSpace(l) == IgnoreLine {
-			return existing, false
-		}
-	}
 	out = bytes.Clone(existing)
-	if len(out) > 0 && out[len(out)-1] != '\n' {
-		out = append(out, '\n')
+	for _, want := range []string{LocalIgnoreLine, IgnoreLine} {
+		found := false
+		for _, l := range strings.Split(string(out), "\n") {
+			if strings.TrimSpace(l) == want {
+				found = true
+				break
+			}
+		}
+		if found {
+			continue
+		}
+		if len(out) > 0 && out[len(out)-1] != '\n' {
+			out = append(out, '\n')
+		}
+		out = append(out, want+"\n"...)
+		changed = true
 	}
-	return append(out, IgnoreLine+"\n"...), true
+	if !changed {
+		return existing, false
+	}
+	return out, true
 }

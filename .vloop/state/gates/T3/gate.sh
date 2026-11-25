@@ -1,81 +1,187 @@
 #!/bin/sh
-# Gate T3 — Z3 and Z4: `release prepare` refuses a module that does not zip,
-# after "main is not origin/main" and before the configured checks, writing
-# nothing; and go.mod retracts v0.15.0-rc.2. Through the release tool built
-# from this tree, in fixture repositories made here under $t, with stub claude
-# and gh on PATH and a [[check]] that leaves a marker when it runs.
+# Gate T3 — L3, first half: the ignore line that vloop init and vloop upgrade
+# keep, doctor's config.local row, and vloop run's preflight refusal and
+# warning. Judged through those commands on fixture repositories, with a stub
+# claude first on PATH and a fake home that trusts the run repositories.
 G=.vloop/state/gates/T3
 . "$G/lib.sh"
-buildrel
+L=.vloop/config.local.toml
+NOTIGN="✗ config.local .vloop/config.local.toml is not git-ignored $EMDASH the next git add -A would commit it: add it to .gitignore"
+TRACKED="✗ config.local .vloop/config.local.toml is tracked by git $EMDASH it is shared with everyone who clones: run git rm --cached .vloop/config.local.toml and add it to .gitignore"
 
-mkdir -p "$t/bin" || fail mkdir
-for c in claude gh; do
-  printf '#!/bin/sh\necho "$*" >>"%s/%s.ran"\nexit 0\n' "$t" "$c" >"$t/bin/$c" && chmod +x "$t/bin/$c" || fail "stub $c"
-done
-PATH="$t/bin:$PATH"; export PATH
-
-# prepmod NAME: newmod NAME with a .vloop/config.toml whose one check leaves
-# $t/check.ran, committed, and an origin with main pushed.
-prepmod() {
-  newmod "$1"
-  mkdir -p "$F/.vloop" && printf '[[check]]\nname = "marker"\npaths = ["**"]\nrun = "touch %s/check.ran"\n' "$t" >"$F/.vloop/config.toml" ||
-    fail "config in $1"
-  commitall "$F" config
-}
-# norun WHAT: neither the configured check nor claude nor gh ran.
-norun() {
-  for m in check claude gh; do
-    [ ! -e "$t/$m.ran" ] || fail "$1: $m ran after the refusal"
+# lines2 FILE: FILE holds .vloop/tmp/ and .vloop/config.local.toml, each on
+# exactly one line of its own.
+lines2() {
+  for l in .vloop/tmp/ .vloop/config.local.toml; do
+    [ "$(grep -cxF -- "$l" "$1")" = 1 ] || fail "$2: $l is not on exactly one line of .gitignore:
+$(cat "$1")"
   done
 }
-# snapshot DIR FILE: DIR's refs, status and HEAD, in FILE.
-snapshot() {
-  { git -C "$1" for-each-ref --format='%(refname) %(objectname)'; git -C "$1" status --porcelain; git -C "$1" rev-parse HEAD; } >"$2" ||
-    fail "snapshot $1"
+
+# 1. vloop init: a fresh repository, one with a .gitignore of its own, one
+#    whose .gitignore already holds both lines.
+newrepo i1
+runin "$R" init
+wantrc "vloop init" 0
+lines2 "$R/.gitignore" "vloop init"
+newrepo i2
+printf 'node_modules/\n' >"$R/.gitignore" && commitall "$R" ignore
+runin "$R" init
+wantrc "vloop init with a .gitignore" 0
+lines2 "$R/.gitignore" "vloop init with a .gitignore"
+[ "$(head -n 1 "$R/.gitignore")" = node_modules/ ] && [ "$(wc -l <"$R/.gitignore" | tr -d ' ')" = 3 ] ||
+  fail "vloop init changed more than the two lines of .gitignore:
+$(cat "$R/.gitignore")"
+newrepo i3
+printf '.vloop/config.local.toml\n.vloop/tmp/\n' >"$R/.gitignore" && commitall "$R" ignore
+cp "$R/.gitignore" "$t/before"
+runin "$R" init
+wantrc "vloop init with both lines already" 0
+cmp -s "$t/before" "$R/.gitignore" || fail "vloop init changed a .gitignore that held both lines:
+$(cat "$R/.gitignore")"
+
+# 2. vloop upgrade from an older stamp puts the line back, once.
+newrepo u
+runin "$R" init
+wantrc "vloop init (for upgrade)" 0
+python3 -I -c 'import json,sys
+p=sys.argv[1]; d=json.load(open(p)); d["version"]="0.1.0"; json.dump(d, open(p,"w"))' "$R/.vloop/install.json" ||
+  fail "rewrite the install stamp"
+printf '.vloop/tmp/\n' >"$R/.gitignore"
+commitall "$R" "an older setup"
+runin "$R" upgrade --yes
+wantrc "vloop upgrade --yes" 0
+lines2 "$R/.gitignore" "vloop upgrade"
+[ "$(wc -l <"$R/.gitignore" | tr -d ' ')" = 2 ] || fail "vloop upgrade changed more than the line:
+$(cat "$R/.gitignore")"
+
+# 3. doctor's config.local row.
+initrepo d
+D=$R
+printf '.vloop/tmp/\n.vloop/config.local.toml\n' >"$D/.gitignore" && commitall "$D" ignore
+runin "$D" doctor
+rows config.local "$t/out" >"$t/rows"
+[ ! -s "$t/rows" ] || fail "doctor with no local file printed a config.local row:
+$(cat "$t/rows")"
+
+printf '[agent]\nwork = "claude"\n\n[model]\nwork = "sonnet"\n' >"$D/$L"
+runin "$D" doctor
+rows config.local "$t/out" >"$t/rows"
+lit "$t/w" "! config.local overrides model.work, agent.work $EMDASH on this machine only"
+cmp -s "$t/rows" "$t/w" || fail "doctor with an ignored local file overriding two keys: config.local rows
+$(cat "$t/rows")
+want
+$(cat "$t/w")
+doctor printed:
+$(cat "$t/out")"
+awk -v w="$(cat "$t/w")" '$0 == w { print prev; exit } { prev = $0 }' "$t/out" >"$t/prev"
+[ "$(cat "$t/prev")" = "✓ config" ] || fail "the config.local row does not come right after ✓ config:
+$(cat "$t/out")"
+
+: >"$D/$L"
+runin "$D" doctor
+rows config.local "$t/out" >"$t/rows"
+lit "$t/w" "✓ config.local"
+cmp -s "$t/rows" "$t/w" || fail "doctor with an empty ignored local file: config.local rows
+$(cat "$t/rows")
+want ✓ config.local"
+
+printf '[agent]\nwork = "claude"\n' >"$D/$L"
+printf '.vloop/tmp/\n' >"$D/.gitignore"
+runin "$D" doctor
+rows config.local "$t/out" >"$t/rows"
+lit "$t/w" "$NOTIGN"
+cmp -s "$t/rows" "$t/w" || fail "doctor with a local file git does not ignore: config.local rows
+$(cat "$t/rows")
+want
+$(cat "$t/w")"
+
+printf '.vloop/tmp/\n.vloop/*.local.toml\n' >"$D/.gitignore"
+runin "$D" doctor
+rows config.local "$t/out" >"$t/rows"
+lit "$t/w" "! config.local overrides agent.work $EMDASH on this machine only"
+cmp -s "$t/rows" "$t/w" || fail "doctor with the local file ignored by a pattern: config.local rows
+$(cat "$t/rows")
+want
+$(cat "$t/w")"
+
+printf 'agent.work = "nope"\n' >"$D/$L"
+runin "$D" doctor
+rows config.local "$t/out" >"$t/rows"
+[ ! -s "$t/rows" ] || fail "doctor with an unreadable local file printed a config.local row:
+$(cat "$t/rows")"
+grep -q '^✗ config ' "$t/out" || fail "doctor with an unreadable local file has no ✗ config row:
+$(cat "$t/out")"
+
+printf '.vloop/tmp/\n.vloop/config.local.toml\n' >"$D/.gitignore"
+printf '[agent]\nwork = "claude"\n' >"$D/$L"
+git -C "$D" add -f "$L" .gitignore && git -C "$D" commit -q -m "share the local file" || fail commit
+runin "$D" doctor
+rows config.local "$t/out" >"$t/rows"
+lit "$t/w" "$TRACKED"
+cmp -s "$t/rows" "$t/w" || fail "doctor with a tracked local file: config.local rows
+$(cat "$t/rows")
+want
+$(cat "$t/w")"
+
+# Not a git repository: the ignore test is skipped.
+N=$t/plain
+mkdir -p "$N/.vloop" && printf '%s' "$CHECKCFG" >"$N/.vloop/config.toml" && printf '[agent]\nwork = "claude"\n' >"$N/$L" ||
+  fail "the plain folder"
+runin "$N" doctor
+rows config.local "$t/out" >"$t/rows"
+lit "$t/w" "! config.local overrides agent.work $EMDASH on this machine only"
+cmp -s "$t/rows" "$t/w" || fail "doctor outside git: config.local rows
+$(cat "$t/rows")
+want
+$(cat "$t/w")"
+
+# 4. vloop run's preflight. Each repository is trusted, the stub claude plays
+#    no session script, so a run that gets past its preflight halts in planning.
+# runrepo NAME IGNORE: initrepo NAME with .gitignore IGNORE committed and the
+# directory trusted; sets R.
+runrepo() {
+  initrepo "$1"
+  printf '%s' "$2" >"$R/.gitignore" && commitall "$R" ignore
+  trust "$R"
 }
 
-# A module that zips: --dry-run passes, and the checks after the zip still run.
-prepmod good
-withorigin
-runin "$F" prepare v0.1.0 --dry-run
-[ "$rc" = 0 ] || fail "prepare v0.1.0 --dry-run on a module that zips: exit $rc, want 0
-stderr:
+# Ignored and overriding: preflight passes, with the warning.
+runrepo r0 '.vloop/tmp/
+.vloop/config.local.toml
+'
+printf '[agent]\nwork = "claude"\n' >"$R/$L"
+runin "$R" run "$BRIEF"
+! grep -q 'preflight failed' "$t/err" || fail "vloop run with an ignored local file failed its preflight:
 $(cat "$t/err")"
-[ "$(head -n 1 "$t/out")" = "dry run: every check passed for v0.1.0; nothing written" ] ||
-  fail "prepare --dry-run on a module that zips: stdout $(cat "$t/out")"
-[ -e "$t/check.ran" ] && [ -e "$t/claude.ran" ] || fail "prepare --dry-run on a module that zips did not run the check and claude plugin validate"
-rm -f "$t/check.ran" "$t/claude.ran" "$t/gh.ran"
+hasline "vloop run with an ignored local file overriding agent.work (stderr)" "$t/err" \
+  "  ! config.local overrides agent.work $EMDASH on this machine only"
 
-# The same module from a linked worktree: CreateFromVCS finds no .git directory.
-git -C "$F" worktree add -q --force "$t/wt" main 2>"$t/wt.err" || fail "git worktree add: $(cat "$t/wt.err")"
-runin "$t/wt" prepare v0.1.0 --dry-run
-want "prepare --dry-run in a linked worktree" 1 /dev/null "$G/worktree.err"
-norun "prepare in a linked worktree"
+# Not ignored: refused by name, one problem, no session.
+runrepo r1 '.vloop/tmp/
+'
+printf '[agent]\nwork = "claude"\n' >"$R/$L"
+: >"$t/stub/claude.log"
+head=$(git -C "$R" rev-parse HEAD)
+runin "$R" run "$BRIEF"
+wantrc "vloop run with a local file git does not ignore" 1
+hasline "vloop run, not ignored (stderr)" "$t/err" "  $NOTIGN"
+hasline "vloop run, not ignored (stderr)" "$t/err" "vloop: preflight failed $EMDASH 1 problem(s), nothing has run"
+! grep -q '/vloop:' "$t/stub/claude.log" || fail "vloop run refused but a session ran"
+[ "$(git -C "$R" rev-parse HEAD)" = "$head" ] && [ "$(git -C "$R" rev-parse --abbrev-ref HEAD)" = main ] ||
+  fail "the refused run moved HEAD or the branch"
 
-# A committed and pushed it's repo/.keep: one line per rejected file, the count, exit 1.
-prepmod bad
-mkdir -p "$F/it's repo" && : >"$F/it's repo/.keep" || fail "fixture bad"
-commitall "$F" keep
-withorigin
-snapshot "$F" "$t/before"
-runin "$F" prepare v0.1.0 --dry-run
-want "prepare v0.1.0 --dry-run with a committed it's repo/.keep" 1 /dev/null "$G/zip.err"
-norun "prepare on a module that does not zip"
-snapshot "$F" "$t/after"
-cmp -s "$t/before" "$t/after" || fail "prepare changed the fixture's refs, status or HEAD:
-$(diff "$t/before" "$t/after")"
-
-# The zip check comes after "main is not origin/main".
-printf 'x\n' >"$F/later.txt" && commitall "$F" later
-runin "$F" prepare v0.1.0 --dry-run
-want "prepare with an unpushed commit and a rejected path" 1 /dev/null "$G/notorigin.err"
-norun "prepare with an unpushed commit"
-
-# Z4: go.mod ends with the existing retraction, then v0.15.0-rc.2's.
-tail -n 7 go.mod >"$t/tail" || fail "read go.mod"
-cmp -s "$t/tail" "$G/gomod.tail" || fail "go.mod does not end with the retraction of v0.15.0-rc.2:
-$(cat "$t/tail")"
-runin "$top" prepare v0.15.0-rc.2 --dry-run
-want "prepare v0.15.0-rc.2 --dry-run in this repository" 1 /dev/null "$G/retracted.err"
+# Tracked: refused by name, one problem.
+runrepo r2 '.vloop/tmp/
+.vloop/config.local.toml
+'
+printf '[agent]\nwork = "claude"\n' >"$R/$L"
+git -C "$R" add -f "$L" && git -C "$R" commit -q -m "share the local file" || fail commit
+: >"$t/stub/claude.log"
+runin "$R" run "$BRIEF"
+wantrc "vloop run with a tracked local file" 1
+hasline "vloop run, tracked (stderr)" "$t/err" "  $TRACKED"
+hasline "vloop run, tracked (stderr)" "$t/err" "vloop: preflight failed $EMDASH 1 problem(s), nothing has run"
+! grep -q '/vloop:' "$t/stub/claude.log" || fail "vloop run refused but a session ran"
 
 echo "gate T3: ok"

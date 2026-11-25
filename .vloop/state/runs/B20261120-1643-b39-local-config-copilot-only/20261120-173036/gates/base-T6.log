@@ -1,0 +1,5 @@
+GATE FAIL: config get copilot.credit-usd with no file: stdout differs.
+got:
+0.0066667
+want:
+0.01

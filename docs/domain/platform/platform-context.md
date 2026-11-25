@@ -14,8 +14,9 @@ on every OS (C-2).
 
 ## Configuration
 
-`.vloop/config.toml`, in the repo only (C-1). Each key resolves as the
-`VLOOP_<KEY>` environment variable, else the file, else the default;
+`.vloop/config.toml` and the untracked `.vloop/config.local.toml`, in the repo
+only (C-1). Each key resolves as the `VLOOP_<KEY>` environment variable, else
+the local file, else the shared file, else the default;
 `vloop config list` shows each value with its source. The keys, defaults and
 valid values: [`docs/guide/configuration.md`](../../guide/configuration.md).
 

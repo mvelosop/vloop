@@ -1,1 +1,0 @@
-usage: release notes <from> <to> | paths | prepare <version> [--dry-run] | publish <version> [--wait <duration>] [--dry-run]

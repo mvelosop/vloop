@@ -110,10 +110,17 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 	}
 
 	if cerr == nil {
+		doctorConfigLocal(root, vals, isRepo, add)
 		doctorConfig(root, vals, isRepo, add)
 	}
 
-	hasClaude := doctorClaude(add)
+	claudeUsed := cerr != nil || claudeInUse(root, runBrief == nil)
+	hasClaude := false
+	if claudeUsed {
+		hasClaude = doctorClaude(add)
+	} else {
+		add("claude", resNA, claudeNotInUse)
+	}
 
 	copilotRow, copilotBad := false, false
 	if cerr == nil {
@@ -129,7 +136,9 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 		}
 	}
 
-	if doctorTrusted(root) {
+	if !claudeUsed {
+		add("trust", resNA, claudeNotInUse)
+	} else if doctorTrusted(root) {
 		add("trust", resPass, "")
 	} else {
 		add("trust", resWarning, "this folder is not marked trusted in the Claude settings — run claude here once and accept the trust dialog")
@@ -138,7 +147,9 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 	plan, hasPlan := doctorPlan(root)
 	doctorPlanShell(root, plan, hasPlan, runBrief, vals, isRepo, add)
 
-	if !hasClaude {
+	if !claudeUsed {
+		add("plugin", resNA, claudeNotInUse)
+	} else if !hasClaude {
 		add("plugin", resNA, "")
 	} else {
 		add(doctorPlugin(b, root))
@@ -151,7 +162,9 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 			add(doctorCopilotPlugin(b, root))
 		}
 	}
-	if !hasClaude {
+	if !claudeUsed {
+		add("gate edits", resNA, claudeNotInUse)
+	} else if !hasClaude {
 		add("gate edits", resNA, "")
 	} else {
 		add(doctorGateEdits(root))
@@ -187,6 +200,36 @@ func doctorInstall(b Build, root string, add func(name, result, msg string)) {
 			add("install", resWarning, fmt.Sprintf("set up by vloop %s, this binary is %s — run vloop upgrade", stamp.Version, b.Version))
 		}
 	}
+}
+
+// doctorConfigLocal adds the config.local row: nothing without a local file; a
+// problem when git tracks it or would commit it; else a warning naming the keys
+// it overrides, or a pass when it overrides none.
+func doctorConfigLocal(root string, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
+	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(config.LocalFilePath))); err != nil {
+		return
+	}
+	if isRepo {
+		if gitrun.At(root, "ls-files", "--error-unmatch", "--", config.LocalFilePath).Run() == nil {
+			add("config.local", resProblem, config.LocalFilePath+" is tracked by git — it is shared with everyone who clones: run git rm --cached "+config.LocalFilePath+" and add it to .gitignore")
+			return
+		}
+		if gitrun.At(root, "check-ignore", "-q", "--no-index", "--", config.LocalFilePath).Run() != nil {
+			add("config.local", resProblem, config.LocalFilePath+" is not git-ignored — the next git add -A would commit it: add it to .gitignore")
+			return
+		}
+	}
+	var keys []string
+	for _, v := range vals {
+		if v.Source == config.SourceLocal {
+			keys = append(keys, v.Key)
+		}
+	}
+	if len(keys) == 0 {
+		add("config.local", resPass, "")
+		return
+	}
+	add("config.local", resWarning, "overrides "+strings.Join(keys, ", ")+" — on this machine only")
 }
 
 // doctorConfig adds the checks and gate-scratch findings of a readable config.
@@ -327,6 +370,34 @@ func copilotKeys(root string) []string {
 		keys = append(keys, "agent.verify")
 	}
 	return keys
+}
+
+// claudeNotInUse is the message of the Claude rows when no session in use runs
+// on claude.
+const claudeNotInUse = "no session in use runs on claude"
+
+// claudeInUse reports whether a session in use resolves to claude: agent.plan,
+// agent.gate-review, agent.work or agent.review; agent.verify while run.verify
+// is not false; agent.second-review while run.second-review is not off; and,
+// for the bare doctor (withReviewBrief), agent.review-brief. An agent key that
+// cannot be read counts as claude, as the default is.
+func claudeInUse(root string, withReviewBrief bool) bool {
+	isClaude := func(key string) bool {
+		v, err := config.Get(root, key)
+		return err != nil || v.Value == driver.AgentClaude
+	}
+	for _, k := range []string{"agent.plan", "agent.gate-review", "agent.work", "agent.review"} {
+		if isClaude(k) {
+			return true
+		}
+	}
+	if r, err := config.Get(root, "run.verify"); (err != nil || r.Value != "false") && isClaude("agent.verify") {
+		return true
+	}
+	if secondReviewMode(root) != "off" && isClaude("agent.second-review") {
+		return true
+	}
+	return withReviewBrief && isClaude("agent.review-brief")
 }
 
 // doctorSecondReview adds the second review's rows; with run.second-review off

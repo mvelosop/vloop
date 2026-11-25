@@ -1,53 +1,112 @@
 #!/bin/sh
-# Gate T1 — Z1, the kit's fixtures without ' in a path. Judged from outside the
-# task's reach: the starting point's testdata/ and gen.sh (56bf0155, read with
-# git archive), the Python of d7b9cbb5 (read with git show), and the vloop
-# built from this tree. The edited gen.sh and the kit's tests are not run here
-# (P-8); the go check runs the tests.
+# Gate T1 — L1, the local layer in resolution. Judged through vloop config list
+# and config get, on a fixture repository whose two files are written by hand.
 G=.vloop/state/gates/T1
 . "$G/lib.sh"
-START=56bf0155
-PYC=d7b9cbb5
-K=tools/copilot-acceptance/kit/testdata
+L=.vloop/config.local.toml
 
-# toREPO DIR: every directory named "it's repo" under DIR renamed @REPO@.
-toREPO() {
-  find "$1" -depth -type d -name "it's repo" | while IFS= read -r d; do
-    mv "$d" "$(dirname "$d")/@REPO@" || exit 1
-  done || fail "rename under $1"
-}
+newrepo r
+mkdir -p "$R/.vloop" || fail mkdir
+cat >"$R/.vloop/config.toml" <<'EOF'
+agent.work = "copilot"
+model.work = "gpt-6.1-terra"
+run.max-iterations = 7
 
-# 1. No path under tools/copilot-acceptance holds ' (the working tree).
-find tools/copilot-acceptance -name "*'*" >"$t/quoted" || fail "find tools/copilot-acceptance"
-[ ! -s "$t/quoted" ] || fail "paths under tools/copilot-acceptance still hold ':
-$(cat "$t/quoted")"
+[metrics]
+code = ["a/**"]
+test = ["t/**"]
+EOF
 
-# 2. Every file of testdata/ but gen.sh keeps its bytes, and its path with each
-#    component "it's repo" read as @REPO@.
-mkdir -p "$t/start" || fail mkdir
-git archive "$START" "$K" | tar -x -C "$t/start" || fail "git archive $START $K"
-cp -R "$t/start/$K" "$t/want" && rm -f "$t/want/gen.sh" || fail "copy the starting point's testdata"
-toREPO "$t/want"
-cp -R "$K" "$t/have" && rm -f "$t/have/gen.sh" || fail "copy the working tree's testdata"
-diff -r -x .DS_Store -x __pycache__ "$t/want" "$t/have" >"$t/diff" ||
-  fail "testdata/ (gen.sh aside) is not the starting point's with it's repo read as @REPO@:
-$(head -n 40 "$t/diff")"
+# 1. No local file, then an empty one: the shared file decides, source file.
+runin "$R" config get --json agent.work
+lit "$t/w" '{"key":"agent.work","value":"copilot","source":"file"}'
+want "no local file: config get --json agent.work" 0 "$t/w" /dev/null
+: >"$R/$L"
+runin "$R" config get --json agent.work
+want "an empty local file: config get --json agent.work" 0 "$t/w" /dev/null
 
-# 3. The starting point's gen.sh, on d7b9cbb5's Python and the vloop built
-#    here, from a copy of the starting point's testdata/, writes goldens that,
-#    with it's repo read as @REPO@, equal the working tree's, file for file.
-mkdir -p "$t/py" || fail mkdir
-for f in report.py hook.py bypass.sh; do
-  git show "$PYC:tools/copilot-acceptance/$f" >"$t/py/$f" || fail "git show $PYC:tools/copilot-acceptance/$f"
-done
-command -v python3 >/dev/null || fail "python3 is needed to run the reference Python"
-go build -buildvcs=false -o "$t/vloop" ./cmd/vloop >"$t/build.out" 2>&1 ||
-  fail "go build ./cmd/vloop: $(tail -n 5 "$t/build.out")"
-(cd "$t/elsewhere" && HOME="$t/elsewhere" sh "$t/start/$K/gen.sh" "$t/py" "$t/vloop" "$t/gen") >"$t/gen.out" 2>&1 ||
-  fail "the starting point's gen.sh failed: $(tail -n 10 "$t/gen.out")"
-toREPO "$t/gen"
-diff -r -x .DS_Store "$t/gen" "$K/golden" >"$t/diff" ||
-  fail "the goldens are not what the starting point's gen.sh writes, with it's repo read as @REPO@:
-$(head -n 40 "$t/diff")"
+# 2. The local file wins over the shared one, key by key, with source local;
+#    a list key takes the local list whole; an empty list sets nothing; keys
+#    vloop does not know are ignored.
+cat >"$R/$L" <<'EOF'
+# this machine only
+[agent]
+work = "claude"
+
+[model]
+work = "sonnet"
+
+[run]
+cost-ceiling = 12
+
+[metrics]
+code = ["b/**", "c/**"]
+test = []
+
+[unknown]
+thing = 1
+EOF
+runin "$R" config list
+wantrc "config list with a local file" 0
+grep -E '^(agent|model)\.work=' "$t/out" >"$t/got"
+printf 'model.work=sonnet (local)\nagent.work=claude (local)\n' >"$t/w"
+cmp -s "$t/got" "$t/w" || fail "config list | grep -E '^(agent|model)\\.work=' printed
+$(cat "$t/got")
+want
+$(cat "$t/w")"
+hasline "config list" "$t/out" "run.max-iterations=7 (file)"
+hasline "config list" "$t/out" "run.cost-ceiling=12 (local)"
+hasline "config list" "$t/out" "language=en (default)"
+
+runin "$R" config list --json
+wantrc "config list --json with a local file" 0
+cp "$t/out" "$t/list.json"
+jtrue "$t/list.json" 'd["agent.work"]=={"value":"claude","source":"local"}' "config list --json: agent.work is not claude from local"
+jtrue "$t/list.json" 'd["model.work"]["source"]=="local" and d["model.work"]["value"]=="sonnet"' "config list --json: model.work is not sonnet from local"
+jtrue "$t/list.json" 'd["metrics.code"]=={"value":["b/**","c/**"],"source":"local"}' "config list --json: metrics.code is not the local list, whole"
+jtrue "$t/list.json" 'd["metrics.test"]=={"value":["t/**"],"source":"file"}' "config list --json: an empty local list must set nothing (metrics.test from the shared file)"
+jtrue "$t/list.json" 'd["run.max-iterations"]["source"]=="file" and d["run.cost-ceiling"]["source"]=="local"' "config list --json: run.* sources"
+
+runin "$R" config get --json model.work
+wantrc "config get --json model.work" 0
+cp "$t/out" "$t/get.json"
+jtrue "$t/get.json" 'd=={"key":"model.work","value":"sonnet","source":"local"}' "config get --json model.work is not sonnet from local"
+
+# 3. The environment still wins over both.
+(cd "$R" && VLOOP_AGENT_WORK=copilot "$t/vloop" config get --json agent.work) >"$t/out" 2>"$t/err"; rc=$?
+lit "$t/w" '{"key":"agent.work","value":"copilot","source":"env"}'
+want "VLOOP_AGENT_WORK=copilot config get --json agent.work" 0 "$t/w" /dev/null
+
+# 4. A bad value in the local file is reported with the local path, exit 1.
+lit "$R/$L" 'agent.work = "nope"'
+runin "$R" config get agent.work
+lit "$t/w" 'vloop: .vloop/config.local.toml: invalid value "nope" for agent.work: want one of claude, copilot'
+want "agent.work = \"nope\" in the local file: config get agent.work" 1 /dev/null "$t/w"
+runin "$R" config list
+wantrc "agent.work = \"nope\" in the local file: config list" 1
+grep -q '^vloop: \.vloop/config\.local\.toml: ' "$t/err" || fail "config list with a bad local value: stderr does not name the local file:
+$(cat "$t/err")"
+
+# 5. Malformed TOML in the local file: exit 1, stderr naming the local file.
+lit "$R/$L" 'agent.work = '
+runin "$R" config get language
+wantrc "malformed local file: config get language" 1
+head -n 1 "$t/err" | grep -q '^vloop: \.vloop/config\.local\.toml: ' ||
+  fail "malformed local file: stderr does not start with vloop: .vloop/config.local.toml:
+$(cat "$t/err")"
+
+# 6. [[check]] in the local file is an error wherever the config is read.
+printf '[[check]]\nname = "mine"\npaths = ["**"]\nrun = "true"\n' >"$R/$L"
+lit "$t/w" "vloop: .vloop/config.local.toml: [[check]] belongs in .vloop/config.toml $EMDASH the checks are the repository's, not one machine's"
+runin "$R" config list
+want "[[check]] in the local file: config list" 1 /dev/null "$t/w"
+runin "$R" config get language
+want "[[check]] in the local file: config get language" 1 /dev/null "$t/w"
+
+# 7. Without the local file, everything is as before.
+rm -f "$R/$L"
+runin "$R" config get --json model.work
+lit "$t/w" '{"key":"model.work","value":"gpt-6.1-terra","source":"file"}'
+want "local file removed: config get --json model.work" 0 "$t/w" /dev/null
 
 echo "gate T1: ok"

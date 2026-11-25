@@ -103,6 +103,8 @@ command".
 | `Write(.vloop/state/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the plan and the gate fixtures after the session |
 | `Edit(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Write(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/config.local.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/config.local.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Edit(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Write(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Edit(.vloop/interventions/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
@@ -297,6 +299,8 @@ answer and is fast, and the deny list stays behind it.
 | `Write(.vloop/state/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Edit(.vloop/config.toml)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Write(.vloop/config.toml)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/config.local.toml)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/config.local.toml)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Edit(.vloop/defects/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Write(.vloop/defects/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Edit(.vloop/interventions/**)` | hook, driver | hook denies a write there but under `.vloop/tmp/`; driver restores the file or folder after the session |
@@ -482,6 +486,8 @@ always prints its answer and is fast, and the deny list stays behind it.
 | `Write(.vloop/state/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the plan and the gate fixtures after the session |
 | `Edit(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Write(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Edit(.vloop/config.local.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
+| `Write(.vloop/config.local.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Edit(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Write(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
 | `Edit(.vloop/interventions/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; driver restores the file or folder after the session |
@@ -673,6 +679,8 @@ always prints its answer and is fast, and the deny list stays behind it.
 | `Write(.vloop/state/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
 | `Edit(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
 | `Write(.vloop/config.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Edit(.vloop/config.local.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
+| `Write(.vloop/config.local.toml)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
 | `Edit(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
 | `Write(.vloop/defects/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
 | `Edit(.vloop/interventions/**)` | hook | hook: file tools and redirections may write only under `.vloop/tmp/`; the driver does not restore this path after a gate-review session, so the hook is the line |
@@ -1063,6 +1071,8 @@ the interventions nor the configuration after this session.
 | `Write(.vloop/state/**)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |
 | `Edit(.vloop/config.toml)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |
 | `Write(.vloop/config.toml)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |
+| `Edit(.vloop/config.local.toml)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |
+| `Write(.vloop/config.local.toml)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |
 | `Edit(.vloop/defects/**)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |
 | `Write(.vloop/defects/**)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |
 | `Edit(.vloop/interventions/**)` | hook | hook: only `.vloop/tmp/` may be written; the driver does not revert files after the session |

@@ -1,0 +1,2 @@
+GATE FAIL: vloop init: .vloop/config.local.toml is not on exactly one line of .gitignore:
+.vloop/tmp/

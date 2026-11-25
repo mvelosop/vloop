@@ -45,7 +45,7 @@ func TestInitWritesEverything(t *testing.T) {
 			t.Errorf("output lacks %q:\n%s", want, out)
 		}
 	}
-	if got := readFile(t, d, ".gitignore"); got != "x/\n.vloop/tmp/\n" {
+	if got := readFile(t, d, ".gitignore"); got != "x/\n.vloop/config.local.toml\n.vloop/tmp/\n" {
 		t.Errorf(".gitignore = %q", got)
 	}
 	if got := readFile(t, d, ".vloop/config.toml"); !strings.Contains(got, `language = "es"`) || !strings.Contains(got, "go") {
@@ -90,7 +90,7 @@ func TestInitKeepsConfigAndBriefs(t *testing.T) {
 		"go.mod":             "module a\n",
 		".vloop/config.toml": "# mine\nlanguage = \"en\"\n",
 		"docs/briefs/B20250101-0900-m.loop-brief.md": "x\n",
-		".gitignore": ".vloop/tmp/\n",
+		".gitignore": ".vloop/tmp/\n.vloop/config.local.toml\n",
 	})
 	out, _, code := runPluginCLI(t, initBuild, d, "init")
 	if code != 0 {
@@ -122,7 +122,7 @@ func TestInitClaudeMarkers(t *testing.T) {
 	if !strings.HasPrefix(got, "# Rules\nmine\n\n<!-- vloop:begin -->\n") || !strings.HasSuffix(got, "<!-- vloop:end -->\n") {
 		t.Errorf("appended: %q", got)
 	}
-	if readFile(t, d, ".gitignore") != "keep\n.vloop/tmp/\n" {
+	if readFile(t, d, ".gitignore") != "keep\n.vloop/config.local.toml\n.vloop/tmp/\n" {
 		t.Error("gitignore")
 	}
 }

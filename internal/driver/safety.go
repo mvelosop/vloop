@@ -295,7 +295,7 @@ type inputGuard struct {
 
 func snapshotInputs(root, runDir string) inputGuard {
 	g := inputGuard{root: root, files: map[string][]byte{}}
-	g.roots = []string{".vloop/config.toml", GuidelinesFile, ".vloop/defects", ".vloop/interventions"}
+	g.roots = []string{".vloop/config.toml", ".vloop/config.local.toml", GuidelinesFile, ".vloop/defects", ".vloop/interventions"}
 	if rel, err := filepath.Rel(root, runDir); err == nil {
 		rel = filepath.ToSlash(rel)
 		g.roots = append(g.roots, rel+"/sessions", rel+"/reports")

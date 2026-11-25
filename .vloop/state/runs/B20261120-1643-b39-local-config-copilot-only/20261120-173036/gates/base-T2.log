@@ -1,0 +1,5 @@
+GATE FAIL: config path --local: exit 2, want 0
+stdout:
+
+stderr:
+vloop: unknown flag: --local

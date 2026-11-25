@@ -1,0 +1,36 @@
+{"schema": "brief-review/v1",
+ "brief": "B20261120-1643-b39-local-config-copilot-only.loop-brief",
+ "verdict": "FIX",
+ "findings": [
+  {"kind": "fact",
+   "section": "Why this shape, and what was rejected — 'The run refuses a local file git would commit'",
+   "summary": "The brief says an un-ignored local file 'lands in the run's first commit and is pushed with the branch'. That is not true today. The driver already refuses an untracked, un-ignored path before planning. The only case that really leaks is a local file that is already tracked. The rejected alternative's reasoning ('would still show as untracked in every git status') misses that the same check would block every run.",
+   "evidence": "internal/driver/plan.go:166-205 requireCleanTree runs git status --porcelain --untracked-files=all and halts on any path outside .vloop/tmp/: 'the tree is not clean — commit, ignore or remove these first: …'. It is called at internal/driver/plan.go:472, before the plan's git add -A at :506. runPreflight (internal/cli/run.go:83) runs before it, so the worked example's refusal output still holds.",
+   "fix": "Restate the rationale. The run already refuses an un-ignored local file, but its message offers 'commit' as a remedy, the very mistake to avoid. A file that is already tracked passes that check and is pushed with every branch. The config.local row gives the right remedy for both cases and shows it in doctor before any run. The decision itself stands."},
+  {"kind": "consistency",
+   "section": "Violations the review must rule on — the copilot.credit-usd exception",
+   "summary": "The exception spares 'session records and run folders under .vloop/state/'. Other files under .vloop/state/ also hold 0.0066667: a journal and this brief's own review records. A literal reviewer could flag them, and no session can edit them anyway (S-4).",
+   "evidence": "grep -rl 0.0066667 lists .vloop/state/journals/B20261025-1307-b19-copilot-review.md and .vloop/state/brief-reviews/B20261120-1643-b39-local-config-copilot-only/*/brief-review.json, besides the run folders.",
+   "fix": "Write 'anything under .vloop/state/' in place of 'session records and run folders under .vloop/state/'."},
+  {"kind": "consistency",
+   "section": "Behaviour contract — L2 (the stderr notice)",
+   "summary": "The notice is defined only for config set without --local. The contract does not say what `config set --local` prints when a VLOOP_* variable still overrides the key it just wrote. That is the same surprise the notice exists for, and the reviewer has no rule to judge it by.",
+   "evidence": "L2's second bullet begins 'Without --local, config set writes the shared file … When, after the write, the key's value still comes from the local file or the environment, it prints one line'. Nothing covers the --local case.",
+   "fix": "Add one sentence. Recommended: with --local, the same line when the environment overrides, for example '! agent.work stays copilot on this machine: VLOOP_AGENT_WORK overrides it'. Alternatively, state that --local prints nothing."}
+ ],
+ "decisions": [
+  "Order env > local > shared > default — agree; keeps a one-shell VLOOP_* override strongest, as C-1 has it.",
+  "File at .vloop/config.local.toml, any key but [[check]] — agree; [[check]] is the repository's contract.",
+  "A local list replaces the shared one, and an empty list sets nothing (so no machine can clear a shared list) — acceptable; the out-of-scope item names the limitation.",
+  "[[check]] in the local file is an error for every command that reads the config, not only run — agree; one configuration.",
+  "vloop run refuses a tracked or un-ignored local file (problem, not warning) — agree, with finding 1's corrected rationale.",
+  "The ignore test asks git about the file path itself, accepting any rule including global excludes — agree; driver.GitIgnored (internal/driver/plan.go:896) probes a directory and is rightly not reused as is.",
+  "An empty local file, or one with only unknown keys, gets ✓ config.local — fine.",
+  "Claude in use follows copilotKeys' rule, review-brief counting only for doctor; a broken config counts Claude as in use — agree.",
+  "The config set notice goes to stderr, exit 0 — agree.",
+  "copilot.credit-usd default 0.0066667 → 0.01, without recomputing past records — the operator's call on GitHub's price as read on 2026-11-20; I could not check the billing page (no web access).",
+  "One brief for L1–L5 in 8 tasks — acceptable; tasks 3 and 4 split L3 sensibly."
+ ],
+ "checked": "facts (config.go resolve/resolveList/Keys order and the error text, doctor.go row order, the n/a rendering '- ', copilotKeys and copilotVerify, run.go runPreflight's refusal and warning cases, brief_review.go's conditional Claude preflight, iterate.go:1325 and plan.go:506 git add -A, safety.go snapshotInputs, the five fences' deny entries, fence-audit rows, every file holding 0.0066667, the README's 193 of 200 lines, the 19.3 credits in copilot-cli-experiments.md, domain S-2/S-4/C-1); consistency (worked example vs contract, key order model before agent, messages literal); rules (CLAUDE.md, the roadmap row added in vloop-roadmap-b18-b21.md, allowed test changes); runnability (checks after each task: the guide-default test lands with L5 in task 6, commands.md regenerated in task 2 before the README names --local in task 7, init/upgrade .gitignore tests allowed to change). vloop brief check: ok, 0 warnings. I did not run the worked example: the sandbox denies writing config files in a scratch repo, so the messages come from the code and the existing tests.",
+ "header": "Reviewed 2026-11-20: FIX, 3 findings"}
+
