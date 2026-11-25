@@ -2,6 +2,10 @@
 # leave it no headroom (B11 owns the suite's speed).
 run.gate-timeout = 30
 
+# This repository is worked on from macOS and Windows: checks and gates run in
+# pwsh everywhere (issue #156).
+shell = "pwsh"
+
 [metrics]
   code = ["internal/brief/templates/**", "schemas/**"]
   # The plugin's eval cases are the skills' tests: graders, prompts, briefs and
@@ -11,7 +15,8 @@ run.gate-timeout = 30
 
 # The repository's tests and health checks — CLAUDE.md's toolchain — run by the
 # driver on the base, after every iteration, and once in full at the end.
+# tools/check runs them in Go, so the check is the same in any shell.
 [[check]]
   name = "go"
   paths = ["**"]
-  run = "go test -timeout 30m ./... && go vet ./... && test -z \"$(gofmt -l .)\" && go mod tidy -diff && GOOS=linux go build ./... && GOOS=windows go build ./..."
+  run = "go run ./tools/check"

@@ -11,6 +11,7 @@ import (
 // answers from answers, one per call; "EXIT" makes the call fail, "RAW:x" prints x.
 func fakeClaude(t *testing.T, answers ...string) (stdinDir string) {
 	t.Helper()
+	skipPOSIXStubs(t)
 	bin, st := t.TempDir(), t.TempDir()
 	var cases strings.Builder
 	for i, a := range answers {
