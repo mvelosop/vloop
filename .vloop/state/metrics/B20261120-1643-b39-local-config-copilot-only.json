@@ -2,7 +2,7 @@
   "schema": "metrics/v4",
   "brief": "B20261120-1643-b39-local-config-copilot-only.loop-brief",
   "run_id": "B20261120-1643-b39-local-config-copilot-only",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 8,
@@ -50,19 +50,21 @@
     "gates_ms": 42131,
     "checks_ms": 2244438,
     "gate_review_ms": 108997,
-    "wall_ms": null
+    "verify_ms": 77611,
+    "wall_ms": 6718000
   },
   "rate": {
     "code_per_min": 3.9532189629133048,
     "code_test_per_min": 13.49083947052453
   },
   "cost": {
-    "total_usd": 7.863856300000002,
+    "total_usd": 8.099320200000001,
     "plan_usd": 4.138317400000002,
     "work_usd": 2.3387745000000004,
     "review_usd": 0.9267869000000001,
     "gate_review_usd": 0.4599775,
-    "per_1000_code_lines_usd": 38.17405970873788
+    "per_1000_code_lines_usd": 39.31708834951457,
+    "verify_usd": 0.23546389999999998
   },
   "credits": {
     "total": 0,
@@ -72,11 +74,11 @@
     "gate_review": 0
   },
   "tokens": {
-    "input": 472,
-    "output": 158485,
-    "cache_read": 12731476,
-    "cache_creation": 733939,
-    "cache_hit_ratio": 0.9454613721324113
+    "input": 502,
+    "output": 163191,
+    "cache_read": 13267235,
+    "cache_creation": 767631,
+    "cache_hit_ratio": 0.9452716166758149
   },
   "models": {
     "plan": [
@@ -89,6 +91,9 @@
       "claude-sonnet-5-5"
     ],
     "gate-review": [
+      "claude-sonnet-5-5"
+    ],
+    "verify": [
       "claude-sonnet-5-5"
     ]
   },
@@ -105,6 +110,9 @@
     "second-review": [],
     "gate-review": [
       "claude"
+    ],
+    "verify": [
+      "claude"
     ]
   },
   "second_review": {
@@ -119,7 +127,8 @@
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 2,
@@ -152,7 +161,7 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 6,
+  "permission_denials": 9,
   "iterations": 10,
   "iterations_per_closed": 1.25,
   "by_task": [
@@ -355,414 +364,6 @@
       ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
-    }
-  ],
-  "by_session": [
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 1,
-      "schema": "session/v3",
-      "phase": "plan",
-      "iteration": 0,
-      "task": null,
-      "agent": "claude",
-      "model": "opus",
-      "effort": null,
-      "time_ms": 799376,
-      "cost_usd": 4.138317400000002,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 55,
-      "permission_denials": 4,
-      "denials": [
-        {
-          "tool_name": "Bash",
-          "text": "set -e; t=$(mktemp -d \"${TMPDIR:-/tmp}/plan.XXXXXX\"); go build -buildvcs=false -o $t/vloop ./cmd/vloop; cd $t; mkdir r; cd r; git init -q -b main; export HOME=$t GIT_CONFIG_GLOBAL=/dev/null; $t/vloop …"
-        },
-        {
-          "tool_name": "Bash",
-          "text": "mkdir -p .vloop/tmp/probe \u0026\u0026 cat \u003e .vloop/tmp/probe/p1.sh \u003c\u003c'EOF'\nt=$(mktemp -d \"${TMPDIR:-/tmp}/plan.XXXXXX\")\ngo build -buildvcs=false -o \"$t/vloop\" ./cmd/vloop || exit 1\nmkdir \"$t/r\" \"$t/home\"\nexpor…"
-        },
-        {
-          "tool_name": "Bash",
-          "text": "d=.vloop/tmp/gtest \u0026\u0026 {\n  echo 'G=.vloop/tmp/gtest'; echo '. \"$G/lib.sh\"'\n  sed -n '/^# 2. vloop upgrade/,/^wantrc \"vloop upgrade --yes\" 0$/p' .vloop/state/gates/T3/gate.sh\n  echo 'cat \"$t/out\"; echo …"
-        },
-        {
-          "tool_name": "Bash",
-          "text": "rm -r .vloop/tmp/gtest; vloop schema validate state/v2 .vloop/state/state.json \u0026\u0026 vloop task validate \u0026\u0026 grep -rn \"/Users/\" .vloop/state/state.json .vloop/state/gates/ ; echo \"abs-path grep rc=$?\""
-        }
-      ],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 2,
-      "schema": "session/v3",
-      "phase": "gate-review",
-      "iteration": 0,
-      "task": null,
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 108997,
-      "cost_usd": 0.4599775,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 21,
-      "permission_denials": 2,
-      "denials": [
-        {
-          "tool_name": "Bash",
-          "text": "cat .vloop/state/gates/T3/gate.sh; grep -n 'config.toml' docs/design-notes/fence-audit.md | head; grep -rn 'Language\\b' internal/cli/*.go | grep -v _test | head -5; go build -o /tmp/vl ./cmd/vloop \u0026\u0026 …"
-        },
-        {
-          "tool_name": "Bash",
-          "text": "go build -o .vloop/tmp/vl ./cmd/vloop \u0026\u0026 d=$(mktemp -d) \u0026\u0026 cd $d \u0026\u0026 git init -q \u0026\u0026 \"$OLDPWD/.vloop/tmp/vl\" config list --json | python3 -I -c 'import json,sys;d=json.load(sys.stdin);print(d[\"agent.wor…"
-        }
-      ],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 3,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 1,
-      "task": "T1",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 495969,
-      "cost_usd": 0.3122333,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 13,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 4,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 1,
-      "task": "T1",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 20931,
-      "cost_usd": 0.1319288,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 6,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 5,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 2,
-      "task": "T2",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 85592,
-      "cost_usd": 0.2191514,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 12,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 6,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 3,
-      "task": "T2",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 192240,
-      "cost_usd": 0.1367375,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 9,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 7,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 3,
-      "task": "T2",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 19317,
-      "cost_usd": 0.11792330000000001,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 6,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 8,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 4,
-      "task": "T3",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 531981,
-      "cost_usd": 0.46327350000000006,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 3,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 9,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 5,
-      "task": "T3",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 287057,
-      "cost_usd": 0.1744699,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 11,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 10,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 5,
-      "task": "T3",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 24416,
-      "cost_usd": 0.1315981,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 7,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 11,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 6,
-      "task": "T4",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 285999,
-      "cost_usd": 0.17356750000000004,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 9,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 12,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 6,
-      "task": "T4",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 16251,
-      "cost_usd": 0.10762000000000001,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 5,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 13,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 7,
-      "task": "T5",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 414123,
-      "cost_usd": 0.30049980000000004,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 18,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 14,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 7,
-      "task": "T5",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 20157,
-      "cost_usd": 0.11027029999999999,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 5,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 15,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 8,
-      "task": "T6",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 458034,
-      "cost_usd": 0.1517617,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 9,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 16,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 8,
-      "task": "T6",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 14268,
-      "cost_usd": 0.1031686,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 4,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 17,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 9,
-      "task": "T7",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 161340,
-      "cost_usd": 0.25278480000000003,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 12,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 18,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 9,
-      "task": "T7",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 19512,
-      "cost_usd": 0.11296149999999999,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 6,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 19,
-      "schema": "session/v3",
-      "phase": "work",
-      "iteration": 10,
-      "task": "T8",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 57763,
-      "cost_usd": 0.15429510000000002,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 9,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
-    },
-    {
-      "folder": ".vloop/state/runs/B20261120-1643-b39-local-config-copilot-only/20261120-173036",
-      "seq": 20,
-      "schema": "session/v3",
-      "phase": "review",
-      "iteration": 10,
-      "task": "T8",
-      "agent": "claude",
-      "model": "sonnet",
-      "effort": null,
-      "time_ms": 21616,
-      "cost_usd": 0.1113163,
-      "cost_source": "reported",
-      "credits": null,
-      "turns": 9,
-      "permission_denials": 0,
-      "denials": [],
-      "is_error": false
     }
   ]
 }
