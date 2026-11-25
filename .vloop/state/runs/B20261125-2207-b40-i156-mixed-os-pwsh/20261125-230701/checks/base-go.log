@@ -1,0 +1,26 @@
+ok  	github.com/mvelosop/vloop	0.099s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	2.602s
+ok  	github.com/mvelosop/vloop/cmd/vloop	26.407s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/budget	(cached)
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	142.186s
+ok  	github.com/mvelosop/vloop/internal/closing	(cached)
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	5.074s
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	3.919s
+ok  	github.com/mvelosop/vloop/internal/fence	0.361s
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitrun	0.156s
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	0.212s
+ok  	github.com/mvelosop/vloop/internal/metrics	9.942s
+ok  	github.com/mvelosop/vloop/internal/runs	7.884s
+ok  	github.com/mvelosop/vloop/internal/schema	0.169s
+ok  	github.com/mvelosop/vloop/internal/state	(cached)
+ok  	github.com/mvelosop/vloop/tools/agent-eval	0.104s
+?   	github.com/mvelosop/vloop/tools/check	[no test files]
+ok  	github.com/mvelosop/vloop/tools/copilot-acceptance/kit	14.970s
+ok  	github.com/mvelosop/vloop/tools/release	7.809s

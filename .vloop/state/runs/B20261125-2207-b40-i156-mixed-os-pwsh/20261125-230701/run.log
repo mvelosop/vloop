@@ -1,0 +1,14 @@
+checking the base: go
+the plan B20261120-1643-b39-local-config-copilot-only was for docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md — you asked for docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md using mai-code-2
+   plan · 8m01s · $0.22 · run $0.22 / $40.00
+checking the gate of T1 on the base
+checking the gate of T2 on the base
+checking the gate of T3 on the base
+checking the gate of T4 on the base
+checking the gate of T5 on the base
+checking the gate of T6 on the base
+planned: B20261125-2207-b40-i156-mixed-os-pwsh — 6 tasks
+reviewing the gates using mai-code-2 (round 1)
+   gate review · 2m31s · $0.08 · run $0.30 / $40.00
+committing the plan

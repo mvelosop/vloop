@@ -1,0 +1,191 @@
+=== RUN   TestPortableGateLint
+=== RUN   TestPortableGateLint/awk
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls awk, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/basename
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls basename, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/bash
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls bash, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/cat
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls cat, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/chmod
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls chmod, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/cmd
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls cmd, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/cmp
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls cmp, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/cp
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls cp, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/cut
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls cut, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/date
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls date, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/diff
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls diff, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/dirname
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls dirname, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/env
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls env, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/fc
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls fc, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/find
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls find, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/findstr
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls findstr, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/grep
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls grep, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/head
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls head, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/ln
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls ln, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/ls
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls ls, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/mkdir
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls mkdir, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/mktemp
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls mktemp, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/mv
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls mv, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/powershell
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls powershell, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/printf
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls printf, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/readlink
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls readlink, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/rm
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls rm, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/robocopy
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls robocopy, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/sed
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls sed, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/seq
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls seq, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/sh
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls sh, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/sleep
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls sleep, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/sort
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls sort, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/stat
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls stat, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/tail
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls tail, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/tee
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls tee, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/test
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls test, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/touch
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls touch, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/tr
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls tr, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/uniq
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls uniq, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/wc
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls wc, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/which
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls which, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/xargs
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls xargs, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/xcopy
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls xcopy, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/zsh
+    oracle_test.go:29: problems = [], want ["gate shape rejected: T1  calls zsh, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+=== RUN   TestPortableGateLint/cp#01
+    oracle_test.go:48: problems [] do not contain "calls cp,"
+=== RUN   TestPortableGateLint/cmd#01
+    oracle_test.go:48: problems [] do not contain "calls cmd,"
+=== RUN   TestPortableGateLint/wc#01
+    oracle_test.go:48: problems [] do not contain "calls wc,"
+=== RUN   TestPortableGateLint/grep#01
+    oracle_test.go:48: problems [] do not contain "calls grep,"
+=== RUN   TestPortableGateLint/wc#02
+    oracle_test.go:48: problems [] do not contain "calls wc,"
+=== RUN   TestPortableGateLint/grep#02
+    oracle_test.go:48: problems [] do not contain "calls grep,"
+=== RUN   TestPortableGateLint/grep#03
+    oracle_test.go:48: problems [] do not contain "calls grep,"
+=== RUN   TestPortableGateLint/grep#04
+    oracle_test.go:48: problems [] do not contain "calls grep,"
+=== RUN   TestPortableGateLint/sed#01
+    oracle_test.go:48: problems [] do not contain "calls sed,"
+=== RUN   TestPortableGateLint/head#01
+    oracle_test.go:48: problems [] do not contain "calls head,"
+=== RUN   TestPortableGateLint/Select-String_-Pattern_'grep'_-Path_a.txt
+=== RUN   TestPortableGateLint/go_test_-run_TestGrep_./...
+=== RUN   TestPortableGateLint/node_-e_"require('fs')"
+=== RUN   TestPortableGateLint/Write-Output_"go_|_grep_ok"
+=== RUN   TestPortableGateLint/if_(Test-Path_a)_{_Get-Content_a_|_Measure-Object_-Line_}
+=== RUN   TestPortableGateLint/$command_=_'grep';_$value
+=== RUN   TestPortableGateLint/foreach_($x_in_$xs)_{_Write-Output_$x_}
+=== RUN   TestPortableGateLint/exit_1
+=== NAME  TestPortableGateLint
+    oracle_test.go:73: problems = [], want ["gate shape rejected: T1  .vloop/state/gates/T1/nested/gate.ps1 calls grep, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain"]
+--- FAIL: TestPortableGateLint (0.00s)
+    --- FAIL: TestPortableGateLint/awk (0.00s)
+    --- FAIL: TestPortableGateLint/basename (0.00s)
+    --- FAIL: TestPortableGateLint/bash (0.00s)
+    --- FAIL: TestPortableGateLint/cat (0.00s)
+    --- FAIL: TestPortableGateLint/chmod (0.00s)
+    --- FAIL: TestPortableGateLint/cmd (0.00s)
+    --- FAIL: TestPortableGateLint/cmp (0.00s)
+    --- FAIL: TestPortableGateLint/cp (0.00s)
+    --- FAIL: TestPortableGateLint/cut (0.00s)
+    --- FAIL: TestPortableGateLint/date (0.00s)
+    --- FAIL: TestPortableGateLint/diff (0.00s)
+    --- FAIL: TestPortableGateLint/dirname (0.00s)
+    --- FAIL: TestPortableGateLint/env (0.00s)
+    --- FAIL: TestPortableGateLint/fc (0.00s)
+    --- FAIL: TestPortableGateLint/find (0.00s)
+    --- FAIL: TestPortableGateLint/findstr (0.00s)
+    --- FAIL: TestPortableGateLint/grep (0.00s)
+    --- FAIL: TestPortableGateLint/head (0.00s)
+    --- FAIL: TestPortableGateLint/ln (0.00s)
+    --- FAIL: TestPortableGateLint/ls (0.00s)
+    --- FAIL: TestPortableGateLint/mkdir (0.00s)
+    --- FAIL: TestPortableGateLint/mktemp (0.00s)
+    --- FAIL: TestPortableGateLint/mv (0.00s)
+    --- FAIL: TestPortableGateLint/powershell (0.00s)
+    --- FAIL: TestPortableGateLint/printf (0.00s)
+    --- FAIL: TestPortableGateLint/readlink (0.00s)
+    --- FAIL: TestPortableGateLint/rm (0.00s)
+    --- FAIL: TestPortableGateLint/robocopy (0.00s)
+    --- FAIL: TestPortableGateLint/sed (0.00s)
+    --- FAIL: TestPortableGateLint/seq (0.00s)
+    --- FAIL: TestPortableGateLint/sh (0.00s)
+    --- FAIL: TestPortableGateLint/sleep (0.00s)
+    --- FAIL: TestPortableGateLint/sort (0.00s)
+    --- FAIL: TestPortableGateLint/stat (0.00s)
+    --- FAIL: TestPortableGateLint/tail (0.00s)
+    --- FAIL: TestPortableGateLint/tee (0.00s)
+    --- FAIL: TestPortableGateLint/test (0.00s)
+    --- FAIL: TestPortableGateLint/touch (0.00s)
+    --- FAIL: TestPortableGateLint/tr (0.00s)
+    --- FAIL: TestPortableGateLint/uniq (0.00s)
+    --- FAIL: TestPortableGateLint/wc (0.00s)
+    --- FAIL: TestPortableGateLint/which (0.00s)
+    --- FAIL: TestPortableGateLint/xargs (0.00s)
+    --- FAIL: TestPortableGateLint/xcopy (0.00s)
+    --- FAIL: TestPortableGateLint/zsh (0.00s)
+    --- FAIL: TestPortableGateLint/cp#01 (0.00s)
+    --- FAIL: TestPortableGateLint/cmd#01 (0.00s)
+    --- FAIL: TestPortableGateLint/wc#01 (0.00s)
+    --- FAIL: TestPortableGateLint/grep#01 (0.00s)
+    --- FAIL: TestPortableGateLint/wc#02 (0.00s)
+    --- FAIL: TestPortableGateLint/grep#02 (0.00s)
+    --- FAIL: TestPortableGateLint/grep#03 (0.00s)
+    --- FAIL: TestPortableGateLint/grep#04 (0.00s)
+    --- FAIL: TestPortableGateLint/sed#01 (0.00s)
+    --- FAIL: TestPortableGateLint/head#01 (0.00s)
+    --- PASS: TestPortableGateLint/Select-String_-Pattern_'grep'_-Path_a.txt (0.00s)
+    --- PASS: TestPortableGateLint/go_test_-run_TestGrep_./... (0.00s)
+    --- PASS: TestPortableGateLint/node_-e_"require('fs')" (0.00s)
+    --- PASS: TestPortableGateLint/Write-Output_"go_|_grep_ok" (0.00s)
+    --- PASS: TestPortableGateLint/if_(Test-Path_a)_{_Get-Content_a_|_Measure-Object_-Line_} (0.00s)
+    --- PASS: TestPortableGateLint/$command_=_'grep';_$value (0.00s)
+    --- PASS: TestPortableGateLint/foreach_($x_in_$xs)_{_Write-Output_$x_} (0.00s)
+    --- PASS: TestPortableGateLint/exit_1 (0.00s)
+=== RUN   TestPortableGateLintRejectsB39Plan
+    oracle_test.go:99: B39 problems = 0, tasks = 8:
+--- FAIL: TestPortableGateLintRejectsB39Plan (0.06s)
+FAIL
+FAIL	github.com/mvelosop/vloop/.vloop/state/gates/T3	0.123s
+FAIL
