@@ -32,3 +32,10 @@ committing the plan
    review T2 · 2m00s · $0.06 · run $0.97 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/6 done ──
+   Lint mixed-team gates for portable commands
+   work T3 · 5m54s · $0.14 · run $1.11 / $40.00
+   check go
+   review T3 · 1m39s · $0.05 · run $1.16 / $40.00
+   review: PASS
+   T3 done

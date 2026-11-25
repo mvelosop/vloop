@@ -6,7 +6,7 @@
   "merged": null,
   "tasks": {
     "planned": 6,
-    "done": 1,
+    "done": 2,
     "blocked": 0,
     "first_pass": 1,
     "estimate": {
@@ -16,8 +16,8 @@
   },
   "size": {
     "delivered": {
-      "code": 277,
-      "test": 239,
+      "code": 285,
+      "test": 241,
       "docs": 2,
       "other": 0,
       "deleted": {
@@ -28,47 +28,47 @@
       }
     },
     "churn": {
-      "code": 277,
-      "test": 239,
+      "code": 287,
+      "test": 241,
       "docs": 2,
       "other": 0,
       "deleted": {
-        "code": 31,
+        "code": 33,
         "test": 6,
         "docs": 1,
         "other": 0
       }
     },
-    "test_code_ratio": 0.8628158844765343,
-    "rework": 1
+    "test_code_ratio": 0.8456140350877193,
+    "rework": 1.0070175438596491
   },
   "time": {
-    "agent_ms": 982427,
-    "work_ms": 777540,
-    "review_ms": 204887,
+    "agent_ms": 1200155,
+    "work_ms": 875580,
+    "review_ms": 324575,
     "plan_ms": 480914,
-    "gates_ms": 4081,
-    "checks_ms": 315343,
+    "gates_ms": 4558,
+    "checks_ms": 469842,
     "gate_review_ms": 150656,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 16.91728749311654,
-    "code_test_per_min": 31.513791864433696
+    "code_per_min": 14.248159612716691,
+    "code_test_per_min": 26.296603355399927
   },
   "cost": {
-    "total_usd": 0.8381098,
+    "total_usd": 0.9707857000000001,
     "plan_usd": 0.2241802,
-    "work_usd": 0.3939982,
-    "review_usd": 0.14458580000000001,
+    "work_usd": 0.46916810000000003,
+    "review_usd": 0.20209180000000002,
     "gate_review_usd": 0.0753456,
-    "per_1000_code_lines_usd": 3.02566714801444
+    "per_1000_code_lines_usd": 3.4062656140350884
   },
   "credits": {
-    "total": 83.81098,
+    "total": 97.07857000000001,
     "plan": 22.41802,
-    "work": 39.399820000000005,
-    "review": 14.45858,
+    "work": 46.916810000000005,
+    "review": 20.20918,
     "gate_review": 7.53456
   },
   "tokens": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 7,
-  "iterations": 2,
-  "iterations_per_closed": 2,
+  "iterations": 3,
+  "iterations_per_closed": 1.5,
   "by_task": [
     {
       "id": "T1",
@@ -185,26 +185,26 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
-        "code": 162,
-        "test": 62,
+        "code": 172,
+        "test": 64,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 15,
+          "code": 17,
           "test": 1,
           "docs": 0,
           "other": 0
         }
       },
-      "agent_ms": 487075,
-      "cost_usd": 0.26304350000000004,
+      "agent_ms": 704803,
+      "cost_usd": 0.39571940000000005,
       "models": [
         "mai-code-2"
       ],
-      "test_code_ratio": 0.38271604938271603,
-      "per_1000_code_lines_usd": 1.6237253086419756
+      "test_code_ratio": 0.37209302325581395,
+      "per_1000_code_lines_usd": 2.300694186046512
     },
     {
       "id": "T3",
@@ -441,6 +441,44 @@
       "cost_usd": 0.0875597,
       "cost_source": "estimated",
       "credits": 8.75597,
+      "turns": 10,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261125-230701",
+      "seq": 7,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 3,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 98040,
+      "cost_usd": 0.0751699,
+      "cost_source": "estimated",
+      "credits": 7.51699,
+      "turns": 13,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261125-230701",
+      "seq": 8,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 3,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 119688,
+      "cost_usd": 0.057506,
+      "cost_source": "estimated",
+      "credits": 5.7506,
       "turns": 10,
       "permission_denials": 0,
       "denials": [],

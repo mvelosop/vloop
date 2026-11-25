@@ -1,0 +1,44 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "One authoritative, ordered list in the driver contains exactly awk, basename, bash, cat, chmod, cmd, cmp, cp, cut, date, diff, dirname, env, fc, find, findstr, grep, head, ln, ls, mkdir, mktemp, mv, powershell, printf, readlink, rm, robocopy, sed, seq, sh, sleep, sort, stat, tail, tee, test, touch, tr, uniq, wc, which, xargs, xcopy and zsh.",
+      "met": true,
+      "evidence": "internal/driver/gateshape.go:41-48 defines the one ordered list and internal/driver/plan_test.go:89-99 verifies exact membership and order."
+    },
+    {
+      "criterion": "For a mixed team, command-position words in each task verify and in every .ps1 file at any depth of that task's gate folder are linted; the first listed command in each command source produces the exact M3 refusal naming the task, source file when applicable, and sorted platforms.",
+      "met": true,
+      "evidence": "internal/driver/gateshape.go:209-240 resolves mixed platforms, lints every task verify, recursively walks each gate folder for .ps1 files, and emits the exact task/source/platform messages; internal/driver/plan_test.go:102-119 pins the verify and nested-script output."
+    },
+    {
+      "criterion": "Matching uses the final path element after slash or backslash, removes a trailing .exe, ignores case, and recognizes wholly quoted command words after the call operator; separators are recognized only outside single and double quotes.",
+      "met": true,
+      "evidence": "internal/driver/gateshape.go:51-118 tracks quote state and separators, normalizes path separators and case, strips .exe, and unwraps only wholly quoted words after &; internal/driver/plan_test.go:65-86 covers Unix/Windows paths, case, .exe, call-operator quoting and quoted data."
+    },
+    {
+      "criterion": "Quoted data, pwsh keywords and command names beginning with $, -, @, [ or a digit are not matched, and Select-String -Pattern 'grep', go test -run TestGrep and node -e \"require('fs')\" remain accepted.",
+      "met": true,
+      "evidence": "internal/driver/gateshape.go:62-108 handles command positions, quotes and excluded initial characters; internal/driver/plan_test.go:74-79 and :121-131 asserts the specified accepted forms."
+    },
+    {
+      "criterion": "With platforms unset or having only one distinct entry, none of these verify or .ps1 command checks are applied, and all earlier gate-shape refusals remain intact.",
+      "met": true,
+      "evidence": "internal/driver/gateshape.go:190-215 performs all existing gate-shape checks before returning for unreadable or non-mixed platforms; internal/driver/plan_test.go:133-146 pins unset and single-platform bypass, while the existing shape test at :148-211 still checks prior refusals."
+    },
+    {
+      "criterion": "Plan acceptance reads B39's plan from 4c69adf0 as real data, computes the expected task count from that plan, and refuses all eight sh-based gates for mixed platforms without hard-coding the count.",
+      "met": true,
+      "evidence": "internal/driver/plan_test.go:150-181 runs git show on 4c69adf0, unmarshals its plan, compares the refusal count to len(p.Tasks), and checks each task for an sh refusal without a hard-coded count."
+    },
+    {
+      "criterion": "The task adds committed, non-skipping Go tests for command parsing, exact list membership, .ps1 recursion, unmixed behavior and the B39 real-data plan, and the go check runs them.",
+      "met": true,
+      "evidence": "internal/driver/plan_test.go:65-181 contains the non-skipping tests for all required cases; .vloop/tmp/checks.json records the go check exit 0, and its log reports ok for github.com/mvelosop/vloop/internal/driver."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

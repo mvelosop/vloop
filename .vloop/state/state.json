@@ -5,9 +5,9 @@
   "base": "04c5526e85ea6a6483b153c55a4f8f241a85006c",
   "branch": "B20261125-2207-b40-i156-mixed-os-pwsh",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-25T23:09:54Z",
-  "updated": "2026-11-25T23:48:36Z",
+  "updated": "2026-11-25T23:58:51Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -136,7 +136,7 @@
         "The task adds committed, non-skipping Go tests for command parsing, exact list membership, .ps1 recursion, unmixed behavior and the B39 real-data plan, and the go check runs them."
       ],
       "verify": "$o = go test ./.vloop/state/gates/T3 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -2,12 +2,14 @@ package driver
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/mvelosop/vloop/internal/config"
 	"github.com/mvelosop/vloop/internal/state"
 )
 
@@ -206,6 +208,34 @@ func GateShapeProblems(root string, p *state.Plan) []string {
 		if ref := diffRef(t.Verify); ref != "" {
 			add("%s  diffs against %s rather than HEAD; a gate re-runs for the life of the plan and that baseline decays on the next commit", t.ID, ref)
 		}
+	}
+	platforms, err := config.Get(root, "platforms")
+	if err != nil || !config.MixedPlatforms(platforms.List) {
+		return out
+	}
+	platformText := config.FormatPlatforms(platforms.List)
+	for _, t := range p.Tasks {
+		if command := FirstPlatformSpecificCommand(t.Verify); command != "" {
+			add("%s  calls %s, which is not on every platform in platforms (%s); use a pwsh cmdlet or the project's own toolchain", t.ID, command, platformText)
+		}
+		gateDir := filepath.Join(root, filepath.FromSlash(state.GateFolder(t.ID)))
+		_ = filepath.WalkDir(gateDir, func(path string, entry fs.DirEntry, walkErr error) error {
+			if walkErr != nil || entry.IsDir() || !strings.EqualFold(filepath.Ext(path), ".ps1") {
+				return nil
+			}
+			raw, readErr := os.ReadFile(path)
+			if readErr != nil {
+				return nil
+			}
+			if command := FirstPlatformSpecificCommand(string(raw)); command != "" {
+				rel, relErr := filepath.Rel(root, path)
+				if relErr != nil {
+					rel = path
+				}
+				add("%s  %s calls %s, which is not on every platform in platforms (%s); use a pwsh cmdlet or the project's own toolchain", t.ID, filepath.ToSlash(rel), command, platformText)
+			}
+			return nil
+		})
 	}
 	return out
 }

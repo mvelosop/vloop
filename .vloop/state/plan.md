@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 3
+**Status:** running · **3/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-25T23:48:36Z
+**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-25T23:58:51Z
 
 ## Progress
 
 - [x] **T1** — Add mixed-team platform configuration
 - [x] **T2** — Report mixed-team health and block unsafe runs · 1 attempt(s)
-- [ ] **T3** — Lint mixed-team gates for portable commands
+- [x] **T3** — Lint mixed-team gates for portable commands
 - [ ] **T4** — Teach skills to write portable mixed-team gates
 - [ ] **T5** — Document mixed teams and the repository policy
 - [ ] **T6** — Prove the complete mixed-team workflow
@@ -66,7 +66,7 @@ $o = go test ./.vloop/state/gates/T2 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }
 
 ### T3 — Lint mixed-team gates for portable commands
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Make plan acceptance reject gate commands and PowerShell scripts that rely on platform-specific native tools when platforms is mixed. The lint must recognize PowerShell command positions precisely without changing behavior for unmixed or undeclared repositories.
 

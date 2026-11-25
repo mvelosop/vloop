@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Plan acceptance now rejects platform-specific command words in mixed-team task verifies and recursively scanned PowerShell gate fixtures while preserving unmixed and undeclared behavior.",
+  "files": [
+    "internal/driver/gateshape.go",
+    "internal/driver/plan_test.go"
+  ],
+  "verified": "vloop task gate T3 exited 0 and printed \"gate T3: pass (481ms)\".",
+  "notes": "Gate-shape lint resolves platforms through config, formats them canonically, and reuses FirstPlatformSpecificCommand so doctor and plan acceptance share one parser and command list. Committed tests cover exact membership, parsing exclusions, recursive .ps1 sources, unmixed behavior, and the B39 plan at 4c69adf0."
+}
