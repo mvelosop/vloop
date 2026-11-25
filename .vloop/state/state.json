@@ -5,9 +5,9 @@
   "base": "04c5526e85ea6a6483b153c55a4f8f241a85006c",
   "branch": "B20261125-2207-b40-i156-mixed-os-pwsh",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-25T23:09:54Z",
-  "updated": "2026-11-25T23:42:19Z",
+  "updated": "2026-11-25T23:48:36Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -99,9 +99,9 @@
         "The task adds committed doctor and preflight tests that run on Windows, macOS and Linux without a real claude or copilot process, and the go check runs them."
       ],
       "verify": "$o = go test ./.vloop/state/gates/T2 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "FirstPlatformSpecificCommand treats a wholly quoted standalone token such as 'grep' as a command, so mixed-repository checks warn on data that is not in command position."
+      "notes": ""
     },
     {
       "id": "T3",

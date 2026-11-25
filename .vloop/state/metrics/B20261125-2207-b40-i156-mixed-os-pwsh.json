@@ -16,59 +16,59 @@
   },
   "size": {
     "delivered": {
-      "code": 115,
-      "test": 177,
+      "code": 277,
+      "test": 239,
       "docs": 2,
       "other": 0,
       "deleted": {
-        "code": 16,
-        "test": 5,
+        "code": 31,
+        "test": 6,
         "docs": 1,
         "other": 0
       }
     },
     "churn": {
-      "code": 115,
-      "test": 177,
+      "code": 277,
+      "test": 239,
       "docs": 2,
       "other": 0,
       "deleted": {
-        "code": 16,
-        "test": 5,
+        "code": 31,
+        "test": 6,
         "docs": 1,
         "other": 0
       }
     },
-    "test_code_ratio": 1.5391304347826087,
+    "test_code_ratio": 0.8628158844765343,
     "rework": 1
   },
   "time": {
-    "agent_ms": 495352,
-    "work_ms": 394248,
-    "review_ms": 101104,
+    "agent_ms": 982427,
+    "work_ms": 777540,
+    "review_ms": 204887,
     "plan_ms": 480914,
-    "gates_ms": 1671,
-    "checks_ms": 160147,
+    "gates_ms": 4081,
+    "checks_ms": 315343,
     "gate_review_ms": 150656,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 13.929488525331482,
-    "code_test_per_min": 35.36878825562429
+    "code_per_min": 16.91728749311654,
+    "code_test_per_min": 31.513791864433696
   },
   "cost": {
-    "total_usd": 0.5750663,
+    "total_usd": 0.8381098,
     "plan_usd": 0.2241802,
-    "work_usd": 0.2185144,
-    "review_usd": 0.0570261,
+    "work_usd": 0.3939982,
+    "review_usd": 0.14458580000000001,
     "gate_review_usd": 0.0753456,
-    "per_1000_code_lines_usd": 5.000576521739131
+    "per_1000_code_lines_usd": 3.02566714801444
   },
   "credits": {
-    "total": 57.506629999999994,
+    "total": 83.81098,
     "plan": 22.41802,
-    "work": 21.85144,
-    "review": 5.70261,
+    "work": 39.399820000000005,
+    "review": 14.45858,
     "gate_review": 7.53456
   },
   "tokens": {
@@ -122,11 +122,11 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 0,
+    "in_loop": 1,
     "operator": 0,
     "escaped": 0,
-    "total": 0,
-    "removal_efficiency": null
+    "total": 1,
+    "removal_efficiency": 1
   },
   "interventions": {
     "total": 0,
@@ -152,9 +152,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 6,
-  "iterations": 1,
-  "iterations_per_closed": 1,
+  "permission_denials": 7,
+  "iterations": 2,
+  "iterations_per_closed": 2,
   "by_task": [
     {
       "id": "T1",
@@ -185,24 +185,26 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 162,
+        "test": 62,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 15,
+          "test": 1,
           "docs": 0,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "agent_ms": 487075,
+      "cost_usd": 0.26304350000000004,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": 0.38271604938271603,
+      "per_1000_code_lines_usd": 1.6237253086419756
     },
     {
       "id": "T3",
@@ -397,6 +399,49 @@
       "cost_source": "estimated",
       "credits": 5.70261,
       "turns": 13,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261125-230701",
+      "seq": 5,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 2,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 383292,
+      "cost_usd": 0.17548380000000002,
+      "cost_source": "estimated",
+      "credits": 17.54838,
+      "turns": 26,
+      "permission_denials": 1,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: command word $env:GOOS=linux starts with $ and cannot be judged"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261125-230701",
+      "seq": 6,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 2,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 103783,
+      "cost_usd": 0.0875597,
+      "cost_source": "estimated",
+      "credits": 8.75597,
+      "turns": 10,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

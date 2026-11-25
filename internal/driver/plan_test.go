@@ -68,6 +68,8 @@ func TestFirstPlatformSpecificCommand(t *testing.T) {
 		`if (Test-Path a) { wc -l a }`:                      "wc",
 		`& 'grep' -n ok a.txt`:                              "grep",
 		`& "/usr/bin/GREP.EXE" ok`:                          "grep",
+		`'grep'`:                                            "",
+		`"grep"`:                                            "",
 		`Select-String -Pattern 'grep' -Path a.txt`:         "",
 		`go test -run TestGrep ./...`:                       "",
 		`node -e "require('fs')"`:                           "",

@@ -48,12 +48,19 @@ var PlatformSpecificCommands = []string{
 // FirstPlatformSpecificCommand returns the first listed command word in s.
 func FirstPlatformSpecificCommand(s string) string {
 	commandPosition := true
+	afterCallOperator := false
 	for i := 0; i < len(s); {
 		switch s[i] {
 		case ' ', '\t', '\r':
 			i++
 			continue
-		case '\n', ';', '|', '&', '{', '(':
+		case '&':
+			afterCallOperator = (i == 0 || s[i-1] != '&') && (i+1 == len(s) || s[i+1] != '&')
+			commandPosition = true
+			i++
+			continue
+		case '\n', ';', '|', '{', '(':
+			afterCallOperator = false
 			commandPosition = true
 			i++
 			continue
@@ -89,7 +96,7 @@ func FirstPlatformSpecificCommand(s string) string {
 		word := s[start:i]
 		if commandPosition {
 			commandPosition = false
-			if len(word) >= 2 && whollyQuoted && (word[0] == word[len(word)-1]) {
+			if len(word) >= 2 && whollyQuoted && afterCallOperator && (word[0] == word[len(word)-1]) {
 				word = word[1 : len(word)-1]
 			}
 			word = strings.TrimSuffix(word, `.exe`)
@@ -105,6 +112,7 @@ func FirstPlatformSpecificCommand(s string) string {
 					}
 				}
 			}
+			afterCallOperator = false
 		}
 	}
 	return ""
