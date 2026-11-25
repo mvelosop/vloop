@@ -52,7 +52,7 @@ Sessions started by the vloop loop (plan, gate review, work, review) follow thes
 
 In an interactive session you are the operator's hands: follow the operator's playbook (/vloop:operate), not these session rules. To write a brief, follow /vloop:create-brief; to review one, run /vloop:review-brief in a separate session. If /vloop:operate is not available, the vloop plugin is not loaded: say so, give the user the ways to load it (in Claude Code, claude plugin install vloop@vloop --scope project, after claude plugin marketplace add mvelosop/vloop if Claude does not know the marketplace, or claude --plugin-dir "$(vloop plugin path)"; in Copilot CLI, trust this folder, since .claude/settings.json declares the plugin, or copilot plugin install vloop@vloop after copilot plugin marketplace add mvelosop/vloop, or copilot --plugin-dir "$(vloop plugin path)"), and meanwhile work from vloop --help.
 
-Written by vloop 0.15.0-rc.3.
+Written by vloop 0.15.0-rc.4.
 <!-- vloop:end -->
 
 ## Rules for any session working here

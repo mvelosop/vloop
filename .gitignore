@@ -2,3 +2,4 @@
 .DS_Store
 .vloop/tmp/
 __pycache__/
+.vloop/config.local.toml
