@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/mvelosop/vloop/internal/config"
 )
 
 type doctorEnv struct {
@@ -173,9 +176,50 @@ func (e *doctorEnv) plan(status, shell string) {
 func TestDoctorWorkedExampleText(t *testing.T) {
 	e := newDoctorEnv(t)
 	out, code := e.run("doctor")
-	want := "✓ git\n✓ install\n✓ config\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n✓ plugin\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n✓ guidelines 0 rule(s)\n- self-hosting\ndoctor: 0 problem(s), 1 warning(s)\n"
+	wantShell := "sh"
+	if runtime.GOOS == "windows" {
+		wantShell = "pwsh"
+	}
+	want := "✓ git\n✓ install\n✓ config\n! checks shell is not set in .vloop/config.toml, so each machine runs the checks in its own (" + wantShell + " here): set it there\n✓ claude\n✓ trust\n✓ gate shell\n- plan\n- branch\n✓ plugin\n! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json\n✓ guidelines 0 rule(s)\n- self-hosting\ndoctor: 0 problem(s), 2 warning(s)\n"
 	if code != 0 || out != want {
 		t.Errorf("exit %d, output:\n%s\nwant:\n%s", code, out, want)
+	}
+}
+
+func TestDoctorPlatformsAndPreflightRows(t *testing.T) {
+	vals := []config.Value{
+		{Key: "platforms", List: []string{"windows", "macos", "macos"}},
+		{Key: "shell", Value: "pwsh", Source: config.SourceFile},
+	}
+	var rows []doctorCheck
+	add := func(name, result, msg string) {
+		rows = append(rows, doctorCheck{Name: name, Result: result, Message: msg})
+	}
+	doctorPlatforms(vals, add)
+	if len(rows) != 1 || rows[0].Message != "macos, windows" && rows[0].Result != resWarning {
+		t.Fatalf("platforms rows = %#v", rows)
+	}
+
+	vals[1].Source = config.SourceDefault
+	rows = nil
+	doctorPlatforms(vals, add)
+	wantProblem := `macos, windows need shell = "pwsh" in .vloop/config.toml; it is not set`
+	if len(rows) != 1 || rows[0].Result != resProblem || rows[0].Message != wantProblem {
+		t.Fatalf("missing shell row = %#v", rows)
+	}
+
+	var out bytes.Buffer
+	bad := writeRunPreflightChecks(&out, []doctorCheck{
+		{Name: "platforms", Result: resProblem, Message: wantProblem},
+		{Name: "platforms", Result: resWarning, Message: "this machine (linux) is not one of macos, windows"},
+		{Name: "checks", Result: resWarning, Message: "go calls grep, which is not on every platform in platforms (macos, windows)"},
+		{Name: "checks", Result: resWarning, Message: "shell is not set in .vloop/config.toml, so each machine runs the checks in its own (pwsh here): set it there"},
+	}, false)
+	want := "  ✗ platforms " + wantProblem + "\n" +
+		"  ! platforms this machine (linux) is not one of macos, windows\n" +
+		"  ! checks go calls grep, which is not on every platform in platforms (macos, windows)\n"
+	if bad != 1 || out.String() != want {
+		t.Fatalf("preflight bad=%d output:\n%s\nwant:\n%s", bad, out.String(), want)
 	}
 }
 

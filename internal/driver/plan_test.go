@@ -61,6 +61,28 @@ func TestHeadDiffAdvisory(t *testing.T) {
 	}
 }
 
+func TestFirstPlatformSpecificCommand(t *testing.T) {
+	for cmd, want := range map[string]string{
+		`grep -n ok a.txt`:                                  "grep",
+		`go test ./... && /usr/bin/GREP.exe ok`:             "grep",
+		`if (Test-Path a) { wc -l a }`:                      "wc",
+		`& 'grep' -n ok a.txt`:                              "grep",
+		`& "/usr/bin/GREP.EXE" ok`:                          "grep",
+		`Select-String -Pattern 'grep' -Path a.txt`:         "",
+		`go test -run TestGrep ./...`:                       "",
+		`node -e "require('fs')"`:                           "",
+		`Write-Output 'go test ./... | grep ok'`:            "",
+		`$cmd = 'grep'; & $cmd ok`:                          "",
+		`pwsh -NoProfile -File script.ps1`:                  "",
+		`go version | Select-String -Pattern "awk | sed"`:   "",
+		`go version; /opt/bin/find.exe . && Measure-Object`: "find",
+	} {
+		if got := FirstPlatformSpecificCommand(cmd); got != want {
+			t.Errorf("FirstPlatformSpecificCommand(%q) = %q, want %q", cmd, got, want)
+		}
+	}
+}
+
 func TestGateShapeProblems(t *testing.T) {
 	root := t.TempDir()
 	run := func(args ...string) {

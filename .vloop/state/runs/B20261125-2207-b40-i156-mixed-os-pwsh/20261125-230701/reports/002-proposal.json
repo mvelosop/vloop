@@ -1,0 +1,15 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Doctor now reports mixed-platform shell health in the required row order and warns about default or non-portable checks. Run preflight prints the portable-check and platform findings, and refuses platform and mixed-shell problems before planning.",
+  "files": [
+    "internal/cli/doctor.go",
+    "internal/cli/doctor_test.go",
+    "internal/cli/run.go",
+    "internal/driver/gateshape.go",
+    "internal/driver/plan_test.go"
+  ],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: pass; focused doctor, preflight and parser tests passed.",
+  "notes": "The platform command parser and ordered list live in internal/driver so T3's gate lint can reuse the same M3 command-position rules. A plan's recorded shell remains the doctorPlanShell authority; mixed config changes only the no-plan gate-shell row."
+}

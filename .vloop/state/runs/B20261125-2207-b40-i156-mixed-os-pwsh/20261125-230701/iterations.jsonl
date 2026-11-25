@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":160147,"exit":0,"name":"go"}],"ended":"2026-11-25T23:31:31Z","gate":{"duration_ms":1671,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261125-2207-b40-i156-mixed-os-pwsh","schema":"iteration/v2","started":"2026-11-25T23:20:32Z","task":"T1"}
+{"attempt":1,"checks":[{"duration_ms":155196,"exit":0,"name":"go"}],"ended":"2026-11-25T23:42:19Z","gate":{"duration_ms":2410,"exit":0},"iteration":2,"outcome":"rejected","run_id":"B20261125-2207-b40-i156-mixed-os-pwsh","schema":"iteration/v2","started":"2026-11-25T23:31:32Z","task":"T2"}

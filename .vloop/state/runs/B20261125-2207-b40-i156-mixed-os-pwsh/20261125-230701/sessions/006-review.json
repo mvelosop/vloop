@@ -1,0 +1,29 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.0875597,
+  "credits": 8.75597,
+  "duration_ms": 101646,
+  "effort": null,
+  "ended": "2026-11-25T23:42:19Z",
+  "is_error": false,
+  "iteration": 2,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.0875597,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [],
+  "phase": "review",
+  "run_id": "B20261125-2207-b40-i156-mixed-os-pwsh",
+  "schema": "session/v3",
+  "started": "2026-11-25T23:40:35Z",
+  "task": "T2",
+  "turns": 10,
+  "wall_ms": 103783
+}

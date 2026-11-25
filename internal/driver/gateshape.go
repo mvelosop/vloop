@@ -34,6 +34,82 @@ var (
 	reHeadDiff = regexp.MustCompile(`git[[:space:]]+(diff|log|rev-list)[[:space:]]+(--[a-zA-Z-]+[[:space:]]+)*HEAD([[:space:]]|$)`)
 )
 
+// PlatformSpecificCommands are native commands a mixed-platform gate may not
+// assume exist with the same meaning on every declared platform.
+var PlatformSpecificCommands = []string{
+	"awk", "basename", "bash", "cat", "chmod", "cmd", "cmp", "cp", "cut",
+	"date", "diff", "dirname", "env", "fc", "find", "findstr", "grep", "head",
+	"ln", "ls", "mkdir", "mktemp", "mv", "powershell", "printf", "readlink",
+	"rm", "robocopy", "sed", "seq", "sh", "sleep", "sort", "stat", "tail",
+	"tee", "test", "touch", "tr", "uniq", "wc", "which", "xargs", "xcopy",
+	"zsh",
+}
+
+// FirstPlatformSpecificCommand returns the first listed command word in s.
+func FirstPlatformSpecificCommand(s string) string {
+	commandPosition := true
+	for i := 0; i < len(s); {
+		switch s[i] {
+		case ' ', '\t', '\r':
+			i++
+			continue
+		case '\n', ';', '|', '&', '{', '(':
+			commandPosition = true
+			i++
+			continue
+		}
+
+		start := i
+		quote := byte(0)
+		whollyQuoted := false
+		for i < len(s) {
+			c := s[i]
+			if quote == 0 {
+				switch c {
+				case ' ', '\t', '\r', '\n', ';', '|', '&', '{', '(':
+					goto token
+				case '\'', '"':
+					quote = c
+					whollyQuoted = i == start
+					i++
+					continue
+				}
+			} else {
+				if c == quote {
+					quote = 0
+				} else if c == '\\' && quote == '"' && i+1 < len(s) {
+					i++
+				}
+				i++
+				continue
+			}
+			i++
+		}
+	token:
+		word := s[start:i]
+		if commandPosition {
+			commandPosition = false
+			if len(word) >= 2 && whollyQuoted && (word[0] == word[len(word)-1]) {
+				word = word[1 : len(word)-1]
+			}
+			word = strings.TrimSuffix(word, `.exe`)
+			if strings.HasSuffix(word, `.EXE`) {
+				word = strings.TrimSuffix(word, `.EXE`)
+			}
+			if word != "" && !strings.ContainsAny(word[:1], "$-@[0123456789") {
+				base := filepath.Base(strings.ReplaceAll(word, `\`, `/`))
+				base = strings.TrimSuffix(strings.ToLower(base), ".exe")
+				for _, name := range PlatformSpecificCommands {
+					if base == name {
+						return name
+					}
+				}
+			}
+		}
+	}
+	return ""
+}
+
 // lastField is the last whitespace-separated field of s.
 func lastField(s string) string {
 	f := strings.Fields(s)

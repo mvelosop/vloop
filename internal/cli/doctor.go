@@ -111,6 +111,7 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 
 	if cerr == nil {
 		doctorConfigLocal(root, vals, isRepo, add)
+		doctorPlatforms(vals, add)
 		doctorConfig(root, vals, isRepo, add)
 	}
 
@@ -232,10 +233,70 @@ func doctorConfigLocal(root string, vals []config.Value, isRepo bool, add func(n
 	add("config.local", resWarning, "overrides "+strings.Join(keys, ", ")+" — on this machine only")
 }
 
+// doctorPlatforms reports the shared mixed-team shell contract and whether the
+// current machine is one of the declared platforms.
+func doctorPlatforms(vals []config.Value, add func(name, result, msg string)) {
+	platforms, shell := config.Value{}, config.Value{}
+	for _, v := range vals {
+		switch v.Key {
+		case "platforms":
+			platforms = v
+		case "shell":
+			shell = v
+		}
+	}
+	if len(platforms.List) == 0 {
+		return
+	}
+	shown := config.FormatPlatforms(platforms.List)
+	if config.MixedPlatforms(platforms.List) {
+		switch {
+		case shell.Source != config.SourceFile:
+			add("platforms", resProblem, fmt.Sprintf(`%s need shell = "pwsh" in %s; it is not set`, shown, config.FilePath))
+			return
+		case shell.Value != "pwsh":
+			add("platforms", resProblem, fmt.Sprintf(`%s need shell = "pwsh" in %s; it is %q`, shown, config.FilePath, shell.Value))
+			return
+		}
+	}
+	host := hostOS
+	if host == "darwin" {
+		host = "macos"
+	}
+	if !slices.Contains(platforms.List, host) {
+		add("platforms", resWarning, fmt.Sprintf("this machine (%s) is not one of %s", host, shown))
+		return
+	}
+	add("platforms", resPass, shown)
+}
+
 // doctorConfig adds the checks and gate-scratch findings of a readable config.
 func doctorConfig(root string, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
-	if cks, err := config.Checks(root); err == nil && len(cks) == 0 {
+	cks, err := config.Checks(root)
+	if err == nil && len(cks) == 0 {
 		add("checks", resProblem, "no [[check]] is configured — a run needs at least one; see docs/guide/configuration.md")
+	}
+	platforms := config.Value{}
+	shell := config.Value{}
+	for _, v := range vals {
+		switch v.Key {
+		case "platforms":
+			platforms = v
+		case "shell":
+			shell = v
+		}
+	}
+	if len(cks) > 0 {
+		switch {
+		case len(platforms.List) == 0 && shell.Source != config.SourceFile:
+			add("checks", resWarning, fmt.Sprintf("shell is not set in %s, so each machine runs the checks in its own (%s here): set it there", config.FilePath, shell.Value))
+		case config.MixedPlatforms(platforms.List):
+			for _, check := range cks {
+				if command := driver.FirstPlatformSpecificCommand(check.Run); command != "" {
+					add("checks", resWarning, fmt.Sprintf("%s calls %s, which is not on every platform in platforms (%s)", check.Name, command, config.FormatPlatforms(platforms.List)))
+				}
+			}
+		}
 	}
 	for _, v := range vals {
 		if v.Key != "run.gate-scratch" {
@@ -473,11 +534,15 @@ func doctorCopilot(root string, keys []string, add func(name, result, msg string
 // doctorPlanShell adds the gate shell, plan and branch checks.
 func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *string, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
 	shell := plan.Shell
+	mixed := false
 	if !hasPlan {
 		shell = ""
 		for _, v := range vals {
 			if v.Key == "shell" {
 				shell = v.Value
+			}
+			if v.Key == "platforms" {
+				mixed = config.MixedPlatforms(v.List)
 			}
 		}
 	}
@@ -488,6 +553,8 @@ func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *s
 		add("gate shell", resPass, "")
 	case hasPlan:
 		add("gate shell", resProblem, fmt.Sprintf("the plan's shell %q is not on PATH", shell))
+	case mixed:
+		add("gate shell", resProblem, fmt.Sprintf("the configured shell %q is not on PATH", shell))
 	default:
 		add("gate shell", resWarning, fmt.Sprintf("the configured shell %q is not on PATH", shell))
 	}

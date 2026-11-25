@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 1
+**Status:** running · **1/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-25T23:31:31Z
+**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-25T23:42:19Z
 
 ## Progress
 
 - [x] **T1** — Add mixed-team platform configuration
-- [ ] **T2** — Report mixed-team health and block unsafe runs
+- [ ] **T2** — Report mixed-team health and block unsafe runs · 1 attempt(s)
 - [ ] **T3** — Lint mixed-team gates for portable commands
 - [ ] **T4** — Teach skills to write portable mixed-team gates
 - [ ] **T5** — Document mixed teams and the repository policy
@@ -42,7 +42,7 @@ $o = go test ./.vloop/state/gates/T1 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }
 
 ### T2 — Report mixed-team health and block unsafe runs
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 Expose the new configuration contract through doctor and run preflight so mixed repositories fail clearly before work starts. Preserve the existing P-5 behavior when a plan already records its shell, while adding only the required warnings for ordinary repositories.
 
@@ -55,6 +55,8 @@ Expose the new configuration contract through doctor and run preflight so mixed 
 - A mixed repository produces one checks warning for each check whose command word first matches the M3 list, and vloop run prints it; a listed token used only as data or inside a quoted argument does not warn.
 - Run preflight prints the exact platforms problem or warning with two spaces and its symbol, counts the platforms problem as a refusal, and reaches no plan session or agent when it fails.
 - The task adds committed doctor and preflight tests that run on Windows, macOS and Linux without a real claude or copilot process, and the go check runs them.
+
+**From the last attempt:** FirstPlatformSpecificCommand treats a wholly quoted standalone token such as 'grep' as a command, so mixed-repository checks warn on data that is not in command position.
 
 <details><summary>verify command</summary>
 

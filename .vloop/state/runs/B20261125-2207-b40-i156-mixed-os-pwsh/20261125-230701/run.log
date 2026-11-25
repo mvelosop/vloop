@@ -19,3 +19,9 @@ committing the plan
    review T1 · 1m41s · $0.06 · run $0.58 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/6 done ──
+   Report mixed-team health and block unsafe runs
+   work T2 · 6m23s · $0.18 · run $0.75 / $40.00
+   check go
+   review T2 · 1m44s · $0.09 · run $0.84 / $40.00
+   review: FAIL
