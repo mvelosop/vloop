@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md",
   "base": "3b2db83b1a7b73c5eec9d712263240246c01e797",
   "branch": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan",
-  "status": "running",
+  "status": "complete",
   "iteration": 4,
   "created": "2026-11-26T10:24:41Z",
-  "updated": "2026-11-26T10:56:10Z",
+  "updated": "2026-11-26T11:01:42Z",
   "shell": "pwsh",
   "checks": [
     {

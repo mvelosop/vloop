@@ -36,3 +36,11 @@ committing the plan
    review T3 · 1m59s · $0.06 · run $0.87 / $40.00
    review: PASS
    T3 done
+   check go
+   verify · 4m42s · $0.16 · run $1.03 / $40.00
+verify: no findings; 5 example line(s) not run — see .vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817/reports/verify.json
+
+═══ complete ═══
+run:    B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817  (4 iteration(s) this run)
+plan:   3/3 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.md

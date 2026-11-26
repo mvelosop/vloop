@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 3,
-    "done": 2,
+    "done": 3,
     "blocked": 0,
-    "first_pass": 1,
+    "first_pass": 2,
     "estimate": {
       "min": 2,
       "max": 3
@@ -43,32 +43,32 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 620250,
-    "work_ms": 376305,
-    "review_ms": 243945,
+    "agent_ms": 819848,
+    "work_ms": 456953,
+    "review_ms": 362895,
     "plan_ms": 408173,
-    "gates_ms": 10090,
-    "checks_ms": 455958,
+    "gates_ms": 15833,
+    "checks_ms": 505094,
     "gate_review_ms": 118257,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 2.2249093107617894,
-    "code_test_per_min": 12.962515114873035
+    "code_per_min": 1.6832388442735726,
+    "code_test_per_min": 9.806695875332988
   },
   "cost": {
-    "total_usd": 0.7575516,
+    "total_usd": 0.8659773000000001,
     "plan_usd": 0.3144804,
-    "work_usd": 0.2244489,
-    "review_usd": 0.12026300000000001,
+    "work_usd": 0.2720207,
+    "review_usd": 0.18111690000000003,
     "gate_review_usd": 0.0983593,
-    "per_1000_code_lines_usd": 32.93702608695652
+    "per_1000_code_lines_usd": 37.65118695652174
   },
   "credits": {
-    "total": 75.75516,
+    "total": 86.59773,
     "plan": 31.44804,
-    "work": 22.44489,
-    "review": 12.026299999999999,
+    "work": 27.20207,
+    "review": 18.11169,
     "gate_review": 9.83593
   },
   "tokens": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 2,
-  "iterations": 3,
-  "iterations_per_closed": 1.5,
+  "iterations": 4,
+  "iterations_per_closed": 1.3333333333333333,
   "by_task": [
     {
       "id": "T1",
@@ -210,7 +210,7 @@
       "id": "T3",
       "area": null,
       "kind": "test",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -223,9 +223,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 199598,
+      "cost_usd": 0.1084257,
+      "models": [
+        "mai-code-2"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     }
@@ -388,6 +390,44 @@
       "cost_source": "estimated",
       "credits": 2.30262,
       "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 9,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 80648,
+      "cost_usd": 0.0475718,
+      "cost_source": "estimated",
+      "credits": 4.75718,
+      "turns": 10,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 10,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 118950,
+      "cost_usd": 0.0608539,
+      "cost_source": "estimated",
+      "credits": 6.08539,
+      "turns": 14,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

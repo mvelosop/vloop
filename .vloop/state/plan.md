@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/3 done** · iteration 4
+**Status:** complete · **3/3 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T10:56:10Z
+**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T11:01:42Z
 
 ## Progress
 

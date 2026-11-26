@@ -34,3 +34,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The final tree passes both earlier gates together, including the built-CLI worked example for doctor text and JSON, configured-shell warnings, and replaced versus in-use plans during run preflight.
 - **Files:** none
 - **Notes for next iteration:** No product or documentation changes were needed in the close task; the T3 gate reused the unchanged T1 and T2 gates and the T1 gate exercised the complete worked example in a temporary repository.
+
+## Run ended — complete
+
+- **Run:** `B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan` · 4 iteration(s) this run
+- **Plan:** 3/3 done, 0 blocked

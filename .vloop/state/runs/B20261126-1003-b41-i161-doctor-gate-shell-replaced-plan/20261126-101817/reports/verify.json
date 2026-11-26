@@ -1,0 +1,34 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [],
+  "not_run": [
+    {
+      "line": "vloop init",
+      "reason": "denied rule; operator's, at close"
+    },
+    {
+      "line": "vloop doctor",
+      "reason": "command denied by the vloop fence"
+    },
+    {
+      "line": "vloop doctor --json",
+      "reason": "command denied by the vloop fence"
+    },
+    {
+      "line": "vloop run docs/briefs/B20260101-0901-b.loop-brief.md",
+      "reason": "denied rule"
+    },
+    {
+      "line": "vloop run docs/briefs/B20260101-0900-a.loop-brief.md",
+      "reason": "denied rule"
+    }
+  ],
+  "checked": {
+    "example_lines": 2,
+    "sentences": 12,
+    "surfaces": 10
+  },
+  "notes": "No disagreement found. The verify fence denied vloop run --help; the generated command reference and the preflight implementation were read instead."
+}
+
