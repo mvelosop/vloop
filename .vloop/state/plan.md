@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **0/5 done** · iteration 1
+**Status:** running · **0/5 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T14:54:38Z
+**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T14:59:25Z
 
 ## Progress
 
-- [ ] **T1** — Implement self-update target decisions and check mode · **blocked**
+- [ ] **T1** — Implement self-update target decisions and check mode · 1 attempt(s)
 - [ ] **T2** — Install self-update targets safely
 - [ ] **T3** — Update installed agent plugins
 - [ ] **T4** — Point existing commands and guides to self-update
@@ -18,7 +18,7 @@
 
 ### T1 — Implement self-update target decisions and check mode
 
-`blocked` · **blocked** · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 Introduce the self-update command so a released vloop can safely choose and report its target from any directory. This establishes the refusal, version-selection and machine-readable contract that installation and plugin updates build on.
 
@@ -36,7 +36,7 @@ Introduce the self-update command so a released vloop can safely choose and repo
 - docs/guide/commands.md is regenerated from the command tree and documents the new command and flags rather than being hand-maintained.
 - No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted.
 
-**From the last attempt:** gate disputed: The T1 gate fails inside its own PowerShell harness before it invokes the command because $HOME is a read-only automatic variable on PowerShell. — Harness line 21 is '$home = [IO.Path]::GetFullPath(...)'. Running vloop task gate T1 exits 1 with 'Cannot overwrite variable HOME because it is read-only or constant.' and never reaches an assertion.
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-145545/checks/002-go.fail.log
 
 <details><summary>verify command</summary>
 

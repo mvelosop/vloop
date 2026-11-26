@@ -1,0 +1,36 @@
+--- FAIL: TestSchemasAreEmbedded (0.00s)
+    embed_test.go:19: embedded schemas: 27 entries, err <nil>
+FAIL
+FAIL	github.com/mvelosop/vloop	0.142s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	2.115s
+--- FAIL: TestWorkedExampleB2Commands (1.47s)
+    b2_e2e_test.go:128: got code=0 out="brief-review/v1\ndefect/v1\nexport/v1\ngate-verdict/v1\ngate-verdict/v2\ninstall/v1\nintervention/v1\nintervention/v2\niteration/v1\niteration/v2\niteration/v3\nmetrics/v1\nmetrics/v2\nmetrics/v3\nmetrics/v4\nproposal/v1\nself-update/v1\nsession/v1\nsession/v2\nsession/v3\nsession/v4\nsession/v5\nstate/v1\nstate/v2\nverdict/v1\nverify/v1\nverify/v2\n" err=""
+        want code=0 out="brief-review/v1\ndefect/v1\nexport/v1\ngate-verdict/v1\ngate-verdict/v2\ninstall/v1\nintervention/v1\nintervention/v2\niteration/v1\niteration/v2\niteration/v3\nmetrics/v1\nmetrics/v2\nmetrics/v3\nmetrics/v4\nproposal/v1\nsession/v1\nsession/v2\nsession/v3\nsession/v4\nsession/v5\nstate/v1\nstate/v2\nverdict/v1\nverify/v1\nverify/v2\n" err=""
+FAIL
+FAIL	github.com/mvelosop/vloop/cmd/vloop	35.175s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+ok  	github.com/mvelosop/vloop/internal/budget	(cached)
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	109.976s
+ok  	github.com/mvelosop/vloop/internal/closing	0.095s
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	5.907s
+ok  	github.com/mvelosop/vloop/internal/fence	(cached)
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	0.568s
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	0.387s
+ok  	github.com/mvelosop/vloop/internal/state	6.879s
+ok  	github.com/mvelosop/vloop/tools/agent-eval	(cached)
+?   	github.com/mvelosop/vloop/tools/check	[no test files]
+ok  	github.com/mvelosop/vloop/tools/copilot-acceptance/kit	(cached)
+ok  	github.com/mvelosop/vloop/tools/release	(cached)
+FAIL
+check: test failed: exit status 1
+exit status 1
