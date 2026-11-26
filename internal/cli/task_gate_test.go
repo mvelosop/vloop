@@ -101,10 +101,12 @@ func TestTaskGateShellInvocation(t *testing.T) {
 	if _, err := exec.LookPath("sh"); err != nil {
 		t.Skip("sh is not on PATH, so the shell test doubles cannot run")
 	}
+	// pwsh and powershell run the command after the UTF-8 setup (B43).
+	const utf8 = `try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {} ; try { [Console]::InputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {} ; try { $OutputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {} ; `
 	for shell, want := range map[string]string{
 		"bash":       "-c|CMD",
-		"pwsh":       "-NoProfile|-NonInteractive|-Command|CMD",
-		"powershell": "-NoProfile|-NonInteractive|-Command|CMD",
+		"pwsh":       "-NoProfile|-NonInteractive|-Command|" + utf8 + "CMD",
+		"powershell": "-NoProfile|-NonInteractive|-Command|" + utf8 + "CMD",
 		"cmd":        "/C|CMD",
 	} {
 		bin, log := t.TempDir(), filepath.Join(t.TempDir(), "args")
