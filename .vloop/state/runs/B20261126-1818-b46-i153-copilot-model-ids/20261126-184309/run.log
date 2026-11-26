@@ -31,3 +31,10 @@ committing the plan
    review T2 · 1m26s · $0.04 · run $0.86 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/6 done ──
+   Check configured Copilot models in doctor
+   work T3 · 6m32s · $0.14 · run $1.00 / $40.00
+   check go
+   review T3 · 1m34s · $0.04 · run $1.04 / $40.00
+   review: PASS
+   T3 done

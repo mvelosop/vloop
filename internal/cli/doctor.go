@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,12 +12,14 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/mvelosop/vloop/internal/budget"
 	"github.com/mvelosop/vloop/internal/classify"
 	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/copilot"
 	"github.com/mvelosop/vloop/internal/driver"
 	"github.com/mvelosop/vloop/internal/gitrun"
 	"github.com/mvelosop/vloop/internal/install"
@@ -126,7 +129,11 @@ func runDoctor(b Build, root string, runBrief *string) []doctorCheck {
 	copilotRow, copilotBad := false, false
 	if cerr == nil {
 		doctorSecondReview(root, add)
-		if keys := append(copilotKeys(root), copilotReviewBriefKey(root)...); len(keys) > 0 {
+		keys := copilotKeys(root)
+		if runBrief == nil {
+			keys = append(keys, copilotReviewBriefKey(root)...)
+		}
+		if len(keys) > 0 {
 			doctorCopilot(root, keys, add)
 			copilotRow = true
 			for _, c := range checks {
@@ -511,7 +518,9 @@ func doctorCopilot(root string, keys []string, add func(name, result, msg string
 	} else {
 		add("copilot", resPass, "")
 	}
-	if copilotLoggedIn() {
+	loggedIn := copilotLoggedIn()
+	doctorCopilotModels(root, keys, loggedIn, add)
+	if loggedIn {
 		add("copilot login", resPass, "")
 	} else {
 		add("copilot login", resProblem, copilotNoLogin)
@@ -529,6 +538,106 @@ func doctorCopilot(root string, keys []string, add func(name, result, msg string
 			add(".claude/skills/"+e.Name(), resWarning, "may be loaded instead of /vloop:review by a copilot session")
 		}
 	}
+}
+
+func doctorCopilotModels(root string, keys []string, loggedIn bool, add func(name, result, msg string)) {
+	type configuredModel struct {
+		key string
+		id  string
+	}
+	var configured, aliases []configuredModel
+	for _, key := range keys {
+		modelKey := strings.Replace(key, "agent.", "model.", 1)
+		model, err := config.Get(root, modelKey)
+		if err != nil {
+			continue
+		}
+		entry := configuredModel{key: modelKey, id: model.Value}
+		configured = append(configured, entry)
+		if isClaudeAlias(entry.id) {
+			aliases = append(aliases, entry)
+		}
+	}
+
+	aliasProblems := func() []string {
+		problems := make([]string, 0, len(aliases))
+		for _, model := range aliases {
+			problems = append(problems, model.key+" "+model.id+" is a Claude alias")
+		}
+		return problems
+	}
+	if len(configured) == 0 {
+		return
+	}
+	if len(aliases) == len(configured) {
+		problems := aliasProblems()
+		problems = append(problems, "ids not checked against the list")
+		add("copilot models", resProblem, strings.Join(problems, "; "))
+		return
+	}
+	if !loggedIn {
+		if len(aliases) > 0 {
+			problems := append(aliasProblems(), "ids not checked against the list")
+			add("copilot models", resProblem, strings.Join(problems, "; "))
+		}
+		return
+	}
+
+	client, err := copilot.New(5 * time.Second)
+	if err != nil {
+		if errors.Is(err, copilot.ErrNoLogin) {
+			if len(aliases) > 0 {
+				problems := append(aliasProblems(), "ids not checked against the list")
+				add("copilot models", resProblem, strings.Join(problems, "; "))
+			}
+			return
+		}
+		add("copilot models", resWarning, fmt.Sprintf("cannot reach Copilot's model list (%s); ids not checked", err))
+		return
+	}
+	models, modelsErr := client.Models(context.Background())
+	plan, planErr := client.Plan(context.Background())
+	planName := "unknown"
+	if planErr == nil && plan != nil {
+		planName = *plan
+	}
+	if modelsErr != nil {
+		if len(aliases) > 0 {
+			problems := append(aliasProblems(), "ids not checked against the list")
+			add("copilot models", resProblem, strings.Join(problems, "; "))
+		} else {
+			add("copilot models", resWarning, fmt.Sprintf("cannot reach Copilot's model list (%s); ids not checked", modelsErr))
+		}
+		return
+	}
+
+	byID := make(map[string]copilot.Model, len(models))
+	for _, model := range models {
+		byID[model.ID] = model
+	}
+	var problems []string
+	problems = append(problems, aliasProblems()...)
+	for _, model := range configured {
+		if isClaudeAlias(model.id) {
+			continue
+		}
+		listed, ok := byID[model.id]
+		switch {
+		case !ok:
+			problems = append(problems, model.key+" "+model.id+" is not listed")
+		case listed.Policy != nil && *listed.Policy == "disabled":
+			problems = append(problems, model.key+" "+model.id+" is disabled")
+		}
+	}
+	if len(problems) > 0 {
+		add("copilot models", resProblem, strings.Join(problems, "; ")+" · plan "+planName+" — vloop models copilot lists them")
+		return
+	}
+	distinct := make(map[string]bool, len(configured))
+	for _, model := range configured {
+		distinct[model.id] = true
+	}
+	add("copilot models", resPass, fmt.Sprintf("%d id(s) checked · plan %s", len(distinct), planName))
 }
 
 // doctorPlanShell adds the gate shell, plan and branch checks.

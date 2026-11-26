@@ -5,9 +5,9 @@
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T19:25:01Z",
+  "updated": "2026-11-26T19:35:40Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -124,7 +124,7 @@
         "Committed Go tests use httptest for pass, missing, disabled, alias, unreachable, no-login, no-Copilot-kind, distinct-count, plan-unknown, ordering, and JSON-row behavior; no test reaches the real APIs."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

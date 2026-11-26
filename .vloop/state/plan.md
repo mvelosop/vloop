@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 3
+**Status:** running · **3/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:25:01Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:35:40Z
 
 ## Progress
 
 - [x] **T1** — List Copilot model ids and the account plan · 1 attempt(s)
 - [x] **T2** — Check Copilot model ids in config set
-- [ ] **T3** — Check configured Copilot models in doctor
+- [x] **T3** — Check configured Copilot models in doctor
 - [ ] **T4** — Set several session kinds in one config command
 - [ ] **T5** — Document the Copilot model commands
 - [ ] **T6** — Verify the Copilot model workflow end to end
@@ -64,7 +64,7 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 ### T3 — Check configured Copilot models in doctor
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Extend doctor's existing Copilot preflight with one row that checks every in-use Copilot kind's resolved model and displays the account plan. This makes an edited invalid id refuse vloop run before a paid session starts without turning API unavailability into a refusal.
 

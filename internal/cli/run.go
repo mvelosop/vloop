@@ -222,7 +222,7 @@ func writeRunPreflightChecks(out io.Writer, checks []doctorCheck, runKeys bool) 
 		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
 			fmt.Fprintf(out, "  ✗ %s %s\n", c.Name, c.Message)
 			bad++
-		case c.Result == resWarning && (c.Name == "platforms" || c.Name == "checks" || c.Name == "gate shell" || c.Name == "config.local" || c.Name == "agent.plan" || c.Name == "agent.work" || c.Name == "agent.review" || c.Name == "agent.gate-review" || c.Name == "agent.second-review" || c.Name == "agent.verify" || c.Name == "run.second-review:" && c.Result == resWarning || strings.HasPrefix(c.Name, ".claude/skills/")):
+		case c.Result == resWarning && (c.Name == "platforms" || c.Name == "checks" || c.Name == "gate shell" || c.Name == "config.local" || c.Name == "copilot models" || c.Name == "agent.plan" || c.Name == "agent.work" || c.Name == "agent.review" || c.Name == "agent.gate-review" || c.Name == "agent.second-review" || c.Name == "agent.verify" || c.Name == "run.second-review:" && c.Result == resWarning || strings.HasPrefix(c.Name, ".claude/skills/")):
 			fmt.Fprintf(out, "  ! %s %s\n", c.Name, c.Message)
 		}
 	}

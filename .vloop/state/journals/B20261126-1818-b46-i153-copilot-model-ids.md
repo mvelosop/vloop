@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Config set now validates a resolved Copilot model before writing, refuses aliases, missing ids and disabled ids, and warns without refusing when the five-second models check is unavailable.
 - **Files:** internal/cli/config.go, internal/cli/config_test.go, internal/copilot/client.go
 - **Notes for next iteration:** Validation previews C-1 precedence for the candidate model without writing; removals, non-Copilot agents and locally known aliases skip the models request. Responses without the required data field are treated as malformed and warning-only for config set.
+
+## T3 — Check configured Copilot models in doctor
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Doctor now checks every in-use Copilot kind's resolved model, reports the account plan, and refuses invalid listed-state, missing, or Claude-alias models through the run preflight.
+- **Files:** internal/cli/doctor.go, internal/cli/doctor_copilot_models_test.go, internal/cli/doctor_test.go, internal/cli/run.go
+- **Notes for next iteration:** The models and plan requests each use the shared Copilot client with a five-second timeout. API failures remain warnings, aliases are diagnosed without network access when all configured ids are aliases, and the shared test harness now uses httptest so doctor tests never contact real APIs.
