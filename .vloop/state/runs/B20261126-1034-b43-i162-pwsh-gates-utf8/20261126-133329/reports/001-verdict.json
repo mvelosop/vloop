@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "GateCommand configures [Console]::OutputEncoding, [Console]::InputEncoding, and $OutputEncoding as BOM-free UTF-8 before the recorded command runs for both pwsh and powershell, while attempting setup failures silently and continuing to the recorded command.",
+      "met": true,
+      "evidence": "internal/state/gate.go:18-31 defines three independent try/catch assignments using UTF8Encoding(false) and prefixes them to the -Command argument only for pwsh and powershell."
+    },
+    {
+      "criterion": "The shared runner preserves the recorded command's stdout, stderr, and exit code; an exit 3 remains 3 and the setup itself prints nothing.",
+      "met": true,
+      "evidence": "internal/state/gate.go:77-111 keeps the existing direct stdout/stderr wiring and exit-code return; internal/state/gate_test.go:70-72 verifies exit 3 with empty stdout and stderr for each discovered PowerShell shell."
+    },
+    {
+      "criterion": "Native git output containing café reaches a PowerShell Select-String assertion intact, and café sent through a PowerShell pipeline to git hash-object has the expected UTF-8 bytes and platform line ending.",
+      "met": true,
+      "evidence": "internal/state/gate_test.go:40-65 exercises native git log output and computes git hash-object's expected value from UTF-8 café plus the platform line ending."
+    },
+    {
+      "criterion": "The invocation arguments for sh, bash, and cmd are unchanged, and shown, recorded, or logged gate command text contains only the recorded command, never the encoding setup.",
+      "met": true,
+      "evidence": "internal/state/gate.go:24-32 changes only the pwsh/powershell branch; internal/state/gate_test.go:15-24 pins the sh, bash, and cmd argument lists, while task display and driver logs continue to read the task's original Verify value and captured command output."
+    },
+    {
+      "criterion": "Committed tests run by the go check cover native output, native stdin, emitted bytes, all three BOM-free encodings, setup silence, exit-code preservation, and the unchanged non-PowerShell argument lists; the planner-owned oracle is not used as that test suite.",
+      "met": true,
+      "evidence": "internal/state/gate_test.go:27-80 contains the committed native input/output, byte, encoding, silence, exit-code, and argument assertions; .vloop/tmp/checks.json records the go check exit 0, and its log includes internal/state."
+    }
+  ],
+  "findings": [],
+  "notes": "The planner-owned oracle remains unchanged under .vloop; the product adds its own independent committed coverage in internal/state/gate_test.go."
+}

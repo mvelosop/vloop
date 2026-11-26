@@ -1,0 +1,36 @@
+checking the base: go
+the plan B20261126-1008-b42-i162-fence-reads-pwsh was for docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md — you asked for docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md using mai-code-2
+   plan · 4m48s · $0.17 · run $0.17 / $40.00
+checking the gate of T1 on the base
+checking the gate of T2 on the base
+checking the gate of T3 on the base
+planned: B20261126-1034-b43-i162-pwsh-gates-utf8 — 3 tasks
+reviewing the gates using mai-code-2 (round 1)
+   gate review · 2m45s · $0.09 · run $0.26 / $40.00
+committing the plan
+── iteration 1 (1 this run) · T1 · 0/3 done ──
+   Make PowerShell gate processes UTF-8
+   work T1 · 2m07s · $0.09 · run $0.35 / $40.00
+   check go
+   review T1 · 1m14s · $0.05 · run $0.40 / $40.00
+   review: PASS
+   T1 done
+── iteration 2 (2 this run) · T2 · 1/3 done ──
+   Document UTF-8 behavior for PowerShell users
+   work T2 · 1m05s · $0.04 · run $0.44 / $40.00
+   check go
+   review T2 · 0m53s · $0.03 · run $0.47 / $40.00
+   review: PASS
+   T2 done
+── iteration 3 (3 this run) · T3 · 2/3 done ──
+   Verify PowerShell UTF-8 through the built CLI
+   work T3 · 2m02s · $0.07 · run $0.54 / $40.00
+   GATE DISPUTE T3 — blocked for the operator; no review, no attempt charged
+   T3 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+
+═══ blocked ═══
+run:    B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329  (3 iteration(s) this run)
+plan:   2/3 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

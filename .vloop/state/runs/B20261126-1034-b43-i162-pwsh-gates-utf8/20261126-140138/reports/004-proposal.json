@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "The corrected T3 close oracle now verifies the completed runner and guide through the built vloop CLI, including native git reads, café output, unchanged verify text, and exit-code 3 reporting.",
+  "files": [],
+  "verified": "vloop task gate T3 exited 0 and printed \"gate T3: pass (6.036s)\".",
+  "notes": "The close gate composes the T1 and T2 oracles, then builds and runs the CLI against a temporary git repository; it clears VLOOP_PLAN_SHA256 only for that scratch-repository invocation so the outer run's plan hash does not leak into a different plan."
+}

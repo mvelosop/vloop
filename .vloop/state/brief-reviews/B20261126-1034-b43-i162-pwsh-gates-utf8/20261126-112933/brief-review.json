@@ -1,0 +1,31 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Worked example; U1 Gate",
+      "summary": "The stated pre-fix failure is factually wrong: a non-matching Select-String exits 0, and code page 437 decodes UTF-8 'café' as 'caf├⌐', not 'cafÃ©'.",
+      "evidence": "docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md lines 27-29, 106-110 and 156-157 claim the mismatch exits 1 and show 'cafÃ©'. On the review machine, `chcp` prints `Active code page: 437`; `pwsh -NoProfile -NonInteractive -Command '$x=[System.Text.Encoding]::GetEncoding(437).GetString([byte[]](0x63,0x61,0x66,0xC3,0xA9)); Write-Output $x'` prints `caf├⌐`; and `pwsh -NoProfile -NonInteractive -Command \"'caf' | Select-String -SimpleMatch 'café'\"` prints nothing and exits 0.",
+      "fix": "Make the worked example state the actual pre-fix result (no match, exit 0 under this command), and correct the code-page-437 mojibake. State that the oracle wrapper, not Select-String's process exit, makes the base gate fail because the captured bytes are missing/wrong."
+    },
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract / U1 Gate; Shape task 1",
+      "summary": "The proposed gate does not prove all three required encodings and may pass before the fix on the stated Windows run environment, so plan acceptance can reject a correct planner rather than establish a planted failure.",
+      "evidence": "docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md lines 89-95 require [Console]::OutputEncoding, [Console]::InputEncoding and $OutputEncoding to be BOM-less UTF-8, but lines 106-111 and 194-196 gate only the café native-output case, exit 3 and unchanged sh arguments. On the review machine, a fresh pwsh 7.7 process reports input 437, output 65001, $OutputEncoding 65001 and preamble length 0. Thus the café/output test can pass before the change while [Console]::InputEncoding remains 437. Current internal/state/gate.go lines 23-24 pass the recorded command unchanged and internal/state/gate_test.go lines 10-19 is the existing cross-platform argument test.",
+      "fix": "Add a deterministic U1 gate that asserts literal WebName/code-page and zero preamble for all three encodings inside each vloop-started PowerShell process, and add a PowerShell-to-native-stdin round trip for $OutputEncoding. Cover both `pwsh` and `powershell`; where an executable is unavailable, pin the generated -Command argument with the existing cross-platform test-double/argument mechanism. Name the wrapper assertion that fails on the base and pin the exact captured bytes, including the line ending or an explicit no-line-ending form."
+    }
+  ],
+  "decisions": [
+    "vloop sets UTF-8 itself in the command it starts rather than requiring every gate author to do so; sound for the cross-repository defect, provided the setup is silent and failure-tolerant as contracted.",
+    "The behavior applies on every OS; sound because it gives both shell names one path and the brief still leaves other shells unchanged.",
+    "All three encodings use BOM-less UTF-8; sound, but the gate must explicitly prove each setting and both conversion directions.",
+    "The setup may live in the -Command prefix or another pwsh mechanism; sound as an implementation freedom, provided arbitrary recorded command semantics remain intact.",
+    "The café subject is the native-output fixture and git is addressed with -C in a temporary repository; sound as a fixture choice, but not sufficient by itself to prove the base failure."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

@@ -1,0 +1,6 @@
+[31;1mWrite-Error: [0m~\source\personal\vloop\.vloop\state\gates\T2\gate.ps1:5
+[36;1mLine |[0m
+[36;1m[36;1m   5 | [0m   [36;1mWrite-Error "missing PowerShell profile line: $line"[0m
+[36;1m     | [31;1m   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mmissing PowerShell profile line: [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m

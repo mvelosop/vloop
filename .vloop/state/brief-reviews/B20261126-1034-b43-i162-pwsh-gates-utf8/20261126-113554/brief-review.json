@@ -1,0 +1,30 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Executive summary, U1 Defect, Gate and Worked example",
+      "summary": "The stated pre-fix failure does not reproduce on the named Windows baseline: both pwsh 7.7 and Windows PowerShell already write the expected UTF-8 café bytes, and both decode the native UTF-8 byte fixture correctly.",
+      "evidence": "The brief says at docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md:24 that Console.OutputEncoding defaults to OEM 437, at :111-117 that the native read and UTF-8 write fail before the fix, and at :170-171 repeats that example. On this Windows machine, `chcp.com` prints `Active code page: 437`, but `pwsh 7.7.0` reports Console.InputEncoding=437, Console.OutputEncoding=65001, and $OutputEncoding=65001; Windows PowerShell 5.1 reports 437, 65001 and 20127. Redirecting each shell's `Write-Output 'café'` to bytes gives `63 61 66 c3 a9 0d 0a`. Piping native node bytes `63 61 66 c3 a9` into Select-String -SimpleMatch 'café' -Quiet exits 0 in both shells. The code today passes the recorded command unchanged through GateArgs (internal/state/gate.go:21-24,64), so these are baseline observations, not a partial fix.",
+      "fix": "Replace the OEM-437/failed-read/CP437-output diagnosis with the measured baseline. State the actual pwsh 7.7 differences that require the fix (Console.InputEncoding is 437 and Console.OutputEncoding has a three-byte preamble), distinguish Windows PowerShell 5.1's $OutputEncoding=20127, and rewrite the worked example's 'before' outcomes so every claimed failure was actually observed. Keep the café fixture only if a separate, currently failing output variant is identified."
+    },
+    {
+      "kind": "consistency",
+      "section": "U1 Gate and Shape task 1",
+      "summary": "The proposed gates do not prove the complete three-encoding, BOM-less contract: their read/write cases pass on the base, they never inspect Console.OutputEncoding's preamble, they do not round-trip PowerShell-to-native stdin, and they cover only the pwsh case despite the powershell requirement.",
+      "evidence": "The Required text at docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md:89-103 requires BOM-less UTF-8 for Console.OutputEncoding, Console.InputEncoding and $OutputEncoding for both `pwsh` and `powershell`. The Gate at :111-125 instead checks only the two codes pages for InputEncoding and $OutputEncoding, and checks output bytes. On the measured base, Console.OutputEncoding has `CodePage=65001` but `GetPreamble().Length=3`; meanwhile its café output has no BOM, so the output-bytes assertion passes while the required setter state remains wrong. A native-output match also passes on the base. Thus an implementation could omit the Console.OutputEncoding no-BOM change and pass every asserted output/read case; the InputEncoding assertion alone would not catch the omitted direction.",
+      "fix": "Name literal failing gates that, inside each vloop-started PowerShell process, assert CodePage 65001 and GetPreamble().Length 0 for all three encodings. Add a native-stdin round trip for $OutputEncoding and retain the exact output-bytes assertion with an explicit line-ending form. Exercise both `pwsh` and `powershell` on Windows; on systems where `powershell` is absent, pin the generated `GateArgs(\"powershell\", ...)` command in a cross-platform unit test. Make the base expectation say precisely which assertions fail in each shell."
+    }
+  ],
+  "decisions": [
+    "Mechanism: the setup may live in the -Command prefix or another PowerShell mechanism; this is appropriately left open (the observable behavior, not the mechanism, is binding).",
+    "Fixture: the author chose literal `café` in a temporary git repository addressed with `git -C`. Keep it only after rewriting its expected baseline to match an observed failure.",
+    "User-terminal remedy: the guide will recommend setting only Console.OutputEncoding in the user's profile because that is the parent process's native-output decoding surface. This is distinct from vloop's three-encoding setup.",
+    "Task shape: 2-3 tasks, with U1 plus U2 and a close task that re-runs all gates through an oracle/built CLI. This is runnable once task 1's listed gates are corrected."
+  ],
+  "checked": "facts, consistency, rules, runnability; brief structure check; dependency B40; P-5/P-8/C-5; config checks; GateCommand callers; GateArgs tests; configuration/concepts guides; Windows pwsh 7.7 and PowerShell 5.1 encoding behavior",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

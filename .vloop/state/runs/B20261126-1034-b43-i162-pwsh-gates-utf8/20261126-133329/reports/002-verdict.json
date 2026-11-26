@@ -1,0 +1,24 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The Mixed teams section says vloop runs pwsh gates and checks with UTF-8 input and output so native tool output remains correct on Windows.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:132-133 explicitly says vloop runs pwsh gates and checks with UTF-8 input and output so native tool output remains correct on Windows."
+    },
+    {
+      "criterion": "The paragraph distinguishes vloop's behavior from a person's own PowerShell terminal and includes the exact profile line [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new().",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:134-141 limits the behavior to PowerShell processes vloop starts, contrasts the user's interactive terminal, and includes the exact required profile line."
+    },
+    {
+      "criterion": "The paragraph explains that the profile line makes vloop run output remain correct through Tee-Object and similar terminal pipes, without claiming that vloop changes the profile or machine code page.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:135-139 says vloop does not change the profile or machine code page and that the profile line keeps vloop run output correct through Tee-Object and similar terminal pipes."
+    }
+  ],
+  "findings": [],
+  "notes": "The checks log passes, and the product diff is limited to the required guide paragraph in docs/guide/configuration.md."
+}

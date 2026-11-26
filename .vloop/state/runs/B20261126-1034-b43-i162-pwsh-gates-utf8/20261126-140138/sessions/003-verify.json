@@ -1,0 +1,54 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.1261186,
+  "credits": 12.61186,
+  "duration_ms": 198974,
+  "effort": null,
+  "ended": "2026-11-26T14:11:29Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.1261186,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: skill vloop-operator is not vloop's — use /vloop:verify",
+      "tool_name": "skill",
+      "tool_use_id": "call_fDYv4SNhm9sGBOzlBPqiQaJA"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: git -C .vloop/tmp/verify-scratch/example config user.name Verify is denied by the verify fence (Bash(git -c:*))",
+      "tool_name": "powershell",
+      "tool_use_id": "call_lGhblkWvJsgo87S1lYzaTL14"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: git -C .vloop/tmp/verify-scratch/example config user.email verify@example.invalid is denied by the verify fence (Bash(git -c:*))",
+      "tool_name": "powershell",
+      "tool_use_id": "call_HLHUdVJ27r8ihskD4TLB6FJH"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: git -C .vloop/tmp/verify-scratch/example add input.txt is denied by the verify fence (Bash(git -c:*))",
+      "tool_name": "powershell",
+      "tool_use_id": "call_Qo5LJ1Npvo0fFOztVGU9j3Wr"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: command word $env:VLOOP_PLAN_SHA256 starts with $ and cannot be judged",
+      "tool_name": "powershell",
+      "tool_use_id": "call_Gk8xRV7KjHabjIp64hoz6y68"
+    }
+  ],
+  "phase": "verify",
+  "run_id": "B20261126-1034-b43-i162-pwsh-gates-utf8",
+  "schema": "session/v4",
+  "started": "2026-11-26T14:08:08Z",
+  "turns": 28,
+  "wall_ms": 201339
+}

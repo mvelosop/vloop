@@ -1,0 +1,24 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Behaviour contract U1 / Worked example / Acceptance",
+      "summary": "The reported pre-fix output-reading and output-writing failure is not reproducible through the gate runner under the brief's stated Windows code-page-437 condition.",
+      "evidence": "The brief says at lines 106-119 that redirected state.RunGate starts with 437 for both console encodings, and at lines 128-133 and 194-195 that the cafe read and Write-Output assertions fail on the base. On Windows with chcp reporting 437 and unmodified internal/state/gate.go, an in-module probe using state.RunGate against pwsh 7.7 and Windows PowerShell 5.1 produced, respectively, `65001, 437, 65001` and `65001, 437, 20127` for Output/Input/$OutputEncoding. A temporary git commit whose subject was cafe passed the Select-String gate in both shells, and both emitted cafe as `63 61 66 c3 a9 0d 0a`. Thus T1 and T2 pass before the fix in the acceptance environment; the report's broader encoding-state assertion is what fails there, not the two native-output claims.",
+      "fix": "Correct the defect table, pre-fix worked-example result, and acceptance proof to match redirected-gate behaviour. Base the failing assertion on the observed unsatisfied InputEncoding/$OutputEncoding contract (and the Windows PowerShell 5.1 stdin case), and describe the native-read/write cases as regression coverage unless a separate, reproducible launch condition actually makes them fail."
+    }
+  ],
+  "decisions": [
+    "vloop itself sets PowerShell encodings inside the process rather than relying on profiles or machine settings; this is appropriate for deterministic repository commands.",
+    "The setting applies on every OS; I agree because it keeps one invocation path and one cross-platform contract.",
+    "The contract sets Console.OutputEncoding, Console.InputEncoding and $OutputEncoding to BOM-less UTF-8; this covers native stdout, console input and native stdin respectively.",
+    "The setup mechanism is left to the implementer, provided the command remains operational after an encoding setter failure.",
+    "The operator chose `cafe` as the literal fixture; it is a suitable one-code-point non-ASCII case, though the brief should pin the byte and newline expectations as it currently does."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

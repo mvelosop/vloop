@@ -1,0 +1,28 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Executive summary; U1 — Defect and console table; U2 — the guide",
+      "summary": "The described CP437 reproduction is false for gates whose output is redirected as GateCommand redirects it: both pwsh and powershell read UTF-8 native output and emit café as UTF-8 before this change. The actual observed pre-fix failures are different.",
+      "evidence": "On the stated Windows host, `chcp` prints `Active code page: 437`. A Go `exec.Command(...).CombinedOutput()` probe, matching `internal/state/gate.go:51-69`, printed: pwsh `65001 / 437 / 65001` and bytes `63 61 66 c3 a9 0d 0a`; powershell `65001 / 437 / 20127` and the same output bytes. A UTF-8 native child piped to `Select-String -SimpleMatch 'café' -Quiet` exited 0 in both shells. Piping `café` to a native byte-dumper produced UTF-8 in pwsh and `63 61 66 3f 0d 0a` in powershell. Thus the table's CP437 output bytes and both `git` decode failures, and U2's claim that a person's pwsh terminal generally has the problem, are unsupported.",
+      "fix": "Correct the defect narrative and measured table to this runner behavior. State the real pre-fix assertions precisely: InputEncoding is 437 in both shells, powershell's $OutputEncoding is 20127 and mangles native stdin, while pwsh and redirected powershell already read and write UTF-8 in this reproduction. Qualify or prove any remaining version/profile claim made by U2, and make the before/after examples match it."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / U1 Gate; Shape, task 1",
+      "summary": "Shape says task 1 is gated on four U1 gates, but the U1 Gate section enumerates five bullets and the last bullet itself contains the separate exit-code and unchanged-sh assertions.",
+      "evidence": "The U1 Gate list has reading native output, writing own output, the three encodings, native stdin, and `exit 3` plus `sh` invocation. Shape then says `Gated on the four gates of U1's Gate`.",
+      "fix": "Remove the count or name the exact oracle commands/assertions task 1 must run, so a planner cannot omit the exit-code or sh regression checks while following the stated count."
+    }
+  ],
+  "decisions": [
+    "The implementer may place setup in a -Command prefix or another pwsh mechanism, provided the full contract holds; this is a sensible mechanics decision, but it must also satisfy the explicit failure-tolerance requirement.",
+    "The non-ASCII fixture is the literal café, built in a temporary repository with git -C; this is appropriate and makes the encoding assertion concrete."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

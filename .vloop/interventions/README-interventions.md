@@ -137,6 +137,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | yes | no-options | [I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s](I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s.md) |
 | halt | repair | yes | no-options | [I20261126-005104-gate-shell-refused-the-run-over-b39-s-co](I20261126-005104-gate-shell-refused-the-run-over-b39-s-co.md) |
 | halt | repair | partly | recommended | [I20261126-115225-b42-s-first-attempt-halted-with-exit-9-f](I20261126-115225-b42-s-first-attempt-halted-with-exit-9-f.md) |
+| halt | repair | partly | recommended | [I20261126-140046-b43-s-t3-close-gate-ran-vloop-in-its-own](I20261126-140046-b43-s-t3-close-gate-ran-vloop-in-its-own.md) |
 | halt | verification-finding | no | recommended | [I20261102-112835-t2-s-gate-disputed-its-loop-variable-was](I20261102-112835-t2-s-gate-disputed-its-loop-variable-was.md) |
 | halt | verification-finding | partly | no-options | [I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi](I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi.md) |
 | halt | verification-finding | no | no-options | [I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh](I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh.md) |
@@ -220,6 +221,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo](I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo.md) |
 | verify | verification-finding | partly | no-options | [I20261126-110826-vloop-run-s-preflight-now-also-prints-th](I20261126-110826-vloop-run-s-preflight-now-also-prints-th.md) |
 | verify | verification-finding | partly | no-options | [I20261126-133232-two-routes-past-the-new-pwsh-judging-tha](I20261126-133232-two-routes-past-the-new-pwsh-judging-tha.md) |
+| verify | verification-finding | partly | no-options | [I20261126-141648-t3-s-close-gate-ran-vloop-in-its-own-scr](I20261126-141648-t3-s-close-gate-ran-vloop-in-its-own-scr.md) |
+| verify | verification-finding | partly | no-options | [I20261126-141649-the-encoding-setup-the-contract-required](I20261126-141649-the-encoding-setup-the-contract-required.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

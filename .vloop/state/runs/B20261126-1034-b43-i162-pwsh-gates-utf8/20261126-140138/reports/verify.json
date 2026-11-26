@@ -1,0 +1,30 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [],
+  "not_run": [
+    {
+      "line": "vloop task gate T1",
+      "reason": "the operator's acceptance at close"
+    },
+    {
+      "line": "vloop task gate T2",
+      "reason": "the operator's acceptance at close"
+    },
+    {
+      "line": "vloop task gate T3",
+      "reason": "the operator's acceptance at close"
+    },
+    {
+      "line": "vloop task show T1",
+      "reason": "the operator's acceptance at close"
+    }
+  ],
+  "checked": {
+    "example_lines": 0,
+    "sentences": 11,
+    "surfaces": 6
+  },
+  "notes": "All three passes are complete with no findings. The worked example's four CLI lines are reserved for the operator's close-time Windows/code-page-437 acceptance; no example line was counted. The contract was checked from GateCommand, its four caller paths, the focused committed tests, and the already-passed final check log. The current configuration guide, concepts guide, README, domain glossary, GateCommand comment, and task help source agree with the change."
+}
+

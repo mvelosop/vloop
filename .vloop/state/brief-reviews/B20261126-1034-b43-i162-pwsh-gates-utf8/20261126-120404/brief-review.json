@@ -1,0 +1,24 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Worked example and Acceptance, at close",
+      "summary": "The worked example claims that `vloop task gate T3` exits 3, but the CLI intentionally normalizes a failed gate to exit 1.",
+      "evidence": "The brief at lines 143 and 185-186 says a gate `exit 3` exits 3 and shows `vloop task gate T3 -> exit 3`. `internal/cli/task_gate.go:80-83` prints the inner code as `gate ...: fail (exit 3, ...)`, then returns `Problem`; `internal/cli/root.go:63-64,104-107` maps that error to `ExitProblems` (1), pinned by `internal/cli/task_gate_test.go:36-38` for an inner `exit 3` gate (`code != 1`).",
+      "fix": "Keep the contract that the gate runner preserves exit 3, but make the worked example and operator acceptance expect `vloop task gate T3` to print `gate T3: fail (exit 3, <duration>)` and itself exit 1. Have the oracle that calls `state.RunGate` assert that the underlying gate exit is 3."
+    }
+  ],
+  "decisions": [
+    "U1's UTF-8 setup is owned by vloop and applied inside each pwsh/powershell process, rather than requiring profiles or machine configuration. This is sound for a process-local, reproducible fix.",
+    "The setup applies on every OS, including pwsh on macOS and Linux, to retain one implementation path. I agree.",
+    "All three encodings use UTF-8 without a BOM: Console.OutputEncoding, Console.InputEncoding, and OutputEncoding. I agree.",
+    "The exact setup form is left to the implementer; only the recorded command and observable behavior are fixed. I agree.",
+    "The contract uses `café` as the literal fixture and explicitly requires the one profile line for a person's own terminal. I agree; both values are concrete."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

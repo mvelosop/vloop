@@ -1,0 +1,481 @@
+{
+  "schema": "metrics/v4",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "run_id": "B20261126-1034-b43-i162-pwsh-gates-utf8",
+  "status": "consumed",
+  "merged": null,
+  "tasks": {
+    "planned": 3,
+    "done": 3,
+    "blocked": 0,
+    "first_pass": 2,
+    "estimate": {
+      "min": 2,
+      "max": 3
+    }
+  },
+  "size": {
+    "delivered": {
+      "code": 4,
+      "test": 137,
+      "docs": 9,
+      "other": 0,
+      "deleted": {
+        "code": 2,
+        "test": 5,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "churn": {
+      "code": 4,
+      "test": 137,
+      "docs": 9,
+      "other": 0,
+      "deleted": {
+        "code": 2,
+        "test": 5,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 34.25,
+    "rework": 1
+  },
+  "time": {
+    "agent_ms": 590047,
+    "work_ms": 370575,
+    "review_ms": 219472,
+    "plan_ms": 287505,
+    "gates_ms": 9999,
+    "checks_ms": 497520,
+    "gate_review_ms": 164625,
+    "verify_ms": 201339,
+    "wall_ms": 1935000
+  },
+  "rate": {
+    "code_per_min": 0.40674725911664666,
+    "code_test_per_min": 14.337840883861794
+  },
+  "cost": {
+    "total_usd": 0.7495930999999999,
+    "plan_usd": 0.1720959,
+    "work_usd": 0.223762,
+    "review_usd": 0.1424166,
+    "gate_review_usd": 0.0852,
+    "per_1000_code_lines_usd": 187.39827499999998,
+    "verify_usd": 0.1261186
+  },
+  "credits": {
+    "total": 74.95930999999999,
+    "plan": 17.20959,
+    "work": 22.376199999999997,
+    "review": 14.24166,
+    "gate_review": 8.52,
+    "verify": 12.61186
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "cache_read": 0,
+    "cache_creation": 0,
+    "cache_hit_ratio": null
+  },
+  "models": {
+    "plan": [
+      "mai-code-2"
+    ],
+    "work": [
+      "mai-code-2"
+    ],
+    "review": [
+      "mai-code-2"
+    ],
+    "gate-review": [
+      "mai-code-2"
+    ],
+    "verify": [
+      "mai-code-2"
+    ]
+  },
+  "agents": {
+    "plan": [
+      "copilot"
+    ],
+    "work": [
+      "copilot"
+    ],
+    "review": [
+      "copilot"
+    ],
+    "second-review": [],
+    "gate-review": [
+      "copilot"
+    ],
+    "verify": [
+      "copilot"
+    ]
+  },
+  "second_review": {
+    "mode": "off",
+    "sessions": 0,
+    "dissents": 0,
+    "dissent_tasks": [],
+    "cost_usd": 0,
+    "time_ms": 0
+  },
+  "effort": {
+    "plan": null,
+    "work": null,
+    "review": null,
+    "gate-review": null,
+    "verify": null
+  },
+  "defects": {
+    "in_loop": 0,
+    "operator": 2,
+    "escaped": 0,
+    "total": 2,
+    "removal_efficiency": 1
+  },
+  "interventions": {
+    "total": 3,
+    "by_agreement": {
+      "recommended": 1,
+      "other-option": 0,
+      "adjusted": 0,
+      "different": 0,
+      "no-options": 2
+    }
+  },
+  "instructions": {
+    "plan": 4881,
+    "gate_review": 2420,
+    "work": 2487,
+    "review": 2508,
+    "verify": 2161,
+    "guidelines_rules": 2
+  },
+  "records": {
+    "missing": []
+  },
+  "lead_time": {
+    "plan_to_merge_ms": null
+  },
+  "permission_denials": 10,
+  "iterations": 4,
+  "iterations_per_closed": 1.3333333333333333,
+  "by_task": [
+    {
+      "id": "T1",
+      "area": null,
+      "kind": "fix",
+      "attempts": 1,
+      "churn": {
+        "code": 4,
+        "test": 137,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 2,
+          "test": 5,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 200767,
+      "cost_usd": 0.1429743,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": 34.25,
+      "per_1000_code_lines_usd": 35.743575
+    },
+    {
+      "id": "T2",
+      "area": null,
+      "kind": "docs",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 9,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 118156,
+      "cost_usd": 0.069829,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T3",
+      "area": null,
+      "kind": "test",
+      "attempts": 2,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 271124,
+      "cost_usd": 0.15337530000000002,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    }
+  ],
+  "by_session": [
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329",
+      "seq": 1,
+      "schema": "session/v4",
+      "phase": "plan",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 287505,
+      "cost_usd": 0.1720959,
+      "cost_source": "estimated",
+      "credits": 17.20959,
+      "turns": 14,
+      "permission_denials": 1,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329",
+      "seq": 2,
+      "schema": "session/v4",
+      "phase": "gate-review",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 164625,
+      "cost_usd": 0.0852,
+      "cost_source": "estimated",
+      "credits": 8.52,
+      "turns": 14,
+      "permission_denials": 3,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: a backtick cannot be judged — write the command on one line, without escapes"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: pwsh: runs a script, stdin or an encoded command, not a literal -Command string"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329",
+      "seq": 3,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 1,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 126592,
+      "cost_usd": 0.09246259999999999,
+      "cost_source": "estimated",
+      "credits": 9.24626,
+      "turns": 11,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329",
+      "seq": 4,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 1,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 74175,
+      "cost_usd": 0.0505117,
+      "cost_source": "estimated",
+      "credits": 5.05117,
+      "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329",
+      "seq": 5,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 2,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 64815,
+      "cost_usd": 0.0411546,
+      "cost_source": "estimated",
+      "credits": 4.11546,
+      "turns": 11,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329",
+      "seq": 6,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 2,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 53341,
+      "cost_usd": 0.028674400000000003,
+      "cost_source": "estimated",
+      "credits": 2.86744,
+      "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329",
+      "seq": 7,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 3,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 121786,
+      "cost_usd": 0.0658543,
+      "cost_source": "estimated",
+      "credits": 6.58543,
+      "turns": 14,
+      "permission_denials": 1,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: pwsh: runs a script, stdin or an encoded command, not a literal -Command string"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-140138",
+      "seq": 1,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 57382,
+      "cost_usd": 0.024290500000000003,
+      "cost_source": "estimated",
+      "credits": 2.42905,
+      "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-140138",
+      "seq": 2,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 91956,
+      "cost_usd": 0.06323050000000001,
+      "cost_source": "estimated",
+      "credits": 6.32305,
+      "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-140138",
+      "seq": 3,
+      "schema": "session/v4",
+      "phase": "verify",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 201339,
+      "cost_usd": 0.1261186,
+      "cost_source": "estimated",
+      "credits": 12.61186,
+      "turns": 28,
+      "permission_denials": 5,
+      "denials": [
+        {
+          "tool_name": "skill",
+          "text": "Denied by preToolUse hook: vloop fence: skill vloop-operator is not vloop's — use /vloop:verify"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: git -C .vloop/tmp/verify-scratch/example config user.name Verify is denied by the verify fence (Bash(git -c:*))"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: git -C .vloop/tmp/verify-scratch/example config user.email verify@example.invalid is denied by the verify fence (Bash(git -c:*))"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: git -C .vloop/tmp/verify-scratch/example add input.txt is denied by the verify fence (Bash(git -c:*))"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: command word $env:VLOOP_PLAN_SHA256 starts with $ and cannot be judged"
+        }
+      ],
+      "is_error": false
+    }
+  ]
+}
