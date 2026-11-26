@@ -302,7 +302,10 @@ func splitMode(s string, syntax splitSyntax) ([]command, error) {
 			l.put(c, stUnquoted)
 		case '(':
 			if syntax == syntaxCMD {
-				l.put(c, stUnquoted)
+				if err := l.end(); err != nil {
+					return nil, err
+				}
+				l.depth++
 				break
 			}
 			if (i > 0 && s[i-1] == '(') || !l.opens() {
@@ -314,7 +317,14 @@ func splitMode(s string, syntax splitSyntax) ([]command, error) {
 			l.depth++
 		case ')':
 			if syntax == syntaxCMD {
-				l.put(c, stUnquoted)
+				if l.depth == 0 {
+					return nil, errors.New("cmd command group cannot be judged")
+				}
+				if err := l.end(); err != nil {
+					return nil, err
+				}
+				l.depth--
+				l.closed = true
 				break
 			}
 			if l.depth == 0 {
@@ -426,6 +436,9 @@ func splitMode(s string, syntax splitSyntax) ([]command, error) {
 		return nil, err
 	}
 	if l.depth > 0 {
+		if syntax == syntaxCMD {
+			return nil, errors.New("cmd command group cannot be judged")
+		}
 		return nil, errors.New(subshellRefusal)
 	}
 	return l.cmds, nil

@@ -5,9 +5,9 @@
   "base": "3b98a38748ef7e8bfab9d640429b019ffdafd4f5",
   "branch": "B20261126-1008-b42-i162-fence-reads-pwsh",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-26T12:00:48Z",
-  "updated": "2026-11-26T12:27:14Z",
+  "updated": "2026-11-26T12:33:40Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -57,9 +57,9 @@
         "Committed Go tests cover the allowed and refused wrapper forms, option and name variants, command matching, nesting, phase/root preservation and both outer tools, and the go check executes them."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 2,
-      "notes": "The cmd-specific lexer treats parentheses as literal words, allowing cmd /c \"(git push)\" even though cmd executes the grouped command and the direct git push command is denied."
+      "notes": ""
     },
     {
       "id": "T2",

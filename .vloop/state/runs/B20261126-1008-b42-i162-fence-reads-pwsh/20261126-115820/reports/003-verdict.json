@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "For both the bash and powershell tools, pwsh and powershell accept only the pinned literal -Command/-c form after the allowed pre-options, judge every remaining word joined with spaces as a powershell call, preserve the phase and root, and count each wrapper toward the eight-level nesting limit.",
+      "met": true,
+      "evidence": "internal/fence/judge.go:385-393 and internal/fence/expand.go:192-234 implement literal PowerShell wrapper strings and recursive mode/phase/root-preserving judgement; internal/fence/wrappers_test.go:12-43 and :87-110 exercise both outer tools, phase/root preservation and the eighth/ninth wrapper."
+    },
+    {
+      "criterion": "Missing, expanded, encoded, file, stdin, bare-script and unsupported-option pwsh forms fail closed with the exact W1 reasons, including the wrapper's written pwsh or powershell name where specified.",
+      "met": true,
+      "evidence": "internal/fence/expand.go:193-233 rejects every unsupported PowerShell form; internal/fence/judge.go:386-392 applies the exact missing/expansion or written-name-prefixed refusal; internal/fence/wrappers_test.go:21-33 pins those outcomes."
+    },
+    {
+      "criterion": "cmd accepts only /c or /k after /d, /q and /s, judges its literal string split at &, &&, || and |, and denies % or ^; every other cmd form fails closed with the exact W1 reason.",
+      "met": true,
+      "evidence": "internal/fence/expand.go:236-278 accepts only the pinned cmd switches and operators and rejects % or ^; internal/fence/split.go:302-335 now judges parenthesized groups as command segments; internal/fence/wrappers_test.go:48-83 covers the allowed/refused forms through both outer tools."
+    },
+    {
+      "criterion": "A command inside a wrapper is allowed or denied exactly as the same command in the wrapped tool would be, including case-insensitive command and option matching and names with a path or .exe.",
+      "met": true,
+      "evidence": "internal/fence/judge.go:378-397 dispatches recognized wrapper paths case-insensitively into the same judge/matcher; internal/fence/wrappers_test.go:15-20 and :53-67 cover case variants, options, paths/.exe and wrapped commands."
+    },
+    {
+      "criterion": "Committed Go tests cover the allowed and refused wrapper forms, option and name variants, command matching, nesting, phase/root preservation and both outer tools, and the go check executes them.",
+      "met": true,
+      "evidence": "internal/fence/wrappers_test.go contains the complete wrapper matrix plus nesting/phase tests, and .vloop/tmp/checks.json records the go check at exit 0 with internal/fence passing in its log."
+    }
+  ],
+  "findings": [],
+  "notes": "The second attempt closes the parenthesized cmd group bypass identified in the first review while retaining fail-closed malformed-group handling."
+}
