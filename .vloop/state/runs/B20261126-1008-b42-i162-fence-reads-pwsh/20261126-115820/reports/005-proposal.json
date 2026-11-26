@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "PowerShell calls now retain the exact script-block refusal even when an earlier command is a W2-denied dynamic-execution form.",
+  "files": [
+    "internal/fence/judge.go",
+    "internal/fence/wrappers_test.go"
+  ],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: pass.",
+  "notes": "The PowerShell parser now gives an unquoted script-block error precedence over previously parsed W2 denials; focused tests cover direct, piped, and wrapped combinations."
+}

@@ -36,3 +36,10 @@ committing the plan
    check go
    review T2 · 1m48s · $0.11 · run $1.36 / $40.00
    review: FAIL
+── iteration 5 (5 this run) · T2 · 1/5 done ──
+   Refuse pwsh evaluation forms
+   work T2 · 1m36s · $0.08 · run $1.44 / $40.00
+   check go
+   review T2 · 1m41s · $0.06 · run $1.51 / $40.00
+   review: PASS
+   T2 done

@@ -5,9 +5,9 @@
   "base": "3b98a38748ef7e8bfab9d640429b019ffdafd4f5",
   "branch": "B20261126-1008-b42-i162-fence-reads-pwsh",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-26T12:00:48Z",
-  "updated": "2026-11-26T12:41:07Z",
+  "updated": "2026-11-26T12:46:55Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -96,9 +96,9 @@
         "Committed Go tests cover every pinned command and alias, command position, case/path variant, script-block spelling and the bash non-regression, and the go check executes them."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "A later unquoted PowerShell script block loses its required exact guidance when any earlier parsed command is a W2-denied command, because shellMode returns that command's denial before the splitter's script-block error."
+      "notes": ""
     },
     {
       "id": "T3",

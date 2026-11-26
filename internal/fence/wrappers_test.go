@@ -100,6 +100,16 @@ func TestPowerShellScriptBlocks(t *testing.T) {
 	j, _, _ := newJudge(t, PhaseWork)
 	reason := scriptBlockRefusal
 	for _, command := range []string{
+		"iex 'git status'; & {git push}",
+		"Get-Content a | Invoke-Item b; @{ Name = 'value' }",
+		"pwsh -c 'Start-Process git status; ForEach-Object { $_.Name }'",
+	} {
+		d := j.Decide("powershell", "", command)
+		if d.Allow || d.Reason != reason {
+			t.Errorf("%q after a denied command: got allow=%v reason=%q, want %q", command, d.Allow, d.Reason, reason)
+		}
+	}
+	for _, command := range []string{
 		`Get-ChildItem | ForEach-Object { $_.Name }`,
 		`& {git push}`,
 		`@{ Name = "value" }`,

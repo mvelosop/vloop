@@ -293,6 +293,9 @@ func (j *Judge) shellMode(s string, depth int, mode shellMode) string {
 	}
 	if err != nil {
 		if mode == shellPowerShell {
+			if err.Error() == scriptBlockRefusal {
+				return err.Error()
+			}
 			for _, c := range cmds {
 				if r := j.words(c.words, c.plain, c.exp, depth, mode); powerShellDenialReason(r) {
 					return r

@@ -16,8 +16,8 @@
   },
   "size": {
     "delivered": {
-      "code": 249,
-      "test": 106,
+      "code": 282,
+      "test": 196,
       "docs": 0,
       "other": 0,
       "deleted": {
@@ -28,47 +28,47 @@
       }
     },
     "churn": {
-      "code": 256,
-      "test": 106,
+      "code": 290,
+      "test": 196,
       "docs": 0,
       "other": 0,
       "deleted": {
-        "code": 33,
+        "code": 34,
         "test": 0,
         "docs": 0,
         "other": 0
       }
     },
-    "test_code_ratio": 0.42570281124497994,
-    "rework": 1.0281124497991967
+    "test_code_ratio": 0.6950354609929078,
+    "rework": 1.0283687943262412
   },
   "time": {
-    "agent_ms": 1101076,
-    "work_ms": 707448,
-    "review_ms": 393628,
+    "agent_ms": 1396289,
+    "work_ms": 895152,
+    "review_ms": 501137,
     "plan_ms": 659921,
-    "gates_ms": 6329,
-    "checks_ms": 411764,
+    "gates_ms": 10940,
+    "checks_ms": 554010,
     "gate_review_ms": 458736,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 13.568545677137635,
-    "code_test_per_min": 19.344713716401046
+    "code_per_min": 12.11783520460306,
+    "code_test_per_min": 20.540160382270432
   },
   "cost": {
-    "total_usd": 1.4403086000000003,
+    "total_usd": 1.6652279,
     "plan_usd": 0.46582670000000004,
-    "work_usd": 0.46908279999999997,
-    "review_usd": 0.3291428,
+    "work_usd": 0.5872658,
+    "review_usd": 0.4358791,
     "gate_review_usd": 0.17625630000000003,
-    "per_1000_code_lines_usd": 5.7843718875502015
+    "per_1000_code_lines_usd": 5.905063475177306
   },
   "credits": {
-    "total": 144.03086,
+    "total": 166.52279,
     "plan": 46.58267,
-    "work": 46.90828,
-    "review": 32.91428,
+    "work": 58.72658,
+    "review": 43.587909999999994,
     "gate_review": 17.62563
   },
   "tokens": {
@@ -122,10 +122,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 3,
+    "in_loop": 4,
     "operator": 0,
     "escaped": 0,
-    "total": 3,
+    "total": 4,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 6,
-  "iterations": 3,
-  "iterations_per_closed": 3,
+  "iterations": 4,
+  "iterations_per_closed": 4,
   "by_task": [
     {
       "id": "T1",
@@ -185,24 +185,26 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 34,
+        "test": 90,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
+          "code": 1,
           "test": 0,
           "docs": 0,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "agent_ms": 295213,
+      "cost_usd": 0.2249193,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": 2.6470588235294117,
+      "per_1000_code_lines_usd": 6.615273529411764
     },
     {
       "id": "T3",
@@ -490,6 +492,44 @@
           "text": "Denied by preToolUse hook: vloop fence: git branch --show-current is denied by the review fence (Bash(git branch:*))"
         }
       ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820",
+      "seq": 9,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 4,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 187704,
+      "cost_usd": 0.11818300000000001,
+      "cost_source": "estimated",
+      "credits": 11.8183,
+      "turns": 15,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820",
+      "seq": 10,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 4,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 107509,
+      "cost_usd": 0.10673629999999999,
+      "cost_source": "estimated",
+      "credits": 10.67363,
+      "turns": 10,
+      "permission_denials": 0,
+      "denials": [],
       "is_error": false
     }
   ]

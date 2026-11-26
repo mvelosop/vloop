@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "In a powershell call, Invoke-Expression, Invoke-Command, Start-Process, Start-Job, Start-ThreadJob, Invoke-Item and every listed alias are denied wherever a command name stands, case-insensitively and with a path or .exe, using the command name exactly as written.",
+      "met": true,
+      "evidence": "internal/fence/judge.go:338-347 lists every pinned command and alias, normalizes case and paths/.exe for lookup, and returns the original token; internal/fence/wrappers_test.go:48-79 covers all names directly, after a pipe and semicolon, uppercase, and with a path/.exe."
+    },
+    {
+      "criterion": "The same W2 denials apply after pipelines, separators and pwsh/powershell -Command wrappers and inside a W3 parenthesized pipeline.",
+      "met": true,
+      "evidence": "internal/fence/judge.go:284-312 judges parsed PowerShell commands retained on splitter errors, including wrapper recursion through words; internal/fence/wrappers_test.go:59-96 covers pipeline, separator, wrappers under both relevant routes and a parenthesized pipeline."
+    },
+    {
+      "criterion": "Every unquoted { in a powershell call is denied with the exact script-block guidance, including @{, & { } and cmdlet script blocks; quoted braces remain literal.",
+      "met": true,
+      "evidence": "internal/fence/split.go:299-302 emits scriptBlockRefusal for every unquoted PowerShell brace, while internal/fence/judge.go:295-298 now gives that exact splitter refusal precedence; internal/fence/wrappers_test.go:99-135 covers direct, piped, wrapper-mixed, @{, & { } and cmdlet forms plus quoted literals."
+    },
+    {
+      "criterion": "The bash tool keeps its existing brace-group and POSIX decisions; the simplified pwsh cmdlet forms named by the brief stay allowed; and no new PowerShell form outside W1-W3 is accepted.",
+      "met": true,
+      "evidence": "internal/fence/split.go:299-302 scopes brace refusal to syntaxPowerShell, and internal/fence/wrappers_test.go:119-141 proves the named simplified cmdlets remain allowed, quoted braces remain literal, bash brace groups retain POSIX denial, and cmd braces remain unchanged."
+    },
+    {
+      "criterion": "Committed Go tests cover every pinned command and alias, command position, case/path variant, script-block spelling and the bash non-regression, and the go check executes them.",
+      "met": true,
+      "evidence": "internal/fence/wrappers_test.go:48-141 provides the committed command/alias, position, case/path, wrapper, script-block and bash cases; the go check log reports internal/fence passing."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}
