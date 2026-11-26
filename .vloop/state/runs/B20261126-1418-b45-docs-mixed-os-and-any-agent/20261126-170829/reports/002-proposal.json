@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "README now describes both Claude Code and GitHub Copilot CLI throughout onboarding and the loop, and links mai-code-2's run evidence while explicitly leaving it not yet qualified.",
+  "files": ["README.md"],
+  "verified": "vloop task gate T2 exited 0 and printed: gate T2: pass.",
+  "notes": "Preserved the gpt-6.1-terra limitation to work, review, second review and brief review, with plan and gate review kept on Claude and verify still untried; mai-code-2's evidence covers every session kind except second review."
+}

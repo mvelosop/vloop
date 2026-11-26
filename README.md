@@ -1,12 +1,12 @@
 # vloop
 
-vloop (short for **verification loop**) is a Go command-line tool and Claude Code
-plugin that runs an autonomous loop. What the loop is about is the gate and the
-independent review: nothing counts as done until a check passes and a separate
-session agrees. You write a **brief** (what to build and why); vloop has Claude plan it
-into tasks, then for each task a fresh work session does it, a gate checks it, an
-independent review judges it, and vloop makes one commit. You read the result,
-not every step.
+vloop (short for **verification loop**) is a Go command-line tool and a plugin
+for Claude Code and GitHub Copilot CLI that runs an autonomous loop. What the
+loop is about is the gate and the independent review: nothing counts as done
+until a check passes and a separate session agrees. You write a **brief** (what
+to build and why); an agent plans the brief into tasks, then for each task a
+fresh work session does it, a gate checks it, an independent review judges it,
+and vloop makes one commit. You read the result, not every step.
 
 ## Prerequisites
 
@@ -17,6 +17,9 @@ not every step.
 - **Workspace trust**, when a session runs on Claude: open the repository once with
   `claude` and accept the trust prompt, or sessions started by vloop cannot work.
   `vloop doctor` checks it.
+- The **`copilot` CLI** and a **GitHub login** its sessions can use, when a
+  session runs on Copilot (experimental). See
+  [Running sessions on GitHub Copilot](#running-sessions-on-github-copilot).
 
 ## Install
 
@@ -72,8 +75,9 @@ In a git repository, on a clean tree:
    `.claude/settings.json`. It never commits.
 2. Add a `[[check]]` to `.vloop/config.toml`: a command that must keep passing
    after every task, such as your test suite.
-3. `vloop doctor` verifies git, config, `claude`, trust and the rest. Fix what it
-   reports before going on.
+3. `vloop doctor` verifies git, config, the agent CLIs in use (`claude` and
+   workspace trust, or `copilot` and its GitHub login), and the rest. Fix what
+   it reports before going on.
 4. `vloop brief new <slug>` writes a draft brief in `docs/briefs/`. Fill in its
    sections and set `status: ready`.
 5. `vloop brief check docs/briefs/<brief>.md` says whether the brief is fit to plan.
@@ -98,7 +102,11 @@ session needs a Copilot model id, never a Claude alias such as `sonnet`;
 `vloop run` refuses one. To list the ids your account can use, see
 [Copilot model ids](docs/guide/configuration.md#copilot-model-ids). So far `gpt-6.1-terra` is qualified for work, review,
 the second review and brief review; keep plan and gate review on Claude, and
-verify is not yet tried.
+verify is not yet tried. `mai-code-2` has run every session kind but the second
+review (plan, gate review, work, review, verify and brief review) in the URL
+shortener acceptance run and in B40 to B44, which built vloop itself, and is
+not yet qualified by the [eval rule](docs/guide/evals.md#other-agents); see the
+[run evidence](docs/design-notes/copilot-cli-experiments.md#mai-code-2-in-the-loop-2026-11).
 
 - **Requirements:** `copilot` on PATH, and a GitHub login its sessions can use
   (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, else `gh auth login`).
@@ -128,16 +136,17 @@ a **gate**: a verify command, often with a gate folder of fixtures. Before any
 work, [the driver](docs/guide/concepts.md#the-driver) runs the gates on the base and a **gate review** judges them. Then
 for each task a **work** session does it, the gates run, the repository's
 `[[check]]` entries run, an independent **review** session judges the diff, and the
-driver makes **one commit**. Every session is a fresh Claude session; they share
-only files in the repository. A task that fails is tried again, and a run that
-cannot go on halts and says why.
+driver makes **one commit**. Every session is a fresh agent session (Claude Code
+or Copilot CLI); they share only files in the repository. A task that fails is
+tried again, and a run that cannot go on halts and says why.
 
 ## You ask; the skill drives
 
-With the plugin loaded, you do not have to type vloop's commands. Ask Claude Code
-in plain words ("run this brief", "what did that cost?", "record this as a
-defect") and the `/vloop:operate` skill runs the right vloop commands, checks the
-result and tells you what happened. Merging and pushing stay yours.
+With the plugin loaded, you do not have to type vloop's commands. Ask your agent
+(Claude Code or Copilot CLI) in plain words ("run this brief", "what did that
+cost?", "record this as a defect") and the `/vloop:operate` skill runs the
+right vloop commands, checks the result and tells you what happened. Merging
+and pushing stay yours.
 
 ## Everyday commands
 

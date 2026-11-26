@@ -19,3 +19,8 @@ committing the plan
    review T1 · 1m29s · $0.09 · run $0.43 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/6 done ──
+   Make the README agent-neutral and cite mai-code-2
+   work T2 · 1m26s · $0.06 · run $0.49 / $40.00
+   check go
+   CHECK FAIL T2 — check go failed — see .vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829/checks/002-go.fail.log; review skipped
