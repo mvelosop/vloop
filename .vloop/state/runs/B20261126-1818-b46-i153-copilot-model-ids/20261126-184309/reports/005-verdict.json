@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "vloop config set --kinds <comma-list> accepts exactly plan, gate-review, work, review, second-review, verify, and review-brief, requires at least one of --agent, --model, or --effort, and rejects a positional key or value with the brief's exact usage lines.",
+      "met": true,
+      "evidence": "internal/cli/config.go:257-301 defines the exact seven-kind allowlist, requires a changed option, and emits the specified unknown-kind, missing-option, and positional-argument usage errors; internal/cli/config_test.go:527-561 asserts those exact lines and all seven kinds."
+    },
+    {
+      "criterion": "Every named kind's existing agent, model, and effort keys are validated as a single-key set would validate them; no new key or session kind is added.",
+      "met": true,
+      "evidence": "internal/cli/config.go:286-297 creates only agent.<kind>, model.<kind>, and effort.<kind> assignments; internal/config/config.go:736-775 and 871-924 validate every assignment through the existing key registry before any write, and internal/cli/config_test.go:550-568 verifies every key for every allowed kind."
+    },
+    {
+      "criterion": "All resulting Copilot pairs are checked before any write, one models request is made per invocation, removal is resolved by C-1, an environment override can still supply a Claude alias, and removing agent alone is never refused.",
+      "met": true,
+      "evidence": "internal/cli/config.go:160-203 previews all assignments before SetMany, internal/config/config.go:747-779 resolves the preview through environment/local/shared/default, and internal/cli/config.go:315-373 performs one models call over the resulting pairs; internal/cli/config_test.go:571-663 covers one-request reuse, disabled/missing resolution, removals, environment aliases, and agent-removal exemption."
+    },
+    {
+      "criterion": "Any unknown kind, invalid value, alias, missing id, disabled id, or other refusal leaves both shared and local files byte-for-byte unchanged; --local targets only the local file and success prints only the warnings a single set would print.",
+      "met": true,
+      "evidence": "internal/cli/config.go:164-211 completes preview, pair validation, and batch write ordering before output; internal/config/config.go:785-847 validates all assignments and writes the selected file once. internal/cli/config_test.go:523-663 covers exact refusals, byte-for-byte atomicity, --local isolation, and warning/override output."
+    },
+    {
+      "criterion": "Committed Go tests cover success, each option, every kind, exact usage errors, API reuse, model-result checks, removals, environment precedence, --local, and all-or-nothing failure; no test reaches a real API.",
+      "met": true,
+      "evidence": "internal/cli/config_test.go:523-663 uses httptest with stub VLOOP_COPILOT_API_URL and GH_TOKEN and covers the stated success, option, kind, usage, reuse, result, removal, precedence, local, and atomicity cases; .vloop/tmp/checks.json records the Go check at exit 0."
+    }
+  ],
+  "findings": [],
+  "notes": "The batch implementation previews C-1-resolved pairs and writes the target file once; no scope, gate, or regression issue was found."
+}

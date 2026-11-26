@@ -5,9 +5,9 @@
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T19:35:40Z",
+  "updated": "2026-11-26T19:47:24Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -159,7 +159,7 @@
         "Committed Go tests cover success, each option, every kind, exact usage errors, API reuse, model-result checks, removals, environment precedence, --local, and all-or-nothing failure; no test reaches a real API."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

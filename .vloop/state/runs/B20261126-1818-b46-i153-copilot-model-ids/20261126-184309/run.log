@@ -38,3 +38,10 @@ committing the plan
    review T3 · 1m34s · $0.04 · run $1.04 / $40.00
    review: PASS
    T3 done
+── iteration 5 (5 this run) · T4 · 3/6 done ──
+   Set several session kinds in one config command
+   work T4 · 7m43s · $0.14 · run $1.19 / $40.00
+   check go
+   review T4 · 1m24s · $0.06 · run $1.25 / $40.00
+   review: PASS
+   T4 done

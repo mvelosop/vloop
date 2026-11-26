@@ -1,0 +1,14 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Added atomic `vloop config set --kinds` updates for agent, model, and effort, with one C-1-aware Copilot validation per invocation and shared/local targeting.",
+  "files": [
+    "internal/cli/config.go",
+    "internal/cli/config_test.go",
+    "internal/config/config.go",
+    "docs/guide/commands.md"
+  ],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: pass; scoped config tests passed.",
+  "notes": "Batch candidates are previewed against environment/local/shared/default precedence and all assignments are written in one file operation. Removing agent alone intentionally skips pair validation; model removals are checked against the value that C-1 resolves."
+}

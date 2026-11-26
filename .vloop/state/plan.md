@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 4
+**Status:** running · **4/6 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:35:40Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:47:24Z
 
 ## Progress
 
 - [x] **T1** — List Copilot model ids and the account plan · 1 attempt(s)
 - [x] **T2** — Check Copilot model ids in config set
 - [x] **T3** — Check configured Copilot models in doctor
-- [ ] **T4** — Set several session kinds in one config command
+- [x] **T4** — Set several session kinds in one config command
 - [ ] **T5** — Document the Copilot model commands
 - [ ] **T6** — Verify the Copilot model workflow end to end
 
@@ -86,7 +86,7 @@ pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1
 
 ### T4 — Set several session kinds in one config command
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Replace up to fourteen separate config writes with one atomic --kinds operation for agent, model, and effort. Every candidate kind must be validated against its resolved pair before any shared or local file changes.
 
