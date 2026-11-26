@@ -214,6 +214,9 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261105-232221-doc-fix-for-verify-s-finding-by-session](I20261105-232221-doc-fix-for-verify-s-finding-by-session.md) |
 | verify | verification-finding | partly | no-options | [I20261106-213845-docs-guide-concepts-md-did-not-list-prep](I20261106-213845-docs-guide-concepts-md-did-not-list-prep.md) |
 | verify | verification-finding | partly | no-options | [I20261106-213846-z2-pinned-git-s-error-as-release-git-s-e](I20261106-213846-z2-pinned-git-s-error-as-release-git-s-e.md) |
+| verify | verification-finding | partly | no-options | [I20261126-094553-vloop-config-set-help-still-said-any-key](I20261126-094553-vloop-config-set-help-still-said-any-key.md) |
+| verify | verification-finding | partly | no-options | [I20261126-094554-the-plan-skill-kept-the-mktemp-scratch-d](I20261126-094554-the-plan-skill-kept-the-mktemp-scratch-d.md) |
+| verify | verification-finding | partly | no-options | [I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo](I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
