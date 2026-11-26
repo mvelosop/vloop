@@ -1,0 +1,28 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "All four gates fail on the base at the intended missing README, upgrade, documentation, or composed-workflow assertion. Every acceptance criterion is judgeable by a gate, the named go check, or review of the diff."
+}
+

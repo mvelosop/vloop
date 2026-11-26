@@ -1,0 +1,39 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.1239632,
+  "credits": 12.39632,
+  "duration_ms": 288505,
+  "effort": null,
+  "ended": "2026-11-26T20:44:19Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.1239632,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_JgQPsye6GnKn4NJg42Lcphqf"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: a redirection target holding $ cannot be resolved: $null",
+      "tool_name": "powershell",
+      "tool_use_id": "call_xpmdIwp3pHATgnC29cSgW2bw"
+    }
+  ],
+  "phase": "plan",
+  "run_id": "B20261126-1843-b47-i160-vloop-folder-readme",
+  "schema": "session/v4",
+  "started": "2026-11-26T20:39:28Z",
+  "turns": 19,
+  "wall_ms": 291055
+}

@@ -1,0 +1,15 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T1\gate.ps1:5
+[36;1mLine |[0m
+[36;1m[36;1m   5 | [0m     if (-not $Condition) { [36;1mthrow $Message[0m }
+[36;1m     | [31;1m                            ~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mREADME output is not between the install files and starter brief: detected stacks: none wrote .vloop/config.toml[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mwrote .vloop/install.json wrote .vloop/repo-guidelines.md wrote[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mdocs/briefs/B20261126-2044-getting-started.loop-brief.md wrote .gitignore wrote CLAUDE.md wrote[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1m.claude/settings.json next:   vloop doctor   get /vloop:operate for your Claude Code sessions in this[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mrepository, once:     claude plugin marketplace add mvelosop/vloop     claude plugin install vloop@vloop --scope[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mproject   or, for one session: claude --plugin-dir "$(vloop plugin path)"   for Copilot CLI: trust this folder[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1min copilot (the plugin is declared in .claude/settings.json), or once:     copilot plugin marketplace add[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mmvelosop/vloop     copilot plugin install vloop@vloop   or, for one session: copilot --plugin-dir "$(vloop[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mplugin path)"   then ask Claude Code for what you want ("run the brief docs/briefs/<name>"); /vloop:operate[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mdrives vloop[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m[31;1m[0m
