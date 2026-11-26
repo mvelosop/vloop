@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md",
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
-  "status": "running",
+  "status": "blocked",
   "iteration": 8,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T19:59:07Z",
+  "updated": "2026-11-26T19:59:08Z",
   "shell": "pwsh",
   "checks": [
     {

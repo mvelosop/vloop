@@ -62,3 +62,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The completed workflow passes T6, but the planner-owned close oracle does not prove three required close behaviors.
 - **Files:** none
 - **Notes for next iteration:** gate_dispute: the T6 oracle only checks that --all contains the extra model line, never compares the whole output; it checks one value after refusal instead of byte-for-byte unchanged files; and it ignores doctor exit codes while checking warning substrings. Strengthen .vloop/state/gates/T6/oracle.go so the unchanged product is judged by the acceptance criteria rather than adding a product workaround.
+
+## Run ended — blocked
+
+- **Run:** `B20261126-1818-b46-i153-copilot-model-ids` · 8 iteration(s) this run
+- **Plan:** 5/6 done, 1 blocked

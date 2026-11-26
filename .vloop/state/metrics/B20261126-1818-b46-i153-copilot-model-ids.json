@@ -7,7 +7,7 @@
   "tasks": {
     "planned": 6,
     "done": 5,
-    "blocked": 0,
+    "blocked": 1,
     "first_pass": 4,
     "estimate": {
       "min": 4,
@@ -43,8 +43,8 @@
     "rework": 1.004950495049505
   },
   "time": {
-    "agent_ms": 2370130,
-    "work_ms": 1855156,
+    "agent_ms": 2456968,
+    "work_ms": 1941994,
     "review_ms": 514974,
     "plan_ms": 547379,
     "gates_ms": 28189,
@@ -53,21 +53,21 @@
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 20.454574221667166,
-    "code_test_per_min": 41.33950458413673
+    "code_per_min": 19.73163671647331,
+    "code_test_per_min": 39.87841925495163
   },
   "cost": {
-    "total_usd": 1.3952039,
+    "total_usd": 1.4365180000000002,
     "plan_usd": 0.3419035,
-    "work_usd": 0.6836114000000001,
+    "work_usd": 0.7249255000000001,
     "review_usd": 0.2526425,
     "gate_review_usd": 0.11704650000000001,
-    "per_1000_code_lines_usd": 1.7267375
+    "per_1000_code_lines_usd": 1.7778688118811883
   },
   "credits": {
-    "total": 139.52039000000002,
+    "total": 143.65180000000004,
     "plan": 34.19035,
-    "work": 68.36114,
+    "work": 72.49255000000001,
     "review": 25.26425,
     "gate_review": 11.70465
   },
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 5,
-  "iterations": 7,
-  "iterations_per_closed": 1.4,
+  "iterations": 8,
+  "iterations_per_closed": 1.6,
   "by_task": [
     {
       "id": "T1",
@@ -285,7 +285,7 @@
       "id": "T6",
       "area": null,
       "kind": "test",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
         "code": 0,
         "test": 0,
@@ -298,8 +298,8 @@
           "other": 0
         }
       },
-      "agent_ms": 186057,
-      "cost_usd": 0.0824646,
+      "agent_ms": 272895,
+      "cost_usd": 0.12377869999999999,
       "models": [
         "mai-code-2"
       ],
@@ -611,6 +611,25 @@
       "cost_source": "estimated",
       "credits": 4.22899,
       "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309",
+      "seq": 16,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 8,
+      "task": "T6",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 86838,
+      "cost_usd": 0.0413141,
+      "cost_source": "estimated",
+      "credits": 4.13141,
+      "turns": 9,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

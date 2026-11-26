@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 8
+**Status:** blocked · **5/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:59:07Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:59:08Z
 
 ## Progress
 
