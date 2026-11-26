@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 5
+**Status:** running · **4/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-26T00:10:01Z
+**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-26T00:21:26Z
 
 ## Progress
 
 - [x] **T1** — Add mixed-team platform configuration
 - [x] **T2** — Report mixed-team health and block unsafe runs · 1 attempt(s)
 - [x] **T3** — Lint mixed-team gates for portable commands
-- [ ] **T4** — Teach skills to write portable mixed-team gates · 1 attempt(s)
+- [x] **T4** — Teach skills to write portable mixed-team gates · 1 attempt(s)
 - [ ] **T5** — Document mixed teams and the repository policy
 - [ ] **T6** — Prove the complete mixed-team workflow
 
@@ -90,7 +90,7 @@ $o = go test ./.vloop/state/gates/T3 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }
 
 ### T4 — Teach skills to write portable mixed-team gates
 
-`pending` · 1 attempt(s) · depends on: T3
+`done` · 1 attempt(s) · depends on: T3
 
 Align the planning and gate-review skills with the driver's portability lint so generated pwsh gates are accepted for mixed teams and missing cross-platform tools are caught by review. This keeps the human-facing skill contract synchronized with the executable rule.
 
@@ -101,8 +101,6 @@ Align the planning and gate-review skills with the driver's portability lint so 
 - The gate-review skill says a mixed-team gate that calls any tool unavailable on even one declared platform is unpassable even if it passes on the reviewing host.
 - The command list is copied from the driver's authoritative list without a different spelling or ordering, and neither skill replaces the driver lint as the enforcement point.
 - Committed structural skill tests assert these mixed-team rules and the go check runs them; no test invokes a real agent or skips on Windows.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261126-000247/checks/005-go.fail.log
 
 <details><summary>verify command</summary>
 

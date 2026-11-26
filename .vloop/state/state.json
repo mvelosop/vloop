@@ -5,9 +5,9 @@
   "base": "04c5526e85ea6a6483b153c55a4f8f241a85006c",
   "branch": "B20261125-2207-b40-i156-mixed-os-pwsh",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-25T23:09:54Z",
-  "updated": "2026-11-26T00:10:01Z",
+  "updated": "2026-11-26T00:21:26Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -171,9 +171,9 @@
         "Committed structural skill tests assert these mixed-team rules and the go check runs them; no test invokes a real agent or skips on Windows."
       ],
       "verify": "if (-not (Select-String -Path plugin/skills/plan/SKILL.md -SimpleMatch -Pattern 'vloop config get platforms' -Quiet)) { throw 'plan skill has no mixed-platform instruction' }; if (-not (Select-String -Path plugin/skills/plan/SKILL.md -SimpleMatch -Pattern 'pwsh -NoProfile -File' -Quiet)) { throw 'plan skill has no .ps1 invocation instruction' }; if (-not (Select-String -Path plugin/skills/gate-review/SKILL.md -SimpleMatch -Pattern 'platforms' -Quiet)) { throw 'gate-review skill has no mixed-platform rule' }",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261126-000247/checks/005-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T5",

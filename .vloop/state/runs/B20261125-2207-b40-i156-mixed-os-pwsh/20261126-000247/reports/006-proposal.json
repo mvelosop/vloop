@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Mixed-team planning and gate-review guidance now requires portable pwsh gates, preserves macOS BSD guidance, and is backed by structural tests tied to the driver's authoritative command list.",
+  "files": [
+    "plugin/skills/plan/SKILL.md",
+    "plugin/skills/gate-review/SKILL.md",
+    "internal/cli/skills_test.go"
+  ],
+  "verified": "vloop task gate T4 exited 0 and printed 'gate T4: pass (284ms)'; go run ./tools/check exited 0 with VLOOP_PLAN_SHA256 unset.",
+  "notes": "The structural test normalizes Markdown whitespace and compares the listed commands directly to driver.PlatformSpecificCommands, preserving spelling and order. The shortened gate-review prose remains within the 1600-word skill budget; the full check requires clearing the loop session's VLOOP_PLAN_SHA256 guard so its TestTaskGate* fixtures are not rejected as altered live plans."
+}
