@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/3 done** · iteration 1
+**Status:** running · **2/3 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:52:36Z
+**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:57:34Z
 
 ## Progress
 
 - [x] **T1** — Make PowerShell gate processes UTF-8
-- [ ] **T2** — Document UTF-8 behavior for PowerShell users
+- [x] **T2** — Document UTF-8 behavior for PowerShell users
 - [ ] **T3** — Verify PowerShell UTF-8 through the built CLI
 
 ## Tasks
@@ -38,7 +38,7 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 ### T2 — Document UTF-8 behavior for PowerShell users
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Explain where vloop supplies UTF-8 and where an interactive PowerShell terminal still needs profile setup. The distinction prevents the new runner behavior from being mistaken for a machine-wide encoding change.
 

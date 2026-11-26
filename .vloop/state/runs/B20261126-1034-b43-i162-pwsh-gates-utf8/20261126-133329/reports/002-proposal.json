@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The Mixed teams guide now distinguishes vloop's UTF-8 PowerShell gate/check processes from a user's interactive terminal and provides the profile encoding line needed for terminal pipes.",
+  "files": ["docs/guide/configuration.md"],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: pass (457ms).",
+  "notes": "The paragraph explicitly limits the encoding setup to processes vloop starts, says it does not change the profile or machine code page, and explains that the profile line preserves vloop run output through Tee-Object and similar pipes."
+}

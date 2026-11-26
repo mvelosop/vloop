@@ -16,3 +16,10 @@ committing the plan
    review T1 · 1m14s · $0.05 · run $0.40 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/3 done ──
+   Document UTF-8 behavior for PowerShell users
+   work T2 · 1m05s · $0.04 · run $0.44 / $40.00
+   check go
+   review T2 · 0m53s · $0.03 · run $0.47 / $40.00
+   review: PASS
+   T2 done

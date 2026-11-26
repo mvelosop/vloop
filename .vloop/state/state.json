@@ -5,9 +5,9 @@
   "base": "acfa8dc01f72688c17ea28dc6997768236398cd3",
   "branch": "B20261126-1034-b43-i162-pwsh-gates-utf8",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-26T13:39:18Z",
-  "updated": "2026-11-26T13:52:36Z",
+  "updated": "2026-11-26T13:57:34Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -80,7 +80,7 @@
         "The paragraph explains that the profile line makes vloop run output remain correct through Tee-Object and similar terminal pipes, without claiming that vloop changes the profile or machine code page."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
