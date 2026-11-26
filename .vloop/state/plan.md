@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 9
+**Status:** running · **5/6 done** · iteration 10
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T20:09:05Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T20:10:41Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Check configured Copilot models in doctor
 - [x] **T4** — Set several session kinds in one config command
 - [x] **T5** — Document the Copilot model commands
-- [ ] **T6** — Verify the Copilot model workflow end to end · 1 attempt(s)
+- [ ] **T6** — Verify the Copilot model workflow end to end · **blocked**
 
 ## Tasks
 
@@ -128,7 +128,7 @@ pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1
 
 ### T6 — Verify the Copilot model workflow end to end
 
-`pending` · 1 attempt(s) · depends on: T1, T2, T3, T4, T5
+`blocked` · **blocked** · depends on: T1, T2, T3, T4, T5
 
 Run all earlier behavioral gates together and replay the brief's worked example in an initialized temporary repository. This closes the run only when listing, set-time checks, doctor, atomic --kinds writes, and failure warnings compose as one operator workflow.
 
@@ -138,7 +138,7 @@ Run all earlier behavioral gates together and replay the brief's worked example 
 - The workflow proves exact picker and --all output, successful multi-kind writes, exit-2 absent/disabled/alias refusals, byte-for-byte all-or-nothing behavior, the doctor pass row, and warning-only writes and doctor after the stub stops.
 - No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot.
 
-**From the last attempt:** The close oracle can pass if the stub token is persisted in a generated fixture or log because it scans only command stdout and stderr, not artifacts produced in the temporary repository.
+**From the last attempt:** gate disputed: The gate can pass even if the workflow persists the stub token in a generated log, fixture, or configuration artifact. — oracle.go appends only got.stdout and got.stderr to combined, checks strings.Contains(combined, "stub-token"), and then calls os.RemoveAll(root) through defer without reading or scanning the temporary repository's artifacts, although T6 acceptance 3 explicitly covers output, log, fixture, and error secrecy.
 
 <details><summary>verify command</summary>
 

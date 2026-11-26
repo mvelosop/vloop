@@ -1,1 +1,2 @@
 {"attempt":1,"checks":[{"duration_ms":197186,"exit":0,"name":"go"}],"ended":"2026-11-26T20:09:05Z","gate":{"duration_ms":13449,"exit":0},"iteration":9,"outcome":"rejected","run_id":"B20261126-1818-b46-i153-copilot-model-ids","schema":"iteration/v2","started":"2026-11-26T20:01:33Z","task":"T6"}
+{"attempt":2,"checks":[],"ended":"2026-11-26T20:10:41Z","gate":null,"iteration":10,"outcome":"blocked","run_id":"B20261126-1818-b46-i153-copilot-model-ids","schema":"iteration/v2","started":"2026-11-26T20:09:06Z","task":"T6"}

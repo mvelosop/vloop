@@ -5,9 +5,9 @@
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
   "status": "running",
-  "iteration": 9,
+  "iteration": 10,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T20:09:05Z",
+  "updated": "2026-11-26T20:10:41Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -226,9 +226,9 @@
         "No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 1,
-      "notes": "The close oracle can pass if the stub token is persisted in a generated fixture or log because it scans only command stdout and stderr, not artifacts produced in the temporary repository.",
+      "notes": "gate disputed: The gate can pass even if the workflow persists the stub token in a generated log, fixture, or configuration artifact. — oracle.go appends only got.stdout and got.stderr to combined, checks strings.Contains(combined, \"stub-token\"), and then calls os.RemoveAll(root) through defer without reading or scanning the temporary repository's artifacts, although T6 acceptance 3 explicitly covers output, log, fixture, and error secrecy.",
       "gate_history": [
         {
           "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",

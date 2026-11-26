@@ -74,3 +74,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The completed tree passes every earlier behavioral gate and the strengthened end-to-end Copilot model workflow, including exact output, atomic refusal, doctor behavior, warning-only failures, and token secrecy.
 - **Files:** none
 - **Notes for next iteration:** No product change was required. The planner-owned close oracle ran in temporary directories with httptest endpoints and a stub credential, and made no GitHub or Copilot network request.
+
+## T6 — Verify the Copilot model workflow end to end
+
+- **Outcome:** blocked (review: skipped)
+- **Summary:** The completed workflow passes T6, but the close oracle does not prove token secrecy in generated temporary artifacts.
+- **Files:** none
+- **Notes for next iteration:** The oracle scans command stdout and stderr in combined, but never inspects files in its temporary repository before os.RemoveAll(root). Acceptance 3 requires no output, log, fixture, or error to contain the stub token, so the gate needs an artifact scan (or a product-independent assertion over every generated artifact) before cleanup; the product was not changed to mask this test gap.

@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "blocked",
+  "summary": "The completed workflow passes T6, but the close oracle does not prove token secrecy in generated temporary artifacts.",
+  "files": [],
+  "verified": "vloop task gate T6 exited 0: gate T6: pass (13.866s).",
+  "notes": "The oracle scans command stdout and stderr in combined, but never inspects files in its temporary repository before os.RemoveAll(root). Acceptance 3 requires no output, log, fixture, or error to contain the stub token, so the gate needs an artifact scan (or a product-independent assertion over every generated artifact) before cleanup; the product was not changed to mask this test gap.",
+  "gate_dispute": {
+    "reason": "The gate can pass even if the workflow persists the stub token in a generated log, fixture, or configuration artifact.",
+    "evidence": "oracle.go appends only got.stdout and got.stderr to combined, checks strings.Contains(combined, \"stub-token\"), and then calls os.RemoveAll(root) through defer without reading or scanning the temporary repository's artifacts, although T6 acceptance 3 explicitly covers output, log, fixture, and error secrecy."
+  }
+}
