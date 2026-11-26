@@ -1,0 +1,11 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added committed self-update coverage for exact non-check JSON documents, JSON refusals, and the complete install-location refusal line.",
+  "files": [
+    "internal/cli/selfupdate_test.go"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: pass (3.946s).",
+  "notes": "The JSON assertions pin one-document output and schema validity for up-to-date and install-needed paths; refusal coverage proves --json emits no stdout document, and the install-location test now compares the full contract line."
+}

@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -100,6 +101,8 @@ func TestSelfUpdateRefusals(t *testing.T) {
 
 	code, out, errOut := h.run("self-update", "--version", "0.15")
 	assertSelfUpdateResult(t, code, out, errOut, 2, "", "vloop: --version 0.15 is not a version like v0.15.0\n")
+	code, out, errOut = h.run("--json", "self-update", "--version", "0.15")
+	assertSelfUpdateResult(t, code, out, errOut, 2, "", "vloop: --version 0.15 is not a version like v0.15.0\n")
 
 	h.build.Module = ""
 	code, out, errOut = h.run("self-update")
@@ -119,6 +122,30 @@ func TestSelfUpdateRefusals(t *testing.T) {
 	t.Setenv("PATH", t.TempDir())
 	code, out, errOut = h.run("self-update")
 	assertSelfUpdateResult(t, code, out, errOut, 1, "", "vloop: self-update needs go on PATH — install the release by hand: go install github.com/mvelosop/vloop/cmd/vloop@latest\n")
+}
+
+func TestSelfUpdateJSONNonCheckBranches(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+
+	h.build.Module = "v0.15.0-rc.4"
+	t.Setenv("FAKE_GO_LATEST", "v0.14.0")
+	code, out, errOut := h.run("--json", "self-update")
+	assertSelfUpdateResult(t, code, out, errOut, 0,
+		"{\"schema\":\"self-update/v1\",\"current\":\"v0.15.0-rc.4\",\"target\":\"v0.14.0\",\"newer\":false,\"installed\":false,\"dir\":\"\",\"plugins\":[]}\n",
+		"",
+	)
+	assertSelfUpdateDocumentValid(t, out)
+
+	h.build.Module = "v0.14.0"
+	t.Setenv("FAKE_GO_LATEST", "v0.15.0")
+	code, out, errOut = h.run("--json", "self-update")
+	assertSelfUpdateResult(t, code, out, errOut, 0,
+		fmt.Sprintf("{\"schema\":\"self-update/v1\",\"current\":\"v0.14.0\",\"target\":\"v0.15.0\",\"newer\":true,\"installed\":false,\"dir\":%q,\"plugins\":[]}\n",
+			displaySelfUpdatePath(h.gobin)),
+		"",
+	)
+	assertSelfUpdateDocumentValid(t, out)
 }
 
 func TestSelfUpdateInstallLocationChecksOnlyWhenNeeded(t *testing.T) {
@@ -151,9 +178,11 @@ func TestSelfUpdateInstallLocationChecksOnlyWhenNeeded(t *testing.T) {
 	}
 	selfUpdateExecutable = func() (string, error) { return other, nil }
 	code, out, errOut = h.run("self-update")
-	if code != 1 || out != "" || !strings.Contains(errOut, "but go install writes to ") {
-		t.Fatalf("wrong location: code=%d stdout=%q stderr=%q", code, out, errOut)
-	}
+	wantErr := fmt.Sprintf(
+		"vloop: this vloop runs from %s, but go install writes to %s — update it the way you installed it, or put %s first on PATH\n",
+		displaySelfUpdatePath(other), displaySelfUpdatePath(h.gobin), displaySelfUpdatePath(h.gobin),
+	)
+	assertSelfUpdateResult(t, code, out, errOut, 1, "", wantErr)
 
 	selfUpdateExecutable = func() (string, error) { return filepath.Join(h.gobin, filepath.Base(h.executable)), nil }
 	t.Setenv("FAKE_GO_ENV_FAIL", "go env broke")
@@ -265,6 +294,17 @@ func (h *selfUpdateHarness) run(args ...string) (int, string, string) {
 	var stdout, stderr bytes.Buffer
 	code := Execute(h.build, args, &stdout, &stderr)
 	return code, stdout.String(), stderr.String()
+}
+
+func assertSelfUpdateDocumentValid(t *testing.T, out string) {
+	t.Helper()
+	violations, err := schema.Validate("self-update/v1", []byte(out))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(violations) != 0 {
+		t.Fatalf("schema violations: %+v", violations)
+	}
 }
 
 func assertSelfUpdateResult(t *testing.T, code int, out, errOut string, wantCode int, wantOut, wantErr string) {
