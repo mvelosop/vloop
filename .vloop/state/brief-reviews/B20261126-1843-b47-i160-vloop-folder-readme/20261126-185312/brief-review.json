@@ -1,0 +1,25 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1843-b47-i160-vloop-folder-readme.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "R1 / Decided here, because the cited documents leave it underdetermined",
+      "summary": "The language precedence needs an operator decision: the brief requires the value resolved by `vloop config get language`, but `init --language` currently wins for generated guidance without changing an existing config.",
+      "evidence": "The brief says the repository's `language` at line 37, requires the value resolved by `vloop config get language` at line 152, and says other init behavior is unchanged at lines 44-45. `internal/cli/init.go:103,106` renders the guidelines and starter brief from `lang`; `internal/cli/init.go:214-232` gives an explicit `--language` precedence and only reads config when it is absent. Thus a repository with `language = \"en\"` run as `init --language es` keeps config.get at `en` while its existing generated files are Spanish: making README follow config.get, follow the existing `lang`, or update config each produces a different observable result.",
+      "fix": "Choose and state the precedence literally. For example: `init` uses an explicit `--language`, otherwise the value `config get language` resolves to; `upgrade` uses `config get language` and preserves the existing init behavior. If config.get must instead govern init, explicitly amend the existing `--language` behavior and add the worked-example and gate case."
+    }
+  ],
+  "decisions": [
+    "Resolve the language-precedence conflict between `init --language` and `vloop config get language`; my recommendation is to preserve init's existing effective language and have upgrade use the resolved config value.",
+    "vloop wholly owns `.vloop/README.md`: regeneration discards edits, with no opt-out or team-owned block.",
+    "`vloop upgrade` always repairs a missing or different README, including at the same installed version; normal and `--dry-run` messages and the breaking-upgrade listing follow R2.",
+    "The generated document is descriptive, at most 400 words, with the exact title/section scheme, ownership statement, version token and repository URL; English and Spanish headings and ownership text are pinned.",
+    "Generated line endings are LF, and the concepts guide gains the specified init/upgrade sentence.",
+    "The loop leaves this repository's own `.vloop/README.md` to the operator after merge because S-4 forbids a loop session from writing it."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 1 finding"
+}
+

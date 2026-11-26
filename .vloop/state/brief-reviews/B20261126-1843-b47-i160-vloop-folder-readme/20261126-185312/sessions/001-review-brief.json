@@ -1,0 +1,49 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.24197559999999999,
+  "credits": 24.19756,
+  "duration_ms": 266795,
+  "effort": null,
+  "ended": "2026-11-26T18:57:41Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.24197559999999999,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_75QDBBdXJ5b37eepO8CLVJgv"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_mwQ51zCfYexgnGxR7MOUkXO6"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: script blocks cannot be judged — use Where-Object \u003cProperty\u003e -like \u003cvalue\u003e, ForEach-Object -MemberName \u003cProperty\u003e or Select-Object -ExpandProperty \u003cProperty\u003e",
+      "tool_name": "powershell",
+      "tool_use_id": "call_34dHNH2hcvCeNm84sZZLemKm"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: command word $name=B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md starts with $ and cannot be judged",
+      "tool_name": "powershell",
+      "tool_use_id": "call_BWesmZX96TArJkf6gUwL9IMZ"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261126-1843-b47-i160-vloop-folder-readme",
+  "schema": "session/v5",
+  "started": "2026-11-26T18:53:12Z",
+  "turns": 19,
+  "wall_ms": 269082
+}

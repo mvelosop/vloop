@@ -1,0 +1,24 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1843-b47-i160-vloop-folder-readme.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / R1 — the file; Worked example",
+      "summary": "The README output position is undefined when an uninitialized repository already has repo-guidelines.md, because init intentionally emits no line for that kept file.",
+      "evidence": "The brief says at line 127 that `wrote .vloop/README.md` is printed right after the guidelines file's line, and repeats that ordering in the worked example at lines 177-178. internal/cli/init.go:100-104 only adds a guidelines step when the file is absent; internal/cli/init_test.go:234-244 asserts that an existing guidelines file is kept and that init prints no repo-guidelines.md line.",
+      "fix": "State the fallback ordering explicitly: place the README line immediately after the guidelines step, following its `wrote .vloop/repo-guidelines.md` line when present; when the file is kept and no line is emitted, place the README line immediately after `wrote .vloop/install.json` (or another literal position chosen by the operator). Keep the fresh-repository worked example unchanged if that is the intended choice."
+    }
+  ],
+  "decisions": [
+    "The file is wholly vloop-owned and regenerated; `upgrade` overwrites local edits with no opt-out or user-text block. This is stated as approved and matches the seed.",
+    "`upgrade` restores a missing or different README even at the current installed version, including the specified dry-run and same-version output. This is an explicit product decision and is coherent.",
+    "The README is descriptive rather than promotional, stays within 400 words and covers vloop, usage, all top-level .vloop entries, and the repository URL. The exact prose remains implementation detail.",
+    "`init` uses its effective initialization language; `upgrade` resolves `language` through config, defaulting to `en`; generated files use LF line endings. These are stated as decided and are implementable.",
+    "This repository's own README is an operator action after merge, not a loop-session write, which correctly respects S-4."
+  ],
+  "checked": "facts, internal consistency, repository rules, and runnability; read the full brief and dependency, roadmap/domain and cited references, config checks, init/upgrade and their exact-output tests; ran vloop brief check on a ready copy and confirmed the current version output",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+
