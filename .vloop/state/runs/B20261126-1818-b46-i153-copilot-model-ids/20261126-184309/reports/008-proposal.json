@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "blocked",
+  "summary": "The completed workflow passes T6, but the planner-owned close oracle does not prove three required close behaviors.",
+  "files": [],
+  "verified": "vloop task gate T6 exited 0: gate T6: pass.",
+  "notes": "gate_dispute: the T6 oracle only checks that --all contains the extra model line, never compares the whole output; it checks one value after refusal instead of byte-for-byte unchanged files; and it ignores doctor exit codes while checking warning substrings. Strengthen .vloop/state/gates/T6/oracle.go so the unchanged product is judged by the acceptance criteria rather than adding a product workaround.",
+  "gate_dispute": {
+    "reason": "The planner-owned close oracle omits assertions required by T6 acceptance: exact --all output, byte-for-byte all-or-nothing refusal, and warning-only doctor exit 0.",
+    "evidence": "The --all branch uses contains(r.stdout, \"text-embedding-9  -\\n\", ...) instead of an exact equality; the disabled refusal checks only one model via config get rather than both configuration files byte-for-byte; and both doctor commands only inspect stdout substrings, not r.code. The unchanged gate nevertheless exits 0."
+  }
+}

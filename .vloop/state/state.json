@@ -5,9 +5,9 @@
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T19:57:25Z",
+  "updated": "2026-11-26T19:59:07Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -226,9 +226,9 @@
         "No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 1,
-      "notes": "The close oracle does not prove exact --all output because it asserts only that the extra model line is present.; The close oracle does not prove byte-for-byte atomic refusal behavior or warning-only doctor success; it checks one resolved value and ignores both doctor exit codes."
+      "notes": "gate disputed: The planner-owned close oracle omits assertions required by T6 acceptance: exact --all output, byte-for-byte all-or-nothing refusal, and warning-only doctor exit 0. — The --all branch uses contains(r.stdout, \"text-embedding-9  -\\n\", ...) instead of an exact equality; the disabled refusal checks only one model via config get rather than both configuration files byte-for-byte; and both doctor commands only inspect stdout substrings, not r.code. The unchanged gate nevertheless exits 0."
     }
   ]
 }

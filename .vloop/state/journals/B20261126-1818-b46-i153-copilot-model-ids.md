@@ -55,3 +55,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The completed tree passes all earlier behavioral gates and the end-to-end Copilot model workflow, including exact listing output, atomic multi-kind writes, refusals, doctor results, warning-only failures, and token secrecy.
 - **Files:** none
 - **Notes for next iteration:** No source change was required; the planner-owned close oracle exercised the worked example in a temporary initialized repository with local httptest endpoints and a stub token, then verified warning-only behavior after the server stopped.
+
+## T6 — Verify the Copilot model workflow end to end
+
+- **Outcome:** blocked (review: skipped)
+- **Summary:** The completed workflow passes T6, but the planner-owned close oracle does not prove three required close behaviors.
+- **Files:** none
+- **Notes for next iteration:** gate_dispute: the T6 oracle only checks that --all contains the extra model line, never compares the whole output; it checks one value after refusal instead of byte-for-byte unchanged files; and it ignores doctor exit codes while checking warning substrings. Strengthen .vloop/state/gates/T6/oracle.go so the unchanged product is judged by the acceptance criteria rather than adding a product workaround.
