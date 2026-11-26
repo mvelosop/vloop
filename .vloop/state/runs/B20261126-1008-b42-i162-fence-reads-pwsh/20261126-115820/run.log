@@ -17,3 +17,9 @@ committing the plan
    check go
    review T1 · 2m31s · $0.13 · run $0.71 / $40.00
    review: FAIL
+── iteration 2 (2 this run) · T1 · 0/5 done ──
+   Judge pwsh and cmd wrappers
+   work T1 · 3m24s · $0.11 · run $0.82 / $40.00
+   check go
+   review T1 · 2m07s · $0.08 · run $0.90 / $40.00
+   review: FAIL

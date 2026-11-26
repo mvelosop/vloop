@@ -1,0 +1,39 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "FAIL",
+  "criteria": [
+    {
+      "criterion": "For both the bash and powershell tools, pwsh and powershell accept only the pinned literal -Command/-c form after the allowed pre-options, judge every remaining word joined with spaces as a powershell call, preserve the phase and root, and count each wrapper toward the eight-level nesting limit.",
+      "met": true,
+      "evidence": "internal/fence/expand.go:202-208 refuses expanded policy values; internal/fence/judge.go:324-334 recurses in the PowerShell mode while preserving the Judge and incrementing depth; internal/fence/wrappers_test.go:10-45 and 83-109 exercise both outer tools, phase/root and the depth limit."
+    },
+    {
+      "criterion": "Missing, expanded, encoded, file, stdin, bare-script and unsupported-option pwsh forms fail closed with the exact W1 reasons, including the wrapper's written pwsh or powershell name where specified.",
+      "met": true,
+      "evidence": "internal/fence/expand.go:173-233 enforces the pinned options and exact refusals, and internal/fence/wrappers_test.go:21-41 asserts the named missing, expanded, encoded, file, stdin, bare-script and unsupported-option cases for both outer tools."
+    },
+    {
+      "criterion": "cmd accepts only /c or /k after /d, /q and /s, judges its literal string split at &, &&, || and |, and denies % or ^; every other cmd form fails closed with the exact W1 reason.",
+      "met": true,
+      "evidence": "internal/fence/expand.go:235-268 validates the wrapper form and special characters; internal/fence/judge.go:272-287 applies splitCMD and the cmd-specific lexer; internal/fence/wrappers_test.go:50-81 covers the accepted options/operators and refused forms in both outer tools."
+    },
+    {
+      "criterion": "A command inside a wrapper is allowed or denied exactly as the same command in the wrapped tool would be, including case-insensitive command and option matching and names with a path or .exe.",
+      "met": false,
+      "evidence": "internal/fence/split.go:300-310 makes every parenthesis literal in syntaxCMD, so cmd /c \"(git push)\" becomes a command named \"(git\" and is allowed, although cmd executes the grouped git push command and a direct git push is denied. This leaves a wrapper bypass contrary to the criterion."
+    },
+    {
+      "criterion": "Committed Go tests cover the allowed and refused wrapper forms, option and name variants, command matching, nesting, phase/root preservation and both outer tools, and the go check executes them.",
+      "met": true,
+      "evidence": "internal/fence/wrappers_test.go covers the listed behavior and variants for bash and powershell, and .vloop/tmp/checks.json records the go check exiting 0 with internal/fence passing in its log."
+    }
+  ],
+  "findings": [
+    {
+      "summary": "The cmd-specific lexer treats parentheses as literal words, allowing cmd /c \"(git push)\" even though cmd executes the grouped command and the direct git push command is denied.",
+      "kind": "bug"
+    }
+  ],
+  "notes": "Fail closed or correctly judge cmd command groups; add a committed regression test comparing the grouped wrapper with direct git push."
+}

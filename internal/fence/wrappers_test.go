@@ -27,6 +27,8 @@ func TestPowerShellWrappers(t *testing.T) {
 		{"no command", `pwsh`, "pwsh: runs a script, stdin or an encoded command, not a literal -Command string"},
 		{"encoded", `powershell -EncodedCommand Z2l0`, "powershell: runs a script, stdin or an encoded command, not a literal -Command string"},
 		{"unsupported option", `pwsh -Sta -c 'git status'`, "pwsh: runs a script, stdin or an encoded command, not a literal -Command string"},
+		{"expanded policy value", `pwsh -ExecutionPolicy $policy -c 'git status'`, "pwsh: $policy expands before the command string and cannot be judged"},
+		{"expanded policy abbreviation", `powershell -ep $policy -c 'git status'`, "powershell: $policy expands before the command string and cannot be judged"},
 	}
 	for _, tool := range []string{"bash", "powershell"} {
 		for _, tc := range cases {
@@ -54,6 +56,8 @@ func TestCMDWrapper(t *testing.T) {
 		{"and", `cmd /c git status && git push`, push},
 		{"or", `cmd /c 'git status || git push'`, push},
 		{"pipe", `cmd /c "git status | git push"`, push},
+		{"semicolon is literal", "cmd /c \"echo ok; git push\"", ""},
+		{"newline is literal", "cmd /c \"echo ok\ngit push\"", ""},
 		{"percent", `cmd /c echo %PATH%`, "cmd: % and ^ cannot be judged"},
 		{"caret", `cmd /c echo a^&git push`, "cmd: % and ^ cannot be judged"},
 		{"path", `C:\Windows\System32\cmd.exe /c git push`, push},

@@ -278,7 +278,7 @@ func (j *Judge) shellMode(s string, depth int, mode shellMode) string {
 		}
 		for _, part := range splitCMD(s) {
 			var parsed []command
-			parsed, err = splitPowerShell(part)
+			parsed, err = splitCMDPart(part)
 			if err != nil {
 				return err.Error()
 			}

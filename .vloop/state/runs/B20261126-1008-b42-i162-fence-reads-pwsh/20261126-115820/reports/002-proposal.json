@@ -1,0 +1,14 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The fence now rejects expanded pwsh policy values and judges cmd wrapper strings with cmd's literal separator grammar instead of PowerShell separators.",
+  "files": [
+    "internal/fence/expand.go",
+    "internal/fence/judge.go",
+    "internal/fence/split.go",
+    "internal/fence/wrappers_test.go"
+  ],
+  "verified": "go test ./internal/fence exited 0 and vloop task gate T1 exited 0 and printed gate T1: pass (3.667s).",
+  "notes": "Added syntax-specific cmd lexing so semicolons and newlines remain within one command segment while &, &&, || and | separate commands; PowerShell policy option values are now checked for expansion before -Command. Tests cover both outer tools and cmd's semicolon/newline edge cases."
+}

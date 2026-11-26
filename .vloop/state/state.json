@@ -5,9 +5,9 @@
   "base": "3b98a38748ef7e8bfab9d640429b019ffdafd4f5",
   "branch": "B20261126-1008-b42-i162-fence-reads-pwsh",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-26T12:00:48Z",
-  "updated": "2026-11-26T12:19:22Z",
+  "updated": "2026-11-26T12:27:14Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -58,8 +58,8 @@
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
       "status": "pending",
-      "attempts": 1,
-      "notes": "pwsh -ExecutionPolicy accepts an expanded value without refusing it, so structural argument expansion can inject options that the fence never judges.; cmd command strings are reparsed as PowerShell, adding semicolon and newline separators that the W1 cmd grammar explicitly excludes and changing the wrapper's decisions."
+      "attempts": 2,
+      "notes": "The cmd-specific lexer treats parentheses as literal words, allowing cmd /c \"(git push)\" even though cmd executes the grouped command and the direct git push command is denied."
     },
     {
       "id": "T2",

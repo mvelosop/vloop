@@ -202,6 +202,9 @@ func powerShellString(rest []string, exp []bool, repls []string) (string, string
 			if i >= len(rest) {
 				return "", refusal
 			}
+			if exp[i] {
+				return "", rest[i] + " expands before the command string and cannot be judged"
+			}
 			continue
 		case "-command", "-c":
 			if i+1 >= len(rest) {

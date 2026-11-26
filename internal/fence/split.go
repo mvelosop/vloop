@@ -33,12 +33,21 @@ type lexer struct {
 	cur    command
 	word   strings.Builder
 	st     []byte // per byte of word: stUnquoted, stDouble or stLiteral
-	in     bool   // a word is being built (possibly empty, if quoted)
+	syntax splitSyntax
+	in     bool // a word is being built (possibly empty, if quoted)
 	quoted bool
 	pend   pending
 	depth  int  // subshells open
 	closed bool // a subshell was just closed: only a redirection or an operator may follow
 }
+
+type splitSyntax int
+
+const (
+	syntaxPOSIX splitSyntax = iota
+	syntaxPowerShell
+	syntaxCMD
+)
 
 const subshellRefusal = "subshells and process substitution cannot be judged"
 
@@ -131,6 +140,9 @@ func (l *lexer) flush() error {
 	}
 	w := l.word.String()
 	ex := expands(w, l.st)
+	if l.syntax == syntaxCMD {
+		ex = false
+	}
 	l.resetWord()
 	plain := !l.quoted
 	l.in, l.quoted = false, false
@@ -153,7 +165,7 @@ func (l *lexer) flush() error {
 		}
 		p = pendWrite
 	}
-	if strings.ContainsAny(w, "$`") {
+	if l.syntax != syntaxCMD && strings.ContainsAny(w, "$`") {
 		return errors.New("a redirection target holding $ cannot be resolved: " + w)
 	}
 	if ex {
@@ -202,15 +214,19 @@ func (l *lexer) opens() bool {
 // quote, command substitution, process substitution and what a ( opens
 // anywhere but a subshell. A subshell's ( and ) cut commands like ; does.
 func split(s string) ([]command, error) {
-	return splitMode(s, false)
+	return splitMode(s, syntaxPOSIX)
 }
 
 func splitPowerShell(s string) ([]command, error) {
-	return splitMode(s, true)
+	return splitMode(s, syntaxPowerShell)
 }
 
-func splitMode(s string, powerShell bool) ([]command, error) {
-	l := &lexer{}
+func splitCMDPart(s string) ([]command, error) {
+	return splitMode(s, syntaxCMD)
+}
+
+func splitMode(s string, syntax splitSyntax) ([]command, error) {
+	l := &lexer{syntax: syntax}
 	next := func(i int) byte {
 		if i+1 < len(s) {
 			return s[i+1]
@@ -221,6 +237,10 @@ func splitMode(s string, powerShell bool) ([]command, error) {
 		c := s[i]
 		switch c {
 		case '\'':
+			if syntax == syntaxCMD {
+				l.put(c, stUnquoted)
+				break
+			}
 			j := strings.IndexByte(s[i+1:], '\'')
 			if j < 0 {
 				return nil, errors.New("unterminated quote")
@@ -237,10 +257,10 @@ func splitMode(s string, powerShell bool) ([]command, error) {
 					closed = true
 					break
 				}
-				if d == '`' || (d == '$' && next(i) == '(') {
+				if syntax != syntaxCMD && (d == '`' || (d == '$' && next(i) == '(')) {
 					return nil, errors.New("command substitution cannot be judged")
 				}
-				if d == '\\' && i+1 < len(s) {
+				if syntax != syntaxCMD && d == '\\' && i+1 < len(s) {
 					n := s[i+1]
 					if n == '\n' {
 						i++
@@ -260,7 +280,7 @@ func splitMode(s string, powerShell bool) ([]command, error) {
 		case '\\':
 			word := l.word.String()
 			windowsPath := len(word) >= 2 && word[1] == ':' && ((word[0] >= 'A' && word[0] <= 'Z') || (word[0] >= 'a' && word[0] <= 'z'))
-			if powerShell || windowsPath {
+			if syntax != syntaxPOSIX || windowsPath {
 				l.put(c, stUnquoted)
 			} else if i+1 < len(s) {
 				i++
@@ -270,13 +290,21 @@ func splitMode(s string, powerShell bool) ([]command, error) {
 				}
 			}
 		case '`':
-			return nil, errors.New("command substitution cannot be judged")
+			if syntax == syntaxCMD {
+				l.put(c, stUnquoted)
+			} else {
+				return nil, errors.New("command substitution cannot be judged")
+			}
 		case '$':
-			if next(i) == '(' {
+			if syntax != syntaxCMD && next(i) == '(' {
 				return nil, errors.New("command substitution cannot be judged")
 			}
 			l.put(c, stUnquoted)
 		case '(':
+			if syntax == syntaxCMD {
+				l.put(c, stUnquoted)
+				break
+			}
 			if (i > 0 && s[i-1] == '(') || !l.opens() {
 				return nil, errors.New(subshellRefusal)
 			}
@@ -285,6 +313,10 @@ func splitMode(s string, powerShell bool) ([]command, error) {
 			}
 			l.depth++
 		case ')':
+			if syntax == syntaxCMD {
+				l.put(c, stUnquoted)
+				break
+			}
 			if l.depth == 0 {
 				return nil, errors.New(subshellRefusal)
 			}
@@ -306,7 +338,21 @@ func splitMode(s string, powerShell bool) ([]command, error) {
 			if err := l.flush(); err != nil {
 				return nil, err
 			}
-		case '\n', ';':
+		case '\n':
+			if syntax == syntaxCMD {
+				if err := l.flush(); err != nil {
+					return nil, err
+				}
+				break
+			}
+			if err := l.end(); err != nil {
+				return nil, err
+			}
+		case ';':
+			if syntax == syntaxCMD {
+				l.put(c, stUnquoted)
+				break
+			}
 			if err := l.end(); err != nil {
 				return nil, err
 			}
