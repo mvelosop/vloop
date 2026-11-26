@@ -56,7 +56,11 @@ it past its timeout.
    log, not the exit code. The gate is run, and read, in the plan's shell with
    this host's tools: `sh` unless the config names another (P-5), and on macOS
    BSD `grep`, `sed`, `awk` and `date`. A pattern those tools reject is
-   `unpassable`.
+   `unpassable`. Also read `vloop config get platforms`. When it lists two or
+   more configured platforms, a mixed-team gate that calls any tool unavailable
+   on even one declared platform is `unpassable`, even if the gate passes on the
+   reviewing host. This review complements the driver's M3 plan-acceptance lint
+   and does not replace that enforcement point.
 2. **Every fixture it builds is read back.** When a gate edits a file, appends
    a config key, plants a defect in a copy or builds a repository, check the
    state the edit leaves with commands that already exist — do not assume it. A

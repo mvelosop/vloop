@@ -78,9 +78,22 @@ pins a class name pins how the page was built.
 
 Each `verify` command must be:
 
-- **In the plan's shell** (P-5): the value `vloop config get shell` prints, and
-  written for the host's tools — BSD `grep`, `sed`, `awk` and `date` on macOS.
-  A GNU-only pattern stalled a real run. A scratch directory is
+- **In the plan's shell** (P-5): the value `vloop config get shell` prints.
+  Read `vloop config get platforms`; when it lists two or more configured
+  platforms, every gate is pwsh, using pwsh cmdlets and the project's own
+  toolchain, never an M3 listed command. A gate script in the gate folder is a
+  `.ps1` file run as `pwsh -NoProfile -File <path>`. Useful pwsh building blocks
+  are `Select-String`, `Test-Path`, `Get-Content`, `Measure-Object`, `New-Item`,
+  `Remove-Item`, `Join-Path` and `[System.IO.Path]::GetTempPath()`. The
+  authoritative M3 command list, in the driver's order, is: `awk`, `basename`,
+  `bash`, `cat`, `chmod`, `cmd`, `cmp`, `cp`, `cut`, `date`, `diff`, `dirname`,
+  `env`, `fc`, `find`, `findstr`, `grep`, `head`, `ln`, `ls`, `mkdir`,
+  `mktemp`, `mv`, `powershell`, `printf`, `readlink`, `rm`, `robocopy`, `sed`,
+  `seq`, `sh`, `sleep`, `sort`, `stat`, `tail`, `tee`, `test`, `touch`, `tr`,
+  `uniq`, `wc`, `which`, `xargs`, `xcopy`, `zsh`. The mixed-team skill guidance
+  does not replace the driver's plan-acceptance portability lint. When the
+  plan shell is `sh` on macOS, write for the host's BSD `grep`, `sed`, `awk`
+  and `date`; a GNU-only pattern stalled a real run. A scratch directory is
   `mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX"`: macOS `mktemp -d` without a
   template ignores `TMPDIR`, and a sandbox may deny the directory it uses instead.
 - **Runnable from the repo root**, as a single command line.
