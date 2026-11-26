@@ -93,3 +93,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The completed tree passes every earlier behavioral gate and the strengthened end-to-end Copilot model workflow, including exact output, atomic writes, refusal paths, doctor behavior, warning-only failure paths, and token secrecy across command output and temporary artifacts.
 - **Files:** none
 - **Notes for next iteration:** No product or test file change was required. The planner-owned oracle used a temporary initialized repository and httptest endpoints with a stub credential, then scanned all temporary artifacts for the token before cleanup.
+
+## Run ended — complete
+
+- **Run:** `B20261126-1818-b46-i153-copilot-model-ids` · 1 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked

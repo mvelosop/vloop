@@ -1,0 +1,18 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [],
+  "not_run": [
+    {
+      "line": "vloop init",
+      "reason": "the verify fence denies vloop init"
+    }
+  ],
+  "checked": {
+    "example_lines": 11,
+    "sentences": 35,
+    "surfaces": 8
+  },
+  "notes": "All three passes found no disagreement. The verify fence denied vloop config set --help and a command-line file comparison; the generated config set and models sections were inspected directly against the checked-in reference instead."
+}
+
