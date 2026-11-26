@@ -1,0 +1,15 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief",
+  "verdict": "PASS",
+  "findings": [],
+  "decisions": [
+    "Share one replaced-plan decision between the plan and gate-shell rows; sound because the two rows must not diverge.",
+    "Judge a replaced plan as though no plan exists, using the configured shell and B40's mixed-team result rules; sound because the recorded plan's gates will not run again.",
+    "Define \"on PATH\" with the existing exec.LookPath check and control PATH in tests; sound and directly portable to the implementation.",
+    "Limit documentation to one sentence in the concepts guide; sound for this narrow bug fix."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: PASS, 0 findings"
+}
+

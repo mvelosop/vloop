@@ -1,0 +1,30 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "G1 — Gate and Worked example",
+      "summary": "The proposed gate does not prove all of the contract it calls exhaustive, including the required configured-shell result for replaced state/v1 and missing-shell cases.",
+      "evidence": "docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md:96-116 declares every table row, while :111-116 requires only the planted pass for a complete state/v2 plan and the same-brief problem. The worked example at :148-156 additionally pins --json and the configured-shell warning when neither shell is on PATH; none of those cases is required by the stated gate. internal/cli/doctor.go:535-589 shows the replacement decision and shell result are separate today, so a task could pass the narrow gate while still mishandling one of those required paths.",
+      "fix": "Make the task's gate run the complete table on Windows and assert the literal gate-shell result/message for text and --json: no plan, complete state/v2 for bare doctor and another/same/no brief, complete state/v1, and non-complete plans. Include the missing configured shell's mixed-team problem and non-mixed warning, with controlled PATH, plus the planted base failure."
+    },
+    {
+      "kind": "runnability",
+      "section": "Shape",
+      "summary": "The shape has no final task that runs every gate and the worked example line by line.",
+      "evidence": "docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md:191-199 permits only one implementation task and an optional guide sentence; the guide task, when present, is gated only on text presence. The create-brief standard at .vloop/tmp/plugin/0.15.0-rc.4/skills/create-brief/guidelines.md:76-78 requires the last task to run every gate and the worked example line by line.",
+      "fix": "Revise the task range and make the last task an integration/close gate that runs all earlier gates and every worked-example line, or explicitly fold that complete aggregate gate into the single final task. Keep the guide assertion as part of that final proof."
+    }
+  ],
+  "decisions": [
+    "Use one replacement decision for both the plan and gate-shell rows; sound and consistent with the existing B31 plan-row rule.",
+    "When a plan is replaced, judge the configured shell exactly as when no plan exists; sound and required by P-5's limit to plans that still have gates.",
+    "Keep 'on PATH' as exec.LookPath and control PATH in the test; sound and portable when the gate supplies both executables.",
+    "Limit documentation to one sentence in docs/guide/concepts.md; sound for this small behavior change."
+  ],
+  "checked": "facts, consistency, repository rules, runnability, operator-visible decisions; structural brief check",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+
