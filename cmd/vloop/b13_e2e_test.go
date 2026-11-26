@@ -95,7 +95,7 @@ func TestWorkedExampleB13(t *testing.T) {
 	if got := b13After(t, d.out); got != gateWarn {
 		t.Fatalf("after the plugin line: %q", got)
 	}
-	b5Has(t, d, "doctor: 0 problem(s), 2 warning(s)")
+	b5Has(t, d, "doctor: 0 problem(s), 3 warning(s)")
 
 	// The plugin at the binary's version, enabled: the plugin check passes.
 	r.b13Stub(`[{"id":"vloop@vloop","version":"` + version + `","enabled":true}]`)

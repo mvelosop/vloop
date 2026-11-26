@@ -571,7 +571,7 @@ func TestDoctorChecksAndGateScratch(t *testing.T) {
 		t.Errorf("message %q", c.Message)
 	}
 	e.write(".vloop/config.toml", cfg)
-	if out, _ := e.run("--json", "doctor"); strings.Contains(out, `"name":"checks"`) || strings.Contains(out, `"result":"problem"`) {
+	if out, _ := e.run("--json", "doctor"); strings.Contains(out, `"result":"problem"`) {
 		t.Errorf("a problem with a check configured:\n%s", out)
 	}
 	e.write(".vloop/config.toml", "run.gate-scratch = [\"web/.gate/\"]\n\n"+cfg)

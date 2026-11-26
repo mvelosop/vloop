@@ -290,8 +290,9 @@ func TestWorkedExampleB6RealData(t *testing.T) {
 		t.Fatal(err)
 	}
 	// The repository's own checks run its whole suite; the fixture run has its
-	// own passing one instead.
-	r.write(".vloop/config.toml", withoutChecks(r.read(".vloop/config.toml"))+"\n"+runCheckConfig)
+	// own passing one instead. Its platforms are dropped too: the fixture's
+	// scripted plan gates with POSIX tools, which a mixed team's lint refuses.
+	r.write(".vloop/config.toml", withoutPlatforms(withoutChecks(r.read(".vloop/config.toml")))+"\n"+runCheckConfig)
 	r.write("docs/x.md", "x\n")
 	r.write("docs/briefs/"+runBriefName+".md", runBriefText())
 	r.commitAll("fixture brief")
@@ -381,6 +382,23 @@ func withoutChecks(toml string) string {
 		if !skip {
 			out = append(out, l)
 		}
+	}
+	return strings.Join(out, "\n")
+}
+
+// withoutPlatforms drops a top-level platforms key from a config file.
+func withoutPlatforms(toml string) string {
+	var out []string
+	top := true
+	for _, l := range strings.Split(toml, "\n") {
+		t := strings.TrimSpace(l)
+		if strings.HasPrefix(t, "[") {
+			top = false
+		}
+		if top && (strings.HasPrefix(t, "platforms ") || strings.HasPrefix(t, "platforms=")) {
+			continue
+		}
+		out = append(out, l)
 	}
 	return strings.Join(out, "\n")
 }
