@@ -55,3 +55,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Updated the generated and repository CLAUDE.md sections to list all six loop session kinds, and aligned the operator and architect guidance with portable pwsh gates on this mixed macOS/Windows team.
 - **Files:** internal/install/section.go, internal/install/install_test.go, CLAUDE.md, .claude/skills/vloop-operator/SKILL.md, .claude/skills/vloop-architect/SKILL.md
 - **Notes for next iteration:** The only Go test change updates the existing generated-section pin to the full six-kind list; no gate fixtures or unrelated generated text changed. BSD-tool cautions now apply only to plans whose shell is sh.
+
+## T6 — Run the complete documentation contract
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The completed documentation now satisfies all five earlier gates and the brief's worked-example contract without additional source changes.
+- **Files:** none
+- **Notes for next iteration:** The combined gate ran T1 through T5 together, then rechecked the stale-string absences, mixed-team heading, mai-code-2 and self-update evidence, Copilot plugin-dir example, model-value wording, six-kind generated section, and operator pwsh shell.

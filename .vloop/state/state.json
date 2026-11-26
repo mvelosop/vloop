@@ -5,9 +5,9 @@
   "base": "16f54afef788a77ae268e6fe12189fbd53c435f3",
   "branch": "B20261126-1418-b45-docs-mixed-os-and-any-agent",
   "status": "running",
-  "iteration": 7,
+  "iteration": 8,
   "created": "2026-11-26T17:11:14Z",
-  "updated": "2026-11-26T17:54:32Z",
+  "updated": "2026-11-26T17:57:52Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -248,7 +248,7 @@
         "No changed prose contradicts the domain model or the binding guides, and no README mixed-team section exceeds 150 words."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

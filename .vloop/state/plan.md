@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 7
+**Status:** running · **6/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:54:32Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:57:52Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Explain mixed teams in the README · 1 attempt(s)
 - [x] **T4** — Update the guides for any agent
 - [x] **T5** — List every session kind and portable gate shell
-- [ ] **T6** — Run the complete documentation contract
+- [x] **T6** — Run the complete documentation contract
 
 ## Tasks
 
@@ -129,7 +129,7 @@ pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1
 
 ### T6 — Run the complete documentation contract
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`done` · depends on: T1, T2, T3, T4, T5
 
 Close the pass by exercising every earlier gate together and replaying the brief's worked-example assertions. This catches cross-file drift that a single documentation task could miss.
 
