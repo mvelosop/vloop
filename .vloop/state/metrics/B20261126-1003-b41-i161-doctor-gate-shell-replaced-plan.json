@@ -1,0 +1,478 @@
+{
+  "schema": "metrics/v4",
+  "brief": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief",
+  "run_id": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan",
+  "status": "consumed",
+  "merged": null,
+  "tasks": {
+    "planned": 3,
+    "done": 3,
+    "blocked": 0,
+    "first_pass": 2,
+    "estimate": {
+      "min": 2,
+      "max": 3
+    }
+  },
+  "size": {
+    "delivered": {
+      "code": 23,
+      "test": 111,
+      "docs": 1,
+      "other": 0,
+      "deleted": {
+        "code": 8,
+        "test": 0,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "churn": {
+      "code": 23,
+      "test": 132,
+      "docs": 1,
+      "other": 0,
+      "deleted": {
+        "code": 8,
+        "test": 21,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 4.826086956521739,
+    "rework": 1
+  },
+  "time": {
+    "agent_ms": 819848,
+    "work_ms": 456953,
+    "review_ms": 362895,
+    "plan_ms": 408173,
+    "gates_ms": 15833,
+    "checks_ms": 505094,
+    "gate_review_ms": 118257,
+    "verify_ms": 281788,
+    "wall_ms": 2226000
+  },
+  "rate": {
+    "code_per_min": 1.6832388442735726,
+    "code_test_per_min": 9.806695875332988
+  },
+  "cost": {
+    "total_usd": 1.0282755000000001,
+    "plan_usd": 0.3144804,
+    "work_usd": 0.2720207,
+    "review_usd": 0.18111690000000003,
+    "gate_review_usd": 0.0983593,
+    "per_1000_code_lines_usd": 44.707630434782615,
+    "verify_usd": 0.1622982
+  },
+  "credits": {
+    "total": 102.82755,
+    "plan": 31.44804,
+    "work": 27.20207,
+    "review": 18.11169,
+    "gate_review": 9.83593,
+    "verify": 16.22982
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "cache_read": 0,
+    "cache_creation": 0,
+    "cache_hit_ratio": null
+  },
+  "models": {
+    "plan": [
+      "mai-code-2"
+    ],
+    "work": [
+      "mai-code-2"
+    ],
+    "review": [
+      "mai-code-2"
+    ],
+    "gate-review": [
+      "mai-code-2"
+    ],
+    "verify": [
+      "mai-code-2"
+    ]
+  },
+  "agents": {
+    "plan": [
+      "copilot"
+    ],
+    "work": [
+      "copilot"
+    ],
+    "review": [
+      "copilot"
+    ],
+    "second-review": [],
+    "gate-review": [
+      "copilot"
+    ],
+    "verify": [
+      "copilot"
+    ]
+  },
+  "second_review": {
+    "mode": "off",
+    "sessions": 0,
+    "dissents": 0,
+    "dissent_tasks": [],
+    "cost_usd": 0,
+    "time_ms": 0
+  },
+  "effort": {
+    "plan": null,
+    "work": null,
+    "review": null,
+    "gate-review": null,
+    "verify": null
+  },
+  "defects": {
+    "in_loop": 2,
+    "operator": 1,
+    "escaped": 0,
+    "total": 3,
+    "removal_efficiency": 1
+  },
+  "interventions": {
+    "total": 1,
+    "by_agreement": {
+      "recommended": 0,
+      "other-option": 0,
+      "adjusted": 0,
+      "different": 0,
+      "no-options": 1
+    }
+  },
+  "instructions": {
+    "plan": 4881,
+    "gate_review": 2420,
+    "work": 2487,
+    "review": 2508,
+    "verify": 2161,
+    "guidelines_rules": 2
+  },
+  "records": {
+    "missing": []
+  },
+  "lead_time": {
+    "plan_to_merge_ms": null
+  },
+  "permission_denials": 5,
+  "iterations": 4,
+  "iterations_per_closed": 1.3333333333333333,
+  "by_task": [
+    {
+      "id": "T1",
+      "area": null,
+      "kind": "fix",
+      "attempts": 2,
+      "churn": {
+        "code": 23,
+        "test": 132,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 8,
+          "test": 21,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 504547,
+      "cost_usd": 0.2893293,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": 5.739130434782608,
+      "per_1000_code_lines_usd": 12.579534782608695
+    },
+    {
+      "id": "T2",
+      "area": null,
+      "kind": "docs",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 1,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 115703,
+      "cost_usd": 0.055382600000000004,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T3",
+      "area": null,
+      "kind": "test",
+      "attempts": 1,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 199598,
+      "cost_usd": 0.1084257,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    }
+  ],
+  "by_session": [
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 1,
+      "schema": "session/v4",
+      "phase": "plan",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 408173,
+      "cost_usd": 0.3144804,
+      "cost_source": "estimated",
+      "credits": 31.44804,
+      "turns": 26,
+      "permission_denials": 2,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 2,
+      "schema": "session/v4",
+      "phase": "gate-review",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 118257,
+      "cost_usd": 0.0983593,
+      "cost_source": "estimated",
+      "credits": 9.83593,
+      "turns": 14,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 3,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 1,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 200722,
+      "cost_usd": 0.11535240000000001,
+      "cost_source": "estimated",
+      "credits": 11.53524,
+      "turns": 21,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 4,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 1,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 100714,
+      "cost_usd": 0.0578378,
+      "cost_source": "estimated",
+      "credits": 5.78378,
+      "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 5,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 2,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 112720,
+      "cost_usd": 0.0767401,
+      "cost_source": "estimated",
+      "credits": 7.67401,
+      "turns": 14,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 6,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 2,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 90391,
+      "cost_usd": 0.039399,
+      "cost_source": "estimated",
+      "credits": 3.9399,
+      "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 7,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 3,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 62863,
+      "cost_usd": 0.0323564,
+      "cost_source": "estimated",
+      "credits": 3.23564,
+      "turns": 13,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 8,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 3,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 52840,
+      "cost_usd": 0.0230262,
+      "cost_source": "estimated",
+      "credits": 2.30262,
+      "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 9,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 80648,
+      "cost_usd": 0.0475718,
+      "cost_source": "estimated",
+      "credits": 4.75718,
+      "turns": 10,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 10,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 118950,
+      "cost_usd": 0.0608539,
+      "cost_source": "estimated",
+      "credits": 6.08539,
+      "turns": 14,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 11,
+      "schema": "session/v4",
+      "phase": "verify",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 281788,
+      "cost_usd": 0.1622982,
+      "cost_source": "estimated",
+      "credits": 16.22982,
+      "turns": 32,
+      "permission_denials": 3,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: command word $oldPath=$env:PATH starts with $ and cannot be judged"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: vloop run --help is denied by the verify fence (Bash(vloop run:*))"
+        }
+      ],
+      "is_error": false
+    }
+  ]
+}

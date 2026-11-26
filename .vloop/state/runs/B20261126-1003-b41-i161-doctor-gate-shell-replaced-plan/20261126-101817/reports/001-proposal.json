@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Doctor now uses one replaced-plan decision for both plan and gate shell checks, selecting the configured shell for replaced plans and the recorded shell for plans still in use. Added cross-platform table coverage for every G1 status and preserved configured-shell warnings in run preflight.",
+  "files": [
+    "internal/cli/doctor.go",
+    "internal/cli/doctor_plan_shell_test.go",
+    "internal/cli/run.go"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: pass (5.338s).",
+  "notes": "doctorPlanReplaced is shared by the plan and gate shell rows; complete state/v1 plans are always replaced, while complete state/v2 plans depend on whether doctor or run names a different brief. gate shell warnings are now included in preflight output without changing their result or message."
+}

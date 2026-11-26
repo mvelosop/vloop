@@ -1,0 +1,23 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "All gates fail on the base at the intended behavioural assertion; fixtures are read back through doctor and run, and matchers accept the brief's pinned literal output. T1's table and T2's documentation are gate-judged, the named go check judges committed Windows-compatible tests, and review judges the shared replacement decision, diff scope, and protection against weakening earlier gates."
+}
+

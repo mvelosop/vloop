@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Doctor now preserves the legacy complete state/v1 plan message while sharing the replaced-plan decision with the gate shell row. The Windows-safe table tests pin both the configured-shell behavior and the unchanged plan messages.",
+  "files": [
+    "internal/cli/doctor.go",
+    "internal/cli/doctor_plan_shell_test.go"
+  ],
+  "verified": "vloop task gate T1 exited 0: gate T1: pass (5.168s).",
+  "notes": "Complete state/v1 plans continue to use the configured gate shell, but the plan row retains `a complete state/v1 plan — the next brief's plan replaces it`; complete state/v2 plans retain the brief-specific replaced-plan message. The doctor table test remains cross-platform and now asserts both row messages."
+}

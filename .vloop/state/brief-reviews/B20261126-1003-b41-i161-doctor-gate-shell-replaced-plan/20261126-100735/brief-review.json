@@ -1,0 +1,23 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Worked example; Shape",
+      "summary": "The close task requires the verify session to run worked-example commands that its fence cannot run.",
+      "evidence": "docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md:147-171 uses vloop init and two vloop run commands, and :208-209 requires the close task to execute the worked example line by line through the built CLI. The review standard at .vloop/tmp/plugin/0.15.0-rc.4/skills/create-brief/guidelines.md:60-64 says verify cannot run vloop init or vloop run and requires those lines to be covered by named end-to-end tests or moved to the operator's close acceptance.",
+      "fix": "Name a Windows-running test (preferably an in-process preflight test with a controlled PATH and stub/failing agents) that covers both vloop run lines and creates its scratch repository without invoking vloop init. Make the close gate run that test; run only the permitted doctor/doctor --json lines directly, or move the prohibited invocations to Acceptance, at close (the operator's)."
+    }
+  ],
+  "decisions": [
+    "Use one shared replaced-plan predicate for the plan and gate shell rows, defined by the plan row's complete-v2-other-brief and complete-v1 messages. Sound: it prevents the rows drifting.",
+    "Treat a replaced plan as no plan for gate-shell evaluation, so B40's configured-shell rules apply. Sound: the old plan has no gates left to run.",
+    "Define on PATH as the existing exec.LookPath lookup and control PATH in the tests. Sound and directly supported by internal/cli/doctor.go:677-679.",
+    "Document the exception only with one sentence in docs/guide/concepts.md. Sound: this is a narrow extension of the existing doctor/plan explanation."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

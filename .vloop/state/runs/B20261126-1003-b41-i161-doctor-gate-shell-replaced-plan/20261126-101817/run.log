@@ -1,0 +1,46 @@
+checking the base: go
+the plan B20261125-2207-b40-i156-mixed-os-pwsh was for docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md — you asked for docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md using mai-code-2
+   plan · 6m48s · $0.31 · run $0.31 / $40.00
+checking the gate of T1 on the base
+checking the gate of T2 on the base
+checking the gate of T3 on the base
+planned: B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan — 3 tasks
+reviewing the gates using mai-code-2 (round 1)
+   gate review · 1m58s · $0.10 · run $0.41 / $40.00
+committing the plan
+── iteration 1 (1 this run) · T1 · 0/3 done ──
+   Make replaced plans use the configured gate shell
+   work T1 · 3m21s · $0.12 · run $0.53 / $40.00
+   check go
+   review T1 · 1m41s · $0.06 · run $0.59 / $40.00
+   review: FAIL
+── iteration 2 (2 this run) · T1 · 0/3 done ──
+   Make replaced plans use the configured gate shell
+   work T1 · 1m53s · $0.08 · run $0.66 / $40.00
+   check go
+   review T1 · 1m30s · $0.04 · run $0.70 / $40.00
+   review: PASS
+   T1 done
+── iteration 3 (3 this run) · T2 · 1/3 done ──
+   Document the configured shell for replaced plans
+   work T2 · 1m03s · $0.03 · run $0.73 / $40.00
+   check go
+   review T2 · 0m53s · $0.02 · run $0.76 / $40.00
+   review: PASS
+   T2 done
+── iteration 4 (4 this run) · T3 · 2/3 done ──
+   Verify the complete doctor shell replacement contract
+   work T3 · 1m21s · $0.05 · run $0.81 / $40.00
+   check go
+   review T3 · 1m59s · $0.06 · run $0.87 / $40.00
+   review: PASS
+   T3 done
+   check go
+   verify · 4m42s · $0.16 · run $1.03 / $40.00
+verify: no findings; 5 example line(s) not run — see .vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817/reports/verify.json
+
+═══ complete ═══
+run:    B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817  (4 iteration(s) this run)
+plan:   3/3 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.md

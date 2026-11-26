@@ -1,0 +1,30 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Executive summary; G1 Behaviour contract",
+      "summary": "The unchanged rule contradicts the state/v1 row about resume-like invocations.",
+      "evidence": "docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md:38-40 says any complete plan keeps its recorded shell when run names its own brief or no brief, but :57-60 defines every complete state/v1 plan as replaced by the second printed plan-row message, and :105 plus :119-124 explicitly require a complete state/v1 plan to judge the configured shell for every invocation. B31 also establishes the state/v1 precedent as replacement (docs/briefs/B20261102-1844-b31-i110-i112-plan-phase-edges.loop-brief.md:83-88).",
+      "fix": "Qualify the executive-summary unchanged sentence to complete state/v2 plans, matching the G1 table and the brief's shared replaced decision; retain the explicit complete-state/v1 exception."
+    },
+    {
+      "kind": "consistency",
+      "section": "G1 Behaviour contract — exhaustive cases and gate",
+      "summary": "The supposedly exhaustive matrix and gate omit two valid non-complete plan statuses.",
+      "evidence": "docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md:97-106 calls the table exhaustive but lists only planning, running and blocked as non-complete; :123-125 and the gate's test inventory at :111-125 repeat that narrower set. Both schemas/state.v2.json:13 and schemas/state.v1.json:13 also define stalled and halted as valid statuses, and the code path at internal/cli/doctor.go:536-559 preserves the plan shell for any plan not selected as replaced.",
+      "fix": "Add stalled and halted to the unchanged row, the corresponding test bullet and the Windows gate's asserted cases, or replace the parenthesized status list with an explicit \"every non-complete state/v2 or state/v1 status\" rule and name all valid values in the gate."
+    }
+  ],
+  "decisions": [
+    "Use one shared replaced decision for the plan and gate-shell rows, keyed to the plan row's two replacement messages. This is sound: it prevents the rows from drifting.",
+    "For a replaced plan, judge the configured shell exactly as for no plan rather than checking both shells or dropping the row. This is consistent with B31's replacement rule and P-5; I agree.",
+    "Define \"on PATH\" by the existing exec.LookPath behavior and control PATH in tests. Sound and implementation-independent.",
+    "Change only docs/guide/concepts.md with one sentence about replaced-plan shell selection. Appropriately narrow."
+  ],
+  "checked": "facts, consistency, rules, runnability: brief structure and ready-copy check; all binding references and the B40/B31 contracts; .vloop/config.toml checks; doctor/preflight code and existing tests; state/v1 and state/v2 status shells; the worked example and Windows gate shape",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

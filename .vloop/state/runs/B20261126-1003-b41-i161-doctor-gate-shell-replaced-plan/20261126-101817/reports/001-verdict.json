@@ -1,0 +1,43 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "FAIL",
+  "criteria": [
+    {
+      "criterion": "The plan and gate shell rows use one shared replaced-plan decision: complete state/v2 plans of another brief are replaced for a bare doctor or a run naming another brief, while a run naming the plan's own brief or no brief and every non-complete status keep the plan in use; complete state/v1 plans are replaced in every invocation.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorPlanShell computes replaced once with doctorPlanReplaced and uses it for both the gate-shell branch and the plan branch."
+    },
+    {
+      "criterion": "When that shared decision says replaced, and when no plan exists, the gate shell row uses the configured shell and exactly B40's configured-shell pass, warning and mixed-team problem outcomes and messages; otherwise it uses the plan's recorded shell and the existing plan-shell problem message without changing a result or message in that branch of the table.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorPlanShell selects the configured shell whenever !usePlanShell and retains the exact configured/plan-shell outcomes and messages; internal/cli/doctor_plan_shell_test.go covers present, absent, and mixed configured-shell cases."
+    },
+    {
+      "criterion": "Doctor --json reports the same gate shell result and message, and vloop run's preflight does not report the old plan shell for a different brief but does report it when resuming or naming the replaced plan's own brief.",
+      "met": true,
+      "evidence": "doctorPlanShell supplies the same doctorCheck consumed by --json; run.go includes gate-shell warnings in preflight output while problems already print, and the matrix test plus the task gate exercise different, own and unnamed briefs."
+    },
+    {
+      "criterion": "The implementation does not duplicate the replaced-plan calculation between the plan and gate shell rows.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorPlanReplaced is called once in doctorPlanShell and the resulting replaced value drives both rows."
+    },
+    {
+      "criterion": "Committed tests exercise every row of G1's table, including planning, running, blocked, stalled and halted, and run on Windows without depending on POSIX stub agents; the go check executes those tests.",
+      "met": true,
+      "evidence": "internal/cli/doctor_plan_shell_test.go's table covers no plan, complete v2 doctor/other/own/unnamed contexts, complete v1, and all five non-complete statuses; it creates a platform-specific executable fixture in a temporary directory. .vloop/tmp/checks.json's go check passed and its log includes internal/cli."
+    }
+  ],
+  "findings": [
+    {
+      "summary": "A complete state/v1 plan now takes the generic replaced-plan branch and prints `a complete plan of  — the next brief's plan replaces it` instead of the existing `a complete state/v1 plan — the next brief's plan replaces it`; G1 explicitly requires no other doctor output to change.",
+      "kind": "bug"
+    },
+    {
+      "summary": "The gate and committed tests cover state/v1 only as a gate-shell row and do not assert the plan row's existing state/v1 message, so this output regression passes.",
+      "kind": "gate-gap"
+    }
+  ],
+  "notes": "The shared replacement rule should still allow doctorPlanShell's state/v1 plan-row message branch to run. Then add an assertion that preserves that exact message while still checking the configured shell."
+}
