@@ -12,3 +12,8 @@ planned: B20261126-1818-b46-i153-copilot-model-ids — 6 tasks
 reviewing the gates using mai-code-2 (round 1)
    gate review · 2m29s · $0.12 · run $0.46 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/6 done ──
+   List Copilot model ids and the account plan
+   work T1 · 5m46s · $0.14 · run $0.60 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309/checks/001-go.fail.log; review skipped

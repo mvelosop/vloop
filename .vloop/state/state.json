@@ -5,9 +5,9 @@
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T19:02:14Z",
+  "updated": "2026-11-26T19:10:22Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -51,8 +51,8 @@
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "check go failed — see .vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309/checks/001-go.fail.log"
     },
     {
       "id": "T2",

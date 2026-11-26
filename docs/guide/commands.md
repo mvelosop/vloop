@@ -322,6 +322,16 @@ Show the built-in stack presets
 vloop metrics stacks [name]
 ```
 
+## vloop models
+
+List the Copilot model ids available to this account
+
+```
+vloop models copilot [flags]
+```
+
+- `--all`: include models not shown in Copilot's model picker
+
 ## vloop plugin
 
 Work with the plugin embedded in the binary
