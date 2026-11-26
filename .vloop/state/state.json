@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 7,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T15:35:49Z",
+  "updated": "2026-11-26T15:37:33Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -29,7 +29,7 @@
       "title": "Implement self-update target decisions and check mode",
       "goal": "Introduce the self-update command so a released vloop can safely choose and report its target from any directory. This establishes the refusal, version-selection and machine-readable contract that installation and plugin updates build on.",
       "kind": "feature",
-      "fixtures": "b92b8762a8ce1e73be47dfa28dd9ebfd370ef063d5c7fbd9bd638ab5dab06f0f",
+      "fixtures": "2cda958ac01522591754753edf558ea2ced29ea1019fa8cce9ac2b797d3d28ef",
       "references": [
         {
           "path": "docs/domain/domain-model.md",
@@ -77,6 +77,13 @@
           "reason": "Gate defect the work session disputed correctly: harness.ps1 assigned $home, which in PowerShell is the read-only automatic $HOME (names ignore case), so the gate failed before any assertion; renamed to $homeDir",
           "by": "operator",
           "fixtures": "cdf27de34245623ccfab483abefa494eb6b199177b037d794964f1a6624ed2f6"
+        },
+        {
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
+          "replaced_at": "2026-11-26T15:37:33Z",
+          "reason": "The shared fake agent now answers --version, which doctor's copilot preflight calls (needed by T4's gate); T1-T3's gates still pass",
+          "by": "operator",
+          "fixtures": "b92b8762a8ce1e73be47dfa28dd9ebfd370ef063d5c7fbd9bd638ab5dab06f0f"
         }
       ]
     },
@@ -160,7 +167,7 @@
       "title": "Point existing commands and guides to self-update",
       "goal": "Make machine-wide self-update discoverable from the repository upgrade workflow and doctor without changing those commands' offline behaviour. This also records the intentional path exception and the release handoff.",
       "kind": "docs",
-      "fixtures": "8c7508071a2255d310c5032bc9fbb0715f3443353269a9b365bc332b1599e3be",
+      "fixtures": "825b05669146c15299337f2ace0512daea642287ace729ae9005e7831aa8d9f7",
       "references": [
         {
           "path": "docs/domain/domain-model.md",
@@ -196,9 +203,18 @@
         "Any committed tests for the new help and doctor wording use the CLI and fake agent programs rather than real agents or network access."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1",
-      "status": "blocked",
+      "status": "pending",
       "attempts": 0,
-      "notes": "gate disputed: The gate's fake doctor environment cannot produce both plugin-version warnings it asserts. — .vloop/config.local.toml selects copilot for all Claude-capable phases, so runDoctor does not add the Claude plugin warning; .vloop/state/gates/T1/fakeagent.go rejects --version, causing doctorCopilot's preflight result to be a problem and the gate's copilot plugin row to be skipped. T4's assertions for claude and copilot self-update pointers therefore fail before evaluating the changed suffixes."
+      "notes": "gate disputed: The gate's fake doctor environment cannot produce both plugin-version warnings it asserts. — .vloop/config.local.toml selects copilot for all Claude-capable phases, so runDoctor does not add the Claude plugin warning; .vloop/state/gates/T1/fakeagent.go rejects --version, causing doctorCopilot's preflight result to be a problem and the gate's copilot plugin row to be skipped. T4's assertions for claude and copilot self-update pointers therefore fail before evaluating the changed suffixes.",
+      "gate_history": [
+        {
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1",
+          "replaced_at": "2026-11-26T15:37:33Z",
+          "reason": "Gate defect the work session disputed correctly: doctor ran under this repository's local config (every session on copilot), so it built no claude plugin row, and the fake copilot rejected --version; the gate now names one claude and one copilot session through the environment, which beats the local file (C-1)",
+          "by": "operator",
+          "fixtures": "8c7508071a2255d310c5032bc9fbb0715f3443353269a9b365bc332b1599e3be"
+        }
+      ]
     },
     {
       "id": "T5",

@@ -18,6 +18,10 @@ func main() {
 		}
 	}
 	key := strings.ToUpper(agent)
+	if len(args) == 1 && args[0] == "--version" {
+		fmt.Println(agent + " 0.0.0-fake")
+		return
+	}
 	if len(args) >= 3 && args[0] == "plugin" && args[1] == "list" && args[2] == "--json" {
 		if fail := os.Getenv("FAKE_" + key + "_LIST_FAIL"); fail != "" {
 			fmt.Fprintln(os.Stderr, fail)

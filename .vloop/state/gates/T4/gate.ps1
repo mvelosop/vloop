@@ -11,7 +11,13 @@ try {
     Assert-Equal $help.Code 0 "upgrade help exits 0"
     Assert-Gate ($help.Out.Contains("To update the vloop binary and its plugins, run vloop self-update first.")) "upgrade help points to self-update"
 
+    # Doctor builds the claude plugin row only when a session runs on claude, and
+    # the copilot one only when one runs on copilot: name one of each through the
+    # environment, which beats any .vloop/config.local.toml (C-1).
+    $env:VLOOP_AGENT_WORK = "claude"; $env:VLOOP_MODEL_WORK = "sonnet"
+    $env:VLOOP_AGENT_REVIEW = "copilot"; $env:VLOOP_MODEL_REVIEW = "gpt-6.1-terra"
     $doctor = Invoke-GateCommand $h.Exe @("--json", "doctor")
+    Remove-Item Env:VLOOP_AGENT_WORK, Env:VLOOP_MODEL_WORK, Env:VLOOP_AGENT_REVIEW, Env:VLOOP_MODEL_REVIEW -ErrorAction SilentlyContinue
     $checks = ($doctor.Out | ConvertFrom-Json).checks
     $claude = $checks | Where-Object { $_.name -eq "plugin" } | Select-Object -Last 1
     $copilot = $checks | Where-Object { $_.name -eq "copilot plugin" } | Select-Object -Last 1
