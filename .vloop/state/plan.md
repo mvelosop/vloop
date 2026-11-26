@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/5 done** · iteration 7
+**Status:** running · **4/5 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T13:03:27Z
+**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T13:10:12Z
 
 ## Progress
 
 - [x] **T1** — Judge pwsh and cmd wrappers · 2 attempt(s)
 - [x] **T2** — Refuse pwsh evaluation forms · 1 attempt(s)
 - [x] **T3** — Read common pwsh forms and guide refusals · 1 attempt(s)
-- [ ] **T4** — Document the pwsh fence rules
+- [x] **T4** — Document the pwsh fence rules
 - [ ] **T5** — Verify the complete pwsh fence contract
 
 ## Tasks
@@ -84,7 +84,7 @@ pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1
 
 ### T4 — Document the pwsh fence rules
 
-`pending` · depends on: T1, T2, T3
+`done` · depends on: T1, T2, T3
 
 Publish the new wrapper, eval, script-block and guided-refusal behavior where users and future fence auditors will encounter it. Keep the command reference generated from the CLI help rather than hand-maintaining a second copy.
 

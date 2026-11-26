@@ -26,7 +26,11 @@ func CommandsReference() string {
 
 func writeCommand(b *strings.Builder, c *cobra.Command, isRoot bool) {
 	if !isRoot {
-		fmt.Fprintf(b, "## %s\n\n%s\n\n```\n%s\n```\n\n", c.CommandPath(), c.Short, c.UseLine())
+		description := c.Short
+		if c.Annotations["vloop:command-reference-long"] == "true" {
+			description = c.Long
+		}
+		fmt.Fprintf(b, "## %s\n\n%s\n\n```\n%s\n```\n\n", c.CommandPath(), description, c.UseLine())
 		writeFlags(b, c.LocalFlags())
 	}
 	for _, s := range c.Commands() {

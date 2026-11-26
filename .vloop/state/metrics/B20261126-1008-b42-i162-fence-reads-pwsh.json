@@ -6,7 +6,7 @@
   "merged": null,
   "tasks": {
     "planned": 5,
-    "done": 2,
+    "done": 3,
     "blocked": 0,
     "first_pass": 0,
     "estimate": {
@@ -17,7 +17,7 @@
   "size": {
     "delivered": {
       "code": 534,
-      "test": 305,
+      "test": 307,
       "docs": 0,
       "other": 0,
       "deleted": {
@@ -28,47 +28,47 @@
       }
     },
     "churn": {
-      "code": 543,
-      "test": 305,
+      "code": 544,
+      "test": 307,
       "docs": 0,
       "other": 0,
       "deleted": {
-        "code": 41,
+        "code": 42,
         "test": 0,
         "docs": 0,
         "other": 0
       }
     },
-    "test_code_ratio": 0.5711610486891385,
-    "rework": 1.0168539325842696
+    "test_code_ratio": 0.5749063670411985,
+    "rework": 1.0187265917602997
   },
   "time": {
-    "agent_ms": 2061487,
-    "work_ms": 1312493,
-    "review_ms": 748994,
+    "agent_ms": 2258498,
+    "work_ms": 1389982,
+    "review_ms": 868516,
     "plan_ms": 659921,
-    "gates_ms": 16925,
-    "checks_ms": 847486,
+    "gates_ms": 18954,
+    "checks_ms": 989178,
     "gate_review_ms": 458736,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 15.54217901931955,
-    "code_test_per_min": 24.41926628690843
+    "code_per_min": 14.186419469930902,
+    "code_test_per_min": 22.3422823487114
   },
   "cost": {
-    "total_usd": 2.121909,
+    "total_usd": 2.3260843999999996,
     "plan_usd": 0.46582670000000004,
-    "work_usd": 0.8626826999999999,
-    "review_usd": 0.6171433000000001,
+    "work_usd": 0.9572871,
+    "review_usd": 0.7267143,
     "gate_review_usd": 0.17625630000000003,
-    "per_1000_code_lines_usd": 3.9736123595505615
+    "per_1000_code_lines_usd": 4.355963295880149
   },
   "credits": {
-    "total": 212.1909,
+    "total": 232.60844000000003,
     "plan": 46.58267,
-    "work": 86.26827,
-    "review": 61.71433,
+    "work": 95.72871,
+    "review": 72.67143,
     "gate_review": 17.62563
   },
   "tokens": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 7,
-  "iterations": 6,
-  "iterations_per_closed": 3,
+  "iterations": 7,
+  "iterations_per_closed": 2.3333333333333335,
   "by_task": [
     {
       "id": "T1",
@@ -210,26 +210,26 @@
       "id": "T3",
       "area": null,
       "kind": "feature",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
-        "code": 250,
-        "test": 99,
+        "code": 251,
+        "test": 101,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 7,
+          "code": 8,
           "test": 0,
           "docs": 0,
           "other": 0
         }
       },
-      "agent_ms": 468354,
-      "cost_usd": 0.31105910000000003,
+      "agent_ms": 665365,
+      "cost_usd": 0.5152345,
       "models": [
         "mai-code-2"
       ],
-      "test_code_ratio": 0.396,
-      "per_1000_code_lines_usd": 1.2442364000000001
+      "test_code_ratio": 0.40239043824701193,
+      "per_1000_code_lines_usd": 2.052727091633466
     },
     {
       "id": "T4",
@@ -611,6 +611,44 @@
       "cost_source": "estimated",
       "credits": 11.7588,
       "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820",
+      "seq": 15,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 7,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 77489,
+      "cost_usd": 0.0946044,
+      "cost_source": "estimated",
+      "credits": 9.46044,
+      "turns": 11,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820",
+      "seq": 16,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 7,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 119522,
+      "cost_usd": 0.109571,
+      "cost_source": "estimated",
+      "credits": 10.9571,
+      "turns": 9,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

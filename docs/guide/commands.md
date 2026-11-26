@@ -174,7 +174,13 @@ vloop fence
 
 ## vloop fence check
 
-Print allow or deny: <reason> for one tool call; exit 1 on deny
+Judge one tool call the way the Copilot hook does, without running anything.
+A shell tool's command string is split at ; && || | & and newlines outside
+quotes, looked through env, command, exec, nohup, time, nice, timeout, stdbuf,
+xargs, sh -c, pwsh and powershell -Command, and cmd /c, read through if, while, until, for, !, { } and subshells, and matched against the phase's fence (review, work, verify, gate-review, plan or review-brief) Bash deny rules and the
+Copilot adapter's deny list. A word the shell expands ($, a glob, a brace expansion) matches as any text. A file tool's path, and a skill's name, are given
+with --path. In a powershell call, pwsh's eval-like commands and script blocks are refused. Exits 0 and prints allow, or exits 1 and prints deny: <reason>;
+bad arguments exit 2.
 
 ```
 vloop fence check --phase <review|second-review|work|verify|gate-review|plan|review-brief> --root <dir> --tool <name> [--path <p>] ["<command>"] [flags]

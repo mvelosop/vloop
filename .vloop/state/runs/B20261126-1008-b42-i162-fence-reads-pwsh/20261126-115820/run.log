@@ -56,3 +56,10 @@ committing the plan
    review T3 · 2m00s · $0.11 · run $2.02 / $40.00
    review: PASS
    T3 done
+── iteration 8 (8 this run) · T4 · 3/5 done ──
+   Document the pwsh fence rules
+   work T4 · 3m16s · $0.23 · run $2.25 / $40.00
+   check go
+   review T4 · 0m59s · $0.06 · run $2.31 / $40.00
+   review: PASS
+   T4 done

@@ -55,6 +55,8 @@ command".
 
 | Rule | Enforced by | Note |
 | --- | --- | --- |
+| `W1: pwsh and powershell -Command, cmd /c wrappers` | hook, driver | hook judges literal wrapper strings with the call's phase and root and refuses unreadable forms; the driver re-judges every call and halts on a denied one |
+| `W2: pwsh dynamic-execution commands and script blocks` | hook, driver | hook refuses `Invoke-Expression` and the other eval-like commands and every unquoted script block in a PowerShell call; the driver re-judges every call and halts on a denied one |
 | `Bash(git push:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
 | `Bash(git commit:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
 | `Bash(git reset:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
@@ -251,6 +253,8 @@ answer and is fast, and the deny list stays behind it.
 
 | Rule | Enforced by | Note |
 | --- | --- | --- |
+| `W1: pwsh and powershell -Command, cmd /c wrappers` | hook, driver | hook judges literal wrapper strings with the call's phase and root and refuses unreadable forms; the driver re-judges every call and halts on a denied one |
+| `W2: pwsh dynamic-execution commands and script blocks` | hook, driver | hook refuses `Invoke-Expression` and the other eval-like commands and every unquoted script block in a PowerShell call; the driver re-judges every call and halts on a denied one |
 | `Bash(git push:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
 | `Bash(git commit:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
 | `Bash(git reset:*)` | hook, driver | hook matches it (the fence's own matching); driver restores the plan, defects, interventions and config and halts on a moved ref or a changed `.git/config` or hook |
@@ -438,6 +442,8 @@ always prints its answer and is fast, and the deny list stays behind it.
 
 | Rule | Enforced by | Note |
 | --- | --- | --- |
+| `W1: pwsh and powershell -Command, cmd /c wrappers` | hook, driver | hook judges literal wrapper strings with the call's phase and root and refuses unreadable forms; the driver re-judges every call and halts on a denied one |
+| `W2: pwsh dynamic-execution commands and script blocks` | hook, driver | hook refuses `Invoke-Expression` and the other eval-like commands and every unquoted script block in a PowerShell call; the driver re-judges every call and halts on a denied one |
 | `Bash(git push:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
 | `Bash(git commit:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
 | `Bash(git reset:*)` | hook, driver | hook matches the git command; driver halts the run (exit 9) if a ref moved |
@@ -631,6 +637,8 @@ always prints its answer and is fast, and the deny list stays behind it.
 
 | Rule | Enforced by | Note |
 | --- | --- | --- |
+| `W1: pwsh and powershell -Command, cmd /c wrappers` | hook, driver | hook judges literal wrapper strings with the call's phase and root and refuses unreadable forms; the driver re-judges every call and halts on a denied one |
+| `W2: pwsh dynamic-execution commands and script blocks` | hook, driver | hook refuses `Invoke-Expression` and the other eval-like commands and every unquoted script block in a PowerShell call; the driver re-judges every call and halts on a denied one |
 | `Bash(git push:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
 | `Bash(git commit:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
 | `Bash(git reset:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved |
@@ -830,6 +838,8 @@ always prints its answer and is fast, and the deny list stays behind it.
 
 | Rule | Enforced by | Note |
 | --- | --- | --- |
+| `W1: pwsh and powershell -Command, cmd /c wrappers` | hook, driver | hook judges literal wrapper strings with the call's phase and root and refuses unreadable forms; the driver re-judges every call and halts on a denied one |
+| `W2: pwsh dynamic-execution commands and script blocks` | hook, driver | hook refuses `Invoke-Expression` and the other eval-like commands and every unquoted script block in a PowerShell call; the driver re-judges every call and halts on a denied one |
 | `Bash(git push:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved (`REFS MOVED plan`) |
 | `Bash(git commit:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved (`REFS MOVED plan`) |
 | `Bash(git reset:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved (`REFS MOVED plan`) |
@@ -1023,6 +1033,8 @@ the interventions nor the configuration after this session.
 
 | Rule | Enforced by | Note |
 | --- | --- | --- |
+| `W1: pwsh and powershell -Command, cmd /c wrappers` | hook, driver | hook judges literal wrapper strings with the call's phase and root and refuses unreadable forms; the driver re-judges every call and halts on a denied one |
+| `W2: pwsh dynamic-execution commands and script blocks` | hook, driver | hook refuses `Invoke-Expression` and the other eval-like commands and every unquoted script block in a PowerShell call; the driver re-judges every call and halts on a denied one |
 | `Bash(git push:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved or `.git/config` or a hook changed |
 | `Bash(git commit:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved or `.git/config` or a hook changed |
 | `Bash(git reset:*)` | hook, driver | hook matches the git command; the driver halts the run (exit 9) if a ref moved or `.git/config` or a hook changed |
