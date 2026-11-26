@@ -6,7 +6,7 @@
   "merged": null,
   "tasks": {
     "planned": 3,
-    "done": 0,
+    "done": 1,
     "blocked": 0,
     "first_pass": 0,
     "estimate": {
@@ -16,59 +16,59 @@
   },
   "size": {
     "delivered": {
-      "code": 18,
-      "test": 102,
+      "code": 23,
+      "test": 111,
       "docs": 0,
       "other": 0,
       "deleted": {
-        "code": 5,
+        "code": 8,
         "test": 0,
         "docs": 0,
         "other": 0
       }
     },
     "churn": {
-      "code": 18,
-      "test": 102,
+      "code": 23,
+      "test": 132,
       "docs": 0,
       "other": 0,
       "deleted": {
-        "code": 5,
-        "test": 0,
+        "code": 8,
+        "test": 21,
         "docs": 0,
         "other": 0
       }
     },
-    "test_code_ratio": 5.666666666666667,
+    "test_code_ratio": 4.826086956521739,
     "rework": 1
   },
   "time": {
-    "agent_ms": 301436,
-    "work_ms": 200722,
-    "review_ms": 100714,
+    "agent_ms": 504547,
+    "work_ms": 313442,
+    "review_ms": 191105,
     "plan_ms": 408173,
-    "gates_ms": 4796,
-    "checks_ms": 139124,
+    "gates_ms": 9648,
+    "checks_ms": 272750,
     "gate_review_ms": 118257,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 3.582850090898234,
-    "code_test_per_min": 23.885667272654892
+    "code_per_min": 2.7351267572693923,
+    "code_test_per_min": 15.935086324960809
   },
   "cost": {
-    "total_usd": 0.5860299,
+    "total_usd": 0.702169,
     "plan_usd": 0.3144804,
-    "work_usd": 0.11535240000000001,
-    "review_usd": 0.0578378,
+    "work_usd": 0.1920925,
+    "review_usd": 0.09723680000000001,
     "gate_review_usd": 0.0983593,
-    "per_1000_code_lines_usd": 32.55721666666667
+    "per_1000_code_lines_usd": 30.52908695652174
   },
   "credits": {
-    "total": 58.60299,
+    "total": 70.21690000000001,
     "plan": 31.44804,
-    "work": 11.53524,
-    "review": 5.78378,
+    "work": 19.20925,
+    "review": 9.72368,
     "gate_review": 9.83593
   },
   "tokens": {
@@ -153,33 +153,33 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 2,
-  "iterations": 1,
-  "iterations_per_closed": null,
+  "iterations": 2,
+  "iterations_per_closed": 2,
   "by_task": [
     {
       "id": "T1",
       "area": null,
       "kind": "fix",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
-        "code": 18,
-        "test": 102,
+        "code": 23,
+        "test": 132,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 5,
-          "test": 0,
+          "code": 8,
+          "test": 21,
           "docs": 0,
           "other": 0
         }
       },
-      "agent_ms": 301436,
-      "cost_usd": 0.17319020000000002,
+      "agent_ms": 504547,
+      "cost_usd": 0.2893293,
       "models": [
         "mai-code-2"
       ],
-      "test_code_ratio": 5.666666666666667,
-      "per_1000_code_lines_usd": 9.621677777777778
+      "test_code_ratio": 5.739130434782608,
+      "per_1000_code_lines_usd": 12.579534782608695
     },
     {
       "id": "T2",
@@ -310,6 +310,44 @@
       "cost_source": "estimated",
       "credits": 5.78378,
       "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 5,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 2,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 112720,
+      "cost_usd": 0.0767401,
+      "cost_source": "estimated",
+      "credits": 7.67401,
+      "turns": 14,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan/20261126-101817",
+      "seq": 6,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 2,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 90391,
+      "cost_usd": 0.039399,
+      "cost_source": "estimated",
+      "credits": 3.9399,
+      "turns": 8,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

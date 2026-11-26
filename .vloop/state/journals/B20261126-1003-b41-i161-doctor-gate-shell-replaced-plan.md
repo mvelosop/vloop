@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Doctor now preserves the legacy complete state/v1 plan message while sharing the replaced-plan decision with the gate shell row. The Windows-safe table tests pin both the configured-shell behavior and the unchanged plan messages.
 - **Files:** internal/cli/doctor.go, internal/cli/doctor_plan_shell_test.go
 - **Notes for next iteration:** Complete state/v1 plans continue to use the configured gate shell, but the plan row retains `a complete state/v1 plan — the next brief's plan replaces it`; complete state/v2 plans retain the brief-specific replaced-plan message. The doctor table test remains cross-platform and now asserts both row messages.
+
+## T2 — Document the configured shell for replaced plans
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The Gates and the gate shell section now explains that doctor checks the configured shell for a plan the next brief replaces.
+- **Files:** docs/guide/concepts.md
+- **Notes for next iteration:** No other documentation was changed.

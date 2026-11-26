@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/3 done** · iteration 2
+**Status:** running · **2/3 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T10:46:41Z
+**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T10:51:48Z
 
 ## Progress
 
 - [x] **T1** — Make replaced plans use the configured gate shell · 1 attempt(s)
-- [ ] **T2** — Document the configured shell for replaced plans
+- [x] **T2** — Document the configured shell for replaced plans
 - [ ] **T3** — Verify the complete doctor shell replacement contract
 
 ## Tasks
@@ -38,7 +38,7 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 ### T2 — Document the configured shell for replaced plans
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Add the single guide sentence promised by G1 so users of doctor understand why a completed plan from another brief does not control the gate shell row. Keep the change confined to the existing Gates and the gate shell section.
 

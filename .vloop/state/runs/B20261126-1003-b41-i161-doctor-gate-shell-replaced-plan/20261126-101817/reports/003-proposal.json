@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "The Gates and the gate shell section now explains that doctor checks the configured shell for a plan the next brief replaces.",
+  "files": ["docs/guide/concepts.md"],
+  "verified": "vloop task gate T2 exited 0 and printed pass.",
+  "notes": "No other documentation was changed."
+}

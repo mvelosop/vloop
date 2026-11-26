@@ -1,0 +1,19 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "docs/guide/concepts.md contains one sentence in the Gates and the gate shell section stating that for a plan the next brief replaces, doctor checks the configured shell.",
+      "met": true,
+      "evidence": "docs/guide/concepts.md:120 adds exactly that sentence under \"Gates and the gate shell\"."
+    },
+    {
+      "criterion": "No other documentation is changed by this task.",
+      "met": true,
+      "evidence": "git diff HEAD -- . ':(exclude).vloop' shows only docs/guide/concepts.md changed."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

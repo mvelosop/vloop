@@ -117,6 +117,7 @@ A task's `verify` command is its **gate**: the task is done only when it exits 0
 default, `pwsh` on Windows). A gate is written before the work exists, and the
 work session may not change it; only the operator does, with `vloop task verify
 <id> <command> --reason <text>`, which records the change in the task's history.
+For a plan the next brief replaces, doctor checks the configured shell.
 
 **Gate fixtures.** What a gate needs besides its command (an oracle, a script,
 expected outputs) lives in the task's gate folder, `.vloop/state/gates/<id>/`.

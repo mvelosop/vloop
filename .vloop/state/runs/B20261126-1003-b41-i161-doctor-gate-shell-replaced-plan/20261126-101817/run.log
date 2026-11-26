@@ -22,3 +22,10 @@ committing the plan
    review T1 · 1m30s · $0.04 · run $0.70 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/3 done ──
+   Document the configured shell for replaced plans
+   work T2 · 1m03s · $0.03 · run $0.73 / $40.00
+   check go
+   review T2 · 0m53s · $0.02 · run $0.76 / $40.00
+   review: PASS
+   T2 done

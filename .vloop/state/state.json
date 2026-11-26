@@ -5,9 +5,9 @@
   "base": "3b2db83b1a7b73c5eec9d712263240246c01e797",
   "branch": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-26T10:24:41Z",
-  "updated": "2026-11-26T10:46:41Z",
+  "updated": "2026-11-26T10:51:48Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -85,7 +85,7 @@
         "No other documentation is changed by this task."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
