@@ -31,3 +31,10 @@ committing the plan
    review T3 · 0m45s · $0.03 · run $0.44 / $40.00
    review: PASS
    T3 done
+── iteration 4 (4 this run) · T4 · 3/4 done ──
+   Verify the README workflow end to end
+   work T4 · 0m56s · $0.04 · run $0.48 / $40.00
+   check go
+   review T4 · 0m56s · $0.05 · run $0.53 / $40.00
+   review: PASS
+   T4 done

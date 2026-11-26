@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The setup guide now states that init writes `.vloop/README.md` and upgrade rewrites or restores it.
 - **Files:** docs/guide/concepts.md
 - **Notes for next iteration:** The change is limited to the prescribed lifecycle sentence in the Setting up a repository section.
+
+## T4 — Verify the README workflow end to end
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The aggregate close gate proves the completed init, upgrade, and documentation workflow through the built CLI in a temporary repository.
+- **Files:** none
+- **Notes for next iteration:** T4 required validation only: the planner-owned gate ran T1-T3, then replayed init, missing-file restoration, non-writing dry-run, local-edit overwrite, and same-version silence; it left the repository unchanged and removed its temporary repository.

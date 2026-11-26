@@ -1,0 +1,24 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "Every earlier task's planner-owned gate passes against the completed tree, and the close gate builds the CLI and runs the brief's worked example line by line in a temporary git repository.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T4/gate.ps1:3-6 runs T1-T3 before proceeding; lines 24-34 build ./cmd/vloop into a temporary directory, read its version, and create and initialize the temporary repository."
+    },
+    {
+      "criterion": "The workflow proves init output ordering, the version-bearing owned README, missing-file restoration, non-writing dry-run, overwrite of a local edit, and silence for a current file at the same version.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T4/gate.ps1:35-52 asserts init's ordered README line and exact version-bearing ownership text; lines 54-72 assert restore, dry-run non-writing, overwrite, and exact same-version silence."
+    },
+    {
+      "criterion": "No gate creates or changes a file in the repository, and the temporary repository is removed after the workflow whether a command passes or fails.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T1/gate.ps1, T2/gate.ps1, T3/gate.ps1 and T4/gate.ps1 perform writes only in their unique system-temp directories; T4 encloses the workflow in try/finally and recursively removes the temporary root at lines 73-76. git status --short shows no product change from T4."
+    }
+  ],
+  "findings": [],
+  "notes": "T4 is validation-only; the completed product behavior is covered by committed init/upgrade tests from T1 and T2, and the aggregate close gate uses only a temporary repository."
+}

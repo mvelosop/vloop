@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "The aggregate close gate proves the completed init, upgrade, and documentation workflow through the built CLI in a temporary repository.",
+  "files": [],
+  "verified": "vloop task gate T4 exited 0 and reported gate T4: pass (4.67s).",
+  "notes": "T4 required validation only: the planner-owned gate ran T1-T3, then replayed init, missing-file restoration, non-writing dry-run, local-edit overwrite, and same-version silence; it left the repository unchanged and removed its temporary repository."
+}

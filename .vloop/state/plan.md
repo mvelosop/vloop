@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/4 done** · iteration 3
+**Status:** running · **4/4 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T21:05:17Z
+**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T21:08:01Z
 
 ## Progress
 
 - [x] **T1** — Generate the owned README during init
 - [x] **T2** — Reconcile the owned README during upgrade
 - [x] **T3** — Document the owned README lifecycle
-- [ ] **T4** — Verify the README workflow end to end
+- [x] **T4** — Verify the README workflow end to end
 
 ## Tasks
 
@@ -80,7 +80,7 @@ pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1
 
 ### T4 — Verify the README workflow end to end
 
-`pending` · depends on: T1, T2, T3
+`done` · depends on: T1, T2, T3
 
 Prove that generation, restoration, dry-run behavior and documentation compose into the operator workflow specified by the brief. This closes the plan only when the built CLI replays every worked-example line in a temporary repository.
 
