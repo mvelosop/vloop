@@ -11,7 +11,8 @@ What briefing, execution and measurement share and none of them owns.
 The nearest ancestor (the start directory included) holding `.vloop/` or `.git`,
 whichever is found first, else the start directory (`-C` changes the start). Every path vloop prints is relative to it, with `/`
 on every OS (C-2). When `self-update` runs outside any repository, it prints
-external paths with `/` and uses `~` for the home directory.
+external paths with `/` and abbreviates the home directory as `~/` (for
+example, `~/go/bin`).
 
 ## Configuration
 

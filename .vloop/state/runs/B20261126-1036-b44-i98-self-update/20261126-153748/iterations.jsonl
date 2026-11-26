@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":154814,"exit":0,"name":"go"}],"ended":"2026-11-26T15:45:12Z","gate":{"duration_ms":3434,"exit":0},"iteration":8,"outcome":"done","run_id":"B20261126-1036-b44-i98-self-update","schema":"iteration/v2","started":"2026-11-26T15:37:48Z","task":"T4"}

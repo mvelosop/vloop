@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **3/5 done** · iteration 7
+**Status:** running · **4/5 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:35:49Z
+**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:45:12Z
 
 ## Progress
 
 - [x] **T1** — Implement self-update target decisions and check mode · 2 attempt(s)
 - [x] **T2** — Install self-update targets safely
 - [x] **T3** — Update installed agent plugins
-- [ ] **T4** — Point existing commands and guides to self-update · **blocked**
+- [x] **T4** — Point existing commands and guides to self-update
 - [ ] **T5** — Verify the complete self-update workflow
 
 ## Tasks
@@ -95,7 +95,7 @@ pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1
 
 ### T4 — Point existing commands and guides to self-update
 
-`blocked` · **blocked** · depends on: T3
+`done` · depends on: T3
 
 Make machine-wide self-update discoverable from the repository upgrade workflow and doctor without changing those commands' offline behaviour. This also records the intentional path exception and the release handoff.
 
@@ -108,8 +108,6 @@ Make machine-wide self-update discoverable from the repository upgrade workflow 
 - go run ./tools/release publish reports the final handoff as one line: then: vloop self-update, and vloop upgrade in each repository.
 - No text or output elsewhere changes except the explicitly listed help, two doctor warnings, guide/domain additions, generated command reference and release handoff.
 - Any committed tests for the new help and doctor wording use the CLI and fake agent programs rather than real agents or network access.
-
-**From the last attempt:** gate disputed: The gate's fake doctor environment cannot produce both plugin-version warnings it asserts. — .vloop/config.local.toml selects copilot for all Claude-capable phases, so runDoctor does not add the Claude plugin warning; .vloop/state/gates/T1/fakeagent.go rejects --version, causing doctorCopilot's preflight result to be a problem and the gate's copilot plugin row to be skipped. T4's assertions for claude and copilot self-update pointers therefore fail before evaluating the changed suffixes.
 
 <details><summary>verify command</summary>
 

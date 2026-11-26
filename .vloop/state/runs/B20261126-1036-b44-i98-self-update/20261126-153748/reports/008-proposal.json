@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Clarified C-2's outside-repository self-update path format with the home-relative `~/go/bin` example in both domain references.",
+  "files": [
+    "docs/domain/domain-model.md",
+    "docs/domain/platform/platform-context.md"
+  ],
+  "verified": "vloop task gate T4 exited 0 and printed gate T4: pass.",
+  "notes": "The prior T4 attempt already supplies upgrade help, doctor warning suffixes, guide and generated-command additions, and the release handoff. This iteration makes the required slash-separated external path and home shorthand explicit in the C-2 and platform-context text."
+}
