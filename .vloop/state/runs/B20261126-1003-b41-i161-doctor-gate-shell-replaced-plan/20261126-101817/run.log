@@ -29,3 +29,10 @@ committing the plan
    review T2 · 0m53s · $0.02 · run $0.76 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/3 done ──
+   Verify the complete doctor shell replacement contract
+   work T3 · 1m21s · $0.05 · run $0.81 / $40.00
+   check go
+   review T3 · 1m59s · $0.06 · run $0.87 / $40.00
+   review: PASS
+   T3 done

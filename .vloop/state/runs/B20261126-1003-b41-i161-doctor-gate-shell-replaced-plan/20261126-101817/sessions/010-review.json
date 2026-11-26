@@ -1,0 +1,29 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.0608539,
+  "credits": 6.08539,
+  "duration_ms": 115789,
+  "effort": null,
+  "ended": "2026-11-26T10:56:10Z",
+  "is_error": false,
+  "iteration": 4,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.0608539,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [],
+  "phase": "review",
+  "run_id": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan",
+  "schema": "session/v3",
+  "started": "2026-11-26T10:54:11Z",
+  "task": "T3",
+  "turns": 14,
+  "wall_ms": 118950
+}

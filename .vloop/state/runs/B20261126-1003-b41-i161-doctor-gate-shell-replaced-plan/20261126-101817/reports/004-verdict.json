@@ -1,0 +1,24 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "T1's exhaustive Windows CLI oracle and T2's guide oracle pass together against the final tree.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T3/gate.ps1 runs T1/gate.ps1 and T2/gate.ps1 in sequence with a failure on either nonzero exit; the driver reran that T3 gate successfully."
+    },
+    {
+      "criterion": "The worked example succeeds through a CLI built from the final tree: complete-plan doctor text and JSON pass on the configured shell, running plans use the old plan shell and fail exactly as shown, missing configured pwsh becomes the exact non-mixed warning, and run preflight treats a different brief and the plan's own brief differently.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T1/gate.ps1:12-15 builds ./cmd/vloop; its Doctor-Row, Doctor-Text and Run-Text assertions cover configured-shell pass and JSON, the running-plan old-shell problem, the exact non-mixed configured-shell warning, and different-versus-own-brief preflight; internal/cli/doctor.go:73-76 returns a problem exit when the asserted problem row exists."
+    },
+    {
+      "criterion": "The close adds no product change that is not required by the brief and does not weaken either earlier gate or the go check.",
+      "met": true,
+      "evidence": "git diff HEAD contains only .vloop run records; T3/gate.ps1 calls the unchanged T1 and T2 gates, and checks.json records the go check exit 0."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

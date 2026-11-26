@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The Gates and the gate shell section now explains that doctor checks the configured shell for a plan the next brief replaces.
 - **Files:** docs/guide/concepts.md
 - **Notes for next iteration:** No other documentation was changed.
+
+## T3 — Verify the complete doctor shell replacement contract
+
+- **Outcome:** done (review: PASS)
+- **Summary:** The final tree passes both earlier gates together, including the built-CLI worked example for doctor text and JSON, configured-shell warnings, and replaced versus in-use plans during run preflight.
+- **Files:** none
+- **Notes for next iteration:** No product or documentation changes were needed in the close task; the T3 gate reused the unchanged T1 and T2 gates and the T1 gate exercised the complete worked example in a temporary repository.

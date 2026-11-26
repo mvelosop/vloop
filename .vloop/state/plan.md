@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/3 done** · iteration 3
+**Status:** running · **3/3 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T10:51:48Z
+**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T10:56:10Z
 
 ## Progress
 
 - [x] **T1** — Make replaced plans use the configured gate shell · 1 attempt(s)
 - [x] **T2** — Document the configured shell for replaced plans
-- [ ] **T3** — Verify the complete doctor shell replacement contract
+- [x] **T3** — Verify the complete doctor shell replacement contract
 
 ## Tasks
 
@@ -57,7 +57,7 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 ### T3 — Verify the complete doctor shell replacement contract
 
-`pending` · depends on: T1, T2
+`done` · depends on: T1, T2
 
 Close the brief only after the implementation and documentation gates pass together and the worked example is exercised through the built CLI in a temporary repository. This preserves the whole-run acceptance independently of each individual task.
 
