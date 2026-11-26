@@ -1,157 +1,81 @@
-$ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot "..\T1\harness.ps1")
 
-& pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
-if ($LASTEXITCODE -ne 0) {
-  exit $LASTEXITCODE
-}
-& pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
-if ($LASTEXITCODE -ne 0) {
-  exit $LASTEXITCODE
-}
-
-# The driver sets VLOOP_PLAN_SHA256 for this gate; the vloop it runs in its own
-# scratch repository must not inherit it, or it refuses that repository's plan.
-Remove-Item Env:VLOOP_PLAN_SHA256 -ErrorAction SilentlyContinue
-
-$temp = Join-Path ([System.IO.Path]::GetTempPath()) ("vloop-b43-" + [guid]::NewGuid().ToString('N'))
-$binary = Join-Path $temp 'vloop.exe'
-$repo = Join-Path $temp 'repo'
-
-function Need($condition, $message) {
-  if (-not $condition) {
-    throw $message
-  }
-}
-
-function Invoke-Vloop([string[]] $arguments) {
-  $start = [System.Diagnostics.ProcessStartInfo]::new()
-  $start.FileName = $binary
-  $start.WorkingDirectory = $repo
-  $start.Arguments = $arguments -join ' '
-  $start.UseShellExecute = $false
-  $start.RedirectStandardOutput = $true
-  $start.RedirectStandardError = $true
-  $start.StandardOutputEncoding = [System.Text.Encoding]::UTF8
-  $start.StandardErrorEncoding = [System.Text.Encoding]::UTF8
-  $process = [System.Diagnostics.Process]::new()
-  $process.StartInfo = $start
-  [void] $process.Start()
-  $stdout = $process.StandardOutput.ReadToEnd()
-  $stderr = $process.StandardError.ReadToEnd()
-  $process.WaitForExit()
-  [pscustomobject]@{
-    Code = $process.ExitCode
-    Out = $stdout
-    Err = $stderr
-  }
-}
-
+$h = New-GateHarness -Latest "v0.14.0" -Agents @("claude", "copilot")
 try {
-  [void] (New-Item -ItemType Directory -Force -Path $temp)
-  [void] (New-Item -ItemType Directory -Force -Path $repo)
-  & go build -o $binary ./cmd/vloop
-  Need ($LASTEXITCODE -eq 0) "built CLI failed"
+    $env:FAKE_CLAUDE_LIST = '[{"id":"vloop@vloop","version":"0.14.0","scope":"","enabled":true},{"id":"vloop@vloop","version":"0.14.0","scope":"project","projectPath":"' + $script:RepoRoot.Replace('\', '/') + '","enabled":true},{"id":"vloop@vloop","version":"0.14.0","scope":"local","projectPath":"/somewhere-else","enabled":true}]'
+    $env:FAKE_COPILOT_LIST = '[{"name":"vloop","version":"0.14.0","enabled":true}]'
+    $r = Invoke-GateCommand $h.Exe @("self-update")
+    $want = @(
+        "vloop v0.14.0 is up to date (latest release v0.14.0)"
+        "plugin claude (user): updated"
+        "plugin claude (project): updated"
+        "plugin copilot: updated"
+        "next: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository"
+    ) -join "`n"
+    Assert-Equal $r.Code 0 "plugin updates exit 0"
+    Assert-Equal $r.Out $want "plugin success output"
+    $log = Get-GateLog $h.AgentLog
+    Assert-Gate ($log.Contains("claude plugin marketplace update vloop")) "claude marketplace refreshed first"
+    Assert-Gate ($log.Contains("claude plugin update vloop@vloop --scope user")) "claude user scope updated"
+    Assert-Gate ($log.Contains("claude plugin update vloop@vloop --scope project")) "claude project scope updated"
+    Assert-Gate (-not $log.Contains(" --scope local")) "foreign project installation is ignored"
+    Assert-Gate ($log.Contains("copilot plugin update vloop@vloop")) "copilot updated"
 
-  & git -C $repo init --quiet
-  & git -C $repo config user.name Gate
-  & git -C $repo config user.email gate@example.invalid
-  Set-Content -Path (Join-Path $repo 'input.txt') -Value 'fixture' -Encoding utf8
-  & git -C $repo add input.txt
-  & git -C $repo commit --quiet -m 'café'
-  Need ($LASTEXITCODE -eq 0) "fixture commit failed"
+    $env:FAKE_CLAUDE_UPDATE_FAIL = "network down"
+    $env:FAKE_COPILOT_UPDATE_FAIL = "copilot denied"
+    $r = Invoke-GateCommand $h.Exe @("self-update")
+    Assert-Equal $r.Code 0 "plugin failures remain non-fatal"
+    Assert-Gate ($r.Out.Contains("! plugin claude (user): claude plugin update vloop@vloop --scope user failed: network down — run it by hand")) "claude failure line"
+    Assert-Gate ($r.Out.Contains("! plugin copilot: copilot plugin update vloop@vloop failed: copilot denied — run it by hand")) "copilot failure line"
+    $env:FAKE_CLAUDE_UPDATE_FAIL = ""
+    $env:FAKE_COPILOT_UPDATE_FAIL = ""
 
-  [void] (New-Item -ItemType Directory -Force -Path (Join-Path $repo '.vloop/state'))
-  Set-Content -Path (Join-Path $repo '.vloop/config.toml') -Value @(
-    'shell = "pwsh"',
-    '',
-    '[[check]]',
-    'name = "gate"',
-    'paths = ["**"]',
-    'run = "go test ./..."'
-  ) -Encoding utf8
+    $env:FAKE_CLAUDE_MARKETPLACE_FAIL = "market unavailable"
+    $r = Invoke-GateCommand $h.Exe @("self-update")
+    Assert-Equal $r.Code 0 "marketplace failure remains non-fatal"
+    Assert-Gate ($r.Out.Contains("! plugin claude: claude plugin marketplace update vloop failed: market unavailable — run it by hand")) "marketplace failure line"
+    Assert-Gate (-not $r.Out.Contains("plugin claude (user): updated")) "marketplace failure skips update"
+    $env:FAKE_CLAUDE_MARKETPLACE_FAIL = ""
 
-  $native = "if (-not (git log -1 --format=%s | Select-String -SimpleMatch 'café' -Quiet)) { exit 1 }"
-  $plan = @{
-    schema = 'state/v2'
-    run_id = 'B20261126-1034-b43-i162-pwsh-gates-utf8'
-    brief = 'docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md'
-    base = 'acfa8dc01f72688c17ea28dc6997768236398cd3'
-    branch = 'work'
-    status = 'planning'
-    iteration = 0
-    created = '2026-11-26T13:39:18Z'
-    updated = '2026-11-26T13:39:18Z'
-    shell = 'pwsh'
-    checks = @()
-    gate_scratch = @()
-    gate_review = @{ rounds = 0; verdict = '' }
-    tasks = @(
-      @{
-        id = 'T1'
-        title = 'Native read'
-        goal = 'Read native UTF-8 output correctly.'
-        kind = 'test'
-        fixtures = ''
-        references = @()
-        depends_on = @()
-        acceptance = @('The native read passes.')
-        verify = $native
-        status = 'pending'
-        attempts = 0
-        notes = ''
-      },
-      @{
-        id = 'T2'
-        title = 'UTF-8 output'
-        goal = 'Write UTF-8 output correctly.'
-        kind = 'test'
-        fixtures = ''
-        references = @()
-        depends_on = @()
-        acceptance = @('The UTF-8 output is visible.')
-        verify = "Write-Output 'café'"
-        status = 'pending'
-        attempts = 0
-        notes = ''
-      },
-      @{
-        id = 'T3'
-        title = 'Exit code'
-        goal = 'Preserve the gate exit code.'
-        kind = 'test'
-        fixtures = ''
-        references = @()
-        depends_on = @()
-        acceptance = @('Exit 3 remains exit 3.')
-        verify = 'exit 3'
-        status = 'pending'
-        attempts = 0
-        notes = ''
-      }
-    )
-  }
-  $plan | ConvertTo-Json -Depth 8 | Set-Content -Path (Join-Path $repo '.vloop/state/state.json') -Encoding utf8
+    $env:FAKE_CLAUDE_LIST = "[]"
+    $env:FAKE_COPILOT_LIST = "[]"
+    $r = Invoke-GateCommand $h.Exe @("self-update")
+    Assert-Gate ($r.Out.Contains("plugin claude: not installed")) "claude not installed line"
+    Assert-Gate ($r.Out.Contains("plugin copilot: not installed")) "copilot not installed line"
 
-  $read = Invoke-Vloop @('task', 'gate', 'T1')
-  Need ($read.Code -eq 0) "T1 exited $($read.Code): $($read.Out)$($read.Err)"
-  Need ($read.Err.Length -eq 0) "T1 wrote stderr: $($read.Err)"
+    $beforeCheck = if (Test-Path $h.AgentLog) { (Get-Item $h.AgentLog).Length } else { 0 }
+    $r = Invoke-GateCommand $h.Exe @("self-update", "--check")
+    $afterCheck = if (Test-Path $h.AgentLog) { (Get-Item $h.AgentLog).Length } else { 0 }
+    Assert-Equal $afterCheck $beforeCheck "--check does not inspect plugins"
 
-  $write = Invoke-Vloop @('task', 'gate', 'T2')
-  Need ($write.Code -eq 0) "T2 exited $($write.Code): $($write.Out)$($write.Err)"
-  Need ($write.Out -match '(?m)^café\r?$') "T2 did not emit café: $($write.Out)"
-  Need ($write.Err.Length -eq 0) "T2 wrote stderr: $($write.Err)"
+    $env:FAKE_CLAUDE_LIST = '[{"id":"vloop@vloop","version":"0.14.0","scope":"user","enabled":true}]'
+    $env:FAKE_COPILOT_LIST = "not-json"
+    $r = Invoke-GateCommand $h.Exe @("self-update")
+    Assert-Gate ($r.Out.Contains("! plugin copilot: cannot read copilot plugin list --json:")) "invalid list is reported"
+    Assert-Gate ($r.Out.Contains(" — run copilot plugin update vloop@vloop by hand")) "invalid list remedy"
+    $env:FAKE_COPILOT_LIST = "[]"
 
-  $failure = Invoke-Vloop @('task', 'gate', 'T3')
-  Need ($failure.Code -eq 1) "T3 command exited $($failure.Code)"
-  Need ($failure.Out -match 'gate T3: fail \(exit 3,') "T3 did not report exit 3: $($failure.Out)"
-  Need ($failure.Err.Length -eq 0) "T3 wrote stderr: $($failure.Err)"
+    $copilotName = if ([OperatingSystem]::IsWindows()) { "copilot.exe" } else { "copilot" }
+    Remove-Item (Join-Path $h.Fake $copilotName) -Force
+    $r = Invoke-GateCommand $h.Exe @("--json", "self-update")
+    Assert-Equal $r.Code 0 "plugin JSON exits 0"
+    $doc = $r.Out | ConvertFrom-Json
+    Assert-Equal $doc.plugins.Count 1 "plugin JSON entries"
+    Assert-Equal $doc.plugins[0].agent "claude" "plugin JSON claude"
+    Assert-Equal $doc.plugins[0].scope "user" "plugin JSON scope"
+    Assert-Equal $doc.plugins[0].result "updated" "plugin JSON result"
+    Assert-Equal $doc.plugins[0].message "" "plugin JSON message"
 
-  $shown = Invoke-Vloop @('task', 'show', 'T1')
-  Need ($shown.Code -eq 0) "task show exited $($shown.Code)"
-  Need ($shown.Out.Contains("verify  $native")) "task show changed the recorded command: $($shown.Out)"
-  Need (-not $shown.Out.Contains('[Console]::OutputEncoding')) "task show exposed the setup"
-  Need (-not $shown.Out.Contains('[Console]::InputEncoding')) "task show exposed the setup"
-  Need (-not $shown.Out.Contains('$OutputEncoding')) "task show exposed the setup"
+    $r = Invoke-GateCommand $h.Exe @("self-update", "--version", "v0.14.0")
+    Assert-Gate ($r.Out.Contains("! with --version, the plugins still update to their latest release, which may differ from vloop v0.14.0")) "human --version plugin warning"
+
+    $env:FAKE_CLAUDE_UPDATE_FAIL = "network down"
+    $r = Invoke-GateCommand $h.Exe @("--json", "self-update", "--version", "v0.13.0")
+    Assert-Equal $r.Code 0 "JSON with version exits 0"
+    Assert-Gate (-not $r.Out.Contains("with --version")) "JSON suppresses version warning"
+    Assert-Equal (($r.Out | ConvertFrom-Json).plugins[0].message) "network down" "JSON failure message"
+
 } finally {
-  Remove-Item -Recurse -Force -Path $temp -ErrorAction SilentlyContinue
+    Remove-Item $h.Temp -Recurse -Force -ErrorAction SilentlyContinue
+    $env:Path = $script:OriginalPath
 }

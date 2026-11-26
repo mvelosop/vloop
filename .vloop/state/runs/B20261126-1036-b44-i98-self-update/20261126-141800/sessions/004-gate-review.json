@@ -1,0 +1,44 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.09070589999999999,
+  "credits": 9.07059,
+  "duration_ms": 218968,
+  "effort": null,
+  "ended": "2026-11-26T14:44:16Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.09070589999999999,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: script blocks cannot be judged — use Where-Object \u003cProperty\u003e -like \u003cvalue\u003e, ForEach-Object -MemberName \u003cProperty\u003e or Select-Object -ExpandProperty \u003cProperty\u003e",
+      "tool_name": "powershell",
+      "tool_use_id": "call_JLDBHtCioT2sTu2MZ1MIfYjQ"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: a backtick cannot be judged — write the command on one line, without escapes",
+      "tool_name": "powershell",
+      "tool_use_id": "call_51PyzeOjihP6w2YER1CPg7vm"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_cwYG3UqGVjGJeSlWPauioODD"
+    }
+  ],
+  "phase": "gate-review",
+  "run_id": "B20261126-1036-b44-i98-self-update",
+  "schema": "session/v4",
+  "started": "2026-11-26T14:40:35Z",
+  "turns": 18,
+  "wall_ms": 221251
+}

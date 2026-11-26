@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T1\harness.ps1:14
+[36;1mLine |[0m
+[36;1m[36;1m  14 | [0m         [36;1mthrow "$Message`nexpected: <$Expected>`nactual:   <$Actual>"[0m
+[36;1m     | [31;1m         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mplugin updates exit 0 expected: <0> actual:   <2>[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m
