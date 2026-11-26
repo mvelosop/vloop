@@ -45,6 +45,100 @@ func TestPowerShellWrappers(t *testing.T) {
 	}
 }
 
+func TestPowerShellDynamicCommands(t *testing.T) {
+	j, _, _ := newJudge(t, PhaseWork)
+	names := []string{
+		"Invoke-Expression", "iex", "Invoke-Command", "icm", "Start-Process",
+		"saps", "start", "Start-Job", "sajb", "Start-ThreadJob", "Invoke-Item", "ii",
+	}
+	for _, name := range names {
+		forms := []string{
+			name + " git push",
+			"Get-Content a | " + name + " git push",
+			"Get-Content a; " + strings.ToUpper(name) + " git push",
+			`C:\Windows\System32\` + name + `.exe git push`,
+		}
+		for _, command := range forms {
+			t.Run(command, func(t *testing.T) {
+				d := j.Decide("powershell", "", command)
+				written := command
+				for _, separator := range []string{"| ", "; "} {
+					if i := strings.LastIndex(command, separator); i >= 0 {
+						written = command[i+len(separator):]
+						break
+					}
+				}
+				written = strings.Fields(written)[0]
+				if d.Allow || d.Reason != written+" is not allowed" {
+					t.Errorf("got allow=%v reason=%q, want %q", d.Allow, d.Reason, written+" is not allowed")
+				}
+			})
+		}
+	}
+
+	for _, tc := range []struct {
+		name, command, want string
+	}{
+		{"bash wrapper", `pwsh -c 'INVOKE-ITEM a'`, "INVOKE-ITEM is not allowed"},
+		{"powershell path", `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -c "IEX 'git push'"`, "IEX is not allowed"},
+		{"parenthesized", `(Get-Content a | iex 'git push').Length`, "iex is not allowed"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			tool := "powershell"
+			if tc.name == "bash wrapper" {
+				tool = "bash"
+			}
+			d := j.Decide(tool, "", tc.command)
+			if d.Allow || d.Reason != tc.want {
+				t.Errorf("got allow=%v reason=%q, want %q", d.Allow, d.Reason, tc.want)
+			}
+		})
+	}
+}
+
+func TestPowerShellScriptBlocks(t *testing.T) {
+	j, _, _ := newJudge(t, PhaseWork)
+	reason := scriptBlockRefusal
+	for _, command := range []string{
+		`Get-ChildItem | ForEach-Object { $_.Name }`,
+		`& {git push}`,
+		`@{ Name = "value" }`,
+		`{git status}`,
+		`pwsh -c '& {git push}'`,
+	} {
+		d := j.Decide("powershell", "", command)
+		if d.Allow || d.Reason != reason {
+			t.Errorf("%q: got allow=%v reason=%q, want %q", command, d.Allow, d.Reason, reason)
+		}
+	}
+	for _, command := range []string{
+		`Write-Output '{ literal }'`,
+		`Write-Output "{ literal }"`,
+		`Get-ChildItem | ForEach-Object -MemberName Name`,
+		`Get-ChildItem | Where-Object Name -like '*.go'`,
+		`Get-ChildItem | Select-Object -ExpandProperty Name`,
+	} {
+		if d := j.Decide("powershell", "", command); !d.Allow {
+			t.Errorf("%q denied: %s", command, d.Reason)
+		}
+	}
+
+	for _, tc := range []struct {
+		tool, command, want string
+	}{
+		{"bash", `{ git push; }`, "git push is denied by the work fence (Bash(git push:*))"},
+		{"powershell", `cmd /c "echo {ok}"`, ""},
+	} {
+		d := j.Decide(tc.tool, "", tc.command)
+		if tc.want == "" && !d.Allow {
+			t.Errorf("[%s] %q denied: %s", tc.tool, tc.command, d.Reason)
+		}
+		if tc.want != "" && (d.Allow || d.Reason != tc.want) {
+			t.Errorf("[%s] %q: got allow=%v reason=%q, want %q", tc.tool, tc.command, d.Allow, d.Reason, tc.want)
+		}
+	}
+}
+
 func TestCMDWrapper(t *testing.T) {
 	j, _, _ := newJudge(t, PhaseWork)
 	push := "git push is denied by the work fence (Bash(git push:*))"

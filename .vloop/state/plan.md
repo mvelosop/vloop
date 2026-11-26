@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/5 done** · iteration 3
+**Status:** running · **1/5 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T12:33:40Z
+**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T12:41:07Z
 
 ## Progress
 
 - [x] **T1** — Judge pwsh and cmd wrappers · 2 attempt(s)
-- [ ] **T2** — Refuse pwsh evaluation forms
+- [ ] **T2** — Refuse pwsh evaluation forms · 1 attempt(s)
 - [ ] **T3** — Read common pwsh forms and guide refusals
 - [ ] **T4** — Document the pwsh fence rules
 - [ ] **T5** — Verify the complete pwsh fence contract
@@ -40,7 +40,7 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 ### T2 — Refuse pwsh evaluation forms
 
-`pending` · depends on: T1
+`pending` · 1 attempt(s) · depends on: T1
 
 Bring PowerShell calls to eval's fail-closed bar by refusing named dynamic-execution commands and script blocks at every command position. This prevents pwsh syntax from bypassing the deny list without expanding the fence into a full PowerShell sandbox.
 
@@ -51,6 +51,8 @@ Bring PowerShell calls to eval's fail-closed bar by refusing named dynamic-execu
 - Every unquoted { in a powershell call is denied with the exact script-block guidance, including @{, &amp; { } and cmdlet script blocks; quoted braces remain literal.
 - The bash tool keeps its existing brace-group and POSIX decisions; the simplified pwsh cmdlet forms named by the brief stay allowed; and no new PowerShell form outside W1-W3 is accepted.
 - Committed Go tests cover every pinned command and alias, command position, case/path variant, script-block spelling and the bash non-regression, and the go check executes them.
+
+**From the last attempt:** A later unquoted PowerShell script block loses its required exact guidance when any earlier parsed command is a W2-denied command, because shellMode returns that command's denial before the splitter's script-block error.
 
 <details><summary>verify command</summary>
 

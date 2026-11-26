@@ -51,6 +51,8 @@ const (
 
 const subshellRefusal = "subshells and process substitution cannot be judged"
 
+const scriptBlockRefusal = "script blocks cannot be judged — use Where-Object <Property> -like <value>, ForEach-Object -MemberName <Property> or Select-Object -ExpandProperty <Property>"
+
 // opening are the keywords that start a command whose own words follow.
 var opening = map[string]bool{
 	"if": true, "then": true, "elif": true, "else": true, "while": true, "until": true, "do": true, "!": true, "{": true,
@@ -225,8 +227,13 @@ func splitCMDPart(s string) ([]command, error) {
 	return splitMode(s, syntaxCMD)
 }
 
-func splitMode(s string, syntax splitSyntax) ([]command, error) {
+func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 	l := &lexer{syntax: syntax}
+	defer func() {
+		if err != nil && syntax == syntaxPowerShell && cmds == nil {
+			cmds = l.cmds
+		}
+	}()
 	next := func(i int) byte {
 		if i+1 < len(s) {
 			return s[i+1]
@@ -289,6 +296,11 @@ func splitMode(s string, syntax splitSyntax) ([]command, error) {
 					l.in, l.quoted = true, true
 				}
 			}
+		case '{':
+			if syntax == syntaxPowerShell {
+				return nil, errors.New(scriptBlockRefusal)
+			}
+			l.put(c, stUnquoted)
 		case '`':
 			if syntax == syntaxCMD {
 				l.put(c, stUnquoted)

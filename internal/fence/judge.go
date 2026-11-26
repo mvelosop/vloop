@@ -292,6 +292,13 @@ func (j *Judge) shellMode(s string, depth int, mode shellMode) string {
 		}
 	}
 	if err != nil {
+		if mode == shellPowerShell {
+			for _, c := range cmds {
+				if r := j.words(c.words, c.plain, c.exp, depth, mode); powerShellDenialReason(r) {
+					return r
+				}
+			}
+		}
 		return err.Error()
 	}
 	for _, c := range cmds {
@@ -324,6 +331,20 @@ var forName = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 var lookupOption = regexp.MustCompile(`^-[pvV]*[vV][pvV]*$`)
 
 var assignment = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*=`)
+
+var powerShellDenied = map[string]bool{
+	"invoke-expression": true, "iex": true,
+	"invoke-command": true, "icm": true,
+	"start-process": true, "saps": true, "start": true,
+	"start-job": true, "sajb": true,
+	"start-threadjob": true,
+	"invoke-item":     true, "ii": true,
+}
+
+func powerShellDenialReason(reason string) bool {
+	name, ok := strings.CutSuffix(reason, " is not allowed")
+	return ok && powerShellDenied[strings.ToLower(baseName(name))]
+}
 
 func baseName(w string) string {
 	b := w
@@ -378,6 +399,9 @@ func (j *Judge) words(ws []string, plain, exp []bool, depth int, mode shellMode)
 		name, rest := baseName(w), ws[1:]
 		if keywords[name] {
 			return fmt.Sprintf("shell syntax %s cannot be judged", name)
+		}
+		if mode == shellPowerShell && powerShellDenied[strings.ToLower(name)] {
+			return w + " is not allowed"
 		}
 		var err, repl string
 		switch strings.ToLower(name) {

@@ -5,9 +5,9 @@
   "base": "3b98a38748ef7e8bfab9d640429b019ffdafd4f5",
   "branch": "B20261126-1008-b42-i162-fence-reads-pwsh",
   "status": "running",
-  "iteration": 3,
+  "iteration": 4,
   "created": "2026-11-26T12:00:48Z",
-  "updated": "2026-11-26T12:33:40Z",
+  "updated": "2026-11-26T12:41:07Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -97,8 +97,8 @@
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "A later unquoted PowerShell script block loses its required exact guidance when any earlier parsed command is a W2-denied command, because shellMode returns that command's denial before the splitter's script-block error."
     },
     {
       "id": "T3",
