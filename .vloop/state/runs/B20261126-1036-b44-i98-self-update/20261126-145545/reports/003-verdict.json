@@ -1,0 +1,69 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "FAIL",
+  "criteria": [
+    {
+      "criterion": "vloop self-update is a top-level command runnable without a repository and accepts only the exact --check and --version <v> flag contract in the brief.",
+      "met": true,
+      "evidence": "internal/cli/root.go adds newSelfUpdate as a top-level command; internal/cli/selfupdate.go defines only --check and --version command flags with cobra.NoArgs and does not perform repository discovery; docs/guide/commands.md documents that command and those flags."
+    },
+    {
+      "criterion": "No go on PATH and a checkout build produce the two exact S1 refusal lines and exit 1, before any target lookup or install-location check.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go checks exec.LookPath and b.Module before latestVloopVersion or selfUpdateInstallDir; selfupdate_test.go asserts both exact stderr lines and exit 1."
+    },
+    {
+      "criterion": "A valid --version target is used exactly without a latest-release lookup; a value that does not start with v and parse as semver produces the exact usage message and exits 2.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go validates an explicit target with strings.HasPrefix and semver.IsValid, otherwise directly uses requested; selfupdate_test.go uses a failing latest lookup with an explicit equal target and asserts the exact invalid-version usage error and exit 2."
+    },
+    {
+      "criterion": "Without --version, go list -m -json github.com/mvelosop/vloop@latest runs outside a module in a temporary directory, a failure uses its first error line, and only a semantically newer target is selected.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go runs the exact go list command with cmd.Dir set to os.MkdirTemp, uses firstSelfUpdateLine on failure, and compares with semver.Compare; selfupdate_test.go verifies the invocation and that its temporary working directory has no go.mod."
+    },
+    {
+      "criterion": "--check prints the exact current/latest or current/target two-line report, exits 0, never installs, never asks go for its install directory and leaves plugins empty.",
+      "met": true,
+      "evidence": "The check branch in internal/cli/selfupdate.go returns before selfUpdateInstallDir and all installation work, formats the exact two-line report, and initializes plugins as an empty non-nil slice; selfupdate_test.go asserts latest, explicit-equal and explicit-older reports and sets go env to fail to prove it is not queried."
+    },
+    {
+      "criterion": "With no install needed, the exact up-to-date line is printed; pre-releases newer than latest are not downgraded.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go installs only when newer is true and prints the exact up-to-date line otherwise; selfupdate_test.go verifies v0.15.0-rc.4 remains up to date against latest v0.14.0 without querying go env."
+    },
+    {
+      "criterion": "The install-location calculation queries GOBIN then GOPATH/bin only when installation is about to happen, uses exact resolved-path comparison (case-insensitive on Windows), and emits the specified refusal when it differs.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go calls selfUpdateInstallDir only after installNeeded, falls back from go env GOBIN to go env GOPATH/bin, resolves and compares both paths with EqualFold on Windows, and formats the brief's refusal; selfupdate_test.go covers the wrong path, go-env failure, empty values and GOPATH fallback."
+    },
+    {
+      "criterion": "Global --json emits only one self-update/v1 document for successful runs, with no human lines; refusals remain one vloop: stderr line, and the embedded schemas/self-update.v1.json validates every documented field.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go uses writeSelfUpdateJSON instead of human output in each success branch and returns errors to the existing one-line refusal handler; schemas/self-update.v1.json defines every document and plugin field, and selfupdate_test.go unmarshals and validates the emitted document."
+    },
+    {
+      "criterion": "Committed Go tests use temporary Go fake programs for go, cover all target/refusal/check/JSON branches above, never call the real go install or the network, and are run by the repository's go check.",
+      "met": false,
+      "evidence": "internal/cli/selfupdate_test.go builds a fake Go program and covers human check, target selection and several refusals, but its only JSON assertion is the --check branch. It does not exercise JSON for an up-to-date run, an install-needed run or a refusal, and its install-location refusal test only checks a substring rather than the exact required line; therefore all JSON and refusal branches are not committed and pinned."
+    },
+    {
+      "criterion": "docs/guide/commands.md is regenerated from the command tree and documents the new command and flags rather than being hand-maintained.",
+      "met": true,
+      "evidence": "The current generated reference contains the vloop self-update usage and --check/--version entries in the command-tree order, and the task diff includes no independent hand-maintained command prose outside that generated section."
+    },
+    {
+      "criterion": "No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted.",
+      "met": true,
+      "evidence": "The product diff limits new exec.LookPath/go command code to internal/cli/selfupdate.go; internal/cli/root.go only registers the command, and the check log .vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-145545/checks/go.log passes the existing repository tests."
+    }
+  ],
+  "findings": [
+    {
+      "summary": "Committed self-update tests do not pin JSON output for non-check successes or refusals, and do not assert the exact install-location refusal, so T1's all-branch committed-test acceptance criterion is unmet.",
+      "kind": "bug"
+    }
+  ],
+  "notes": "The implementation behavior and generated command reference match the T1 contract; the next work should add focused committed tests for JSON in the check, up-to-date, install-needed and refusal paths and for the exact wrong-install-location line."
+}

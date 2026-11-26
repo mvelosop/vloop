@@ -5,9 +5,9 @@
   "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
   "branch": "B20261126-1036-b44-i98-self-update",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T14:59:25Z",
+  "updated": "2026-11-26T15:05:04Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -68,8 +68,8 @@
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
       "status": "pending",
-      "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-145545/checks/002-go.fail.log",
+      "attempts": 2,
+      "notes": "Committed self-update tests do not pin JSON output for non-check successes or refusals, and do not assert the exact install-location refusal, so T1's all-branch committed-test acceptance criterion is unmet.",
       "gate_history": [
         {
           "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
