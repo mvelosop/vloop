@@ -5,8 +5,8 @@ origin: work
 found-by: operator
 kind: bug
 severity: medium
-status: open
-fixed-by: ""
+status: fixed
+fixed-by: B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief
 case: ""
 created: 2026-11-26T00:51:04Z
 ---
