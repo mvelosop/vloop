@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 6,
-    "done": 4,
+    "done": 5,
     "blocked": 0,
-    "first_pass": 3,
+    "first_pass": 4,
     "estimate": {
       "min": 4,
       "max": 6
@@ -18,24 +18,24 @@
     "delivered": {
       "code": 808,
       "test": 825,
-      "docs": 11,
+      "docs": 31,
       "other": 0,
       "deleted": {
         "code": 81,
         "test": 6,
-        "docs": 1,
+        "docs": 18,
         "other": 0
       }
     },
     "churn": {
       "code": 812,
       "test": 825,
-      "docs": 11,
+      "docs": 31,
       "other": 0,
       "deleted": {
         "code": 85,
         "test": 6,
-        "docs": 1,
+        "docs": 18,
         "other": 0
       }
     },
@@ -43,32 +43,32 @@
     "rework": 1.004950495049505
   },
   "time": {
-    "agent_ms": 2037977,
-    "work_ms": 1688034,
-    "review_ms": 349943,
+    "agent_ms": 2184073,
+    "work_ms": 1769774,
+    "review_ms": 414299,
     "plan_ms": 547379,
-    "gates_ms": 14136,
-    "checks_ms": 628439,
+    "gates_ms": 14588,
+    "checks_ms": 813737,
     "gate_review_ms": 149457,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 23.788295942495914,
-    "code_test_per_min": 48.07708821051464
+    "code_per_min": 22.1970602630956,
+    "code_test_per_min": 44.861137883211775
   },
   "cost": {
-    "total_usd": 1.2471099,
+    "total_usd": 1.3127393000000003,
     "plan_usd": 0.3419035,
-    "work_usd": 0.606651,
-    "review_usd": 0.1815089,
+    "work_usd": 0.6434367000000001,
+    "review_usd": 0.2103526,
     "gate_review_usd": 0.11704650000000001,
-    "per_1000_code_lines_usd": 1.5434528465346535
+    "per_1000_code_lines_usd": 1.6246773514851487
   },
   "credits": {
-    "total": 124.71099000000001,
+    "total": 131.27393,
     "plan": 34.19035,
-    "work": 60.6651,
-    "review": 18.15089,
+    "work": 64.34367,
+    "review": 21.03526,
     "gate_review": 11.70465
   },
   "tokens": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 5,
-  "iterations": 5,
-  "iterations_per_closed": 1.25,
+  "iterations": 6,
+  "iterations_per_closed": 1.2,
   "by_task": [
     {
       "id": "T1",
@@ -260,22 +260,24 @@
       "id": "T5",
       "area": null,
       "kind": "docs",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
-        "docs": 0,
+        "docs": 20,
         "other": 0,
         "deleted": {
           "code": 0,
           "test": 0,
-          "docs": 0,
+          "docs": 17,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 146096,
+      "cost_usd": 0.0656294,
+      "models": [
+        "mai-code-2"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     },
@@ -533,6 +535,44 @@
           "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
         }
       ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309",
+      "seq": 12,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 6,
+      "task": "T5",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 81740,
+      "cost_usd": 0.036785700000000005,
+      "cost_source": "estimated",
+      "credits": 3.67857,
+      "turns": 12,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309",
+      "seq": 13,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 6,
+      "task": "T5",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 64356,
+      "cost_usd": 0.0288437,
+      "cost_source": "estimated",
+      "credits": 2.88437,
+      "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
       "is_error": false
     }
   ]

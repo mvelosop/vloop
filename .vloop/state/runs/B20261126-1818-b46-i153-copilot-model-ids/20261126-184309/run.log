@@ -52,3 +52,9 @@ committing the plan
    review T5 · 1m04s · $0.03 · run $1.31 / $40.00
    review: PASS
    T5 done
+── iteration 7 (7 this run) · T6 · 5/6 done ──
+   Verify the Copilot model workflow end to end
+   work T6 · 1m25s · $0.04 · run $1.35 / $40.00
+   check go
+   review T6 · 1m41s · $0.04 · run $1.40 / $40.00
+   review: FAIL

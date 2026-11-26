@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "The completed tree passes all earlier behavioral gates and the end-to-end Copilot model workflow, including exact listing output, atomic multi-kind writes, refusals, doctor results, warning-only failures, and token secrecy.",
+  "files": [],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: pass (13.693s).",
+  "notes": "No source change was required; the planner-owned close oracle exercised the worked example in a temporary initialized repository with local httptest endpoints and a stub token, then verified warning-only behavior after the server stopped."
+}

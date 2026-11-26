@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 6
+**Status:** running · **5/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:53:12Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:57:25Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Check configured Copilot models in doctor
 - [x] **T4** — Set several session kinds in one config command
 - [x] **T5** — Document the Copilot model commands
-- [ ] **T6** — Verify the Copilot model workflow end to end
+- [ ] **T6** — Verify the Copilot model workflow end to end · 1 attempt(s)
 
 ## Tasks
 
@@ -128,7 +128,7 @@ pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1
 
 ### T6 — Verify the Copilot model workflow end to end
 
-`pending` · depends on: T1, T2, T3, T4, T5
+`pending` · 1 attempt(s) · depends on: T1, T2, T3, T4, T5
 
 Run all earlier behavioral gates together and replay the brief's worked example in an initialized temporary repository. This closes the run only when listing, set-time checks, doctor, atomic --kinds writes, and failure warnings compose as one operator workflow.
 
@@ -137,6 +137,8 @@ Run all earlier behavioral gates together and replay the brief's worked example 
 - Every earlier task's planner-owned gate passes against the completed tree, and the close oracle executes the brief's worked example line by line with httptest servers and stub credentials in a temporary vloop-init repository.
 - The workflow proves exact picker and --all output, successful multi-kind writes, exit-2 absent/disabled/alias refusals, byte-for-byte all-or-nothing behavior, the doctor pass row, and warning-only writes and doctor after the stub stops.
 - No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot.
+
+**From the last attempt:** The close oracle does not prove exact --all output because it asserts only that the extra model line is present.; The close oracle does not prove byte-for-byte atomic refusal behavior or warning-only doctor success; it checks one resolved value and ignores both doctor exit codes.
 
 <details><summary>verify command</summary>
 

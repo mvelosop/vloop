@@ -1,0 +1,33 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "FAIL",
+  "criteria": [
+    {
+      "criterion": "Every earlier task's planner-owned gate passes against the completed tree, and the close oracle executes the brief's worked example line by line with httptest servers and stub credentials in a temporary vloop-init repository.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T6/gate.ps1 runs T1 through T5 and the close oracle; .vloop/state/gates/T6/oracle.go builds the CLI, initializes a repository under os.MkdirTemp, starts httptest.Server stubs, and invokes the worked-example commands in order."
+    },
+    {
+      "criterion": "The workflow proves exact picker and --all output, successful multi-kind writes, exit-2 absent/disabled/alias refusals, byte-for-byte all-or-nothing behavior, the doctor pass row, and warning-only writes and doctor after the stub stops.",
+      "met": false,
+      "evidence": ".vloop/state/gates/T6/oracle.go checks picker output exactly, but only checks that --all contains the extra line; it re-reads only model.work after refusal instead of comparing configuration bytes, and it does not assert exit 0 for either doctor invocation."
+    },
+    {
+      "criterion": "No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T6/oracle.go directs both API bases to httptest servers, supplies a copilot PATH shim, accumulates captured command output and rejects any stub-token occurrence, and creates its build and initialized-repository directories beneath os.MkdirTemp's external temporary root."
+    }
+  ],
+  "findings": [
+    {
+      "summary": "The close oracle does not prove exact --all output because it asserts only that the extra model line is present.",
+      "kind": "gate-gap"
+    },
+    {
+      "summary": "The close oracle does not prove byte-for-byte atomic refusal behavior or warning-only doctor success; it checks one resolved value and ignores both doctor exit codes.",
+      "kind": "gate-gap"
+    }
+  ],
+  "notes": "T6 made no product changes by design; the FAIL is on the planner-owned close oracle's ability to prove its acceptance criteria."
+}

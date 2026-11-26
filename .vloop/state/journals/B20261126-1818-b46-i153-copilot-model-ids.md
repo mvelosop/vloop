@@ -48,3 +48,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Replaced the manual Copilot API recipes with vloop models copilot guidance covering picker filtering, policies, plan output, config validation, doctor checks, and atomic --kinds setup; regenerated the command reference.
 - **Files:** docs/guide/configuration.md
 - **Notes for next iteration:** go generate ./... confirmed docs/guide/commands.md is already current from the completed CLI; it includes vloop models copilot and all --kinds, --agent, --model, and --effort surfaces.
+
+## T6 — Verify the Copilot model workflow end to end
+
+- **Outcome:** rejected (review: FAIL)
+- **Summary:** The completed tree passes all earlier behavioral gates and the end-to-end Copilot model workflow, including exact listing output, atomic multi-kind writes, refusals, doctor results, warning-only failures, and token secrecy.
+- **Files:** none
+- **Notes for next iteration:** No source change was required; the planner-owned close oracle exercised the worked example in a temporary initialized repository with local httptest endpoints and a stub token, then verified warning-only behavior after the server stopped.
