@@ -1,0 +1,28 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1818-b46-i153-copilot-model-ids.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Shape",
+      "summary": "M3 leaves the mandatory check red until the later documentation task regenerates the command reference.",
+      "evidence": "docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md:317-320 puts M3 (`--kinds`) in task 4 and M4/command-reference regeneration in task 5, while lines 292-293 require `go run ./tools/check` after every task. internal/cli/commands_doc_test.go:14-20 compares docs/guide/commands.md byte-for-byte with the current Cobra tree and fails when generated help or flags change. Adding --kinds and its related help necessarily changes that tree.",
+      "fix": "Regenerate docs/guide/commands.md in task 4 together with M3 (and say so in Shape), leaving task 5 only for the configuration guide, or otherwise move command-reference generation into every task that changes CLI help."
+    },
+    {
+      "kind": "consistency",
+      "section": "Executive summary / M3",
+      "summary": "The summary says only config set of a Copilot model calls the network, but M3 also checks and calls for agent-only or effort-only updates that resolve to a Copilot pair.",
+      "evidence": "docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md:50-52 limits config-set networking to `config set` of a Copilot model. Lines 193-202 require M2's model check on each kind's resulting pair, including `--agent copilot` without --model, and say the models call is made once per invocation. A valid existing Copilot model therefore causes a network call for an invocation that sets only agent or effort.",
+      "fix": "Replace the summary's narrow wording with `config set` invocations that check a resolved Copilot model pair, and explicitly state that --kinds can make this call even when --model is absent."
+    }
+  ],
+  "decisions": [
+    "Keep today's three keys (`agent.<kind>`, `model.<kind>`, `effort.<kind>`) for every supported kind; --kinds adds no keys. This matches internal/config/config.go and the configuration guide.",
+    "Print the plan first in M1, then models sorted by id with Go's `strings` ordering. This is deterministic and suitable for the aligned text output."
+  ],
+  "checked": "facts, consistency, rules, runnability; all binding references, B45, roadmap, config/doctor/run surfaces, generated-command check, and the ready-copy brief check",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

@@ -1,0 +1,41 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1818-b46-i153-copilot-model-ids.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Behaviour contract > The two calls",
+      "summary": "The plan endpoint and copilot_plan response field are not evidenced by a cited repository document or existing code, so the planner would implement an unverified internal-API contract and a stub could pass regardless of real-account correctness.",
+      "evidence": "The cited `docs/design-notes/copilot-cli-experiments.md`, lines 623-643, documents only GET https://api.githubcopilot.com/models and its fields. A repository search for `copilot_internal/user` or `copilot_plan`, excluding this brief, returned no matches.",
+      "fix": "Before planning, confirm the endpoint and response field on a real account and add that experiment/result to a cited repository document, or explicitly record the operator's approval of this internal-API assumption in the brief."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract > M2 — the id checked where it is set, and in doctor",
+      "summary": "The doctor row does not define its result when an id is locally knowable as a Claude alias but the models call fails or no login is available; the brief simultaneously promises an alias problem and a warning for call failure/no login.",
+      "evidence": "M2 states that any not-listed, disabled, or Claude-alias model is a problem naming each, but immediately says that a failed call or no login produces a warning. No literal alias entry is given for the doctor row. The model aliases can be detected without the API, and current `internal/cli/doctor.go:337-348` also distinguishes token availability before adding other rows.",
+      "fix": "Pin the precedence and literal doctor-row text for a Claude alias, including the case where the API is unreachable or no token exists: for example, whether the alias is a problem while the failed API is additionally warned elsewhere, or whether the new models row is warning-only. Keep it consistent with the existing unchanged `copilot login` row."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example / Shape",
+      "summary": "The close shape says to run the worked example line by line, but its setup includes `vloop init`, which the verify fence cannot run, without naming an end-to-end test or gate that covers that setup.",
+      "evidence": "The worked example prefaces the scratch repository with `vloop init` run; Shape task 6 runs the example line by line. The review guidelines bind: verify cannot run `vloop init`, and such a line must be covered by a named test with stubs or moved to operator acceptance.",
+      "fix": "Name the committed stubbed end-to-end test or final gate that performs the init precondition, or reframe the example around a test-created repository fixture and state explicitly what verify does not run."
+    }
+  ],
+  "decisions": [
+    "Doctor/preflight checks Copilot ids with a short timeout and shows the account plan; I agree, subject to retaining the API-unreachable warning behavior.",
+    "Several session kinds are configured with `--kinds`; I agree.",
+    "Use the GitHub-internal plan endpoint and `copilot_plan` field; this needs operator confirmation because the cited repository evidence covers only the models endpoint.",
+    "Use five-second config/doctor calls and twenty-second list calls; recorded as an author choice for operator approval.",
+    "Use `VLOOP_COPILOT_API_URL` and `VLOOP_GITHUB_API_URL` as test-only endpoint overrides; recorded as an author choice for operator approval.",
+    "Treat `opus`, `sonnet`, `haiku`, and `fable` as Claude aliases; recorded as an author choice for operator approval.",
+    "Make picker-enabled models the default list, expose every entry through `--all`, and return missing policy as `-`/null; I agree.",
+    "Make `--kinds` all-or-nothing and accept `plan, gate-review, work, review, second-review, verify, review-brief`; I agree."
+  ],
+  "checked": "facts, consistency, rules, runnability; the ready-copy brief check passed with no warnings",
+  "header": "Reviewed 2026-11-26: ASK, 3 findings"
+}
+

@@ -1,0 +1,17 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1818-b46-i153-copilot-model-ids.loop-brief",
+  "verdict": "PASS",
+  "findings": [],
+  "decisions": [
+    "Doctor and run preflight query Copilot model ids with a 5-second timeout; this is the right place to reject account-incompatible ids before a session costs money.",
+    "The account's Copilot plan is shown and an absent/failed plan lookup is reported as unknown, never as an error; this is sound because the internal endpoint is not a public contract.",
+    "API reachability and login failures do not block config set or doctor, except models copilot itself; this preserves an unavailable network as a warning while still refusing authoritative missing/disabled answers.",
+    "config set --kinds accepts --agent, --model and --effort and writes all named kinds atomically after validation; the selected form is clearer than comma lists in positional keys.",
+    "The seven current session kinds and their existing agent/model/effort key triplets define the --kinds surface; no new keys are introduced.",
+    "models copilot prints the plan first, then model rows in strings ordering; the ordering is deterministic and appropriate."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: PASS, 0 findings"
+}
+
