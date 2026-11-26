@@ -130,6 +130,11 @@ func (j *Judge) Decide(tool, path, cmd string) Decision {
 			return deny("read of %s is not allowed: it is under ~/.claude, ~/.copilot or ~/.config/gh", path)
 		}
 		return allow()
+	case "read_powershell", "list_powershell", "stop_powershell", "read_bash", "list_bash", "stop_bash":
+		// Copilot's shell sessions: these read, list or stop a command the
+		// fence already judged when it started; write_* (input to a running
+		// shell) stays unlisted, so denied.
+		return allow()
 	case "skill":
 		if !j.skills[path] {
 			return deny("skill %s is not vloop's — use /vloop:%s", path, j.skillPhase())

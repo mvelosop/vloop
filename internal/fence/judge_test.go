@@ -713,3 +713,26 @@ func TestExpandedWords(t *testing.T) {
 		})
 	}
 }
+
+// Copilot runs a long shell command as a shell session the agent, or its
+// runtime on its own, reads, lists and stops later. Those calls touch only a
+// command the fence already judged, so every phase allows them; writing input
+// to a running shell stays denied.
+func TestShellSessionTools(t *testing.T) {
+	for _, phase := range []string{PhaseReview, PhaseSecondReview, PhaseWork, PhaseVerify, PhaseGateReview, PhasePlan, PhaseReviewBrief} {
+		j, _, _ := newJudge(t, phase)
+		for _, shell := range []string{"powershell", "bash"} {
+			for _, verb := range []string{"read", "list", "stop"} {
+				tool := verb + "_" + shell
+				if d := j.Decide(tool, "", ""); !d.Allow {
+					t.Errorf("[%s] %s denied: %s", phase, tool, d.Reason)
+				}
+			}
+			tool := "write_" + shell
+			want := "tool " + tool + " is not allowed in a " + phase + " session"
+			if d := j.Decide(tool, "", ""); d.Allow || d.Reason != want {
+				t.Errorf("[%s] %s: allow = %v, reason %q, want %q", phase, tool, d.Allow, d.Reason, want)
+			}
+		}
+	}
+}
