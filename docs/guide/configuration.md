@@ -91,6 +91,112 @@ run` refuses, and `vloop doctor` shows `✗ config.local`, while the file is tra
 not git-ignored; when it overrides keys, both warn `! config.local overrides model.work,
 agent.work — on this machine only`. A session cannot change it: the driver puts it back.
 
+## Mixed teams
+
+Declare the operating systems used by the team in the shared
+`.vloop/config.toml` file:
+
+```toml
+platforms = ["macos", "windows"]
+shell = "pwsh"
+```
+
+The `platforms` values are `linux`, `macos` and `windows`. The list's stored
+order is preserved by `vloop config get platforms`, but vloop deduplicates and
+sorts it as `linux`, `macos`, `windows` in messages. Two or more distinct
+entries make a mixed team. Requiring one shared PowerShell on every mixed team,
+including a macOS/Linux team, avoids differences between BSD and GNU tools as
+well as tools missing from Windows. The plan records `shell`, so every gate in
+that plan runs in the same `pwsh` even when the team runs vloop on different
+platforms.
+
+`platforms` always belongs to `.vloop/config.toml`, never the local file or
+the environment. A mixed team's `shell` also belongs there, so no machine can
+write checks or gates for a different shell. These settings are errors, not
+warnings, when read from the wrong source; `config set --local` exits 2 and
+writes nothing:
+
+```text
+vloop: .vloop/config.local.toml: platforms belongs in .vloop/config.toml — the platforms are the repository's, not one machine's
+vloop: VLOOP_PLATFORMS: platforms belongs in .vloop/config.toml — the platforms are the repository's, not one machine's
+vloop: .vloop/config.local.toml: shell belongs in .vloop/config.toml while platforms lists macos, windows — the checks and the gates are written for one shell
+vloop: VLOOP_SHELL: shell belongs in .vloop/config.toml while platforms lists macos, windows — the checks and the gates are written for one shell
+```
+
+The machine's local file and environment may still override `shell` when the
+team is not mixed. A mixed team with no shared `shell`, or one set to anything
+other than `pwsh`, fails `vloop doctor` and `vloop run` before planning.
+
+Keep checks simple and portable: use plain `program arguments && program
+arguments` commands whose programs exist on every declared platform, or let one
+project program implement the check. For example:
+
+```toml
+[[check]]
+name = "go"
+paths = ["**"]
+run = "go test ./... && go vet ./..."
+```
+
+The equivalent program-run shape is `run = "go run ./tools/check"`, which is
+what this repository uses so its PowerShell, Go and other health checks live
+in one portable toolchain entry point. A listed native command appearing in a
+mixed check produces a doctor warning; the same command in a gate makes plan
+acceptance fail.
+
+Mixed-team gates use `pwsh` cmdlets and the project's own toolchain (`go`,
+`node`, `pnpm`, or equivalent), never an OS-specific command. The exact list
+checked by the driver, in order, is `awk`, `basename`, `bash`, `cat`, `chmod`,
+`cmd`, `cmp`, `cp`, `cut`, `date`, `diff`, `dirname`, `env`, `fc`, `find`,
+`findstr`, `grep`, `head`, `ln`, `ls`, `mkdir`, `mktemp`, `mv`, `powershell`,
+`printf`, `readlink`, `rm`, `robocopy`, `sed`, `seq`, `sh`, `sleep`, `sort`,
+`stat`, `tail`, `tee`, `test`, `touch`, `tr`, `uniq`, `wc`, `which`, `xargs`,
+`xcopy`, `zsh`. Match their intent with portable facilities:
+
+| Listed command | Portable replacement |
+| --- | --- |
+| `awk` | `Select-String`, PowerShell string operations, or the project's toolchain |
+| `basename` | `Split-Path -Leaf` |
+| `bash`, `cmd`, `powershell`, `sh`, `zsh` | `pwsh` commands or the project's own toolchain; do not start another shell |
+| `cat` | `Get-Content` |
+| `chmod` | `Get-Acl`/`Set-Acl`, or the project's toolchain when it owns file permissions |
+| `cmp`, `diff`, `fc` | `Compare-Object`, `Select-String`, or a project/test-tool comparison |
+| `cp`, `robocopy`, `xcopy` | `Copy-Item` |
+| `cut`, `sed`, `tr` | PowerShell string operators, `Select-String`, or the project's toolchain |
+| `date` | `Get-Date` |
+| `dirname` | `Split-Path -Parent` |
+| `env` | `$env:NAME`, `Get-ChildItem Env:`, or the process invocation's environment |
+| `find`, `grep`, `findstr` | `Get-ChildItem` for paths and `Select-String` for content |
+| `head`, `tail` | `Select-Object -First` or `Select-Object -Last` |
+| `ln` | `New-Item -ItemType SymbolicLink` only when the operation is genuinely needed and supported |
+| `ls` | `Get-ChildItem` |
+| `mkdir` | `New-Item -ItemType Directory` |
+| `mktemp` | `[System.IO.Path]::GetTempPath()`, `New-TemporaryFile`, or the gate scratch folder |
+| `mv` | `Move-Item` |
+| `printf` | PowerShell interpolation, formatting and `Set-Content`/`Out-File` |
+| `readlink` | `Resolve-Path` |
+| `rm` | `Remove-Item` |
+| `seq` | PowerShell's range operator (`1..10`) or `ForEach-Object` |
+| `sleep` | `Start-Sleep` |
+| `sort`, `uniq` | `Sort-Object`, with `-Unique` where appropriate |
+| `stat` | `Get-Item`/`Get-ChildItem` and the resulting file-system properties |
+| `tee` | `Tee-Object` |
+| `test` | PowerShell conditionals and `Test-Path` |
+| `touch` | `New-Item -Force` or `Set-Item` |
+| `wc` | `Measure-Object` |
+| `which` | `Get-Command` |
+| `xargs` | `ForEach-Object` or a typed PowerShell pipeline |
+
+Gate scripts belong in `.ps1` files and are invoked explicitly with
+`pwsh -NoProfile -File <path>`. Quoted data is not a command; for example,
+`Select-String -Pattern 'grep' -Path a.txt` is portable. The lint is the
+enforcement point: it also scans every `.ps1` file in a task's gate folder.
+
+Install PowerShell on every mixed-team machine that does not already provide
+`pwsh`. On macOS, use `brew install powershell/tap/powershell`. On Linux, use
+Microsoft's PowerShell package for the distribution and ensure `pwsh` is on
+`PATH`; do not substitute a distribution's `powershell` compatibility command.
+
 ### Copilot model ids
 
 A Copilot session's `model.<kind>` takes the exact id Copilot's `--model` takes.

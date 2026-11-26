@@ -71,7 +71,10 @@ evidence, not the driver.
   `bash`, `pwsh`, `powershell`, `cmd`; default `sh` on macOS and Linux, `pwsh`
   on Windows) says which shell gates are written for. The plan records it, the
   planner writes every `verify` in that shell's syntax, and gates run in the
-  plan's shell. From B2.
+  plan's shell (P-5). A `platforms` list with two or more distinct platforms is
+  a mixed team: `shell = "pwsh"` belongs in the shared config with `platforms`,
+  and the driver refuses gates that call a command a declared platform lacks
+  (C-5). From B2, extended for mixed teams by B40.
 - **Cross-OS by cross-compiling.** Every Go task's gate builds for `windows`
   and `linux` as well as the host.
 - **Metrics are vloop's, not the shell loop's.** `.loop/` gets none of this; vloop

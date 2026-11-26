@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 6
+**Status:** running · **5/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-26T00:21:26Z
+**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-26T00:28:44Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Report mixed-team health and block unsafe runs · 1 attempt(s)
 - [x] **T3** — Lint mixed-team gates for portable commands
 - [x] **T4** — Teach skills to write portable mixed-team gates · 1 attempt(s)
-- [ ] **T5** — Document mixed teams and the repository policy
+- [x] **T5** — Document mixed teams and the repository policy
 - [ ] **T6** — Prove the complete mixed-team workflow
 
 ## Tasks
@@ -112,7 +112,7 @@ if (-not (Select-String -Path plugin/skills/plan/SKILL.md -SimpleMatch -Pattern 
 
 ### T5 — Document mixed teams and the repository policy
 
-`pending` · depends on: T1, T4
+`done` · depends on: T1, T4
 
 Make the mixed-OS model, configuration workflow and portable check guidance discoverable and consistent across the product's binding documents. The repository remains the first user by reading back its ready-commit platforms declaration.
 

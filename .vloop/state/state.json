@@ -5,9 +5,9 @@
   "base": "04c5526e85ea6a6483b153c55a4f8f241a85006c",
   "branch": "B20261125-2207-b40-i156-mixed-os-pwsh",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-11-25T23:09:54Z",
-  "updated": "2026-11-26T00:21:26Z",
+  "updated": "2026-11-26T00:28:44Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -212,7 +212,7 @@
         "The command guide is regenerated with go generate ./... if any command help changed, and the committed guide/README structural tests in the go check pass without weakening them."
       ],
       "verify": "if (-not (Select-String -Path docs/guide/configuration.md -SimpleMatch -Pattern '## Mixed teams' -Quiet)) { throw 'configuration guide has no Mixed teams section' }; $files = @('docs/domain/domain-model.md','docs/domain/platform/platform-context.md','docs/design-notes/vloop-roadmap.md','README.md','.vloop/config.toml'); foreach ($f in $files) { if (-not (Select-String -Path $f -SimpleMatch -Pattern 'platforms' -Quiet)) { throw \"$f does not name platforms\" } }",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

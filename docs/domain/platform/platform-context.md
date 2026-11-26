@@ -1,6 +1,6 @@
 ---
 name: platform-context
-description: Binds the platform every context stands on — the repo root, repo-local configuration and its resolution, the language setting, the embedded JSON Schemas and their versioning, and the global CLI conventions (exit codes, --json, paths) — and the invariants C-1..C-4
+description: Binds the platform every context stands on — the repo root, repo-local configuration and its resolution, the language setting, the embedded JSON Schemas and their versioning, and the global CLI conventions (exit codes, --json, paths) — and the invariants C-1..C-5
 ---
 # Platform
 
@@ -26,7 +26,8 @@ What the keys decide, by context:
 | --- | --- |
 | `language` | briefing: heading set and templates; execution: the language sessions write prose in *(planned, B5)* (C-4) |
 | `model.*`, `effort.*` | execution: each session kind's model and effort, under per-task overrides (P-6) |
-| `shell` | execution: the shell a new plan's gates are written for (P-5) |
+| `platforms` | execution: teams with two or more platforms require shared `pwsh`, and mixed-team plan acceptance lints gates for commands absent on any declared platform (C-5) |
+| `shell` | execution: the shell a new plan's gates are written for; a mixed team's shared-only `pwsh` rule applies before a plan is accepted, while the plan's recorded shell continues to govern its gates (P-5, C-5) |
 | `areas` | execution: the areas a task may belong to |
 | `metrics.*` | measurement: line classification (M-3) |
 

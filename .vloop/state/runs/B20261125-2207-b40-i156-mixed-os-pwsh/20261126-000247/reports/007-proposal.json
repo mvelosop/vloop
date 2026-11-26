@@ -1,0 +1,15 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Documented mixed-team platform declaration, shared pwsh policy, portable checks and gates, command replacements, installation guidance, C-5, and repository discoverability across the binding documents.",
+  "files": [
+    "docs/guide/configuration.md",
+    "docs/domain/domain-model.md",
+    "docs/domain/platform/platform-context.md",
+    "docs/design-notes/vloop-roadmap.md",
+    "README.md"
+  ],
+  "verified": "vloop task gate T5 exited 0 and printed \"gate T5: pass (304ms)\".",
+  "notes": "The guide now names the driver's ordered command list and concrete pwsh/toolchain replacements; README stays at 156 lines. The existing .vloop/config.toml declaration remains platforms = [\"macos\", \"windows\"] beside shell = \"pwsh\"; no command help changed, so docs/guide/commands.md did not require regeneration."
+}

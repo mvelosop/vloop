@@ -10,3 +10,10 @@
    review T4 · 1m10s · $0.05 · run $0.20 / $40.00
    review: PASS
    T4 done
+── iteration 7 (3 this run) · T5 · 4/6 done ──
+   Document mixed teams and the repository policy
+   work T5 · 2m40s · $0.11 · run $0.31 / $40.00
+   check go
+   review T5 · 1m27s · $0.05 · run $0.36 / $40.00
+   review: PASS
+   T5 done
