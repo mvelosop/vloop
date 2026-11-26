@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T2\gate.ps1:5
+[36;1mLine |[0m
+[36;1m[36;1m   5 | [0m     [36;1mthrow "concepts guide does not state that doctor checks the confi[0m …
+[36;1m     | [31;1m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mconcepts guide does not state that doctor checks the configured shell for a replaced plan[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m

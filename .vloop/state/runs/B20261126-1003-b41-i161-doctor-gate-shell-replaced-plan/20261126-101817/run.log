@@ -1,0 +1,11 @@
+checking the base: go
+the plan B20261125-2207-b40-i156-mixed-os-pwsh was for docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md — you asked for docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md using mai-code-2
+   plan · 6m48s · $0.31 · run $0.31 / $40.00
+checking the gate of T1 on the base
+checking the gate of T2 on the base
+checking the gate of T3 on the base
+planned: B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan — 3 tasks
+reviewing the gates using mai-code-2 (round 1)
+   gate review · 1m58s · $0.10 · run $0.41 / $40.00
+committing the plan

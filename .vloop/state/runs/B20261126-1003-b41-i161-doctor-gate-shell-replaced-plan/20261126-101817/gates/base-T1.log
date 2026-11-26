@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T1\gate.ps1:81
+[36;1mLine |[0m
+[36;1m[36;1m  81 | [0m             [36;1mthrow "$Case`: gate shell = $($row.result) '$($row.messag[0m …
+[36;1m     | [31;1m             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mcomplete state/v2 replaced, configured shell present: gate shell = problem 'the plan's shell "bash" is not on PATH', want pass ''[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m
