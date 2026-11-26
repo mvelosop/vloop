@@ -5,3 +5,10 @@
    review T4 · 2m41s · $0.08 · run $0.16 / $40.00
    review: PASS
    T4 done
+── iteration 9 (2 this run) · T5 · 4/5 done ──
+   Verify the complete self-update workflow
+   work T5 · 2m54s · $0.09 · run $0.25 / $40.00
+   check go
+   review T5 · 1m39s · $0.03 · run $0.29 / $40.00
+   review: PASS
+   T5 done

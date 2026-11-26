@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/5 done** · iteration 8
+**Status:** running · **5/5 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:45:12Z
+**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:51:09Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Install self-update targets safely
 - [x] **T3** — Update installed agent plugins
 - [x] **T4** — Point existing commands and guides to self-update
-- [ ] **T5** — Verify the complete self-update workflow
+- [x] **T5** — Verify the complete self-update workflow
 
 ## Tasks
 
@@ -119,7 +119,7 @@ pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1
 
 ### T5 — Verify the complete self-update workflow
 
-`pending` · depends on: T1, T2, T3, T4
+`done` · depends on: T1, T2, T3, T4
 
 Prove the binary and plugin paths work together through the worked example after every earlier task is present. This final task closes gaps that isolated gates or task-local tests could miss.
 

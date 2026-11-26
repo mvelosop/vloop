@@ -6,7 +6,7 @@
   "merged": null,
   "tasks": {
     "planned": 5,
-    "done": 0,
+    "done": 3,
     "blocked": 1,
     "first_pass": 2,
     "estimate": {
@@ -16,59 +16,59 @@
   },
   "size": {
     "delivered": {
-      "code": 302,
-      "test": 252,
-      "docs": 7,
+      "code": 545,
+      "test": 678,
+      "docs": 18,
       "other": 0,
       "deleted": {
-        "code": 0,
-        "test": 3,
-        "docs": 0,
+        "code": 33,
+        "test": 11,
+        "docs": 3,
         "other": 0
       }
     },
     "churn": {
-      "code": 302,
-      "test": 252,
-      "docs": 7,
+      "code": 584,
+      "test": 684,
+      "docs": 18,
       "other": 0,
       "deleted": {
-        "code": 0,
-        "test": 3,
-        "docs": 0,
+        "code": 72,
+        "test": 17,
+        "docs": 3,
         "other": 0
       }
     },
-    "test_code_ratio": 0.8344370860927153,
-    "rework": 1
+    "test_code_ratio": 1.2440366972477064,
+    "rework": 1.071559633027523
   },
   "time": {
-    "agent_ms": 2332427,
-    "work_ms": 1831104,
-    "review_ms": 501323,
+    "agent_ms": 2602997,
+    "work_ms": 1941131,
+    "review_ms": 661866,
     "plan_ms": 770089,
-    "gates_ms": 20061,
-    "checks_ms": 629121,
+    "gates_ms": 23495,
+    "checks_ms": 783935,
     "gate_review_ms": 434527,
-    "wall_ms": 1847000
+    "wall_ms": 4317000
   },
   "rate": {
-    "code_per_min": 7.768731883141466,
-    "code_test_per_min": 14.251249878345602
+    "code_per_min": 12.562442446149573,
+    "code_test_per_min": 28.190581856221886
   },
   "cost": {
-    "total_usd": 1.4940954000000002,
+    "total_usd": 1.6505594000000003,
     "plan_usd": 0.3609682,
-    "work_usd": 0.71313,
-    "review_usd": 0.24449630000000003,
+    "work_usd": 0.7888512000000001,
+    "review_usd": 0.3252391,
     "gate_review_usd": 0.1755009,
-    "per_1000_code_lines_usd": 4.947335761589405
+    "per_1000_code_lines_usd": 3.0285493577981657
   },
   "credits": {
-    "total": 149.40954,
+    "total": 165.05594000000002,
     "plan": 36.09682,
-    "work": 71.313,
-    "review": 24.44963,
+    "work": 78.88512,
+    "review": 32.52391,
     "gate_review": 17.550089999999997
   },
   "tokens": {
@@ -123,15 +123,15 @@
   },
   "defects": {
     "in_loop": 2,
-    "operator": 1,
+    "operator": 2,
     "escaped": 0,
-    "total": 3,
+    "total": 4,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 1,
+    "total": 2,
     "by_agreement": {
-      "recommended": 1,
+      "recommended": 2,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 12,
-  "iterations": 7,
-  "iterations_per_closed": null,
+  "iterations": 8,
+  "iterations_per_closed": 2.6666666666666665,
   "by_task": [
     {
       "id": "T1",
@@ -163,12 +163,12 @@
       "attempts": 4,
       "churn": {
         "code": 302,
-        "test": 252,
+        "test": 293,
         "docs": 7,
         "other": 0,
         "deleted": {
           "code": 0,
-          "test": 3,
+          "test": 8,
           "docs": 0,
           "other": 0
         }
@@ -178,7 +178,7 @@
       "models": [
         "mai-code-2"
       ],
-      "test_code_ratio": 0.8344370860927153,
+      "test_code_ratio": 0.9701986754966887,
       "per_1000_code_lines_usd": 1.462189072847682
     },
     {
@@ -187,13 +187,13 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 58,
+        "test": 199,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
+          "code": 4,
+          "test": 3,
           "docs": 0,
           "other": 0
         }
@@ -203,8 +203,8 @@
       "models": [
         "mai-code-2"
       ],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "test_code_ratio": 3.4310344827586206,
+      "per_1000_code_lines_usd": 3.2594017241379314
     },
     {
       "id": "T3",
@@ -212,12 +212,12 @@
       "kind": "feature",
       "attempts": 1,
       "churn": {
-        "code": 0,
-        "test": 0,
+        "code": 215,
+        "test": 188,
         "docs": 0,
         "other": 0,
         "deleted": {
-          "code": 0,
+          "code": 63,
           "test": 0,
           "docs": 0,
           "other": 0
@@ -228,33 +228,33 @@
       "models": [
         "mai-code-2"
       ],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "test_code_ratio": 0.8744186046511628,
+      "per_1000_code_lines_usd": 0.8356023255813954
     },
     {
       "id": "T4",
       "area": null,
       "kind": "docs",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
-        "code": 0,
-        "test": 0,
-        "docs": 0,
+        "code": 9,
+        "test": 4,
+        "docs": 11,
         "other": 0,
         "deleted": {
-          "code": 0,
-          "test": 0,
-          "docs": 0,
+          "code": 5,
+          "test": 6,
+          "docs": 3,
           "other": 0
         }
       },
-      "agent_ms": 247375,
-      "cost_usd": 0.14734540000000002,
+      "agent_ms": 517945,
+      "cost_usd": 0.3038094,
       "models": [
         "mai-code-2"
       ],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "test_code_ratio": 0.4444444444444444,
+      "per_1000_code_lines_usd": 33.7566
     },
     {
       "id": "T5",
@@ -618,6 +618,44 @@
           "text": "Denied by preToolUse hook: vloop fence: pwsh: runs a script, stdin or an encoded command, not a literal -Command string"
         }
       ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-153748",
+      "seq": 1,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 8,
+      "task": "T4",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 110027,
+      "cost_usd": 0.0757212,
+      "cost_source": "estimated",
+      "credits": 7.57212,
+      "turns": 12,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-153748",
+      "seq": 2,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 8,
+      "task": "T4",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 160543,
+      "cost_usd": 0.0807428,
+      "cost_source": "estimated",
+      "credits": 8.07428,
+      "turns": 14,
+      "permission_denials": 0,
+      "denials": [],
       "is_error": false
     }
   ]

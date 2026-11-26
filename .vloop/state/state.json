@@ -5,9 +5,9 @@
   "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
   "branch": "B20261126-1036-b44-i98-self-update",
   "status": "running",
-  "iteration": 8,
+  "iteration": 9,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T15:45:12Z",
+  "updated": "2026-11-26T15:51:09Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -245,7 +245,7 @@
         "The integration test does not replace or weaken the task-specific committed tests; every new behaviour remains covered by the repository's go check."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }
