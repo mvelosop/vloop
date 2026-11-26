@@ -8,7 +8,7 @@
     "planned": 6,
     "done": 3,
     "blocked": 0,
-    "first_pass": 2,
+    "first_pass": 3,
     "estimate": {
       "min": 6,
       "max": 8
@@ -43,32 +43,32 @@
     "rework": 1.0063492063492063
   },
   "time": {
-    "agent_ms": 2606780,
-    "work_ms": 2112739,
-    "review_ms": 494041,
+    "agent_ms": 2853736,
+    "work_ms": 2272438,
+    "review_ms": 581298,
     "plan_ms": 480914,
-    "gates_ms": 5897,
-    "checks_ms": 979213,
+    "gates_ms": 6110,
+    "checks_ms": 1163116,
     "gate_review_ms": 150656,
     "wall_ms": 3141000
   },
   "rate": {
-    "code_per_min": 7.250324154704271,
-    "code_test_per_min": 15.881662434114117
+    "code_per_min": 6.62289714255278,
+    "code_test_per_min": 14.507298502734661
   },
   "cost": {
-    "total_usd": 1.4226662,
+    "total_usd": 1.5852604000000001,
     "plan_usd": 0.2241802,
-    "work_usd": 0.8268779,
-    "review_usd": 0.29626250000000004,
+    "work_usd": 0.9355969000000001,
+    "review_usd": 0.35013770000000005,
     "gate_review_usd": 0.0753456,
-    "per_1000_code_lines_usd": 4.516400634920635
+    "per_1000_code_lines_usd": 5.032572698412698
   },
   "credits": {
-    "total": 142.26662,
+    "total": 158.52604,
     "plan": 22.41802,
-    "work": 82.68779,
-    "review": 29.62625,
+    "work": 93.55969,
+    "review": 35.01377,
     "gate_review": 7.53456
   },
   "tokens": {
@@ -152,9 +152,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 7,
-  "iterations": 6,
-  "iterations_per_closed": 2,
+  "permission_denials": 11,
+  "iterations": 7,
+  "iterations_per_closed": 2.3333333333333335,
   "by_task": [
     {
       "id": "T1",
@@ -260,7 +260,7 @@
       "id": "T5",
       "area": null,
       "kind": "docs",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -273,9 +273,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 246956,
+      "cost_usd": 0.16259420000000002,
+      "models": [
+        "mai-code-2"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     },
@@ -600,6 +602,62 @@
       "turns": 9,
       "permission_denials": 0,
       "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261126-000247",
+      "seq": 4,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 7,
+      "task": "T5",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 159699,
+      "cost_usd": 0.10871900000000001,
+      "cost_source": "estimated",
+      "credits": 10.8719,
+      "turns": 16,
+      "permission_denials": 1,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261126-000247",
+      "seq": 5,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 7,
+      "task": "T5",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 87257,
+      "cost_usd": 0.053875200000000005,
+      "cost_source": "estimated",
+      "credits": 5.38752,
+      "turns": 10,
+      "permission_denials": 3,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: command substitution cannot be judged"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged"
+        }
+      ],
       "is_error": false
     }
   ]

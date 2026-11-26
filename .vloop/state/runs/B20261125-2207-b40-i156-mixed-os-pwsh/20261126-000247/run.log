@@ -17,3 +17,9 @@
    review T5 · 1m27s · $0.05 · run $0.36 / $40.00
    review: PASS
    T5 done
+── iteration 8 (4 this run) · T6 · 5/6 done ──
+   Prove the complete mixed-team workflow
+   work T6 · 4m04s · $0.14 · run $0.50 / $40.00
+   check go
+   review T6 · 1m56s · $0.05 · run $0.55 / $40.00
+   review: FAIL
