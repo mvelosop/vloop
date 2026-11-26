@@ -1,0 +1,51 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "internal/cli/upgrade.go:20: \"Refresh vloop's parts of a repository set up by an older vloop\"; README.md:147: \"vloop upgrade: refresh a repository after a newer vloop\"",
+      "observed": "The same-version path now refreshes or restores .vloop/README.md: when it differs it prints updated or would update before \"already at <version>\" and otherwise remains silent. The help and command list still describe the command only in terms of a newer/older version transition; docs/guide/commands.md:507 mirrors the older-vloop wording.",
+      "where": "brief R2; internal/cli/upgrade.go:20; docs/guide/commands.md:507; README.md:147; internal/cli/upgrade.go:65-87"
+    },
+    {
+      "kind": "surface",
+      "claim": "docs/guide/concepts.md:438: \"vloop keeps its files under `.vloop/` in the repository root:\"",
+      "observed": "The following .vloop layout lists config, install, local config, tmp, state, runs, metrics, defects and repo-guidelines, but omits the newly generated and vloop-owned .vloop/README.md.",
+      "where": "brief R1 and Decided here, guide; docs/guide/concepts.md:438-448; internal/cli/init.go:106; internal/cli/upgrade.go:67-74"
+    }
+  ],
+  "not_run": [
+    {
+      "line": "vloop init",
+      "reason": "denied by the verify fence"
+    },
+    {
+      "line": "Get-Content .vloop/README.md -TotalCount 3",
+      "reason": "needs the denied vloop init line"
+    },
+    {
+      "line": "Remove-Item .vloop/README.md; vloop upgrade",
+      "reason": "needs the denied vloop init line"
+    },
+    {
+      "line": "Add-Content .vloop/README.md 'local edit'; vloop upgrade --dry-run",
+      "reason": "needs the denied vloop init line"
+    },
+    {
+      "line": "vloop upgrade",
+      "reason": "needs the denied vloop init line; first occurrence"
+    },
+    {
+      "line": "vloop upgrade",
+      "reason": "needs the denied vloop init line; second occurrence"
+    }
+  ],
+  "checked": {
+    "example_lines": 0,
+    "sentences": 16,
+    "surfaces": 10
+  },
+  "notes": "Pass 1 recorded: all worked-example commands depend on vloop init, which the verify fence denies. Pass 2 checked 16 observable R1, R2, language, line-ending and guide sentences against implementation and existing assertions. Pass 3 read 10 setup, command, help-source, layout and roadmap surfaces. The fence denied built init/upgrade --help probes, so their generated command-reference text and source were read instead."
+}
+

@@ -38,3 +38,11 @@ committing the plan
    review T4 · 0m56s · $0.05 · run $0.53 / $40.00
    review: PASS
    T4 done
+   check go
+   verify · 2m55s · $0.10 · run $0.63 / $40.00
+verify: 2 finding(s); 6 example line(s) not run — see .vloop/state/runs/B20261126-1843-b47-i160-vloop-folder-readme/20261126-203401/reports/verify.json
+
+═══ complete ═══
+run:    B20261126-1843-b47-i160-vloop-folder-readme/20261126-203401  (4 iteration(s) this run)
+plan:   4/4 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1843-b47-i160-vloop-folder-readme.md

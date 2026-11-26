@@ -34,3 +34,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The aggregate close gate proves the completed init, upgrade, and documentation workflow through the built CLI in a temporary repository.
 - **Files:** none
 - **Notes for next iteration:** T4 required validation only: the planner-owned gate ran T1-T3, then replayed init, missing-file restoration, non-writing dry-run, local-edit overwrite, and same-version silence; it left the repository unchanged and removed its temporary repository.
+
+## Run ended — complete
+
+- **Run:** `B20261126-1843-b47-i160-vloop-folder-readme` · 4 iteration(s) this run
+- **Plan:** 4/4 done, 0 blocked
