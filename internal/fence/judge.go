@@ -348,6 +348,9 @@ var powerShellDenied = map[string]bool{
 	"start-job": true, "sajb": true,
 	"start-threadjob": true,
 	"invoke-item":     true, "ii": true,
+	// An alias names another command: defining one is eval by another name.
+	"set-alias": true, "sal": true, "new-alias": true, "nal": true,
+	"import-alias": true, "ipal": true,
 }
 
 func powerShellDenialReason(reason string) bool {
@@ -410,6 +413,10 @@ func (j *Judge) words(ws []string, plain, exp []bool, depth int, mode shellMode)
 			return fmt.Sprintf("shell syntax %s cannot be judged", name)
 		}
 		if mode == shellPowerShell && powerShellDenied[strings.ToLower(name)] {
+			return w + " is not allowed"
+		}
+		// In a cmd string, start and call run another command.
+		if mode == shellCMD && (strings.EqualFold(name, "start") || strings.EqualFold(name, "call")) {
 			return w + " is not allowed"
 		}
 		var err, repl string
