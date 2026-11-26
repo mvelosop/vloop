@@ -93,8 +93,8 @@ Each `verify` command must be:
   `uniq`, `wc`, `which`, `xargs`, `xcopy`, `zsh`. The mixed-team skill guidance
   does not replace the driver's plan-acceptance portability lint. When the
   plan shell is `sh` on macOS, write for the host's BSD `grep`, `sed`, `awk`
-  and `date`; a GNU-only pattern stalled a real run. A scratch directory is
-  `mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX"`: macOS `mktemp -d` without a
+  and `date`; a GNU-only pattern stalled a real run. In a POSIX plan shell, a
+  scratch directory is `mktemp -d "${TMPDIR:-/tmp}/gate.XXXXXX"`: macOS `mktemp -d` without a
   template ignores `TMPDIR`, and a sandbox may deny the directory it uses instead.
 - **Runnable from the repo root**, as a single command line.
 - **Failing right now**, and failing for the *right reason* — because the work

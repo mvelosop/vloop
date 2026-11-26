@@ -72,7 +72,9 @@ environment and in `config set`.
 `.vloop/config.local.toml` is your own, untracked layer: the same format and keys as
 `.vloop/config.toml`, any key but `[[check]]` (the checks are the repository's; a
 `[[check]]` there is exit 1: `vloop: .vloop/config.local.toml: [[check]] belongs in
-.vloop/config.toml — the checks are the repository's, not one machine's`). It wins
+.vloop/config.toml — the checks are the repository's, not one machine's`), `platforms`,
+and `shell` on a mixed team (see [Mixed teams](#mixed-teams); `vloop config set --local`
+refuses both, exit 2). It wins
 over the shared file and loses to the environment; a list key is replaced, not
 merged. `vloop config list` and `--json` show its values with source `local`.
 
