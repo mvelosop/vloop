@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":44930,"exit":0,"name":"go"}],"ended":"2026-11-26T17:23:52Z","gate":{"duration_ms":520,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261126-1418-b45-docs-mixed-os-and-any-agent","schema":"iteration/v2","started":"2026-11-26T17:19:53Z","task":"T1"}

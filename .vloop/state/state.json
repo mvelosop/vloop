@@ -5,9 +5,9 @@
   "base": "16f54afef788a77ae268e6fe12189fbd53c435f3",
   "branch": "B20261126-1418-b45-docs-mixed-os-and-any-agent",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-26T17:11:14Z",
-  "updated": "2026-11-26T17:19:52Z",
+  "updated": "2026-11-26T17:23:52Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -49,7 +49,7 @@
         "No claim says or implies that mai-code-2 is qualified under the evaluation rule."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

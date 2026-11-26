@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 0
+**Status:** running · **1/6 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:19:52Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:23:52Z
 
 ## Progress
 
-- [ ] **T1** — Document the mai-code-2 evidence
+- [x] **T1** — Document the mai-code-2 evidence
 - [ ] **T2** — Make the README agent-neutral and cite mai-code-2
 - [ ] **T3** — Explain mixed teams in the README
 - [ ] **T4** — Update the guides for any agent
@@ -19,7 +19,7 @@
 
 ### T1 — Document the mai-code-2 evidence
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Add the D6 evidence section before any README link points to it. The section must turn B40 through B44 telemetry into a traceable account without overstating qualification.
 

@@ -1,0 +1,35 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.08814069999999999,
+  "credits": 8.81407,
+  "duration_ms": 86530,
+  "effort": null,
+  "ended": "2026-11-26T17:23:52Z",
+  "is_error": false,
+  "iteration": 1,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.08814069999999999,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: script blocks cannot be judged — use Where-Object \u003cProperty\u003e -like \u003cvalue\u003e, ForEach-Object -MemberName \u003cProperty\u003e or Select-Object -ExpandProperty \u003cProperty\u003e",
+      "tool_name": "powershell",
+      "tool_use_id": "call_0PM0Ten5cvBn087WkXm8yY7z"
+    }
+  ],
+  "phase": "review",
+  "run_id": "B20261126-1418-b45-docs-mixed-os-and-any-agent",
+  "schema": "session/v3",
+  "started": "2026-11-26T17:22:23Z",
+  "task": "T1",
+  "turns": 11,
+  "wall_ms": 88750
+}
