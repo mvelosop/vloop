@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/mod/module"
 	"golang.org/x/mod/semver"
 )
 
@@ -61,7 +62,7 @@ func runSelfUpdate(b Build, g *Globals, check, explicit bool, requested string, 
 	if err != nil {
 		return Problem(errors.New("self-update needs go on PATH — install the release by hand: go install github.com/mvelosop/vloop/cmd/vloop@latest"))
 	}
-	if b.Module == "" || b.Module == "(devel)" {
+	if checkoutBuild(b.Module) {
 		return Problem(errors.New("this vloop was built from a checkout, not installed from a release — build it again from the checkout, or go install github.com/mvelosop/vloop/cmd/vloop@latest"))
 	}
 
@@ -502,4 +503,11 @@ func writeSelfUpdateJSON(out interface{ Write([]byte) (int, error) }, doc selfUp
 	enc := json.NewEncoder(out)
 	enc.SetEscapeHTML(false)
 	return enc.Encode(doc)
+}
+
+// checkoutBuild reports a binary built from a checkout rather than installed
+// from a release: no module version, (devel), or the pseudo-version (with
+// +dirty when the tree was modified) that Go stamps on a checkout build.
+func checkoutBuild(v string) bool {
+	return v == "" || v == "(devel)" || strings.Contains(v, "+") || module.IsPseudoVersion(v)
 }

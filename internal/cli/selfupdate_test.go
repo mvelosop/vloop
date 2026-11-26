@@ -185,6 +185,13 @@ func TestSelfUpdateRefusals(t *testing.T) {
 	h.build.Module = ""
 	code, out, errOut = h.run("self-update")
 	assertSelfUpdateResult(t, code, out, errOut, 1, "", "vloop: this vloop was built from a checkout, not installed from a release — build it again from the checkout, or go install github.com/mvelosop/vloop/cmd/vloop@latest\n")
+	// Go stamps a build from a checkout with a pseudo-version, +dirty when the
+	// tree was modified: still a checkout build, not a release.
+	for _, m := range []string{"v0.15.0-rc.4.0.20261126155805-37d1d135e2c6", "v0.15.0-rc.4.0.20261126155805-37d1d135e2c6+dirty", "v0.14.0+dirty"} {
+		h.build.Module = m
+		code, out, errOut = h.run("self-update")
+		assertSelfUpdateResult(t, code, out, errOut, 1, "", "vloop: this vloop was built from a checkout, not installed from a release — build it again from the checkout, or go install github.com/mvelosop/vloop/cmd/vloop@latest\n")
+	}
 	h.build.Module = "v0.14.0"
 
 	t.Setenv("FAKE_GO_LIST_FAIL", "1")
