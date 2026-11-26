@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The plan and gate shell rows use one shared replaced-plan decision: complete state/v2 plans of another brief are replaced for a bare doctor or a run naming another brief, while a run naming the plan's own brief or no brief and every non-complete status keep the plan in use; complete state/v1 plans are replaced in every invocation.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorPlanShell computes one replaced value through doctorPlanReplaced and uses it for both rows; doctorPlanReplaced handles complete state/v1 and the state/v2 bare/other/own/unnamed cases. internal/cli/doctor_plan_shell_test.go:35-107 covers the complete v1/v2 cases and planning, running, blocked, stalled and halted."
+    },
+    {
+      "criterion": "When that shared decision says replaced, and when no plan exists, the gate shell row uses the configured shell and exactly B40's configured-shell pass, warning and mixed-team problem outcomes and messages; otherwise it uses the plan's recorded shell and the existing plan-shell problem message without changing a result or message in that branch of the table.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: usePlanShell is derived from the shared replaced decision; the no-plan/replaced branch selects the configured shell and retains the pass, warning and mixed-problem messages, while the plan-owned branch retains the plan-shell problem. internal/cli/doctor_plan_shell_test.go:54-75 asserts those exact outcomes and messages."
+    },
+    {
+      "criterion": "Doctor --json reports the same gate shell result and message, and vloop run's preflight does not report the old plan shell for a different brief but does report it when resuming or naming the replaced plan's own brief.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: runDoctor passes runBrief into doctorPlanShell and emits the same doctorCheck values used by both renderers; internal/cli/run.go: runPreflight passes its resolved brief to runDoctor. internal/cli/doctor_plan_shell_test.go:109-118 verifies preflight renders the configured warning, and its table verifies other-brief versus own/unnamed decisions."
+    },
+    {
+      "criterion": "The implementation does not duplicate the replaced-plan calculation between the plan and gate shell rows.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorPlanShell computes replaced once with doctorPlanReplaced, then shares that value between gate-shell selection and the plan row."
+    },
+    {
+      "criterion": "Committed tests exercise every row of G1's table, including planning, running, blocked, stalled and halted, and run on Windows without depending on POSIX stub agents; the go check executes those tests.",
+      "met": true,
+      "evidence": "internal/cli/doctor_plan_shell_test.go: the table covers no plan, replaced complete v2 and v1, own/unnamed v2, and every non-complete status; it creates a Windows .exe stub and controls PATH without a POSIX agent. The go check log reports internal/cli passing."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

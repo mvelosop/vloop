@@ -578,9 +578,11 @@ func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *s
 		}
 		switch {
 		case replaced:
-			add("plan", resPass, "a complete plan of "+plan.Brief+" — the next brief's plan replaces it")
-		case plan.Schema == state.SchemaV1 && plan.Status == "complete":
-			add("plan", resPass, "a complete "+state.SchemaV1+" plan — the next brief's plan replaces it")
+			message := "a complete plan of " + plan.Brief + " — the next brief's plan replaces it"
+			if plan.Schema == state.SchemaV1 {
+				message = "a complete " + state.SchemaV1 + " plan — the next brief's plan replaces it"
+			}
+			add("plan", resPass, message)
 		case plan.Schema == state.SchemaV1:
 			add("plan", resWarning, "a "+state.SchemaV1+" plan — finish it with vloop 1.x or re-plan the brief")
 		case err != nil:

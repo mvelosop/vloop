@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/3 done** · iteration 1
+**Status:** running · **1/3 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T10:40:57Z
+**Brief:** `docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md` · **Updated:** 2026-11-26T10:46:41Z
 
 ## Progress
 
-- [ ] **T1** — Make replaced plans use the configured gate shell · 1 attempt(s)
+- [x] **T1** — Make replaced plans use the configured gate shell · 1 attempt(s)
 - [ ] **T2** — Document the configured shell for replaced plans
 - [ ] **T3** — Verify the complete doctor shell replacement contract
 
@@ -16,7 +16,7 @@
 
 ### T1 — Make replaced plans use the configured gate shell
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 Make doctor's gate shell row follow the same replaced-plan decision as its plan row, so a finished plan from another brief cannot reject a run that will use the configured shell. Implement G1 across the complete status table while preserving every plan-owned shell result and message.
 
@@ -27,8 +27,6 @@ Make doctor's gate shell row follow the same replaced-plan decision as its plan 
 - Doctor --json reports the same gate shell result and message, and vloop run's preflight does not report the old plan shell for a different brief but does report it when resuming or naming the replaced plan's own brief.
 - The implementation does not duplicate the replaced-plan calculation between the plan and gate shell rows.
 - Committed tests exercise every row of G1's table, including planning, running, blocked, stalled and halted, and run on Windows without depending on POSIX stub agents; the go check executes those tests.
-
-**From the last attempt:** A complete state/v1 plan now takes the generic replaced-plan branch and prints `a complete plan of  — the next brief's plan replaces it` instead of the existing `a complete state/v1 plan — the next brief's plan replaces it`; G1 explicitly requires no other doctor output to change.; The gate and committed tests cover state/v1 only as a gate-shell row and do not assert the plan row's existing state/v1 message, so this output regression passes.
 
 <details><summary>verify command</summary>
 

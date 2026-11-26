@@ -15,3 +15,10 @@ committing the plan
    check go
    review T1 · 1m41s · $0.06 · run $0.59 / $40.00
    review: FAIL
+── iteration 2 (2 this run) · T1 · 0/3 done ──
+   Make replaced plans use the configured gate shell
+   work T1 · 1m53s · $0.08 · run $0.66 / $40.00
+   check go
+   review T1 · 1m30s · $0.04 · run $0.70 / $40.00
+   review: PASS
+   T1 done
