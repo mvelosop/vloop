@@ -1,0 +1,107 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "internal/cli/config.go:141: \"Set any key config list shows, in .vloop/config.toml or with --local in .vloop/config.local.toml ('' removes it)\"",
+      "observed": "The built vloop config set --help says every listed key can use --local, but vloop config set --local platforms linux exits 2 because platforms is shared-only, and in a mixed team vloop config set --local shell pwsh exits 2 because shell is shared-only.",
+      "where": "brief M1 and M2 Shared file only; internal/cli/config.go:141; vloop config set --help; docs/guide/configuration.md:72-73; docs/guide/commands.md:107; docs/design-notes/vloop-roadmap-b18-b21.md:46"
+    },
+    {
+      "kind": "surface",
+      "claim": "plugin/skills/plan/SKILL.md:97: \"A scratch directory is `mktemp -d \\\"${TMPDIR:-/tmp}/gate.XXXXXX\\\"`\"",
+      "observed": "The same skill names mktemp as an M3 listed command that mixed-team gates must never use, and the driver rejects a mixed gate that calls mktemp. The POSIX mktemp advice is still unconditional and the state/v2 example at line 236 also uses it.",
+      "where": "brief M3 The plan skill; plugin/skills/plan/SKILL.md:67,97,236; internal/driver/gateshape.go:42"
+    }
+  ],
+  "not_run": [
+    {
+      "line": "$ vloop doctor          (shell not set, platforms not set)",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ VLOOP_SHELL=bash vloop doctor",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ vloop config set platforms windows,macos",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ vloop config get platforms",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ vloop doctor",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ vloop config set shell pwsh",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ VLOOP_SHELL=pwsh vloop config get shell",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ vloop config set --local shell pwsh",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ vloop config set --local platforms linux",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "$ vloop config set platforms macos,beos",
+      "reason": "needs vloop init, denied by the verify fence"
+    },
+    {
+      "line": "go test ./x; if ($LASTEXITCODE) { exit 1 }; (Get-Content out.txt | Measure-Object -Line).Lines     accepted",
+      "reason": "covered by TestPlanAcceptancePlatformCommands"
+    },
+    {
+      "line": "Select-String -Pattern 'grep' -Path a.txt                                                          accepted",
+      "reason": "covered by TestFirstPlatformSpecificCommand"
+    },
+    {
+      "line": "node -e \"require('fs')\"                                                                             accepted",
+      "reason": "covered by TestFirstPlatformSpecificCommand"
+    },
+    {
+      "line": "if (Test-Path a) { wc -l a }",
+      "reason": "covered by TestPlanAcceptancePlatformCommands"
+    },
+    {
+      "line": "go test ./x | /usr/bin/GREP.exe ok",
+      "reason": "covered by TestPlanAcceptancePlatformCommands"
+    },
+    {
+      "line": "& 'grep' -n ok a.txt",
+      "reason": "covered by TestPlanAcceptancePlatformCommands"
+    },
+    {
+      "line": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1     (gate.ps1's second line: $o = go test ./x | grep ok)",
+      "reason": "covered by TestPlanAcceptancePlatformCommands"
+    },
+    {
+      "line": "The same plan with `platforms` unset: every task accepted by this rule.",
+      "reason": "covered by TestPlanAcceptancePlatformCommands"
+    },
+    {
+      "line": "A check whose `run` is `go test ./... | grep ok`, mixed:",
+      "reason": "covered by TestWorkedExampleB40"
+    },
+    {
+      "line": "**Real data:** with `platforms = [\"macos\", \"windows\"]`, the rule refuses all 8 gates of B39's plan",
+      "reason": "covered by TestGateShapeB39RealData"
+    }
+  ],
+  "checked": {
+    "example_lines": 0,
+    "sentences": 38,
+    "surfaces": 18
+  },
+  "notes": "All three passes are complete. The README ends below its 200-line cap."
+}
+
