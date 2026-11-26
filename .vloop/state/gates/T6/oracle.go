@@ -70,7 +70,7 @@ func main() {
 	equal(r.stdout, "plan  individual_pro\nclaude-fable-5.1  disabled\ngpt-6.1-terra     -\nmai-code-2        enabled\n", "worked models")
 	r = record(invoke(binary, repo, env, "models", "copilot", "--all"))
 	equal(r.code, 0, "models --all exit")
-	contains(r.stdout, "text-embedding-9  -\n", "worked --all")
+	equal(r.stdout, "plan  individual_pro\nclaude-fable-5.1  disabled\ngpt-6.1-terra     -\nmai-code-2        enabled\ntext-embedding-9  -\n", "worked --all")
 
 	r = record(invoke(binary, repo, env, "config", "set", "--kinds", "work,review", "--agent", "copilot", "--model", "mai-code-2"))
 	equal(r.code, 0, "worked kinds exit")
@@ -82,17 +82,26 @@ func main() {
 	equal(r.code, 2, "worked missing exit")
 	equal(r.stderr, "vloop: mai-code-3 is not a Copilot model this account lists: vloop models copilot lists them\n", "worked missing")
 
+	beforeShared, _ := os.ReadFile(filepath.Join(repo, ".vloop", "config.toml"))
+	beforeLocal, _ := os.ReadFile(filepath.Join(repo, ".vloop", "config.local.toml"))
 	r = record(invoke(binary, repo, env, "config", "set", "--kinds", "work,review", "--model", "claude-fable-5.1"))
 	equal(r.code, 2, "worked disabled exit")
 	equal(r.stderr, "vloop: claude-fable-5.1 is disabled by this account's Copilot policy: vloop models copilot lists the enabled ones\n", "worked disabled")
 	r = record(invoke(binary, repo, env, "config", "get", "model.work"))
 	equal(r.stdout, "mai-code-2\n", "worked atomic")
+	afterShared, _ := os.ReadFile(filepath.Join(repo, ".vloop", "config.toml"))
+	afterLocal, _ := os.ReadFile(filepath.Join(repo, ".vloop", "config.local.toml"))
+	equal(string(afterShared), string(beforeShared), "worked atomic shared file")
+	equal(string(afterLocal), string(beforeLocal), "worked atomic local file")
 
 	r = record(invoke(binary, repo, env, "config", "set", "model.work", "sonnet"))
 	equal(r.code, 2, "worked alias exit")
 	equal(r.stderr, "vloop: sonnet is a Claude alias, and agent.work is copilot: vloop models copilot lists the Copilot ids\n", "worked alias")
 	r = record(invoke(binary, repo, env, "doctor"))
 	contains(r.stdout, "✓ copilot models 1 id(s) checked · plan individual_pro\n", "worked doctor")
+	if strings.Contains(r.stdout, "✗ copilot models") {
+		fail("worked doctor: the copilot models row is a problem")
+	}
 
 	server.Close()
 	r = record(invoke(binary, repo, env, "config", "set", "model.work", "gpt-6.1-terra"))
@@ -102,6 +111,9 @@ func main() {
 	r = record(invoke(binary, repo, env, "doctor"))
 	contains(r.stdout, "! copilot models cannot reach Copilot's model list (", "stopped stub doctor warning")
 	contains(r.stdout, "); ids not checked\n", "stopped stub doctor suffix")
+	if strings.Contains(r.stdout, "✗ copilot models") {
+		fail("stopped stub doctor: an unreachable API made the copilot models row a problem")
+	}
 	if strings.Contains(combined, "stub-token") {
 		fail("token leaked into command output")
 	}

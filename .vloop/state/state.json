@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 8,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T19:59:08Z",
+  "updated": "2026-11-26T20:01:20Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -198,7 +198,7 @@
       "title": "Verify the Copilot model workflow end to end",
       "goal": "Run all earlier behavioral gates together and replay the brief's worked example in an initialized temporary repository. This closes the run only when listing, set-time checks, doctor, atomic --kinds writes, and failure warnings compose as one operator workflow.",
       "kind": "test",
-      "fixtures": "b559f67cdb52f264bedac0848b289b68fd18ca6f2de6568a781a50aed32b07bc",
+      "fixtures": "514ac3e370ef592788a2a009d9212b413a78aaea087ae580c4e5ca9e91bcc51a",
       "references": [
         {
           "path": "docs/guide/configuration.md",
@@ -226,9 +226,18 @@
         "No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",
-      "status": "blocked",
-      "attempts": 1,
-      "notes": "gate disputed: The planner-owned close oracle omits assertions required by T6 acceptance: exact --all output, byte-for-byte all-or-nothing refusal, and warning-only doctor exit 0. — The --all branch uses contains(r.stdout, \"text-embedding-9  -\\n\", ...) instead of an exact equality; the disabled refusal checks only one model via config get rather than both configuration files byte-for-byte; and both doctor commands only inspect stdout substrings, not r.code. The unchanged gate nevertheless exits 0."
+      "status": "pending",
+      "attempts": 0,
+      "notes": "gate disputed: The planner-owned close oracle omits assertions required by T6 acceptance: exact --all output, byte-for-byte all-or-nothing refusal, and warning-only doctor exit 0. — The --all branch uses contains(r.stdout, \"text-embedding-9  -\\n\", ...) instead of an exact equality; the disabled refusal checks only one model via config get rather than both configuration files byte-for-byte; and both doctor commands only inspect stdout substrings, not r.code. The unchanged gate nevertheless exits 0.",
+      "gate_history": [
+        {
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",
+          "replaced_at": "2026-11-26T20:01:20Z",
+          "reason": "The work session disputed a gate weaker than T6's acceptance: --all is now compared exactly, the all-or-nothing refusal compares both config files byte for byte, and doctor's copilot models row must not be a problem (exit codes are not asserted: the scratch repository's other doctor rows, such as Claude trust, are not this task's)",
+          "by": "operator",
+          "fixtures": "b559f67cdb52f264bedac0848b289b68fd18ca6f2de6568a781a50aed32b07bc"
+        }
+      ]
     }
   ]
 }

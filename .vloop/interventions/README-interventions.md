@@ -143,6 +143,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | verification-finding | no | no-options | [I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh](I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh.md) |
 | halt | verification-finding | partly | recommended | [I20261126-145532-b44-s-t1-gate-harness-assigned-home-powe](I20261126-145532-b44-s-t1-gate-harness-assigned-home-powe.md) |
 | halt | verification-finding | partly | recommended | [I20261126-153734-b44-s-t4-gate-asserted-both-doctor-plugi](I20261126-153734-b44-s-t4-gate-asserted-both-doctor-plugi.md) |
+| halt | verification-finding | partly | recommended | [I20261126-200120-b46-s-t6-close-gate-passed-but-was-weake](I20261126-200120-b46-s-t6-close-gate-passed-but-was-weake.md) |
 | verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261101-230340-acceptance-on-the-real-cli-the-url-short](I20261101-230340-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261102-004526-acceptance-on-the-real-cli-the-url-short](I20261102-004526-acceptance-on-the-real-cli-the-url-short.md) |
