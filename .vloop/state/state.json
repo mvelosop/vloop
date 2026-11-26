@@ -5,9 +5,9 @@
   "base": "6fbee5b7b53133af2f17e19317a3b203c904abe9",
   "branch": "B20261126-1843-b47-i160-vloop-folder-readme",
   "status": "running",
-  "iteration": 2,
+  "iteration": 3,
   "created": "2026-11-26T20:40:41Z",
-  "updated": "2026-11-26T21:00:33Z",
+  "updated": "2026-11-26T21:05:17Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -113,7 +113,7 @@
         "The guide change is limited to that lifecycle sentence and does not alter the documented behavior of any other file init or upgrade writes."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

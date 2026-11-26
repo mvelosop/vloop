@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "The setup guide now states that init writes `.vloop/README.md` and upgrade rewrites or restores it.",
+  "files": ["docs/guide/concepts.md"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: pass (508ms).",
+  "notes": "The change is limited to the prescribed lifecycle sentence in the Setting up a repository section."
+}

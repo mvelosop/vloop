@@ -24,3 +24,10 @@ committing the plan
    review T2 · 1m07s · $0.04 · run $0.39 / $40.00
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/4 done ──
+   Document the owned README lifecycle
+   work T3 · 0m52s · $0.03 · run $0.41 / $40.00
+   check go
+   review T3 · 0m45s · $0.03 · run $0.44 / $40.00
+   review: PASS
+   T3 done

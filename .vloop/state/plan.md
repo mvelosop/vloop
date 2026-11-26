@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/4 done** · iteration 2
+**Status:** running · **3/4 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T21:00:33Z
+**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T21:05:17Z
 
 ## Progress
 
 - [x] **T1** — Generate the owned README during init
 - [x] **T2** — Reconcile the owned README during upgrade
-- [ ] **T3** — Document the owned README lifecycle
+- [x] **T3** — Document the owned README lifecycle
 - [ ] **T4** — Verify the README workflow end to end
 
 ## Tasks
@@ -61,7 +61,7 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 ### T3 — Document the owned README lifecycle
 
-`pending` · depends on: T1, T2
+`done` · depends on: T1, T2
 
 Make the setup guide tell repository users that init creates the folder README and upgrade refreshes or restores it. This keeps the documented setup and lifecycle aligned with the two command changes.
 
