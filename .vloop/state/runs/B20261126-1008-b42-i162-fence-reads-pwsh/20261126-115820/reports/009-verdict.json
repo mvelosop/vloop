@@ -1,0 +1,29 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "T1 through T4's gates pass together against the final tree.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T5/gate.ps1:3-6 runs the T1, T2, T3 and T4 gate scripts in sequence and throws on any nonzero exit; this T5 gate completed successfully, as required before review."
+    },
+    {
+      "criterion": "Every worked-example line runs through a CLI built from the final tree and returns the exact shown allow or deny result and exit status, including the unchanged bash lines.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T5/gate.ps1:12-13 builds ./cmd/vloop from the final tree; lines 16-24 assert exact output and exit 0 for allow or exit 1 for deny, and lines 27-55 cover every line in the brief's worked example, including the three unchanged bash cases."
+    },
+    {
+      "criterion": "The final implementation preserves the phase and root through nested wrappers, still fails closed on unreadable forms, changes no fence file or fence matching rule, adds no dependency, and does not weaken the go check.",
+      "met": true,
+      "evidence": "internal/fence/wrappers_test.go:278-319 covers phase/root-sensitive writes and the eight/nine-wrapper boundary; lines 21-30, 105-123, 139-176, 200-216 and 239-250 assert exact fail-closed refusals. The cumulative branch diff contains no fence/*.json, go.mod, go.sum or tools/check change, and .vloop/tmp/checks.json records the unchanged go check with exit 0."
+    },
+    {
+      "criterion": "The close adds no production change beyond what the prior tasks require and leaves a committed test for every behavior introduced by W1-W3.",
+      "met": true,
+      "evidence": "git diff HEAD shows no product files changed by T5, only driver-owned .vloop records; the committed internal/fence/wrappers_test.go exercises W1 wrappers, W2 dynamic commands/script blocks, W3 property statements/environment assignments, unreadable syntax, phase/root propagation and wrapper depth, and the final go check log reports every package ok."
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}

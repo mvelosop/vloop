@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "PowerShell property reads are now accepted only at statement-leading positions and denied with the W4 guidance after an existing pipeline stage.",
+  "files": [
+    "internal/fence/split.go",
+    "internal/fence/wrappers_test.go"
+  ],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: pass (2.039s).",
+  "notes": "The shared PowerShell-read position guard now checks the pipeline state, preventing a property expression after | or || from being treated as a leading stage. Go regression cases pin both non-leading positions and the exact parentheses refusal."
+}

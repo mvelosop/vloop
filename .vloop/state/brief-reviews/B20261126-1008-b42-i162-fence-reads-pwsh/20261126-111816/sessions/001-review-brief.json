@@ -1,0 +1,39 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.1476616,
+  "credits": 14.76616,
+  "duration_ms": 303047,
+  "effort": null,
+  "ended": "2026-11-26T11:23:22Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.1476616,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged",
+      "tool_name": "powershell",
+      "tool_use_id": "call_DjrVJHJY4cakgbIM664fygeB"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged",
+      "tool_name": "powershell",
+      "tool_use_id": "call_8VYyuEPQitg8HRjXOIr2gZaK"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261126-1008-b42-i162-fence-reads-pwsh",
+  "schema": "session/v5",
+  "started": "2026-11-26T11:18:16Z",
+  "turns": 14,
+  "wall_ms": 305983
+}

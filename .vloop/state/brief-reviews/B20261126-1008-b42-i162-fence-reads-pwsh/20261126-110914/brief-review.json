@@ -1,0 +1,26 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Decided here / Shape",
+      "summary": "The brief changes the wrappers documented by `vloop fence check --help` but neither binds nor updates that help text.",
+      "evidence": "The brief's Decided here section names only updates to `docs/guide/configuration.md` and `docs/design-notes/fence-audit.md`, and Shape task 4 gates only those two files. `internal/cli/fence.go:32-34` still describes a shell as looked through `env`, ... `xargs` and `sh -c`; after W1 it would omit the newly supported `pwsh`/`powershell` and `cmd` wrappers. B35 already treated and updated this same command-help surface in its C4 contract.",
+      "fix": "Add `internal/cli/fence.go` as a binding reference and require task 4 to update and gate the `vloop fence check` long help so it names the new pwsh/powershell/cmd wrapper behavior."
+    }
+  ],
+  "decisions": [
+    "Parity with sh, not a pwsh sandbox: pwsh file cmdlets and script-file invocation remain unjudged; this matches the stated advisory-fence boundary.",
+    "pwsh and powershell wrappers are inspected rather than refused outright, with nonliteral command forms denied; appropriate and runnable.",
+    "Script blocks are refused rather than parsed, with the three simplified cmdlet forms retained; appropriate scope.",
+    "Only `(<pipeline>).<Property>` and literal `$env:<NAME> = <value>` are read; the other parenthesis, substitution, cast-method and escape forms fail closed.",
+    "cmd's `/c` and `/k` strings are inspected with literal `%` and `^` restrictions; appropriate parity treatment.",
+    "W2-W4 use the powershell dialect for direct powershell calls and pwsh/powershell wrapper strings under either tool, while sh strings remain POSIX; clear and consistent.",
+    "The guide receives one pwsh bullet and the audit receives W1/W2 rows; the fence's denial text, rather than skill text, carries the guidance."
+  ],
+  "checked": "facts, consistency, rules, runnability; checked CLAUDE.md, the dependency brief, every binding reference, .vloop/config.toml, the fence judge/lexer/wrapper code and tests, B40's recorded denial metrics, a ready-copy `vloop brief check`, and baseline `vloop fence check` probes",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

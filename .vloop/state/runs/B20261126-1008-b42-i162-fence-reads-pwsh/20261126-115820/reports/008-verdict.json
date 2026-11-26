@@ -1,0 +1,29 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "docs/guide/configuration.md's The fence hook section gains one bullet that states the W1 wrapper behavior, W2's refused pwsh eval-like commands and script blocks, W3's two read forms and W4's refusal guidance without implying that all pwsh is parsed.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:241 adds the single PowerShell bullet covering literal wrappers/fail-closed forms, W2 refusals, the bounded property and $env read forms, and explicit guidance; it also states this is not a full PowerShell parser."
+    },
+    {
+      "criterion": "docs/design-notes/fence-audit.md gains rows for W1 wrappers and W2 dynamic execution/script blocks, with the correct hook and driver enforcement claims and no unrelated audit prose changed.",
+      "met": true,
+      "evidence": "The HEAD diff adds only W1 and W2 rows at docs/design-notes/fence-audit.md:58, :256, :445, :640, :841 and :1036, each assigning hook and driver enforcement and describing the driver's re-judgment."
+    },
+    {
+      "criterion": "vloop fence check --help names pwsh and powershell -Command and cmd /c in its wrapper list and states that powershell calls refuse pwsh eval-like commands and script blocks.",
+      "met": true,
+      "evidence": "internal/cli/fence.go:35-42 expands the long-help wrapper list with pwsh, powershell -Command and cmd /c, then says pwsh eval-like commands and script blocks are refused in a powershell call."
+    },
+    {
+      "criterion": "docs/guide/commands.md is regenerated from the command tree so the three required help additions are present, and no skill text changes.",
+      "met": true,
+      "evidence": "internal/cli/fence.go opts into the long-description annotation and internal/cli/commands_doc.go:27-34 renders annotated long help; docs/guide/commands.md:177-183 contains the wrapper and refusal additions, and git diff --name-only HEAD contains no skill files."
+    }
+  ],
+  "findings": [],
+  "notes": "The pass is based on the product diff and the successful go check; the T4 gate log contains no additional output."
+}

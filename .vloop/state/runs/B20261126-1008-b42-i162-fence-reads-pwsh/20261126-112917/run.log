@@ -1,0 +1,14 @@
+checking the base: go
+the plan B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan was for docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md — you asked for docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md using mai-code-2
+   plan · 5m40s · $0.21 · run $0.21 / $40.00
+checking the gate of T1 on the base
+checking the gate of T2 on the base
+checking the gate of T3 on the base
+checking the gate of T4 on the base
+checking the gate of T5 on the base
+planned: B20261126-1008-b42-i162-fence-reads-pwsh — 5 tasks
+reviewing the gates using mai-code-2 (round 1)
+   gate review · 5m40s · $0.10 · run $0.30 / $40.00
+vloop: read_powershell — tool read_powershell is not allowed in a gate-review session
+FENCE BYPASSED gate-review — the session ran 1 call(s) its fence denies; nothing from it was used

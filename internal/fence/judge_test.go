@@ -713,3 +713,52 @@ func TestExpandedWords(t *testing.T) {
 		})
 	}
 }
+
+// Copilot runs a long shell command as a shell session the agent, or its
+// runtime on its own, reads, lists and stops later. Those calls touch only a
+// command the fence already judged, so every phase allows them; writing input
+// to a running shell stays denied.
+func TestShellSessionTools(t *testing.T) {
+	for _, phase := range []string{PhaseReview, PhaseSecondReview, PhaseWork, PhaseVerify, PhaseGateReview, PhasePlan, PhaseReviewBrief} {
+		j, _, _ := newJudge(t, phase)
+		for _, shell := range []string{"powershell", "bash"} {
+			for _, verb := range []string{"read", "list", "stop"} {
+				tool := verb + "_" + shell
+				if d := j.Decide(tool, "", ""); !d.Allow {
+					t.Errorf("[%s] %s denied: %s", phase, tool, d.Reason)
+				}
+			}
+			tool := "write_" + shell
+			want := "tool " + tool + " is not allowed in a " + phase + " session"
+			if d := j.Decide(tool, "", ""); d.Allow || d.Reason != want {
+				t.Errorf("[%s] %s: allow = %v, reason %q, want %q", phase, tool, d.Allow, d.Reason, want)
+			}
+		}
+	}
+}
+
+// An alias names another command, so defining one is eval by another name;
+// in a cmd string, start and call run another command.
+func TestIndirectCommands(t *testing.T) {
+	j, _, _ := newJudge(t, PhaseWork)
+	for _, c := range []struct{ tool, cmd, reason string }{
+		{"powershell", "Set-Alias x iex; x 'git push'", "Set-Alias is not allowed"},
+		{"powershell", "New-Alias x git; x push", "New-Alias is not allowed"},
+		{"powershell", "sal x git", "sal is not allowed"},
+		{"powershell", "nal x git", "nal is not allowed"},
+		{"powershell", "Import-Alias a.csv", "Import-Alias is not allowed"},
+		{"powershell", "ipal a.csv", "ipal is not allowed"},
+		{"powershell", "cmd /c start git push", "start is not allowed"},
+		{"powershell", "cmd /c call git push", "call is not allowed"},
+		{"bash", "cmd /c START git push", "START is not allowed"},
+	} {
+		if d := j.Decide(c.tool, "", c.cmd); d.Allow || d.Reason != c.reason {
+			t.Errorf("%s %q: allow = %v, reason %q, want %q", c.tool, c.cmd, d.Allow, d.Reason, c.reason)
+		}
+	}
+	for _, c := range []string{"cmd /c git status", "Get-Alias"} {
+		if d := j.Decide("powershell", "", c); !d.Allow {
+			t.Errorf("%q denied: %s", c, d.Reason)
+		}
+	}
+}

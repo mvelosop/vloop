@@ -1,0 +1,43 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "FAIL",
+  "criteria": [
+    {
+      "criterion": "For both the bash and powershell tools, pwsh and powershell accept only the pinned literal -Command/-c form after the allowed pre-options, judge every remaining word joined with spaces as a powershell call, preserve the phase and root, and count each wrapper toward the eight-level nesting limit.",
+      "met": false,
+      "evidence": "internal/fence/expand.go:200 advances past -ExecutionPolicy's value without checking exp; an expanded structural value is accepted and can inject additional pwsh arguments. Literal command joining, phase/root reuse, and the depth boundary otherwise appear in expand.go:205-224, judge.go:384-398 and wrappers_test.go:79-103."
+    },
+    {
+      "criterion": "Missing, expanded, encoded, file, stdin, bare-script and unsupported-option pwsh forms fail closed with the exact W1 reasons, including the wrapper's written pwsh or powershell name where specified.",
+      "met": true,
+      "evidence": "internal/fence/expand.go:193-242 implements the listed refusal branches, and wrappers_test.go:15-45 checks the missing command-string, expanded command string, stdin, file, bare-script, encoded and unsupported-option reasons through both outer tools."
+    },
+    {
+      "criterion": "cmd accepts only /c or /k after /d, /q and /s, judges its literal string split at &, &&, || and |, and denies % or ^; every other cmd form fails closed with the exact W1 reason.",
+      "met": false,
+      "evidence": "internal/fence/judge.go:278-287 sends each splitCMD part through splitPowerShell, whose lexer also splits at ';' and newline (split.go:314-317); cmd therefore does not implement the pinned four-operator grammar. cmdString does enforce its pre-options and literal command expansion, and shellMode denies % and ^."
+    },
+    {
+      "criterion": "A command inside a wrapper is allowed or denied exactly as the same command in the wrapped tool would be, including case-insensitive command and option matching and names with a path or .exe.",
+      "met": false,
+      "evidence": "A cmd string is judged by the PowerShell lexer (judge.go:281), so cmd /c \"echo ok; git push\" is split into a denied second PowerShell statement although ';' is literal in cmd. Conversely, a direct command under cmd's specified wrapped semantics is not matched with the same result."
+    },
+    {
+      "criterion": "Committed Go tests cover the allowed and refused wrapper forms, option and name variants, command matching, nesting, phase/root preservation and both outer tools, and the go check executes them.",
+      "met": true,
+      "evidence": "internal/fence/wrappers_test.go covers both outer tools, wrapper spellings/options/paths, allowed and refused forms, command matching, phase/root writes and the nesting boundary; .vloop/tmp/checks.json's go check exited 0 and its log runs internal/fence successfully."
+    }
+  ],
+  "findings": [
+    {
+      "summary": "pwsh -ExecutionPolicy accepts an expanded value without refusing it, so structural argument expansion can inject options that the fence never judges.",
+      "kind": "bug"
+    },
+    {
+      "summary": "cmd command strings are reparsed as PowerShell, adding semicolon and newline separators that the W1 cmd grammar explicitly excludes and changing the wrapper's decisions.",
+      "kind": "bug"
+    }
+  ],
+  "notes": "The committed tests should pin an expanded -ExecutionPolicy/-ep value and a semicolon/newline inside cmd /c so these fail-closed and grammar-parity gaps cannot regress."
+}

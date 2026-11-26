@@ -1,0 +1,13 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [],
+  "not_run": [],
+  "checked": {
+    "example_lines": 26,
+    "sentences": 27,
+    "surfaces": 6
+  },
+  "notes": "All three passes complete with no discrepancies. The supplemental hook invocation was denied by the active tool fence, so the hook's matching reason-prefix behaviour was checked in the changed code instead."
+}
+

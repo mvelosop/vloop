@@ -32,6 +32,14 @@ func xargsCommand(ws []string, plain, exp []bool, repl string) ([]string, []bool
 // the adapter's stems covers: as written first, then with each expanded word
 // standing for any text.
 func (j *Judge) match(ws []string, exp []bool) string {
+	return j.matchMode(ws, exp, false)
+}
+
+func (j *Judge) matchFold(ws []string, exp []bool) string {
+	return j.matchMode(ws, exp, true)
+}
+
+func (j *Judge) matchMode(ws []string, exp []bool, fold bool) string {
 	var shown []string
 	anyExp := false
 	for i, w := range ws {
@@ -41,13 +49,31 @@ func (j *Judge) match(ws []string, exp []bool) string {
 		anyExp = anyExp || exp[i]
 	}
 	text := strings.Join(shown, " ")
-	for _, p := range j.fence {
-		if patternMatch(p, text) {
+	compareText, compareWS := text, ws
+	pattern := patternMatch
+	meets := patternMeets
+	patterns := func(values []string) []string { return values }
+	if fold {
+		compareText = strings.ToLower(text)
+		compareWS = append([]string(nil), ws...)
+		for i := range compareWS {
+			compareWS[i] = strings.ToLower(compareWS[i])
+		}
+		patterns = func(values []string) []string {
+			out := make([]string, len(values))
+			for i, value := range values {
+				out[i] = strings.ToLower(value)
+			}
+			return out
+		}
+	}
+	for _, p := range patterns(j.fence) {
+		if pattern(p, compareText) {
 			return fmt.Sprintf("%s is denied by the %s fence (Bash(%s))", text, j.fenceLabel(), p)
 		}
 	}
-	for _, p := range j.stems {
-		if patternMatch(p, text) {
+	for _, p := range patterns(j.stems) {
+		if pattern(p, compareText) {
 			return fmt.Sprintf("%s is denied by the Copilot deny list (%s)", text, p)
 		}
 	}
@@ -55,13 +81,13 @@ func (j *Judge) match(ws []string, exp []bool) string {
 		return ""
 	}
 	const suffix = ": a word the shell expands may be any text"
-	for _, p := range j.fence {
-		if patternMeets(p, ws, exp) {
+	for _, p := range patterns(j.fence) {
+		if meets(p, compareWS, exp) {
 			return fmt.Sprintf("%s is denied by the %s fence (Bash(%s))%s", text, j.fenceLabel(), p, suffix)
 		}
 	}
-	for _, p := range j.stems {
-		if patternMeets(p, ws, exp) {
+	for _, p := range patterns(j.stems) {
+		if meets(p, compareWS, exp) {
 			return fmt.Sprintf("%s is denied by the Copilot deny list (%s)%s", text, p, suffix)
 		}
 	}
@@ -131,6 +157,7 @@ func shellString(rest []string, exp []bool, repls []string) (string, string) {
 		if isOpt && exp[i] {
 			return "", o + before
 		}
+
 		switch {
 		case o == "-o" || o == "+o":
 			i++
@@ -157,8 +184,94 @@ func shellString(rest []string, exp []bool, repls []string) (string, string) {
 		default:
 			return "", "runs a script or stdin, not a literal -c string"
 		}
+
 	}
 	return "", "runs a script or stdin, not a literal -c string"
+}
+
+// powerShellString finds the literal -Command string of pwsh/powershell.
+func powerShellString(rest []string, exp []bool, repls []string) (string, string) {
+	const refusal = "runs a script, stdin or an encoded command, not a literal -Command string"
+	for i := 0; i < len(rest); i++ {
+		o := strings.ToLower(rest[i])
+		switch o {
+		case "-noprofile", "-nop", "-noninteractive", "-noni", "-nologo", "-nol":
+			continue
+		case "-executionpolicy", "-ep":
+			i++
+			if i >= len(rest) {
+				return "", refusal
+			}
+			if exp[i] {
+				return "", rest[i] + " expands before the command string and cannot be judged"
+			}
+			continue
+		case "-command", "-c":
+			if i+1 >= len(rest) {
+				return "", "-Command has no command string"
+			}
+			command := rest[i+1:]
+			commandExp := exp[i+1:]
+			if command[0] == "-" {
+				return "", refusal
+			}
+			for k, w := range command {
+				if commandExp[k] {
+					return "", "the -Command string expands and cannot be judged"
+				}
+				for _, r := range repls {
+					if strings.Contains(w, r) {
+						return "", "the -Command string holds xargs' replace string " + r + " and cannot be judged"
+					}
+				}
+			}
+			return strings.Join(command, " "), ""
+		default:
+			return "", refusal
+		}
+	}
+	return "", refusal
+}
+
+// cmdString finds the literal /c or /k string after cmd's allowed pre-options.
+func cmdString(rest []string, exp []bool) (string, string) {
+	const refusal = "runs stdin or a batch file, not a literal /c string"
+	for i := 0; i < len(rest); i++ {
+		switch strings.ToLower(rest[i]) {
+		case "/d", "/q", "/s":
+			continue
+		case "/c", "/k":
+			if i+1 >= len(rest) {
+				return "", refusal
+			}
+			for _, expanded := range exp[i+1:] {
+				if expanded {
+					return "", refusal
+				}
+			}
+			return strings.Join(rest[i+1:], " "), ""
+		default:
+			return "", refusal
+		}
+	}
+	return "", refusal
+}
+
+// splitCMD cuts a cmd command line at its four command operators.
+func splitCMD(s string) []string {
+	var out []string
+	start := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] != '&' && s[i] != '|' {
+			continue
+		}
+		out = append(out, strings.TrimSpace(s[start:i]))
+		if i+1 < len(s) && s[i+1] == s[i] {
+			i++
+		}
+		start = i + 1
+	}
+	return append(out, strings.TrimSpace(s[start:]))
 }
 
 // patternMeets reports whether some text in place of the expanded words makes

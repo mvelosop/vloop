@@ -1,0 +1,32 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Starting point / frontmatter depends-on",
+      "summary": "The stated base sequence names B41, but no B41 exists in the repository or dependency chain, so the base SHA and dependency decision cannot be pinned as written.",
+      "evidence": "docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md:7-13 says it extends main after B41's merge and depends only on B40; the docs/briefs tree has no B41 or other B20261126 brief; git log -8 shows origin/main and main at 87536f4e, 'B40: mixed-OS teams - platforms, required pwsh, portable checks and gates (#163)', with no later merge.",
+      "fix": "Confirm whether B41 is a typo or a real predecessor. If it is a typo, name B40's merged main as the starting point. If it is real, supply its repository brief and add it to depends-on in the intended order."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example",
+      "summary": "The worked example requires a scratch repository prepared with vloop init even though that command is denied to verify sessions and fence check does not require initialization.",
+      "evidence": "docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md:238 says <repo> has vloop init run; fence/verify.json:61 denies Bash(vloop init:*). internal/cli/fence.go:39-56 resolves --root and calls fence.New directly, so fence check needs a directory, not an initialized repository.",
+      "fix": "Define <repo> as any temporary directory, or name tests that cover the prerequisite and state that the verify session uses the existing repository root. If initialization is genuinely required, move its setup to operator acceptance and name the corresponding automated coverage."
+    }
+  ],
+  "decisions": [
+    "Parity with sh rather than a complete PowerShell sandbox; the probe's pwsh file cmdlets and script-file invocation remain out of scope.",
+    "Inspect literal -Command and /c command strings in pwsh, powershell, and cmd wrappers instead of refusing the wrappers.",
+    "Refuse PowerShell eval-like cmdlets, their listed aliases, and script blocks rather than parse script-block bodies.",
+    "Read only parenthesized pipeline property access and literal $env assignments; leave other PowerShell expression forms fail-closed.",
+    "Apply W2-W4 to the powershell tool and to strings handed over by a wrapper in either tool; keep direct bash-tool PowerShell forms under the existing POSIX judgment.",
+    "Update the configuration guide and fence audit only; denial text carries the agent guidance, so no skill text changes."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 2 findings"
+}
+

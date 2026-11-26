@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Executive summary; W1; W2; W4",
+      "summary": "The stated W4 promise that every pwsh-specific denial says what to write instead conflicts with the literal denials in W1 and W2.",
+      "evidence": "docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md:42 and :169 promise steering for pwsh denials, but the exact messages at W1/W2 (:127-150) include `the -Command string expands and cannot be judged`, `-Command has no command string`, `pwsh: runs a script, stdin or an encoded command, not a literal -Command string`, `cmd: % and ^ cannot be judged`, and `<name> is not allowed`; those messages give no replacement.",
+      "fix": "Either narrow the summary and W4 claim to the four syntax refusals W4 actually changes, or keep the broad promise and pin literal replacement guidance for every W1 and W2 denial (and update the worked example to match)."
+    },
+    {
+      "kind": "runnability",
+      "section": "Shape, task 4",
+      "summary": "The prose-only documentation task has no disposition for repeated review failures.",
+      "evidence": "docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md:283 gates task 4 only on the two texts being present. The create-brief guidelines' `What the loop can and cannot do` require a prose-only task to state what happens if review rejects wording twice.",
+      "fix": "State that two wording rejections block the task and hand the documentation wording to the operator, or give another explicit repeat-failure disposition."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references",
+      "summary": "The brief relies on the shell lexer that produces and will parse the W3/W4 forms but does not bind it.",
+      "evidence": "The brief cites internal/fence/judge.go and internal/fence/expand.go, but not internal/fence/split.go. split.go:43, :260 and :269 own the current subshell, backtick and command-substitution refusals that W3/W4 replace for powershell; the brief's before-behaviour and syntax scope depend on that code.",
+      "fix": "Add internal/fence/split.go to Binding references with a reason covering its lexer, quote state, parentheses/backtick refusals and the POSIX branch that must remain unchanged."
+    }
+  ],
+  "decisions": [
+    "W2-W4 apply to the powershell tool and to W1's pwsh/powershell -Command strings under either tool; a direct bash call and sh -c inside a pwsh string remain POSIX. Sound: this keeps the promised bash surface unchanged.",
+    "The configuration guide gets one pwsh fence bullet and the audit gets W1/W2 rows; denial text, rather than skill changes, carries the guidance. Sound if the denial-text inconsistency above is fixed.",
+    "Set-Content .git/config, Remove-Item -Recurse -Force .git, New-Item ~/.claude/x and & ./x.ps1 remain unjudged by parity with sh. This deliberately preserves the advisory fence's current boundary; I would retain it and keep the driver as the boundary (S-2)."
+  ],
+  "checked": "facts, consistency, rules, runnability; ready-copy brief check; predecessor and binding references; judge, lexer and fence config; B40 denial records; base fence probes; task/check ordering",
+  "header": "Reviewed 2026-11-26: FIX, 3 findings"
+}
+

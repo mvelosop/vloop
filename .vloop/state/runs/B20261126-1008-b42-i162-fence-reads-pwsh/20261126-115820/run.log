@@ -1,0 +1,80 @@
+checking the base: go
+the plan B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan was for docs/briefs/B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan.loop-brief.md — you asked for docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md using mai-code-2
+   plan · 5m20s · $0.26 · run $0.26 / $40.00
+checking the gate of T1 on the base
+checking the gate of T2 on the base
+checking the gate of T3 on the base
+checking the gate of T4 on the base
+checking the gate of T5 on the base
+planned: B20261126-1008-b42-i162-fence-reads-pwsh — 5 tasks
+reviewing the gates using mai-code-2 (round 1)
+   gate review · 1m59s · $0.08 · run $0.34 / $40.00
+committing the plan
+── iteration 1 (1 this run) · T1 · 0/5 done ──
+   Judge pwsh and cmd wrappers
+   work T1 · 6m09s · $0.23 · run $0.57 / $40.00
+   check go
+   review T1 · 2m31s · $0.13 · run $0.71 / $40.00
+   review: FAIL
+── iteration 2 (2 this run) · T1 · 0/5 done ──
+   Judge pwsh and cmd wrappers
+   work T1 · 3m24s · $0.11 · run $0.82 / $40.00
+   check go
+   review T1 · 2m07s · $0.08 · run $0.90 / $40.00
+   review: FAIL
+── iteration 3 (3 this run) · T1 · 0/5 done ──
+   Judge pwsh and cmd wrappers
+   work T1 · 2m14s · $0.12 · run $1.02 / $40.00
+   check go
+   review T1 · 1m56s · $0.11 · run $1.14 / $40.00
+   review: PASS
+   T1 done
+── iteration 4 (4 this run) · T2 · 1/5 done ──
+   Refuse pwsh evaluation forms
+   work T2 · 3m08s · $0.12 · run $1.26 / $40.00
+   check go
+   review T2 · 1m48s · $0.11 · run $1.36 / $40.00
+   review: FAIL
+── iteration 5 (5 this run) · T2 · 1/5 done ──
+   Refuse pwsh evaluation forms
+   work T2 · 1m36s · $0.08 · run $1.44 / $40.00
+   check go
+   review T2 · 1m41s · $0.06 · run $1.51 / $40.00
+   review: PASS
+   T2 done
+── iteration 6 (6 this run) · T3 · 2/5 done ──
+   Read common pwsh forms and guide refusals
+   work T3 · 5m22s · $0.19 · run $1.70 / $40.00
+   check go
+   review T3 · 2m27s · $0.12 · run $1.82 / $40.00
+   review: FAIL
+── iteration 7 (7 this run) · T3 · 2/5 done ──
+   Read common pwsh forms and guide refusals
+   work T3 · 1m17s · $0.09 · run $1.91 / $40.00
+   check go
+   review T3 · 2m00s · $0.11 · run $2.02 / $40.00
+   review: PASS
+   T3 done
+── iteration 8 (8 this run) · T4 · 3/5 done ──
+   Document the pwsh fence rules
+   work T4 · 3m16s · $0.23 · run $2.25 / $40.00
+   check go
+   review T4 · 0m59s · $0.06 · run $2.31 / $40.00
+   review: PASS
+   T4 done
+── iteration 9 (9 this run) · T5 · 4/5 done ──
+   Verify the complete pwsh fence contract
+   work T5 · 1m03s · $0.07 · run $2.38 / $40.00
+   check go
+   review T5 · 1m35s · $0.10 · run $2.48 / $40.00
+   review: PASS
+   T5 done
+   check go
+   verify · 4m32s · $0.27 · run $2.75 / $40.00
+verify: no findings
+
+═══ complete ═══
+run:    B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820  (9 iteration(s) this run)
+plan:   5/5 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1008-b42-i162-fence-reads-pwsh.md

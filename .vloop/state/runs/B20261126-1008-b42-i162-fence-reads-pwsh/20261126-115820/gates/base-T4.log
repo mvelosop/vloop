@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T4\gate.ps1:15
+[36;1mLine |[0m
+[36;1m[36;1m  15 | [0m … not $flat.Contains($Needle)) { [36;1mthrow "$Surface is missing: $Needle"[0m }
+[36;1m     | [31;1m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mvloop fence check --help is missing: pwsh and powershell -Command[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m

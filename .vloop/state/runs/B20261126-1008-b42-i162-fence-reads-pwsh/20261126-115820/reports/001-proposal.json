@@ -1,0 +1,14 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "The fence now judges literal pwsh, powershell, and cmd wrapper command strings with the same phase and root as direct calls, including case-insensitive matching, fail-closed invocation errors, and nesting limits.",
+  "files": [
+    "internal/fence/expand.go",
+    "internal/fence/judge.go",
+    "internal/fence/split.go",
+    "internal/fence/wrappers_test.go"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: pass; go test ./internal/fence exited 0.",
+  "notes": "Added separate POSIX, PowerShell, and cmd judging modes; wrapper recursion enters PowerShell/cmd mode, while sh -c remains POSIX. Committed tests cover both outer tools, exact refusals, path and case variants, separator matching, phase/root preservation, and the eight-level boundary."
+}

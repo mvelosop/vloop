@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T4\gate.ps1:16
+[36;1mLine |[0m
+[36;1m[36;1m  16 | [0m …    if (-not $help.Contains($line)) { [36;1mthrow "help is missing: $line"[0m }
+[36;1m     | [31;1m                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mhelp is missing: pwsh and powershell -Command, and cmd /c[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m
