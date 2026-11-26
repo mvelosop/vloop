@@ -1,0 +1,20 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief",
+  "verdict": "PASS",
+  "findings": [],
+  "decisions": [
+    "Choose parity with sh rather than a full pwsh sandbox; keep pwsh file cmdlets and & ./script.ps1 unjudged. Sound scope.",
+    "Judge pwsh -Command and cmd /c or /k strings instead of refusing those wrappers. Sound, because it preserves legitimate use while matching sh wrappers.",
+    "Refuse script blocks rather than parse them, and direct sessions to the supported simplified cmdlets. Sound, because it keeps the change bounded and fail-closed.",
+    "Read exactly the two B40 forms: member property access on a parenthesized pipeline and literal $env assignments. Sound, targeted scope.",
+    "Judge cmd with the existing splitter and refuse % and ^ rather than parsing cmd fully. Sound for the advisory, fail-closed fence.",
+    "Apply W2-W4 to powershell calls and strings handed to powershell by W1, while sh -c remains POSIX and direct bash calls retain their current judgement.",
+    "Extend the configuration guide and fence audit; carry all user guidance in denial messages and change no skills.",
+    "Name pwsh, powershell -Command and cmd /c in fence help, document the pwsh eval and script-block refusal, and regenerate the command guide.",
+    "Leave Set-Content, Remove-Item, New-Item and & ./x.ps1 unchanged under the parity decision."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: PASS, 0 findings"
+}
+
