@@ -53,7 +53,10 @@ func TestPluginSkillsMixedTeamPortability(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	planText := string(plan)
+	normalize := func(s string) string {
+		return strings.Join(strings.Fields(s), " ")
+	}
+	planText := normalize(string(plan))
 	for _, want := range []string{
 		"vloop config get platforms",
 		"two or more configured platforms",
@@ -64,12 +67,12 @@ func TestPluginSkillsMixedTeamPortability(t *testing.T) {
 		"BSD `grep`, `sed`, `awk` and `date`",
 		"`" + strings.Join(driver.PlatformSpecificCommands, "`, `") + "`",
 	} {
-		if !strings.Contains(planText, want) {
+		if !strings.Contains(planText, normalize(want)) {
 			t.Errorf("plan skill is missing mixed-team rule %q", want)
 		}
 	}
 
-	reviewText := string(gateReview)
+	reviewText := normalize(string(gateReview))
 	for _, want := range []string{
 		"vloop config get platforms",
 		"two or more configured platforms",
@@ -77,7 +80,7 @@ func TestPluginSkillsMixedTeamPortability(t *testing.T) {
 		"`unpassable`, even if the gate passes on the reviewing host",
 		"does not replace that enforcement point",
 	} {
-		if !strings.Contains(reviewText, want) {
+		if !strings.Contains(reviewText, normalize(want)) {
 			t.Errorf("gate-review skill is missing mixed-team rule %q", want)
 		}
 	}

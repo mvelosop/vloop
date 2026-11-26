@@ -1,0 +1,5 @@
+── iteration 5 (1 this run) · T4 · 3/6 done ──
+   Teach skills to write portable mixed-team gates
+   work T4 · 4m35s · $0.09 · run $0.09 / $40.00
+   check go
+   CHECK FAIL T4 — check go failed — see .vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261126-000247/checks/005-go.fail.log; review skipped

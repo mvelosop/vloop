@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":154429,"exit":1,"name":"go"}],"ended":"2026-11-26T00:10:01Z","gate":{"duration_ms":250,"exit":0},"iteration":5,"outcome":"check_failed","run_id":"B20261125-2207-b40-i156-mixed-os-pwsh","schema":"iteration/v2","started":"2026-11-26T00:02:47Z","task":"T4"}
