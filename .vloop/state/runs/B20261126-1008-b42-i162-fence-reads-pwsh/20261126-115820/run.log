@@ -49,3 +49,10 @@ committing the plan
    check go
    review T3 · 2m27s · $0.12 · run $1.82 / $40.00
    review: FAIL
+── iteration 7 (7 this run) · T3 · 2/5 done ──
+   Read common pwsh forms and guide refusals
+   work T3 · 1m17s · $0.09 · run $1.91 / $40.00
+   check go
+   review T3 · 2m00s · $0.11 · run $2.02 / $40.00
+   review: PASS
+   T3 done

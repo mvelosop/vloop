@@ -220,7 +220,7 @@ func (l *lexer) opens() bool {
 }
 
 func (l *lexer) startsPowerShellRead() bool {
-	return !l.in && !l.closed && l.pend == pendNone &&
+	return !l.in && !l.closed && !l.pipe && l.pend == pendNone &&
 		len(l.cur.words) == 0 && len(l.cur.writes) == 0 && len(l.cur.reads) == 0
 }
 

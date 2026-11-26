@@ -164,6 +164,8 @@ func TestPowerShellPropertyStatements(t *testing.T) {
 		{"denied inner pipeline", `(Get-Content a | git push).Length`, push},
 		{"dynamic inner command", `(Get-Content a | iex 'git push').Length`, "iex is not allowed"},
 		{"script block inner command", `(Get-Content a | ForEach-Object { $_.Name }).Length`, scriptBlockRefusal},
+		{"non-leading pipeline stage", `Get-Content a | (Get-Content b).Name`, parentheses},
+		{"non-leading conditional stage", `Get-Content a || (Get-Content b).Name`, parentheses},
 		{"method", `(Get-Content a).Trim()`, parentheses},
 		{"argument", `Write-Output (Get-Content a)`, parentheses},
 		{"array", `@(git status)`, parentheses},

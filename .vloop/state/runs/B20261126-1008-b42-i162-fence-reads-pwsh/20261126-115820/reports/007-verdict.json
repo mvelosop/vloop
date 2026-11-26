@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "A powershell statement or leading pipeline stage of the exact (<pipeline>).<Property> form judges its parentheses contents as a powershell call and allows only one or more letter, digit or underscore property-path components with no trailing syntax except end of statement or |; method calls and parentheses in every other position deny with W4's reason.",
+      "met": true,
+      "evidence": "internal/fence/split.go:222-224 limits PowerShell read starts to non-pipeline command boundaries; split.go:363-383 recognizes the bounded property form and recursively judges its contents; split.go:522-589 validates one or more alphanumeric/underscore components and only permits statement terminators or |. wrappers_test.go:153-205 covers leading reads and pipeline, method, argument, invalid-path and non-leading-stage cases with the exact W4 reason."
+    },
+    {
+      "criterion": "A powershell whole statement $env:<NAME> = <literal> with a valid non-digit-leading name and one non-expanding literal is allowed and does not stop judging following commands; every other $env: statement keeps the existing command-word-starts-with-$ reason using the split first word.",
+      "met": true,
+      "evidence": "internal/fence/split.go:256-270 recognizes env assignments only at PowerShell statement starts, continues scanning following commands, and emits the split first word on invalid forms; split.go:591-671 enforces the name and literal boundaries. wrappers_test.go:207-245 pins valid forms, invalid names/values, following-command behavior, pipeline positions and exact legacy reasons."
+    },
+    {
+      "criterion": "In a powershell call, unsupported parentheses and @(…) use the exact parentheses guidance, $(…) uses the exact inner-command guidance, a backtick uses the exact one-line guidance, and @{…} reaches W2's script-block denial.",
+      "met": true,
+      "evidence": "internal/fence/split.go:57-63 defines the three exact W4 messages, and split.go:291-314, 347-355 and 363-383 apply them to substitutions, backticks and unsupported parentheses while the existing unquoted-{ branch returns W2's reason. wrappers_test.go:173-184 and 247-263 assert these outcomes, including @(…), $(…), backticks and script blocks."
+    },
+    {
+      "criterion": "W2-W4's PowerShell-specific judgment also applies inside pwsh/powershell -Command strings, while sh -c inside such a string remains POSIX and direct bash-tool calls retain the old refusals and reasons.",
+      "met": true,
+      "evidence": "internal/fence/judge.go:308-313 recursively judges each W3 inner string in PowerShell mode, while the T1 wrapper dispatch passes pwsh -Command strings through PowerShell and sh -c retains POSIX mode. wrappers_test.go:181-184, 244 and 252-263 cover wrapped property/env/guidance cases; the bash cases retain subshell, command-word and command-substitution reasons."
+    },
+    {
+      "criterion": "Committed Go tests cover both successful W3 forms, the invalid-name/value boundaries, property and pipeline positions, the exact W4 reasons, nested W1/W2/W3 interactions and bash non-regressions, and the go check executes them.",
+      "met": true,
+      "evidence": "internal/fence/wrappers_test.go:153-263 adds table-driven W3/W4 coverage, including non-leading | and || stages at lines 176-177, invalid env boundaries, W1 wrappers, W2 commands/script blocks inside properties, and bash refusals. .vloop/tmp/checks.json records the go check at exit 0 and .vloop/state/runs/B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820/checks/go.log shows internal/fence passed."
+    }
+  ],
+  "findings": [],
+  "notes": "The repair attempt fixes the prior pipeline-position defect and adds two regression cases for property reads after existing pipeline operators."
+}
