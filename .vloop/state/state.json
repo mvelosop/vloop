@@ -5,9 +5,9 @@
   "base": "04c5526e85ea6a6483b153c55a4f8f241a85006c",
   "branch": "B20261125-2207-b40-i156-mixed-os-pwsh",
   "status": "running",
-  "iteration": 8,
+  "iteration": 9,
   "created": "2026-11-25T23:09:54Z",
-  "updated": "2026-11-26T00:35:38Z",
+  "updated": "2026-11-26T00:40:32Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -253,9 +253,9 @@
         "No repository without platforms changes doctor, run or plan acceptance behavior except the specified default-shell warning, and the final regression coverage names that violation explicitly."
       ],
       "verify": "$o = go test ./.vloop/state/gates/T6 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "The end-to-end test checks sorted platform messages but never includes a duplicate, so it does not prove the required deduplicated rendering."
+      "notes": ""
     }
   ]
 }

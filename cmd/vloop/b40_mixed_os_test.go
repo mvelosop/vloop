@@ -54,6 +54,15 @@ func TestWorkedExampleB40(t *testing.T) {
 		b40NeedDoctorRow(t, s, nil, "platforms", "pass", "macos, windows")
 	}
 
+	expect(t, s.run(nil, "config", "set", "platforms", "windows,macos,windows"), 0, "", "")
+	expect(t, s.run(nil, "config", "get", "platforms"), 0, "windows,macos,windows\n", "")
+	if runtime.GOOS == "linux" {
+		b40NeedDoctorRow(t, s, nil, "platforms", "warning",
+			"this machine (linux) is not one of macos, windows")
+	} else {
+		b40NeedDoctorRow(t, s, nil, "platforms", "pass", "macos, windows")
+	}
+
 	expect(t, s.run([]string{"VLOOP_SHELL=pwsh"}, "config", "get", "shell"), 1, "",
 		`vloop: VLOOP_SHELL: shell belongs in .vloop/config.toml while platforms lists macos, windows — the checks and the gates are written for one shell`+"\n")
 	expect(t, s.run([]string{"VLOOP_PLATFORMS=linux"}, "config", "get", "platforms"), 1, "",
@@ -64,12 +73,12 @@ func TestWorkedExampleB40(t *testing.T) {
 		"vloop: .vloop/config.local.toml: platforms belongs in .vloop/config.toml — the platforms are the repository's, not one machine's\n")
 	expect(t, s.run(nil, "config", "set", "platforms", "macos,beos"), 2, "",
 		`vloop: invalid value "macos,beos" for platforms: want a comma-separated list of linux, macos, windows`+"\n")
-	expect(t, s.run(nil, "config", "get", "platforms"), 0, "windows,macos\n", "")
+	expect(t, s.run(nil, "config", "get", "platforms"), 0, "windows,macos,windows\n", "")
 
 	const brief = "docs/briefs/B20260101-0000-gate.loop-brief.md"
 	s.write(brief, "---\nname: B20260101-0000-gate.loop-brief\nstatus: ready\n---\n# Brief\n\n## Shape\n\n1 to 1 task.\n")
 	s.write(".vloop/config.toml",
-		"platforms = [\"windows\", \"macos\"]\n\n[[check]]\nname = \"go\"\npaths = [\"**\"]\nrun = \"go test ./... | grep ok\"\n")
+		"platforms = [\"windows\", \"macos\", \"windows\"]\n\n[[check]]\nname = \"go\"\npaths = [\"**\"]\nrun = \"go test ./... | grep ok\"\n")
 	b40Git(t, s, "config", "user.name", "test")
 	b40Git(t, s, "config", "user.email", "test@example.com")
 	b40Git(t, s, "config", "commit.gpgsign", "false")

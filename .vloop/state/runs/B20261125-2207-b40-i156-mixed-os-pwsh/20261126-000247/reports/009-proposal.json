@@ -1,0 +1,11 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "The mixed-team end-to-end workflow now preserves duplicate platform order in config output while proving doctor, override errors, and run preflight render sorted, deduplicated platforms.",
+  "files": [
+    "cmd/vloop/b40_mixed_os_test.go"
+  ],
+  "verified": "go test ./cmd/vloop -run '^(TestWorkedExampleB40|TestNoPlatformsRegressionViolationGuard)$' -count=1 exited 0; vloop task gate T6 exited 0 and printed pass.",
+  "notes": "The worked-example test sets windows,macos,windows after checking the original windows,macos flow, then verifies config get preserves stored order while doctor and all shell override/preflight messages use macos, windows."
+}

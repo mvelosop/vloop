@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **5/6 done** · iteration 8
+**Status:** running · **6/6 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-26T00:35:38Z
+**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-26T00:40:32Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Lint mixed-team gates for portable commands
 - [x] **T4** — Teach skills to write portable mixed-team gates · 1 attempt(s)
 - [x] **T5** — Document mixed teams and the repository policy
-- [ ] **T6** — Prove the complete mixed-team workflow · 1 attempt(s)
+- [x] **T6** — Prove the complete mixed-team workflow · 1 attempt(s)
 
 ## Tasks
 
@@ -135,7 +135,7 @@ if (-not (Select-String -Path docs/guide/configuration.md -SimpleMatch -Pattern 
 
 ### T6 — Prove the complete mixed-team workflow
 
-`pending` · 1 attempt(s) · depends on: T2, T3, T5
+`done` · 1 attempt(s) · depends on: T2, T3, T5
 
 Exercise the whole worked example after all component tasks so the six tasks close as one coherent feature rather than isolated fixes. This final task leaves durable end-to-end regression coverage for the config, doctor and preflight messages the brief pins.
 
@@ -146,8 +146,6 @@ Exercise the whole worked example after all component tasks so the six tasks clo
 - The end-to-end coverage drives vloop run with the platforms problem and portable-check warning and proves it exits 1 before a plan session starts.
 - This task leaves committed tests covering every worked-example line in the repository's existing test surface, runs on Windows, macOS and Linux without skips or real agents, and the go check runs them.
 - No repository without platforms changes doctor, run or plan acceptance behavior except the specified default-shell warning, and the final regression coverage names that violation explicitly.
-
-**From the last attempt:** The end-to-end test checks sorted platform messages but never includes a duplicate, so it does not prove the required deduplicated rendering.
 
 <details><summary>verify command</summary>
 

@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "A fresh temporary repository follows the worked example from default-shell doctor warning through config set platforms and shell, doctor pass or machine warning, each exact override refusal and invalid-value exit 2.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go: TestWorkedExampleB40 initializes a scratch repository, asserts both default-shell warning forms, config set/get, the missing-shell and host-specific doctor rows, VLOOP_SHELL and VLOOP_PLATFORMS read refusals, both --local refusals, and the invalid-value exit 2 via expect."
+    },
+    {
+      "criterion": "The end-to-end coverage proves vloop config get platforms prints the stored order, while doctor and errors print deduplicated sorted platforms.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go: after setting windows,macos,windows, config get must print that exact stored order, while the doctor row and every shell/platforms refusal and preflight assertion must print deduplicated macos, windows."
+    },
+    {
+      "criterion": "The end-to-end coverage drives vloop run with the platforms problem and portable-check warning and proves it exits 1 before a plan session starts.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go: TestWorkedExampleB40 invokes run --plan-only with no shared shell and a grep check, asserts exit 1 and both exact stderr lines, and checks that no state/runs, commit, branch change, or stub-agent marker appeared."
+    },
+    {
+      "criterion": "This task leaves committed tests covering every worked-example line in the repository's existing test surface, runs on Windows, macOS and Linux without skips or real agents, and the go check runs them.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go contains non-skipping TestWorkedExampleB40 and TestNoPlatformsRegressionViolationGuard in cmd/vloop's normal Go suite; it uses runtime.GOOS branches and a compiled stub agent. .vloop/tmp/checks.json and its go.log show the go check exited 0 and ran github.com/mvelosop/vloop/cmd/vloop."
+    },
+    {
+      "criterion": "No repository without platforms changes doctor, run or plan acceptance behavior except the specified default-shell warning, and the final regression coverage names that violation explicitly.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go: TestNoPlatformsRegressionViolationGuard explicitly names the compatibility violation, rejects platform-specific doctor and run output without platforms, verifies no agent starts, and calls driver.GateShapeProblems on an unscoped grep gate and requires no portability rejection."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}
