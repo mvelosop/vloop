@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "copilot-models/v1",
+  "description": "The models an account can use with GitHub Copilot and the account's Copilot plan, when known.",
+  "type": "object",
+  "required": ["schema", "plan", "models"],
+  "properties": {
+    "schema": { "const": "copilot-models/v1" },
+    "plan": { "type": ["string", "null"] },
+    "models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "policy", "picker"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "policy": { "enum": ["enabled", "disabled", null] },
+          "picker": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

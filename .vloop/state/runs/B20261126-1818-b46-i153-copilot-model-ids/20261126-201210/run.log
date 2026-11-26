@@ -1,0 +1,15 @@
+── iteration 11 (1 this run) · T6 · 5/6 done ──
+   Verify the Copilot model workflow end to end
+   work T6 · 1m12s · $0.06 · run $0.06 / $40.00
+   check go
+   review T6 · 1m19s · $0.03 · run $0.10 / $40.00
+   review: PASS
+   T6 done
+   check go
+   verify · 4m33s · $0.15 · run $0.25 / $40.00
+verify: no findings; 1 example line(s) not run — see .vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-201210/reports/verify.json
+
+═══ complete ═══
+run:    B20261126-1818-b46-i153-copilot-model-ids/20261126-201210  (1 iteration(s) this run)
+plan:   6/6 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1818-b46-i153-copilot-model-ids.md

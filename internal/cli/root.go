@@ -175,6 +175,7 @@ Start with vloop init in your repository, then vloop brief new to draft a brief.
 	pf.BoolVarP(&g.Quiet, "quiet", "q", false, "print less")
 	pf.BoolVarP(&g.Verbose, "verbose", "v", false, "print more")
 	root.AddCommand(newVersion(b, g))
+	root.AddCommand(newModels(g))
 	root.AddCommand(newConfig(g))
 	root.AddCommand(newBrief(b, g))
 	root.AddCommand(newSchema(g))

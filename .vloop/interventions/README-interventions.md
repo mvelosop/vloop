@@ -143,6 +143,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | verification-finding | no | no-options | [I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh](I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh.md) |
 | halt | verification-finding | partly | recommended | [I20261126-145532-b44-s-t1-gate-harness-assigned-home-powe](I20261126-145532-b44-s-t1-gate-harness-assigned-home-powe.md) |
 | halt | verification-finding | partly | recommended | [I20261126-153734-b44-s-t4-gate-asserted-both-doctor-plugi](I20261126-153734-b44-s-t4-gate-asserted-both-doctor-plugi.md) |
+| halt | verification-finding | partly | recommended | [I20261126-200120-b46-s-t6-close-gate-passed-but-was-weake](I20261126-200120-b46-s-t6-close-gate-passed-but-was-weake.md) |
+| halt | verification-finding | partly | recommended | [I20261126-201157-b46-s-t6-close-gate-was-disputed-a-secon](I20261126-201157-b46-s-t6-close-gate-was-disputed-a-secon.md) |
 | verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261101-230340-acceptance-on-the-real-cli-the-url-short](I20261101-230340-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261102-004526-acceptance-on-the-real-cli-the-url-short](I20261102-004526-acceptance-on-the-real-cli-the-url-short.md) |
@@ -228,6 +230,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261126-161111-s3-changed-doctor-s-plugin-warnings-but](I20261126-161111-s3-changed-doctor-s-plugin-warnings-but.md) |
 | verify | verification-finding | partly | no-options | [I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on](I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on.md) |
 | verify | verification-finding | partly | no-options | [I20261126-181649-docs-domain-execution-task-md-still-said](I20261126-181649-docs-domain-execution-task-md-still-said.md) |
+| verify | verification-finding | partly | no-options | [I20261126-203317-the-new-model-check-made-existing-cmd-vl](I20261126-203317-the-new-model-check-made-existing-cmd-vl.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

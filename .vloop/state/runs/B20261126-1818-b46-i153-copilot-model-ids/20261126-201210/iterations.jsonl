@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":199350,"exit":0,"name":"go"}],"ended":"2026-11-26T20:18:29Z","gate":{"duration_ms":13047,"exit":0},"iteration":11,"outcome":"done","run_id":"B20261126-1818-b46-i153-copilot-model-ids","schema":"iteration/v2","started":"2026-11-26T20:12:10Z","task":"T6"}

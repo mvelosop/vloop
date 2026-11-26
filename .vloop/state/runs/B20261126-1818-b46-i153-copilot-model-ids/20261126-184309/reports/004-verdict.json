@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "When at least one session kind in use resolves to copilot, doctor places copilot models immediately after copilot and makes one models call and one plan call, reporting the distinct configured ids and plan exactly as the brief specifies in text and JSON.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go calls doctorCopilotModels immediately after the copilot row; it resolves every supplied model key, calls Models and Plan once, counts distinct ids, and emits the specified pass/problem messages. internal/cli/doctor_copilot_models_test.go asserts row ordering, one call to each endpoint, distinct count, exact text, and the JSON row."
+    },
+    {
+      "criterion": "An unlisted, disabled, or Claude-alias id produces a problem naming every affected model.<kind>, joined with ; ; a Claude alias is reported without any network request and receives ; ids not checked against the list when the list also cannot be reached.",
+      "met": true,
+      "evidence": "doctorCopilotModels in internal/cli/doctor.go builds one message per affected configured model for aliases, missing ids, and disabled policies, joins them with '; ', and returns before network access when all configured ids are aliases. The httptest matrix in internal/cli/doctor_copilot_models_test.go covers missing, disabled, and alias-with-zero-calls cases."
+    },
+    {
+      "criterion": "A failed models call is a warning, an unknown or failed plan call remains plan unknown, and absence of login adds no models row because the existing copilot login row remains the problem; absence of a Copilot kind adds no models row or network call.",
+      "met": true,
+      "evidence": "doctorCopilotModels emits resWarning on a models error without aliases, maps a failed or empty plan to 'unknown', and returns without adding a row when not logged in and no alias exists. runDoctor only invokes the check when copilotKeys or the doctor-only review-brief key is nonempty. internal/cli/doctor_copilot_models_test.go asserts warning-only API failure, plan unknown, and zero rows/calls for no login and no Copilot kind."
+    },
+    {
+      "criterion": "The row uses five-second timeouts, the token never appears in text or JSON, and the row's problem participates in vloop run's preflight so the run refuses before a plan session starts.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go constructs the shared Copilot client with 5*time.Second, whose client redacts errors in internal/copilot/client.go. internal/cli/run.go classifies a copilot models problem as a preflight failure while allowing only its warning. Tests assert token absence in text and JSON and assert the preflight refuses the problem."
+    },
+    {
+      "criterion": "Committed Go tests use httptest for pass, missing, disabled, alias, unreachable, no-login, no-Copilot-kind, distinct-count, plan-unknown, ordering, and JSON-row behavior; no test reaches the real APIs.",
+      "met": true,
+      "evidence": "internal/cli/doctor_copilot_models_test.go contains httptest coverage for every named case, and internal/cli/doctor_test.go installs an httptest Copilot/GitHub API in the shared doctor test environment so existing doctor tests cannot reach the real services."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

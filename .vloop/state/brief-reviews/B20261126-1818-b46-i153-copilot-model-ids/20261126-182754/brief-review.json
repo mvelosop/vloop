@@ -1,0 +1,32 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1818-b46-i153-copilot-model-ids.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Violations the review must rule on / M1 and M2",
+      "summary": "The missing-login violation forbids refusals that the contract explicitly requires.",
+      "evidence": "The violations list bans \"A refusal caused by ... a missing login\" (brief lines 218-222), while M1 requires `vloop models copilot` to exit 1 when no login exists (lines 134-137) and M2 says doctor's existing Copilot login problem refuses the run (lines 174-175), matching `internal/cli/doctor.go` lines 333-347 and 514-517.",
+      "fix": "Scope the violation to an inability by the new model-list validation to add a refusal: the listing command's no-login exit 1 and the existing Copilot-session login problem remain explicit exceptions. Alternatively, restate each required behavior so a reviewer can distinguish the listing command, config-set validation, and doctor's existing login prerequisite."
+    },
+    {
+      "kind": "fact",
+      "section": "Frontmatter seeds / Why this shape, and what was rejected",
+      "summary": "The brief relies on an external, uncited test-bed script to justify `--kinds` without giving loop sessions evidence they can read.",
+      "evidence": "Line 7 calls the URL shortener test bed's four scripts the behavioural seed, and lines 74-76 say `--kinds` is shaped as `Set-VloopModels.ps1` does. No cited path contains that script or evidence in this repository; the Binding references section (lines 80-87) names only repository files, and a repository search finds the claim only in this brief.",
+      "fix": "Remove the external-script claim and make the in-brief `--kinds` contract the sole source, or first add the relevant evidence to a repository document and cite that document. Do the same for the \"four scripts\" seed statement."
+    }
+  ],
+  "decisions": [
+    "Doctor/config-set model checks use a 5-second timeout; `models copilot` uses 20 seconds. This is reasonable, but the operator should confirm the two concrete values.",
+    "A failed or timed-out models request warns and does not block config set or the new doctor model row; a successful answer that omits or disables the exact id refuses. This is the intended availability tradeoff.",
+    "A missing policy is represented by `-`/null and remains usable; picker false hides a model only from the default list, not from `--all` or validation.",
+    "`--kinds` changes agent, model and effort atomically for the seven existing session kinds; duplicates are not specified, and the single-key agent setter remains unpaired while the multi-kind form checks resulting pairs.",
+    "The new list and schema pin plan-first output, `copilot-models/v1`, `strings` ordering for ids, and account-plan visibility. These forms are coherent with C-3.",
+    "The implementation uses only `net/http` and `encoding/json`, with test-only base-URL overrides."
+  ],
+  "checked": "facts, consistency, rules, runnability; verified the consumed B45 dependency and B46 roadmap placement, C-1/C-3 and CLI conventions, the existing session-kind/key table, config-set and doctor/preflight behavior, token lookup, the Windows/pwsh task ordering, and the check/test/command-doc constraints. A ready copy passed `vloop brief check` with 0 warnings.",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

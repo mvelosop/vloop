@@ -1,35 +1,36 @@
-# Plan — B20261126-1418-b45-docs-mixed-os-and-any-agent
+# Plan — B20261126-1818-b46-i153-copilot-model-ids
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **6/6 done** · iteration 8
+**Status:** complete · **6/6 done** · iteration 11
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T18:03:39Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T20:23:41Z
 
 ## Progress
 
-- [x] **T1** — Document the mai-code-2 evidence
-- [x] **T2** — Make the README agent-neutral and cite mai-code-2 · 1 attempt(s)
-- [x] **T3** — Explain mixed teams in the README · 1 attempt(s)
-- [x] **T4** — Update the guides for any agent
-- [x] **T5** — List every session kind and portable gate shell
-- [x] **T6** — Run the complete documentation contract
+- [x] **T1** — List Copilot model ids and the account plan · 1 attempt(s)
+- [x] **T2** — Check Copilot model ids in config set
+- [x] **T3** — Check configured Copilot models in doctor
+- [x] **T4** — Set several session kinds in one config command
+- [x] **T5** — Document the Copilot model commands
+- [x] **T6** — Verify the Copilot model workflow end to end
 
 ## Tasks
 
-### T1 — Document the mai-code-2 evidence
+### T1 — List Copilot model ids and the account plan
 
-`done` · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
-Add the D6 evidence section before any README link points to it. The section must turn B40 through B44 telemetry into a traceable account without overstating qualification.
+Give the operator one CLI command that exposes the exact Copilot model ids, picker filtering, account policies, and Copilot plan returned by the two documented endpoints. This establishes the shared API client and the copilot-models/v1 document that later validation surfaces can reuse.
 
 **Acceptance**
 
-- The design note has the exact heading "## mai-code-2 in the loop (2026-11)" and records the URL shortener run as 10 of 10 tasks, 10 first-pass, about $1.31, explicitly measured in an acceptance repository outside this repository.
-- The section names B40 through B44 with task count, first-pass count and cost.total_usd rounded to cents exactly as read from each committed metrics snapshot, including B42's halted attempt.
-- The section names every session kind B40 through B44 ran, says no second review ran, and records that B40 through B45 brief reviews ran on mai-code-2 with their kept records under .vloop/state/brief-reviews/.
-- The section records B39's $8.10 Claude comparison from its run record, B40's HTTP 503 exit 7 with no attempt counted, real defects caught by reviews and gate disputes, and operator-found defects in B42 and B43.
-- No claim says or implies that mai-code-2 is qualified under the evaluation rule.
+- vloop models copilot reads the models endpoint and prints the plan line first, then picker-enabled models sorted by strings order; --all adds non-picker entries, and the policy column is enabled, disabled, or -.
+- vloop models copilot --json emits exactly one copilot-models/v1 document with plan null when unknown and policy null when the text column would be -.
+- The models and plan requests use the first non-empty token from COPILOT_GITHUB_TOKEN, GH_TOKEN, GITHUB_TOKEN, then gh auth token; the required Copilot integration header is sent, VLOOP_COPILOT_API_URL and VLOOP_GITHUB_API_URL replace only their respective bases, and no token reaches output or errors.
+- A missing login and a failed models request exit 1 with the brief's exact refusal; a missing or incorrect agent argument exits 2 with the brief's usage line. A failed or plan-less plan request is unknown, never an error.
+- The listing command uses a 20-second timeout per call and only the standard library; the vloop models command performs no network access for an invalid agent argument.
+- Committed Go tests exercise the output formats, filtering, JSON schema, request headers, unknown plan, failure, and no-login paths through httptest; no test reaches GitHub or Copilot for real.
 
 <details><summary>verify command</summary>
 
@@ -39,19 +40,19 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 </details>
 
-### T2 — Make the README agent-neutral and cite mai-code-2
+### T2 — Check Copilot model ids in config set
 
-`done` · 1 attempt(s) · depends on: T1
+`done` · depends on: T1
 
-Apply D1 and D3 to README.md now that the evidence section exists. Readers must understand that either supported agent can drive the loop and that mai-code-2's results are evidence, not qualification.
+Prevent a single model.&lt;kind&gt; write from introducing an unusable Copilot id while preserving config set's existing warning-only behavior for an unavailable API. The validation must use the pair configuration resolves to after a candidate write, including local and environment overrides.
 
 **Acceptance**
 
-- README.md's opening names both Claude Code and GitHub Copilot CLI, says an agent plans the brief, and no longer contains "vloop has Claude plan it".
-- Prerequisites names the copilot CLI and a usable GitHub login when Copilot runs, while retaining the two Claude-specific bullets; quickstart says doctor checks the agent CLIs in use rather than Claude alone.
-- The loop summary says a fresh agent session for Claude Code or Copilot CLI, and "You ask; the skill drives" addresses the user's agent rather than Claude Code alone.
-- The Copilot section adds the prescribed mai-code-2 sentence for the URL shortener and B40 through B44, links D6's section, names every session kind but the second review, and says it is not yet qualified.
-- Neither "Every session is a fresh Claude session" nor "mai-code-2 is qualified" appears, and the gpt-6.1-terra sentence still limits plan and gate review to Claude and leaves verify untried.
+- Before writing model.&lt;kind&gt;, with or without --local, config set resolves agent.&lt;kind&gt; and the candidate model by C-1 and refuses a Copilot Claude alias, an id absent from the --all list, or a disabled id with the brief's exact exit-2 line; all other keys retain their existing validation.
+- The models request is skipped for a removed model, for a kind not resolved to copilot, and when the candidate is a Claude alias already decidable locally.
+- A failed, timed-out, or malformed models call and a missing login do not refuse a single-key set: it writes the value and emits exactly the brief's stderr warning with exit 0; the warning or error never contains the token.
+- Each config-set validation uses a five-second models-call timeout and writes nothing on refusal; a successful removal remains the existing remove operation and is never checked.
+- Committed Go tests use httptest and cover listed, absent, disabled, alias, unreachable, no-login, removal, --local, and environment/local precedence; no test reaches the real APIs.
 
 <details><summary>verify command</summary>
 
@@ -61,19 +62,19 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 </details>
 
-### T3 — Explain mixed teams in the README
+### T3 — Check configured Copilot models in doctor
 
-`done` · 1 attempt(s) · depends on: T2
+`done` · depends on: T1
 
-Apply D2 to README.md after its agent-neutral edits. The README needs one short mixed-OS entry point plus accurate install and Windows-only Copilot guidance.
+Extend doctor's existing Copilot preflight with one row that checks every in-use Copilot kind's resolved model and displays the account plan. This makes an edited invalid id refuse vloop run before a paid session starts without turning API unavailability into a refusal.
 
 **Acceptance**
 
-- README.md has a section headed "## Mixed macOS and Windows teams" after Quickstart and before the Copilot section, and its body is at most 150 words.
-- That section states the shared platforms and shell values, the refusal of local or environment overrides, the fixed-command portability lint, portable pwsh cmdlets and project toolchain, UTF-8 execution, and that this repository is such a team.
-- The section links docs/guide/configuration.md#mixed-teams, and the Copilot Windows bullet retains only the PowerShell hook plus the B40 through B44 Copilot-on-Windows evidence and links back to the mixed-team section.
-- README no longer says Windows is untested; Install points Windows users to the PowerShell PATH line in concepts.md, then explains self-update and the per-repository vloop upgrade step.
-- No mixed-team claim contradicts docs/guide/configuration.md.
+- When at least one session kind in use resolves to copilot, doctor places copilot models immediately after copilot and makes one models call and one plan call, reporting the distinct configured ids and plan exactly as the brief specifies in text and JSON.
+- An unlisted, disabled, or Claude-alias id produces a problem naming every affected model.&lt;kind&gt;, joined with ; ; a Claude alias is reported without any network request and receives ; ids not checked against the list when the list also cannot be reached.
+- A failed models call is a warning, an unknown or failed plan call remains plan unknown, and absence of login adds no models row because the existing copilot login row remains the problem; absence of a Copilot kind adds no models row or network call.
+- The row uses five-second timeouts, the token never appears in text or JSON, and the row's problem participates in vloop run's preflight so the run refuses before a plan session starts.
+- Committed Go tests use httptest for pass, missing, disabled, alias, unreachable, no-login, no-Copilot-kind, distinct-count, plan-unknown, ordering, and JSON-row behavior; no test reaches the real APIs.
 
 <details><summary>verify command</summary>
 
@@ -83,19 +84,19 @@ pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1
 
 </details>
 
-### T4 — Update the guides for any agent
+### T4 — Set several session kinds in one config command
 
-`done` · depends on: none
+`done` · depends on: T2
 
-Apply D4 consistently across the four guides. Agent-neutral prose must describe only where Claude and Copilot genuinely share behavior, while preserving agent-specific mechanisms.
+Replace up to fourteen separate config writes with one atomic --kinds operation for agent, model, and effort. Every candidate kind must be validated against its resolved pair before any shared or local file changes.
 
 **Acceptance**
 
-- concepts.md says each configured agent runs a fresh agent session, explains both guideline delivery mechanisms, shows both interactive plugin-dir commands, names agent-eval for other agents, and adds a short mixed-team portable-gates note.
-- metrics.md says Copilot reports no tokens, estimates cost from copilot.credit-usd with cost_source estimated, sums every phase in credits.total, and counts cache_hit_ratio for Claude sessions only.
-- All seven model.* values explain that the setting is a Claude alias or model name, or a Copilot model id when that phase's agent is copilot; the old "any model name" value is absent.
-- evals.md's Calls claude row says claude plugin eval calls claude and tools/agent-eval calls the agent it is given, while the qualification rule remains unchanged.
-- No Claude-specific adapter, installation or qualification wording is made generic, and all new statements agree with the driver implementation.
+- vloop config set --kinds &lt;comma-list&gt; accepts exactly plan, gate-review, work, review, second-review, verify, and review-brief, requires at least one of --agent, --model, or --effort, and rejects a positional key or value with the brief's exact usage lines.
+- Every named kind's existing agent, model, and effort keys are validated as a single-key set would validate them; no new key or session kind is added.
+- All resulting Copilot pairs are checked before any write, one models request is made per invocation, removal is resolved by C-1, an environment override can still supply a Claude alias, and removing agent alone is never refused.
+- Any unknown kind, invalid value, alias, missing id, disabled id, or other refusal leaves both shared and local files byte-for-byte unchanged; --local targets only the local file and success prints only the warnings a single set would print.
+- Committed Go tests cover success, each option, every kind, exact usage errors, API reuse, model-result checks, removals, environment precedence, --local, and all-or-nothing failure; no test reaches a real API.
 
 <details><summary>verify command</summary>
 
@@ -105,19 +106,17 @@ pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1
 
 </details>
 
-### T5 — List every session kind and portable gate shell
+### T5 — Document the Copilot model commands
 
-`done` · depends on: none
+`done` · depends on: T1, T4
 
-Apply D5 to vloop's generated CLAUDE.md text, this repository's own copy, and the operator and architect guidance. The implementation and its pinning test must describe the full loop on this mixed-OS repository.
+Replace the operator's manual API recipes with the supported vloop command and document how the new validation and multi-kind write affect configuration. Regenerate the command reference so the new command and flag are discoverable together.
 
 **Acceptance**
 
-- internal/install/section.go generates the exact session list "(plan, gate review, work, review, second review, verify)", and the existing test that pins that text is changed only to expect the new list.
-- This repository's CLAUDE.md vloop section is edited to the same session list; no unrelated generated section text or behavior changes.
-- The operator skill says this repository is a mixed team with platforms = ["macos", "windows"] and shell = "pwsh", its gates are pwsh and portable, and the BSD-tool rules apply only to plans whose shell is sh.
-- The architect skill says gates are pwsh and portable for a mixed macOS and Windows team; it no longer states that this repository's gates run on macOS BSD tools.
-- A committed Go test in the checks continues to pin the generated section, and changing that pin is the only test change in this task.
+- The Copilot model ids section uses vloop models copilot in place of the curl and PowerShell raw-API snippets, explains picker filtering, enabled/disabled/- policies, and the plan or plan unknown line.
+- The section states that config set and doctor validate ids for Copilot kinds and includes one vloop config set --kinds example; it contains no line that calls api.githubcopilot.com directly.
+- docs/guide/commands.md is regenerated from the completed CLI and includes vloop models copilot plus every --kinds, --agent, --model, and --effort surface.
 
 <details><summary>verify command</summary>
 
@@ -127,19 +126,17 @@ pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1
 
 </details>
 
-### T6 — Run the complete documentation contract
+### T6 — Verify the Copilot model workflow end to end
 
 `done` · depends on: T1, T2, T3, T4, T5
 
-Close the pass by exercising every earlier gate together and replaying the brief's worked-example assertions. This catches cross-file drift that a single documentation task could miss.
+Run all earlier behavioral gates together and replay the brief's worked example in an initialized temporary repository. This closes the run only when listing, set-time checks, doctor, atomic --kinds writes, and failure warnings compose as one operator workflow.
 
 **Acceptance**
 
-- All five earlier gates pass from the finished tree, including the real-data evidence comparison and generated CLAUDE.md behavior.
-- Every line of the brief's worked example is true: stale README and concepts strings are absent, the mixed-team heading and mai-code-2 and self-update strings are present, and mai-code-2 is not called qualified.
-- The Copilot plugin-dir example exists, the old any-model table value is absent, the generated section source names all six session kinds, and the operator skill names shell = "pwsh".
-- No behavior, flag, message, default or test outcome changed except the generated section text and its test pin.
-- No changed prose contradicts the domain model or the binding guides, and no README mixed-team section exceeds 150 words.
+- Every earlier task's planner-owned gate passes against the completed tree, and the close oracle executes the brief's worked example line by line with httptest servers and stub credentials in a temporary vloop-init repository.
+- The workflow proves exact picker and --all output, successful multi-kind writes, exit-2 absent/disabled/alias refusals, byte-for-byte all-or-nothing behavior, the doctor pass row, and warning-only writes and doctor after the stub stops.
+- No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot.
 
 <details><summary>verify command</summary>
 

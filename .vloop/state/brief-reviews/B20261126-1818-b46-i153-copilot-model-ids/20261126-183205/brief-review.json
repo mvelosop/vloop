@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1818-b46-i153-copilot-model-ids.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "The two calls",
+      "summary": "The plan endpoint and response field are not established by the cited repository evidence; the brief asks the planner to implement an internal API contract that the loop's stubs cannot verify.",
+      "evidence": "The brief names GET https://api.github.com/copilot_internal/user and copilot_plan at docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md:98-103, but its binding reference at line 85 points to docs/design-notes/copilot-cli-experiments.md:623-643, which documents only GET https://api.githubcopilot.com/models. A repository search found no copilot_internal/user or copilot_plan outside this brief, and M4 says the design note will gain the plan evidence (brief line 208).",
+      "fix": "Operator: confirm the exact endpoint and copilot_plan field from an account observation, and preferably name or include that evidence in a repository binding reference before marking the brief ready; otherwise revise M1 to a plan source the cited evidence supports."
+    },
+    {
+      "kind": "fact",
+      "section": "M2 - Doctor",
+      "summary": "The no-login case names the wrong doctor row.",
+      "evidence": "The brief says the existing `copilot` row reports the missing login at docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md:174-175. Current code creates `copilot` for the CLI check, then a separate `copilot login` row for the token check at internal/cli/doctor.go:510-517; doctor tests assert that row at internal/cli/doctor_copilot_test.go:177-206.",
+      "fix": "Change the M2 wording and any matching contract/gate expectation from `copilot` to `copilot login`; keep the specified absence of the `copilot models` row."
+    },
+    {
+      "kind": "consistency",
+      "section": "M3 - config set --kinds",
+      "summary": "The prospective agent/model pair is not defined consistently with configuration precedence, and removal is ambiguous.",
+      "evidence": "M2 says the single-key check uses the agent value `after the write` and never checks removal at docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md:145-156. M3 instead says a flag-written agent/model beats the resolved value at lines 192-200, while C-1 says environment, local, shared and default resolution decides the effective value (docs/domain/domain-model.md:268-271). The brief does not say whether `--kinds --model ''` checks the resulting default alias or is exempt, nor whether a higher-precedence environment override makes the candidate pair non-Copilot.",
+      "fix": "Define validation from the prospective fully resolved configuration after all named changes, respecting C-1; state explicitly that removals first expose the next source/default, and then apply or skip M2 according to that effective pair. Add a gate for a local or environment override and for `--model ''`."
+    }
+  ],
+  "decisions": [
+    "B46 treats today's seven session-kind key table as the complete --kinds vocabulary; this is reasonable, but the operator should confirm it is intentional.",
+    "M1 prints the plan first and models in strings/id order; I agree, and the wording should remain literal in gates.",
+    "B46 relies on GET https://api.github.com/copilot_internal/user and copilot_plan; operator confirmation is required by the first finding."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 3 findings"
+}
+

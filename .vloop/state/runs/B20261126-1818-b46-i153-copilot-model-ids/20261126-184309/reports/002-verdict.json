@@ -1,0 +1,39 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "vloop models copilot reads the models endpoint and prints the plan line first, then picker-enabled models sorted by strings order; --all adds non-picker entries, and the policy column is enabled, disabled, or -.",
+      "met": true,
+      "evidence": "internal/cli/models.go:34-55 fetches models and plan, filters with visibleModels, sorts IDs with <, and writeCopilotModels emits plan first with enabled, disabled, or -; internal/cli/models_test.go:13-68 asserts exact sorted text and --all output."
+    },
+    {
+      "criterion": "vloop models copilot --json emits exactly one copilot-models/v1 document with plan null when unknown and policy null when the text column would be -.",
+      "met": true,
+      "evidence": "internal/cli/models.go:45-52 emits one JSON-encoded copilotModelsDocument, and internal/copilot/client.go:98-101 maps an absent plan to nil and unknown policy states to nil; schemas/copilot-models.v1.json permits the required nulls. internal/cli/models_test.go:51-67 and 79-90 exercise schema identity and null fields."
+    },
+    {
+      "criterion": "The models and plan requests use the first non-empty token from COPILOT_GITHUB_TOKEN, GH_TOKEN, GITHUB_TOKEN, then gh auth token; the required Copilot integration header is sent, VLOOP_COPILOT_API_URL and VLOOP_GITHUB_API_URL replace only their respective bases, and no token reaches output or errors.",
+      "met": true,
+      "evidence": "internal/copilot/client.go:44-74 resolves tokens in the required order and bases from separate environment variables; client.go:76-118 sets Authorization and the models integration header; client.go:145-152 redacts token text from returned errors. internal/cli/models_test.go:13-47 verifies the selected first token and required header through httptest."
+    },
+    {
+      "criterion": "A missing login and a failed models request exit 1 with the brief's exact refusal; a missing or incorrect agent argument exits 2 with the brief's usage line. A failed or plan-less plan request is unknown, never an error.",
+      "met": true,
+      "evidence": "internal/cli/models.go:34-43 returns Problem or Usage with the exact brief strings, and line 44 deliberately ignores the plan error. internal/cli/models_test.go:70-130 asserts failed and plan-less requests plus all usage cases, and lines 113-121 assert the exact no-login refusal."
+    },
+    {
+      "criterion": "The listing command uses a 20-second timeout per call and only the standard library; the vloop models command performs no network access for an invalid agent argument.",
+      "met": true,
+      "evidence": "internal/cli/models.go:37 constructs copilot.New(20*time.Second), and internal/copilot/client.go:41-64 uses net/http.Client.Timeout with no non-standard dependency. models.go validates arguments before client construction; models_test.go:123-130 verifies invalid arguments make zero httptest requests."
+    },
+    {
+      "criterion": "Committed Go tests exercise the output formats, filtering, JSON schema, request headers, unknown plan, failure, and no-login paths through httptest; no test reaches GitHub or Copilot for real.",
+      "met": true,
+      "evidence": "internal/cli/models_test.go contains httptest coverage for exact text/JSON, picker filtering, headers, unknown or malformed plan, request failure, invalid usage without network, and no login; TestModelsSchema validates the committed schema. All HTTP endpoints are supplied by httptest, and the current go check log passes."
+    }
+  ],
+  "findings": [],
+  "notes": "The retry correctly updates cmd/vloop/b2_e2e_test.go's schema-list expectation for the new copilot-models/v1 schema."
+}

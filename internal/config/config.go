@@ -139,6 +139,12 @@ type Value struct {
 	List   []string
 }
 
+// Assignment is one validated config write. SetMany applies assignments to one
+// file in one write.
+type Assignment struct {
+	Key, Value string
+}
+
 // UnknownKeyError, InvalidValueError and UsageError are usage errors (exit 2).
 // UsageError wraps another package's invalid-value message unchanged.
 type UsageError struct{ Err error }
@@ -727,72 +733,202 @@ func Set(root, name, value string) error { return setAt(root, FilePath, name, va
 // SetLocal is Set for the local file, .vloop/config.local.toml.
 func SetLocal(root, name, value string) error { return setAt(root, LocalFilePath, name, value) }
 
-func setAt(root, rel, name, value string) error {
-	k, err := Lookup(name)
+// SetMany applies assignments to the shared file in one write, after every
+// assignment has been validated.
+func SetMany(root string, assignments []Assignment) error {
+	return setManyAt(root, FilePath, assignments)
+}
+
+// SetManyLocal is SetMany for .vloop/config.local.toml.
+func SetManyLocal(root string, assignments []Assignment) error {
+	return setManyAt(root, LocalFilePath, assignments)
+}
+
+// PreviewSet resolves names after assignments without changing either config
+// file. Resolution still honours environment and the untouched config layer.
+func PreviewSet(root string, assignments []Assignment, local bool, names ...string) (map[string]Value, error) {
+	if err := validateAssignments(root, assignments, local); err != nil {
+		return nil, err
+	}
+	file, localFile, err := readLayers(root)
 	if err != nil {
+		return nil, err
+	}
+	target := file
+	if local {
+		target = localFile
+	}
+	for _, assignment := range assignments {
+		if err := applyAssignment(target, assignment); err != nil {
+			return nil, err
+		}
+	}
+	values := make(map[string]Value, len(names))
+	for _, name := range names {
+		k, err := Lookup(name)
+		if err != nil {
+			return nil, err
+		}
+		value, err := resolve(k, file, localFile)
+		if err != nil {
+			return nil, err
+		}
+		values[name] = value
+	}
+	return values, nil
+}
+
+func setAt(root, rel, name, value string) error {
+	return setManyAt(root, rel, []Assignment{{Key: name, Value: value}})
+}
+
+func setManyAt(root, rel string, assignments []Assignment) error {
+	local := rel == LocalFilePath
+	if err := validateAssignments(root, assignments, local); err != nil {
 		return err
 	}
-	if rel == LocalFilePath && name == "platforms" {
-		return &UsageError{fmt.Errorf("%s: %w", LocalFilePath, sharedOnlyError(name, nil))}
-	}
-	if rel == LocalFilePath && name == "shell" {
-		file, _, err := readFile(root)
-		if err != nil {
-			return err
-		}
-		local, err := readLocal(root)
-		if err != nil {
-			return err
-		}
-		if _, ok := fileValue(local, "platforms"); ok {
-			return &SourceError{LocalFilePath, sharedOnlyError("platforms", nil)}
-		}
-		if os.Getenv(EnvVar("platforms")) != "" {
-			return &SourceError{EnvVar("platforms"), sharedOnlyError("platforms", nil)}
-		}
-		platformKey, _ := Lookup("platforms")
-		platforms, _, err := fileListValue(platformKey, layer{m: file, path: FilePath, source: SourceFile})
-		if err != nil {
-			return err
-		}
-		if MixedPlatforms(platforms) {
-			return &UsageError{fmt.Errorf("%s: %w", LocalFilePath, sharedOnlyError(name, platforms))}
-		}
-	} else if _, _, err := readLayers(root); err != nil {
-		return err
-	}
-	if value != "" {
-		if err := k.Validate(value); err != nil {
-			return err
-		}
-		if k.Stacks {
-			if err := checkScopeDirs(root, value); err != nil {
-				return err
-			}
-		}
+	if len(assignments) == 0 {
+		return nil
 	}
 	file, raw, err := readPath(root, rel)
 	if err != nil {
 		return err
 	}
-	cur, present := fileValue(file, name)
-	if value == "" && !present {
-		return nil
-	}
-	if value != "" && present {
-		if arr, ok := cur.([]any); k.List && ok {
-			var names []string
-			for _, e := range arr {
-				names = append(names, fmt.Sprint(e))
+	out := append([]byte(nil), raw...)
+	for _, assignment := range assignments {
+		if !assignmentChanges(file, assignment) {
+			continue
+		}
+		if err := applyAssignment(file, assignment); err != nil {
+			return err
+		}
+		_, present := fileValue(file, assignment.Key)
+		rhs := ""
+		if assignment.Value != "" && present {
+			rhs, err = valueTextFromFile(file, assignment.Key)
+			if err != nil {
+				return err
 			}
-			if strings.Join(names, ",") == value {
-				return nil
+		}
+		if edited, ok := editKey(out, assignment.Key, rhs); ok {
+			out = edited
+		} else {
+			var buf bytes.Buffer
+			if err := toml.NewEncoder(&buf).Encode(file); err != nil {
+				return err
 			}
-		} else if cur == value || (k.Int || k.Num) && fmt.Sprint(cur) == value {
-			return nil
+			out = buf.Bytes()
 		}
 	}
-	table, leaf, _ := strings.Cut(name, ".")
+	if len(bytes.TrimSpace(raw)) == 0 {
+		if len(file) == 0 {
+			return nil
+		}
+		var buf bytes.Buffer
+		if err := toml.NewEncoder(&buf).Encode(file); err != nil {
+			return err
+		}
+		out = buf.Bytes()
+	} else if !sameKeys(out, file) {
+		var buf bytes.Buffer
+		if err := toml.NewEncoder(&buf).Encode(file); err != nil {
+			return err
+		}
+		out = buf.Bytes()
+	}
+	if raw != nil && bytes.Equal(raw, out) {
+		return nil
+	}
+	p := filepath.Join(root, filepath.FromSlash(rel))
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(p, out, 0o644)
+}
+
+func assignmentChanges(file map[string]any, assignment Assignment) bool {
+	cur, present := fileValue(file, assignment.Key)
+	if assignment.Value == "" {
+		return present
+	}
+	if !present {
+		return true
+	}
+	k, _ := Lookup(assignment.Key)
+	if arr, ok := cur.([]any); k.List && ok {
+		names := make([]string, 0, len(arr))
+		for _, element := range arr {
+			names = append(names, fmt.Sprint(element))
+		}
+		return strings.Join(names, ",") != assignment.Value
+	}
+	if k.Int || k.Num {
+		return fmt.Sprint(cur) != assignment.Value
+	}
+	return cur != assignment.Value
+}
+
+func validateAssignments(root string, assignments []Assignment, local bool) error {
+	if local {
+		for _, assignment := range assignments {
+			if assignment.Key == "platforms" {
+				return &UsageError{fmt.Errorf("%s: %w", LocalFilePath, sharedOnlyError(assignment.Key, nil))}
+			}
+			if assignment.Key == "shell" {
+				file, _, err := readFile(root)
+				if err != nil {
+					return err
+				}
+				localFile, err := readLocal(root)
+				if err != nil {
+					return err
+				}
+				if _, ok := fileValue(localFile, "platforms"); ok {
+					return &SourceError{LocalFilePath, sharedOnlyError("platforms", nil)}
+				}
+				if os.Getenv(EnvVar("platforms")) != "" {
+					return &SourceError{EnvVar("platforms"), sharedOnlyError("platforms", nil)}
+				}
+				platformKey, _ := Lookup("platforms")
+				platforms, _, err := fileListValue(platformKey, layer{m: file, path: FilePath, source: SourceFile})
+				if err != nil {
+					return err
+				}
+				if MixedPlatforms(platforms) {
+					return &UsageError{fmt.Errorf("%s: %w", LocalFilePath, sharedOnlyError(assignment.Key, platforms))}
+				}
+			}
+		}
+	}
+	if _, _, err := readLayers(root); err != nil {
+		return err
+	}
+	for _, assignment := range assignments {
+		k, err := Lookup(assignment.Key)
+		if err != nil {
+			return err
+		}
+		if assignment.Value == "" {
+			continue
+		}
+		if err := k.Validate(assignment.Value); err != nil {
+			return err
+		}
+		if k.Stacks {
+			if err := checkScopeDirs(root, assignment.Value); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func applyAssignment(file map[string]any, assignment Assignment) error {
+	k, err := Lookup(assignment.Key)
+	if err != nil {
+		return err
+	}
+	table, leaf, _ := strings.Cut(assignment.Key, ".")
 	if leaf == "" {
 		leaf, table = table, ""
 	}
@@ -805,44 +941,29 @@ func setAt(root, rel, name, value string) error {
 		}
 		dst = t
 	}
-	if value == "" {
+	if assignment.Value == "" {
 		delete(dst, leaf)
 		if table != "" && len(dst) == 0 {
 			delete(file, table)
 		}
 	} else {
 		if k.List {
-			dst[leaf] = strings.Split(value, ",")
+			dst[leaf] = strings.Split(assignment.Value, ",")
 		} else if k.Int {
-			dst[leaf], _ = strconv.ParseInt(value, 10, 64)
+			dst[leaf], _ = strconv.ParseInt(assignment.Value, 10, 64)
 		} else if k.Num {
-			dst[leaf], _ = strconv.ParseFloat(value, 64)
+			dst[leaf], _ = strconv.ParseFloat(assignment.Value, 64)
 		} else {
-			dst[leaf] = value
+			dst[leaf] = assignment.Value
 		}
 	}
-	var buf bytes.Buffer
-	if err := toml.NewEncoder(&buf).Encode(file); err != nil {
-		return err
+	return nil
+}
+
+func valueTextFromFile(file map[string]any, name string) (string, error) {
+	value, ok := fileValue(file, name)
+	if !ok {
+		return "", nil
 	}
-	out := buf.Bytes()
-	if len(bytes.TrimSpace(raw)) > 0 {
-		rhs := ""
-		if value != "" {
-			if rhs, err = valueText(dst[leaf]); err != nil {
-				return err
-			}
-		}
-		if edited, ok := editKey(raw, name, rhs); ok && sameKeys(edited, file) {
-			out = edited
-		}
-	}
-	if raw != nil && bytes.Equal(raw, out) {
-		return nil
-	}
-	p := filepath.Join(root, filepath.FromSlash(rel))
-	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
-		return err
-	}
-	return os.WriteFile(p, out, 0o644)
+	return valueText(value)
 }

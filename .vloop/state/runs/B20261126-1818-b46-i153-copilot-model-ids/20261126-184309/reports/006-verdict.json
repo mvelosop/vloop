@@ -1,0 +1,24 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The Copilot model ids section uses vloop models copilot in place of the curl and PowerShell raw-API snippets, explains picker filtering, enabled/disabled/- policies, and the plan or plan unknown line.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:223-235 uses `vloop models copilot`, explains `--all` picker filtering, all three policy values, and the `plan`/`plan unknown` line."
+    },
+    {
+      "criterion": "The section states that config set and doctor validate ids for Copilot kinds and includes one vloop config set --kinds example; it contains no line that calls api.githubcopilot.com directly.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:237-248 documents config-set and doctor validation, gives the work/review `--kinds` example, and the section contains no direct api.githubcopilot.com call."
+    },
+    {
+      "criterion": "docs/guide/commands.md is regenerated from the completed CLI and includes vloop models copilot plus every --kinds, --agent, --model, and --effort surface.",
+      "met": true,
+      "evidence": "docs/guide/commands.md:108-117 lists the config-set flags and :330-337 lists `vloop models copilot`; the passing go check includes the generated-doc freshness test."
+    }
+  ],
+  "findings": [],
+  "notes": "The generated command reference was already current from T1 and T4, so T5 correctly left it byte-for-byte unchanged while its new guide content was added."
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1818-b46-i153-copilot-model-ids.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "Frontmatter / depends-on",
+      "summary": "B46 depends on B44 even though the roadmap places B46 after B45 and says each brief names its predecessor.",
+      "evidence": "The brief names only B44 at docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md:8. The roadmap at docs/design-notes/vloop-roadmap-b18-b21.md:18-19 requires every brief to name its predecessor; B45 is the immediately preceding B44-dependent row at :52. With the current edge, the brief checker can admit B46 while B45 is unconsumed or absent from the planned base.",
+      "fix": "Change depends-on to B45 (B44 remains transitive), then re-run brief check."
+    },
+    {
+      "kind": "consistency",
+      "section": "M2 / Doctor",
+      "summary": "The new no-login model warning is not distinguished from the existing copilot-login doctor problem and run-preflight refusal.",
+      "evidence": "The brief says the model row warns when there is no login and says unreachable checks never refuse (brief:172-175), while also saying every other doctor row is unchanged (brief:51-53). Today no login adds a copilot login problem at internal/cli/doctor.go:514-517; doctor exits nonzero on any problem at :61-73, and the run preflight separately refuses it at internal/cli/run.go:196-199. A planner could incorrectly downgrade the existing login row to make the new row's non-blocking requirement apply to the whole command.",
+      "fix": "State explicitly that the new copilot models row is a warning on no login, but the unchanged copilot login row still makes bare doctor exit 1 and the existing run preflight refuse; add a literal worked case if that is the intended outcome."
+    },
+    {
+      "kind": "decision",
+      "section": "M3 / --kinds",
+      "summary": "The contract does not decide whether --kinds --agent copilot alone validates the kinds' current models.",
+      "evidence": "M3 permits any one of --agent, --model or --effort (brief:180-190), but also says each value is validated as a single config set and that M2's model check uses the agent the call sets (brief:189-191). A single config set agent.work copilot is not one of M2's checked model.<kind> operations (brief:147-156). With a default Claude alias still resolved, these statements admit either a refusal or a successful agent change deferred to doctor/preflight.",
+      "fix": "Choose and pin the agent-only case literally: either validate every affected kind's resulting model and refuse the alias, or perform no model check unless --model is supplied; also state whether the former makes zero or one models call when --model removes to ''."
+    }
+  ],
+  "decisions": [
+    "Approved scope: doctor and run preflight check Copilot ids with a 5-second timeout, and model listing uses 20 seconds; sound with the short-timeout intent.",
+    "Approved scope: list and doctor show the account's Copilot plan, with unknown represented as described; sound, but the implementation evidence remains the stub contract.",
+    "Approved scope: --kinds accepts --agent, --model and --effort for the seven named session kinds and writes atomically; sound once the agent-only validation case is settled.",
+    "Approved policy: model API and plan API failures warn rather than refuse, except a successful answer that names a missing or disabled id; preserve this as distinct from the existing Copilot-login prerequisite.",
+    "Approved scope: use only net/http and encoding/json, with the two API base URLs overridable for tests; sound.",
+    "Author decision: --kinds adds no keys beyond today's agent/model/effort table; sound against the cited configuration guide.",
+    "Author decision: M1 prints plan first, then ids in strings order; sound and literal in the worked example."
+  ],
+  "checked": "facts, consistency, rules, runnability; brief check on a ready copy passed all structural checks; reviewed the dependency, roadmap, C-1/C-3, CLI conventions, configuration and Copilot evidence, current doctor/preflight/config seams, and the full six-task shape",
+  "header": "Reviewed 2026-11-26: ASK, 3 findings"
+}
+

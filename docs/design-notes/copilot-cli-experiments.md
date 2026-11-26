@@ -956,3 +956,15 @@ directory first on `PATH` whose `python3` exits 127:
   mode 644, so the README's `tools/copilot-acceptance/run.sh` failed with
   "Permission denied". They are 755 now. Claude's trust dialog defaults
   to "No, exit", so an Enter alone declines it.
+
+## The account's Copilot plan (2026-11-26)
+
+Which models an account may use depends on its Copilot plan. The plan is not
+in the models list (`GET https://api.githubcopilot.com/models`). The operator
+found it on 2026-11-26 at `GET https://api.github.com/copilot_internal/user`,
+with the same `Authorization: Bearer <gh token>`: the answer carried
+`"copilot_plan": "individual_pro"` and `"access_type_sku":
+"plus_monthly_subscriber_quota"` for this account, among many other fields.
+Like the models endpoint, it is GitHub-internal, not a public contract: B46
+reads `copilot_plan` when it is there and treats its absence, or a failed
+call, as an unknown plan, never as an error.

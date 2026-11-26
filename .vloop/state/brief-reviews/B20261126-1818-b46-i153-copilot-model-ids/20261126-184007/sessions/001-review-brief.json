@@ -1,0 +1,34 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.0958715,
+  "credits": 9.58715,
+  "duration_ms": 163322,
+  "effort": null,
+  "ended": "2026-11-26T18:42:53Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.0958715,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_GEHvnS4yCPjM8AguZtCosDga"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261126-1818-b46-i153-copilot-model-ids",
+  "schema": "session/v5",
+  "started": "2026-11-26T18:40:07Z",
+  "turns": 14,
+  "wall_ms": 165888
+}

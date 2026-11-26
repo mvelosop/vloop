@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -47,6 +49,19 @@ func newDoctorEnv(t *testing.T) *doctorEnv {
 	t.Setenv("USERPROFILE", e.home)
 	t.Setenv("GIT_CONFIG_GLOBAL", os.DevNull)
 	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
+	api := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/models":
+			fmt.Fprint(w, `{"data":[{"id":"gpt-x","model_picker_enabled":true,"policy":{"state":"enabled"}}]}`)
+		case "/copilot_internal/user":
+			fmt.Fprint(w, `{"copilot_plan":"test"}`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(api.Close)
+	t.Setenv("VLOOP_COPILOT_API_URL", api.URL)
+	t.Setenv("VLOOP_GITHUB_API_URL", api.URL)
 	for _, k := range []string{"GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "VLOOP_SHELL", "VLOOP_LANGUAGE", "VLOOP_METRICS_STACKS", "COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"} {
 		t.Setenv(k, "")
 		os.Unsetenv(k)

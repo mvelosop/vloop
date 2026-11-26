@@ -1,0 +1,19 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Added `vloop models copilot` with picker filtering, aligned text output, one `copilot-models/v1` JSON document, account-plan lookup, and a reusable standard-library Copilot API client.",
+  "files": [
+    "docs/guide/commands.md",
+    "embed_test.go",
+    "internal/cli/models.go",
+    "internal/cli/models_test.go",
+    "internal/cli/root.go",
+    "internal/cli/schema_test.go",
+    "internal/copilot/client.go",
+    "internal/schema/schema_test.go",
+    "schemas/copilot-models.v1.json"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: pass (1.752s).",
+  "notes": "The shared client resolves COPILOT_GITHUB_TOKEN, GH_TOKEN, GITHUB_TOKEN, then gh auth token; model and plan calls each use their own configurable base and 20-second client timeout. Models failures are fatal to the listing command, while plan failures intentionally produce an unknown plan."
+}

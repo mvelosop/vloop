@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T5\gate.ps1:6
+[36;1mLine |[0m
+[36;1m[36;1m   6 | [0m …  models copilot') { [36;1mthrow 'guide does not use vloop models copilot'[0m }
+[36;1m     | [31;1m                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mguide does not use vloop models copilot[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m

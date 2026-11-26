@@ -1,0 +1,24 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "Every earlier task's planner-owned gate passes against the completed tree, and the close oracle executes the brief's worked example line by line with httptest servers and stub credentials in a temporary vloop-init repository.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T6/gate.ps1:2-10 runs the T1-T5 gates and then the oracle; .vloop/state/gates/T6/oracle.go:20-55 creates the temporary repository, runs vloop init, and serves the worked example with httptest; oracle.go:62-116 executes the listing, multi-kind write, refusal, atomicity, doctor, and stopped-stub steps; the recorded T6 gate run exited successfully."
+    },
+    {
+      "criterion": "The workflow proves exact picker and --all output, successful multi-kind writes, exit-2 absent/disabled/alias refusals, byte-for-byte all-or-nothing behavior, the doctor pass row, and warning-only writes and doctor after the stub stops.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T6/oracle.go:62-100 checks exact model output, successful writes, all three exit-2 refusals, and byte-for-byte shared/local files; oracle.go:101-116 requires the doctor pass row and warning-only config and doctor behavior after the httptest server stops."
+    },
+    {
+      "criterion": "No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T6/oracle.go:20 uses os.MkdirTemp outside the repository, oracle.go:41-59 routes both API bases to httptest and supplies only a stub credential, oracle.go:117-130 checks all captured command output and recursively scans every file under the temporary root for the token; the Copilot subprocess is replaced by a local shim at oracle.go:133-139."
+    }
+  ],
+  "findings": [],
+  "notes": "T6 intentionally adds no product files: its planner-owned close oracle is the test artifact for the completed workflow."
+}

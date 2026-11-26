@@ -1,0 +1,17 @@
+── iteration 9 (1 this run) · T6 · 5/6 done ──
+   Verify the Copilot model workflow end to end
+   work T6 · 1m18s · $0.06 · run $0.06 / $40.00
+   check go
+   review T6 · 2m28s · $0.05 · run $0.11 / $40.00
+   review: FAIL
+── iteration 10 (2 this run) · T6 · 5/6 done ──
+   Verify the Copilot model workflow end to end
+   work T6 · 1m21s · $0.04 · run $0.15 / $40.00
+   GATE DISPUTE T6 — blocked for the operator; no review, no attempt charged
+   T6 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+
+═══ blocked ═══
+run:    B20261126-1818-b46-i153-copilot-model-ids/20261126-200133  (2 iteration(s) this run)
+plan:   5/6 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

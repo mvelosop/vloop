@@ -107,10 +107,14 @@ vloop config path [flags]
 Set any key config list shows, in .vloop/config.toml or with --local in .vloop/config.local.toml (not platforms, nor shell on a mixed team; '' removes it)
 
 ```
-vloop config set <key> <value> [flags]
+vloop config set [<key> <value>] [flags]
 ```
 
+- `--agent string`: agent for every kind named by --kinds
+- `--effort string`: effort for every kind named by --kinds
+- `--kinds string`: set agent, model and effort for a comma-separated list of session kinds
 - `--local`: write .vloop/config.local.toml, this machine's overrides, instead of the shared file
+- `--model string`: model for every kind named by --kinds
 
 ## vloop defect
 
@@ -321,6 +325,16 @@ Show the built-in stack presets
 ```
 vloop metrics stacks [name]
 ```
+
+## vloop models
+
+List the Copilot model ids available to this account
+
+```
+vloop models copilot [flags]
+```
+
+- `--all`: include models not shown in Copilot's model picker
 
 ## vloop plugin
 
