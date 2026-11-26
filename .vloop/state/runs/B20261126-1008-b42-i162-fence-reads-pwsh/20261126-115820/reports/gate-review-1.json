@@ -1,0 +1,33 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T5",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "Coverage by acceptance criterion (in order): T1 gate, gate, gate, gate, go check plus review; T2 gate, gate, gate, gate, go check plus review; T3 gate, gate, gate, gate, go check plus review; T4 gate plus review, gate plus review, gate, gate plus review; T5 gate, gate, go check plus review, go check plus review. All base failures are behavioural assertions about absent W1-W4 behavior or documentation."
+}
+

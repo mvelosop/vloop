@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T1\gate.ps1:17
+[36;1mLine |[0m
+[36;1m[36;1m  17 | [0m       [36;1mthrow "[$Tool] $Command`nexpected ($wantedCode) $Expected`nactu[0m …
+[36;1m     | [31;1m       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1m[powershell] pwsh -c 'git push' expected (1) deny: git push is denied by the work fence (Bash(git push:*)) actual   (0) allow[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m

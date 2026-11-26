@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T3\gate.ps1:17
+[36;1mLine |[0m
+[36;1m[36;1m  17 | [0m       [36;1mthrow "[$Tool] $Command`nexpected ($wantedCode) $Expected`nactu[0m …
+[36;1m     | [31;1m       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1m[powershell] (Get-Content README.md | Measure-Object -Line).Lines expected (0) allow actual   (1) deny: subshells and process substitution cannot be judged[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m
