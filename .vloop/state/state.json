@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 3,
   "created": "2026-11-26T13:39:18Z",
-  "updated": "2026-11-26T14:00:58Z",
+  "updated": "2026-11-26T14:01:22Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -110,7 +110,7 @@
         "The close gate runs the T1 and T2 oracles together, uses only temporary repositories and build outputs, and leaves the repository tree unchanged."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
-      "status": "blocked",
+      "status": "pending",
       "attempts": 0,
       "notes": "gate disputed: The close gate's nested vloop invocations inherit the outer repository's plan hash, so the temporary repository's intentionally different plan is rejected before any UTF-8 assertion can run. — Prescribed vloop task gate T3 exited 1 with 'the plan was changed during this session — gates run only from the plan the driver holds'. Running the same T3 gate after Remove-Item Env:VLOOP_PLAN_SHA256 exited 0 and printed 'gate T3: pass'.",
       "gate_history": [
