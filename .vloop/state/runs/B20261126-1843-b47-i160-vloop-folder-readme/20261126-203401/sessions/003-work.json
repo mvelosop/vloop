@@ -1,0 +1,29 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.0839836,
+  "credits": 8.39836,
+  "duration_ms": 220949,
+  "effort": null,
+  "ended": "2026-11-26T20:49:58Z",
+  "is_error": false,
+  "iteration": 1,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.0839836,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261126-1843-b47-i160-vloop-folder-readme",
+  "schema": "session/v4",
+  "started": "2026-11-26T20:46:13Z",
+  "task": "T1",
+  "turns": 13,
+  "wall_ms": 224922
+}

@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/4 done** · iteration 0
+**Status:** running · **1/4 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T20:46:13Z
+**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T20:53:20Z
 
 ## Progress
 
-- [ ] **T1** — Generate the owned README during init
+- [x] **T1** — Generate the owned README during init
 - [ ] **T2** — Reconcile the owned README during upgrade
 - [ ] **T3** — Document the owned README lifecycle
 - [ ] **T4** — Verify the README workflow end to end
@@ -17,7 +17,7 @@
 
 ### T1 — Generate the owned README during init
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Make every newly initialized repository explain vloop and its .vloop folder in the repository's language. This establishes the generated file and output contract that later upgrades can reproduce and keep current.
 

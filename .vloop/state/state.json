@@ -5,9 +5,9 @@
   "base": "6fbee5b7b53133af2f17e19317a3b203c904abe9",
   "branch": "B20261126-1843-b47-i160-vloop-folder-readme",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-26T20:40:41Z",
-  "updated": "2026-11-26T20:46:13Z",
+  "updated": "2026-11-26T20:53:20Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -53,7 +53,7 @@
         "Committed Go tests exercise both languages, version insertion, the folder inventory, overwrite behavior, output ordering, and the existing-guidelines case, including any earlier exact-output assertions that only gain the README line."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },
