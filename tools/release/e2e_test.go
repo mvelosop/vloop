@@ -96,8 +96,7 @@ func TestReleaseSequence(t *testing.T) {
 
 	wantTail := "published v0.12.0: https://github.example/releases/tag/v0.12.0\n" +
 		"install: go install github.com/mvelosop/vloop/cmd/vloop@v0.12.0\n" +
-		"then, in each repository: vloop upgrade\n" +
-		"and for the plugin: claude plugin marketplace update vloop && claude plugin update vloop@vloop\n"
+		"then: vloop self-update, and vloop upgrade in each repository\n"
 	code, out, errs = pub(dir, "v0.12.0")
 	if code != 0 || !strings.HasSuffix(out, wantTail) {
 		t.Fatalf("publish: exit %d stdout %q stderr %q", code, out, errs)

@@ -30,3 +30,8 @@
    review T3 · 1m48s · $0.05 · run $0.67 / $40.00
    review: PASS
    T3 done
+── iteration 7 (6 this run) · T4 · 3/5 done ──
+   Point existing commands and guides to self-update
+   work T4 · 4m07s · $0.15 · run $0.82 / $40.00
+   GATE DISPUTE T4 — blocked for the operator; no review, no attempt charged
+   T4 blocked — the operator resolves the disputed gate with vloop task verify

@@ -490,7 +490,9 @@ vloop task verify <id> [<command>] [flags]
 
 ## vloop upgrade
 
-Refresh vloop's parts of a repository set up by an older vloop
+Refresh vloop's parts of a repository set up by an older vloop.
+
+To update the vloop binary and its plugins, run vloop self-update first.
 
 ```
 vloop upgrade [flags]

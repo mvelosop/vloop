@@ -1,0 +1,24 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "blocked",
+  "summary": "Implemented the self-update pointers in upgrade help, doctor warnings, guides, domain path rules, and the release handoff; the T4 gate's doctor setup cannot expose the rows it asserts.",
+  "files": [
+    "docs/domain/domain-model.md",
+    "docs/domain/platform/platform-context.md",
+    "docs/guide/commands.md",
+    "docs/guide/concepts.md",
+    "internal/cli/doctor.go",
+    "internal/cli/doctor_test.go",
+    "internal/cli/upgrade.go",
+    "tools/release/e2e_test.go",
+    "tools/release/publish.go",
+    "tools/release/publish_test.go"
+  ],
+  "verified": "vloop task gate T4 exited 1: doctor claude self-update pointer; focused doctor, command-reference, and release tests exited 0.",
+  "notes": "Gate dispute: the run's untracked config selects copilot for every session, so bare doctor marks Claude plugin n/a, while fakeagent exits 1 for the copilot --version preflight and doctor suppresses the copilot plugin row. The gate asserts both version-warning rows without configuring Claude use or making --version succeed. The implementation uses the required exact suffixes; the fixture must expose those rows through the normal CLI.",
+  "gate_dispute": {
+    "reason": "The gate's fake doctor environment cannot produce both plugin-version warnings it asserts.",
+    "evidence": ".vloop/config.local.toml selects copilot for all Claude-capable phases, so runDoctor does not add the Claude plugin warning; .vloop/state/gates/T1/fakeagent.go rejects --version, causing doctorCopilot's preflight result to be a problem and the gate's copilot plugin row to be skipped. T4's assertions for claude and copilot self-update pointers therefore fail before evaluating the changed suffixes."
+  }
+}

@@ -340,10 +340,10 @@ func TestDoctorPlugin(t *testing.T) {
 const (
 	noPluginMsg    = `/vloop:operate is not available in your interactive sessions — claude plugin install vloop@vloop --scope project installs it for this repository (after claude plugin marketplace add mvelosop/vloop if claude does not know the marketplace), or claude --plugin-dir "$(vloop plugin path)" for one session`
 	notEnabledMsg  = `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, claude plugin enable vloop@vloop --scope project (or with --scope user, if you disabled it for every repository), or start claude --plugin-dir "$(vloop plugin path)"`
-	oldPluginMsg   = "the vloop plugin is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind"
+	oldPluginMsg   = "the vloop plugin is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; vloop self-update updates the binary and the plugin"
 	noCopilotMsg   = `/vloop:operate is not available in your copilot sessions — trusting this folder in copilot installs it when .claude/settings.json declares it (vloop init writes the declaration), or copilot plugin install vloop@vloop (after copilot plugin marketplace add mvelosop/vloop), or copilot --plugin-dir "$(vloop plugin path)" for one session`
 	notEnabledCopi = `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, set enabledPlugins["vloop@vloop"] to true in .claude/settings.json and trust this folder in copilot, or start copilot --plugin-dir "$(vloop plugin path)"`
-	oldCopilotMsg  = "the vloop plugin for copilot is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; copilot plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind"
+	oldCopilotMsg  = "the vloop plugin for copilot is 0.0.9 but this binary is 0.1.0 — vloop run is unaffected; vloop self-update updates the binary and the plugin"
 )
 
 // claudeCwds is the working directories the stub claude ran plugin list in.

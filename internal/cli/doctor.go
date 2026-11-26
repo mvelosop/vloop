@@ -849,7 +849,7 @@ func doctorPlugin(b Build, root string) (string, string, string) {
 	}
 	switch {
 	case found != "":
-		return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind", found, b.Version)
+		return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — vloop run is unaffected; vloop self-update updates the binary and the plugin", found, b.Version)
 	case counted:
 		return "plugin", resWarning, `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, claude plugin enable vloop@vloop --scope project (or with --scope user, if you disabled it for every repository), or start claude --plugin-dir "$(vloop plugin path)"`
 	}
@@ -881,7 +881,7 @@ func doctorCopilotPlugin(b Build, root string) (string, string, string) {
 	}
 	switch {
 	case found != "":
-		return "copilot plugin", resWarning, fmt.Sprintf("the vloop plugin for copilot is %s but this binary is %s — vloop run is unaffected; copilot plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind", found, b.Version)
+		return "copilot plugin", resWarning, fmt.Sprintf("the vloop plugin for copilot is %s but this binary is %s — vloop run is unaffected; vloop self-update updates the binary and the plugin", found, b.Version)
 	case counted:
 		return "copilot plugin", resWarning, `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, set enabledPlugins["vloop@vloop"] to true in .claude/settings.json and trust this folder in copilot, or start copilot --plugin-dir "$(vloop plugin path)"`
 	}

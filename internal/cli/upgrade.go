@@ -18,7 +18,13 @@ func newUpgrade(b Build, g *Globals) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "upgrade",
 		Short: "Refresh vloop's parts of a repository set up by an older vloop",
-		Args:  cobra.NoArgs,
+		Long: `Refresh vloop's parts of a repository set up by an older vloop.
+
+To update the vloop binary and its plugins, run vloop self-update first.`,
+		Annotations: map[string]string{
+			"vloop:command-reference-long": "true",
+		},
+		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return runUpgrade(b, g, cmd, dryRun, yes, time.Now())
 		},

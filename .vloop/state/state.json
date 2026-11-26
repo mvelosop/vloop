@@ -5,9 +5,9 @@
   "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
   "branch": "B20261126-1036-b44-i98-self-update",
   "status": "running",
-  "iteration": 6,
+  "iteration": 7,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T15:31:24Z",
+  "updated": "2026-11-26T15:35:48Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -196,9 +196,9 @@
         "Any committed tests for the new help and doctor wording use the CLI and fake agent programs rather than real agents or network access."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 0,
-      "notes": ""
+      "notes": "gate disputed: The gate's fake doctor environment cannot produce both plugin-version warnings it asserts. — .vloop/config.local.toml selects copilot for all Claude-capable phases, so runDoctor does not add the Claude plugin warning; .vloop/state/gates/T1/fakeagent.go rejects --version, causing doctorCopilot's preflight result to be a problem and the gate's copilot plugin row to be skipped. T4's assertions for claude and copilot self-update pointers therefore fail before evaluating the changed suffixes."
     },
     {
       "id": "T5",
