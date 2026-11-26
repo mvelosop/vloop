@@ -81,3 +81,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The completed workflow passes T6, but the close oracle does not prove token secrecy in generated temporary artifacts.
 - **Files:** none
 - **Notes for next iteration:** The oracle scans command stdout and stderr in combined, but never inspects files in its temporary repository before os.RemoveAll(root). Acceptance 3 requires no output, log, fixture, or error to contain the stub token, so the gate needs an artifact scan (or a product-independent assertion over every generated artifact) before cleanup; the product was not changed to mask this test gap.
+
+## Run ended — blocked
+
+- **Run:** `B20261126-1818-b46-i153-copilot-model-ids` · 2 iteration(s) this run
+- **Plan:** 5/6 done, 1 blocked
