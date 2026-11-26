@@ -1,0 +1,11 @@
+checking the base: go
+the plan B20261126-1008-b42-i162-fence-reads-pwsh was for docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md — you asked for docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md: resetting and planning fresh
+planning from docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md using mai-code-2
+   plan · 4m48s · $0.17 · run $0.17 / $40.00
+checking the gate of T1 on the base
+checking the gate of T2 on the base
+checking the gate of T3 on the base
+planned: B20261126-1034-b43-i162-pwsh-gates-utf8 — 3 tasks
+reviewing the gates using mai-code-2 (round 1)
+   gate review · 2m45s · $0.09 · run $0.26 / $40.00
+committing the plan

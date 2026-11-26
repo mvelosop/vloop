@@ -1,0 +1,44 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.0852,
+  "credits": 8.52,
+  "duration_ms": 162559,
+  "effort": null,
+  "ended": "2026-11-26T13:46:56Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.0852,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: a backtick cannot be judged — write the command on one line, without escapes",
+      "tool_name": "powershell",
+      "tool_use_id": "call_uFm7AQm3BuQ1yfhWdPyZrhIR"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_hjaZbg9S3yCN31fFvtfA2tsH"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: pwsh: runs a script, stdin or an encoded command, not a literal -Command string",
+      "tool_name": "powershell",
+      "tool_use_id": "call_WHnnjCWH4C5hMUNpZBeqRP1H"
+    }
+  ],
+  "phase": "gate-review",
+  "run_id": "B20261126-1034-b43-i162-pwsh-gates-utf8",
+  "schema": "session/v4",
+  "started": "2026-11-26T13:44:11Z",
+  "turns": 14,
+  "wall_ms": 164625
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "T1's runtime behavior, byte assertions, encodings, stdin, exit preservation, and shell arguments are judged by its gate; the committed-test and setup-failure details are judged by the go check and review. T2's exact profile line is judged by its gate and the required explanatory wording and location by review. T3's integrated CLI behavior and recorded-command display are judged by its gate; its temporary-only execution and unchanged-tree requirement are judged by the gate plus review."
+}
+

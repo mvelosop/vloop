@@ -1,0 +1,12 @@
+--- FAIL: TestPowerShellGateUTF8Contract (2.44s)
+    --- FAIL: TestPowerShellGateUTF8Contract/pwsh (1.44s)
+        --- FAIL: TestPowerShellGateUTF8Contract/pwsh/three_BOM-free_encodings (0.21s)
+            oracle_test.go:46: code 1 stdout "" stderr ""
+    --- FAIL: TestPowerShellGateUTF8Contract/powershell (1.00s)
+        --- FAIL: TestPowerShellGateUTF8Contract/powershell/three_BOM-free_encodings (0.14s)
+            oracle_test.go:46: code 1 stdout "" stderr ""
+        --- FAIL: TestPowerShellGateUTF8Contract/powershell/native_stdin (0.19s)
+            oracle_test.go:57: code 1 stdout "" stderr ""
+FAIL
+FAIL	github.com/mvelosop/vloop/.vloop/state/gates/T1	2.484s
+FAIL
