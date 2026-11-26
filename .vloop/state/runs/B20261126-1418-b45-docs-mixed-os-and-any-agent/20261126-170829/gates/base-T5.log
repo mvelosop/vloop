@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T5\gate.ps1:5
+[36;1mLine |[0m
+[36;1m[36;1m   5 | [0m         [36;1mthrow $Message[0m
+[36;1m     | [31;1m         ~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mvloop init still omits a loop session kind[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m
