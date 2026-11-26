@@ -1,0 +1,24 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / U1 / Gate",
+      "summary": "The \"three encodings, without a BOM\" gate does not assert that Console.InputEncoding has an empty preamble.",
+      "evidence": "docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md:66 requires all three encodings to be UTF-8 without a BOM, but the literal gate at lines 133-134 checks InputEncoding.CodePage only. Its preamble checks cover OutputEncoding and $OutputEncoding, so InputEncoding could be a BOM-emitting UTF-8 encoding and the gate would still exit 0.",
+      "fix": "Add `-or [Console]::InputEncoding.GetPreamble().Length -ne 0` to the pinned condition at line 134."
+    }
+  ],
+  "decisions": [
+    "vloop sets UTF-8 inside the pwsh/powershell process on every OS rather than relying only on documentation or changing global machine/profile state; this is sound for the stated goal.",
+    "Console.OutputEncoding, Console.InputEncoding and $OutputEncoding all use BOM-less UTF-8; this is sound, subject to the gate correction above.",
+    "The implementer may choose the PowerShell setup mechanism; leaving this open is sound because the observable contract is exact.",
+    "The test fixture is the literal `café`, with the stdin hash computed from the platform line ending; this is sound.",
+    "The guide recommends only `[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()` for a person's terminal pipeline; this matches the documented symptom."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

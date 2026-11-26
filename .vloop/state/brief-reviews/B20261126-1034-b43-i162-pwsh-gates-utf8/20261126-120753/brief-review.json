@@ -1,0 +1,31 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / U1 — The defect depends on the console vloop inherits",
+      "summary": "The powershell 5.1 measurement is not what this execution mode produces from code page 437.",
+      "evidence": "The brief states at B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md:116 that redirected powershell 5.1 has Output/Input code pages 437/437 and writes cafe-e-acute as 63 61 66 82 0d 0a. RunGateWithin redirects stdout to its supplied writer at internal/state/gate.go:86-91. From chcp 437, reproducing that redirected process launch on this host produced 36 35 30 30 31 (65001), 36 35 30 30 31 (65001), 32 30 31 32 37 (20127), then 63 61 66 c3 a9 0d 0a for OutputEncoding, InputEncoding, $OutputEncoding and Write-Output respectively. The pwsh 7.7 row reproduced as 437/437, 65001 and 63 61 66 82 0d 0a.",
+      "fix": "Correct or qualify the powershell 5.1 row using a reproduction through the redirected gate runner. Keep the valid $OutputEncoding/native-stdin defect explicit, and do not promise that each powershell read/write assertion fails before the fix on a console where PowerShell already switches its redirected Console encodings to UTF-8."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example",
+      "summary": "The three `vloop task gate` lines omit output the CLI always prints, so the worked example is not an exact run of the named command and conflicts with the close gate's line-by-line requirement.",
+      "evidence": "The example at B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md:178-189 shows only the gate payload or says nothing was printed. internal/cli/task_gate.go:78 always appends `gate Tn: pass (<duration>)` on success, line 80 appends `gate Tn: fail (exit N, <duration>)` on failure, and line 83 makes a failing gate return the command's exit 1. internal/cli/task_gate_test.go:24-43 pins both forms.",
+      "fix": "Either include the existing status line for each command (and pin or clearly mark the nondeterministic duration) or explicitly say the arrows show only the child gate's payload and list the unchanged CLI status/error lines alongside it. Make the close gate's expected output follow that same convention."
+    }
+  ],
+  "decisions": [
+    "vloop, rather than a profile or machine-wide code-page change, owns the encodings for each started PowerShell process; sound.",
+    "The behavior applies on every OS and uses one code path; sound.",
+    "[Console]::OutputEncoding, [Console]::InputEncoding and $OutputEncoding use UTF-8 without a BOM; sound and directly testable.",
+    "The implementation mechanism is deliberately left open as a command prefix or another PowerShell mechanism; appropriate, provided the failure-safe and exit-code contract remains literal.",
+    "The `café` fixture is the chosen non-ASCII case, and the documented profile line sets only the caller's terminal decoding; appropriate."
+  ],
+  "checked": "Ran vloop brief check on a ready copy (0 warnings); checked facts against GateCommand and every Go caller, the B40 consumed dependency, P-5/P-8/C-5, the guide destinations, .vloop/config.toml, gate/command exit behavior and PowerShell 7.7/Windows PowerShell 5.1 encoding behavior from code page 437; checked consistency and task ordering for the base check and final worked example.",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+
