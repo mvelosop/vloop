@@ -225,6 +225,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261126-133232-two-routes-past-the-new-pwsh-judging-tha](I20261126-133232-two-routes-past-the-new-pwsh-judging-tha.md) |
 | verify | verification-finding | partly | no-options | [I20261126-141648-t3-s-close-gate-ran-vloop-in-its-own-scr](I20261126-141648-t3-s-close-gate-ran-vloop-in-its-own-scr.md) |
 | verify | verification-finding | partly | no-options | [I20261126-141649-the-encoding-setup-the-contract-required](I20261126-141649-the-encoding-setup-the-contract-required.md) |
+| verify | verification-finding | partly | no-options | [I20261126-161111-s3-changed-doctor-s-plugin-warnings-but](I20261126-161111-s3-changed-doctor-s-plugin-warnings-but.md) |
+| verify | verification-finding | partly | no-options | [I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on](I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
