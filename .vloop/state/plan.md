@@ -2,7 +2,7 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/5 done** · iteration 1
+**Status:** blocked · **0/5 done** · iteration 1
 
 **Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T14:54:38Z
 

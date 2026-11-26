@@ -4,7 +4,7 @@
   "brief": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md",
   "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
   "branch": "B20261126-1036-b44-i98-self-update",
-  "status": "running",
+  "status": "blocked",
   "iteration": 1,
   "created": "2026-11-26T14:23:56Z",
   "updated": "2026-11-26T14:54:38Z",
