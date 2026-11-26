@@ -11,11 +11,12 @@ import (
 // command is one simple command: its words, and the files it redirects to and
 // from.
 type command struct {
-	words  []string
-	plain  []bool // per word: written with no quote or escape
-	exp    []bool // per word: the shell expands it (C2)
-	writes []string
-	reads  []string
+	words      []string
+	plain      []bool // per word: written with no quote or escape
+	exp        []bool // per word: the shell expands it (C2)
+	writes     []string
+	reads      []string
+	powerShell string
 }
 
 type pending int
@@ -39,6 +40,7 @@ type lexer struct {
 	pend   pending
 	depth  int  // subshells open
 	closed bool // a subshell was just closed: only a redirection or an operator may follow
+	pipe   bool // the current command is after a pipeline operator
 }
 
 type splitSyntax int
@@ -52,6 +54,12 @@ const (
 const subshellRefusal = "subshells and process substitution cannot be judged"
 
 const scriptBlockRefusal = "script blocks cannot be judged — use Where-Object <Property> -like <value>, ForEach-Object -MemberName <Property> or Select-Object -ExpandProperty <Property>"
+
+const powerShellParenthesesRefusal = "parentheses cannot be judged here — (<command>).<Property> is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+
+const powerShellSubstitutionRefusal = "command substitution cannot be judged — run the inner command on its own"
+
+const powerShellBacktickRefusal = "a backtick cannot be judged — write the command on one line, without escapes"
 
 // opening are the keywords that start a command whose own words follow.
 var opening = map[string]bool{
@@ -211,6 +219,11 @@ func (l *lexer) opens() bool {
 	return true
 }
 
+func (l *lexer) startsPowerShellRead() bool {
+	return !l.in && !l.closed && l.pend == pendNone &&
+		len(l.cur.words) == 0 && len(l.cur.writes) == 0 && len(l.cur.reads) == 0
+}
+
 // split cuts a command string into simple commands at ; && || | & and
 // newlines outside quotes. It refuses what it cannot judge: an unterminated
 // quote, command substitution, process substitution and what a ( opens
@@ -242,6 +255,20 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 	}
 	for i := 0; i < len(s); i++ {
 		c := s[i]
+		if syntax == syntaxPowerShell && c == '$' && !l.pipe && l.startsPowerShellRead() {
+			end, first, ok, assignment := powerShellEnvAssignment(s, i)
+			if assignment {
+				if !ok {
+					l.cmds = append(l.cmds, command{
+						words: []string{first},
+						plain: []bool{true},
+						exp:   []bool{false},
+					})
+				}
+				i = end - 1
+				continue
+			}
+		}
 		switch c {
 		case '\'':
 			if syntax == syntaxCMD {
@@ -264,8 +291,19 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 					closed = true
 					break
 				}
-				if syntax != syntaxCMD && (d == '`' || (d == '$' && next(i) == '(')) {
-					return nil, errors.New("command substitution cannot be judged")
+				if d == '`' && syntax != syntaxCMD {
+					reason := "command substitution cannot be judged"
+					if syntax == syntaxPowerShell {
+						reason = powerShellBacktickRefusal
+					}
+					return nil, errors.New(reason)
+				}
+				if syntax != syntaxCMD && d == '$' && next(i) == '(' {
+					reason := "command substitution cannot be judged"
+					if syntax == syntaxPowerShell {
+						reason = powerShellSubstitutionRefusal
+					}
+					return nil, errors.New(reason)
 				}
 				if syntax != syntaxCMD && d == '\\' && i+1 < len(s) {
 					n := s[i+1]
@@ -304,11 +342,16 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 		case '`':
 			if syntax == syntaxCMD {
 				l.put(c, stUnquoted)
+			} else if syntax == syntaxPowerShell {
+				return nil, errors.New(powerShellBacktickRefusal)
 			} else {
 				return nil, errors.New("command substitution cannot be judged")
 			}
 		case '$':
 			if syntax != syntaxCMD && next(i) == '(' {
+				if syntax == syntaxPowerShell {
+					return nil, errors.New(powerShellSubstitutionRefusal)
+				}
 				return nil, errors.New("command substitution cannot be judged")
 			}
 			l.put(c, stUnquoted)
@@ -319,6 +362,21 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 				}
 				l.depth++
 				break
+			}
+			if syntax == syntaxPowerShell {
+				if !l.startsPowerShellRead() {
+					return nil, errors.New(powerShellParenthesesRefusal)
+				}
+				inner, end, ok := powerShellProperty(s, i)
+				if ok {
+					if _, nestedErr := splitPowerShell(inner); nestedErr != nil && nestedErr.Error() == scriptBlockRefusal {
+						return nil, nestedErr
+					}
+					l.cmds = append(l.cmds, command{powerShell: inner})
+					i = end
+					break
+				}
+				return nil, errors.New(powerShellParenthesesRefusal)
 			}
 			if (i > 0 && s[i-1] == '(') || !l.opens() {
 				return nil, errors.New(subshellRefusal)
@@ -340,6 +398,9 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 				break
 			}
 			if l.depth == 0 {
+				if syntax == syntaxPowerShell {
+					return nil, errors.New(powerShellParenthesesRefusal)
+				}
 				return nil, errors.New(subshellRefusal)
 			}
 			if err := l.end(); err != nil {
@@ -370,6 +431,7 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 			if err := l.end(); err != nil {
 				return nil, err
 			}
+			l.pipe = false
 		case ';':
 			if syntax == syntaxCMD {
 				l.put(c, stUnquoted)
@@ -378,6 +440,7 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 			if err := l.end(); err != nil {
 				return nil, err
 			}
+			l.pipe = false
 		case '|':
 			if n := next(i); n == '|' || n == '&' {
 				i++
@@ -385,6 +448,7 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 			if err := l.end(); err != nil {
 				return nil, err
 			}
+			l.pipe = true
 		case '&', '<', '>':
 			if c == '&' {
 				n := next(i)
@@ -395,6 +459,7 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 					if err := l.end(); err != nil {
 						return nil, err
 					}
+					l.pipe = false
 					break
 				}
 			}
@@ -454,4 +519,185 @@ func splitMode(s string, syntax splitSyntax) (cmds []command, err error) {
 		return nil, errors.New(subshellRefusal)
 	}
 	return l.cmds, nil
+}
+
+func powerShellProperty(s string, start int) (inner string, end int, ok bool) {
+	depth := 0
+	quote := byte(0)
+	for i := start; i < len(s); i++ {
+		c := s[i]
+		if quote != 0 {
+			if c == quote {
+				if quote == '\'' && i+1 < len(s) && s[i+1] == '\'' {
+					i++
+					continue
+				}
+				quote = 0
+			}
+			continue
+		}
+		if c == '\'' || c == '"' {
+			quote = c
+			continue
+		}
+		switch c {
+		case '(':
+			depth++
+		case ')':
+			depth--
+			if depth != 0 {
+				continue
+			}
+			if strings.TrimSpace(s[start+1:i]) == "" || i+1 >= len(s) || s[i+1] != '.' {
+				return "", 0, false
+			}
+			j := i + 2
+			components := 0
+			for {
+				componentStart := j
+				for j < len(s) && ((s[j] >= 'A' && s[j] <= 'Z') ||
+					(s[j] >= 'a' && s[j] <= 'z') ||
+					(s[j] >= '0' && s[j] <= '9') || s[j] == '_') {
+					j++
+				}
+				if j == componentStart {
+					return "", 0, false
+				}
+				components++
+				if j >= len(s) || s[j] != '.' {
+					break
+				}
+				j++
+			}
+			if components == 0 {
+				return "", 0, false
+			}
+			for j < len(s) && (s[j] == ' ' || s[j] == '\t' || s[j] == '\r') {
+				j++
+			}
+			if j < len(s) {
+				switch s[j] {
+				case '|', ';', '\n', '&':
+				default:
+					return "", 0, false
+				}
+			}
+			return s[start+1 : i], j - 1, true
+		}
+	}
+	return "", 0, false
+}
+
+func powerShellEnvAssignment(s string, start int) (end int, first string, ok, assignment bool) {
+	const prefix = "$env:"
+	if len(s)-start < len(prefix) || !strings.EqualFold(s[start:start+len(prefix)], prefix) {
+		return start + 1, "", false, false
+	}
+	assignment = true
+	end = start
+	quote := byte(0)
+	for end < len(s) {
+		c := s[end]
+		if quote != 0 {
+			if c == quote {
+				if quote == '\'' && end+1 < len(s) && s[end+1] == '\'' {
+					end += 2
+					continue
+				}
+				quote = 0
+			}
+			end++
+			continue
+		}
+		if c == '\'' || c == '"' {
+			quote = c
+			end++
+			continue
+		}
+		if c == ';' || c == '\n' || c == '|' {
+			break
+		}
+		if c == '&' {
+			break
+		}
+		end++
+	}
+	statement := strings.TrimSpace(s[start:end])
+	first = powerShellFirstWord(statement)
+	if len(prefix) >= len(statement) {
+		return end, first, false, true
+	}
+	i := len(prefix)
+	nameStart := i
+	for i < len(statement) && powerShellNameChar(statement[i]) {
+		i++
+	}
+	if i == nameStart || statement[nameStart] >= '0' && statement[nameStart] <= '9' {
+		return end, first, false, true
+	}
+	for i < len(statement) && (statement[i] == ' ' || statement[i] == '\t' || statement[i] == '\r') {
+		i++
+	}
+	if i >= len(statement) || statement[i] != '=' {
+		return end, first, false, true
+	}
+	i++
+	for i < len(statement) && (statement[i] == ' ' || statement[i] == '\t' || statement[i] == '\r') {
+		i++
+	}
+	if end < len(s) && s[end] == '|' {
+		return end, first, false, true
+	}
+	return end, first, powerShellLiteral(statement[i:]), true
+}
+
+func powerShellFirstWord(s string) string {
+	quote := byte(0)
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if quote != 0 {
+			if c == quote {
+				if quote == '\'' && i+1 < len(s) && s[i+1] == '\'' {
+					i++
+					continue
+				}
+				quote = 0
+			}
+			continue
+		}
+		if c == '\'' || c == '"' {
+			quote = c
+			continue
+		}
+		if c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == ';' || c == '|' || c == '&' {
+			return s[:i]
+		}
+	}
+	return s
+}
+
+func powerShellNameChar(c byte) bool {
+	return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' ||
+		c >= '0' && c <= '9' || c == '_'
+}
+
+func powerShellLiteral(s string) bool {
+	if len(s) >= 2 && s[0] == '\'' && s[len(s)-1] == '\'' {
+		for i := 1; i < len(s)-1; i++ {
+			if s[i] == '\'' {
+				if i+1 >= len(s)-1 || s[i+1] != '\'' {
+					return false
+				}
+				i++
+			}
+		}
+		return true
+	}
+	if len(s) >= 2 && s[0] == '"' && s[len(s)-1] == '"' {
+		return !strings.ContainsAny(s[1:len(s)-1], "$`")
+	}
+	if s == "" || strings.IndexAny(s, " \t\r\n$(){}[]@`") >= 0 {
+		return false
+	}
+	return true
 }

@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/5 done** · iteration 5
+**Status:** running · **2/5 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T12:46:55Z
+**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T12:57:35Z
 
 ## Progress
 
 - [x] **T1** — Judge pwsh and cmd wrappers · 2 attempt(s)
 - [x] **T2** — Refuse pwsh evaluation forms · 1 attempt(s)
-- [ ] **T3** — Read common pwsh forms and guide refusals
+- [ ] **T3** — Read common pwsh forms and guide refusals · 1 attempt(s)
 - [ ] **T4** — Document the pwsh fence rules
 - [ ] **T5** — Verify the complete pwsh fence contract
 
@@ -62,7 +62,7 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 ### T3 — Read common pwsh forms and guide refusals
 
-`pending` · depends on: T1, T2
+`pending` · 1 attempt(s) · depends on: T1, T2
 
 Stop rejecting the two pwsh forms that caused B40's denials while retaining exact, actionable fail-closed messages for syntax the fence still cannot read. The PowerShell-specific reading must not alter the bash tool's existing grammar.
 
@@ -73,6 +73,8 @@ Stop rejecting the two pwsh forms that caused B40's denials while retaining exac
 - In a powershell call, unsupported parentheses and @(…) use the exact parentheses guidance, $(…) uses the exact inner-command guidance, a backtick uses the exact one-line guidance, and @{…} reaches W2's script-block denial.
 - W2-W4's PowerShell-specific judgment also applies inside pwsh/powershell -Command strings, while sh -c inside such a string remains POSIX and direct bash-tool calls retain the old refusals and reasons.
 - Committed Go tests cover both successful W3 forms, the invalid-name/value boundaries, property and pipeline positions, the exact W4 reasons, nested W1/W2/W3 interactions and bash non-regressions, and the go check executes them.
+
+**From the last attempt:** PowerShell property reads are accepted after an existing pipeline stage, although W3 permits them only as a whole statement or the leading stage; the parser must deny that position with the W4 parentheses reason.
 
 <details><summary>verify command</summary>
 

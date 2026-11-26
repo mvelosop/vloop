@@ -149,6 +149,108 @@ func TestPowerShellScriptBlocks(t *testing.T) {
 	}
 }
 
+func TestPowerShellPropertyStatements(t *testing.T) {
+	j, _, _ := newJudge(t, PhaseWork)
+	push := "git push is denied by the work fence (Bash(git push:*))"
+	parentheses := powerShellParenthesesRefusal
+	cases := []struct {
+		name, command, want string
+	}{
+		{"pipeline", `(Get-Content README.md | Measure-Object -Line).Lines`, ""},
+		{"leading stage", `(Get-Content a).Name | Measure-Object`, ""},
+		{"property path", `(Get-Item a).Name.Value2 | Select-Object -First 1`, ""},
+		{"nested", `((Get-Item a).Name).Length`, ""},
+		{"denied inner command", `(git push).Length`, push},
+		{"denied inner pipeline", `(Get-Content a | git push).Length`, push},
+		{"dynamic inner command", `(Get-Content a | iex 'git push').Length`, "iex is not allowed"},
+		{"script block inner command", `(Get-Content a | ForEach-Object { $_.Name }).Length`, scriptBlockRefusal},
+		{"method", `(Get-Content a).Trim()`, parentheses},
+		{"argument", `Write-Output (Get-Content a)`, parentheses},
+		{"array", `@(git status)`, parentheses},
+		{"trailing argument", `(Get-Content a).Name suffix`, parentheses},
+		{"empty inner", `().Name`, parentheses},
+		{"invalid path", `(Get-Content a).Name-Thing`, parentheses},
+		{"bash unchanged", `(Get-Content a).Count`, subshellRefusal},
+		{"wrapper", `pwsh -c '(Get-Content a).Count'`, ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tool := "powershell"
+			if tc.name == "bash unchanged" {
+				tool = "bash"
+			}
+			d := j.Decide(tool, "", tc.command)
+			if tc.want == "" && !d.Allow {
+				t.Errorf("%q denied: %s", tc.command, d.Reason)
+			}
+			if tc.want != "" && (d.Allow || d.Reason != tc.want) {
+				t.Errorf("%q: got allow=%v reason=%q, want %q", tc.command, d.Allow, d.Reason, tc.want)
+			}
+		})
+	}
+}
+
+func TestPowerShellEnvironmentAssignments(t *testing.T) {
+	j, _, _ := newJudge(t, PhaseWork)
+	cases := []struct {
+		name, command, want string
+	}{
+		{"single quoted", `$env:GOOS='linux'; go build ./...`, ""},
+		{"double quoted", `$env:GOOS = "linux"; go vet ./...`, ""},
+		{"bare", `$env:_NAME=linux; go test ./x`, ""},
+		{"case insensitive drive", `$Env:GOOS=linux; go test ./x`, ""},
+		{"empty literal", `$env:NAME=''; go test ./x`, ""},
+		{"escaped single quote", `$env:NAME='can''t'; go test ./x`, ""},
+		{"invalid first character", `$env:1GOOS=linux; go test ./x`, "command word $env:1GOOS=linux starts with $ and cannot be judged"},
+		{"expanded compact", `$env:GOOS=$x; go build ./...`, "command word $env:GOOS=$x starts with $ and cannot be judged"},
+		{"expanded compact quoted space", `$env:GOOS="$x value"; go build ./...`, `command word $env:GOOS="$x value" starts with $ and cannot be judged`},
+		{"expanded spaced", `$env:GOOS = $x; go build ./...`, "command word $env:GOOS starts with $ and cannot be judged"},
+		{"double with backtick", "$env:GOOS=\"lin`ux\"; go build ./...", "command word $env:GOOS=\"lin`ux\" starts with $ and cannot be judged"},
+		{"parenthesized compact", `$env:GOOS=(linux); go test ./x`, "command word $env:GOOS=(linux) starts with $ and cannot be judged"},
+		{"array compact", `$env:GOOS=@(linux); go test ./x`, "command word $env:GOOS=@(linux) starts with $ and cannot be judged"},
+		{"extra word", `$env:GOOS=linux extra; go test ./x`, "command word $env:GOOS=linux starts with $ and cannot be judged"},
+		{"pipeline position", `Get-Content a | $env:GOOS=linux`, "command word $env:GOOS=linux starts with $ and cannot be judged"},
+		{"pipeline suffix", `$env:GOOS=linux | Get-Content`, "command word $env:GOOS=linux starts with $ and cannot be judged"},
+		{"bash unchanged", `$env:GOOS=linux; go build ./...`, "command word $env:GOOS=linux starts with $ and cannot be judged"},
+		{"wrapper", `pwsh -c '$env:GOOS=linux; go build ./...'`, ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tool := "powershell"
+			if tc.name == "bash unchanged" {
+				tool = "bash"
+			}
+			d := j.Decide(tool, "", tc.command)
+			if tc.want == "" && !d.Allow {
+				t.Errorf("%q denied: %s", tc.command, d.Reason)
+			}
+			if tc.want != "" && (d.Allow || d.Reason != tc.want) {
+				t.Errorf("%q: got allow=%v reason=%q, want %q", tc.command, d.Allow, d.Reason, tc.want)
+			}
+		})
+	}
+}
+
+func TestPowerShellUnreadableSyntaxGuidance(t *testing.T) {
+	j, _, _ := newJudge(t, PhaseWork)
+	for _, tc := range []struct {
+		tool, command, want string
+	}{
+		{"powershell", `Write-Output "$(git push)"`, powerShellSubstitutionRefusal},
+		{"powershell", "Write-Output a`tb", powerShellBacktickRefusal},
+		{"powershell", `pwsh -c 'Write-Output "$(git push)"'`, powerShellSubstitutionRefusal},
+		{"bash", `Write-Output "$(git push)"`, "command substitution cannot be judged"},
+		{"bash", "Write-Output a`tb", "command substitution cannot be judged"},
+	} {
+		t.Run(tc.tool+"/"+tc.command, func(t *testing.T) {
+			d := j.Decide(tc.tool, "", tc.command)
+			if d.Allow || d.Reason != tc.want {
+				t.Errorf("got allow=%v reason=%q, want %q", d.Allow, d.Reason, tc.want)
+			}
+		})
+	}
+}
+
 func TestCMDWrapper(t *testing.T) {
 	j, _, _ := newJudge(t, PhaseWork)
 	push := "git push is denied by the work fence (Bash(git push:*))"

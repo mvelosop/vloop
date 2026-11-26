@@ -5,9 +5,9 @@
   "base": "3b98a38748ef7e8bfab9d640429b019ffdafd4f5",
   "branch": "B20261126-1008-b42-i162-fence-reads-pwsh",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-26T12:00:48Z",
-  "updated": "2026-11-26T12:46:55Z",
+  "updated": "2026-11-26T12:57:35Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -137,8 +137,8 @@
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "PowerShell property reads are accepted after an existing pipeline stage, although W3 permits them only as a whole statement or the leading stage; the parser must deny that position with the W4 parentheses reason."
     },
     {
       "id": "T4",

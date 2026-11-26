@@ -1,0 +1,39 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "FAIL",
+  "criteria": [
+    {
+      "criterion": "A powershell statement or leading pipeline stage of the exact (<pipeline>).<Property> form judges its parentheses contents as a powershell call and allows only one or more letter, digit or underscore property-path components with no trailing syntax except end of statement or |; method calls and parentheses in every other position deny with W4's reason.",
+      "met": false,
+      "evidence": "internal/fence/split.go:363-380 accepts any parenthesized property form when startsPowerShellRead is true, including after an existing |, while the contract allows it only at a statement or the leading pipeline stage; internal/fence/split.go:219-223 does not check l.pipe, so a command such as Get-Content a | (Get-Content b).Name is allowed instead of receiving powerShellParenthesesRefusal."
+    },
+    {
+      "criterion": "A powershell whole statement $env:<NAME> = <literal> with a valid non-digit-leading name and one non-expanding literal is allowed and does not stop judging following commands; every other $env: statement keeps the existing command-word-starts-with-$ reason using the split first word.",
+      "met": true,
+      "evidence": "internal/fence/split.go:258-270 recognizes whole-statement assignments through powerShellEnvAssignment, split.go:591-651 validates the name/literal and emits the split first word on failure, and split.go:684-703 restricts expansion; wrappers_test.go:188-227 exercises valid assignments, invalid names/values, continuation, pipelines and the bash reason."
+    },
+    {
+      "criterion": "In a powershell call, unsupported parentheses and @(…) use the exact parentheses guidance, $(…) uses the exact inner-command guidance, a backtick uses the exact one-line guidance, and @{…} reaches W2's script-block denial.",
+      "met": true,
+      "evidence": "internal/fence/split.go:55-61 pins the W4 reasons; split.go:291-348 and split.go:363-404 dispatch PowerShell parentheses, command substitution and backticks to them, while split.go:330-334 sends @{…} through the script-block denial. wrappers_test.go:228-251 asserts the exact substitution and backtick reasons, and the existing script-block tests assert W2's reason."
+    },
+    {
+      "criterion": "W2-W4's PowerShell-specific judgment also applies inside pwsh/powershell -Command strings, while sh -c inside such a string remains POSIX and direct bash-tool calls retain the old refusals and reasons.",
+      "met": true,
+      "evidence": "internal/fence/judge.go:417-425 recursively enters shellPowerShell for pwsh/powershell and judge.go:435-441 enters shellPOSIX for sh wrappers; the bash tool still enters shellPOSIX at judge.go:97-100. wrappers_test.go:153-175, wrappers_test.go:211-215 and wrappers_test.go:228-250 cover PowerShell wrapper behavior and unchanged direct-bash reasons."
+    },
+    {
+      "criterion": "Committed Go tests cover both successful W3 forms, the invalid-name/value boundaries, property and pipeline positions, the exact W4 reasons, nested W1/W2/W3 interactions and bash non-regressions, and the go check executes them.",
+      "met": false,
+      "evidence": "internal/fence/wrappers_test.go:153-251 covers the successful leading-stage property and env forms plus several refusals, but no test covers a property form in a non-leading pipeline stage; the implementation in split.go:219-223 and split.go:363-380 therefore lacks a regression assertion for the pipeline-position boundary it violates. .vloop/tmp/checks.json and its go.log show the Go check ran and passed."
+    }
+  ],
+  "findings": [
+    {
+      "summary": "PowerShell property reads are accepted after an existing pipeline stage, although W3 permits them only as a whole statement or the leading stage; the parser must deny that position with the W4 parentheses reason.",
+      "kind": "bug"
+    }
+  ],
+  "notes": "Add a committed regression case for Get-Content a | (Get-Content b).Name and for another non-leading pipeline stage."
+}

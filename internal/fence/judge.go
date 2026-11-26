@@ -305,6 +305,12 @@ func (j *Judge) shellMode(s string, depth int, mode shellMode) string {
 		return err.Error()
 	}
 	for _, c := range cmds {
+		if c.powerShell != "" {
+			if r := j.shellMode(c.powerShell, depth, shellPowerShell); r != "" {
+				return r
+			}
+			continue
+		}
 		for _, w := range c.writes {
 			if d := j.write(w); !d.Allow {
 				return d.Reason
