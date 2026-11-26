@@ -48,3 +48,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Updated the four guides to describe shared agent behavior while preserving the distinct Claude and Copilot adapters, installation paths, metrics, and model values. Added mixed-team portable gate guidance and agent-aware eval replay instructions.
 - **Files:** docs/guide/concepts.md, docs/guide/metrics.md, docs/guide/configuration.md, docs/guide/evals.md
 - **Notes for next iteration:** The guides now distinguish Claude's appended system prompt from Copilot's custom-instructions directory, document Copilot's credit-based estimated cost and token absence, and keep Claude-specific plugin evaluation and qualification wording scoped.
+
+## T5 — List every session kind and portable gate shell
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Updated the generated and repository CLAUDE.md sections to list all six loop session kinds, and aligned the operator and architect guidance with portable pwsh gates on this mixed macOS/Windows team.
+- **Files:** internal/install/section.go, internal/install/install_test.go, CLAUDE.md, .claude/skills/vloop-operator/SKILL.md, .claude/skills/vloop-architect/SKILL.md
+- **Notes for next iteration:** The only Go test change updates the existing generated-section pin to the full six-kind list; no gate fixtures or unrelated generated text changed. BSD-tool cautions now apply only to plans whose shell is sh.

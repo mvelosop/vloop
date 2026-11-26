@@ -35,7 +35,7 @@ invariants that apply by ID, one path per entry:
   from hand-rounded run records. B1–B7's history is the shell loop's, under
   `.loop/state/runs/`.
 - A real-data check where the slice can read this repository's own history.
-- These lessons as constraints, verbatim where they apply: gates run on macOS's
-  BSD tools; sessions never move refs; tests build their fixtures in temporary
-  directories and address them with `git -C`.
+- These lessons as constraints, verbatim where they apply: gates are pwsh and
+  portable (a mixed team: macOS and Windows); sessions never move refs; tests
+  build their fixtures in temporary directories and address them with `git -C`.
 - In `vloop brief check`, un-backtick paths that exist only after the run.

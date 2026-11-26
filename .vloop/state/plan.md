@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 6
+**Status:** running · **5/6 done** · iteration 7
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:49:59Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:54:32Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Make the README agent-neutral and cite mai-code-2 · 1 attempt(s)
 - [x] **T3** — Explain mixed teams in the README · 1 attempt(s)
 - [x] **T4** — Update the guides for any agent
-- [ ] **T5** — List every session kind and portable gate shell
+- [x] **T5** — List every session kind and portable gate shell
 - [ ] **T6** — Run the complete documentation contract
 
 ## Tasks
@@ -107,7 +107,7 @@ pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1
 
 ### T5 — List every session kind and portable gate shell
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Apply D5 to vloop's generated CLAUDE.md text, this repository's own copy, and the operator and architect guidance. The implementation and its pinning test must describe the full loop on this mixed-OS repository.
 

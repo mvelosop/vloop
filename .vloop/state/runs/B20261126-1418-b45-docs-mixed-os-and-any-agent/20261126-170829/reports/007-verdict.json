@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "internal/install/section.go generates the exact session list \"(plan, gate review, work, review, second review, verify)\", and the existing test that pins that text is changed only to expect the new list.",
+      "met": true,
+      "evidence": "internal/install/section.go:24 contains the exact six-kind list; internal/install/install_test.go:103 changes only the existing expected string to that list."
+    },
+    {
+      "criterion": "This repository's CLAUDE.md vloop section is edited to the same session list; no unrelated generated section text or behavior changes.",
+      "met": true,
+      "evidence": "CLAUDE.md:45 contains the same six-kind list, and the product diff changes no other generated-section line or behavior."
+    },
+    {
+      "criterion": "The operator skill says this repository is a mixed team with platforms = [\"macos\", \"windows\"] and shell = \"pwsh\", its gates are pwsh and portable, and the BSD-tool rules apply only to plans whose shell is sh.",
+      "met": true,
+      "evidence": ".claude/skills/vloop-operator/SKILL.md:26-31 states the mixed-team platforms and pwsh shell, calls the gates pwsh and portable, and scopes the BSD rules to plans whose shell is sh."
+    },
+    {
+      "criterion": "The architect skill says gates are pwsh and portable for a mixed macOS and Windows team; it no longer states that this repository's gates run on macOS BSD tools.",
+      "met": true,
+      "evidence": ".claude/skills/vloop-architect/SKILL.md:38-39 says gates are pwsh and portable for a mixed macOS and Windows team, replacing the BSD-tools constraint."
+    },
+    {
+      "criterion": "A committed Go test in the checks continues to pin the generated section, and changing that pin is the only test change in this task.",
+      "met": true,
+      "evidence": "internal/install/install_test.go:100-106 still asserts the generated Section text, and the only test diff is the expected session-list string; the go check reports internal/install ok."
+    }
+  ],
+  "findings": [],
+  "notes": "The change is limited to D5's generated section, its repository copy, the two repository skills, and the existing pinning test."
+}

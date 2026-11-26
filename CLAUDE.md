@@ -42,7 +42,7 @@ GOOS=linux go build ./...   GOOS=windows go build ./...
 <!-- vloop:begin -->
 ## vloop
 
-Sessions started by the vloop loop (plan, gate review, work, review) follow these rules:
+Sessions started by the vloop loop (plan, gate review, work, review, second review, verify) follow these rules:
 
 1. Use repo-relative paths only, in files, logs and commit messages.
 2. A work session does one task and stops; it does not start the next one.
