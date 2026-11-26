@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "Before writing model.<kind>, with or without --local, config set resolves agent.<kind> and the candidate model by C-1 and refuses a Copilot Claude alias, an id absent from the --all list, or a disabled id with the brief's exact exit-2 line; all other keys retain their existing validation.",
+      "met": true,
+      "evidence": "internal/cli/config.go:148-160 calls validation before the write; config.go:188-258 resolves the agent and candidate through environment/local/shared precedence and returns the exact Usage refusals for aliases, absent ids and disabled ids; config_test.go exercises each refusal and verifies the file remains unchanged."
+    },
+    {
+      "criterion": "The models request is skipped for a removed model, for a kind not resolved to copilot, and when the candidate is a Claude alias already decidable locally.",
+      "met": true,
+      "evidence": "internal/cli/config.go:190-216 returns before creating a client for removal, non-Copilot agents and Claude aliases; config_test.go:458-460, :482-486 and :494-498 assert no request for alias, non-Copilot and removal cases."
+    },
+    {
+      "criterion": "A failed, timed-out, or malformed models call and a missing login do not refuse a single-key set: it writes the value and emits exactly the brief's stderr warning with exit 0; the warning or error never contains the token.",
+      "met": true,
+      "evidence": "internal/cli/config.go:151-161 writes warning-bearing successful validations, while config.go:220-232 turns login and model-call errors into the brief's warning strings; internal/copilot/client.go:127-131 redacts the token and uses a bounded five-second client. config_test.go:500-541 asserts failed, malformed and missing-data writes plus exact warnings; :449-457 checks exact no-login warning and persistence."
+    },
+    {
+      "criterion": "Each config-set validation uses a five-second models-call timeout and writes nothing on refusal; a successful removal remains the existing remove operation and is never checked.",
+      "met": true,
+      "evidence": "internal/cli/config.go:218 constructs copilot.New with 5*time.Second, config.go:148-159 returns refusal before config.Set/SetLocal, and config.go:190-193 bypasses removal checks; config_test.go:405-429 verifies refusal leaves bytes unchanged and :463-470 verifies removal."
+    },
+    {
+      "criterion": "Committed Go tests use httptest and cover listed, absent, disabled, alias, unreachable, no-login, removal, --local, and environment/local precedence; no test reaches the real APIs.",
+      "met": true,
+      "evidence": "internal/cli/config_test.go:374-534 creates an httptest server and covers listed, absent, disabled, alias, failed/unreachable, malformed, no-login, removal, --local and environment/local precedence; every request URL is replaced through VLOOP_COPILOT_API_URL or VLOOP_GITHUB_API_URL, with checks log .vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309/checks/go.log showing internal/cli passed."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

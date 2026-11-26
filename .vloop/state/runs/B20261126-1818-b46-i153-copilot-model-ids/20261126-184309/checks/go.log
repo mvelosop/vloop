@@ -1,10 +1,10 @@
 ok  	github.com/mvelosop/vloop	(cached)
-ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
-ok  	github.com/mvelosop/vloop/cmd/vloop	29.198s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	1.537s
+ok  	github.com/mvelosop/vloop/cmd/vloop	34.042s
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
-ok  	github.com/mvelosop/vloop/internal/cli	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	111.641s
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ?   	github.com/mvelosop/vloop/internal/copilot	[no test files]

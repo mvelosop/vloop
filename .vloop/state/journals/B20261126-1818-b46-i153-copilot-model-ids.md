@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Updated the existing worked-example schema-list assertion for the new embedded copilot-models/v1 contract, completing the Copilot model-listing task without changing the established command behavior.
 - **Files:** cmd/vloop/b2_e2e_test.go
 - **Notes for next iteration:** The prior implementation already added the listing command and schema. Its repository check failed only because the B2 worked example still expected the old schema list; the assertion now includes copilot-models/v1.
+
+## T2 — Check Copilot model ids in config set
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Config set now validates a resolved Copilot model before writing, refuses aliases, missing ids and disabled ids, and warns without refusing when the five-second models check is unavailable.
+- **Files:** internal/cli/config.go, internal/cli/config_test.go, internal/copilot/client.go
+- **Notes for next iteration:** Validation previews C-1 precedence for the candidate model without writing; removals, non-Copilot agents and locally known aliases skip the models request. Responses without the required data field are treated as malformed and warning-only for config set.

@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Config set now validates a resolved Copilot model before writing, refuses aliases, missing ids and disabled ids, and warns without refusing when the five-second models check is unavailable.",
+  "files": [
+    "internal/cli/config.go",
+    "internal/cli/config_test.go",
+    "internal/copilot/client.go"
+  ],
+  "verified": "vloop task gate T2 exited 0 and printed gate T2: pass (1.965s).",
+  "notes": "Validation previews C-1 precedence for the candidate model without writing; removals, non-Copilot agents and locally known aliases skip the models request. Responses without the required data field are treated as malformed and warning-only for config set."
+}

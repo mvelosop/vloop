@@ -1,16 +1,19 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/mvelosop/vloop/internal/config"
+	"github.com/mvelosop/vloop/internal/copilot"
 	"github.com/mvelosop/vloop/internal/gitrun"
 )
 
@@ -145,12 +148,19 @@ func newConfig(g *Globals) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			warning, err := checkConfigSetCopilotModel(root, args[0], args[1], setLocal)
+			if err != nil {
+				return configErr(g, cmd.OutOrStdout(), err)
+			}
 			write := config.Set
 			if setLocal {
 				write = config.SetLocal
 			}
 			if err := write(root, args[0], args[1]); err != nil {
 				return configErr(g, cmd.OutOrStdout(), err)
+			}
+			if warning != "" {
+				fmt.Fprintln(cmd.ErrOrStderr(), warning)
 			}
 			if v, err := config.Get(root, args[0]); err == nil {
 				switch {
@@ -183,6 +193,75 @@ func newConfig(g *Globals) *cobra.Command {
 	path.Flags().BoolVar(&pathLocal, "local", false, "show the local file's path instead")
 	cmd.AddCommand(path)
 	return cmd
+}
+
+func checkConfigSetCopilotModel(root, key, value string, local bool) (string, error) {
+	kind, ok := strings.CutPrefix(key, "model.")
+	if !ok || value == "" {
+		return "", nil
+	}
+	agentKey := "agent." + kind
+	if _, err := config.Lookup(agentKey); err != nil {
+		return "", nil
+	}
+	if err := config.Check(root, key, value); err != nil {
+		return "", err
+	}
+	agent, err := config.Get(root, agentKey)
+	if err != nil {
+		return "", err
+	}
+	if agent.Value != "copilot" {
+		return "", nil
+	}
+	model, err := configValueAfterSet(root, key, value, local)
+	if err != nil {
+		return "", err
+	}
+	if isClaudeAlias(model.Value) {
+		return "", Usage(fmt.Errorf("%s is a Claude alias, and %s is copilot: vloop models copilot lists the Copilot ids", model.Value, agentKey))
+	}
+	client, err := copilot.New(5 * time.Second)
+	if errors.Is(err, copilot.ErrNoLogin) {
+		return fmt.Sprintf("! cannot check %s: no GitHub login reaches Copilot", model.Value), nil
+	}
+	if err != nil {
+		return fmt.Sprintf("! cannot check %s against Copilot's model list (%s); set anyway", model.Value, err), nil
+	}
+	models, err := client.Models(context.Background())
+	if err != nil {
+		return fmt.Sprintf("! cannot check %s against Copilot's model list (%s); set anyway", model.Value, err), nil
+	}
+	for _, listed := range models {
+		if listed.ID != model.Value {
+			continue
+		}
+		if listed.Policy != nil && *listed.Policy == "disabled" {
+			return "", Usage(fmt.Errorf("%s is disabled by this account's Copilot policy: vloop models copilot lists the enabled ones", model.Value))
+		}
+		return "", nil
+	}
+	return "", Usage(fmt.Errorf("%s is not a Copilot model this account lists: vloop models copilot lists them", model.Value))
+}
+
+func configValueAfterSet(root, key, value string, local bool) (config.Value, error) {
+	current, err := config.Get(root, key)
+	if err != nil {
+		return config.Value{}, err
+	}
+	if current.Source == config.SourceEnv || current.Source == config.SourceLocal && !local {
+		return current, nil
+	}
+	return config.Value{Key: key, Value: value, Set: true}, nil
+}
+
+func isClaudeAlias(model string) bool {
+	switch model {
+	case "opus", "sonnet", "haiku", "fable":
+		return true
+	default:
+		return false
+	}
 }
 
 // writeOrdered emits a JSON object whose keys keep the order of vals.

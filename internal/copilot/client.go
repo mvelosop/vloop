@@ -86,13 +86,16 @@ func (c *Client) Models(ctx context.Context) ([]Model, error) {
 	req.Header.Set("Authorization", "Bearer "+c.token)
 	req.Header.Set("Copilot-Integration-Id", integrationID)
 	var response struct {
-		Data []APIModel `json:"data"`
+		Data *[]APIModel `json:"data"`
 	}
 	if err := c.do(req, &response); err != nil {
 		return nil, c.redact(err)
 	}
-	models := make([]Model, 0, len(response.Data))
-	for _, entry := range response.Data {
+	if response.Data == nil {
+		return nil, errors.New("cannot read JSON response: missing data")
+	}
+	models := make([]Model, 0, len(*response.Data))
+	for _, entry := range *response.Data {
 		model := Model{ID: entry.ID, Picker: entry.ModelPickerEnabled}
 		switch entry.Policy.State {
 		case "enabled", "disabled":

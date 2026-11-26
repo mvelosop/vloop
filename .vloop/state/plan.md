@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 2
+**Status:** running · **2/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:15:25Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:25:01Z
 
 ## Progress
 
 - [x] **T1** — List Copilot model ids and the account plan · 1 attempt(s)
-- [ ] **T2** — Check Copilot model ids in config set
+- [x] **T2** — Check Copilot model ids in config set
 - [ ] **T3** — Check configured Copilot models in doctor
 - [ ] **T4** — Set several session kinds in one config command
 - [ ] **T5** — Document the Copilot model commands
@@ -42,7 +42,7 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 ### T2 — Check Copilot model ids in config set
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Prevent a single model.&lt;kind&gt; write from introducing an unusable Copilot id while preserving config set's existing warning-only behavior for an unavailable API. The validation must use the pair configuration resolves to after a candidate write, including local and environment overrides.
 

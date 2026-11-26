@@ -1,6 +1,9 @@
 package cli
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -10,7 +13,7 @@ import (
 
 func scratchRepo(t *testing.T) string {
 	t.Helper()
-	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW", "PLATFORMS", "SHELL", "AREAS", "RUN_MAX_ITERATIONS", "RUN_COST_CEILING", "RUN_MAX_ATTEMPTS", "RUN_STALL_LIMIT", "RUN_CONVERGENCE_MAX", "RUN_CONVERGENCE_MIN"} {
+	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW", "AGENT_PLAN", "AGENT_WORK", "AGENT_REVIEW", "AGENT_SECOND_REVIEW", "AGENT_GATE_REVIEW", "AGENT_VERIFY", "AGENT_REVIEW_BRIEF", "PLATFORMS", "SHELL", "AREAS", "RUN_MAX_ITERATIONS", "RUN_COST_CEILING", "RUN_MAX_ATTEMPTS", "RUN_STALL_LIMIT", "RUN_CONVERGENCE_MAX", "RUN_CONVERGENCE_MIN"} {
 		t.Setenv("VLOOP_"+v, "")
 	}
 	d := t.TempDir()
@@ -368,5 +371,165 @@ func TestConfigPathLocal(t *testing.T) {
 	}
 	if _, out, _ := run(t, "-C", d, "config", "path"); out != ".vloop/config.toml\n" {
 		t.Fatalf("%q", out)
+	}
+}
+
+func TestConfigSetCopilotModelRefusalsAndWarnings(t *testing.T) {
+	mode := "ok"
+	requests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		if r.Header.Get("Authorization") != "Bearer stub-token" || r.Header.Get("Copilot-Integration-Id") != "copilot-developer-cli" {
+			http.Error(w, "bad request", http.StatusUnauthorized)
+			return
+		}
+		switch mode {
+		case "failed":
+			http.Error(w, "unavailable", http.StatusServiceUnavailable)
+		case "malformed":
+			fmt.Fprint(w, `{`)
+		case "missing-data":
+			fmt.Fprint(w, `{}`)
+		default:
+			fmt.Fprint(w, `{"data":[
+				{"id":"mai-code-2","model_picker_enabled":true,"policy":{"state":"enabled"}},
+				{"id":"gpt-6.1-terra","model_picker_enabled":true},
+				{"id":"claude-fable-5.1","model_picker_enabled":true,"policy":{"state":"disabled"}}]}`)
+		}
+	}))
+	defer server.Close()
+	t.Setenv("COPILOT_GITHUB_TOKEN", "")
+	t.Setenv("GH_TOKEN", "stub-token")
+	t.Setenv("GITHUB_TOKEN", "")
+	t.Setenv("VLOOP_COPILOT_API_URL", server.URL)
+	t.Setenv("VLOOP_GITHUB_API_URL", server.URL)
+
+	d := scratchRepo(t)
+	mustWriteConfig(t, d, "[agent]\nwork = \"copilot\"\n[model]\nwork = \"mai-code-2\"\n")
+	assertConfigRefusal := func(value, want string) {
+		t.Helper()
+		path := filepath.Join(d, ".vloop", "config.toml")
+		before, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		code, out, errOut := run(t, "-C", d, "config", "set", "model.work", value)
+		if code != 2 || out != "" || errOut != "vloop: "+want+"\n" {
+			t.Fatalf("%s: code=%d stdout=%q stderr=%q", value, code, out, errOut)
+		}
+		after, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(after) != string(before) {
+			t.Fatalf("%s changed config from %q to %q", value, before, after)
+		}
+	}
+
+	assertConfigRefusal("mai-code-3", "mai-code-3 is not a Copilot model this account lists: vloop models copilot lists them")
+	assertConfigRefusal("claude-fable-5.1", "claude-fable-5.1 is disabled by this account's Copilot policy: vloop models copilot lists the enabled ones")
+	aliasRequests := requests
+	assertConfigRefusal("sonnet", "sonnet is a Claude alias, and agent.work is copilot: vloop models copilot lists the Copilot ids")
+	if requests != aliasRequests {
+		t.Fatal("Claude alias made a models request")
+	}
+
+	mode = "failed"
+	code, out, errOut := run(t, "-C", d, "config", "set", "model.work", "gpt-6.1-terra")
+	wantWarning := "! cannot check gpt-6.1-terra against Copilot's model list (503 Service Unavailable); set anyway\n"
+	if code != 0 || out != "" || errOut != wantWarning {
+		t.Fatalf("failed call: code=%d stdout=%q stderr=%q", code, out, errOut)
+	}
+	if _, out, _ := run(t, "-C", d, "config", "get", "model.work"); out != "gpt-6.1-terra\n" {
+		t.Fatalf("failed call did not write: %q", out)
+	}
+
+	mode = "malformed"
+	code, _, errOut = run(t, "-C", d, "config", "set", "model.work", "mai-code-2")
+	if code != 0 || !strings.HasPrefix(errOut, "! cannot check mai-code-2 against Copilot's model list (") || !strings.HasSuffix(errOut, "); set anyway\n") {
+		t.Fatalf("malformed call: code=%d stderr=%q", code, errOut)
+	}
+	mode = "missing-data"
+	code, _, errOut = run(t, "-C", d, "config", "set", "model.work", "gpt-6.1-terra")
+	if code != 0 || errOut != "! cannot check gpt-6.1-terra against Copilot's model list (cannot read JSON response: missing data); set anyway\n" {
+		t.Fatalf("missing data: code=%d stderr=%q", code, errOut)
+	}
+
+	before := requests
+	mode = "failed"
+	code, _, errOut = run(t, "-C", d, "config", "set", "model.work", "")
+	if code != 0 || errOut != "" || requests != before {
+		t.Fatalf("removal: code=%d stderr=%q requests=%d", code, errOut, requests-before)
+	}
+
+	mode = "ok"
+	code, _, errOut = run(t, "-C", d, "config", "set", "--local", "model.work", "mai-code-2")
+	if code != 0 || errOut != "" {
+		t.Fatalf("local: code=%d stderr=%q", code, errOut)
+	}
+	_, out, _ = run(t, "-C", d, "config", "get", "model.work", "--json")
+	if !strings.Contains(out, `"value":"mai-code-2","source":"local"`) {
+		t.Fatalf("local source: %q", out)
+	}
+}
+
+func TestConfigSetCopilotModelNoLoginAndResolvedPrecedence(t *testing.T) {
+	d := scratchRepo(t)
+	mustWriteConfig(t, d, "[agent]\nwork = \"copilot\"\n[model]\nwork = \"mai-code-2\"\n")
+	t.Setenv("COPILOT_GITHUB_TOKEN", "")
+	t.Setenv("GH_TOKEN", "")
+	t.Setenv("GITHUB_TOKEN", "")
+	t.Setenv("PATH", t.TempDir())
+	code, _, errOut := run(t, "-C", d, "config", "set", "model.work", "gpt-6.1-terra")
+	if code != 0 || errOut != "! cannot check gpt-6.1-terra: no GitHub login reaches Copilot\n" {
+		t.Fatalf("no login: code=%d stderr=%q", code, errOut)
+	}
+
+	requests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		requests++
+		fmt.Fprint(w, `{"data":[{"id":"mai-code-2","policy":{"state":"enabled"}},{"id":"disabled","policy":{"state":"disabled"}}]}`)
+	}))
+	defer server.Close()
+	t.Setenv("GH_TOKEN", "stub-token")
+	t.Setenv("VLOOP_COPILOT_API_URL", server.URL)
+
+	t.Setenv("VLOOP_AGENT_WORK", "claude")
+	code, _, errOut = run(t, "-C", d, "config", "set", "model.work", "not-listed")
+	if code != 0 || errOut != "" || requests != 0 {
+		t.Fatalf("non-Copilot agent: code=%d stderr=%q requests=%d", code, errOut, requests)
+	}
+
+	t.Setenv("VLOOP_AGENT_WORK", "copilot")
+	t.Setenv("VLOOP_MODEL_WORK", "disabled")
+	code, _, errOut = run(t, "-C", d, "config", "set", "model.work", "mai-code-2")
+	want := "vloop: disabled is disabled by this account's Copilot policy: vloop models copilot lists the enabled ones\n"
+	if code != 2 || errOut != want {
+		t.Fatalf("environment model precedence: code=%d stderr=%q", code, errOut)
+	}
+
+	t.Setenv("VLOOP_MODEL_WORK", "")
+	code, _, errOut = run(t, "-C", d, "config", "set", "--local", "model.work", "disabled")
+	if code != 2 || errOut != want {
+		t.Fatalf("local disabled: code=%d stderr=%q", code, errOut)
+	}
+	code, _, errOut = run(t, "-C", d, "config", "set", "--local", "model.work", "mai-code-2")
+	if code != 0 || errOut != "" {
+		t.Fatalf("local enabled: code=%d stderr=%q", code, errOut)
+	}
+	code, _, errOut = run(t, "-C", d, "config", "set", "model.work", "not-listed")
+	if code != 0 {
+		t.Fatalf("local override should validate local model: code=%d stderr=%q", code, errOut)
+	}
+}
+
+func mustWriteConfig(t *testing.T, root, body string) {
+	t.Helper()
+	path := filepath.Join(root, ".vloop", "config.toml")
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
 	}
 }

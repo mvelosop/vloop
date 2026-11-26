@@ -24,3 +24,10 @@ committing the plan
    review T1 · 1m26s · $0.04 · run $0.69 / $40.00
    review: PASS
    T1 done
+── iteration 3 (3 this run) · T2 · 1/6 done ──
+   Check Copilot model ids in config set
+   work T2 · 5m37s · $0.13 · run $0.82 / $40.00
+   check go
+   review T2 · 1m26s · $0.04 · run $0.86 / $40.00
+   review: PASS
+   T2 done
