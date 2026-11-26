@@ -202,6 +202,14 @@ func (l *lexer) opens() bool {
 // quote, command substitution, process substitution and what a ( opens
 // anywhere but a subshell. A subshell's ( and ) cut commands like ; does.
 func split(s string) ([]command, error) {
+	return splitMode(s, false)
+}
+
+func splitPowerShell(s string) ([]command, error) {
+	return splitMode(s, true)
+}
+
+func splitMode(s string, powerShell bool) ([]command, error) {
 	l := &lexer{}
 	next := func(i int) byte {
 		if i+1 < len(s) {
@@ -250,7 +258,11 @@ func split(s string) ([]command, error) {
 				return nil, errors.New("unterminated quote")
 			}
 		case '\\':
-			if i+1 < len(s) {
+			word := l.word.String()
+			windowsPath := len(word) >= 2 && word[1] == ':' && ((word[0] >= 'A' && word[0] <= 'Z') || (word[0] >= 'a' && word[0] <= 'z'))
+			if powerShell || windowsPath {
+				l.put(c, stUnquoted)
+			} else if i+1 < len(s) {
 				i++
 				if s[i] != '\n' {
 					l.put(s[i], stLiteral)

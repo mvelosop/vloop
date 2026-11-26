@@ -104,8 +104,13 @@ func New(phase, root, home string) (*Judge, error) {
 // the patch.
 func (j *Judge) Decide(tool, path, cmd string) Decision {
 	switch strings.ToLower(tool) {
-	case "bash", "powershell":
-		if r := j.shell(cmd, 0); r != "" {
+	case "bash":
+		if r := j.shellMode(cmd, 0, shellPOSIX); r != "" {
+			return Decision{Reason: r}
+		}
+		return allow()
+	case "powershell":
+		if r := j.shellMode(cmd, 0, shellPowerShell); r != "" {
 			return Decision{Reason: r}
 		}
 		return allow()
@@ -251,13 +256,41 @@ func (j *Judge) sensitive(p string) bool {
 	return false
 }
 
-// shell judges a command string: "" when every simple command in it is
-// allowed, else why not.
-func (j *Judge) shell(s string, depth int) string {
+type shellMode int
+
+const (
+	shellPOSIX shellMode = iota
+	shellPowerShell
+	shellCMD
+)
+
+// shellMode judges a command string in the syntax of mode: "" when every
+// simple command in it is allowed, else why not.
+func (j *Judge) shellMode(s string, depth int, mode shellMode) string {
 	if depth > maxDepth {
 		return "shell wrappers nest too deep to judge"
 	}
-	cmds, err := split(s)
+	var cmds []command
+	var err error
+	if mode == shellCMD {
+		if strings.ContainsAny(s, "%^") {
+			return "cmd: % and ^ cannot be judged"
+		}
+		for _, part := range splitCMD(s) {
+			var parsed []command
+			parsed, err = splitPowerShell(part)
+			if err != nil {
+				return err.Error()
+			}
+			cmds = append(cmds, parsed...)
+		}
+	} else {
+		if mode == shellPowerShell {
+			cmds, err = splitPowerShell(s)
+		} else {
+			cmds, err = split(s)
+		}
+	}
 	if err != nil {
 		return err.Error()
 	}
@@ -272,7 +305,7 @@ func (j *Judge) shell(s string, depth int) string {
 				return fmt.Sprintf("read of %s is not allowed: it is under ~/.claude, ~/.copilot or ~/.config/gh", r)
 			}
 		}
-		if r := j.words(c.words, c.plain, c.exp, depth); r != "" {
+		if r := j.words(c.words, c.plain, c.exp, depth, mode); r != "" {
 			return r
 		}
 	}
@@ -304,7 +337,7 @@ func baseName(w string) string {
 }
 
 // words judges one simple command's words, looking through wrappers.
-func (j *Judge) words(ws []string, plain, exp []bool, depth int) string {
+func (j *Judge) words(ws []string, plain, exp []bool, depth int, mode shellMode) string {
 	var repls []string // the replace strings of the xargs looked through
 	// Opening keywords are dropped while they are the command's first word,
 	// before assignments; closing keywords and for read only there too.
@@ -347,6 +380,23 @@ func (j *Judge) words(ws []string, plain, exp []bool, depth int) string {
 			return fmt.Sprintf("shell syntax %s cannot be judged", name)
 		}
 		var err, repl string
+		switch strings.ToLower(name) {
+		case "pwsh", "powershell":
+			str, e := powerShellString(rest, exp[1:], repls)
+			if e != "" {
+				if strings.HasPrefix(e, "the -Command ") || e == "-Command has no command string" {
+					return e
+				}
+				return fmt.Sprintf("%s: %s", strings.ToLower(name), e)
+			}
+			return j.shellMode(str, depth+1, shellPowerShell)
+		case "cmd":
+			str, e := cmdString(rest, exp[1:])
+			if e != "" {
+				return "cmd: " + e
+			}
+			return j.shellMode(str, depth+1, shellCMD)
+		}
 		switch name {
 		case "eval", "source":
 			return name + " is not allowed"
@@ -376,8 +426,11 @@ func (j *Judge) words(ws []string, plain, exp []bool, depth int) string {
 			if e != "" {
 				return fmt.Sprintf("%s: %s", name, e)
 			}
-			return j.shell(str, depth+1)
+			return j.shellMode(str, depth+1, shellPOSIX)
 		default:
+			if mode != shellPOSIX {
+				return j.matchFold(append([]string{name}, rest...), append([]bool{false}, exp[1:]...))
+			}
 			return j.match(append([]string{name}, rest...), append([]bool{false}, exp[1:]...))
 		}
 		if err != "" {

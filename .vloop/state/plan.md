@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/5 done** · iteration 0
+**Status:** running · **0/5 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T12:08:15Z
+**Brief:** `docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md` · **Updated:** 2026-11-26T12:19:22Z
 
 ## Progress
 
-- [ ] **T1** — Judge pwsh and cmd wrappers
+- [ ] **T1** — Judge pwsh and cmd wrappers · 1 attempt(s)
 - [ ] **T2** — Refuse pwsh evaluation forms
 - [ ] **T3** — Read common pwsh forms and guide refusals
 - [ ] **T4** — Document the pwsh fence rules
@@ -18,7 +18,7 @@
 
 ### T1 — Judge pwsh and cmd wrappers
 
-`pending` · depends on: none
+`pending` · 1 attempt(s) · depends on: none
 
 Make pwsh, powershell and cmd execute the same fence decision on their literal command strings that a direct call receives. This closes the wrapper bypass while preserving the existing wrapper nesting limit and fail-closed behavior.
 
@@ -29,6 +29,8 @@ Make pwsh, powershell and cmd execute the same fence decision on their literal c
 - cmd accepts only /c or /k after /d, /q and /s, judges its literal string split at &amp;, &amp;&amp;, || and |, and denies % or ^; every other cmd form fails closed with the exact W1 reason.
 - A command inside a wrapper is allowed or denied exactly as the same command in the wrapped tool would be, including case-insensitive command and option matching and names with a path or .exe.
 - Committed Go tests cover the allowed and refused wrapper forms, option and name variants, command matching, nesting, phase/root preservation and both outer tools, and the go check executes them.
+
+**From the last attempt:** pwsh -ExecutionPolicy accepts an expanded value without refusing it, so structural argument expansion can inject options that the fence never judges.; cmd command strings are reparsed as PowerShell, adding semicolon and newline separators that the W1 cmd grammar explicitly excludes and changing the wrapper's decisions.
 
 <details><summary>verify command</summary>
 
