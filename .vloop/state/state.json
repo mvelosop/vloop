@@ -5,9 +5,9 @@
   "base": "3b2db83b1a7b73c5eec9d712263240246c01e797",
   "branch": "B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-26T10:24:41Z",
-  "updated": "2026-11-26T10:33:30Z",
+  "updated": "2026-11-26T10:40:57Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -62,8 +62,8 @@
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
       "status": "pending",
-      "attempts": 0,
-      "notes": ""
+      "attempts": 1,
+      "notes": "A complete state/v1 plan now takes the generic replaced-plan branch and prints `a complete plan of  — the next brief's plan replaces it` instead of the existing `a complete state/v1 plan — the next brief's plan replaces it`; G1 explicitly requires no other doctor output to change.; The gate and committed tests cover state/v1 only as a gate-shell row and do not assert the plan row's existing state/v1 message, so this output regression passes."
     },
     {
       "id": "T2",

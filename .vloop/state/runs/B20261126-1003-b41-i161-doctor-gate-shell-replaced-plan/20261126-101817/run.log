@@ -9,3 +9,9 @@ planned: B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan — 3 tasks
 reviewing the gates using mai-code-2 (round 1)
    gate review · 1m58s · $0.10 · run $0.41 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/3 done ──
+   Make replaced plans use the configured gate shell
+   work T1 · 3m21s · $0.12 · run $0.53 / $40.00
+   check go
+   review T1 · 1m41s · $0.06 · run $0.59 / $40.00
+   review: FAIL

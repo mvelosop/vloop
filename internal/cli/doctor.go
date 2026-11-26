@@ -533,9 +533,11 @@ func doctorCopilot(root string, keys []string, add func(name, result, msg string
 
 // doctorPlanShell adds the gate shell, plan and branch checks.
 func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *string, vals []config.Value, isRepo bool, add func(name, result, msg string)) {
+	replaced := hasPlan && doctorPlanReplaced(plan, runBrief)
 	shell := plan.Shell
 	mixed := false
-	if !hasPlan {
+	usePlanShell := hasPlan && !replaced
+	if !usePlanShell {
 		shell = ""
 		for _, v := range vals {
 			if v.Key == "shell" {
@@ -551,7 +553,7 @@ func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *s
 		add("gate shell", resNA, "")
 	case pathHas(shell):
 		add("gate shell", resPass, "")
-	case hasPlan:
+	case usePlanShell:
 		add("gate shell", resProblem, fmt.Sprintf("the plan's shell %q is not on PATH", shell))
 	case mixed:
 		add("gate shell", resProblem, fmt.Sprintf("the configured shell %q is not on PATH", shell))
@@ -569,8 +571,6 @@ func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *s
 				areas = v.List
 			}
 		}
-		replaced := plan.Schema == state.SchemaName && plan.Status == "complete" &&
-			(runBrief == nil || *runBrief != "" && *runBrief != plan.Brief)
 		var rep *state.Report
 		var err error
 		if !replaced {
@@ -595,6 +595,20 @@ func doctorPlanShell(root string, plan doctorPlanInfo, hasPlan bool, runBrief *s
 		} else {
 			add("branch", resPass, "")
 		}
+	}
+}
+
+func doctorPlanReplaced(plan doctorPlanInfo, runBrief *string) bool {
+	if plan.Status != "complete" {
+		return false
+	}
+	switch plan.Schema {
+	case state.SchemaV1:
+		return true
+	case state.SchemaName:
+		return runBrief == nil || *runBrief != "" && *runBrief != plan.Brief
+	default:
+		return false
 	}
 }
 

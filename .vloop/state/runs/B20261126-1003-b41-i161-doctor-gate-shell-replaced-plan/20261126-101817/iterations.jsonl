@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":139124,"exit":0,"name":"go"}],"ended":"2026-11-26T10:40:57Z","gate":{"duration_ms":4796,"exit":0},"iteration":1,"outcome":"rejected","run_id":"B20261126-1003-b41-i161-doctor-gate-shell-replaced-plan","schema":"iteration/v2","started":"2026-11-26T10:33:30Z","task":"T1"}
