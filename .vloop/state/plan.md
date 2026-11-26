@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/6 done** · iteration 3
+**Status:** running · **2/6 done** · iteration 4
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:33:35Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:37:45Z
 
 ## Progress
 
 - [x] **T1** — Document the mai-code-2 evidence
 - [x] **T2** — Make the README agent-neutral and cite mai-code-2 · 1 attempt(s)
-- [ ] **T3** — Explain mixed teams in the README
+- [ ] **T3** — Explain mixed teams in the README · 1 attempt(s)
 - [ ] **T4** — Update the guides for any agent
 - [ ] **T5** — List every session kind and portable gate shell
 - [ ] **T6** — Run the complete documentation contract
@@ -63,7 +63,7 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 ### T3 — Explain mixed teams in the README
 
-`pending` · depends on: T2
+`pending` · 1 attempt(s) · depends on: T2
 
 Apply D2 to README.md after its agent-neutral edits. The README needs one short mixed-OS entry point plus accurate install and Windows-only Copilot guidance.
 
@@ -74,6 +74,8 @@ Apply D2 to README.md after its agent-neutral edits. The README needs one short 
 - The section links docs/guide/configuration.md#mixed-teams, and the Copilot Windows bullet retains only the PowerShell hook plus the B40 through B44 Copilot-on-Windows evidence and links back to the mixed-team section.
 - README no longer says Windows is untested; Install points Windows users to the PowerShell PATH line in concepts.md, then explains self-update and the per-repository vloop upgrade step.
 - No mixed-team claim contradicts docs/guide/configuration.md.
+
+**From the last attempt:** check go failed — see .vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829/checks/004-go.fail.log
 
 <details><summary>verify command</summary>
 

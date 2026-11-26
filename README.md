@@ -33,6 +33,10 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 
 The file to put that line in, per shell, is in
 [docs/guide/concepts.md](docs/guide/concepts.md#setting-up-a-repository).
+On Windows, PowerShell users can find the `Path` command in
+[docs/guide/concepts.md](docs/guide/concepts.md#setting-up-a-repository). To
+update later, `vloop self-update` installs the latest release and updates the
+plugins; then run `vloop upgrade` in each repository.
 
 The plugin ships inside the binary, and `vloop run` hands it to its own sessions.
 For an interactive Claude Code session with the plugin, install it from this
@@ -82,6 +86,22 @@ In a git repository, on a clean tree:
    problem you found) records the run, marks the brief `consumed` and makes the
    closing commit. It never merges or pushes; that is yours.
 
+## Mixed macOS and Windows teams
+
+Declare the team's operating systems in the shared `.vloop/config.toml`:
+
+```toml
+platforms = ["macos", "windows"]
+shell = "pwsh"
+```
+
+Neither a local file nor an environment variable can override either setting
+for a mixed team. vloop refuses a plan whose gates call a command from its fixed
+list of tools that some platforms lack, including `grep` and `sed`; use portable
+pwsh cmdlets and the project's own toolchain instead. vloop runs `pwsh` gates
+and checks in UTF-8. This repository is a mixed macOS and Windows team. See the
+full [mixed-team configuration rules](docs/guide/configuration.md#mixed-teams).
+
 ## Running sessions on GitHub Copilot
 
 Each session kind can run on the GitHub Copilot CLI instead of Claude Code
@@ -110,11 +130,9 @@ run and in B40 to B44, which built vloop itself, and is not yet qualified by the
   hook that runs vloop's fence before every tool call, and the driver re-judges
   the calls afterwards.
 - **Cost** is estimated from Copilot credits at `copilot.credit-usd` dollars each.
-- **Windows and mixed teams:** the hook has a PowerShell form and gates run in
-  `pwsh`; declare the team's operating systems with `platforms` and use the
-  shared portability rules in
-  [Mixed teams](docs/guide/configuration.md#mixed-teams). A whole Copilot run on
-  Windows is untested.
+- **Windows:** the hook has a PowerShell form. Copilot runs on Windows were
+  used for B40 through B44; see
+  [Mixed macOS and Windows teams](#mixed-macos-and-windows-teams).
 - **Overriding locally:** `.vloop/config.local.toml` is git-ignored and beats
   `.vloop/config.toml`. To run Claude while the shared file says `copilot`, run
   `vloop config set --local agent.work claude` and `vloop config set --local

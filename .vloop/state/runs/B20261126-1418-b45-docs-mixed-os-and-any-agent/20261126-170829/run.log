@@ -31,3 +31,8 @@ committing the plan
    review T2 · 0m54s · $0.05 · run $0.58 / $40.00
    review: PASS
    T2 done
+── iteration 4 (4 this run) · T3 · 2/6 done ──
+   Explain mixed teams in the README
+   work T3 · 1m30s · $0.05 · run $0.63 / $40.00
+   check go
+   CHECK FAIL T3 — check go failed — see .vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829/checks/004-go.fail.log; review skipped

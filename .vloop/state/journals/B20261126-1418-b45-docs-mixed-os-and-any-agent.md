@@ -27,3 +27,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** README onboarding and loop guidance now describe Claude Code and GitHub Copilot CLI consistently, with Copilot prerequisites and mai-code-2 run evidence linked without claiming qualification.
 - **Files:** README.md
 - **Notes for next iteration:** Retained the gpt-6.1-terra limits: plan and gate review stay on Claude and verify remains untried. The mai-code-2 paragraph covers every session kind except second review and links the unchanged eval qualification rule and D6 evidence.
+
+## T3 — Explain mixed teams in the README
+
+- **Outcome:** check_failed (review: skipped)
+- **Summary:** README.md now has a concise mixed macOS and Windows team section, Copilot-specific Windows evidence, and accurate PowerShell install and update guidance.
+- **Files:** README.md
+- **Notes for next iteration:** The mixed-team section uses the shared platforms and pwsh declarations, summarizes the fixed portability lint and UTF-8 execution, and links to the full configuration guide; the Copilot bullet now retains only its PowerShell hook and B40 through B44 evidence.
