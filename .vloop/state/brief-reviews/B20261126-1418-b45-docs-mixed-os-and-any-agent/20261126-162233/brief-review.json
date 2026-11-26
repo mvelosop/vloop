@@ -1,0 +1,32 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "D2 — README.md, mixed teams",
+      "summary": "The README contract says vloop refuses any gate tool a declared platform lacks, but the implementation rejects only a fixed list of commands.",
+      "evidence": "The brief at docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:127-128 requires that vloop \"refuses a plan whose gates call a tool one of the platforms lacks\". internal/driver/gateshape.go:35-49 instead defines the finite PlatformSpecificCommands list, and internal/driver/gateshape.go:50-51 and :217-235 inspect only the first listed command in verify strings and .ps1 gate files; docs/guide/configuration.md:158 likewise describes rejection of a \"listed native command\".",
+      "fix": "Change the contract to say that vloop refuses a plan whose gates call a command on the driver's mixed-platform/platform-specific command list (including one in a .ps1 gate file). Keep the separate advice that gates use pwsh cmdlets and the project's own toolchain."
+    },
+    {
+      "kind": "rule",
+      "section": "Roadmap; Out of scope; Shape",
+      "summary": "The brief promises the required B45 roadmap row in its ready commit, but the row is absent and no loop task owns that pre-run edit.",
+      "evidence": "docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:17-19 says the B45 row is added in the ready commit. The repository's .claude/skills/vloop-architect/SKILL.md:15-18 requires pointing the roadmap row at the brief at hand-over. docs/design-notes/vloop-roadmap-b18-b21.md:51 ends at B44 with no B45 row, while the brief excludes docs/design-notes except D6 at line 262 and its six tasks (lines 282-292) contain no roadmap step.",
+      "fix": "Add the B45 row to docs/design-notes/vloop-roadmap-b18-b21.md before marking the brief ready (or explicitly assign that edit as a pre-run operator action outside Shape and Out of scope). Ensure the row points to this brief; leave marking it consumed for close."
+    }
+  ],
+  "decisions": [
+    "Name Claude Code and GitHub Copilot CLI where both agents apply, while retaining the explicitly Claude-specific sections; support this boundary.",
+    "Give mixed macOS/Windows teams their own short README section and keep docs/guide/configuration.md as the full treatment; support, subject to the D2 finding.",
+    "State mai-code-2's qualification with the runs and limitations named in D3/D6 rather than a bare claim; support.",
+    "Bring this repository's operator and architect skills into scope because their BSD-only gate wording is stale; support.",
+    "Locate text by its named content rather than line numbers because B40-B44 moved the documents; support.",
+    "Leave Spanish templates and docs/domain out of scope while requiring no contradiction; support."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

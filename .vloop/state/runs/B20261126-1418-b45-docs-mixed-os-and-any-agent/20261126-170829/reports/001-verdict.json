@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The design note has the exact heading \"## mai-code-2 in the loop (2026-11)\" and records the URL shortener run as 10 of 10 tasks, 10 first-pass, about $1.31, explicitly measured in an acceptance repository outside this repository.",
+      "met": true,
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:723-729 has the exact heading and records 10 tasks, 10 first-pass, about $1.31 as the operator's measurement from an external acceptance repository's metrics."
+    },
+    {
+      "criterion": "The section names B40 through B44 with task count, first-pass count and cost.total_usd rounded to cents exactly as read from each committed metrics snapshot, including B42's halted attempt.",
+      "met": true,
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:731-741 lists B40 6/3/$2.18, B41 3/2/$1.03, B42 5/2/$3.05, B43 3/2/$0.75 and B44 5/3/$1.94; each value matches its .vloop/state/metrics/B202611*.json snapshot, and B42 explicitly includes its halted first attempt."
+    },
+    {
+      "criterion": "The section names every session kind B40 through B44 ran, says no second review ran, and records that B40 through B45 brief reviews ran on mai-code-2 with their kept records under .vloop/state/brief-reviews/.",
+      "met": true,
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:742-746 lists plan, gate review, work, review and verify on mai-code-2, says no second review ran, and locates all B40-B45 brief-review records; the committed metrics model maps and brief-review session records agree."
+    },
+    {
+      "criterion": "The section records B39's $8.10 Claude comparison from its run record, B40's HTTP 503 exit 7 with no attempt counted, real defects caught by reviews and gate disputes, and operator-found defects in B42 and B43.",
+      "met": true,
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:747-758 records B39's $8.10 Claude run, the B40 HTTP 503 exit-7 uncounted halt matching .vloop/interventions/I20261126-005105-copilot-model-endpoint-503s-ended-t4-s-w.md, review-caught B42 fence bypasses, B43/B44 gate disputes, and the operator's B42/B43 defects."
+    },
+    {
+      "criterion": "No claim says or implies that mai-code-2 is qualified under the evaluation rule.",
+      "met": true,
+      "evidence": "docs/design-notes/copilot-cli-experiments.md:760-762 says the runs do not meet the three-run qualification requirement and do not qualify the model for any phase."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

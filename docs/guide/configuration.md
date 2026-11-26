@@ -19,13 +19,13 @@ environment and in `config set`.
 | Key | Default | Valid values | Environment variable | Effect |
 | --- | --- | --- | --- | --- |
 | `language` | `en` | `en`, `es` | `VLOOP_LANGUAGE` | language of a brief's section headings and of the template `brief new` writes; commands, flags, keys and JSON stay English |
-| `model.plan` | `opus` | any model name | `VLOOP_MODEL_PLAN` | model of the plan session |
-| `model.work` | `sonnet` | any model name | `VLOOP_MODEL_WORK` | model of the work sessions |
-| `model.review` | `sonnet` | any model name | `VLOOP_MODEL_REVIEW` | model of the review sessions |
-| `model.second-review` | `sonnet` | any model name | `VLOOP_MODEL_SECOND_REVIEW` | model of the second review session |
-| `model.gate-review` | `sonnet` | any model name | `VLOOP_MODEL_GATE_REVIEW` | model of the gate-review session |
-| `model.verify` | `sonnet` | any model name | `VLOOP_MODEL_VERIFY` | model of the verify session |
-| `model.review-brief` | `opus` | any model name | `VLOOP_MODEL_REVIEW_BRIEF` | model of the session `vloop brief review` runs |
+| `model.plan` | `opus` | a Claude alias or model name; a Copilot model id when agent.<kind> is copilot | `VLOOP_MODEL_PLAN` | model of the plan session |
+| `model.work` | `sonnet` | a Claude alias or model name; a Copilot model id when agent.<kind> is copilot | `VLOOP_MODEL_WORK` | model of the work sessions |
+| `model.review` | `sonnet` | a Claude alias or model name; a Copilot model id when agent.<kind> is copilot | `VLOOP_MODEL_REVIEW` | model of the review sessions |
+| `model.second-review` | `sonnet` | a Claude alias or model name; a Copilot model id when agent.<kind> is copilot | `VLOOP_MODEL_SECOND_REVIEW` | model of the second review session |
+| `model.gate-review` | `sonnet` | a Claude alias or model name; a Copilot model id when agent.<kind> is copilot | `VLOOP_MODEL_GATE_REVIEW` | model of the gate-review session |
+| `model.verify` | `sonnet` | a Claude alias or model name; a Copilot model id when agent.<kind> is copilot | `VLOOP_MODEL_VERIFY` | model of the verify session |
+| `model.review-brief` | `opus` | a Claude alias or model name; a Copilot model id when agent.<kind> is copilot | `VLOOP_MODEL_REVIEW_BRIEF` | model of the session `vloop brief review` runs |
 | `effort.plan` | unset | `low`, `medium`, `high`, `xhigh`, `max` | `VLOOP_EFFORT_PLAN` | effort of the plan session |
 | `effort.work` | unset | same | `VLOOP_EFFORT_WORK` | effort of the work sessions |
 | `effort.review` | unset | same | `VLOOP_EFFORT_REVIEW` | effort of the review sessions |

@@ -1,53 +1,29 @@
-. (Join-Path $PSScriptRoot "..\T1\harness.ps1")
+$ErrorActionPreference = 'Stop'
 
-$h = New-GateHarness
-$hOld = $null
-try {
-    New-Item -ItemType File -Force (Join-Path $h.Gobin ($h.ExeName + ".old")) | Out-Null
-    $r = Invoke-GateCommand $h.Exe @("self-update")
-    Assert-Equal $r.Code 0 "successful install exits 0"
-    $want = "installing vloop v0.15.0 (from v0.14.0)…`ninstalled vloop v0.15.0 at $(Format-GatePath $h.Gobin)`nnext: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository"
-    Assert-Equal $r.Out $want "successful install output"
-    Assert-Equal $r.Err "" "successful install stderr"
-    Assert-Equal (Get-GateLog $h.GoLog) "install github.com/mvelosop/vloop/cmd/vloop@v0.15.0" "install command"
-
-    if ([OperatingSystem]::IsWindows()) {
-        $hOld = New-GateHarness
-        $old = Join-Path $hOld.Gobin ($hOld.ExeName + ".old")
-        New-Item -ItemType Directory -Force $old | Out-Null
-        [IO.File]::WriteAllText((Join-Path $old "locked"), "keep")
-        $r = Invoke-GateCommand $hOld.Exe @("self-update")
-        Assert-Equal $r.Code 1 "unremovable old executable exits 1"
-        Assert-Gate ($r.Err.StartsWith("vloop: cannot remove $(Format-GatePath $old) (")) "old removal failure prefix"
-        Assert-Gate ($r.Err.EndsWith(") — delete it and run vloop self-update again")) "old removal failure remedy"
-        Assert-Gate (-not (Test-Path $hOld.GoLog)) "old removal failure installs nothing"
+function Need([bool] $Condition, [string] $Message) {
+    if (-not $Condition) {
+        throw $Message
     }
-
-    $h2 = New-GateHarness
-    $env:FAKE_GO_INSTALL_FAIL = "no matching versions"
-    $r = Invoke-GateCommand $h2.Exe @("self-update")
-    Assert-Equal $r.Code 1 "failed install exits 1"
-    Assert-Equal $r.Err "vloop: go install failed: no matching versions" "failed install message"
-    Assert-Gate (Test-Path $h2.Exe) "failed install restores the executable"
-    $probe = Invoke-GateCommand $h2.Exe @("version", "--json")
-    Assert-Equal $probe.Code 0 "restored executable still runs"
-    $version = $probe.Out | ConvertFrom-Json
-    Assert-Equal $version.module "v0.14.0" "restored executable keeps old version"
-
-    $h3 = New-GateHarness
-    $r = Invoke-GateCommand $h3.Exe @("--json", "self-update", "--version", "v0.13.0")
-    Assert-Equal $r.Code 0 "explicit older install exits 0"
-    $doc = $r.Out | ConvertFrom-Json
-    Assert-Equal $doc.schema "self-update/v1" "install JSON schema"
-    Assert-Equal $doc.target "v0.13.0" "install JSON target"
-    Assert-Gate ($doc.newer -eq $false) "explicit older JSON newer"
-    Assert-Gate ($doc.installed -eq $true) "install JSON installed"
-    Assert-Equal $doc.dir (Format-GatePath $h3.Gobin) "install JSON dir"
-    Assert-Equal (Get-GateLog $h3.GoLog) "install github.com/mvelosop/vloop/cmd/vloop@v0.13.0" "explicit target install command"
-} finally {
-    Remove-Item $h.Temp -Recurse -Force -ErrorAction SilentlyContinue
-    if ($hOld) { Remove-Item $hOld.Temp -Recurse -Force -ErrorAction SilentlyContinue }
-    if ($h2) { Remove-Item $h2.Temp -Recurse -Force -ErrorAction SilentlyContinue }
-    if ($h3) { Remove-Item $h3.Temp -Recurse -Force -ErrorAction SilentlyContinue }
-    $env:Path = $script:OriginalPath
 }
+
+$text = Get-Content -Raw -LiteralPath 'README.md'
+$flat = $text -replace '\s+', ' '
+$opening = ((Get-Content -LiteralPath 'README.md' -TotalCount 8) -join ' ') -replace '\s+', ' '
+Need ($opening -match 'Go command-line tool.*plugin.*Claude Code.*GitHub Copilot CLI') 'the opening sentence does not name both agents'
+Need ($opening -match 'agent plans the brief|agent plan the brief') 'the opening says Claude alone plans the brief'
+Need (-not $text.Contains('vloop has Claude plan it')) 'the Claude-only planning claim remains'
+
+Need ($flat -match '`copilot` CLI.*GitHub login') 'Copilot prerequisites are missing'
+Need ($flat -match 'doctor.*agent CLIs in use|doctor.*`claude`.*`copilot`') 'quickstart does not describe both agent CLIs'
+Need (-not $text.Contains('Every session is a fresh Claude session')) 'the Claude-only fresh-session sentence remains'
+Need ($flat -match 'fresh agent session.*Claude Code.*Copilot CLI') 'the loop paragraph does not name both agent sessions'
+Need ($flat -match 'Ask (your )?agent.*Claude Code.*Copilot CLI') 'the skill-driving paragraph does not address either agent'
+
+Need ($flat -match 'mai-code-2') 'mai-code-2 is absent from the README'
+Need ($flat -match 'URL shortener acceptance run') 'the mai-code-2 evidence does not name the URL shortener run'
+Need ($flat -match 'B40.*B44') 'the mai-code-2 evidence does not name B40 to B44'
+Need ($flat -match 'plan, gate review, work, review, verify and brief review') 'the mai-code-2 sentence omits a session kind'
+Need ($flat -match 'not yet qualified') 'the mai-code-2 sentence does not state that qualification is pending'
+Need ($flat -match 'copilot-cli-experiments\.md#mai-code-2-in-the-loop-2026-11') 'the mai-code-2 sentence does not link its evidence'
+Need (-not $text.Contains('mai-code-2 is qualified')) 'mai-code-2 is incorrectly called qualified'
+Need ($flat -match 'keep plan and gate review on Claude, and') 'the gpt-6.1-terra qualification remains ambiguous'

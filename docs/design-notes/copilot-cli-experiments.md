@@ -721,6 +721,44 @@ B33's branch on `PATH`.
 - One run each is below the guide's qualifying rule (3 runs); these are the
   tool's acceptance, not a qualification.
 
+## mai-code-2 in the loop (2026-11)
+
+The URL shortener acceptance run was measured by the operator from that
+acceptance repository's own metrics, outside this repository: 10 tasks, 10
+first-pass, about $1.31. No session in this repository checks or reproduces that
+external measurement.
+
+The committed metrics snapshots in `.vloop/state/metrics/` record these
+whole-run results for vloop itself, with `cost.total_usd` rounded to cents and
+all attempts included:
+
+- **B40:** 6 tasks, 3 first-pass, $2.18.
+- **B41:** 3 tasks, 2 first-pass, $1.03.
+- **B42:** 5 tasks, 2 first-pass, $3.05; its first attempt, halted on a fence
+  gap, is included.
+- **B43:** 3 tasks, 2 first-pass, $0.75.
+- **B44:** 5 tasks, 3 first-pass, $1.94.
+
+B40 through B44 ran plan, gate review, work, review and verify on
+`mai-code-2`; no second review ran. Every B40 through B45 brief review also ran
+on `mai-code-2`, and the kept records are under
+`.vloop/state/brief-reviews/`.
+
+For scale, not as a like-for-like comparison, B39 was a similarly sized brief
+in this repository and cost $8.10 with Claude (Opus for plan and Sonnet for the
+remaining phases), as its run record reports. The runs also exposed failure
+modes beyond the numbers: B40's Copilot model endpoint returned HTTP 503s,
+halting a T4 work session with exit 7; that task's attempt was not counted.
+The reviews caught real defects, including pwsh and cmd fence bypasses in B42,
+and the gate disputes in B43 and B44 identified faulty gates rather than
+acceptable implementation. The operator's own verification still found defects
+in B42 (two indirect fence-bypass routes) and B43 (the close gate's inherited
+plan hash and the encoding setup's effect on the shared console).
+
+These runs are evidence of what `mai-code-2` has handled in the loop. They do
+not meet the qualification evaluation's three-run requirement, so they do not
+qualify the model for any phase.
+
 ## Conclusions
 
 - **The model matters more than the CLI.** Sonnet reaches equivalent verdicts

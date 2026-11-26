@@ -1,0 +1,25 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "D6 — the evidence for mai-code-2; Shape",
+      "summary": "The brief prescribes B40-B44 and B39 telemetry values but does not give the run a real-data check of those values.",
+      "evidence": ".claude/skills/vloop-architect/SKILL.md:37 requires \"A real-data check where the slice can read this repository's own history.\" The brief's Shape at docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:296-297 gates D6 only on its heading and the B40-B44 names, while D6 at lines 203-215 makes task counts, first-pass counts and costs binding. The corresponding .vloop/state/metrics snapshots currently prove those local values (B40 6/3/$2.1804328, B41 3/2/$1.0282755, B42 5/2/$3.0516345, B43 3/2/$0.7495931, B44 5/3/$1.9409812, and B39 $8.0993202), but the planned gate can pass with every number wrong or omitted.",
+      "fix": "Make the D6 gate read the named local metrics snapshots (or run vloop metrics --json for each named brief) and assert the task, first_pass and rounded cost.total_usd values that the new section will print, including B39's $8.10 comparison. Keep the explicitly external URL-shortener measurement labeled operator-provided and outside the local gate."
+    }
+  ],
+  "decisions": [
+    "Name both agents only where the behavior applies to both, while retaining explicitly Claude-specific sections and commands; agree.",
+    "Give mixed macOS/Windows teams a short README section and keep the full treatment in the configuration guide; agree.",
+    "Document mai-code-2's operational run evidence without calling it qualified under the eval rule; agree.",
+    "Include this repository's operator and architect skill wording because its gates now run in pwsh; agree.",
+    "Locate changed prose by literal text rather than pinned line numbers; agree.",
+    "Keep Spanish templates and docs/domain out of scope; agree."
+  ],
+  "checked": "facts, consistency, rules, runnability; ready-copy brief check passed 0 warning(s); verified D1-D6 against current docs/code, C-5 and adapters, B40-B44/B39 telemetry, qualification wording, generated section/test pin, roadmap row, pwsh task order and worked example",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

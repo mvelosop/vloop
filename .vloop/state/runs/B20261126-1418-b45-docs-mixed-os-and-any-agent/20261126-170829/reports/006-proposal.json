@@ -1,0 +1,14 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Updated the four guides to describe shared agent behavior while preserving the distinct Claude and Copilot adapters, installation paths, metrics, and model values. Added mixed-team portable gate guidance and agent-aware eval replay instructions.",
+  "files": [
+    "docs/guide/concepts.md",
+    "docs/guide/metrics.md",
+    "docs/guide/configuration.md",
+    "docs/guide/evals.md"
+  ],
+  "verified": "vloop task gate T4 exited 0 and printed \"gate T4: pass\".",
+  "notes": "The guides now distinguish Claude's appended system prompt from Copilot's custom-instructions directory, document Copilot's credit-based estimated cost and token absence, and keep Claude-specific plugin evaluation and qualification wording scoped."
+}

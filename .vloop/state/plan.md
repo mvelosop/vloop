@@ -1,40 +1,35 @@
-# Plan — B20261126-1036-b44-i98-self-update
+# Plan — B20261126-1418-b45-docs-mixed-os-and-any-agent
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **5/5 done** · iteration 9
+**Status:** complete · **6/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:58:05Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T18:03:39Z
 
 ## Progress
 
-- [x] **T1** — Implement self-update target decisions and check mode · 2 attempt(s)
-- [x] **T2** — Install self-update targets safely
-- [x] **T3** — Update installed agent plugins
-- [x] **T4** — Point existing commands and guides to self-update
-- [x] **T5** — Verify the complete self-update workflow
+- [x] **T1** — Document the mai-code-2 evidence
+- [x] **T2** — Make the README agent-neutral and cite mai-code-2 · 1 attempt(s)
+- [x] **T3** — Explain mixed teams in the README · 1 attempt(s)
+- [x] **T4** — Update the guides for any agent
+- [x] **T5** — List every session kind and portable gate shell
+- [x] **T6** — Run the complete documentation contract
 
 ## Tasks
 
-### T1 — Implement self-update target decisions and check mode
+### T1 — Document the mai-code-2 evidence
 
-`done` · 2 attempt(s) · depends on: none
+`done` · depends on: none
 
-Introduce the self-update command so a released vloop can safely choose and report its target from any directory. This establishes the refusal, version-selection and machine-readable contract that installation and plugin updates build on.
+Add the D6 evidence section before any README link points to it. The section must turn B40 through B44 telemetry into a traceable account without overstating qualification.
 
 **Acceptance**
 
-- vloop self-update is a top-level command runnable without a repository and accepts only the exact --check and --version &lt;v&gt; flag contract in the brief.
-- No go on PATH and a checkout build produce the two exact S1 refusal lines and exit 1, before any target lookup or install-location check.
-- A valid --version target is used exactly without a latest-release lookup; a value that does not start with v and parse as semver produces the exact usage message and exits 2.
-- Without --version, go list -m -json github.com/mvelosop/vloop@latest runs outside a module in a temporary directory, a failure uses its first error line, and only a semantically newer target is selected.
-- --check prints the exact current/latest or current/target two-line report, exits 0, never installs, never asks go for its install directory and leaves plugins empty.
-- With no install needed, the exact up-to-date line is printed; pre-releases newer than latest are not downgraded.
-- The install-location calculation queries GOBIN then GOPATH/bin only when installation is about to happen, uses exact resolved-path comparison (case-insensitive on Windows), and emits the specified refusal when it differs.
-- Global --json emits only one self-update/v1 document for successful runs, with no human lines; refusals remain one vloop: stderr line, and the embedded schemas/self-update.v1.json validates every documented field.
-- Committed Go tests use temporary Go fake programs for go, cover all target/refusal/check/JSON branches above, never call the real go install or the network, and are run by the repository's go check.
-- docs/guide/commands.md is regenerated from the command tree and documents the new command and flags rather than being hand-maintained.
-- No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted.
+- The design note has the exact heading "## mai-code-2 in the loop (2026-11)" and records the URL shortener run as 10 of 10 tasks, 10 first-pass, about $1.31, explicitly measured in an acceptance repository outside this repository.
+- The section names B40 through B44 with task count, first-pass count and cost.total_usd rounded to cents exactly as read from each committed metrics snapshot, including B42's halted attempt.
+- The section names every session kind B40 through B44 ran, says no second review ran, and records that B40 through B45 brief reviews ran on mai-code-2 with their kept records under .vloop/state/brief-reviews/.
+- The section records B39's $8.10 Claude comparison from its run record, B40's HTTP 503 exit 7 with no attempt counted, real defects caught by reviews and gate disputes, and operator-found defects in B42 and B43.
+- No claim says or implies that mai-code-2 is qualified under the evaluation rule.
 
 <details><summary>verify command</summary>
 
@@ -44,21 +39,19 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 </details>
 
-### T2 — Install self-update targets safely
+### T2 — Make the README agent-neutral and cite mai-code-2
 
-`done` · depends on: T1
+`done` · 1 attempt(s) · depends on: T1
 
-Replace the released binary at the Go install location while preserving the old executable on every failure. Windows move-aside and restoration make the update safe even though the running executable cannot be overwritten in place.
+Apply D1 and D3 to README.md now that the evidence section exists. Readers must understand that either supported agent can drive the loop and that mai-code-2's results are evidence, not qualification.
 
 **Acceptance**
 
-- A necessary install prints the exact installing line, runs go install github.com/mvelosop/vloop/cmd/vloop@&lt;target&gt;, then prints the exact installed line on success.
-- A go install failure prints its last error line, exits 1, leaves no partially replaced running binary and does not continue to plugins.
-- On Windows, a stale vloop.exe.old is removed before moving the running vloop.exe aside; remove and move failures use the exact brief messages and install nothing.
-- On Windows, a failed install moves vloop.exe.old back; if restoration also fails, the exact combined failure line tells the operator to rename it by hand.
-- A successful --version request installs exactly that version even when it is older or a pre-release, and installed/newer/dir fields in self-update/v1 reflect what happened.
-- Committed Go tests build a temporary Go fake for go and cover success, failure, explicit older installation and the Windows old-file/restore paths without invoking the real go install or network.
-- The implementation does not install, downgrade or re-exec a binary outside the exact T1 decision and install-location checks.
+- README.md's opening names both Claude Code and GitHub Copilot CLI, says an agent plans the brief, and no longer contains "vloop has Claude plan it".
+- Prerequisites names the copilot CLI and a usable GitHub login when Copilot runs, while retaining the two Claude-specific bullets; quickstart says doctor checks the agent CLIs in use rather than Claude alone.
+- The loop summary says a fresh agent session for Claude Code or Copilot CLI, and "You ask; the skill drives" addresses the user's agent rather than Claude Code alone.
+- The Copilot section adds the prescribed mai-code-2 sentence for the URL shortener and B40 through B44, links D6's section, names every session kind but the second review, and says it is not yet qualified.
+- Neither "Every session is a fresh Claude session" nor "mai-code-2 is qualified" appears, and the gpt-6.1-terra sentence still limits plan and gate review to Claude and leaves verify untried.
 
 <details><summary>verify command</summary>
 
@@ -68,22 +61,19 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 </details>
 
-### T3 — Update installed agent plugins
+### T3 — Explain mixed teams in the README
 
-`done` · depends on: T2
+`done` · 1 attempt(s) · depends on: T2
 
-Complete self-update by updating each locally discoverable vloop plugin after the binary step. Plugin discovery and failures remain per-agent and non-fatal, with the same scope rules doctor already uses.
+Apply D2 to README.md after its agent-neutral edits. The README needs one short mixed-OS entry point plus accurate install and Windows-only Copilot guidance.
 
 **Acceptance**
 
-- After an installed or up-to-date binary, self-update checks claude then copilot only when each executable is on PATH and runs each plugin-list command from the current directory.
-- Claude counts the exact doctor rule: id starts with vloop@, version present, scope user or empty, or another scope whose project path matches the current directory; Copilot counts name vloop.
-- Claude refreshes the vloop marketplace first, then runs one scoped update per matching entry; Copilot runs one update, with all command, success and failure text exactly as the brief specifies.
-- Agent absence prints nothing; not installed, malformed or failed list, marketplace failure and update failure each produce their specified line, with plugin failures never changing exit 0.
-- With --version, the human output carries the exact latest-may-differ warning before plugin work; self-update/v1 carries no warning and instead records each installed/not-installed/failed plugin structurally.
-- A plugin updated or a binary installed produces the exact next line, while --check never inspects or updates plugins and leaves JSON plugins empty.
-- Committed Go tests build temporary fake claude and copilot programs, cover scope filtering, ordering, malformed/failing tools, JSON and non-fatal failures, and never run real agent CLIs or the network.
-- The implementation reuses doctor's plugin-list/discovery behaviour rather than adding divergent matching rules, and no command other than self-update calls plugin update or marketplace update.
+- README.md has a section headed "## Mixed macOS and Windows teams" after Quickstart and before the Copilot section, and its body is at most 150 words.
+- That section states the shared platforms and shell values, the refusal of local or environment overrides, the fixed-command portability lint, portable pwsh cmdlets and project toolchain, UTF-8 execution, and that this repository is such a team.
+- The section links docs/guide/configuration.md#mixed-teams, and the Copilot Windows bullet retains only the PowerShell hook plus the B40 through B44 Copilot-on-Windows evidence and links back to the mixed-team section.
+- README no longer says Windows is untested; Install points Windows users to the PowerShell PATH line in concepts.md, then explains self-update and the per-repository vloop upgrade step.
+- No mixed-team claim contradicts docs/guide/configuration.md.
 
 <details><summary>verify command</summary>
 
@@ -93,21 +83,19 @@ pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1
 
 </details>
 
-### T4 — Point existing commands and guides to self-update
+### T4 — Update the guides for any agent
 
-`done` · depends on: T3
+`done` · depends on: none
 
-Make machine-wide self-update discoverable from the repository upgrade workflow and doctor without changing those commands' offline behaviour. This also records the intentional path exception and the release handoff.
+Apply D4 consistently across the four guides. Agent-neutral prose must describe only where Claude and Copilot genuinely share behavior, while preserving agent-specific mechanisms.
 
 **Acceptance**
 
-- vloop upgrade --help includes exactly: To update the vloop binary and its plugins, run vloop self-update first.
-- Doctor's Claude and Copilot plugin-version warnings alone end with exactly — vloop run is unaffected; vloop self-update updates the binary and the plugin; doctor performs no new network or update call.
-- docs/guide/concepts.md explains self-update beside go install and vloop upgrade, including the checkout, missing-go and install-location refusals in a sentence, and docs/guide/commands.md is regenerated.
-- The C-2 line in docs/domain/domain-model.md and the platform context say that self-update outside any repository prints external paths with / and ~ for the home directory.
-- go run ./tools/release publish reports the final handoff as one line: then: vloop self-update, and vloop upgrade in each repository.
-- No text or output elsewhere changes except the explicitly listed help, two doctor warnings, guide/domain additions, generated command reference and release handoff.
-- Any committed tests for the new help and doctor wording use the CLI and fake agent programs rather than real agents or network access.
+- concepts.md says each configured agent runs a fresh agent session, explains both guideline delivery mechanisms, shows both interactive plugin-dir commands, names agent-eval for other agents, and adds a short mixed-team portable-gates note.
+- metrics.md says Copilot reports no tokens, estimates cost from copilot.credit-usd with cost_source estimated, sums every phase in credits.total, and counts cache_hit_ratio for Claude sessions only.
+- All seven model.* values explain that the setting is a Claude alias or model name, or a Copilot model id when that phase's agent is copilot; the old "any model name" value is absent.
+- evals.md's Calls claude row says claude plugin eval calls claude and tools/agent-eval calls the agent it is given, while the qualification rule remains unchanged.
+- No Claude-specific adapter, installation or qualification wording is made generic, and all new statements agree with the driver implementation.
 
 <details><summary>verify command</summary>
 
@@ -117,23 +105,46 @@ pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1
 
 </details>
 
-### T5 — Verify the complete self-update workflow
+### T5 — List every session kind and portable gate shell
 
-`done` · depends on: T1, T2, T3, T4
+`done` · depends on: none
 
-Prove the binary and plugin paths work together through the worked example after every earlier task is present. This final task closes gaps that isolated gates or task-local tests could miss.
+Apply D5 to vloop's generated CLAUDE.md text, this repository's own copy, and the operator and architect guidance. The implementation and its pinning test must describe the full loop on this mixed-OS repository.
 
 **Acceptance**
 
-- A committed cross-platform Go integration test runs the complete worked example with temporary fake go and claude programs and verifies each output line and exit code in order.
-- The integrated run verifies successful installation, plugin update and the exact next line, and it never calls the real go install, agent CLIs or network.
-- All earlier contract gates pass together on the final tree, including embedded self-update/v1 validation, Windows install restoration and pointer text.
-- The integration test does not replace or weaken the task-specific committed tests; every new behaviour remains covered by the repository's go check.
+- internal/install/section.go generates the exact session list "(plan, gate review, work, review, second review, verify)", and the existing test that pins that text is changed only to expect the new list.
+- This repository's CLAUDE.md vloop section is edited to the same session list; no unrelated generated section text or behavior changes.
+- The operator skill says this repository is a mixed team with platforms = ["macos", "windows"] and shell = "pwsh", its gates are pwsh and portable, and the BSD-tool rules apply only to plans whose shell is sh.
+- The architect skill says gates are pwsh and portable for a mixed macOS and Windows team; it no longer states that this repository's gates run on macOS BSD tools.
+- A committed Go test in the checks continues to pin the generated section, and changing that pin is the only test change in this task.
 
 <details><summary>verify command</summary>
 
 ```sh
 pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1
+```
+
+</details>
+
+### T6 — Run the complete documentation contract
+
+`done` · depends on: T1, T2, T3, T4, T5
+
+Close the pass by exercising every earlier gate together and replaying the brief's worked-example assertions. This catches cross-file drift that a single documentation task could miss.
+
+**Acceptance**
+
+- All five earlier gates pass from the finished tree, including the real-data evidence comparison and generated CLAUDE.md behavior.
+- Every line of the brief's worked example is true: stale README and concepts strings are absent, the mixed-team heading and mai-code-2 and self-update strings are present, and mai-code-2 is not called qualified.
+- The Copilot plugin-dir example exists, the old any-model table value is absent, the generated section source names all six session kinds, and the operator skill names shell = "pwsh".
+- No behavior, flag, message, default or test outcome changed except the generated section text and its test pin.
+- No changed prose contradicts the domain model or the binding guides, and no README mixed-team section exceeds 150 words.
+
+<details><summary>verify command</summary>
+
+```sh
+pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1
 ```
 
 </details>

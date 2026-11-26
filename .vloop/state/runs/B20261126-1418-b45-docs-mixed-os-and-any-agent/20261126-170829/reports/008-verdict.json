@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "All five earlier gates pass from the finished tree, including the real-data evidence comparison and generated CLAUDE.md behavior.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T6/gate.ps1 invokes T1 through T5 in order; T1 reads the committed metrics for B40-B44 and T5 exercises generated CLAUDE.md behavior. The task's recorded gate run exited 0, and the Go check log passed."
+    },
+    {
+      "criterion": "Every line of the brief's worked example is true: stale README and concepts strings are absent, the mixed-team heading and mai-code-2 and self-update strings are present, and mai-code-2 is not called qualified.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T6/gate.ps1 directly asserts each worked-example condition against README.md, docs/guide/concepts.md, and the finished tree; its pass confirms the absence and presence checks."
+    },
+    {
+      "criterion": "The Copilot plugin-dir example exists, the old any-model table value is absent, the generated section source names all six session kinds, and the operator skill names shell = \"pwsh\".",
+      "met": true,
+      "evidence": "docs/guide/concepts.md:389 contains the Copilot plugin-dir command; docs/guide/configuration.md:22-28 contain all seven agent-aware model rows; internal/install/section.go:24 names all six kinds; .claude/skills/vloop-operator/SKILL.md:27 names shell = \"pwsh\"."
+    },
+    {
+      "criterion": "No behavior, flag, message, default or test outcome changed except the generated section text and its test pin.",
+      "met": true,
+      "evidence": "The base-to-HEAD product diff changes documentation and skills, internal/install/section.go only in the session-kind text, and internal/install/install_test.go only in the expectation pinning that text; the repository check log passed."
+    },
+    {
+      "criterion": "No changed prose contradicts the domain model or the binding guides, and no README mixed-team section exceeds 150 words.",
+      "met": true,
+      "evidence": "README.md's mixed-team section matches C-5 and docs/guide/configuration.md on shared platforms and pwsh; the agent/session wording matches S-1 and the updated binding guides. T3's gate counts the section body at no more than 150 words, and T6 re-ran that gate successfully."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

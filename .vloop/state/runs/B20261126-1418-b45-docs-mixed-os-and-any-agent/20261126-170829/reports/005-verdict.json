@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "README.md has a section headed \"## Mixed macOS and Windows teams\" after Quickstart and before the Copilot section, and its body is at most 150 words.",
+      "met": true,
+      "evidence": "README.md:89-104 places the required heading between Quickstart and the Copilot section; the prose and TOML body is comfortably under 150 words."
+    },
+    {
+      "criterion": "That section states the shared platforms and shell values, the refusal of local or environment overrides, the fixed-command portability lint, portable pwsh cmdlets and project toolchain, UTF-8 execution, and that this repository is such a team.",
+      "met": true,
+      "evidence": "README.md:91-104 contains both shared values, says local and environment overrides are refused, describes the fixed grep/sed-style command list, requires portable pwsh cmdlets and the project toolchain, states UTF-8 execution, and identifies this repository as a mixed team."
+    },
+    {
+      "criterion": "The section links docs/guide/configuration.md#mixed-teams, and the Copilot Windows bullet retains only the PowerShell hook plus the B40 through B44 Copilot-on-Windows evidence and links back to the mixed-team section.",
+      "met": true,
+      "evidence": "README.md:104 links the full mixed-team guide, and README.md:114 limits the Windows bullet to the PowerShell hook, B40 through B44 Windows runs, and the local mixed-team link."
+    },
+    {
+      "criterion": "README no longer says Windows is untested; Install points Windows users to the PowerShell PATH line in concepts.md, then explains self-update and the per-repository vloop upgrade step.",
+      "met": true,
+      "evidence": "README.md has no Windows-is-untested claim; README.md:36-39 links Windows PowerShell users to concepts.md's setup section and explains vloop self-update followed by vloop upgrade in each repository."
+    },
+    {
+      "criterion": "No mixed-team claim contradicts docs/guide/configuration.md.",
+      "met": true,
+      "evidence": "README.md:91-104 agrees with configuration.md's Mixed teams section and C-5: two or more platforms use shared pwsh, platforms and mixed-team shell cannot come from local/environment sources, portable commands are enforced, and UTF-8 applies to vloop-run pwsh gates and checks."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

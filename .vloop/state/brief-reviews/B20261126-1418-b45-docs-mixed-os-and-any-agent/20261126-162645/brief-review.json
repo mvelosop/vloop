@@ -1,0 +1,26 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "D3 — README.md, the qualified model; D6 — the evidence for mai-code-2",
+      "summary": "The brief defines mai-code-2 as qualified from operational runs, but the repository's binding qualification rule requires three comparative eval runs against the default Claude model; the brief neither supplies nor amends that rule.",
+      "evidence": "The brief lines 143-147 require the README to say mai-code-2 is qualified from the URL-shortener acceptance run and B40-B44, while D6 lines 194-212 prescribes that same run evidence. docs/guide/evals.md:149-151 says a model qualifies only when, at 3 runs, every phase case's mean is no lower than the default Claude model's on the same tool and runs. The proposed evidence is operational run data, not those three comparative eval runs, and the brief does not amend the qualification definition.",
+      "fix": "The operator must choose the public meaning of \"qualified\": either run the required comparative evals and add their evidence before using that label, or amend docs/guide/evals.md in this brief to define an explicitly named real-run qualification (and distinguish it from eval qualification). Otherwise, call mai-code-2 operationally proven/used successfully rather than qualified."
+    }
+  ],
+  "decisions": [
+    "Name both agents only where both apply and retain the explicitly listed Claude-specific material; I agree.",
+    "Give mixed macOS/Windows teams a short README section of at most 150 words and retain configuration.md as the full treatment; I agree.",
+    "Present mai-code-2 as qualified with run evidence rather than making a bare qualification claim; this needs the operator decision identified in the finding.",
+    "Include this repository's operator and architect skills in the documentation pass because this is a mixed team whose gates are pwsh; I agree.",
+    "Do not pin line numbers because the cited documents moved during B40-B44; I agree.",
+    "Keep Spanish templates and docs/domain out of scope except for contradiction checks; I agree.",
+    "Use the proposed D6-first, README, guide, D5, and closing task sequence, with prose-review blocking after two wording failures; it is runnable and I agree."
+  ],
+  "checked": "facts, consistency, rules, runnability; the ready-copy brief check passed 0 warnings; B40-B44 task counts, first-pass counts, costs and mai-code-2 phase records match local metrics; generated section test, cited code paths, mixed-team invariants, and each task's proposed pwsh gate order were checked.",
+  "header": "Reviewed 2026-11-26: ASK, 1 finding"
+}
+

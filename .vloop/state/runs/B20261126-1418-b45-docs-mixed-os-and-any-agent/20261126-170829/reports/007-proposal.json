@@ -1,0 +1,15 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Updated the generated and repository CLAUDE.md sections to list all six loop session kinds, and aligned the operator and architect guidance with portable pwsh gates on this mixed macOS/Windows team.",
+  "files": [
+    "internal/install/section.go",
+    "internal/install/install_test.go",
+    "CLAUDE.md",
+    ".claude/skills/vloop-operator/SKILL.md",
+    ".claude/skills/vloop-architect/SKILL.md"
+  ],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: pass (1.662s).",
+  "notes": "The only Go test change updates the existing generated-section pin to the full six-kind list; no gate fixtures or unrelated generated text changed. BSD-tool cautions now apply only to plans whose shell is sh."
+}

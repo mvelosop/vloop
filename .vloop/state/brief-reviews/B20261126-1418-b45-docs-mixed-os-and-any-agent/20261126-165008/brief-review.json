@@ -1,0 +1,25 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "D3 — README.md, the model in use",
+      "summary": "The stated qualification rule is not the rule in docs/guide/evals.md.",
+      "evidence": "The brief says at docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:147-148 that \"at 3 runs, every eval case ... passes as the default Claude model does\". docs/guide/evals.md:149-151 instead says that, on the same tool and runs, every case scores a mean no lower than the phase's default Claude model; it does not require the default Claude model to pass.",
+      "fix": "Restate the literal criterion from docs/guide/evals.md: at 3 runs, every case's mean score must be no lower than that phase's default Claude model on the same tool and the same runs. Keep the conclusion that mai-code-2 is not yet qualified."
+    }
+  ],
+  "decisions": [
+    "Name both agents where both apply and retain text that is genuinely Claude-specific; agree.",
+    "Give mixed macOS/Windows teams a short README section that links the full configuration guide; agree.",
+    "Document mai-code-2's observed runs and evidence without calling the model qualified; agree.",
+    "Include this repository's operator and architect skill updates because its gates are pwsh; agree.",
+    "Do not pin line numbers because B40-B44 moved the documents; agree.",
+    "Keep Spanish templates and docs/domain out of scope except for contradictions; agree."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

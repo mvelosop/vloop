@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "README.md's opening names both Claude Code and GitHub Copilot CLI, says an agent plans the brief, and no longer contains \"vloop has Claude plan it\".",
+      "met": true,
+      "evidence": "README.md's opening paragraph names \"Claude Code and GitHub Copilot CLI\", says \"an agent plans the brief\", and does not contain the removed phrase."
+    },
+    {
+      "criterion": "Prerequisites names the copilot CLI and a usable GitHub login when Copilot runs, while retaining the two Claude-specific bullets; quickstart says doctor checks the agent CLIs in use rather than Claude alone.",
+      "met": true,
+      "evidence": "README.md's Prerequisites retains the claude CLI and workspace-trust bullets and adds the copilot CLI/GitHub login bullet; Quickstart step 3 names the agent CLIs in use, including Claude's trust and Copilot's login."
+    },
+    {
+      "criterion": "The loop summary says a fresh agent session for Claude Code or Copilot CLI, and \"You ask; the skill drives\" addresses the user's agent rather than Claude Code alone.",
+      "met": true,
+      "evidence": "README.md's loop paragraph says every session is a fresh agent session (Claude Code or Copilot CLI), and the following section says to ask your agent (Claude Code or Copilot CLI)."
+    },
+    {
+      "criterion": "The Copilot section adds the prescribed mai-code-2 sentence for the URL shortener and B40 through B44, links D6's section, names every session kind but the second review, and says it is not yet qualified.",
+      "met": true,
+      "evidence": "README.md's Copilot section names the URL shortener acceptance run and B40 to B44, lists plan, gate review, work, review, verify and brief review as the kinds run except the second review, says mai-code-2 is not yet qualified by the eval rule, and links the D6 anchor."
+    },
+    {
+      "criterion": "Neither \"Every session is a fresh Claude session\" nor \"mai-code-2 is qualified\" appears, and the gpt-6.1-terra sentence still limits plan and gate review to Claude and leaves verify untried.",
+      "met": true,
+      "evidence": "The README contains neither prohibited phrase; its gpt-6.1-terra sentence still says to keep plan and gate review on Claude and that verify is not yet tried."
+    }
+  ],
+  "findings": [],
+  "notes": "The product diff is limited to README.md; the Go check passed and covers the README command-tree/line-budget test."
+}

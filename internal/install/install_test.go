@@ -100,7 +100,7 @@ func TestReadRejectsWrongSchema(t *testing.T) {
 
 func TestSectionNamesSessionKindsAndOperatePlaybook(t *testing.T) {
 	s := Section("1.2.3")
-	for _, want := range []string{"(plan, gate review, work, review)", "/vloop:operate"} {
+	for _, want := range []string{"(plan, gate review, work, review, second review, verify)", "/vloop:operate"} {
 		if !strings.Contains(s, want) {
 			t.Errorf("section lacks %q:\n%s", want, s)
 		}

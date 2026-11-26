@@ -1,0 +1,24 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Binding references",
+      "summary": "The brief binds D6 to an unrelated intervention as a second record of B40's HTTP 503 halt.",
+      "evidence": "The brief at docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:91 cites .vloop/interventions/I20261006-1503-the-v1-0-0-and-v2-0-0-tags-deleted-befor.md as D6 evidence for B40's Copilot HTTP 503 halt. That file's Trigger and Done sections concern deleting v1/v2 tags before going public; the actual B40 halt is .vloop/interventions/I20261126-005105-copilot-model-endpoint-503s-ended-t4-s-w.md, already cited on the preceding line.",
+      "fix": "Remove the unrelated I20261006 intervention from the D6 binding references (or replace it with the intended repository evidence). Keep only citations whose contents support the stated D6 claim."
+    }
+  ],
+  "decisions": [
+    "Name both agents only where their behaviour is shared and leave genuinely Claude-specific text unchanged; sound and proportionate.",
+    "Give mixed macOS/Windows teams a short README section linking to the full configuration guide; sound and limits drift.",
+    "Report mai-code-2's measured runs while stopping short of qualification; required by the existing eval rule.",
+    "Include this repository's operator and architect skills because their BSD-tools wording no longer matches its shared pwsh configuration; sound and scoped.",
+    "Leave line numbers unpinned and keep Spanish templates and docs/domain out of scope; sound for this documentation pass."
+  ],
+  "checked": "facts, consistency, rules, runnability; ready-copy brief check passed with its unrelated-issue warning; B40-B44 task, first-pass and cost claims checked against .vloop/state/metrics; roadmap, invariants, config/checks, README, guides, install section, driver adapters and skills checked",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+

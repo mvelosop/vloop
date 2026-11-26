@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "README.md now has a concise mixed macOS and Windows team entry point, Copilot-specific Windows evidence, and accurate PowerShell install and upgrade guidance while staying under the repository line cap.",
+  "files": ["README.md"],
+  "verified": "vloop task gate T3 exited 0 and printed \"gate T3: pass (581ms)\"; go test ./internal/cli -run '^TestReadmeMatchesCommandTree$' -count=1 exited 0.",
+  "notes": "The mixed-team prose remains consistent with the configuration guide and covers shared platforms and pwsh, rejected overrides, fixed-command linting, portable pwsh/toolchain commands, UTF-8, and this repository; prose was compacted without weakening T2's Copilot evidence to satisfy the README line cap."
+}

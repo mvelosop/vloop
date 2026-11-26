@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "README.md now has a concise mixed macOS and Windows team section, Copilot-specific Windows evidence, and accurate PowerShell install and update guidance.",
+  "files": ["README.md"],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: pass.",
+  "notes": "The mixed-team section uses the shared platforms and pwsh declarations, summarizes the fixed portability lint and UTF-8 execution, and links to the full configuration guide; the Copilot bullet now retains only its PowerShell hook and B40 through B44 evidence."
+}

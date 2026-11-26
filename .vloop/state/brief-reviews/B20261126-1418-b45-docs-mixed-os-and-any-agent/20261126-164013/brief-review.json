@@ -1,0 +1,32 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Executive summary / D5",
+      "summary": "The stated D5 outcome says the generated CLAUDE.md section names every session kind, but the literal replacement still omits review-brief.",
+      "evidence": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:50-52 promises every session kind; :185-188 defines the exact list as only plan, gate review, work, review, second review and verify. README.md:95-97 also lists review-brief as a session kind.",
+      "fix": "Either narrow the summary, roadmap claim and D5 wording to the session kinds started by vloop run, or add review-brief to the literal replacement and worked-example gate. Given the generated sentence's wording, the narrow version is the smaller consistent fix."
+    },
+    {
+      "kind": "consistency",
+      "section": "D3 / D6 — evidence for mai-code-2",
+      "summary": "D6 says every phase ran on mai-code-2, contradicting D3's explicit exception for the second review and the B40-B44 metrics.",
+      "evidence": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:150-153 excludes the second review, while :210-212 says every phase. .vloop/state/metrics/B20261125-2207-b40-i156-mixed-os-pwsh.json:101-111 records an empty second-review agents list, and B41-B44 have the same state.",
+      "fix": "Name the six phases literally in D6 (plan, gate review, work, review, verify and brief review), and say the second review was not run, so D3 and D6 cannot imply different evidence."
+    }
+  ],
+  "decisions": [
+    "Name both agents only where both apply and preserve genuinely Claude-specific text; sound.",
+    "Give mixed teams a short README section and keep the full treatment in configuration.md; sound.",
+    "Record mai-code-2's observed runs with evidence but do not call it qualified; sound and required by the cited eval rule.",
+    "Include this repository's operator and architect skill wording in D5; sound given the repo is itself a mixed team.",
+    "Locate prose changes by named text instead of pinned line numbers; sound.",
+    "Keep Spanish templates and docs/domain out of scope except for consistency; sound."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

@@ -1,0 +1,38 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T5",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T6",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "All base failures assert the missing behavior. Criterion judges: T1 gate for criteria 1-4 and review for criterion 5; T2 gate for criteria 1-4 and 5's forbidden strings, review for retained Claude bullets and the full gpt-6.1-terra qualification wording; T3 gate for criteria 1-4 and review for criterion 5; T4 gate for criteria 1-4 and review/check for implementation agreement, preserved qualification, and the Claude-specific wording in criterion 5; T5 gate for generated/session-list and skill criteria, the go check for the pinning test, and review for scope-only test and text changes; T6 gate for criteria 1-3, go/review for criterion 4, and review plus T3 for criterion 5. T5's scratch-generated CLAUDE.md is read back before cleanup; T1 reads the committed metrics and B39 run record."
+}
+

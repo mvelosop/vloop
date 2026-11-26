@@ -23,9 +23,11 @@ operator; it may belong in `domain-model.md`.
 
 - The run id is the brief's file name minus `.loop-brief`; the work branch is
   named for it.
-- Gates run on macOS's BSD tools: no empty alternatives in `grep -E`, no
-  `sed -i` without a suffix, no `\+`/`\|` in basic regexes, no `date -d`. A
-  gate that breaks one of these is a gate defect.
+- This repository is a mixed team with `platforms = ["macos", "windows"]` and
+  `shell = "pwsh"`; its gates are pwsh and portable. The BSD-tool rules below
+  apply only to plans whose shell is `sh`: no empty alternatives in `grep -E`,
+  no `sed -i` without a suffix, no `\+`/`\|` in basic regexes, no `date -d`.
+  A gate that breaks one of these is a gate defect.
 - VS Code's `branch.*.vscode-merge-base` and its pull-request extension's
   `branch.*.github-pr-*` keys are ignored by the guard; any other editor key
   still halts with exit 9.

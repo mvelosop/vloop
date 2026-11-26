@@ -8,10 +8,11 @@ The ideas behind vloop, in the order you meet them. Every command is in
 A loop starts with a **plan**: a session reads a brief and splits it into
 tasks. Then, for each task in turn, a **work** session does the task, a **gate**
 runs its verify command, a **review** session judges the result independently,
-and the driver makes one **commit**. Every session is a fresh Claude session
-with no memory; the sessions share only files in the repository. A task that
-fails its gate or its review is tried again, and a run that cannot go on halts
-and says why (see [Exit codes](#exit-codes)).
+and the driver makes one **commit**. Every session is a fresh agent session
+(Claude Code or Copilot CLI, according to `agent.<kind>`) with no memory; the
+sessions share only files in the repository. A task that fails its gate or its
+review is tried again, and a run that cannot go on halts and says why (see
+[Exit codes](#exit-codes)).
 
 ## The driver
 
@@ -65,8 +66,9 @@ The plugin ships eight skills. Five are the sessions of the loop;
 - `/vloop:review-brief` is yours: invoke it in a separate interactive session to
   review a brief independently before it is marked ready and run.
 
-Each skill's behaviour is checked by evals in the plugin. They are run by the
-operator with `claude plugin eval`; `vloop run` never runs them.
+Each skill's behaviour is checked by evals in the plugin. The operator runs
+them with `claude plugin eval`; `go run ./tools/agent-eval` replays the cases
+on other agents (see [evals.md](evals.md)). `vloop run` never runs them.
 
 ## Briefs and their lifecycle
 
@@ -118,6 +120,11 @@ default, `pwsh` on Windows). A gate is written before the work exists, and the
 work session may not change it; only the operator does, with `vloop task verify
 <id> <command> --reason <text>`, which records the change in the task's history.
 For a plan the next brief replaces, doctor checks the configured shell.
+
+A team on more than one OS declares its `platforms` in the shared configuration
+and uses `shell = "pwsh"` to write portable gates, with PowerShell cmdlets and
+the project's own toolchain. See [Mixed teams](configuration.md#mixed-teams)
+for the full portability rules.
 
 **Gate fixtures.** What a gate needs besides its command (an oracle, a script,
 expected outputs) lives in the task's gate folder, `.vloop/state/gates/<id>/`.
@@ -244,8 +251,9 @@ defect add`. See [defects.md](defects.md).
 `.vloop/repo-guidelines.md` holds this repository's lessons: short rules a
 brief would otherwise repeat as a constraint, brief after brief. `vloop init`
 writes it empty. When it exists and is not empty, `vloop run` hands it to every
-session it starts (plan, gate review, work and review) as appended system
-instructions; with no file, or an empty one, the sessions start as before. A
+session it starts as extra instructions: Claude Code receives it as an appended
+system prompt, and Copilot CLI receives it through a custom-instructions
+directory. With no file, or an empty one, the sessions start as before. A
 guideline never overrides the brief or a domain invariant.
 
 A rule is a line starting with `- ` at the left margin, in any section.
@@ -373,11 +381,12 @@ claude`) otherwise. It exits 1 on a problem.
 The plugin ships inside the binary: `vloop plugin path` extracts it to
 `.vloop/tmp/plugin/<version>/`, and refuses outside a repository where `vloop
 init` ran. `vloop run` hands it to its sessions with `--plugin-dir`; for an
-interactive session, from inside such a repository, start Claude Code the same
-way:
+interactive session, from inside such a repository, start either agent the
+same way:
 
 ```
 claude --plugin-dir "$(vloop plugin path)"
+copilot --plugin-dir "$(vloop plugin path)"
 ```
 
 `vloop version --check-plugin
