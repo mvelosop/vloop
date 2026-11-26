@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/3 done** · iteration 3
+**Status:** blocked · **2/3 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:59:41Z
+**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:59:42Z
 
 ## Progress
 

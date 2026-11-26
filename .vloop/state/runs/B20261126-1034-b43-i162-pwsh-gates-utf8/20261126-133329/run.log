@@ -28,3 +28,9 @@ committing the plan
    work T3 · 2m02s · $0.07 · run $0.54 / $40.00
    GATE DISPUTE T3 — blocked for the operator; no review, no attempt charged
    T3 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+
+═══ blocked ═══
+run:    B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-133329  (3 iteration(s) this run)
+plan:   2/3 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status
