@@ -5,9 +5,9 @@
   "base": "3b98a38748ef7e8bfab9d640429b019ffdafd4f5",
   "branch": "B20261126-1008-b42-i162-fence-reads-pwsh",
   "status": "running",
-  "iteration": 8,
+  "iteration": 9,
   "created": "2026-11-26T12:00:48Z",
-  "updated": "2026-11-26T13:10:12Z",
+  "updated": "2026-11-26T13:13:56Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -213,7 +213,7 @@
         "The close adds no production change beyond what the prior tasks require and leaves a committed test for every behavior introduced by W1-W3."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     }

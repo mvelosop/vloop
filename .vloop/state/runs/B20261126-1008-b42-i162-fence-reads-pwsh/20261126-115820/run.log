@@ -63,3 +63,10 @@ committing the plan
    review T4 · 0m59s · $0.06 · run $2.31 / $40.00
    review: PASS
    T4 done
+── iteration 9 (9 this run) · T5 · 4/5 done ──
+   Verify the complete pwsh fence contract
+   work T5 · 1m03s · $0.07 · run $2.38 / $40.00
+   check go
+   review T5 · 1m35s · $0.10 · run $2.48 / $40.00
+   review: PASS
+   T5 done

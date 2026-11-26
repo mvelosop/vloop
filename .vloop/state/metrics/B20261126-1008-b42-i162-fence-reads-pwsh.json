@@ -6,9 +6,9 @@
   "merged": null,
   "tasks": {
     "planned": 5,
-    "done": 3,
+    "done": 4,
     "blocked": 0,
-    "first_pass": 0,
+    "first_pass": 1,
     "estimate": {
       "min": 3,
       "max": 5
@@ -16,59 +16,59 @@
   },
   "size": {
     "delivered": {
-      "code": 534,
+      "code": 544,
       "test": 307,
-      "docs": 0,
+      "docs": 20,
       "other": 0,
       "deleted": {
-        "code": 32,
+        "code": 35,
         "test": 0,
-        "docs": 0,
+        "docs": 1,
         "other": 0
       }
     },
     "churn": {
-      "code": 544,
+      "code": 554,
       "test": 307,
-      "docs": 0,
+      "docs": 20,
       "other": 0,
       "deleted": {
-        "code": 42,
+        "code": 45,
         "test": 0,
-        "docs": 0,
+        "docs": 1,
         "other": 0
       }
     },
-    "test_code_ratio": 0.5749063670411985,
-    "rework": 1.0187265917602997
+    "test_code_ratio": 0.5643382352941176,
+    "rework": 1.0183823529411764
   },
   "time": {
-    "agent_ms": 2258498,
-    "work_ms": 1389982,
-    "review_ms": 868516,
+    "agent_ms": 2512515,
+    "work_ms": 1585496,
+    "review_ms": 927019,
     "plan_ms": 659921,
-    "gates_ms": 18954,
-    "checks_ms": 989178,
+    "gates_ms": 20160,
+    "checks_ms": 1127204,
     "gate_review_ms": 458736,
     "wall_ms": null
   },
   "rate": {
-    "code_per_min": 14.186419469930902,
-    "code_test_per_min": 22.3422823487114
+    "code_per_min": 12.99096721810616,
+    "code_test_per_min": 20.322266732735923
   },
   "cost": {
-    "total_usd": 2.3260843999999996,
+    "total_usd": 2.6132718,
     "plan_usd": 0.46582670000000004,
-    "work_usd": 0.9572871,
-    "review_usd": 0.7267143,
+    "work_usd": 1.1876283,
+    "review_usd": 0.7835605,
     "gate_review_usd": 0.17625630000000003,
-    "per_1000_code_lines_usd": 4.355963295880149
+    "per_1000_code_lines_usd": 4.803808455882353
   },
   "credits": {
-    "total": 232.60844000000003,
+    "total": 261.32718,
     "plan": 46.58267,
-    "work": 95.72871,
-    "review": 72.67143,
+    "work": 118.76283000000001,
+    "review": 78.35605,
     "gate_review": 17.62563
   },
   "tokens": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 7,
-  "iterations": 7,
-  "iterations_per_closed": 2.3333333333333335,
+  "iterations": 8,
+  "iterations_per_closed": 2,
   "by_task": [
     {
       "id": "T1",
@@ -235,24 +235,26 @@
       "id": "T4",
       "area": null,
       "kind": "docs",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
-        "code": 0,
+        "code": 10,
         "test": 0,
-        "docs": 0,
+        "docs": 20,
         "other": 0,
         "deleted": {
-          "code": 0,
+          "code": 3,
           "test": 0,
-          "docs": 0,
+          "docs": 1,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
-      "test_code_ratio": null,
-      "per_1000_code_lines_usd": null
+      "agent_ms": 254017,
+      "cost_usd": 0.28718740000000004,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": 0,
+      "per_1000_code_lines_usd": 28.718740000000004
     },
     {
       "id": "T5",
@@ -649,6 +651,44 @@
       "cost_source": "estimated",
       "credits": 10.9571,
       "turns": 9,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820",
+      "seq": 17,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 8,
+      "task": "T4",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 195514,
+      "cost_usd": 0.23034120000000002,
+      "cost_source": "estimated",
+      "credits": 23.03412,
+      "turns": 18,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1008-b42-i162-fence-reads-pwsh/20261126-115820",
+      "seq": 18,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 8,
+      "task": "T4",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 58503,
+      "cost_usd": 0.0568462,
+      "cost_source": "estimated",
+      "credits": 5.68462,
+      "turns": 8,
       "permission_denials": 0,
       "denials": [],
       "is_error": false

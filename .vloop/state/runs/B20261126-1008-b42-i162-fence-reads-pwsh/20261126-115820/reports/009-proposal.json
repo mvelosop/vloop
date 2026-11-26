@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Verified the complete PowerShell fence contract by passing T1-T4 together and checking every worked-example line against a fresh CLI build, including exact output and exit status.",
+  "files": [],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: pass (9.208s).",
+  "notes": "No production or test changes were needed for the close: the existing committed T1-T3 regression tests and T4 documentation passed alongside the final built-CLI example."
+}
