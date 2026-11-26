@@ -64,3 +64,11 @@ committing the plan
    review T6 · 1m34s · $0.06 · run $1.03 / $40.00
    review: PASS
    T6 done
+   check go
+   verify · 5m07s · $0.24 · run $1.27 / $40.00
+verify: 1 finding(s); 1 example line(s) not run — see .vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829/reports/verify.json
+
+═══ complete ═══
+run:    B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829  (8 iteration(s) this run)
+plan:   6/6 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1418-b45-docs-mixed-os-and-any-agent.md

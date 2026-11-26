@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **6/6 done** · iteration 8
+**Status:** complete · **6/6 done** · iteration 8
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:57:52Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T18:03:39Z
 
 ## Progress
 

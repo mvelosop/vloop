@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md",
   "base": "16f54afef788a77ae268e6fe12189fbd53c435f3",
   "branch": "B20261126-1418-b45-docs-mixed-os-and-any-agent",
-  "status": "running",
+  "status": "complete",
   "iteration": 8,
   "created": "2026-11-26T17:11:14Z",
-  "updated": "2026-11-26T17:57:52Z",
+  "updated": "2026-11-26T18:03:39Z",
   "shell": "pwsh",
   "checks": [
     {

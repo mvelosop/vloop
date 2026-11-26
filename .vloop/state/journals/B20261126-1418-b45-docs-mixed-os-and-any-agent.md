@@ -62,3 +62,8 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** The completed documentation now satisfies all five earlier gates and the brief's worked-example contract without additional source changes.
 - **Files:** none
 - **Notes for next iteration:** The combined gate ran T1 through T5 together, then rechecked the stale-string absences, mixed-team heading, mai-code-2 and self-update evidence, Copilot plugin-dir example, model-value wording, six-kind generated section, and operator pwsh shell.
+
+## Run ended — complete
+
+- **Run:** `B20261126-1418-b45-docs-mixed-os-and-any-agent` · 8 iteration(s) this run
+- **Plan:** 6/6 done, 0 blocked
