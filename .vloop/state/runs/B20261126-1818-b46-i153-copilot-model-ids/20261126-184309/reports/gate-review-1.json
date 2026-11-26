@@ -1,0 +1,38 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "PASS",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T5",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T6",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "notes": "Each gate reran on the base and failed at a behavioral assertion for the missing contract: absent models command, missing config-set refusal, absent doctor row, unsupported --kinds, stale guide, and absent end-to-end models command. T1-T4 and T6 behavioral criteria are exercised by their oracles; timeout, standard-library, secrecy, committed httptest coverage, preflight, and fixture-specific edge criteria are judged by the named go check and review from the implementation and test diff. T5's guide content is gated, while generated commands.md is review-judged. No criterion is left without a judge."
+}
+
