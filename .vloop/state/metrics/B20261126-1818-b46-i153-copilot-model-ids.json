@@ -1,0 +1,372 @@
+{
+  "schema": "metrics/v4",
+  "brief": "B20261126-1818-b46-i153-copilot-model-ids.loop-brief",
+  "run_id": "B20261126-1818-b46-i153-copilot-model-ids",
+  "status": "ready",
+  "merged": null,
+  "tasks": {
+    "planned": 6,
+    "done": 0,
+    "blocked": 0,
+    "first_pass": 0,
+    "estimate": {
+      "min": 4,
+      "max": 6
+    }
+  },
+  "size": {
+    "delivered": {
+      "code": 253,
+      "test": 162,
+      "docs": 6,
+      "other": 0,
+      "deleted": {
+        "code": 0,
+        "test": 4,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "churn": {
+      "code": 253,
+      "test": 162,
+      "docs": 6,
+      "other": 0,
+      "deleted": {
+        "code": 0,
+        "test": 4,
+        "docs": 0,
+        "other": 0
+      }
+    },
+    "test_code_ratio": 0.6403162055335968,
+    "rework": 1
+  },
+  "time": {
+    "agent_ms": 345518,
+    "work_ms": 345518,
+    "review_ms": 0,
+    "plan_ms": 547379,
+    "gates_ms": 1689,
+    "checks_ms": 139128,
+    "gate_review_ms": 149457,
+    "wall_ms": null
+  },
+  "rate": {
+    "code_per_min": 43.934035274573255,
+    "code_test_per_min": 72.06571003536719
+  },
+  "cost": {
+    "total_usd": 0.6003040000000001,
+    "plan_usd": 0.3419035,
+    "work_usd": 0.141354,
+    "review_usd": 0,
+    "gate_review_usd": 0.11704650000000001,
+    "per_1000_code_lines_usd": 2.372743083003953
+  },
+  "credits": {
+    "total": 60.0304,
+    "plan": 34.19035,
+    "work": 14.1354,
+    "review": 0,
+    "gate_review": 11.70465
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "cache_read": 0,
+    "cache_creation": 0,
+    "cache_hit_ratio": null
+  },
+  "models": {
+    "plan": [
+      "mai-code-2"
+    ],
+    "work": [
+      "mai-code-2"
+    ],
+    "review": [],
+    "gate-review": [
+      "mai-code-2"
+    ]
+  },
+  "agents": {
+    "plan": [
+      "copilot"
+    ],
+    "work": [
+      "copilot"
+    ],
+    "review": [],
+    "second-review": [],
+    "gate-review": [
+      "copilot"
+    ]
+  },
+  "second_review": {
+    "mode": "off",
+    "sessions": 0,
+    "dissents": 0,
+    "dissent_tasks": [],
+    "cost_usd": 0,
+    "time_ms": 0
+  },
+  "effort": {
+    "plan": null,
+    "work": null,
+    "review": null,
+    "gate-review": null
+  },
+  "defects": {
+    "in_loop": 1,
+    "operator": 0,
+    "escaped": 0,
+    "total": 1,
+    "removal_efficiency": 1
+  },
+  "interventions": {
+    "total": 0,
+    "by_agreement": {
+      "recommended": 0,
+      "other-option": 0,
+      "adjusted": 0,
+      "different": 0,
+      "no-options": 0
+    }
+  },
+  "instructions": {
+    "plan": 4884,
+    "gate_review": 2423,
+    "work": 2490,
+    "review": 2511,
+    "verify": 2164,
+    "guidelines_rules": 2
+  },
+  "records": {
+    "missing": []
+  },
+  "lead_time": {
+    "plan_to_merge_ms": null
+  },
+  "permission_denials": 4,
+  "iterations": 1,
+  "iterations_per_closed": null,
+  "by_task": [
+    {
+      "id": "T1",
+      "area": null,
+      "kind": "feature",
+      "attempts": 1,
+      "churn": {
+        "code": 253,
+        "test": 162,
+        "docs": 6,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 4,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 345518,
+      "cost_usd": 0.141354,
+      "models": [
+        "mai-code-2"
+      ],
+      "test_code_ratio": 0.6403162055335968,
+      "per_1000_code_lines_usd": 0.5587114624505929
+    },
+    {
+      "id": "T2",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T3",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T4",
+      "area": null,
+      "kind": "feature",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T5",
+      "area": null,
+      "kind": "docs",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    },
+    {
+      "id": "T6",
+      "area": null,
+      "kind": "test",
+      "attempts": 0,
+      "churn": {
+        "code": 0,
+        "test": 0,
+        "docs": 0,
+        "other": 0,
+        "deleted": {
+          "code": 0,
+          "test": 0,
+          "docs": 0,
+          "other": 0
+        }
+      },
+      "agent_ms": 0,
+      "cost_usd": 0,
+      "models": [],
+      "test_code_ratio": null,
+      "per_1000_code_lines_usd": null
+    }
+  ],
+  "by_session": [
+    {
+      "folder": ".vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309",
+      "seq": 1,
+      "schema": "session/v4",
+      "phase": "plan",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 547379,
+      "cost_usd": 0.3419035,
+      "cost_source": "estimated",
+      "credits": 34.19035,
+      "turns": 37,
+      "permission_denials": 4,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: a backtick cannot be judged — write the command on one line, without escapes"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: the -Command string expands and cannot be judged"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: pwsh: runs a script, stdin or an encoded command, not a literal -Command string"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309",
+      "seq": 2,
+      "schema": "session/v4",
+      "phase": "gate-review",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 149457,
+      "cost_usd": 0.11704650000000001,
+      "cost_source": "estimated",
+      "credits": 11.70465,
+      "turns": 15,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309",
+      "seq": 3,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 1,
+      "task": "T1",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 345518,
+      "cost_usd": 0.141354,
+      "cost_source": "estimated",
+      "credits": 14.1354,
+      "turns": 18,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    }
+  ]
+}

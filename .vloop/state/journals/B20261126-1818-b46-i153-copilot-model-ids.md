@@ -13,3 +13,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added `vloop models copilot` with picker filtering, aligned text output, one `copilot-models/v1` JSON document, account-plan lookup, and a reusable standard-library Copilot API client.
 - **Files:** docs/guide/commands.md, embed_test.go, internal/cli/models.go, internal/cli/models_test.go, internal/cli/root.go, internal/cli/schema_test.go, internal/copilot/client.go, internal/schema/schema_test.go, schemas/copilot-models.v1.json
 - **Notes for next iteration:** The shared client resolves COPILOT_GITHUB_TOKEN, GH_TOKEN, GITHUB_TOKEN, then gh auth token; model and plan calls each use their own configurable base and 20-second client timeout. Models failures are fatal to the listing command, while plan failures intentionally produce an unknown plan.
+
+## T1 — List Copilot model ids and the account plan
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Updated the existing worked-example schema-list assertion for the new embedded copilot-models/v1 contract, completing the Copilot model-listing task without changing the established command behavior.
+- **Files:** cmd/vloop/b2_e2e_test.go
+- **Notes for next iteration:** The prior implementation already added the listing command and schema. Its repository check failed only because the B2 worked example still expected the old schema list; the assertion now includes copilot-models/v1.

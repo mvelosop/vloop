@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/6 done** · iteration 1
+**Status:** running · **1/6 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:10:22Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:15:25Z
 
 ## Progress
 
-- [ ] **T1** — List Copilot model ids and the account plan · 1 attempt(s)
+- [x] **T1** — List Copilot model ids and the account plan · 1 attempt(s)
 - [ ] **T2** — Check Copilot model ids in config set
 - [ ] **T3** — Check configured Copilot models in doctor
 - [ ] **T4** — Set several session kinds in one config command
@@ -19,7 +19,7 @@
 
 ### T1 — List Copilot model ids and the account plan
 
-`pending` · 1 attempt(s) · depends on: none
+`done` · 1 attempt(s) · depends on: none
 
 Give the operator one CLI command that exposes the exact Copilot model ids, picker filtering, account policies, and Copilot plan returned by the two documented endpoints. This establishes the shared API client and the copilot-models/v1 document that later validation surfaces can reuse.
 
@@ -31,8 +31,6 @@ Give the operator one CLI command that exposes the exact Copilot model ids, pick
 - A missing login and a failed models request exit 1 with the brief's exact refusal; a missing or incorrect agent argument exits 2 with the brief's usage line. A failed or plan-less plan request is unknown, never an error.
 - The listing command uses a 20-second timeout per call and only the standard library; the vloop models command performs no network access for an invalid agent argument.
 - Committed Go tests exercise the output formats, filtering, JSON schema, request headers, unknown plan, failure, and no-login paths through httptest; no test reaches GitHub or Copilot for real.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261126-1818-b46-i153-copilot-model-ids/20261126-184309/checks/001-go.fail.log
 
 <details><summary>verify command</summary>
 

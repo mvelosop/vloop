@@ -1,0 +1,11 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Updated the existing worked-example schema-list assertion for the new embedded copilot-models/v1 contract, completing the Copilot model-listing task without changing the established command behavior.",
+  "files": [
+    "cmd/vloop/b2_e2e_test.go"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: pass (2.207s).",
+  "notes": "The prior implementation already added the listing command and schema. Its repository check failed only because the B2 worked example still expected the old schema list; the assertion now includes copilot-models/v1."
+}
