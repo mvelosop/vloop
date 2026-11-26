@@ -230,6 +230,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261126-161111-s3-changed-doctor-s-plugin-warnings-but](I20261126-161111-s3-changed-doctor-s-plugin-warnings-but.md) |
 | verify | verification-finding | partly | no-options | [I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on](I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on.md) |
 | verify | verification-finding | partly | no-options | [I20261126-181649-docs-domain-execution-task-md-still-said](I20261126-181649-docs-domain-execution-task-md-still-said.md) |
+| verify | verification-finding | partly | no-options | [I20261126-203317-the-new-model-check-made-existing-cmd-vl](I20261126-203317-the-new-model-check-made-existing-cmd-vl.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
