@@ -4,10 +4,10 @@
   "brief": "docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md",
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
-  "status": "blocked",
-  "iteration": 8,
+  "status": "running",
+  "iteration": 9,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T20:01:20Z",
+  "updated": "2026-11-26T20:09:05Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -227,8 +227,8 @@
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",
       "status": "pending",
-      "attempts": 0,
-      "notes": "gate disputed: The planner-owned close oracle omits assertions required by T6 acceptance: exact --all output, byte-for-byte all-or-nothing refusal, and warning-only doctor exit 0. — The --all branch uses contains(r.stdout, \"text-embedding-9  -\\n\", ...) instead of an exact equality; the disabled refusal checks only one model via config get rather than both configuration files byte-for-byte; and both doctor commands only inspect stdout substrings, not r.code. The unchanged gate nevertheless exits 0.",
+      "attempts": 1,
+      "notes": "The close oracle can pass if the stub token is persisted in a generated fixture or log because it scans only command stdout and stderr, not artifacts produced in the temporary repository.",
       "gate_history": [
         {
           "verify": "pwsh -NoProfile -File .vloop/state/gates/T6/gate.ps1",

@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** blocked · **5/6 done** · iteration 8
+**Status:** running · **5/6 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:59:08Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T20:09:05Z
 
 ## Progress
 
@@ -13,7 +13,7 @@
 - [x] **T3** — Check configured Copilot models in doctor
 - [x] **T4** — Set several session kinds in one config command
 - [x] **T5** — Document the Copilot model commands
-- [ ] **T6** — Verify the Copilot model workflow end to end · **blocked**
+- [ ] **T6** — Verify the Copilot model workflow end to end · 1 attempt(s)
 
 ## Tasks
 
@@ -128,7 +128,7 @@ pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1
 
 ### T6 — Verify the Copilot model workflow end to end
 
-`blocked` · **blocked** · depends on: T1, T2, T3, T4, T5
+`pending` · 1 attempt(s) · depends on: T1, T2, T3, T4, T5
 
 Run all earlier behavioral gates together and replay the brief's worked example in an initialized temporary repository. This closes the run only when listing, set-time checks, doctor, atomic --kinds writes, and failure warnings compose as one operator workflow.
 
@@ -138,7 +138,7 @@ Run all earlier behavioral gates together and replay the brief's worked example 
 - The workflow proves exact picker and --all output, successful multi-kind writes, exit-2 absent/disabled/alias refusals, byte-for-byte all-or-nothing behavior, the doctor pass row, and warning-only writes and doctor after the stub stops.
 - No output, log, fixture, or error produced by the workflow contains the stub token, and the gate itself creates only temporary directories outside the repository; no network request reaches GitHub or Copilot.
 
-**From the last attempt:** gate disputed: The planner-owned close oracle omits assertions required by T6 acceptance: exact --all output, byte-for-byte all-or-nothing refusal, and warning-only doctor exit 0. — The --all branch uses contains(r.stdout, "text-embedding-9  -\n", ...) instead of an exact equality; the disabled refusal checks only one model via config get rather than both configuration files byte-for-byte; and both doctor commands only inspect stdout substrings, not r.code. The unchanged gate nevertheless exits 0.
+**From the last attempt:** The close oracle can pass if the stub token is persisted in a generated fixture or log because it scans only command stdout and stderr, not artifacts produced in the temporary repository.
 
 <details><summary>verify command</summary>
 

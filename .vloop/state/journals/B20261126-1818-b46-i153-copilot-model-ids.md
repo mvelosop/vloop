@@ -67,3 +67,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 
 - **Run:** `B20261126-1818-b46-i153-copilot-model-ids` · 8 iteration(s) this run
 - **Plan:** 5/6 done, 1 blocked
+
+## T6 — Verify the Copilot model workflow end to end
+
+- **Outcome:** rejected (review: FAIL)
+- **Summary:** The completed tree passes every earlier behavioral gate and the strengthened end-to-end Copilot model workflow, including exact output, atomic refusal, doctor behavior, warning-only failures, and token secrecy.
+- **Files:** none
+- **Notes for next iteration:** No product change was required. The planner-owned close oracle ran in temporary directories with httptest endpoints and a stub credential, and made no GitHub or Copilot network request.
