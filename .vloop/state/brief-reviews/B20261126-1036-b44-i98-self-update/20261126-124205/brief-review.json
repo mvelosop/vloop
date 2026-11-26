@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Behaviour contract / S2 — the plugins",
+      "summary": "The contract says to update the user-scoped and current project-scoped Claude installations, but requires one scope-less update command for the agent.",
+      "evidence": "The brief says both a user-scoped installation and a project-scoped one are updated (lines 163-166), while lines 161-162 require exactly `<agent> plugin update vloop@vloop` once. `docs/design-notes/copilot-cli-experiments.md` lines 819-825 records that the same Claude plugin id can appear once per project and that update accepts `--scope`; it does not establish that scope auto-detection updates every counted installation. The contract therefore has two reachable implementations: update only the auto-detected installation, or update each installation with explicit scopes.",
+      "fix": "Decide whether self-update updates every counted Claude scope or only the active/auto-detected installation. If every scope, specify the literal command(s), their ordering and the plugin output/JSON result when one scope succeeds and another fails; if only one, narrow the \"what is updated\" rule to that installation."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / S2 — the plugins",
+      "summary": "The brief claims to reuse doctor's Claude matching rule but excludes local-scoped entries.",
+      "evidence": "The brief at lines 157-160 counts only `scope: user`/empty or `scope: project` with a matching project path. `internal/cli/doctor.go` lines 812-818 starts with user/empty and otherwise accepts any entry whose non-empty `projectPath` matches the root; it does not restrict that branch to `project`. B36's rule also covers the latter scope-bearing forms.",
+      "fix": "Use the doctor's literal rule: count user or empty scope, otherwise count an entry with a project path matching this root (including local scope), and add a local-scope worked example."
+    }
+  ],
+  "decisions": [
+    "Use `vloop self-update`; keep repository `vloop upgrade` unchanged. I agree: the command names separate machine and repository concerns.",
+    "Use the Go module proxy/toolchain as the release channel. I agree: it matches the documented install path and avoids a second release API.",
+    "Install only a strictly newer release unless `--version` explicitly names an older or prerelease target. I agree.",
+    "Refuse checkout builds, a missing Go toolchain, and a binary/install-directory mismatch rather than install where PATH may not find it. I agree.",
+    "Keep doctor and `vloop upgrade` offline; self-update alone may use the network. I agree.",
+    "Report plugin failures without failing a run in which the binary step succeeded. I agree, with the scope behavior above pinned first.",
+    "Make C-2 path formatting allow this repository-less command to print home-relative, slash-normalized external paths. I agree.",
+    "Use temporary Go fake programs for external tools in tests. I agree.",
+    "Use `golang.org/x/mod/semver` with no new dependency. I agree.",
+    "Allow `--check` with `--version` to compare against the requested target. I agree."
+  ],
+  "checked": "facts, consistency, rules, runnability; inspected the dependency brief, domain/platform rules, roadmap, guide, build-info, doctor, release tooling and plugin experiment record; a ready copy passes `vloop brief check` except for the expected unresolved new schema path.",
+  "header": "Reviewed 2026-11-26: ASK, 2 findings"
+}
+

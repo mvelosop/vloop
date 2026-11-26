@@ -1,0 +1,41 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Acceptance, at close (the operator's)",
+      "summary": "The Windows acceptance command cannot exercise the work-branch build.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:305-308 says to run bare `go build` and then bare `vloop self-update`. The module root is the library package `vloop` (`embed.go:1-2`), so `go build` there does not produce the command binary; the command is `./cmd/vloop`. In this pwsh environment, `Get-Command vloop` resolves the installed GOBIN executable rather than a repository-local executable, so a later bare `vloop self-update` would test the installed release, not the branch build.",
+      "fix": "Name the main package and invoke its output explicitly, for example `go build -o .vloop/tmp/vloop.exe ./cmd/vloop` followed by `& ./.vloop/tmp/vloop.exe self-update`, or run `go run ./cmd/vloop self-update` for the refusal check."
+    },
+    {
+      "kind": "consistency",
+      "section": "Worked example",
+      "summary": "The `--version` worked example omits lines the behaviour contract requires.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:280-281 renders the v0.15.0-rc.5 case as `installing ... … … exit 0`. S1 step 7 requires the `installed vloop <target> at <dir>` line, and the text at lines 192-195 requires a `! with --version` warning before S2; the example shows neither, nor the resulting plugin and next lines.",
+      "fix": "Expand that case to the complete literal output in contract order: installing, installed, the `--version` warning, the Claude result, and the next-step line, with the exact exit 0."
+    },
+    {
+      "kind": "fact",
+      "section": "Header / Roadmap",
+      "summary": "The roadmap row the brief says its ready commit will add is still absent.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:18-19 promises a B44 row in docs/design-notes/vloop-roadmap-b18-b21.md. That file currently ends its sequence at B41 (line 48); a search finds no B44 row.",
+      "fix": "Add the B44 row pointing to this brief, with the same dependency stated in frontmatter, before marking the brief ready, and keep the header claim accurate."
+    }
+  ],
+  "decisions": [
+    "Keep `vloop self-update` for machine-wide binary and plugin updates; `vloop upgrade` remains the per-repository operation. This separation is sound.",
+    "Use the Go toolchain and module proxy as the version and installation channel, not GitHub release APIs or assets. Sound and already followed by tools/release.",
+    "Without `--version`, install only a strictly newer semver target; allow an explicit target to install older or pre-release versions. Sound.",
+    "Refuse rather than guess for missing Go, checkout builds, or a running executable outside Go's install directory. Sound.",
+    "Keep doctor and `vloop upgrade` offline; only `self-update` performs release lookup and plugin updates. Sound.",
+    "Treat plugin failures as reportable but non-fatal after the binary step. Approved tradeoff; retain the pinned retry command.",
+    "Amend C-2 for paths outside a repository: slash-separated and home-shortened with `~`. Necessary for this command and explicitly scoped.",
+    "Fake Go and both agent CLIs with temporary Go programs, use golang.org/x/mod/semver, and let `--check --version` compare with the explicit target. These mechanics preserve the Windows and offline-test requirements."
+  ],
+  "checked": "facts, consistency, rules, runnability; brief structure, dependencies, binding references, domain/platform invariants, config checks, build/module-version handling, doctor plugin discovery, release Go commands, agent update syntax, and the Windows executable move-aside assumption",
+  "header": "Reviewed 2026-11-26: FIX, 3 findings"
+}
+

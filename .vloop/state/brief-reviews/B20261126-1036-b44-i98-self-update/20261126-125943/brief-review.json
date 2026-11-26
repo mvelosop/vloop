@@ -1,0 +1,49 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Behaviour contract — S1, `--check`, and `--json`",
+      "summary": "`--check` is ordered to exit before install-directory discovery, but JSON always promises an install `dir`, leaving check-mode behavior and errors undefined.",
+      "evidence": "The brief exits from `--check` at lines 121-130, discovers `go env GOBIN`/`GOPATH` and enforces the binary-location refusal only at lines 132-139, then requires every JSON document to contain `dir` at lines 198-205. A `--check --json` run that reaches line 123 therefore has no contractually defined `dir`; the brief also does not say whether a bad/missing Go install directory or a binary outside it makes `--check` fail.",
+      "fix": "Choose and pin one rule: either `--check` performs the install-directory and running-path preflight (including the exact errors and exit codes) before printing, or check mode may omit/empty `dir` and deliberately skips the location refusal. Define the JSON schema and worked examples for that choice."
+    },
+    {
+      "kind": "decision",
+      "section": "Behaviour contract — S2, `--json`",
+      "summary": "The required scope field for every Claude JSON entry cannot be derived for `not installed`, list failure, or a marketplace failure represented at agent level.",
+      "evidence": "Lines 182-184 define agent-level Claude results for not-found and list failures; lines 174-177 define a scope-less `! plugin claude:` marketplace failure. Lines 206-210 nevertheless say that a Claude entry also has `scope`, without an exception or fallback value. `scope` is unavailable when discovery did not return entries, so the required `self-update/v1` shape is not implementable literally in those cases.",
+      "fix": "Choose the JSON representation for agent-level failures: omit `scope` for those results, use a literal such as `\"scope\":\"\"`, or emit one failed record for every discovered Claude scope. Pin the choice in the schema and in worked JSON examples."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — S1, Where it installs",
+      "summary": "Checking only that the running binary is somewhere in the install directory does not enforce the brief's safety decision; a renamed executable in that directory would never be updated.",
+      "evidence": "Lines 75-79 reject installing when the new binary will land where PATH will not run it. Lines 132-138 reduce that safety check to membership in the directory, while the install command writes specifically `<GOBIN>/vloop` (or `vloop.exe` on Windows). A binary named `vloop-old` in GOBIN passes a directory-only test, is moved aside, and go installs a different `vloop`, contrary to the stated refusal goal.",
+      "fix": "Require the resolved running executable to equal the resolved expected install target (`<dir>/vloop`, or `<dir>/vloop.exe` on Windows), allowing only path/symlink equivalence. Add the renamed-in-GOBIN case and its exact refusal to the worked example."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract — S2, Finding the plugin",
+      "summary": "The brief says it copies doctor's exact Claude rule but narrows the code's treatment of scopes.",
+      "evidence": "The brief says at lines 160-165 that an entry is eligible for scope `user` or empty, or for `project`/`local` with a matching project path. `internal/cli/doctor.go:812-818` has no `project`/`local` allowlist: it accepts every non-user/non-empty scope when `projectPath` matches. The brief's rule is therefore not doctor's exact rule.",
+      "fix": "State the actual rule: `user` or empty, or any other scope whose non-empty `projectPath` matches the repository. If managed entries must be excluded, say that explicitly and amend doctor in a separate, explicitly scoped part of this brief rather than claiming reuse."
+    }
+  ],
+  "decisions": [
+    "ASK: settle whether `--check` performs the install-path safety preflight or returns a diagnostic document without one, and how JSON represents `dir` in that mode.",
+    "ASK: settle the JSON representation of Claude `not installed`, list-failure and agent-level marketplace-failure results, where no scope exists.",
+    "Keep the operator-approved command split: `self-update` updates the machine-wide binary/plugins and `upgrade` remains repository-local.",
+    "Keep the Go toolchain as the release channel and forward-only default; an explicit `--version` may install exactly that version, including older/pre-release versions.",
+    "Keep refusing checkout, missing-Go and wrong-install-location cases rather than silently installing elsewhere; tighten the location test to the executable path.",
+    "Keep plugin failures non-fatal while binary failures remain fatal, and keep every other command offline.",
+    "The C-2 exception for repository-less external paths is appropriate; pin slash separators and `~` masking in tests.",
+    "The Windows-safe Go fake strategy and use of the existing `golang.org/x/mod/semver` dependency are appropriate.",
+    "`--check --version` should compare the running module version to the requested target without installing, as stated."
+  ],
+  "checked": "facts, consistency, rules, runnability and decisions; read the brief and consumed B36 dependency, CLAUDE.md, roadmap/domain/guide/config, all binding references, build-info/doctor/release code, and ran the ready-copy brief check plus the available local Copilot help",
+  "header": "Reviewed 2026-11-26: ASK, 4 findings"
+}
+

@@ -1,0 +1,37 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract - S1, steps 4-6; Why this shape / Refuse rather than guess; --json",
+      "summary": "The brief does not settle when the install-location safety check runs, and the three statements cannot all be true. Step 4 makes --check exit before step 6, step 5 makes an up-to-date binary go directly to S2, but the refused-options decision says a running binary outside go install's directory is refused, and --json requires dir to be the install directory. The implementation and its T1 gate therefore cannot know whether a report-only or up-to-date invocation must run go env and refuse a path mismatch.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:74-77 says a running binary outside go install's destination is a refusal; lines 121-137 make --check exit at step 4 and an up-to-date binary skip step 6; lines 204-206 require a dir field and an empty plugin list with --check. docs/guide/concepts.md:337-339 confirms go install's GOBIN/GOPATH destinations. `go run ./cmd/vloop brief check` on a ready copy checks structure but cannot resolve this behavioural fork.",
+      "fix": "Choose and state one rule: either (a) resolve GOBIN/GOPATH and validate the running path before every success, including --check and an up-to-date binary, with the exact dir in JSON, or (b) validate only when an install is attempted and define dir as empty/omitted in report-only and no-install JSON. Then reorder S1 to match, pin the selected result for --check and up-to-date cases where the binary is outside GOBIN, and make the T1 gate cover it."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract - S1, step 6",
+      "summary": "The exact go env refusal is underdetermined when go env succeeds but GOBIN and GOPATH are empty: <reason> is not defined by tool output, and the contract does not define which invocation or output line supplies <reason> when go env itself fails.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:132-135 specifies only `vloop: cannot find where go install writes: <reason>` for both cases. The worked example does not name either case, while the brief says every message is exact at lines 102-104 and the repository's C-2 path/source conventions are cited rather than defining a go env error format.",
+      "fix": "Pin the command shape and literal reason rules, for example `go env GOBIN GOPATH`, first-line stderr on command failure, and `GOBIN and GOPATH are empty` when both values are empty; add both cases to the worked example and T1 gate."
+    }
+  ],
+  "decisions": [
+    "Keep binary self-update separate from repository upgrade and re-execution; sound, because it preserves upgrade's existing meaning and exposes a partially completed update.",
+    "Use the Go toolchain, not GitHub or release assets, for latest-version discovery and installation; sound and consistent with README.md:24 and tools/release/publish.go:101-139.",
+    "Without --version, install only a strictly newer semver so an installed prerelease is not downgraded; sound.",
+    "Allow --version to install an exact older or prerelease version; sound, but the selected install-location rule must apply to this path too.",
+    "Refuse a checkout build, missing Go, or an install into a destination that cannot replace the running binary, with manual commands; sound in intent, pending the first finding's scope decision.",
+    "Report plugin failures without changing a successful binary-update exit code; sound, provided the JSON result stays failed and the final next line is emitted only under the stated conditions.",
+    "Keep doctor, upgrade and all other commands offline; sound and required by the brief's unchanged-offline boundary.",
+    "Exception to C-2: show external binary/install paths with / and mask the home as ~; a reasonable amendment, once the brief pins check-mode path resolution.",
+    "Use temporary Go-built fakes for go, claude and copilot on Windows; sound and necessary for offline gates.",
+    "Use golang.org/x/mod/semver, already in go.mod; sound.",
+    "--check --version compares the running version with the explicit target; sound, with check-mode install-path semantics still needing the first decision."
+  ],
+  "checked": "facts (Build.Module in internal/cli/buildinfo.go, README go install at README.md:24, doctor plugin discovery and both warning strings in internal/cli/doctor.go:772-877, publish go list/go install at tools/release/publish.go:101-139 and 303-306, x/mod in go.mod, embedded schemas in embed.go); consistency of S1-S3, messages, worked example, JSON and Shape; rules C-1/C-2/C-3 and P-7/P-8; dependency B36; runnability against .vloop/config.toml's single Go check, Windows constraints and verify fence; vloop brief check on a ready copy passed structure with the expected warning that schemas/self-update.v1.json is a file this brief will add.",
+  "header": "Reviewed 2026-11-26: ASK, 2 findings"
+}
+

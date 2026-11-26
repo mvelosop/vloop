@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "Behaviour contract / S1-S2",
+      "summary": "The new command has no contract for the repository-mandated --json mode.",
+      "evidence": "docs/domain/platform/platform-context.md:49-50 and docs/guide/commands.md:6-11 say every command has --json and that stdout is one JSON document; the brief's S1 and S2 outputs (the worked examples at brief:204-229) pin text only and never say what --json emits.",
+      "fix": "Decide and pin the exact JSON success document for --check, no-op, install, and plugin outcomes, including the install target/current fields and nonfatal plugin failures; also state whether each failure emits an error object on stdout or only the existing one-line stderr error."
+    },
+    {
+      "kind": "consistency",
+      "section": "S2 — the plugins",
+      "summary": "S2 treats both agents as if plugin-list success exposed vloop@vloop, but the binding contract says their identifiers differ.",
+      "evidence": "The new brief says at :94 and :148-150 that a list names vloop@vloop; the depended-on brief says at :299 that Claude counts id starting with vloop@, while at :341 Copilot counts name == vloop. internal/cli/doctor.go:809 and :857 implement those two distinct shapes.",
+      "fix": "State the literal predicate per agent: Claude entries with id vloop@vloop (or the intended starts-with rule), and Copilot entries with name vloop and marketplace vloop; repeat those JSON shapes in the worked example and gate them independently."
+    },
+    {
+      "kind": "consistency",
+      "section": "S2 — the plugins",
+      "summary": "A plugin list command failure or invalid JSON has no specified result even though plugin failures are promised to be reported and nonfatal.",
+      "evidence": "Brief:83-85 promises that a plugin failure prints its reason, but :148-153 defines only successful list/no-plugin and update outcomes; internal/cli/doctor.go:774-785 shows plugin listing can fail either by process exit or JSON decode.",
+      "fix": "Pin one exact nonfatal line for list failure/invalid JSON (using the defined last or first output line), include it in the worked example, and make the S2 gate exercise each agent-list failure as well as update failure."
+    }
+  ],
+  "decisions": [
+    "Tests fake go, claude and copilot with Go programs on PATH: appropriate and consistent with the Windows run and the no-real-tools constraint.",
+    "Semver comparison uses the existing golang.org/x/mod/semver dependency: appropriate; go.mod already contains golang.org/x/mod v0.37.0.",
+    "--check with --version compares the running module version with the requested target: appropriate and needed to make the combined flags deterministic."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 3 findings"
+}
+

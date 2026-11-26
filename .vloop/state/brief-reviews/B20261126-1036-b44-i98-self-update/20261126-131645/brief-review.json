@@ -1,0 +1,41 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Acceptance, at close (the operator's)",
+      "summary": "The real-network acceptance runs a command absent from the exact binary it tells the operator to install.",
+      "evidence": "The acceptance installs the existing tag with `go install github.com/mvelosop/vloop/cmd/vloop@v0.15.0-rc.4`, then requires `vloop self-update`. The brief is B44 and the command is new in its Shape; `plugin/.claude-plugin/plugin.json` is 0.15.0-rc.4 today, and `internal/cli/root.go` registers only the commands currently built. Reinstalling that immutable tag cannot contain B44's new command. A checkout build cannot replace that acceptance either: the command refuses a Build with no module version in S1 step 2.",
+      "fix": "Choose an executable acceptance path with the operator: either test only after a release containing B44 exists (name that post-release step and accept the released version), or provide a deliberate pre-release/tag containing B44 before close. Then rewrite the expected current/latest versions to match that executable."
+    },
+    {
+      "kind": "decision",
+      "section": "Why this shape / S2",
+      "summary": "An explicit older or pre-release binary target is followed by unversioned plugin updates, so the command can knowingly leave the binary and plugin at different versions.",
+      "evidence": "The brief permits `--version <v>` to install an older version. S2 then runs `claude plugin update vloop@vloop --scope <scope>` and `copilot plugin update vloop@vloop` without a version. Doctor's S3 warning is still framed around a binary/plugin mismatch. For example, `--version v0.14.0` from v0.15.0-rc.4 downgrades the binary while S2 advances or retains plugins at the marketplace's current version.",
+      "fix": "Decide and pin what `--version` means for plugins. Either skip plugin updates and say so in human/JSON output, attempt to pin both agents to the same release (if their CLIs support it), or explicitly permit the mismatch and define the next-line and doctor behaviour. Add a literal worked example for the chosen case."
+    },
+    {
+      "kind": "rule",
+      "section": "Starting point / Roadmap",
+      "summary": "The B44 roadmap handover row is absent, and the brief falsely says B40-B43 rows already exist.",
+      "evidence": "The brief says its B44 row will be added only in a ready commit and compares this with B40-B43. `.claude/skills/vloop-architect/SKILL.md` says the active roadmap owns scope and the row points at the brief at handover. `docs/design-notes/vloop-roadmap-b18-b21.md` currently ends at B41; searches in `docs/design-notes/` find no B42 or B43 row.",
+      "fix": "Before marking the brief ready, add the B44 row to the active roadmap with its brief path, owned slice and dependency (and add B42/B43 rows if their queue order requires them), or remove the inaccurate B40-B43 comparison and name the actual predecessor rows."
+    }
+  ],
+  "decisions": [
+    "Keep `vloop self-update` for machine-wide binary/plugin work and `vloop upgrade` for repository work; I agree with the separation.",
+    "Use the Go module channel (`go list -m -json ...@latest` and `go install ...@<version>`), not GitHub release assets; I agree.",
+    "Default updates are strictly forward, while explicit `--version` may select an older or pre-release version; the plugin consequence needs the operator decision above.",
+    "Refuse on missing Go, a devel/checkout build, or a binary outside Go's install destination; I agree.",
+    "Keep doctor and `vloop upgrade` offline; only `self-update` performs network-capable work; I agree.",
+    "Plugin failures are reported but non-fatal after the binary step; I agree.",
+    "Amend C-2 so paths outside a repository use slash-separated absolute/home-relative display; reasonable, and already carried into the brief.",
+    "Fake `go`, `claude` and `copilot`, use existing x/mod/semver, and define `--check --version`; these implementation choices are sound."
+  ],
+  "checked": "facts: Build.Version versus Build.Module and devel detection in internal/cli/buildinfo.go, plugin version storage, doctor plugin discovery/warnings, release go list/go install usage, module dependency, schema embedding and path conventions; consistency: S1-S3, explicit version, human/JSON output and worked example; rules: C-1/C-2/C-3, B36, P-7/P-8 and architect roadmap handover; runnability: .vloop/config.toml's Go check, Windows fakes, command-doc regeneration in task 1, and acceptance reachability. `vloop brief check` on a ready copy passed structure with one expected warning for the new schemas/self-update.v1.json.",
+  "header": "Reviewed 2026-11-26: ASK, 3 findings"
+}
+

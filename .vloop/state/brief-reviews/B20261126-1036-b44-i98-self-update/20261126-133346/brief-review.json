@@ -1,0 +1,30 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Behaviour contract — S1 and S2",
+      "summary": "The explicit --version path must sometimes know the latest release, but the target-selection and failure contracts do not define that lookup.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:117-122 defines --version as using the supplied version and only otherwise running go list -m ...@latest, while lines 192-195 require a warning when that supplied version is older than the latest release. A planner cannot satisfy the condition without another latest lookup, and the brief says neither when to make it nor what happens when it fails (especially for an offline or exactly pinned install).",
+      "fix": "Choose and state one rule. Either always resolve @latest as a separate advisory lookup (and define whether its failure blocks, warns, or is omitted for --version/--check), or remove the latest-relative warning and warn for every --version update under a literal condition."
+    },
+    {
+      "kind": "consistency",
+      "section": "Starting point — Roadmap",
+      "summary": "The brief promises a B44 roadmap row in its ready commit, but that row is not present in the current repository.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:18-19 says the B44 row is added in the ready commit; docs/design-notes/vloop-roadmap-b18-b21.md ends its sequence of present B-series rows at B41 on line 48 and contains no B44 row.",
+      "fix": "Add the B44 row naming this brief and its owns/dependency relationship to docs/design-notes/vloop-roadmap-b18-b21.md in the commit that marks the brief ready."
+    }
+  ],
+  "decisions": [
+    "Paths outside a repository are printed with / and the home directory as ~; this is a reasonable, explicit exception to C-2.",
+    "Tests build small Go fakes for go, claude and copilot; this is necessary to keep the worked example network-free and cross-platform.",
+    "Version comparison uses the existing golang.org/x/mod/semver dependency; this matches the semver contract.",
+    "--check with --version compares the running version to the supplied target; this is clear and should be retained."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 2 findings"
+}
+

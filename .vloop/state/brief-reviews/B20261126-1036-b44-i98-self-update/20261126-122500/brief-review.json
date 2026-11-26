@@ -1,0 +1,56 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Shape",
+      "summary": "Task 1 adds the self-update command to the Cobra tree but the brief postpones commands.md regeneration to task 4, so the repository check turns red after task 1.",
+      "evidence": ".vloop/config.toml:23 runs `go run ./tools/check` after affected iterations, and the brief requires that check after every task (brief:274). Adding the root command in internal/cli/root.go changes CommandsReference; internal/cli/commands_doc_test.go:14-21 fails whenever the committed commands.md differs. The brief schedules regeneration only in S3/task 4 (brief:190, 294-295).",
+      "fix": "Require task 1 to regenerate and commit docs/guide/commands.md as soon as self-update and its flags enter the command tree; regenerate again in task 4 after upgrade's help changes."
+    },
+    {
+      "kind": "fact",
+      "section": "Executive summary and S2",
+      "summary": "The brief claims that updating the Claude plugin is just `plugin update`, while the repository's release tool currently refreshes the marketplace first; the contract does not establish that self-update will obtain a new plugin release.",
+      "evidence": "The brief says the current Claude step is `claude plugin update vloop@vloop` (brief:25) and defines the same command as S2's entire update (brief:148-155). tools/release/publish.go:306 instead tells the operator to run `claude plugin marketplace update vloop && claude plugin update vloop@vloop` after publishing. The cited B36 decision (B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md:139) only names plugin update as a user-state option; it does not prove that update refreshes the marketplace.",
+      "fix": "Measure or cite the current agent behavior. If `plugin update` does not refresh marketplace metadata, add the exact marketplace-update command, output, and failure policy before S2's plugin update; otherwise record the evidence that supersedes the release tool's two-command instruction and align tools/release/publish.go in the brief."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references and --json",
+      "summary": "The new JSON document omits the schema field required by the cited platform invariants.",
+      "evidence": "docs/domain/domain-model.md:275 (C-3) and docs/domain/platform/platform-context.md:36 require every JSON document vloop defines to carry `schema: <name>/v<n>`. The binding reference cites platform-context (brief:92), but the exact self-update JSON at brief:170-172 has no schema field and the shape does not add a schema.",
+      "fix": "Add a literal schema field and name the corresponding embedded schema and validation in the contract, or explicitly amend C-3 here with the operator's approval."
+    },
+    {
+      "kind": "consistency",
+      "section": "S2",
+      "summary": "The stated machine-wide plugin goal is not implementable from the specified 'run once from the current directory' update rule when Claude has multiple project-scoped installations.",
+      "evidence": "The goal is to update every installed vloop plugin (brief:30, 38). The dependency's measured format says the same Claude id can occur once per project (B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md:298), with projectPath; docs/design-notes/copilot-cli-experiments.md:824 says update accepts a scope and otherwise auto-detects. S2 only matches any id, runs one unscoped update from the current directory, and reports one result per agent (brief:148-159). It therefore does not say which project installation is updated or how additional entries are handled.",
+      "fix": "Choose and pin the scope: either update only the installation(s) applicable to the current directory, and narrow the goal/output accordingly, or enumerate every listed installation and specify its working directory or `--scope` arguments, duplicate/multiple results, and retry text."
+    },
+    {
+      "kind": "runnability",
+      "section": "S1 — Windows install",
+      "summary": "Treating failure to remove a stale vloop.exe.old as non-error leaves a reachable path with no specified safe action or exact message.",
+      "evidence": "S1 says stale vloop.exe.old is removed first, but removal failure is not an error (brief:141), then immediately requires moving the running vloop.exe to that same path and restoring it on install failure (brief:138-141). If the old file still exists and cannot be replaced, the move fails; the contract provides no exit code, output, or cleanup behavior for that refusal.",
+      "fix": "Specify the move-aside failure path literally, including exit 1, a one-line `vloop:` message, no install, and the rule that the running binary remains in place; alternatively define and test a replacement operation that is safe when stale removal fails."
+    }
+  ],
+  "decisions": [
+    "Keep `vloop self-update` for the machine-wide binary/plugins and keep `vloop upgrade` for the repository; I agree with the separation.",
+    "Use the Go toolchain (`go list -m -json ...@latest` and `go install`) rather than GitHub releases or downloaded assets; I agree.",
+    "Install only a strictly newer latest release unless an explicit `--version` requests an exact older or pre-release version; I agree.",
+    "Refuse when Go is absent, the build has no module version, or the running path is not the Go install destination; I agree with refusal over an unobservable install.",
+    "Keep doctor and `vloop upgrade` offline, pointing to self-update; I agree.",
+    "Treat plugin update failures as reported, non-fatal outcomes after the binary step; I agree.",
+    "Use Go-built fake `go`, `claude`, and `copilot` executables so tests stay network-free and cross-platform; I agree.",
+    "Compare versions with the existing golang.org/x/mod/semver dependency; I agree.",
+    "Let `--check --version <v>` compare the running module version with the explicit target; I agree."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 5 findings"
+}
+
