@@ -1,0 +1,24 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "D3 / D6 / Shape",
+      "summary": "The contract requires publishing an external acceptance-run result and a B40 HTTP-503 diagnosis that are not established by repository-contained evidence, and the proposed real-data gate expressly cannot check them.",
+      "evidence": "D6 requires 10 of 10 URL-shortener tasks, all first-pass, about $1.31, and every session kind, but says its metrics are in an acceptance repository outside this repository and that no session here checks them. The Shape task 1 gate reads only B40-B44 metrics plus B39's run record. For the separate HTTP-503 claim, B40's .vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261125-230701/run.log records a failed work session with no attempt charged, and sessions/011-work.json records is_error=true, but neither records HTTP 503 or proves the endpoint cause. docs/design-notes/copilot-cli-experiments.md is cited as a binding reference but does not yet contain the new evidence; the task must create it from the unsupported literals.",
+      "fix": "Operator decision required: either provide a durable repository-contained source for the URL-shortener metrics and the 503 cause, cite that source in the brief, and gate the required literals against it; or remove those externally sourced details and scope D3/D6 to the B40-B44 facts that the in-repo metrics and kept brief-review records prove."
+    }
+  ],
+  "decisions": [
+    "Keep genuinely Claude-specific passages unchanged and make shared passages name both agents; sound.",
+    "Give mixed macOS/Windows teams a short README section linking to the full configuration guide; sound.",
+    "Report mai-code-2's observed runs without calling it qualified; required by the eval rule.",
+    "Include this repository's operator and architect skills because their BSD-tools wording conflicts with the shared pwsh configuration; sound.",
+    "Do not pin line numbers; keep Spanish templates and docs/domain out of scope except where the brief allows; sound."
+  ],
+  "checked": "facts, consistency, rules, runnability; ready-copy brief check passed with 0 warnings; B39-B44 telemetry, B40-B44 run phases and models, README, all D4 guides, install section and pin, driver adapters, config and repository skills checked",
+  "header": "Reviewed 2026-11-26: ASK, 1 finding"
+}
+

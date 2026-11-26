@@ -1,0 +1,47 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Frontmatter and Starting point",
+      "summary": "The brief requires a B44 base that is not in this repository, so its dependency cannot resolve and the loop cannot plan it.",
+      "evidence": "docs/briefs contains B43 and B45 but no B20261126-1036-b44-i98-self-update.loop-brief; git HEAD is dda483e9 (B43). The ready-copy check reports: \"depends-on does not resolve: B20261126-1036-b44-i98-self-update.loop-brief\". Domain invariant R-4/B-6 requires a passing ready brief with consumed dependencies.",
+      "fix": "Ask the operator whether B44 is an omitted local/parallel deliverable. Add and consume the actual B44 brief first, or remove the B44 dependency and every B44-specific contract item if B44 is not intended."
+    },
+    {
+      "kind": "fact",
+      "section": "D2, D3 — B44 and mai-code-2 qualification evidence",
+      "summary": "The brief contracts evidence from B44 and a mai-code-2 URL-shortener acceptance run that is absent from the available cited tree.",
+      "evidence": "B45 lines 7, 27, 129-141, and 213 assert B44 and a URL-shortener acceptance run. A tree search for mai-code-2 finds B40-B43 run records only, and no section in docs/design-notes/copilot-cli-experiments.md mentions mai-code-2. There is also no B44 brief or self-update implementation to inspect (no self-update match in Go code).",
+      "fix": "Either supply/cite the repository evidence for the URL-shortener run and B44, then state its exact phase outcomes, or narrow D2/D3 to the evidence actually present (B40-B43 self-hosting runs) and remove B44/self-update claims."
+    },
+    {
+      "kind": "consistency",
+      "section": "D4 and D5 — session-kind enumerations",
+      "summary": "The promised complete session lists omit session kinds vloop actually starts and hands repository guidelines to.",
+      "evidence": "D5 claims this text names every session kind but prescribes \"(plan, gate review, work, review, verify)\", omitting second-review. docs/domain/domain-model.md lines 100-103 defines second-review as a session kind. D4 says the guidelines go to every session vloop starts but its literal list omits review-brief; internal/driver/briefreview.go starts that phase through Runner, and internal/driver/session.go plus agent_copilot.go apply the guidelines for it.",
+      "fix": "For D5 use the full loop list, including second-review. For D4 either explicitly scope the sentence to vloop run and omit review-brief by design, or include review-brief in the complete set."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references",
+      "summary": "The brief restates binding domain rules without citing the applicable domain invariants required by this repository's architect rules.",
+      "evidence": ".claude/skills/vloop-architect/SKILL.md requires each touched domain area to cite invariants by ID. B45 covers B-6 dependencies/readiness, C-5 mixed-platform shell rules, P-4/P-8 gates, and the session/metrics definitions, but its Binding references cite none of docs/domain.",
+      "fix": "Add one reference per applicable page, for example docs/domain/domain-model.md (B-6, P-4, P-8, C-5), docs/domain/execution/session.md (session kinds and guideline delivery), and docs/domain/measurement/metrics.md (Copilot credits and token semantics)."
+    }
+  ],
+  "decisions": [
+    "Name both agents where both apply and preserve explicitly Claude-specific sections — sound and usefully scoped.",
+    "Give mixed teams a short standalone README section and keep configuration.md as the full treatment — sound; 150 words is explicitly bounded.",
+    "State mai-code-2 qualification with evidence — sound in principle, but the claimed URL-shortener evidence must be supplied or the scope narrowed.",
+    "Include this repository's operator and architect skills — sound because their BSD-only instructions contradict the current shared pwsh config.",
+    "Do not pin line numbers — sound for moving prose, provided the named text remains unique.",
+    "Keep Spanish templates and docs/domain out of scope except for contradiction avoidance — consistent with the requested documentation slice.",
+    "Split D1/D3, D2, D4, D5, then close with all gates — runnable in that order once the missing base and session-list contract are fixed."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 4 findings"
+}
+

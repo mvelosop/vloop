@@ -1,0 +1,32 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "D6 - the evidence for mai-code-2",
+      "summary": "The claim that B40's HTTP-503 session charged nothing conflicts with the persisted session telemetry.",
+      "evidence": "docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:205 says the 503 halt was \"nothing charged\"; .vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261125-230701/sessions/011-work.json:3-5 records is_error=true with 6.57856 credits and an estimated cost_usd of 0.0657856 for that B40 attempt, and .vloop/state/metrics/B20261125-2207-b40-i156-mixed-os-pwsh.json:61 includes session costs in the $2.18 total. The intervention at .vloop/interventions/I20261126-005105-copilot-model-endpoint-503s-ended-t4-s-w.md:18 confirms the exit 7/HTTP 503 event but its \"no attempt charged\" wording is not the same evidence level as the recorded telemetry.",
+      "fix": "Remove the unsupported \"nothing charged\" statement, or state the persisted numbers and distinguish explicitly what, if anything, Copilot did not bill outside vloop's estimated-credit accounting."
+    },
+    {
+      "kind": "runnability",
+      "section": "D6 - the evidence for mai-code-2",
+      "summary": "The URL-shortener evidence is tied to a metrics path no review, work, or verify session in this repository can resolve.",
+      "evidence": "docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:197-198 cites `.vloop/state/metrics/B20261022-1234-url-shortener-api.json` and says no session here can read it. The ready-copy check `go run ./cmd/vloop brief check .vloop/tmp/brief-check/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` exits 0 but reports `! path does not resolve: .vloop/state/metrics/B20261022-1234-url-shortener-api.json`. This is the only such warning.",
+      "fix": "Remove the external path and present the literal URL-shortener figures solely as an explicitly operator-supplied measurement, or bring a minimal verifiable metrics artifact into this repository and cite that repo-relative artifact."
+    }
+  ],
+  "decisions": [
+    "Name both agents only where both apply, while preserving Claude-only adapter, installation, eval, and legacy-counting text. Support.",
+    "Give mixed macOS/Windows teams a short README section (at most 150 words) and retain configuration.md as the full treatment. Support.",
+    "Qualify mai-code-2 only for the named phases and back the claim with run evidence rather than a bare label. Support, subject to the D6 findings.",
+    "Include this repository's operator and architect skill text because the repository is itself a mixed pwsh team. Support.",
+    "Do not pin prose line numbers because B40-B44 moved the documents; locate changes by literal text. Support.",
+    "Keep Spanish templates and docs/domain out of scope, except that the new text must not contradict them. Support."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

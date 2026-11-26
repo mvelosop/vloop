@@ -1,0 +1,26 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "D3, D6 and Shape, task 1",
+      "summary": "The brief requires publishing URL-shortener acceptance results that no loop session can verify, and its proposed real-data gate deliberately excludes them.",
+      "evidence": "docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md:151-153 makes the external run part of the README model claim; lines 201-206 hard-code 10 of 10 tasks, all first-pass, and about $1.31 from metrics outside this repository and say no session here checks them. Lines 299-305 gate only the in-repository B40-B44 metrics and B39 run record. docs/design-notes/copilot-cli-experiments.md has no matching mai-code-2 section or these figures. This conflicts with .claude/skills/vloop-architect/SKILL.md:34-37, which requires real telemetry and a real-data check readable from this repository, and with the create-brief guideline that paths outside the repository cannot bind (skills/create-brief/guidelines.md:44).",
+      "fix": "Operator choice: provide a repository-contained, cited capture of the acceptance telemetry and make task 1's gate read the task count, first-pass count, cost and session-kind evidence from it; or remove the external acceptance-run figures and broaden the README/D6 claim only to the B40-B44 evidence this repository can verify."
+    }
+  ],
+  "decisions": [
+    "Use agent-neutral wording where both agents apply, while preserving the explicitly Claude-only sections and commands. I agree.",
+    "Give mixed macOS/Windows teams a short README section and keep the full treatment in docs/guide/configuration.md. I agree.",
+    "Report what mai-code-2 has run but stop short of calling it qualified. I agree.",
+    "Put the repository's operator and architect skills in scope because this mixed team's gates are pwsh. I agree, provided those skill constraints are changed in this same run.",
+    "Do not pin prose line numbers; locate changes by their named text. I agree.",
+    "Leave Spanish templates and docs/domain out of scope. I agree.",
+    "Accept the operator's external URL-shortener acceptance totals as publishable evidence without repository-local telemetry. This needs the operator's approval or one of the fixes in the finding."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 1 finding"
+}
+

@@ -1,0 +1,32 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Roadmap; D3 - README.md, the model in use",
+      "summary": "The B45 roadmap row says mai-code-2 is qualified, directly contradicting the brief's public claim and its prohibition on applying that word to the model.",
+      "evidence": "Brief lines 144-154 say the README does not call mai-code-2 qualified and the words `mai-code-2 is qualified` do not appear; docs/design-notes/vloop-roadmap-b18-b21.md:52 currently owns for B45: `mai-code-2` qualified, with its evidence in the Copilot design note.",
+      "fix": "Change the B45 roadmap row to say mai-code-2 has operational run evidence but is not yet qualified by the eval rule, matching D3."
+    },
+    {
+      "kind": "runnability",
+      "section": "Worked example",
+      "summary": "The verification command for mai-code-2 and self-update includes the qualification expectation as prose on the same command line, so it is not executable PowerShell.",
+      "evidence": "Brief line 249 ends `... -SimpleMatch      (and 'mai-code-2 is qualified': no output)`. That parenthesized prose is parsed as part of the pwsh command rather than as a separate assertion; the Shape's close task is required to run the worked example line by line.",
+      "fix": "Keep the first Select-String command for `mai-code-2` and `vloop self-update`, then put `Select-String -Path README.md -Pattern 'mai-code-2 is qualified' -SimpleMatch` on its own line with `-> (no output)`."
+    }
+  ],
+  "decisions": [
+    "Name both agents only where the behaviour is shared; preserve the listed Claude-specific text and mechanisms. I agree.",
+    "Give mixed teams a short README section linking to configuration.md for the full treatment. I agree.",
+    "Document mai-code-2's operational evidence without calling it qualified because the eval rule is unmet. I agree.",
+    "Include this repository's operator and architect skill wording because its team and gates are now mixed-OS and pwsh. I agree.",
+    "Locate changes by named text rather than pinning line numbers. I agree.",
+    "Keep Spanish templates and docs/domain out of scope unless a change would contradict them. I agree."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+
