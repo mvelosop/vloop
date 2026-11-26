@@ -20,3 +20,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** README now describes both Claude Code and GitHub Copilot CLI throughout onboarding and the loop, and links mai-code-2's run evidence while explicitly leaving it not yet qualified.
 - **Files:** README.md
 - **Notes for next iteration:** Preserved the gpt-6.1-terra limitation to work, review, second review and brief review, with plan and gate review kept on Claude and verify still untried; mai-code-2's evidence covers every session kind except second review.
+
+## T2 — Make the README agent-neutral and cite mai-code-2
+
+- **Outcome:** done (review: PASS)
+- **Summary:** README onboarding and loop guidance now describe Claude Code and GitHub Copilot CLI consistently, with Copilot prerequisites and mai-code-2 run evidence linked without claiming qualification.
+- **Files:** README.md
+- **Notes for next iteration:** Retained the gpt-6.1-terra limits: plan and gate review stay on Claude and verify remains untried. The mai-code-2 paragraph covers every session kind except second review and links the unchanged eval qualification rule and D6 evidence.

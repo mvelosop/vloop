@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "README onboarding and loop guidance now describe Claude Code and GitHub Copilot CLI consistently, with Copilot prerequisites and mai-code-2 run evidence linked without claiming qualification.",
+  "files": ["README.md"],
+  "verified": "vloop task gate T2 exited 0 and printed \"gate T2: pass\"; the README command-tree line-budget test passed and README.md has 199 lines.",
+  "notes": "Retained the gpt-6.1-terra limits: plan and gate review stay on Claude and verify remains untried. The mai-code-2 paragraph covers every session kind except second review and links the unchanged eval qualification rule and D6 evidence."
+}

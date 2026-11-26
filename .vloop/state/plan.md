@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/6 done** · iteration 2
+**Status:** running · **2/6 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:27:59Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:33:35Z
 
 ## Progress
 
 - [x] **T1** — Document the mai-code-2 evidence
-- [ ] **T2** — Make the README agent-neutral and cite mai-code-2 · 1 attempt(s)
+- [x] **T2** — Make the README agent-neutral and cite mai-code-2 · 1 attempt(s)
 - [ ] **T3** — Explain mixed teams in the README
 - [ ] **T4** — Update the guides for any agent
 - [ ] **T5** — List every session kind and portable gate shell
@@ -41,7 +41,7 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 ### T2 — Make the README agent-neutral and cite mai-code-2
 
-`pending` · 1 attempt(s) · depends on: T1
+`done` · 1 attempt(s) · depends on: T1
 
 Apply D1 and D3 to README.md now that the evidence section exists. Readers must understand that either supported agent can drive the loop and that mai-code-2's results are evidence, not qualification.
 
@@ -52,8 +52,6 @@ Apply D1 and D3 to README.md now that the evidence section exists. Readers must 
 - The loop summary says a fresh agent session for Claude Code or Copilot CLI, and "You ask; the skill drives" addresses the user's agent rather than Claude Code alone.
 - The Copilot section adds the prescribed mai-code-2 sentence for the URL shortener and B40 through B44, links D6's section, names every session kind but the second review, and says it is not yet qualified.
 - Neither "Every session is a fresh Claude session" nor "mai-code-2 is qualified" appears, and the gpt-6.1-terra sentence still limits plan and gate review to Claude and leaves verify untried.
-
-**From the last attempt:** check go failed — see .vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829/checks/002-go.fail.log
 
 <details><summary>verify command</summary>
 
