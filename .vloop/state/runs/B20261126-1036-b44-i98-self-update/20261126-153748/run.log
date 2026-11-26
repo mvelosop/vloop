@@ -12,3 +12,11 @@
    review T5 · 1m39s · $0.03 · run $0.29 / $40.00
    review: PASS
    T5 done
+   check go
+   verify · 6m16s · $0.16 · run $0.45 / $40.00
+verify: 1 finding(s); 10 example line(s) not run — see .vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-153748/reports/verify.json
+
+═══ complete ═══
+run:    B20261126-1036-b44-i98-self-update/20261126-153748  (2 iteration(s) this run)
+plan:   5/5 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1036-b44-i98-self-update.md

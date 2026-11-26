@@ -1,0 +1,61 @@
+{
+  "schema": "verify/v2",
+  "complete": true,
+  "findings": [
+    {
+      "kind": "surface",
+      "claim": "cmd/vloop/b5_e2e_test.go:362: \"! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind\"",
+      "observed": "internal/cli/doctor.go:852 emits \"the vloop plugin is %s but this binary is %s — vloop run is unaffected; vloop self-update updates the binary and the plugin\". The non-Windows test at cmd/vloop/b5_e2e_test.go:362 still requires the retired line and therefore cannot match the updated behavior.",
+      "where": "brief Behaviour contract, S3 — doctor's two plugin-version warnings; cmd/vloop/b5_e2e_test.go:362 and internal/cli/doctor.go:852"
+    }
+  ],
+  "not_run": [
+    {
+      "line": "vloop self-update --check",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "vloop self-update",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "the same, the binary reporting v0.15.0-rc.4 and latest v0.14.0",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "vloop self-update --version v0.15.0-rc.5     (binary at v0.15.0-rc.4)",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "vloop self-update --version 0.15",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "no go on PATH",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "a checkout build",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "the binary run from a directory that is not GOBIN",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "a fake claude whose plugin update exits 1 printing \"network down\"",
+      "reason": "command denied by verify fence"
+    },
+    {
+      "line": "a fake go install that fails printing \"no matching versions\"",
+      "reason": "command denied by verify fence"
+    }
+  ],
+  "checked": {
+    "example_lines": 0,
+    "sentences": 44,
+    "surfaces": 11
+  },
+  "notes": "All three passes are complete. Pass 1 could not execute any worked-example line because the verify fence denied the commands before execution; those lines are recorded in not_run. Pass 2 read the implementation and embedded schema. Pass 3 found the stale cross-platform doctor assertion reported above. The persisted final-go check passed on the Windows run but did not exercise cmd/vloop/b5_e2e_test.go's non-Windows branch."
+}
+

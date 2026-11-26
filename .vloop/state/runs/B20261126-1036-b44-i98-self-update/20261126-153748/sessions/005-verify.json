@@ -1,0 +1,79 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.16179310000000002,
+  "credits": 16.17931,
+  "duration_ms": 374493,
+  "effort": null,
+  "ended": "2026-11-26T15:58:05Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.16179310000000002,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_493rNtUSAR8kHvG1HjI4pq3g"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_fjB3fgHY41S4WV8cjbrZ8pqa"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_tQnYMaRwSra8V8JJp0esJwNW"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_t9VPnjcsbLLEPVzP8Zn95FMm"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_RfA88QXDyfkP9P0L4hIuhXnD"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_ET4XjrHHpXMlMJX6PdIVTLck"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_gEtCd7OaJtKUS0RyALo7fU2a"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_g3HXbczFb0Eg0bP9d7KvOhPd"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_2duPfbkgTZUA2j0Pl1b2sl2o"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_4m0io9x47x0PiIzvxKopISVQ"
+    }
+  ],
+  "phase": "verify",
+  "run_id": "B20261126-1036-b44-i98-self-update",
+  "schema": "session/v4",
+  "started": "2026-11-26T15:51:48Z",
+  "turns": 30,
+  "wall_ms": 376379
+}
