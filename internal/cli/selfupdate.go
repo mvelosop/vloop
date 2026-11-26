@@ -17,6 +17,9 @@ import (
 const selfUpdateModule = "github.com/mvelosop/vloop"
 
 var selfUpdateExecutable = os.Executable
+var selfUpdateGOOS = runtime.GOOS
+var selfUpdateRemove = os.Remove
+var selfUpdateRename = os.Rename
 
 type selfUpdatePlugin struct {
 	Agent   string `json:"agent"`
@@ -124,7 +127,7 @@ func runSelfUpdate(b Build, g *Globals, check, explicit bool, requested string, 
 		return Problem(fmt.Errorf("cannot find running vloop: %s", err))
 	}
 	expected := filepath.Join(dir, "vloop")
-	if runtime.GOOS == "windows" {
+	if selfUpdateGOOS == "windows" {
 		expected += ".exe"
 	}
 	exeResolved, err := resolveSelfUpdatePath(exe)
@@ -143,10 +146,63 @@ func runSelfUpdate(b Build, g *Globals, check, explicit bool, requested string, 
 	}
 
 	doc.Dir = displaySelfUpdatePath(dir)
+	if !g.JSON {
+		if _, err := fmt.Fprintf(out, "installing vloop %s (from %s)…\n", target, b.Module); err != nil {
+			return err
+		}
+	}
+	if err := installSelfUpdate(goPath, target, exe); err != nil {
+		return Problem(err)
+	}
+	doc.Installed = true
 	if g.JSON {
 		return writeSelfUpdateJSON(out, doc)
 	}
-	return nil
+	_, err = fmt.Fprintf(out, "installed vloop %s at %s\n", target, displaySelfUpdatePath(dir))
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintln(out, "next: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository")
+	return err
+}
+
+func installSelfUpdate(goPath, target, exe string) error {
+	old := exe + ".old"
+	moved := false
+	if selfUpdateGOOS == "windows" {
+		if err := selfUpdateRemove(old); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("cannot remove %s (%s) — delete it and run vloop self-update again", displaySelfUpdatePath(old), err)
+		}
+		if err := selfUpdateRename(exe, old); err != nil {
+			return fmt.Errorf("cannot move %s aside (%s) — nothing was installed", displaySelfUpdatePath(exe), err)
+		}
+		moved = true
+	}
+
+	cmd := exec.Command(goPath, "install", selfUpdateModule+"/cmd/vloop@"+target)
+	raw, err := cmd.CombinedOutput()
+	if err == nil {
+		return nil
+	}
+	line := lastSelfUpdateLine(raw)
+	if line == "" {
+		line = err.Error()
+	}
+	if moved {
+		if removeErr := selfUpdateRemove(exe); removeErr != nil && !os.IsNotExist(removeErr) {
+			return fmt.Errorf(
+				"go install failed: %s; and %s could not be moved back to %s (%s) — rename it back by hand",
+				line, displaySelfUpdatePath(old), displaySelfUpdatePath(exe), removeErr,
+			)
+		}
+		if restoreErr := selfUpdateRename(old, exe); restoreErr != nil {
+			return fmt.Errorf(
+				"go install failed: %s; and %s could not be moved back to %s (%s) — rename it back by hand",
+				line, displaySelfUpdatePath(old), displaySelfUpdatePath(exe), restoreErr,
+			)
+		}
+	}
+	return fmt.Errorf("go install failed: %s", line)
 }
 
 func latestVloopVersion(goPath string) (string, error) {
@@ -257,7 +313,7 @@ func resolveSelfUpdatePathAllowMissing(path string) (string, error) {
 }
 
 func sameSelfUpdatePath(a, b string) bool {
-	if runtime.GOOS == "windows" {
+	if selfUpdateGOOS == "windows" {
 		return strings.EqualFold(a, b)
 	}
 	return a == b
@@ -275,7 +331,7 @@ func displaySelfUpdatePath(path string) string {
 		if homeErr == nil {
 			rel, relErr := filepath.Rel(home, path)
 			inside := relErr == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
-			if runtime.GOOS == "windows" {
+			if selfUpdateGOOS == "windows" {
 				inside = relErr == nil && rel != ".." && !strings.HasPrefix(strings.ToLower(rel), ".."+string(filepath.Separator))
 			}
 			if inside {

@@ -1,0 +1,44 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "A necessary install prints the exact installing line, runs go install github.com/mvelosop/vloop/cmd/vloop@<target>, then prints the exact installed line on success.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go: runSelfUpdate prints both exact lines and installSelfUpdate invokes exec.Command(goPath, \"install\", selfUpdateModule+\"/cmd/vloop@\"+target); TestSelfUpdateInstalls verifies the output and logged invocation."
+    },
+    {
+      "criterion": "A go install failure prints its last error line, exits 1, leaves no partially replaced running binary and does not continue to plugins.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go: installSelfUpdate selects lastSelfUpdateLine(raw), returns an error immediately, and on Windows removes a partial executable before restoring the old binary; TestSelfUpdateInstallFailure and TestSelfUpdateWindowsRestoresAfterInstallFailure verify exit 1, the final error line, and the restored runnable content."
+    },
+    {
+      "criterion": "On Windows, a stale vloop.exe.old is removed before moving the running vloop.exe aside; remove and move failures use the exact brief messages and install nothing.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go: installSelfUpdate performs the old-file removal, then renames exe to old, with the two specified error messages; TestSelfUpdateWindowsMoveAsideFailures covers both failures and verifies the fake go install was not invoked."
+    },
+    {
+      "criterion": "On Windows, a failed install moves vloop.exe.old back; if restoration also fails, the exact combined failure line tells the operator to rename it by hand.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go: the failure branch removes any partial exe and renames old back, returning the brief's combined rename-by-hand message when cleanup or restoration fails; TestSelfUpdateWindowsRestoresAfterInstallFailure exercises successful restoration and a restoration denial."
+    },
+    {
+      "criterion": "A successful --version request installs exactly that version even when it is older or a pre-release, and installed/newer/dir fields in self-update/v1 reflect what happened.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go: explicit requests install whenever target differs from the current version, preserve the semver target, and set Installed and Dir after success; TestSelfUpdateInstalls verifies an explicit older v0.13.0 invocation and the exact JSON fields, while the existing semantic-version validation accepts pre-release versions."
+    },
+    {
+      "criterion": "Committed Go tests build a temporary Go fake for go and cover success, failure, explicit older installation and the Windows old-file/restore paths without invoking the real go install or network.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate_test.go: newSelfUpdateHarness builds fakeSelfUpdateGo into a temporary PATH and the added install tests cover success, failure, v0.13.0, stale-old removal, move-aside failure, restoration, and combined restoration failure. The go check log reports internal/cli passing."
+    },
+    {
+      "criterion": "The implementation does not install, downgrade or re-exec a binary outside the exact T1 decision and install-location checks.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go: installSelfUpdate is reachable only after explicit-target or strictly-newer installNeeded, successful selfUpdateInstallDir, and exact resolved executable/install-path equality checks; the implementation executes only go install and contains no re-exec path."
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}

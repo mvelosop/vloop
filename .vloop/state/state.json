@@ -5,9 +5,9 @@
   "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
   "branch": "B20261126-1036-b44-i98-self-update",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T15:11:57Z",
+  "updated": "2026-11-26T15:20:22Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -113,7 +113,7 @@
         "The implementation does not install, downgrade or re-exec a binary outside the exact T1 decision and install-location checks."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

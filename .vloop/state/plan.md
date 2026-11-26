@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/5 done** · iteration 4
+**Status:** running · **2/5 done** · iteration 5
 
-**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:11:57Z
+**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:20:22Z
 
 ## Progress
 
 - [x] **T1** — Implement self-update target decisions and check mode · 2 attempt(s)
-- [ ] **T2** — Install self-update targets safely
+- [x] **T2** — Install self-update targets safely
 - [ ] **T3** — Update installed agent plugins
 - [ ] **T4** — Point existing commands and guides to self-update
 - [ ] **T5** — Verify the complete self-update workflow
@@ -46,7 +46,7 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 ### T2 — Install self-update targets safely
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Replace the released binary at the Go install location while preserving the old executable on every failure. Windows move-aside and restoration make the update safe even though the running executable cannot be overwritten in place.
 

@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -19,6 +20,8 @@ const fakeSelfUpdateGo = `package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -49,6 +52,31 @@ func main() {
 			fmt.Println(os.Getenv("FAKE_GOPATH"))
 			return
 		}
+	}
+	if len(args) > 1 && args[0] == "install" {
+		_ = os.WriteFile(log, []byte(strings.Join(args, " ")+"\n"+dir+"\n"), 0o666)
+		name := "vloop"
+		if runtime.GOOS == "windows" || os.Getenv("FAKE_GO_INSTALL_WINDOWS") != "" {
+			name += ".exe"
+		}
+		installDir := os.Getenv("FAKE_GOBIN")
+		if installDir == "" {
+			installDir = filepath.Join(os.Getenv("FAKE_GOPATH"), "bin")
+		}
+		exe := filepath.Join(installDir, name)
+		if os.Getenv("FAKE_GO_INSTALL_PARTIAL") != "" {
+			_ = os.WriteFile(exe, []byte("partial"), 0o755)
+		}
+		if os.Getenv("FAKE_GO_INSTALL_FAIL") != "" {
+			fmt.Fprintln(os.Stderr, "install detail")
+			fmt.Fprintln(os.Stderr, os.Getenv("FAKE_GO_INSTALL_FAIL"))
+			os.Exit(1)
+		}
+		if err := os.WriteFile(exe, []byte("installed"), 0o755); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
 	}
 	os.Exit(9)
 }
@@ -141,7 +169,7 @@ func TestSelfUpdateJSONNonCheckBranches(t *testing.T) {
 	t.Setenv("FAKE_GO_LATEST", "v0.15.0")
 	code, out, errOut = h.run("--json", "self-update")
 	assertSelfUpdateResult(t, code, out, errOut, 0,
-		fmt.Sprintf("{\"schema\":\"self-update/v1\",\"current\":\"v0.14.0\",\"target\":\"v0.15.0\",\"newer\":true,\"installed\":false,\"dir\":%q,\"plugins\":[]}\n",
+		fmt.Sprintf("{\"schema\":\"self-update/v1\",\"current\":\"v0.14.0\",\"target\":\"v0.15.0\",\"newer\":true,\"installed\":true,\"dir\":%q,\"plugins\":[]}\n",
 			displaySelfUpdatePath(h.gobin)),
 		"",
 	)
@@ -206,7 +234,168 @@ func TestSelfUpdateInstallLocationChecksOnlyWhenNeeded(t *testing.T) {
 		t.Fatal(err)
 	}
 	code, out, errOut = h.run("self-update")
-	assertSelfUpdateResult(t, code, out, errOut, 0, "", "")
+	assertSelfUpdateResult(t, code, out, errOut, 0,
+		"installing vloop v0.15.0 (from v0.14.0)…\n"+
+			"installed vloop v0.15.0 at "+displaySelfUpdatePath(expected)+"\n"+
+			"next: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository\n",
+		"",
+	)
+}
+
+func TestSelfUpdateInstalls(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+
+	code, out, errOut := h.run("self-update")
+	assertSelfUpdateResult(t, code, out, errOut, 0,
+		"installing vloop v0.15.0 (from v0.14.0)…\n"+
+			"installed vloop v0.15.0 at "+displaySelfUpdatePath(h.gobin)+"\n"+
+			"next: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository\n",
+		"",
+	)
+	log, err := os.ReadFile(h.log)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Split(string(log), "\n")[0]; got != "install github.com/mvelosop/vloop/cmd/vloop@v0.15.0" {
+		t.Fatalf("go invocation: %q", got)
+	}
+	installed, err := os.ReadFile(h.executable)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(installed) != "installed" {
+		t.Fatalf("installed executable: %q", installed)
+	}
+
+	code, out, errOut = h.run("--json", "self-update", "--version", "v0.13.0")
+	assertSelfUpdateResult(t, code, out, errOut, 0,
+		fmt.Sprintf("{\"schema\":\"self-update/v1\",\"current\":\"v0.14.0\",\"target\":\"v0.13.0\",\"newer\":false,\"installed\":true,\"dir\":%q,\"plugins\":[]}\n",
+			displaySelfUpdatePath(h.gobin)),
+		"",
+	)
+	assertSelfUpdateDocumentValid(t, out)
+}
+
+func TestSelfUpdateInstallFailure(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+	t.Setenv("FAKE_GO_INSTALL_FAIL", "no matching versions")
+
+	code, out, errOut := h.run("self-update")
+	wantOut := "installing vloop v0.15.0 (from v0.14.0)…\n"
+	assertSelfUpdateResult(t, code, out, errOut, 1, wantOut, "vloop: go install failed: no matching versions\n")
+	raw, err := os.ReadFile(h.executable)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(raw) != "running" {
+		t.Fatalf("running executable changed: %q", raw)
+	}
+}
+
+func TestSelfUpdateWindowsMoveAsideFailures(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+	oldGOOS := selfUpdateGOOS
+	oldRemove := selfUpdateRemove
+	oldRename := selfUpdateRename
+	selfUpdateGOOS = "windows"
+	t.Cleanup(func() {
+		selfUpdateGOOS = oldGOOS
+		selfUpdateRemove = oldRemove
+		selfUpdateRename = oldRename
+	})
+	useWindowsSelfUpdateExecutable(t, h)
+	exe := h.executable
+	old := exe + ".old"
+
+	if err := os.Mkdir(old, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(old, "locked"), []byte("keep"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, _, errOut := h.run("self-update")
+	if code != 1 || !strings.HasPrefix(errOut, "vloop: cannot remove "+displaySelfUpdatePath(old)+" (") ||
+		!strings.HasSuffix(errOut, ") — delete it and run vloop self-update again\n") {
+		t.Fatalf("old removal: code=%d stderr=%q", code, errOut)
+	}
+	if log, err := os.ReadFile(h.log); err == nil && strings.Contains(string(log), "install ") {
+		t.Fatal("install ran after stale old removal failure")
+	}
+	if err := os.RemoveAll(old); err != nil {
+		t.Fatal(err)
+	}
+
+	selfUpdateRename = func(oldPath, newPath string) error {
+		if oldPath == exe {
+			return errors.New("move denied")
+		}
+		return oldRename(oldPath, newPath)
+	}
+	code, _, errOut = h.run("self-update")
+	if want := fmt.Sprintf("vloop: cannot move %s aside (move denied) — nothing was installed\n", displaySelfUpdatePath(exe)); errOut != want || code != 1 {
+		t.Fatalf("move aside: code=%d stderr=%q", code, errOut)
+	}
+	if log, err := os.ReadFile(h.log); err == nil && strings.Contains(string(log), "install ") {
+		t.Fatal("install ran after move-aside failure")
+	}
+}
+
+func TestSelfUpdateWindowsRestoresAfterInstallFailure(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+	oldGOOS := selfUpdateGOOS
+	oldRename := selfUpdateRename
+	selfUpdateGOOS = "windows"
+	t.Cleanup(func() {
+		selfUpdateGOOS = oldGOOS
+		selfUpdateRename = oldRename
+	})
+	useWindowsSelfUpdateExecutable(t, h)
+	t.Setenv("FAKE_GO_INSTALL_WINDOWS", "1")
+	t.Setenv("FAKE_GO_INSTALL_FAIL", "no matching versions")
+	t.Setenv("FAKE_GO_INSTALL_PARTIAL", "1")
+
+	original := h.executable
+	old := original + ".old"
+	code, out, errOut := h.run("self-update")
+	assertSelfUpdateResult(t, code, out, errOut, 1,
+		"installing vloop v0.15.0 (from v0.14.0)…\n",
+		"vloop: go install failed: no matching versions\n",
+	)
+	raw, err := os.ReadFile(original)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(raw) != "running" {
+		t.Fatalf("running executable was not restored: %q", raw)
+	}
+	if _, err := os.Stat(old); !os.IsNotExist(err) {
+		t.Fatalf("old executable still exists after restore: %v", err)
+	}
+
+	t.Setenv("FAKE_GO_INSTALL_PARTIAL", "")
+	t.Setenv("FAKE_GO_INSTALL_WINDOWS", "1")
+	t.Setenv("FAKE_GO_INSTALL_FAIL", "no matching versions")
+	original = h.executable
+	old = original + ".old"
+	selfUpdateRename = func(oldPath, newPath string) error {
+		if oldPath == old {
+			return errors.New("restore denied")
+		}
+		return oldRename(oldPath, newPath)
+	}
+	code, out, errOut = h.run("self-update")
+	want := fmt.Sprintf(
+		"vloop: go install failed: no matching versions; and %s could not be moved back to %s (restore denied) — rename it back by hand\n",
+		displaySelfUpdatePath(old), displaySelfUpdatePath(original),
+	)
+	assertSelfUpdateResult(t, code, out, errOut, 1,
+		"installing vloop v0.15.0 (from v0.14.0)…\n",
+		want,
+	)
 }
 
 func TestSelfUpdateRunsLatestLookupOutsideModule(t *testing.T) {
@@ -278,6 +467,9 @@ func newSelfUpdateHarness(t *testing.T) *selfUpdateHarness {
 	t.Setenv("FAKE_GO_LATEST", "v0.15.0")
 	t.Setenv("FAKE_GO_LIST_FAIL", "")
 	t.Setenv("FAKE_GO_ENV_FAIL", "")
+	t.Setenv("FAKE_GO_INSTALL_FAIL", "")
+	t.Setenv("FAKE_GO_INSTALL_PARTIAL", "")
+	t.Setenv("FAKE_GO_INSTALL_WINDOWS", "")
 	t.Setenv("FAKE_GO_LOG", log)
 	oldExecutable := selfUpdateExecutable
 	selfUpdateExecutable = func() (string, error) { return executable, nil }
@@ -288,7 +480,23 @@ func newSelfUpdateHarness(t *testing.T) *selfUpdateHarness {
 	}
 }
 
-func (h *selfUpdateHarness) restoreExecutable() { selfUpdateExecutable = h.oldExecutable }
+func useWindowsSelfUpdateExecutable(t *testing.T, h *selfUpdateHarness) {
+	t.Helper()
+	t.Setenv("FAKE_GO_INSTALL_WINDOWS", "1")
+	if runtime.GOOS == "windows" {
+		return
+	}
+	exe := h.executable + ".exe"
+	if err := os.Rename(h.executable, exe); err != nil {
+		t.Fatal(err)
+	}
+	h.executable = exe
+	selfUpdateExecutable = func() (string, error) { return exe, nil }
+}
+
+func (h *selfUpdateHarness) restoreExecutable() {
+	selfUpdateExecutable = h.oldExecutable
+}
 
 func (h *selfUpdateHarness) run(args ...string) (int, string, string) {
 	var stdout, stderr bytes.Buffer
