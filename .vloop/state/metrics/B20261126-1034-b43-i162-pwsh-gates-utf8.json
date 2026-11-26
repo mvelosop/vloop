@@ -43,32 +43,32 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 440709,
-    "work_ms": 313193,
-    "review_ms": 127516,
+    "agent_ms": 590047,
+    "work_ms": 370575,
+    "review_ms": 219472,
     "plan_ms": 287505,
-    "gates_ms": 4082,
-    "checks_ms": 307245,
+    "gates_ms": 9999,
+    "checks_ms": 497520,
     "gate_review_ms": 164625,
-    "wall_ms": null
+    "wall_ms": 1304000
   },
   "rate": {
-    "code_per_min": 0.544577033825041,
-    "code_test_per_min": 19.196340442332694
+    "code_per_min": 0.40674725911664666,
+    "code_test_per_min": 14.337840883861794
   },
   "cost": {
-    "total_usd": 0.5359535,
+    "total_usd": 0.6234744999999999,
     "plan_usd": 0.1720959,
-    "work_usd": 0.1994715,
-    "review_usd": 0.07918610000000001,
+    "work_usd": 0.223762,
+    "review_usd": 0.1424166,
     "gate_review_usd": 0.0852,
-    "per_1000_code_lines_usd": 133.988375
+    "per_1000_code_lines_usd": 155.86862499999998
   },
   "credits": {
-    "total": 53.595349999999996,
+    "total": 62.347449999999995,
     "plan": 17.20959,
-    "work": 19.947149999999997,
-    "review": 7.91861,
+    "work": 22.376199999999997,
+    "review": 14.24166,
     "gate_review": 8.52
   },
   "tokens": {
@@ -129,9 +129,9 @@
     "removal_efficiency": null
   },
   "interventions": {
-    "total": 0,
+    "total": 1,
     "by_agreement": {
-      "recommended": 0,
+      "recommended": 1,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 5,
-  "iterations": 3,
-  "iterations_per_closed": 1.5,
+  "iterations": 4,
+  "iterations_per_closed": 2,
   "by_task": [
     {
       "id": "T1",
@@ -210,7 +210,7 @@
       "id": "T3",
       "area": null,
       "kind": "test",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
         "code": 0,
         "test": 0,
@@ -223,8 +223,8 @@
           "other": 0
         }
       },
-      "agent_ms": 121786,
-      "cost_usd": 0.0658543,
+      "agent_ms": 271124,
+      "cost_usd": 0.15337530000000002,
       "models": [
         "mai-code-2"
       ],
@@ -387,6 +387,44 @@
           "text": "Denied by preToolUse hook: vloop fence: pwsh: runs a script, stdin or an encoded command, not a literal -Command string"
         }
       ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-140138",
+      "seq": 1,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 57382,
+      "cost_usd": 0.024290500000000003,
+      "cost_source": "estimated",
+      "credits": 2.42905,
+      "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-140138",
+      "seq": 2,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 91956,
+      "cost_usd": 0.06323050000000001,
+      "cost_source": "estimated",
+      "credits": 6.32305,
+      "turns": 8,
+      "permission_denials": 0,
+      "denials": [],
       "is_error": false
     }
   ]

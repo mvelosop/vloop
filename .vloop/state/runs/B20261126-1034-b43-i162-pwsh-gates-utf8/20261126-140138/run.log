@@ -5,3 +5,11 @@
    review T3 · 1m32s · $0.06 · run $0.09 / $40.00
    review: PASS
    T3 done
+   check go
+   verify · 3m21s · $0.13 · run $0.21 / $40.00
+verify: no findings; 4 example line(s) not run — see .vloop/state/runs/B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-140138/reports/verify.json
+
+═══ complete ═══
+run:    B20261126-1034-b43-i162-pwsh-gates-utf8/20261126-140138  (1 iteration(s) this run)
+plan:   3/3 done, 0 blocked
+plan complete. journal: .vloop/state/journals/B20261126-1034-b43-i162-pwsh-gates-utf8.md
