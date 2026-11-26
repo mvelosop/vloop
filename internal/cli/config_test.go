@@ -10,7 +10,7 @@ import (
 
 func scratchRepo(t *testing.T) string {
 	t.Helper()
-	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW", "SHELL", "AREAS", "RUN_MAX_ITERATIONS", "RUN_COST_CEILING", "RUN_MAX_ATTEMPTS", "RUN_STALL_LIMIT", "RUN_CONVERGENCE_MAX", "RUN_CONVERGENCE_MIN"} {
+	for _, v := range []string{"LANGUAGE", "MODEL_PLAN", "MODEL_WORK", "MODEL_REVIEW", "EFFORT_PLAN", "EFFORT_WORK", "EFFORT_REVIEW", "PLATFORMS", "SHELL", "AREAS", "RUN_MAX_ITERATIONS", "RUN_COST_CEILING", "RUN_MAX_ATTEMPTS", "RUN_STALL_LIMIT", "RUN_CONVERGENCE_MAX", "RUN_CONVERGENCE_MIN"} {
 		t.Setenv("VLOOP_"+v, "")
 	}
 	d := t.TempDir()
@@ -26,7 +26,7 @@ func TestConfigListDefaults(t *testing.T) {
 	want := "language=en (default)\nmodel.plan=opus (default)\nmodel.work=sonnet (default)\nmodel.review=sonnet (default)\nmodel.second-review=sonnet (default)\nmodel.gate-review=sonnet (default)\nmodel.verify=sonnet (default)\nmodel.review-brief=opus (default)\n" +
 		"effort.plan= (default)\neffort.work= (default)\neffort.review= (default)\neffort.second-review= (default)\neffort.gate-review= (default)\neffort.verify= (default)\neffort.review-brief= (default)\n" +
 		"agent.plan=claude (default)\nagent.work=claude (default)\nagent.review=claude (default)\nagent.second-review=claude (default)\nagent.gate-review=claude (default)\nagent.verify=claude (default)\nagent.review-brief=claude (default)\ncopilot.credit-usd=0.01 (default)\n" +
-		"shell=" + defaultShellForTest() + " (default)\nareas= (default)\n" +
+		"platforms= (default)\nshell=" + defaultShellForTest() + " (default)\nareas= (default)\n" +
 		"metrics.stacks= (default)\nmetrics.code= (default)\nmetrics.test= (default)\nmetrics.docs= (default)\nmetrics.excluded= (default)\n" +
 		"run.max-iterations=30 (default)\nrun.cost-ceiling=40 (default)\nrun.max-attempts=3 (default)\n" +
 		"run.stall-limit=2 (default)\nrun.convergence-max=3.0 (default)\nrun.convergence-min=6 (default)\nrun.gate-timeout=15 (default)\nrun.gate-scratch= (default)\nrun.git-config-ignore= (default)\nrun.session-timeout=60 (default)\nrun.second-review=off (default)\nrun.verify=true (default)\nrun.keep-awake=on (default)\n"
@@ -44,7 +44,7 @@ func TestConfigListJSONOrderAndNull(t *testing.T) {
 		`"effort.plan":{"value":null,"source":"default"},"effort.work":{"value":null,"source":"default"},` +
 		`"effort.review":{"value":null,"source":"default"},"effort.second-review":{"value":null,"source":"default"},"effort.gate-review":{"value":null,"source":"default"},"effort.verify":{"value":null,"source":"default"},"effort.review-brief":{"value":null,"source":"default"},` +
 		`"agent.plan":{"value":"claude","source":"default"},"agent.work":{"value":"claude","source":"default"},"agent.review":{"value":"claude","source":"default"},"agent.second-review":{"value":"claude","source":"default"},"agent.gate-review":{"value":"claude","source":"default"},"agent.verify":{"value":"claude","source":"default"},"agent.review-brief":{"value":"claude","source":"default"},"copilot.credit-usd":{"value":"0.01","source":"default"},` +
-		`"shell":{"value":"` + defaultShellForTest() + `","source":"default"},"areas":{"value":[],"source":"default"},` +
+		`"platforms":{"value":[],"source":"default"},"shell":{"value":"` + defaultShellForTest() + `","source":"default"},"areas":{"value":[],"source":"default"},` +
 		`"metrics.stacks":{"value":[],"source":"default"},"metrics.code":{"value":[],"source":"default"},` +
 		`"metrics.test":{"value":[],"source":"default"},"metrics.docs":{"value":[],"source":"default"},` +
 		`"metrics.excluded":{"value":[],"source":"default"},` +
@@ -169,6 +169,71 @@ func TestConfigAreasAndShell(t *testing.T) {
 	t.Setenv("VLOOP_SHELL", "cmd")
 	if _, out, _ := run(t, "-C", d, "config", "get", "shell", "--json"); out != `{"key":"shell","value":"cmd","source":"env"}`+"\n" {
 		t.Errorf("env shell: %q", out)
+	}
+}
+
+func TestConfigPlatformsSharedOnlyRefusals(t *testing.T) {
+	d := scratchRepo(t)
+	if code, _, e := run(t, "-C", d, "config", "set", "platforms", "windows,macos"); code != 0 || e != "" {
+		t.Fatalf("set platforms: %d %q", code, e)
+	}
+	if code, out, e := run(t, "-C", d, "config", "get", "platforms"); code != 0 || out != "windows,macos\n" || e != "" {
+		t.Fatalf("get platforms: %d %q %q", code, out, e)
+	}
+	shared, err := os.ReadFile(filepath.Join(d, ".vloop", "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	local := filepath.Join(d, ".vloop", "config.local.toml")
+	if code, out, e := run(t, "-C", d, "config", "set", "platforms", "macos,beos"); code != 2 || out != "" ||
+		e != "vloop: invalid value \"macos,beos\" for platforms: want a comma-separated list of linux, macos, windows\n" {
+		t.Fatalf("invalid platforms: %d %q %q", code, out, e)
+	}
+	t.Setenv("VLOOP_PLATFORMS", "linux")
+	if code, out, e := run(t, "-C", d, "config", "get", "language"); code != 1 || out != "" ||
+		e != "vloop: VLOOP_PLATFORMS: platforms belongs in .vloop/config.toml — the platforms are the repository's, not one machine's\n" {
+		t.Fatalf("environment platforms: %d %q %q", code, out, e)
+	}
+	t.Setenv("VLOOP_PLATFORMS", "")
+	if err := os.WriteFile(local, []byte("platforms = [\"linux\"]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, e := run(t, "-C", d, "config", "get", "language"); code != 1 || out != "" ||
+		e != "vloop: .vloop/config.local.toml: platforms belongs in .vloop/config.toml — the platforms are the repository's, not one machine's\n" {
+		t.Fatalf("local file platforms: %d %q %q", code, out, e)
+	}
+	if err := os.WriteFile(local, []byte("shell = \"pwsh\"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, e := run(t, "-C", d, "config", "get", "shell"); code != 1 || out != "" ||
+		e != "vloop: .vloop/config.local.toml: shell belongs in .vloop/config.toml while platforms lists macos, windows — the checks and the gates are written for one shell\n" {
+		t.Fatalf("local file shell: %d %q %q", code, out, e)
+	}
+	if err := os.Remove(local); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, e := run(t, "-C", d, "config", "set", "--local", "platforms", "linux"); code != 2 || out != "" ||
+		e != "vloop: .vloop/config.local.toml: platforms belongs in .vloop/config.toml — the platforms are the repository's, not one machine's\n" {
+		t.Fatalf("local platforms: %d %q %q", code, out, e)
+	}
+	if code, out, e := run(t, "-C", d, "config", "set", "--local", "shell", "pwsh"); code != 2 || out != "" ||
+		e != "vloop: .vloop/config.local.toml: shell belongs in .vloop/config.toml while platforms lists macos, windows — the checks and the gates are written for one shell\n" {
+		t.Fatalf("local shell: %d %q %q", code, out, e)
+	}
+	t.Setenv("VLOOP_SHELL", "sh")
+	if code, out, e := run(t, "-C", d, "config", "get", "shell"); code != 1 || out != "" ||
+		e != "vloop: VLOOP_SHELL: shell belongs in .vloop/config.toml while platforms lists macos, windows — the checks and the gates are written for one shell\n" {
+		t.Fatalf("environment shell: %d %q %q", code, out, e)
+	}
+	after, err := os.ReadFile(filepath.Join(d, ".vloop", "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(after) != string(shared) {
+		t.Errorf("refusals changed shared file: %q", after)
+	}
+	if _, err := os.Stat(local); !os.IsNotExist(err) {
+		t.Errorf("refusals wrote local file: %v", err)
 	}
 }
 

@@ -1,205 +1,156 @@
-# Plan — B20261120-1643-b39-local-config-copilot-only
+# Plan — B20261125-2207-b40-i156-mixed-os-pwsh
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** complete · **8/8 done** · iteration 10
+**Status:** complete · **6/6 done** · iteration 9
 
-**Brief:** `docs/briefs/B20261120-1643-b39-local-config-copilot-only.loop-brief.md` · **Updated:** 2026-11-20T19:26:33Z
+**Brief:** `docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md` · **Updated:** 2026-11-26T00:47:20Z
 
 ## Progress
 
-- [x] **T1** — Add the local config layer to resolution, with source local
-- [x] **T2** — Add vloop config set --local, config path --local and the override notice · 1 attempt(s)
-- [x] **T3** — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight · 1 attempt(s)
-- [x] **T4** — Keep sessions off the local file: the input guard and the fences
-- [x] **T5** — Check Claude only where a session in use runs on it
-- [x] **T6** — Price a Copilot credit at GitHub's $0.01 by default
-- [x] **T7** — Document the local file, Claude only where used, and the credit price
-- [x] **T8** — Close: the worked example line for line, and every gate at once
+- [x] **T1** — Add mixed-team platform configuration
+- [x] **T2** — Report mixed-team health and block unsafe runs · 1 attempt(s)
+- [x] **T3** — Lint mixed-team gates for portable commands
+- [x] **T4** — Teach skills to write portable mixed-team gates · 1 attempt(s)
+- [x] **T5** — Document mixed teams and the repository policy
+- [x] **T6** — Prove the complete mixed-team workflow · 1 attempt(s)
 
 ## Tasks
 
-### T1 — Add the local config layer to resolution, with source local
+### T1 — Add mixed-team platform configuration
 
 `done` · depends on: none
 
-A developer's own settings live in an untracked .vloop/config.local.toml that wins over the shared .vloop/config.toml, while a VLOOP_* variable still wins over both (L1). This task puts that layer into the config package's resolution, so every later task (config set --local, doctor's row, the run's guards) builds on one resolver. The checks are the repository's contract, so a [[check]] in the local file is refused wherever the config is read, never read.
+Give repositories a shared-only declaration of their supported platforms and enforce the mixed-team shell ownership rules at every config entry point. This establishes the configuration contract that doctor, preflight and the portability lint build on.
 
 **Acceptance**
 
-- Per key, the value is the VLOOP_&lt;KEY&gt; variable when set and not empty, else .vloop/config.local.toml when it sets the key, else .vloop/config.toml when it sets the key, else the default.
-- A list key takes the whole list of the layer that wins (never a merge of two files); an empty list (metrics.code = []) in either file sets nothing, so the next layer decides.
-- A value from the local file has source local: `agent.work=claude (local)` in config list, "source":"local" in config list --json and config get --json; the sources default, file and env keep their names. Violation: a key resolved from the local file whose source prints as file.
-- An empty local file, or one holding only keys vloop does not know, changes nothing and is no error.
-- A bad value or malformed TOML in the local file is reported like the shared file's, with the local path, exit 1: `vloop: .vloop/config.local.toml: invalid value "nope" for agent.work: want one of claude, copilot`.
-- A [[check]] in the local file is an error, exit 1, on every command that reads the config (config list and config get included), with exactly `vloop: .vloop/config.local.toml: [[check]] belongs in .vloop/config.toml — the checks are the repository's, not one machine's`. Violation: any path (Checks, the planner's check copy, doctor) that returns or runs a check defined in the local file.
-- The local file is read wherever and whenever .vloop/config.toml is read today, ResolveRun at a run's start included; no read point is added or moved. With no local file, every output is byte-identical to before.
-- The config package's committed tests cover, in temporary directories: the precedence of all four layers, the list rule and the empty list, source local, the local bad-value and malformed-TOML errors, and the [[check]] refusal; the go check runs them. A task that ships this behaviour and leaves no such test behind fails.
-- No new dependency: the TOML library in use stays the only one.
+- The platforms config key is an unset-by-default list accepting only linux, macos and windows; config set stores the caller's list order, and invalid input keeps the existing list-key wording and exits 2.
+- Platforms are distinct for mixed-team decisions, and every message renders them deduplicated and sorted as linux, macos, windows; a shared list containing two or more distinct entries is mixed.
+- A local file or VLOOP_PLATFORMS value for platforms is an exit-1 config-read error, config set --local platforms is an exit-2 error, and each path reports its own exact source with no file written.
+- When the platforms list is mixed, a local file or VLOOP_SHELL value for shell is an exit-1 config-read error regardless of value, config set --local shell is an exit-2 error, and none of those writes occur; without a mixed team, those shell overrides continue to work.
+- The implementation leaves no cross-platform test behind that skips on Windows and adds committed config/CLI tests, including the exact worked-example refusals, for the go check to run.
+- The configuration guide's keys table contains platforms with VLOOP_PLATFORMS, and its shell row says that a mixed team requires shared pwsh; no alternative spelling of the platform names is documented.
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T1/gate.sh
+$o = go test ./.vloop/state/gates/T1 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }
 ```
 
 </details>
 
-### T2 — Add vloop config set --local, config path --local and the override notice
+### T2 — Report mixed-team health and block unsafe runs
 
 `done` · 1 attempt(s) · depends on: T1
 
-With the local layer resolving (T1), a developer needs to write it without editing TOML by hand, and to be told when a shared value they just set will not apply on their machine (L2). This task adds --local to config set and config path, and the one-line stderr notice config set prints when the local file or the environment still overrides the key it wrote. docs/guide/commands.md is generated from the commands and must be regenerated.
+Expose the new configuration contract through doctor and run preflight so mixed repositories fail clearly before work starts. Preserve the existing P-5 behavior when a plan already records its shell, while adding only the required warnings for ordinary repositories.
 
 **Acceptance**
 
-- vloop config set --local &lt;key&gt; &lt;value&gt; validates as config set does (exit 2 and the same message on an unknown key or an invalid value, nothing written) and writes the key into .vloop/config.local.toml, keeping the file's other keys, comments and layout.
-- config set --local creates the file (and .vloop/) only when it writes a value, and never creates .vloop/config.toml; '' removes the key; removing a key that is not there writes nothing and creates nothing.
-- Without --local, config set writes the shared file as today. When, after the write, the key's value still comes from the local file or the environment, it prints one line on stderr and exits 0: `! agent.work stays claude on this machine: .vloop/config.local.toml overrides it`, or `: VLOOP_AGENT_WORK overrides it`; when both override, the line names the variable. config set --local prints the variable's line when a VLOOP_* variable still overrides the key after its write. No notice when nothing overrides; stdout stays empty in every case.
-- vloop config path --local prints .vloop/config.local.toml; config path alone prints .vloop/config.toml.
-- docs/guide/commands.md is regenerated with go generate ./... and its existing test passes under the go check.
-- Committed tests cover set --local (write, layout kept, create only on a write, remove, absent remove, validation), each notice case and path --local; the go check runs them.
+- Doctor places platforms immediately after config.local, or immediately after config when no config.local row exists, and omits it when platforms is unset or config is a problem.
+- The platforms row reports the exact pass, missing-shell problem, wrong-shell problem and not-on-this-machine warning from M2, using sorted deduplicated platforms and mapping Go darwin to macos.
+- With no plan in use, a mixed team reports a missing configured pwsh as a gate-shell problem; with a plan in use, the plan's recorded shell retains the existing pass/problem behavior, and a non-mixed team retains the existing warning.
+- A repository with checks, no platforms key and no shared shell produces the exact checks warning showing the resolved shell source on that machine; vloop run does not print this warning.
+- A mixed repository produces one checks warning for each check whose command word first matches the M3 list, and vloop run prints it; a listed token used only as data or inside a quoted argument does not warn.
+- Run preflight prints the exact platforms problem or warning with two spaces and its symbol, counts the platforms problem as a refusal, and reaches no plan session or agent when it fails.
+- The task adds committed doctor and preflight tests that run on Windows, macOS and Linux without a real claude or copilot process, and the go check runs them.
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T2/gate.sh
+$o = go test ./.vloop/state/gates/T2 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }
 ```
 
 </details>
 
-### T3 — Keep the local file git-ignored and in view: init, upgrade, doctor and the run's preflight
-
-`done` · 1 attempt(s) · depends on: T2
-
-A local file that git would commit is not local, and one that silently overrides shared values surprises its owner (L3, first half). This task makes vloop init and vloop upgrade keep .vloop/config.local.toml in .gitignore, adds doctor's config.local row (problem when tracked or not ignored, a warning naming the overridden keys), and makes vloop run's preflight refuse on those problems by name and print the warning, before anything runs. The driver's tree-clean refusal stays as it is; this refusal comes first and says why.
-
-**Acceptance**
-
-- vloop init and vloop upgrade keep .vloop/config.local.toml in .gitignore on a line of its own, beside .vloop/tmp/, with that line's rules: added once, nothing else in the file changed, reported as today's .gitignore step. Earlier tests that pin the exact .gitignore change only to include the new line.
-- doctor's config.local row comes right after the config row: no row when there is no local file or when the config row is a problem; outside a git repository the ignore test is skipped.
-- Tracked (in git's index, ignored or not): `✗ config.local .vloop/config.local.toml is tracked by git — it is shared with everyone who clones: run git rm --cached .vloop/config.local.toml and add it to .gitignore`.
-- Untracked and not ignored as the driver's git sees it: `✗ config.local .vloop/config.local.toml is not git-ignored — the next git add -A would commit it: add it to .gitignore`. The test asks git about the file path itself, so any rule that covers it (a .vloop/*.local.toml pattern, the global excludes file) satisfies it.
-- Untracked and ignored: `! config.local overrides model.work, agent.work — on this machine only`, the keys with source local in config list's order; with none, `✓ config.local`.
-- vloop run's preflight counts either config.local problem like any other (exit 1, `vloop: preflight failed — N problem(s), nothing has run`, no session, no commit, no branch) and prints the warning; both on stderr with two spaces before the symbol.
-- Committed end-to-end tests in cmd/vloop, with stub agents on a temporary PATH and repositories in temporary directories (the pattern of cmd/vloop/e2e_test.go), cover each planted failure of the worked example: not ignored and tracked, in doctor and in the run's refusal; plus tests of the row's other cases. No test touches this repository's .vloop/ or .gitignore. The go check runs them.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T3/gate.sh
-```
-
-</details>
-
-### T4 — Keep sessions off the local file: the input guard and the fences
-
-`done` · depends on: T3
-
-Sessions must not change the configuration the driver runs under, and an ignored file is exactly what the driver's tree checks do not see (L3, second half). This task makes the driver's input guard hold .vloop/config.local.toml as it holds .vloop/config.toml, adds the matching deny entries to every fence that denies the shared file, and records them in the fence audit. The Copilot hook already denies every write under .vloop/ but .vloop/tmp/ and does not change.
-
-**Acceptance**
-
-- The input guard holds .vloop/config.local.toml like .vloop/config.toml: a session that changes it, creates it or removes it has it put back (changed: original bytes; created: removed; removed: restored), after work and review sessions alike, as the guard does today for the shared file.
-- Each fence whose deny list names Edit(.vloop/config.toml) and Write(.vloop/config.toml) (work, review, verify, gate-review, review-brief) names Edit(.vloop/config.local.toml) and Write(.vloop/config.local.toml) the same way; fence/plan.json and the Copilot hook are unchanged.
-- docs/design-notes/fence-audit.md has a row for each new entry in each of those fences' sections, saying what enforces it as the config.toml row beside it does.
-- The open fence issues (#129, #130, #134, #136) are not touched, even in the fence files this task edits.
-- Violation: the local file staged or committed by any driver commit in a test run.
-- Committed tests cover the guard for the local file changed, created and removed (driver safety tests), and any existing test that enumerates the fences' rules or their audit rows passes with the new entries; the go check runs them.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T4/gate.sh
-```
-
-</details>
-
-### T5 — Check Claude only where a session in use runs on it
-
-`done` · depends on: T3
-
-A machine with no claude cannot run vloop today even when every session is on Copilot, because doctor's claude row and an untrusted-folder warning stop the run's preflight (L4). This task makes doctor's claude, trust, plugin and gate edits rows apply only when a session in use resolves to the claude agent, by the same rule copilotKeys already follows for Copilot, and n/a otherwise, so the run's preflight passes them. A config that cannot be read counts Claude as in use, so a broken config never hides a missing claude.
-
-**Acceptance**
-
-- Claude is in use for vloop run when any of agent.plan, agent.gate-review, agent.work, agent.review resolves to claude, or agent.verify does while run.verify is not false, or agent.second-review does while run.second-review is not off; for vloop doctor the same, or agent.review-brief resolves to claude.
-- When the config row is a problem, Claude counts as in use and the four rows run as today.
-- When Claude is in use the claude, trust, plugin and gate edits rows are exactly as today. When it is not, each is n/a with the message `no session in use runs on claude` (`- claude no session in use runs on claude`, and the same for trust, plugin and gate edits), runs nothing (no claude --version, no plugin list) and reads nothing (no ~/.claude.json, no settings file); vloop run's preflight passes them.
-- Violation: a Claude row skipped on a repository where some session in use is on Claude, or a Claude row still run when none is.
-- vloop brief review's preflight is unchanged. Earlier doctor tests change only where they pin rows for Claude not in use.
-- A committed end-to-end test in cmd/vloop, on a temporary PATH holding a stub copilot and no claude, every agent.* key copilot with a Copilot model id and run.verify = false, asserts each of the four n/a lines on its own (not as one block) and that vloop run gets past its preflight; with agent.review set back to claude it asserts `✗ claude claude is not on PATH` and the preflight's refusal. No test depends on what is installed on the machine. The go check runs it.
-
-<details><summary>verify command</summary>
-
-```sh
-sh .vloop/state/gates/T5/gate.sh
-```
-
-</details>
-
-### T6 — Price a Copilot credit at GitHub's $0.01 by default
+### T3 — Lint mixed-team gates for portable commands
 
 `done` · depends on: T1
 
-Copilot's estimated cost uses 0.0066667 dollars a credit, Copilot Pro's average, while GitHub now prices one AI credit at $0.01 on every plan (L5). This task moves the default of copilot.credit-usd to 0.01 and updates every place that states the default, while records of what already happened keep their numbers. A developer whose plan makes credits cheaper sets their own, now possible per machine in the local file.
+Make plan acceptance reject gate commands and PowerShell scripts that rely on platform-specific native tools when platforms is mixed. The lint must recognize PowerShell command positions precisely without changing behavior for unmixed or undeclared repositories.
 
 **Acceptance**
 
-- copilot.credit-usd defaults to 0.01: `vloop config get copilot.credit-usd` prints 0.01 with no file setting it, and config list shows `copilot.credit-usd=0.01 (default)`. Its validation is unchanged.
-- The configuration guide's row has default `0.01` and says: dollars per GitHub Copilot AI credit; GitHub's price is $0.01 on every plan; a developer whose plan makes included credits cheaper sets their own in the local file.
-- Every test that pins the default (the expected config list in internal/config, internal/cli and cmd/vloop/e2e_test.go) is changed to 0.01 and nothing else in it changes; the go check runs them.
-- Violation: 0.0066667 left anywhere a default is stated, outside the files that record or quote what already happened (docs/briefs/, .vloop/state/, docs/design-notes/), which keep it.
-- No session record is recomputed.
+- One authoritative, ordered list in the driver contains exactly awk, basename, bash, cat, chmod, cmd, cmp, cp, cut, date, diff, dirname, env, fc, find, findstr, grep, head, ln, ls, mkdir, mktemp, mv, powershell, printf, readlink, rm, robocopy, sed, seq, sh, sleep, sort, stat, tail, tee, test, touch, tr, uniq, wc, which, xargs, xcopy and zsh.
+- For a mixed team, command-position words in each task verify and in every .ps1 file at any depth of that task's gate folder are linted; the first listed command in each command source produces the exact M3 refusal naming the task, source file when applicable, and sorted platforms.
+- Matching uses the final path element after slash or backslash, removes a trailing .exe, ignores case, and recognizes wholly quoted command words after the call operator; separators are recognized only outside single and double quotes.
+- Quoted data, pwsh keywords and command names beginning with $, -, @, [ or a digit are not matched, and Select-String -Pattern 'grep', go test -run TestGrep and node -e "require('fs')" remain accepted.
+- With platforms unset or having only one distinct entry, none of these verify or .ps1 command checks are applied, and all earlier gate-shape refusals remain intact.
+- Plan acceptance reads B39's plan from 4c69adf0 as real data, computes the expected task count from that plan, and refuses all eight sh-based gates for mixed platforms without hard-coding the count.
+- The task adds committed, non-skipping Go tests for command parsing, exact list membership, .ps1 recursion, unmixed behavior and the B39 real-data plan, and the go check runs them.
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T6/gate.sh
+$o = go test ./.vloop/state/gates/T3 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }
 ```
 
 </details>
 
-### T7 — Document the local file, Claude only where used, and the credit price
+### T4 — Teach skills to write portable mixed-team gates
 
-`done` · depends on: T4, T5, T6
+`done` · 1 attempt(s) · depends on: T3
 
-The behaviour of T1–T6 has to be findable where a developer looks: the configuration guide, the domain's C-1, the platform context, the concepts guide, the README's Copilot section and the roadmap's inherited decisions. This task writes those passages and nothing else; the generated commands guide is already T2's. If its review fails twice on wording alone, it is blocked and the operator finishes it.
+Align the planning and gate-review skills with the driver's portability lint so generated pwsh gates are accepted for mixed teams and missing cross-platform tools are caught by review. This keeps the human-facing skill contract synchronized with the executable rule.
 
 **Acceptance**
 
-- docs/guide/configuration.md: the resolution paragraph names .vloop/config.local.toml in the order environment, local file, shared file, default; a short section covers the local file (any key but [[check]], config set --local and config path --local, the ignore line, the run's refusal, doctor's warning); the config set --local example is there.
-- docs/domain/domain-model.md C-1 and docs/domain/platform/platform-context.md Configuration state the order environment, local file, shared file, default.
-- docs/guide/concepts.md names the new .gitignore line where it lists what init writes and what is git-ignored, and its vloop doctor paragraph says the claude, workspace trust, plugin and gate edits rows apply when a session in use runs on Claude and are n/a otherwise.
-- README.md: the Copilot section's Overriding locally bullet names .vloop/config.local.toml and vloop config set --local in place of the environment variables; the requirements bullet no longer says vloop run still needs claude on PATH when every session is on Copilot; the Prerequisites' claude and workspace-trust bullets say they apply when a session runs on Claude; the README stays at or under 200 lines (its test, under the go check, passes).
-- docs/design-notes/vloop-roadmap.md's Config lives in the repo only line names the local file and its place in the order.
-- No passage contradicts the behaviour shipped in T1–T6 (exact messages quoted match the worked example); docs under docs/briefs/ and the other design notes are untouched.
+- The plan skill's shell bullet says that two or more configured platforms require pwsh gates using pwsh cmdlets and the project's own toolchain, never an M3 listed command, and it says .ps1 gate scripts run with pwsh -NoProfile -File.
+- The same plan bullet retains the BSD grep, sed, awk and date guidance when the plan shell is sh on macOS.
+- The gate-review skill says a mixed-team gate that calls any tool unavailable on even one declared platform is unpassable even if it passes on the reviewing host.
+- The command list is copied from the driver's authoritative list without a different spelling or ordering, and neither skill replaces the driver lint as the enforcement point.
+- Committed structural skill tests assert these mixed-team rules and the go check runs them; no test invokes a real agent or skips on Windows.
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T7/gate.sh
+if (-not (Select-String -Path plugin/skills/plan/SKILL.md -SimpleMatch -Pattern 'vloop config get platforms' -Quiet)) { throw 'plan skill has no mixed-platform instruction' }; if (-not (Select-String -Path plugin/skills/plan/SKILL.md -SimpleMatch -Pattern 'pwsh -NoProfile -File' -Quiet)) { throw 'plan skill has no .ps1 invocation instruction' }; if (-not (Select-String -Path plugin/skills/gate-review/SKILL.md -SimpleMatch -Pattern 'platforms' -Quiet)) { throw 'gate-review skill has no mixed-platform rule' }
 ```
 
 </details>
 
-### T8 — Close: the worked example line for line, and every gate at once
+### T5 — Document mixed teams and the repository policy
 
-`done` · depends on: T7
+`done` · depends on: T1, T4
 
-Each earlier task was judged on its own; this one proves the brief's worked example holds as written, in its order, with everything in place, and leaves it behind as a committed end-to-end test. It also runs every earlier gate together. A discrepancy it finds is fixed here, in the product, never by changing what the worked example says.
+Make the mixed-OS model, configuration workflow and portable check guidance discoverable and consistent across the product's binding documents. The repository remains the first user by reading back its ready-commit platforms declaration.
 
 **Acceptance**
 
-- A committed end-to-end test in cmd/vloop walks the worked example's first block in order, in a fresh repository in a temporary directory (vloop init, a [[check]] added): each line's stdout, stderr and exit code exactly as the brief gives them, through the last `✓ config.local`; and config get copilot.credit-usd printing 0.01. The go check runs it.
-- Together with the tests T3 and T5 left, every block of the worked example is covered by an end-to-end test: the local-file block, each planted failure (the run refusal included) and the Claude-not-in-use block.
-- Every earlier task's gate passes in the same tree.
-- Any fix this task makes is to the product or its tests; no expected line of the worked example is changed to match the product.
+- The configuration guide has a platforms key, a mixed-team shell rule and a Mixed teams section covering declaration, shared-only errors, pwsh rationale, portable plain cmd &amp;&amp; cmd or program-run checks, every listed command and pwsh cmdlet/toolchain replacements, plus the macOS and Linux pwsh install guidance from M5.
+- docs/domain/domain-model.md defines C-5 exactly in substance: two or more platforms require shared pwsh, platforms and shell are shared-only, and gates call no command a declared platform lacks.
+- The platform context keys table includes platforms and names its shell-rule and gate-lint execution effect; the roadmap's inherited gate-shell decision names platforms and the mixed-team pwsh rule.
+- README.md links or names the Mixed teams configuration section and stays below its enforced 200-line cap.
+- The repository's .vloop/config.toml keeps platforms = ["macos", "windows"] beside shell = "pwsh" as written by the ready commit.
+- The command guide is regenerated with go generate ./... if any command help changed, and the committed guide/README structural tests in the go check pass without weakening them.
 
 <details><summary>verify command</summary>
 
 ```sh
-sh .vloop/state/gates/T8/gate.sh
+if (-not (Select-String -Path docs/guide/configuration.md -SimpleMatch -Pattern '## Mixed teams' -Quiet)) { throw 'configuration guide has no Mixed teams section' }; $files = @('docs/domain/domain-model.md','docs/domain/platform/platform-context.md','docs/design-notes/vloop-roadmap.md','README.md','.vloop/config.toml'); foreach ($f in $files) { if (-not (Select-String -Path $f -SimpleMatch -Pattern 'platforms' -Quiet)) { throw "$f does not name platforms" } }
+```
+
+</details>
+
+### T6 — Prove the complete mixed-team workflow
+
+`done` · 1 attempt(s) · depends on: T2, T3, T5
+
+Exercise the whole worked example after all component tasks so the six tasks close as one coherent feature rather than isolated fixes. This final task leaves durable end-to-end regression coverage for the config, doctor and preflight messages the brief pins.
+
+**Acceptance**
+
+- A fresh temporary repository follows the worked example from default-shell doctor warning through config set platforms and shell, doctor pass or machine warning, each exact override refusal and invalid-value exit 2.
+- The end-to-end coverage proves vloop config get platforms prints the stored order, while doctor and errors print deduplicated sorted platforms.
+- The end-to-end coverage drives vloop run with the platforms problem and portable-check warning and proves it exits 1 before a plan session starts.
+- This task leaves committed tests covering every worked-example line in the repository's existing test surface, runs on Windows, macOS and Linux without skips or real agents, and the go check runs them.
+- No repository without platforms changes doctor, run or plan acceptance behavior except the specified default-shell warning, and the final regression coverage names that violation explicitly.
+
+<details><summary>verify command</summary>
+
+```sh
+$o = go test ./.vloop/state/gates/T6 -v; if ($LASTEXITCODE -ne 0) { $o; exit 1 }; if (-not ($o | Select-String -SimpleMatch -Pattern '--- PASS:' -Quiet)) { throw 'gate did not run a passing oracle test' }
 ```
 
 </details>

@@ -1,0 +1,39 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The configuration guide has a platforms key, a mixed-team shell rule and a Mixed teams section covering declaration, shared-only errors, pwsh rationale, portable plain cmd && cmd or program-run checks, every listed command and pwsh cmdlet/toolchain replacements, plus the macOS and Linux pwsh install guidance from M5.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md keys table includes platforms and the mixed-team shell rule; the Mixed teams section documents declaration, exact shared-only errors, pwsh rationale, both portable check forms, the complete ordered command list with replacements, and macOS/Linux installation."
+    },
+    {
+      "criterion": "docs/domain/domain-model.md defines C-5 exactly in substance: two or more platforms require shared pwsh, platforms and shell are shared-only, and gates call no command a declared platform lacks.",
+      "met": true,
+      "evidence": "docs/domain/domain-model.md: C-5 states that two or more distinct platforms require shared-file-only pwsh and that plan gates call no command a declared platform lacks."
+    },
+    {
+      "criterion": "The platform context keys table includes platforms and names its shell-rule and gate-lint execution effect; the roadmap's inherited gate-shell decision names platforms and the mixed-team pwsh rule.",
+      "met": true,
+      "evidence": "docs/domain/platform/platform-context.md adds platforms with the mixed-team shared-pwsh and gate-lint effects; docs/design-notes/vloop-roadmap.md's inherited shell decision names platforms, shared pwsh and C-5 gate refusal."
+    },
+    {
+      "criterion": "README.md links or names the Mixed teams configuration section and stays below its enforced 200-line cap.",
+      "met": true,
+      "evidence": "README.md links docs/guide/configuration.md#mixed-teams and is 156 lines; internal/cli/readme_test.go enforces fewer than 200."
+    },
+    {
+      "criterion": "The repository's .vloop/config.toml keeps platforms = [\"macos\", \"windows\"] beside shell = \"pwsh\" as written by the ready commit.",
+      "met": true,
+      "evidence": ".vloop/config.toml contains shell = \"pwsh\" immediately followed by platforms = [\"macos\", \"windows\"], and the T5 diff leaves that ready-commit declaration intact."
+    },
+    {
+      "criterion": "The command guide is regenerated with go generate ./... if any command help changed, and the committed guide/README structural tests in the go check pass without weakening them.",
+      "met": true,
+      "evidence": "No command/help source changed and docs/guide/commands.md has no diff, so regeneration was not required; .vloop/tmp/checks.json records the go check at exit 0, whose log includes internal/cli, and no guide or README test was weakened."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

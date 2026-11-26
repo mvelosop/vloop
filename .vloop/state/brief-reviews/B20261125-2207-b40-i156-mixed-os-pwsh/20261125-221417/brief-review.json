@@ -1,0 +1,35 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / M3 - portable gates",
+      "summary": "The command-word contract excludes quoted executable tokens in command position, so the promised lint can be bypassed by a pwsh call-operator invocation.",
+      "evidence": "docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md:210-217 defines a command word as outside quotes while naming '&' as a command boundary. In pwsh, `& 'grep' -n ok a.txt` and `& \"/usr/bin/GREP.exe\" ok` invoke the listed executable, but neither quoted token can match under that definition. The text nevertheless says every gate call to a listed command is refused at lines 219-226.",
+      "fix": "Specify command-position tokens separately from argument strings: a wholly quoted token is an executable name when it is the command word, including immediately after `&`, but stays data in argument position. Add refused literals for `& 'grep'` and `& \"/usr/bin/GREP.exe\"`, while retaining `Select-String -Pattern 'grep'` as accepted."
+    },
+    {
+      "kind": "rule",
+      "section": "Shape / tasks 1-4",
+      "summary": "The proposed task gates explicitly run tests that the same tasks are to add, making the judge task-reachable.",
+      "evidence": "docs/briefs/B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief.md:423-439 gates tasks 1-3 on \"tests it adds\" and task 4 on the structural tests it changes. This contradicts docs/domain/domain-model.md:210-212, P-8, and plugin/skills/gate-review/SKILL.md:100-103, which classify a gate that runs a task's own test as `task-reach`.",
+      "fix": "State that the added tests are exercised by the `go` check, and have the planner put independent oracle tests and fixture commands in each task's gate folder. Each task gate must exercise the named CLI/driver/skill behaviour without running a test file the work session can edit."
+    }
+  ],
+  "decisions": [
+    "Any two distinct declared platforms, including linux+macos, require pwsh.",
+    "The shared key is `platforms`, with only `linux`, `macos`, and `windows` as values.",
+    "`platforms` is shared-only; in a mixed team, `shell` is shared-only and an override is an error even when its value is pwsh.",
+    "Portability is enforced by a deterministic driver lint, reinforced by plan and gate-review guidance, using the fixed command list.",
+    "The default-shell doctor finding is a warning rather than a problem for compatibility.",
+    "Plans do not record `platforms`; accepted plans retain their recorded shell and only the next plan is linted.",
+    "Shared-only errors apply to every command that reads config.",
+    "`vloop task verify` replacements and existing plans are not linted.",
+    "Gate-script scanning is limited to `.ps1` files under the gate folder."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-25: FIX, 2 findings"
+}
+

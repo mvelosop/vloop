@@ -1,0 +1,39 @@
+{
+  "schema": "verdict/v1",
+  "task": "T6",
+  "verdict": "FAIL",
+  "criteria": [
+    {
+      "criterion": "A fresh temporary repository follows the worked example from default-shell doctor warning through config set platforms and shell, doctor pass or machine warning, each exact override refusal and invalid-value exit 2.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go:26-70 drives init, config, doctor, all exact shell/platform override refusals, and invalid platforms through the CLI with the required exit codes and messages."
+    },
+    {
+      "criterion": "The end-to-end coverage proves vloop config get platforms prints the stored order, while doctor and errors print deduplicated sorted platforms.",
+      "met": false,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go:42-63 stores only windows,macos and checks the sorted macos, windows output; it never stores a duplicate, so the test cannot distinguish deduplication from mere sorting."
+    },
+    {
+      "criterion": "The end-to-end coverage drives vloop run with the platforms problem and portable-check warning and proves it exits 1 before a plan session starts.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go:72-98 asserts exit 1, both exact preflight lines, absent state/runs, unchanged refs, and an unstarted agent marker."
+    },
+    {
+      "criterion": "This task leaves committed tests covering every worked-example line in the repository's existing test surface, runs on Windows, macOS and Linux without skips or real agents, and the go check runs them.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go is in the existing cmd/vloop test package, has no skip, uses runtime-aware expectations and a Go-built claude stub, and the recorded go check passed cmd/vloop in go.log."
+    },
+    {
+      "criterion": "No repository without platforms changes doctor, run or plan acceptance behavior except the specified default-shell warning, and the final regression coverage names that violation explicitly.",
+      "met": true,
+      "evidence": "cmd/vloop/b40_mixed_os_test.go:101-130 names TestNoPlatformsRegressionViolationGuard and guards doctor and run from mixed-team findings while checking that driver.GateShapeProblems accepts non-portable verify and .ps1 commands without platforms."
+    }
+  ],
+  "findings": [
+    {
+      "summary": "The end-to-end test checks sorted platform messages but never includes a duplicate, so it does not prove the required deduplicated rendering.",
+      "kind": "bug"
+    }
+  ],
+  "notes": "none"
+}

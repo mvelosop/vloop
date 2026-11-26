@@ -1,0 +1,6 @@
+=== RUN   TestMixedOSConfigThroughCLI
+    oracle_test.go:20: exit 2 stdout "" stderr "vloop: unknown config key \"platforms\"\n"; want exit 0 and empty stdout
+--- FAIL: TestMixedOSConfigThroughCLI (0.76s)
+FAIL
+FAIL	github.com/mvelosop/vloop/.vloop/state/gates/T1	0.802s
+FAIL

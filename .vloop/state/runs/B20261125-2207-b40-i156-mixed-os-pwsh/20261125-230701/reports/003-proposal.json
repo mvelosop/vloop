@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Mixed-team doctor and preflight reporting is complete, and quoted data-only command names no longer trigger portability warnings.",
+  "files": [
+    "internal/driver/gateshape.go",
+    "internal/driver/plan_test.go"
+  ],
+  "verified": "vloop task gate T2 exited 0: gate T2: pass; targeted TestFirstPlatformSpecificCommand also passed.",
+  "notes": "FirstPlatformSpecificCommand now unwraps wholly quoted command names only after a single & call operator; standalone quoted tokens remain data. Added regressions for both single- and double-quoted standalone tokens."
+}

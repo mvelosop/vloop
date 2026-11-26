@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -61,6 +62,121 @@ func TestHeadDiffAdvisory(t *testing.T) {
 	}
 }
 
+func TestFirstPlatformSpecificCommand(t *testing.T) {
+	for cmd, want := range map[string]string{
+		`grep -n ok a.txt`:                                  "grep",
+		`go test ./... && /usr/bin/GREP.exe ok`:             "grep",
+		`if (Test-Path a) { wc -l a }`:                      "wc",
+		`& 'grep' -n ok a.txt`:                              "grep",
+		`& "/usr/bin/GREP.EXE" ok`:                          "grep",
+		`'grep'`:                                            "",
+		`"grep"`:                                            "",
+		`Select-String -Pattern 'grep' -Path a.txt`:         "",
+		`go test -run TestGrep ./...`:                       "",
+		`node -e "require('fs')"`:                           "",
+		`Write-Output 'go test ./... | grep ok'`:            "",
+		`$cmd = 'grep'; & $cmd ok`:                          "",
+		`pwsh -NoProfile -File script.ps1`:                  "",
+		`go version | Select-String -Pattern "awk | sed"`:   "",
+		`go version; /opt/bin/find.exe . && Measure-Object`: "find",
+	} {
+		if got := FirstPlatformSpecificCommand(cmd); got != want {
+			t.Errorf("FirstPlatformSpecificCommand(%q) = %q, want %q", cmd, got, want)
+		}
+	}
+}
+
+func TestPlatformSpecificCommands(t *testing.T) {
+	want := []string{
+		"awk", "basename", "bash", "cat", "chmod", "cmd", "cmp", "cp", "cut",
+		"date", "diff", "dirname", "env", "fc", "find", "findstr", "grep", "head",
+		"ln", "ls", "mkdir", "mktemp", "mv", "powershell", "printf", "readlink",
+		"rm", "robocopy", "sed", "seq", "sh", "sleep", "sort", "stat", "tail",
+		"tee", "test", "touch", "tr", "uniq", "wc", "which", "xargs", "xcopy",
+		"zsh",
+	}
+	if !reflect.DeepEqual(PlatformSpecificCommands, want) {
+		t.Fatalf("PlatformSpecificCommands = %q, want %q", PlatformSpecificCommands, want)
+	}
+}
+
+func TestGateShapeProblemsMixedPlatforms(t *testing.T) {
+	root := t.TempDir()
+	writePlanTestFile(t, root, ".vloop/config.toml", "platforms = [\"windows\", \"macos\"]\n")
+	script := ".vloop/state/gates/T1/nested/oracle.ps1"
+	writePlanTestFile(t, root, script, "Select-String -Pattern 'grep'\n& 'wc' -l out.txt\n")
+
+	p := &state.Plan{Tasks: []state.Task{{ID: "T1", Verify: `go test ./... && cp source result`}}}
+	got := GateShapeProblems(root, p)
+	want := []string{
+		"gate shape rejected: T1  calls cp, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain",
+		"gate shape rejected: T1  .vloop/state/gates/T1/nested/oracle.ps1 calls wc, which is not on every platform in platforms (macos, windows); use a pwsh cmdlet or the project's own toolchain",
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("problems = %q, want %q", got, want)
+	}
+
+	for _, verify := range []string{
+		`Write-Output "a; grep b"`,
+		`go test -run TestGrep ./...`,
+		`node -e "require('fs')"`,
+		`$grep = 'data'`,
+		`-grep argument`,
+		`@grep argument`,
+		`[grep] argument`,
+		`1grep argument`,
+	} {
+		if got := FirstPlatformSpecificCommand(verify); got != "" {
+			t.Errorf("FirstPlatformSpecificCommand(%q) = %q, want no match", verify, got)
+		}
+	}
+}
+
+func TestGateShapeProblemsSkipPortabilityForUnmixedPlatforms(t *testing.T) {
+	for _, platforms := range []string{"", `platforms = ["windows"]` + "\n"} {
+		root := t.TempDir()
+		writePlanTestFile(t, root, ".vloop/config.toml", platforms)
+		writePlanTestFile(t, root, ".vloop/state/gates/T1/gate.ps1", "grep value input\n")
+		p := &state.Plan{Tasks: []state.Task{{ID: "T1", Verify: `sh gate.sh | grep value`}}}
+		if got := GateShapeProblems(root, p); len(got) != 0 {
+			t.Errorf("unmixed platforms %q produced problems: %q", platforms, got)
+		}
+	}
+}
+
+func TestGateShapeProblemsRejectsB39Plan(t *testing.T) {
+	revParse := exec.Command("git", "rev-parse", "--show-toplevel")
+	rawRoot, err := revParse.Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := strings.TrimSpace(string(rawRoot))
+	raw, err := exec.Command("git", "-C", root, "show", "4c69adf0:.vloop/state/state.json").Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var p state.Plan
+	if err := json.Unmarshal(raw, &p); err != nil {
+		t.Fatal(err)
+	}
+	got := GateShapeProblems(root, &p)
+	if len(got) != len(p.Tasks) {
+		t.Fatalf("B39 problems = %d, task count = %d:\n%s", len(got), len(p.Tasks), strings.Join(got, "\n"))
+	}
+	for _, task := range p.Tasks {
+		found := false
+		for _, problem := range got {
+			if strings.Contains(problem, task.ID+"  ") && strings.Contains(problem, "calls sh,") {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("B39 task %s has no sh portability refusal", task.ID)
+		}
+	}
+}
+
 func TestGateShapeProblems(t *testing.T) {
 	root := t.TempDir()
 	run := func(args ...string) {
@@ -91,6 +207,17 @@ func TestGateShapeProblems(t *testing.T) {
 		if !strings.HasPrefix(g, "gate shape rejected: ") {
 			t.Errorf("a problem without its heading: %q", g)
 		}
+	}
+}
+
+func writePlanTestFile(t *testing.T, root, name, content string) {
+	t.Helper()
+	path := filepath.Join(root, filepath.FromSlash(name))
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
 	}
 }
 

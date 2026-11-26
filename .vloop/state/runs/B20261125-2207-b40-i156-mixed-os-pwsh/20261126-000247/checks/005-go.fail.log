@@ -1,0 +1,32 @@
+ok  	github.com/mvelosop/vloop	0.087s
+ok  	github.com/mvelosop/vloop/cmd/gendocs	(cached)
+ok  	github.com/mvelosop/vloop/cmd/vloop	28.882s
+ok  	github.com/mvelosop/vloop/internal/brief	(cached)
+--- FAIL: TestPluginSkillsWithinBudget (0.00s)
+    budget_test.go:14: gate-review: 1,615 words, over its ceiling of 1,600
+FAIL
+FAIL	github.com/mvelosop/vloop/internal/budget	0.185s
+ok  	github.com/mvelosop/vloop/internal/classify	(cached)
+ok  	github.com/mvelosop/vloop/internal/cli	131.726s
+ok  	github.com/mvelosop/vloop/internal/closing	(cached)
+ok  	github.com/mvelosop/vloop/internal/config	(cached)
+ok  	github.com/mvelosop/vloop/internal/defect	(cached)
+ok  	github.com/mvelosop/vloop/internal/detect	(cached)
+ok  	github.com/mvelosop/vloop/internal/driver	4.612s
+ok  	github.com/mvelosop/vloop/internal/fence	1.201s
+ok  	github.com/mvelosop/vloop/internal/frontmatter	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitcfg	(cached)
+ok  	github.com/mvelosop/vloop/internal/gitrun	(cached)
+ok  	github.com/mvelosop/vloop/internal/install	(cached)
+ok  	github.com/mvelosop/vloop/internal/intervention	(cached)
+ok  	github.com/mvelosop/vloop/internal/metrics	(cached)
+ok  	github.com/mvelosop/vloop/internal/runs	(cached)
+ok  	github.com/mvelosop/vloop/internal/schema	(cached)
+ok  	github.com/mvelosop/vloop/internal/state	(cached)
+ok  	github.com/mvelosop/vloop/tools/agent-eval	0.115s
+?   	github.com/mvelosop/vloop/tools/check	[no test files]
+ok  	github.com/mvelosop/vloop/tools/copilot-acceptance/kit	(cached)
+ok  	github.com/mvelosop/vloop/tools/release	(cached)
+FAIL
+check: test failed: exit status 1
+exit status 1

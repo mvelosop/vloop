@@ -43,10 +43,8 @@ Read, in this order:
 
 ## 2. Check every gate three ways
 
-Run each gate on the base yourself with `vloop task gate <id>`, in the
-foreground, one at a time. It runs in the plan's shell from the repo root. A
-gate that takes minutes is a finding of its own kind in `notes`; do not wait on
-it past its timeout.
+Run each gate on the base with `vloop task gate <id>`, in the foreground, one at
+a time. Record a minutes-long gate in `notes`; stop at its timeout.
 
 1. **It fails on the base, at a behavioural assertion.** A gate that passes
    before the work exists proves nothing. A gate that fails because of a syntax
@@ -56,7 +54,11 @@ it past its timeout.
    log, not the exit code. The gate is run, and read, in the plan's shell with
    this host's tools: `sh` unless the config names another (P-5), and on macOS
    BSD `grep`, `sed`, `awk` and `date`. A pattern those tools reject is
-   `unpassable`.
+   `unpassable`. Read `vloop config get platforms`. When it lists two or
+   more configured platforms, a mixed-team gate that calls any tool unavailable
+   on even one declared platform is `unpassable`, even if the gate passes on the
+   reviewing host. The driver's M3 plan-acceptance lint remains the enforcement
+   point; this review does not replace that enforcement point.
 2. **Every fixture it builds is read back.** When a gate edits a file, appends
    a config key, plants a defect in a copy or builds a repository, check the
    state the edit leaves with commands that already exist — do not assume it. A
@@ -67,7 +69,7 @@ it past its timeout.
    or text the brief says the work will produce. A pattern the host's tools
    reject, or that can never match, shows here instead of in the run.
 
-Then read the gate for what a run cannot show.
+Read the gate for what a run cannot show.
 
 ## 2b. Rule on every criterion
 

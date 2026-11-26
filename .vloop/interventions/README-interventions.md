@@ -120,6 +120,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | halt | partly | recommended | [I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate](I20261011-1027-b12-halted-blocked-on-t3-s-disputed-gate.md) |
 | halt | halt | no | no-options | [I20261102-004525-acceptance-halted-twice-at-the-gate-revi](I20261102-004525-acceptance-halted-twice-at-the-gate-revi.md) |
 | halt | halt | partly | no-options | [I20261102-202406-run-1-halted-refs-moved-the-operator-s-a](I20261102-202406-run-1-halted-refs-moved-the-operator-s-a.md) |
+| halt | halt | partly | no-options | [I20261126-005105-copilot-model-endpoint-503s-ended-t4-s-w](I20261126-005105-copilot-model-endpoint-503s-ended-t4-s-w.md) |
 | halt | repair | partly | no-options | [I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur](I20261003-1147-b8-halted-on-t12-s-gate-dispute-a-fixtur.md) |
 | halt | repair | yes | no-options | [I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th](I20261003-1217-b8-halted-again-on-t17-s-gate-dispute-th.md) |
 | halt | repair | partly | recommended | [I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio](I20261004-2304-b10-blocked-on-t9-a-gate-needed-a-sessio.md) |
@@ -134,6 +135,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | repair | yes | no-options | [I20261015-151132-base-check-halted-on-a-github-pr-extensi](I20261015-151132-base-check-halted-on-a-github-pr-extensi.md) |
 | halt | repair | partly | no-options | [I20261015-215305-t9-stalled-on-a-check-the-fence-forbids](I20261015-215305-t9-stalled-on-a-check-the-fence-forbids.md) |
 | halt | repair | yes | no-options | [I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s](I20261102-093412-dropped-b28-s-consumed-plan-before-b29-s.md) |
+| halt | repair | yes | no-options | [I20261126-005104-gate-shell-refused-the-run-over-b39-s-co](I20261126-005104-gate-shell-refused-the-run-over-b39-s-co.md) |
 | halt | verification-finding | no | recommended | [I20261102-112835-t2-s-gate-disputed-its-loop-variable-was](I20261102-112835-t2-s-gate-disputed-its-loop-variable-was.md) |
 | halt | verification-finding | partly | no-options | [I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi](I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi.md) |
 | halt | verification-finding | no | no-options | [I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh](I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh.md) |
@@ -212,6 +214,9 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261105-232221-doc-fix-for-verify-s-finding-by-session](I20261105-232221-doc-fix-for-verify-s-finding-by-session.md) |
 | verify | verification-finding | partly | no-options | [I20261106-213845-docs-guide-concepts-md-did-not-list-prep](I20261106-213845-docs-guide-concepts-md-did-not-list-prep.md) |
 | verify | verification-finding | partly | no-options | [I20261106-213846-z2-pinned-git-s-error-as-release-git-s-e](I20261106-213846-z2-pinned-git-s-error-as-release-git-s-e.md) |
+| verify | verification-finding | partly | no-options | [I20261126-094553-vloop-config-set-help-still-said-any-key](I20261126-094553-vloop-config-set-help-still-said-any-key.md) |
+| verify | verification-finding | partly | no-options | [I20261126-094554-the-plan-skill-kept-the-mktemp-scratch-d](I20261126-094554-the-plan-skill-kept-the-mktemp-scratch-d.md) |
+| verify | verification-finding | partly | no-options | [I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo](I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

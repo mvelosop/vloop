@@ -1,0 +1,37 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261125-2207-b40-i156-mixed-os-pwsh.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Shape, task 1",
+      "summary": "Task 1 adds the platforms key but leaves the repository-wide check red until the documentation task.",
+      "evidence": "Brief Shape lines 416-418 place the key in task 1 and lines 430-433 put its configuration-guide entry in task 5. .vloop/config.toml's only check applies to paths [\"**\"] and runs go run ./tools/check. internal/cli/guide_test.go:135-144 and internal/cli/commands_doc_test.go:41-50 require every config.Keys entry, including its VLOOP_* name, to appear in docs/guide/configuration.md. Adding platforms to config.Keys in task 1 therefore makes the after-task-1 check fail before task 5.",
+      "fix": "Put the minimal platforms key and VLOOP_PLATFORMS entries in task 1, or move the complete configuration-guide task before the key is added, so the permanent check is green after every task."
+    },
+    {
+      "kind": "runnability",
+      "section": "M5 and Shape, task 5",
+      "summary": "Task 5 requires a work session to edit .vloop/config.toml, which the loop forbids.",
+      "evidence": "Brief M5 at lines 272-273 and Shape task 5 at lines 430-433 require .vloop/config.toml to add platforms. Domain S-4 at docs/domain/domain-model.md:220 allows no work-session writes under .vloop except .vloop/tmp, and fence/work.json:79-80 explicitly denies Edit(.vloop/config.toml) and Write(.vloop/config.toml). The task therefore cannot be completed by a loop session.",
+      "fix": "Move the repository config edit to the ready commit or to a named operator step outside the loop, and make task 5 verify the resulting configuration rather than require the work session to write it."
+    },
+    {
+      "kind": "consistency",
+      "section": "M4 — gate shell and Decided here",
+      "summary": "The gate-shell rule says mixed teams always check configured pwsh even with a plan, but P-5 makes an already accepted plan's shell authoritative.",
+      "evidence": "Brief M4 lines 238-241 requires the configured pwsh row to be a problem with or without a plan. The same brief at lines 281-282 says an accepted plan keeps its shell and does not re-check gates when platforms is added later, while docs/domain/domain-model.md:202-203 (P-5) says the plan's shell governs from then on. internal/cli/doctor.go:474-492 currently checks plan.Shell whenever a plan exists. A pre-mixed plan can therefore legitimately use sh while config requires pwsh.",
+      "fix": "State the precedence literally: an accepted plan's recorded shell governs its gate-shell row and gates; mixed-team pwsh enforcement applies to config, doctor without an in-use plan, and the next plan."
+    }
+  ],
+  "decisions": [
+    "Shared-only errors apply to every command that reads config, not only run: approve; this follows B39's treatment of a local [[check]].",
+    "An accepted plan keeps its shell and is not re-linted when platforms appears later: approve P-5 preservation, but M4 must state its scope as noted above.",
+    "vloop task verify is not portability-linted: approve and keep it explicitly outside this run's scope.",
+    "The automatic lint reads .ps1 files only, while other gate-script languages are judged through their verify command or the skills: approve, with the resulting limitation already stated."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-25: FIX, 3 findings"
+}
+

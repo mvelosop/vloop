@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -181,21 +182,8 @@ func runBriefPath(g *Globals, root, arg string) (string, error) {
 // words.
 func runPreflight(b Build, root string, cmd *cobra.Command, briefPath string) error {
 	errOut := cmd.ErrOrStderr()
-	bad := 0
 	runKeys := len(copilotKeys(root)) > 0
-	for _, c := range runDoctor(b, root, &briefPath) {
-		switch {
-		case !runKeys && (c.Name == "copilot" || c.Name == "copilot login" || strings.HasPrefix(c.Message, "has the name of vloop's ")): // only agent.review-brief is copilot, which vloop run ignores
-		case c.Name == "branch", c.Name == "gate scratch", c.Name == "checks": // the planner refuses these itself, in its own words
-		case c.Name == "copilot login": // refused below, in its own words
-		case c.Result == resProblem && strings.HasPrefix(c.Message, "has the name of vloop's "): // refused below, in its own words
-		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
-			fmt.Fprintf(errOut, "  ✗ %s %s\n", c.Name, c.Message)
-			bad++
-		case c.Result == resWarning && (c.Name == "config.local" || c.Name == "agent.plan" || c.Name == "agent.work" || c.Name == "agent.review" || c.Name == "agent.gate-review" || c.Name == "agent.second-review" || c.Name == "agent.verify" || c.Name == "run.second-review:" && c.Result == resWarning || strings.HasPrefix(c.Name, ".claude/skills/")):
-			fmt.Fprintf(errOut, "  ! %s %s\n", c.Name, c.Message)
-		}
-	}
+	bad := writeRunPreflightChecks(errOut, runDoctor(b, root, &briefPath), runKeys)
 	if hook := preCommitHook(root); hook != "" {
 		fmt.Fprintf(errOut, "  ! a pre-commit hook is active (%s) — the driver's commits do not run repository hooks; put what it checks in the gates\n", hook)
 	}
@@ -218,6 +206,27 @@ func runPreflight(b Build, root string, cmd *cobra.Command, briefPath string) er
 		}
 	}
 	return nil
+}
+
+func writeRunPreflightChecks(out io.Writer, checks []doctorCheck, runKeys bool) int {
+	bad := 0
+	for _, c := range checks {
+		switch {
+		case !runKeys && (c.Name == "copilot" || c.Name == "copilot login" || strings.HasPrefix(c.Message, "has the name of vloop's ")): // only agent.review-brief is copilot, which vloop run ignores
+		case c.Name == "branch", c.Name == "gate scratch": // the planner refuses these itself, in its own words
+		case c.Name == "checks" && c.Result != resWarning: // the planner refuses this itself, in its own words
+		case c.Name == "checks" && !strings.Contains(c.Message, "which is not on every platform"):
+			// The default-shell warning is doctor-only.
+		case c.Name == "copilot login": // refused below, in its own words
+		case c.Result == resProblem && strings.HasPrefix(c.Message, "has the name of vloop's "): // refused below, in its own words
+		case c.Result == resProblem, c.Name == "trust" && c.Result == resWarning:
+			fmt.Fprintf(out, "  ✗ %s %s\n", c.Name, c.Message)
+			bad++
+		case c.Result == resWarning && (c.Name == "platforms" || c.Name == "checks" || c.Name == "config.local" || c.Name == "agent.plan" || c.Name == "agent.work" || c.Name == "agent.review" || c.Name == "agent.gate-review" || c.Name == "agent.second-review" || c.Name == "agent.verify" || c.Name == "run.second-review:" && c.Result == resWarning || strings.HasPrefix(c.Name, ".claude/skills/")):
+			fmt.Fprintf(out, "  ! %s %s\n", c.Name, c.Message)
+		}
+	}
+	return bad
 }
 
 // preCommitHook is the executable pre-commit hook git would run, repo-relative

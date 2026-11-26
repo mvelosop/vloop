@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T4",
+  "outcome": "done",
+  "summary": "Aligned the plan and gate-review skills with mixed-team pwsh gate portability, and added structural coverage tied to the driver's authoritative command list.",
+  "files": [
+    "plugin/skills/plan/SKILL.md",
+    "plugin/skills/gate-review/SKILL.md",
+    "internal/cli/skills_test.go"
+  ],
+  "verified": "vloop task gate T4 exited 0: gate T4: pass (260ms).",
+  "notes": "The structural test normalizes whitespace before matching prose, so readable Markdown line wrapping cannot break the contract while command spelling and order remain exact."
+}

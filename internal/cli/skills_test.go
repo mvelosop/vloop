@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 
 	vloop "github.com/mvelosop/vloop"
+	"github.com/mvelosop/vloop/internal/driver"
 	"github.com/mvelosop/vloop/internal/schema"
 )
 
@@ -39,6 +40,49 @@ func TestPluginSkills(t *testing.T) {
 	}
 	for _, v := range checkSkillPlugin(dir) {
 		t.Errorf("%s", v)
+	}
+}
+
+func TestPluginSkillsMixedTeamPortability(t *testing.T) {
+	plan, err := os.ReadFile(filepath.Join(skillCheckDefault, "skills", "plan", "SKILL.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	gateReview, err := os.ReadFile(filepath.Join(skillCheckDefault, "skills", "gate-review", "SKILL.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	normalize := func(s string) string {
+		return strings.Join(strings.Fields(s), " ")
+	}
+	planText := normalize(string(plan))
+	for _, want := range []string{
+		"vloop config get platforms",
+		"two or more configured platforms",
+		"pwsh cmdlets and the project's own toolchain",
+		"pwsh -NoProfile -File <path>",
+		"does not replace the driver's plan-acceptance portability lint",
+		"the plan shell is `sh` on macOS",
+		"BSD `grep`, `sed`, `awk` and `date`",
+		"`" + strings.Join(driver.PlatformSpecificCommands, "`, `") + "`",
+	} {
+		if !strings.Contains(planText, normalize(want)) {
+			t.Errorf("plan skill is missing mixed-team rule %q", want)
+		}
+	}
+
+	reviewText := normalize(string(gateReview))
+	for _, want := range []string{
+		"vloop config get platforms",
+		"two or more configured platforms",
+		"any tool unavailable on even one declared platform",
+		"`unpassable`, even if the gate passes on the reviewing host",
+		"does not replace that enforcement point",
+	} {
+		if !strings.Contains(reviewText, normalize(want)) {
+			t.Errorf("gate-review skill is missing mixed-team rule %q", want)
+		}
 	}
 }
 

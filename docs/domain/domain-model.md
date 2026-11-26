@@ -277,6 +277,9 @@ marked.
 - **C-4** `language` (`en`, `es`) selects brief headings, templates and (from
   B5) the prose skills write. Keys, frontmatter, JSON, flags and vloop's own
   messages stay English.
+- **C-5** When `platforms` lists two or more distinct platforms, `shell` is
+  `pwsh` and `platforms` and `shell` are set in the shared file only; the
+  plan's gates call no command a declared platform lacks.
 
 ## Gaps
 

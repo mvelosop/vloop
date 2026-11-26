@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The plan skill's shell bullet says that two or more configured platforms require pwsh gates using pwsh cmdlets and the project's own toolchain, never an M3 listed command, and it says .ps1 gate scripts run with pwsh -NoProfile -File.",
+      "met": true,
+      "evidence": "plugin/skills/plan/SKILL.md:81-94 requires pwsh, cmdlets and the project toolchain, forbids M3 listed commands, and specifies pwsh -NoProfile -File for .ps1 gates."
+    },
+    {
+      "criterion": "The same plan bullet retains the BSD grep, sed, awk and date guidance when the plan shell is sh on macOS.",
+      "met": true,
+      "evidence": "plugin/skills/plan/SKILL.md:95-98 retains the BSD grep, sed, awk and date guidance for a sh plan shell on macOS."
+    },
+    {
+      "criterion": "The gate-review skill says a mixed-team gate that calls any tool unavailable on even one declared platform is unpassable even if it passes on the reviewing host.",
+      "met": true,
+      "evidence": "plugin/skills/gate-review/SKILL.md:54-62 reads platforms and marks such a mixed-team gate unpassable even when it passes on the reviewing host."
+    },
+    {
+      "criterion": "The command list is copied from the driver's authoritative list without a different spelling or ordering, and neither skill replaces the driver lint as the enforcement point.",
+      "met": true,
+      "evidence": "plugin/skills/plan/SKILL.md:88-94 matches internal/driver/gateshape.go:41-48 exactly, and the plan and gate-review skills each state that the driver's lint remains the enforcement point; internal/cli/skills_test.go:68 pins the list directly from driver.PlatformSpecificCommands."
+    },
+    {
+      "criterion": "Committed structural skill tests assert these mixed-team rules and the go check runs them; no test invokes a real agent or skips on Windows.",
+      "met": true,
+      "evidence": "internal/cli/skills_test.go:43-87 adds TestPluginSkillsMixedTeamPortability, which reads both skills, asserts the required rules and authoritative command list, invokes no agent and has no platform skip; the go check log reports internal/cli ok."
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}

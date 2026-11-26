@@ -5,6 +5,7 @@ run.gate-timeout = 30
 # This repository is worked on from macOS and Windows: checks and gates run in
 # pwsh everywhere (issue #156).
 shell = "pwsh"
+platforms = ["macos", "windows"]
 
 [metrics]
   code = ["internal/brief/templates/**", "schemas/**"]

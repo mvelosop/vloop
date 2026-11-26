@@ -252,8 +252,8 @@ func TestWorkedExampleB5Session(t *testing.T) {
 	b5Expect(t, r.run("0.1.0", "config", "get", "metrics.stacks"), 0, []string{"go,javascript,react"}, "")
 	b5Expect(t, r.run("0.1.0", "init"), 1, nil, "vloop: already initialized by vloop 0.1.0 — run vloop upgrade\n")
 
-	b5Expect(t, r.run("0.1.0", "doctor"), 0, []string{"✓ git", "✓ install", "✓ config", "✓ claude", "✓ trust", "✓ gate shell",
-		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "✓ guidelines 0 rule(s)", "- self-hosting", "doctor: 0 problem(s), 1 warning(s)"}, "")
+	b5Expect(t, r.run("0.1.0", "doctor"), 0, []string{"✓ git", "✓ install", "✓ config", "! checks shell is not set in .vloop/config.toml, so each machine runs the checks in its own (sh here): set it there", "✓ claude", "✓ trust", "✓ gate shell",
+		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "✓ guidelines 0 rule(s)", "- self-hosting", "doctor: 0 problem(s), 2 warning(s)"}, "")
 
 	b5Expect(t, r.run("0.1.1", "upgrade"), 0, []string{"updated CLAUDE.md", "updated .vloop/install.json"}, "")
 	b5Expect(t, r.run("0.2.0", "upgrade"), 1, []string{"would update CLAUDE.md"},
@@ -360,7 +360,7 @@ func TestWorkedExampleB5PlantedFailures(t *testing.T) {
 		doc := r.run("0.2.0", "doctor")
 		b5Code(t, doc, 0)
 		b5Has(t, doc, "! plugin the vloop plugin is 0.1.0 but this binary is 0.2.0 — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind")
-		b5Has(t, doc, "doctor: 0 problem(s), 2 warning(s)")
+		b5Has(t, doc, "doctor: 0 problem(s), 3 warning(s)")
 	})
 
 	t.Run("no user.email", func(t *testing.T) {

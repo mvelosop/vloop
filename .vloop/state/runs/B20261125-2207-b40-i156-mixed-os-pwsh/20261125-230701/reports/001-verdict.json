@@ -1,0 +1,39 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The platforms config key is an unset-by-default list accepting only linux, macos and windows; config set stores the caller's list order, and invalid input keeps the existing list-key wording and exits 2.",
+      "met": true,
+      "evidence": "internal/config/config.go:106 adds the unset list key; config.go:366 validates list entries through Key.Validate, config.go:760-794 preserves comma-delimited caller order, and internal/cli/config_test.go:175-190 proves the exact invalid-input text and exit 2."
+    },
+    {
+      "criterion": "Platforms are distinct for mixed-team decisions, and every message renders them deduplicated and sorted as linux, macos, windows; a shared list containing two or more distinct entries is mixed.",
+      "met": true,
+      "evidence": "internal/config/config.go:209-229 defines canonical DistinctPlatforms, MixedPlatforms and FormatPlatforms helpers; internal/config/config_test.go:256-263 verifies deduplication, ordering and the mixed threshold."
+    },
+    {
+      "criterion": "A local file or VLOOP_PLATFORMS value for platforms is an exit-1 config-read error, config set --local platforms is an exit-2 error, and each path reports its own exact source with no file written.",
+      "met": true,
+      "evidence": "internal/config/config.go:444-451 rejects local and environment platforms with their source; internal/config/config.go:734 refuses local writes before touching a file; internal/cli/config_test.go:191-220 and 158-181 assert exact exit 1/2 messages and no local file."
+    },
+    {
+      "criterion": "When the platforms list is mixed, a local file or VLOOP_SHELL value for shell is an exit-1 config-read error regardless of value, config set --local shell is an exit-2 error, and none of those writes occur; without a mixed team, those shell overrides continue to work.",
+      "met": true,
+      "evidence": "internal/config/config.go:452-467 gates local/environment shell only when MixedPlatforms is true; internal/cli/config_test.go:215-239 covers both exact refusal paths and no writes, while local_test.go:145-152 covers successful local and environment shell overrides for one platform."
+    },
+    {
+      "criterion": "The implementation leaves no cross-platform test behind that skips on Windows and adds committed config/CLI tests, including the exact worked-example refusals, for the go check to run.",
+      "met": true,
+      "evidence": "The new tests in internal/config/config_test.go, internal/config/local_test.go and internal/cli/config_test.go contain no skip and assert the worked-example messages; .vloop/tmp/checks.json records the go check exit 0 and its log shows internal/config and internal/cli passing."
+    },
+    {
+      "criterion": "The configuration guide's keys table contains platforms with VLOOP_PLATFORMS, and its shell row says that a mixed team requires shared pwsh; no alternative spelling of the platform names is documented.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:44-45 adds the platforms/VLOOP_PLATFORMS row using linux, macos, windows and states that a team with two or more platforms requires shared pwsh in the shell row."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

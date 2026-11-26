@@ -138,7 +138,7 @@ func newConfig(g *Globals) *cobra.Command {
 	var setLocal bool
 	set := &cobra.Command{
 		Use:   "set <key> <value>",
-		Short: "Set any key config list shows, in .vloop/config.toml or with --local in .vloop/config.local.toml ('' removes it)",
+		Short: "Set any key config list shows, in .vloop/config.toml or with --local in .vloop/config.local.toml (not platforms, nor shell on a mixed team; '' removes it)",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := g.root()

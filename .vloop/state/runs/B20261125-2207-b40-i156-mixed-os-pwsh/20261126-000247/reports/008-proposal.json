@@ -1,0 +1,11 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "Added cross-platform end-to-end coverage for the complete mixed-team worked example and an explicit regression guard for repositories without platforms.",
+  "files": [
+    "cmd/vloop/b40_mixed_os_test.go"
+  ],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: pass.",
+  "notes": "The tests drive the built CLI through config, doctor and run preflight, assert stored ordering versus sorted messages, and use a Go-built agent stub plus a marker so no real or scripted plan session can run. The no-platforms test explicitly guards doctor, run and gate-shape portability behavior."
+}

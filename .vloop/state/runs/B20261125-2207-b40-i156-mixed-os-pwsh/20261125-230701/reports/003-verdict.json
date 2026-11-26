@@ -1,0 +1,44 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "Doctor places platforms immediately after config.local, or immediately after config when no config.local row exists, and omits it when platforms is unset or config is a problem.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: runDoctor calls doctorConfigLocal, doctorPlatforms, then doctorConfig only after config.List succeeds; doctorPlatforms returns without a row for an empty platforms list."
+    },
+    {
+      "criterion": "The platforms row reports the exact pass, missing-shell problem, wrong-shell problem and not-on-this-machine warning from M2, using sorted deduplicated platforms and mapping Go darwin to macos.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorPlatforms uses config.FormatPlatforms, the exact M2 messages for missing and wrong shared shells, hostOS mapping from darwin to macos, and the exact pass/warning forms."
+    },
+    {
+      "criterion": "With no plan in use, a mixed team reports a missing configured pwsh as a gate-shell problem; with a plan in use, the plan's recorded shell retains the existing pass/problem behavior, and a non-mixed team retains the existing warning.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorPlanShell preserves plan.Shell when hasPlan is true, reads configuration only without a plan, and promotes only mixed no-plan missing-PATH cases from warning to problem."
+    },
+    {
+      "criterion": "A repository with checks, no platforms key and no shared shell produces the exact checks warning showing the resolved shell source on that machine; vloop run does not print this warning.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorConfig emits the exact resolved-shell warning for checks with no platforms and a non-file shell; internal/cli/run.go suppresses that checks warning unless it is a platform-specific-command warning."
+    },
+    {
+      "criterion": "A mixed repository produces one checks warning for each check whose command word first matches the M3 list, and vloop run prints it; a listed token used only as data or inside a quoted argument does not warn.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go: doctorConfig iterates checks and adds one warning from FirstPlatformSpecificCommand; internal/driver/gateshape.go recognizes command positions but unwraps wholly quoted words only after a single & call operator; internal/driver/plan_test.go covers standalone quoted data as non-matches and vloop preflight prints these warnings."
+    },
+    {
+      "criterion": "Run preflight prints the exact platforms problem or warning with two spaces and its symbol, counts the platforms problem as a refusal, and reaches no plan session or agent when it fails.",
+      "met": true,
+      "evidence": "internal/cli/run.go: writeRunPreflightChecks emits '  ✗' or '  !' platform rows, increments bad for problems, and runPreflight returns before CheckRunID, lock acquisition, planner creation, or iterator creation."
+    },
+    {
+      "criterion": "The task adds committed doctor and preflight tests that run on Windows, macOS and Linux without a real claude or copilot process, and the go check runs them.",
+      "met": true,
+      "evidence": "internal/cli/doctor_test.go adds direct doctor/preflight helper coverage with no agent process or OS skip; internal/driver/plan_test.go adds portable parser regressions; .vloop/tmp/checks.json records the go check at exit 0."
+    }
+  ],
+  "findings": [],
+  "notes": "The retry fixes the prior quoted-data false positive without changing command detection after the PowerShell call operator."
+}

@@ -1,0 +1,34 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.2538493,
+  "credits": 25.38493,
+  "duration_ms": 373981,
+  "effort": null,
+  "ended": "2026-11-26T00:47:19Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.2538493,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged",
+      "tool_name": "powershell",
+      "tool_use_id": "call_47WnsDlgwQ3Irr2aBxSP3Srf"
+    }
+  ],
+  "phase": "verify",
+  "run_id": "B20261125-2207-b40-i156-mixed-os-pwsh",
+  "schema": "session/v4",
+  "started": "2026-11-26T00:41:03Z",
+  "turns": 36,
+  "wall_ms": 376065
+}

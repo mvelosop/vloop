@@ -107,8 +107,11 @@ verify is not yet tried.
   hook that runs vloop's fence before every tool call, and the driver re-judges
   the calls afterwards.
 - **Cost** is estimated from Copilot credits at `copilot.credit-usd` dollars each.
-- **Windows:** the hook has a PowerShell form and gates run in `pwsh`, but a
-  whole Copilot run on Windows is untested.
+- **Windows and mixed teams:** the hook has a PowerShell form and gates run in
+  `pwsh`; declare the team's operating systems with `platforms` and use the
+  shared portability rules in
+  [Mixed teams](docs/guide/configuration.md#mixed-teams). A whole Copilot run on
+  Windows is untested.
 - **Overriding locally:** `.vloop/config.local.toml` is git-ignored and beats
   `.vloop/config.toml`. To run Claude while the shared file says `copilot`, run
   `vloop config set --local agent.work claude` and `vloop config set --local
