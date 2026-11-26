@@ -23,3 +23,8 @@ committing the plan
    review T2 · 0m53s · $0.03 · run $0.47 / $40.00
    review: PASS
    T2 done
+── iteration 3 (3 this run) · T3 · 2/3 done ──
+   Verify PowerShell UTF-8 through the built CLI
+   work T3 · 2m02s · $0.07 · run $0.54 / $40.00
+   GATE DISPUTE T3 — blocked for the operator; no review, no attempt charged
+   T3 blocked — the operator resolves the disputed gate with vloop task verify

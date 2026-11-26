@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/3 done** · iteration 2
+**Status:** running · **2/3 done** · iteration 3
 
-**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:57:34Z
+**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:59:41Z
 
 ## Progress
 
 - [x] **T1** — Make PowerShell gate processes UTF-8
 - [x] **T2** — Document UTF-8 behavior for PowerShell users
-- [ ] **T3** — Verify PowerShell UTF-8 through the built CLI
+- [ ] **T3** — Verify PowerShell UTF-8 through the built CLI · **blocked**
 
 ## Tasks
 
@@ -58,7 +58,7 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 ### T3 — Verify PowerShell UTF-8 through the built CLI
 
-`pending` · depends on: T1, T2
+`blocked` · **blocked** · depends on: T1, T2
 
 Prove the completed runner and documentation together through the built vloop CLI in an isolated repository. This catches integration breaks that either task's focused oracle could miss.
 
@@ -67,6 +67,8 @@ Prove the completed runner and documentation together through the built vloop CL
 - A built CLI in a temporary git repository runs the worked example's native git read and café output gates successfully and reports the exit-3 gate as a failure while vloop task gate itself exits 1.
 - vloop task show prints each recorded verify command unchanged, including the café assertion, and never prints the implementation's encoding setup.
 - The close gate runs the T1 and T2 oracles together, uses only temporary repositories and build outputs, and leaves the repository tree unchanged.
+
+**From the last attempt:** gate disputed: The close gate's nested vloop invocations inherit the outer repository's plan hash, so the temporary repository's intentionally different plan is rejected before any UTF-8 assertion can run. — Prescribed vloop task gate T3 exited 1 with 'the plan was changed during this session — gates run only from the plan the driver holds'. Running the same T3 gate after Remove-Item Env:VLOOP_PLAN_SHA256 exited 0 and printed 'gate T3: pass'.
 
 <details><summary>verify command</summary>
 

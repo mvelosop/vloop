@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "blocked",
+  "summary": "The UTF-8 close oracle passes in isolation, but its prescribed nested-CLI run cannot pass while it inherits the outer gate's plan hash into a different temporary repository.",
+  "files": [],
+  "verified": "vloop task gate T3 exited 1: the temporary CLI refused its different plan with 'the plan was changed during this session'; the same gate exited 0 after removing VLOOP_PLAN_SHA256 from the outer process.",
+  "notes": "The T3 gate starts vloop task gate T1/T2/T3 in a temporary repository, but the outer vloop task gate session exports VLOOP_PLAN_SHA256 and the nested process inherits it. The gate must clear that session-scoped variable before launching the temporary-repository CLI; production plan-integrity enforcement is correct and was not weakened.",
+  "gate_dispute": {
+    "reason": "The close gate's nested vloop invocations inherit the outer repository's plan hash, so the temporary repository's intentionally different plan is rejected before any UTF-8 assertion can run.",
+    "evidence": "Prescribed vloop task gate T3 exited 1 with 'the plan was changed during this session — gates run only from the plan the driver holds'. Running the same T3 gate after Remove-Item Env:VLOOP_PLAN_SHA256 exited 0 and printed 'gate T3: pass'."
+  }
+}
