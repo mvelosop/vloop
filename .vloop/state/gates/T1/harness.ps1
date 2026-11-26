@@ -18,10 +18,10 @@ function Assert-Equal {
 function Format-GatePath {
     param([string]$Path)
     $full = [IO.Path]::GetFullPath($Path).Replace('\', '/')
-    $home = [IO.Path]::GetFullPath([Environment]::GetFolderPath('UserProfile')).TrimEnd('\', '/').Replace('\', '/')
-    if ($full.Equals($home, [StringComparison]::OrdinalIgnoreCase)) { return "~" }
-    if ($full.StartsWith($home + '/', [StringComparison]::OrdinalIgnoreCase)) {
-        return "~" + $full.Substring($home.Length)
+    $homeDir = [IO.Path]::GetFullPath([Environment]::GetFolderPath('UserProfile')).TrimEnd('\', '/').Replace('\', '/')
+    if ($full.Equals($homeDir, [StringComparison]::OrdinalIgnoreCase)) { return "~" }
+    if ($full.StartsWith($homeDir + '/', [StringComparison]::OrdinalIgnoreCase)) {
+        return "~" + $full.Substring($homeDir.Length)
     }
     return $full
 }

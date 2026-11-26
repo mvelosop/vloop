@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 1,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T14:54:38Z",
+  "updated": "2026-11-26T14:55:11Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -29,7 +29,7 @@
       "title": "Implement self-update target decisions and check mode",
       "goal": "Introduce the self-update command so a released vloop can safely choose and report its target from any directory. This establishes the refusal, version-selection and machine-readable contract that installation and plugin updates build on.",
       "kind": "feature",
-      "fixtures": "cdf27de34245623ccfab483abefa494eb6b199177b037d794964f1a6624ed2f6",
+      "fixtures": "b92b8762a8ce1e73be47dfa28dd9ebfd370ef063d5c7fbd9bd638ab5dab06f0f",
       "references": [
         {
           "path": "docs/domain/domain-model.md",
@@ -67,9 +67,18 @@
         "No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
-      "status": "blocked",
+      "status": "pending",
       "attempts": 0,
-      "notes": "gate disputed: The T1 gate fails inside its own PowerShell harness before it invokes the command because $HOME is a read-only automatic variable on PowerShell. — Harness line 21 is '$home = [IO.Path]::GetFullPath(...)'. Running vloop task gate T1 exits 1 with 'Cannot overwrite variable HOME because it is read-only or constant.' and never reaches an assertion."
+      "notes": "gate disputed: The T1 gate fails inside its own PowerShell harness before it invokes the command because $HOME is a read-only automatic variable on PowerShell. — Harness line 21 is '$home = [IO.Path]::GetFullPath(...)'. Running vloop task gate T1 exits 1 with 'Cannot overwrite variable HOME because it is read-only or constant.' and never reaches an assertion.",
+      "gate_history": [
+        {
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
+          "replaced_at": "2026-11-26T14:55:11Z",
+          "reason": "Gate defect the work session disputed correctly: harness.ps1 assigned $home, which in PowerShell is the read-only automatic $HOME (names ignore case), so the gate failed before any assertion; renamed to $homeDir",
+          "by": "operator",
+          "fixtures": "cdf27de34245623ccfab483abefa494eb6b199177b037d794964f1a6624ed2f6"
+        }
+      ]
     },
     {
       "id": "T2",
