@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,6 +18,34 @@ import (
 )
 
 var binPath string
+
+// copilotAPI stands in for the Copilot models and plan endpoints (B46) for
+// every binary the tests start, so no test reaches GitHub: cleanEnv points
+// VLOOP_COPILOT_API_URL and VLOOP_GITHUB_API_URL at it. It lists every model
+// id the tests configure.
+var copilotAPI *httptest.Server
+
+func startCopilotAPI() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/models":
+			var b strings.Builder
+			b.WriteString(`{"data":[`)
+			for i, id := range []string{"gpt-5.1", "gpt-5.6-terra", "gpt-6-luna", "gpt-6.1-terra", "gpt-x", "mai-code-2"} {
+				if i > 0 {
+					b.WriteString(",")
+				}
+				fmt.Fprintf(&b, `{"id":%q,"model_picker_enabled":true,"policy":{"state":"enabled"}}`, id)
+			}
+			b.WriteString("]}")
+			fmt.Fprint(w, b.String())
+		case "/copilot_internal/user":
+			fmt.Fprint(w, `{"copilot_plan":"test"}`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+}
 
 func TestMain(m *testing.M) {
 	dir, err := os.MkdirTemp("", "vloop-e2e-")
@@ -32,7 +62,9 @@ func TestMain(m *testing.M) {
 		fmt.Fprintf(os.Stderr, "build failed: %v\n%s", err, out)
 		os.Exit(1)
 	}
+	copilotAPI = startCopilotAPI()
 	code := m.Run()
+	copilotAPI.Close()
 	os.RemoveAll(dir)
 	os.Exit(code)
 }
@@ -108,7 +140,11 @@ func cleanEnv(home string) []string {
 		}
 		env = append(env, kv)
 	}
-	return append(env, "HOME="+home, "USERPROFILE="+home, "XDG_CONFIG_HOME="+filepath.Join(home, ".config"), "APPDATA="+home)
+	env = append(env, "HOME="+home, "USERPROFILE="+home, "XDG_CONFIG_HOME="+filepath.Join(home, ".config"), "APPDATA="+home)
+	if copilotAPI != nil {
+		env = append(env, "VLOOP_COPILOT_API_URL="+copilotAPI.URL, "VLOOP_GITHUB_API_URL="+copilotAPI.URL)
+	}
+	return env
 }
 
 func expect(t *testing.T, r result, code int, out, errOut string) {
