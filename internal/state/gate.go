@@ -68,6 +68,9 @@ func GateCommand(root, shell, verify string, env []string) (*exec.Cmd, error) {
 	if shell == "cmd" {
 		setCmdLine(c, GateCmdLine(verify))
 	}
+	if shell == "pwsh" || shell == "powershell" {
+		privateConsole(c)
+	}
 	c.Dir = root
 	c.Env = env
 	return c, nil

@@ -132,7 +132,9 @@ other than `pwsh`, fails `vloop doctor` and `vloop run` before planning.
 vloop runs `pwsh` gates and checks with UTF-8 input and output, so native tool
 output remains correct on Windows. This applies to the PowerShell processes
 vloop starts, not to your own interactive PowerShell terminal; vloop does not
-change your PowerShell profile or the machine's code page. Add this line to your
+change your PowerShell profile or the machine's code page. On Windows each such
+process runs on a console of its own, so the code pages it sets never reach the
+terminal you ran vloop from. Add this line to your
 PowerShell profile to keep `vloop run` output correct when it passes through
 `Tee-Object` and similar terminal pipes:
 
