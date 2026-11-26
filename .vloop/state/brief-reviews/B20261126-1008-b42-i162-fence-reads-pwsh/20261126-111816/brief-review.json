@@ -1,0 +1,32 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — W2",
+      "summary": "The script-block rule says every pwsh script block is refused, but its trigger list is not exhaustive.",
+      "evidence": "docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md:149-156 defines a PowerShell `{ ... }` script block as refused only at start or after a command name, parameter, `&`, `.`, or `|`. The summary at lines 49-51 says a script block is refused without that positional limit; PowerShell also admits a script-block expression in other positions, for example after `,` or `=`. A planner that implements the listed trigger positions literally can allow a form the brief says is refused.",
+      "fix": "Require every unquoted `{ ... }` that opens a PowerShell script block to be refused, explicitly including positions after punctuation and assignment; alternatively, name every remaining script-block position as out of scope and reconcile the W2 summary. Keep the literal W2 denial reason."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract — W3",
+      "summary": "Invalid `$env:` statements point to today's unspecified refusal instead of pinning the observable reason.",
+      "evidence": "docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md:168-172 says every other `$env:` statement \"keeps today's refusal\". The worked example at line 240 pins only the no-space `$env:GOOS=$x` token; a spaced form begins with a different token and currently reports `command word $env:GOOS starts with $ and cannot be judged` from internal/fence/judge.go:331-333. A gate comparing invalid forms has no single literal contract value.",
+      "fix": "Pin the reason for each invalid class (including spaced assignment and forms with invalid names or values). For example, state that any refused `$env:` form keeps the exact `<first word>` shown by `command word <word> starts with $ and cannot be judged`, and include representative spaced and otherwise-invalid examples in the worked example."
+    }
+  ],
+  "decisions": [
+    "Keep parity with sh: the fence remains advisory, and PowerShell file cmdlets and script-file execution stay outside its path-writing judgment.",
+    "Judge pwsh/powershell -Command and cmd /c or /k through rather than refusing those wrappers outright.",
+    "Refuse dynamic PowerShell execution commands and script blocks rather than implementing a PowerShell parser.",
+    "Read only the parenthesized pipeline property form and literal $env assignment; keep other PowerShell syntax fail-closed.",
+    "Apply W2-W4 only to a powershell tool call and to a W1-wrapped PowerShell string; a direct bash call remains POSIX.",
+    "Update the fence guide, audit and command help, but not skills; the denial guidance is the agent-facing steering."
+  ],
+  "checked": "Ready-copy structure via vloop brief check (0 warnings); CLAUDE.md and inherited B40 plus B35 decisions; C-5, P-8, S-2 and S-4; .vloop/config.toml and check order; every binding reference; current judge/split/wrapper/help code and tests; B40 denial records and baseline fence probes; worked-example literal outputs, task order, dependencies, paths, and adjacent B41 overlap.",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

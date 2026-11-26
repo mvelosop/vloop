@@ -1,0 +1,28 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "fact",
+      "section": "Executive summary",
+      "summary": "The account of B40's 13 denials leaves one denial unclassified.",
+      "evidence": "docs/briefs/B20261126-1008-b42-i162-fence-reads-pwsh.loop-brief.md:28-31 names 11 subshell denials and one $env denial; the B40 session records contain those plus one `command substitution cannot be judged` denial at .vloop/state/runs/B20261125-2207-b40-i156-mixed-os-pwsh/20261126-000247/sessions/005-review.json:23. Counting the three reason texts across the run gives 11 subshell, 1 command-substitution and 1 $env denial.",
+      "fix": "State the complete breakdown: 11 subshell/process-substitution denials, one command-substitution denial, and one $env denial. Clarify that W3 reads the first and third syntax families' targeted common forms while command substitution remains refused with W4 guidance."
+    }
+  ],
+  "decisions": [
+    "Keep parity with sh rather than building a broader pwsh sandbox; I agree, given S-2 and the stated advisory role of the fence.",
+    "Judge pwsh, powershell and cmd command-string wrappers instead of refusing the wrappers outright; I agree.",
+    "Refuse pwsh script blocks rather than parse them; I agree because the brief supplies explicit alternatives.",
+    "Read only parenthesized property access and literal $env assignment among the pwsh forms; I agree, with the B40 breakdown corrected above.",
+    "Treat cmd command strings with the existing splitter and refuse %, ^ and unresolved wrappers; I agree.",
+    "Apply W2-W4 to the powershell tool and to a W1 pwsh/powershell string under either tool; I agree and find the scope stated.",
+    "Update the guide and fence audit, but no skills; I agree.",
+    "Pin the proposed long-help wording and regenerate docs/guide/commands.md; I agree.",
+    "Leave pwsh file cmdlet paths and & ./script.ps1 unjudged under the parity decision; I agree."
+  ],
+  "checked": "facts and base behavior, internal consistency and literal values, repository rules and binding references, check/config runnability and five-task order; a ready copy passed vloop brief check with 0 warnings",
+  "header": "Reviewed 2026-11-26: FIX, 1 finding"
+}
+
