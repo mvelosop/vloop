@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T6",
+  "outcome": "done",
+  "summary": "The completed tree passes every earlier behavioral gate and the strengthened end-to-end Copilot model workflow, including exact output, atomic writes, refusal paths, doctor behavior, warning-only failure paths, and token secrecy across command output and temporary artifacts.",
+  "files": [],
+  "verified": "vloop task gate T6 exited 0 and printed gate T6: pass (13.005s).",
+  "notes": "No product or test file change was required. The planner-owned oracle used a temporary initialized repository and httptest endpoints with a stub credential, then scanned all temporary artifacts for the token before cleanup."
+}
