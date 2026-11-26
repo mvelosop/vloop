@@ -7,7 +7,7 @@
   "status": "blocked",
   "iteration": 3,
   "created": "2026-11-26T13:39:18Z",
-  "updated": "2026-11-26T13:59:42Z",
+  "updated": "2026-11-26T14:00:32Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -89,7 +89,7 @@
       "title": "Verify PowerShell UTF-8 through the built CLI",
       "goal": "Prove the completed runner and documentation together through the built vloop CLI in an isolated repository. This catches integration breaks that either task's focused oracle could miss.",
       "kind": "test",
-      "fixtures": "292df7533b84168b5350aad71fc418e665d793b0aa469b547df91e8c2544155d",
+      "fixtures": "48d5efa13b515e88ee7f9c98aa64f4c816ea9aeb0698146da86cba9ca57ae716",
       "references": [
         {
           "path": "docs/domain/execution/task.md",
@@ -112,7 +112,16 @@
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
       "status": "blocked",
       "attempts": 0,
-      "notes": "gate disputed: The close gate's nested vloop invocations inherit the outer repository's plan hash, so the temporary repository's intentionally different plan is rejected before any UTF-8 assertion can run. — Prescribed vloop task gate T3 exited 1 with 'the plan was changed during this session — gates run only from the plan the driver holds'. Running the same T3 gate after Remove-Item Env:VLOOP_PLAN_SHA256 exited 0 and printed 'gate T3: pass'."
+      "notes": "gate disputed: The close gate's nested vloop invocations inherit the outer repository's plan hash, so the temporary repository's intentionally different plan is rejected before any UTF-8 assertion can run. — Prescribed vloop task gate T3 exited 1 with 'the plan was changed during this session — gates run only from the plan the driver holds'. Running the same T3 gate after Remove-Item Env:VLOOP_PLAN_SHA256 exited 0 and printed 'gate T3: pass'.",
+      "gate_history": [
+        {
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
+          "replaced_at": "2026-11-26T14:00:32Z",
+          "reason": "Gate defect the work session disputed correctly: the nested vloop runs inherited the driver's VLOOP_PLAN_SHA256 and refused the scratch repository's plan; the gate now clears it before them",
+          "by": "operator",
+          "fixtures": "292df7533b84168b5350aad71fc418e665d793b0aa469b547df91e8c2544155d"
+        }
+      ]
     }
   ]
 }

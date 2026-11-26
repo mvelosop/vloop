@@ -9,6 +9,10 @@ if ($LASTEXITCODE -ne 0) {
   exit $LASTEXITCODE
 }
 
+# The driver sets VLOOP_PLAN_SHA256 for this gate; the vloop it runs in its own
+# scratch repository must not inherit it, or it refuses that repository's plan.
+Remove-Item Env:VLOOP_PLAN_SHA256 -ErrorAction SilentlyContinue
+
 $temp = Join-Path ([System.IO.Path]::GetTempPath()) ("vloop-b43-" + [guid]::NewGuid().ToString('N'))
 $binary = Join-Path $temp 'vloop.exe'
 $repo = Join-Path $temp 'repo'
