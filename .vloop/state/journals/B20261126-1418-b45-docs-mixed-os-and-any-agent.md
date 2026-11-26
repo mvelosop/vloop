@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** README.md now has a concise mixed macOS and Windows team entry point, Copilot-specific Windows evidence, and accurate PowerShell install and upgrade guidance while staying under the repository line cap.
 - **Files:** README.md
 - **Notes for next iteration:** The mixed-team prose remains consistent with the configuration guide and covers shared platforms and pwsh, rejected overrides, fixed-command linting, portable pwsh/toolchain commands, UTF-8, and this repository; prose was compacted without weakening T2's Copilot evidence to satisfy the README line cap.
+
+## T4 — Update the guides for any agent
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Updated the four guides to describe shared agent behavior while preserving the distinct Claude and Copilot adapters, installation paths, metrics, and model values. Added mixed-team portable gate guidance and agent-aware eval replay instructions.
+- **Files:** docs/guide/concepts.md, docs/guide/metrics.md, docs/guide/configuration.md, docs/guide/evals.md
+- **Notes for next iteration:** The guides now distinguish Claude's appended system prompt from Copilot's custom-instructions directory, document Copilot's credit-based estimated cost and token absence, and keep Claude-specific plugin evaluation and qualification wording scoped.

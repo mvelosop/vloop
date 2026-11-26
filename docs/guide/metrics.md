@@ -155,6 +155,11 @@ lines per agent minute, and `rate.code_test_per_min` counts code plus test.
   lines (`$/kloc`).
 - `tokens` holds `input`, `output`, `cache_read` and `cache_creation` totals and
   `cache_hit_ratio` = `cache_read` / (`input` + `cache_read` + `cache_creation`).
+  Copilot sessions report no tokens, and `cache_hit_ratio` counts Claude
+  sessions only.
+- Copilot's cost is estimated at `copilot.credit-usd` dollars for its
+  reported credits each (`cost_source` is `estimated`). `credits.total` sums
+  the credits from every phase.
 - `permission_denials` counts the tool calls the sessions were denied.
 
 ## Models and effort

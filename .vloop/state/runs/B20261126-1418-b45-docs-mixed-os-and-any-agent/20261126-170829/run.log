@@ -43,3 +43,10 @@ committing the plan
    review T3 · 1m22s · $0.04 · run $0.73 / $40.00
    review: PASS
    T3 done
+── iteration 6 (6 this run) · T4 · 3/6 done ──
+   Update the guides for any agent
+   work T4 · 1m48s · $0.07 · run $0.80 / $40.00
+   check go
+   review T4 · 1m07s · $0.06 · run $0.86 / $40.00
+   review: PASS
+   T4 done

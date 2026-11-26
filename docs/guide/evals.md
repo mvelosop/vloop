@@ -14,7 +14,7 @@ A gate and an eval answer different questions, and neither replaces the other.
 | --- | --- | --- |
 | Tests | the code a task produced | a skill's behaviour |
 | Runs | every iteration, by the driver | on demand, by the operator |
-| Calls `claude` | never | always, once per run |
+| Calls an agent | never | `claude plugin eval` calls `claude`; `tools/agent-eval` calls the agent it is given |
 | Result | exit 0 or not | a weighted score per case, 0 to 1 |
 | Cost | none | real model calls |
 

@@ -6,7 +6,7 @@
   "merged": null,
   "tasks": {
     "planned": 6,
-    "done": 2,
+    "done": 3,
     "blocked": 0,
     "first_pass": 1,
     "estimate": {
@@ -18,24 +18,24 @@
     "delivered": {
       "code": 0,
       "test": 0,
-      "docs": 72,
+      "docs": 66,
       "other": 0,
       "deleted": {
         "code": 0,
         "test": 0,
-        "docs": 27,
+        "docs": 46,
         "other": 0
       }
     },
     "churn": {
       "code": 0,
       "test": 0,
-      "docs": 96,
+      "docs": 103,
       "other": 0,
       "deleted": {
         "code": 0,
         "test": 0,
-        "docs": 51,
+        "docs": 83,
         "other": 0
       }
     },
@@ -43,12 +43,12 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 514790,
-    "work_ms": 371890,
-    "review_ms": 142900,
+    "agent_ms": 685103,
+    "work_ms": 460436,
+    "review_ms": 224667,
     "plan_ms": 402830,
-    "gates_ms": 2157,
-    "checks_ms": 544326,
+    "gates_ms": 2654,
+    "checks_ms": 729262,
     "gate_review_ms": 112613,
     "wall_ms": null
   },
@@ -57,18 +57,18 @@
     "code_test_per_min": 0
   },
   "cost": {
-    "total_usd": 0.6252605999999999,
+    "total_usd": 0.7260698,
     "plan_usd": 0.2014817,
-    "work_usd": 0.2236475,
-    "review_usd": 0.1358377,
+    "work_usd": 0.2883863,
+    "review_usd": 0.1719081,
     "gate_review_usd": 0.0642937,
     "per_1000_code_lines_usd": null
   },
   "credits": {
-    "total": 62.52606,
+    "total": 72.60698000000001,
     "plan": 20.14817,
-    "work": 22.36475,
-    "review": 13.58377,
+    "work": 28.838630000000002,
+    "review": 17.19081,
     "gate_review": 6.42937
   },
   "tokens": {
@@ -152,9 +152,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 8,
-  "iterations": 4,
-  "iterations_per_closed": 2,
+  "permission_denials": 10,
+  "iterations": 5,
+  "iterations_per_closed": 1.6666666666666667,
   "by_task": [
     {
       "id": "T1",
@@ -210,21 +210,21 @@
       "id": "T3",
       "area": null,
       "kind": "docs",
-      "attempts": 1,
+      "attempts": 2,
       "churn": {
         "code": 0,
         "test": 0,
-        "docs": 19,
+        "docs": 26,
         "other": 0,
         "deleted": {
           "code": 0,
           "test": 0,
-          "docs": 5,
+          "docs": 37,
           "other": 0
         }
       },
-      "agent_ms": 89903,
-      "cost_usd": 0.045831000000000004,
+      "agent_ms": 260216,
+      "cost_usd": 0.1466402,
       "models": [
         "mai-code-2"
       ],
@@ -489,6 +489,54 @@
       "turns": 14,
       "permission_denials": 0,
       "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829",
+      "seq": 9,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 5,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 88546,
+      "cost_usd": 0.0647388,
+      "cost_source": "estimated",
+      "credits": 6.47388,
+      "turns": 12,
+      "permission_denials": 1,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829",
+      "seq": 10,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 5,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 81767,
+      "cost_usd": 0.0360704,
+      "cost_source": "estimated",
+      "credits": 3.60704,
+      "turns": 9,
+      "permission_denials": 1,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        }
+      ],
       "is_error": false
     }
   ]

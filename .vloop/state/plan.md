@@ -2,16 +2,16 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **3/6 done** · iteration 5
+**Status:** running · **4/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:43:45Z
+**Brief:** `docs/briefs/B20261126-1418-b45-docs-mixed-os-and-any-agent.loop-brief.md` · **Updated:** 2026-11-26T17:49:59Z
 
 ## Progress
 
 - [x] **T1** — Document the mai-code-2 evidence
 - [x] **T2** — Make the README agent-neutral and cite mai-code-2 · 1 attempt(s)
 - [x] **T3** — Explain mixed teams in the README · 1 attempt(s)
-- [ ] **T4** — Update the guides for any agent
+- [x] **T4** — Update the guides for any agent
 - [ ] **T5** — List every session kind and portable gate shell
 - [ ] **T6** — Run the complete documentation contract
 
@@ -85,7 +85,7 @@ pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1
 
 ### T4 — Update the guides for any agent
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Apply D4 consistently across the four guides. Agent-neutral prose must describe only where Claude and Copilot genuinely share behavior, while preserving agent-specific mechanisms.
 

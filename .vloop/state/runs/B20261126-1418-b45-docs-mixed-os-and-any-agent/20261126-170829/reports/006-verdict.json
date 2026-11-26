@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "concepts.md says each configured agent runs a fresh agent session, explains both guideline delivery mechanisms, shows both interactive plugin-dir commands, names agent-eval for other agents, and adds a short mixed-team portable-gates note.",
+      "met": true,
+      "evidence": "docs/guide/concepts.md:11-13 identifies fresh agent sessions; 69-71 names go run ./tools/agent-eval; 124-127 adds mixed-team portable-gate guidance; 253-256 distinguishes Claude's appended system prompt from Copilot's custom-instructions directory; 381-390 shows both interactive plugin-dir commands."
+    },
+    {
+      "criterion": "metrics.md says Copilot reports no tokens, estimates cost from copilot.credit-usd with cost_source estimated, sums every phase in credits.total, and counts cache_hit_ratio for Claude sessions only.",
+      "met": true,
+      "evidence": "docs/guide/metrics.md:156-162 states all four rules, consistent with internal/driver/agent_copilot.go's zero token report and estimated credit pricing and internal/metrics/time.go's sum across all six counted phases."
+    },
+    {
+      "criterion": "All seven model.* values explain that the setting is a Claude alias or model name, or a Copilot model id when that phase's agent is copilot; the old \"any model name\" value is absent.",
+      "met": true,
+      "evidence": "docs/guide/configuration.md:22-28 changes all seven model.* Valid values cells to the Claude-alias/model-name and Copilot-model-id distinction; the old value is absent from the diff."
+    },
+    {
+      "criterion": "evals.md's Calls claude row says claude plugin eval calls claude and tools/agent-eval calls the agent it is given, while the qualification rule remains unchanged.",
+      "met": true,
+      "evidence": "docs/guide/evals.md:17 says `claude plugin eval` calls `claude` and `tools/agent-eval` calls the agent it is given; 149-151 retains the existing three-run qualification rule unchanged."
+    },
+    {
+      "criterion": "No Claude-specific adapter, installation or qualification wording is made generic, and all new statements agree with the driver implementation.",
+      "met": true,
+      "evidence": "The diff preserves Claude-specific eval and installation commands, scopes the new shared statements to genuinely shared behavior, and matches internal/driver/session.go plus internal/driver/agent_copilot.go for the two guideline and cost mechanisms."
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}
