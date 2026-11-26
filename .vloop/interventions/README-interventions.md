@@ -219,6 +219,7 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261126-094554-the-plan-skill-kept-the-mktemp-scratch-d](I20261126-094554-the-plan-skill-kept-the-mktemp-scratch-d.md) |
 | verify | verification-finding | partly | no-options | [I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo](I20261126-094555-the-run-ran-on-windows-where-151-cmd-vlo.md) |
 | verify | verification-finding | partly | no-options | [I20261126-110826-vloop-run-s-preflight-now-also-prints-th](I20261126-110826-vloop-run-s-preflight-now-also-prints-th.md) |
+| verify | verification-finding | partly | no-options | [I20261126-133232-two-routes-past-the-new-pwsh-judging-tha](I20261126-133232-two-routes-past-the-new-pwsh-judging-tha.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
