@@ -117,6 +117,17 @@ func main() {
 	if strings.Contains(combined, "stub-token") {
 		fail("token leaked into command output")
 	}
+	// Nothing the commands left behind (config, logs, records, fixtures)
+	// may hold the token either.
+	_ = filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return nil
+		}
+		if b, err := os.ReadFile(p); err == nil && strings.Contains(string(b), "stub-token") {
+			fail("token leaked into " + p)
+		}
+		return nil
+	})
 }
 
 func writeCopilotShim(dir string) {
