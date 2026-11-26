@@ -5,9 +5,9 @@
   "base": "acfa8dc01f72688c17ea28dc6997768236398cd3",
   "branch": "B20261126-1034-b43-i162-pwsh-gates-utf8",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-26T13:39:18Z",
-  "updated": "2026-11-26T13:46:56Z",
+  "updated": "2026-11-26T13:52:36Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -53,7 +53,7 @@
         "Committed tests run by the go check cover native output, native stdin, emitted bytes, all three BOM-free encodings, setup silence, exit-code preservation, and the unchanged non-PowerShell argument lists; the planner-owned oracle is not used as that test suite."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

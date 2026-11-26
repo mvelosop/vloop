@@ -9,3 +9,10 @@ planned: B20261126-1034-b43-i162-pwsh-gates-utf8 — 3 tasks
 reviewing the gates using mai-code-2 (round 1)
    gate review · 2m45s · $0.09 · run $0.26 / $40.00
 committing the plan
+── iteration 1 (1 this run) · T1 · 0/3 done ──
+   Make PowerShell gate processes UTF-8
+   work T1 · 2m07s · $0.09 · run $0.35 / $40.00
+   check go
+   review T1 · 1m14s · $0.05 · run $0.40 / $40.00
+   review: PASS
+   T1 done

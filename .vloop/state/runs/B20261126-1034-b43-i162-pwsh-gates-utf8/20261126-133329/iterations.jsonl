@@ -1,0 +1,1 @@
+{"attempt":1,"checks":[{"duration_ms":134187,"exit":0,"name":"go"}],"ended":"2026-11-26T13:52:36Z","gate":{"duration_ms":3662,"exit":0},"iteration":1,"outcome":"done","run_id":"B20261126-1034-b43-i162-pwsh-gates-utf8","schema":"iteration/v2","started":"2026-11-26T13:46:56Z","task":"T1"}

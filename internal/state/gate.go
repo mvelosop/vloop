@@ -16,12 +16,15 @@ func (e *ShellMissingError) Error() string {
 	return fmt.Sprintf("this plan's gates are %s commands and %s is not on PATH", e.Shell, e.Shell)
 }
 
+const powerShellUTF8Setup = `try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {} ; try { [Console]::InputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {} ; try { $OutputEncoding = [System.Text.UTF8Encoding]::new($false) } catch {} ; `
+
 // GateArgs returns the arguments that run cmd in shell: sh and bash take -c,
-// pwsh and powershell take -NoProfile -NonInteractive -Command, cmd takes /C.
+// PowerShell takes -NoProfile -NonInteractive -Command with process-local
+// UTF-8 setup, and cmd takes /C.
 func GateArgs(shell, cmd string) []string {
 	switch shell {
 	case "pwsh", "powershell":
-		return []string{"-NoProfile", "-NonInteractive", "-Command", cmd}
+		return []string{"-NoProfile", "-NonInteractive", "-Command", powerShellUTF8Setup + cmd}
 	case "cmd":
 		return []string{"/C", cmd}
 	default:

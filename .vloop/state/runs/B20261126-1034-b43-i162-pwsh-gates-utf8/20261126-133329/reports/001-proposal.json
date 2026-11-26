@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "PowerShell gate processes now set all three BOM-free UTF-8 encodings locally before running the recorded command, and committed tests cover native input/output, emitted bytes, silence, exit codes, and unchanged shell arguments.",
+  "files": [
+    "internal/state/gate.go",
+    "internal/state/gate_test.go"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed ok plus gate T1: pass.",
+  "notes": "The setup is appended only to pwsh and powershell's internal -Command argument as three independent try/catch statements; each failure is suppressed so the recorded command still runs. The plan, display paths, and journal retain the original verify text."
+}

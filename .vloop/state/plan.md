@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/3 done** · iteration 0
+**Status:** running · **1/3 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:46:56Z
+**Brief:** `docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md` · **Updated:** 2026-11-26T13:52:36Z
 
 ## Progress
 
-- [ ] **T1** — Make PowerShell gate processes UTF-8
+- [x] **T1** — Make PowerShell gate processes UTF-8
 - [ ] **T2** — Document UTF-8 behavior for PowerShell users
 - [ ] **T3** — Verify PowerShell UTF-8 through the built CLI
 
@@ -16,7 +16,7 @@
 
 ### T1 — Make PowerShell gate processes UTF-8
 
-`pending` · depends on: none
+`done` · depends on: none
 
 Set UTF-8 encodings inside every pwsh and powershell process that the shared gate runner starts. This gives gates and checks correct native-input and native-output decoding without changing their recorded commands or exit codes.
 
