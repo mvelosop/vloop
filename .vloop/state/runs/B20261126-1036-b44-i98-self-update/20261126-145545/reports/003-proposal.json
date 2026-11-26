@@ -1,0 +1,19 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Implemented self-update target selection, exact refusals, install-location validation, check mode, JSON output, the embedded self-update/v1 schema, generated command documentation, and isolated fake-Go tests; updated schema-list contract assertions for the new embedded schema.",
+  "files": [
+    "cmd/vloop/b2_e2e_test.go",
+    "docs/guide/commands.md",
+    "embed_test.go",
+    "internal/cli/root.go",
+    "internal/cli/schema_test.go",
+    "internal/cli/selfupdate.go",
+    "internal/cli/selfupdate_test.go",
+    "internal/schema/schema_test.go",
+    "schemas/self-update.v1.json"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: pass (3.762s).",
+  "notes": "The checkout/refusal, target selection and --check paths use temporary fake Go programs; latest lookup runs in a temporary non-module directory. Existing schema-count/list assertions were updated because the brief intentionally adds embedded self-update/v1."
+}

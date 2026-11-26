@@ -1,0 +1,36 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "Roadmap / Starting point",
+      "summary": "B44 has no roadmap row, although this repository requires a brief's scope to come from a roadmap row and the row to point to the brief at hand-over.",
+      "evidence": ".claude/skills/vloop-architect/SKILL.md:15-19 says scope comes from the roadmap and the author must point the row at the brief; docs/design-notes/vloop-roadmap-b18-b21.md:47-48 ends at B41 and contains no B42-B44 row. rg for B44 in docs/design-notes returned no match.",
+      "fix": "Add B44 to the active roadmap before marking the brief ready, with its brief path, owned self-update scope, and dependency; extend the same roadmap with B43 first if its queue order is intentional."
+    },
+    {
+      "kind": "rule",
+      "section": "Binding references",
+      "summary": "The binding-reference reasons omit the domain invariants C-2 and C-3 even though the brief amends C-2 and introduces an embedded self-update schema.",
+      "evidence": "The brief's lines 92-93 cite C-1 and a generic platform description; lines 206-207 define the embedded self-update/v1 schema, and lines 233-238 explicitly amend C-2. docs/domain/domain-model.md:272-276 defines C-2 path rendering and C-3's schema/version/embedding rules. .claude/skills/vloop-architect/SKILL.md:21-25 requires applicable invariants to be cited by ID.",
+      "fix": "Rewrite the domain binding entries to cite C-2 for the machine-path exception and C-3 for self-update/v1's embedded-schema contract (and retain C-1 only if its precedence is actually needed)."
+    }
+  ],
+  "decisions": [
+    "Keep the command name vloop self-update and leave vloop upgrade as the repository update; I agree.",
+    "Use the Go toolchain as the release channel, via go list -m and go install; I agree.",
+    "Install only forward by default, with --version allowing any valid explicit version; I agree.",
+    "Refuse unsafe cases rather than install to an unobserved location; I agree.",
+    "Keep doctor and vloop upgrade offline; I agree.",
+    "Report plugin failures without failing the command after the binary step; I agree.",
+    "Amend C-2 so this repository-independent command prints external paths with / and the home as ~; operator approval is already asserted by the brief, and the choice is sensible.",
+    "Fake go, claude and copilot with temporary Go programs on every test OS; I agree.",
+    "Use the existing golang.org/x/mod/semver dependency for comparison; I agree.",
+    "Make --check with --version compare and report that explicit target; I agree."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 2 findings"
+}
+

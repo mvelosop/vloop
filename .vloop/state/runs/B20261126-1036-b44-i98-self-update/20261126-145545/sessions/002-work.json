@@ -1,0 +1,29 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.0527004,
+  "credits": 5.27004,
+  "duration_ms": 109488,
+  "effort": null,
+  "ended": "2026-11-26T15:01:18Z",
+  "is_error": false,
+  "iteration": 3,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.0527004,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [],
+  "phase": "work",
+  "run_id": "B20261126-1036-b44-i98-self-update",
+  "schema": "session/v4",
+  "started": "2026-11-26T14:59:26Z",
+  "task": "T1",
+  "turns": 11,
+  "wall_ms": 111882
+}

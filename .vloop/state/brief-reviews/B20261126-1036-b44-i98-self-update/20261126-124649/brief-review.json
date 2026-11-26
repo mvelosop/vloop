@@ -1,0 +1,44 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Violations the review must rule on",
+      "summary": "The stated prohibition on any call to go, claude or copilot outside self-update forbids existing behavior that this same brief keeps.",
+      "evidence": "The brief at lines 233-234 forbids calls to all three tools from every command but self-update. internal/cli/doctor.go:772-799 and 844-852 currently runs `claude plugin list --json` and `copilot plugin list --json`, and S3 explicitly keeps and edits doctor's plugin warnings. A conforming task could not preserve doctor while satisfying the violation.",
+      "fix": "Limit the violation to new network access or mutating calls outside self-update; explicitly preserve existing read-only plugin-list calls and existing agent launches."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / S1 / --check",
+      "summary": "`--check --version` calls an older explicit target \"up to date\" even though the non-check command is required to install it.",
+      "evidence": "The brief's decision at lines 71-72 says an explicit --version installs exactly that version, including an older version, while lines 124-127 say --check prints `... — up to date` whenever the target is not newer and renames latest to target. Thus target v0.14.0 from current v0.15.0 would be reported as up to date although `self-update --version v0.14.0` would downgrade.",
+      "fix": "Keep the comparison field, but pin a distinct --check message for explicit targets, e.g. that the exact target would be installed, regardless of the semver comparison; add the older-target case to the worked example."
+    },
+    {
+      "kind": "consistency",
+      "section": "S3 — the pointers",
+      "summary": "The cited release publisher will continue telling the operator to perform the manual binary and plugin update that this brief replaces.",
+      "evidence": "The brief says the purpose is one command before `vloop upgrade` (lines 23-31) and cites tools/release/publish.go as a binding reference (line 98). publish.go:304-306 currently prints `install: go install ...`, then `vloop upgrade`, then manual Claude marketplace/plugin commands. S3 names upgrade help, doctor, and the guide, but does not change those release instructions or their tests.",
+      "fix": "Add the release publisher's post-publish instructions and their tests to S3 so they point to `vloop self-update` (and then per-repository `vloop upgrade`) instead of reproducing the replaced three-step flow."
+    },
+    {
+      "kind": "runnability",
+      "section": "Behaviour contract / S1 / Where it installs",
+      "summary": "The safety-critical install-directory lookup has no refusal contract when go is present but `go env` fails or yields no usable directory.",
+      "evidence": "Lines 130-135 require `go env GOBIN`, then `go env GOPATH`, and refuse only by comparing that result with the running executable. The contract provides no exact output, exit code or worked-example case if either command fails or both yield an unusable/empty path. The stated fake-Go testing strategy makes this case directly gateable, so a planner must invent behavior that reviews cannot judge against the brief.",
+      "fix": "Define the exact exit-1 refusal (including the go error where available and the hand-update command), and add a fake-go case to the worked example and S1 gate."
+    }
+  ],
+  "decisions": [
+    "Amend C-2 for this repository-independent command to print external install paths with `/` and `~`. Necessary and consistent with the command's scope.",
+    "Use small Go fake programs for go, claude and copilot, put first on PATH, so the new tests are Windows-safe and isolated. Sound.",
+    "Use the existing golang.org/x/mod/semver dependency. Sound; avoid a duplicate comparison implementation.",
+    "Make `--check` with `--version` compare the running version with the explicit target. The comparison is useful, but the action wording must be corrected by the second finding."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 4 findings"
+}
+

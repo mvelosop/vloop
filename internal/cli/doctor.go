@@ -788,37 +788,52 @@ func runPluginList(tool, root string, out any) error {
 	return err
 }
 
-func doctorPlugin(b Build, root string) (string, string, string) {
-	var list []struct {
-		ID          string `json:"id"`
-		Version     string `json:"version"`
-		Scope       string `json:"scope"`
-		ProjectPath string `json:"projectPath"`
-		Enabled     bool   `json:"enabled"`
+type claudePluginEntry struct {
+	ID          string `json:"id"`
+	Version     string `json:"version"`
+	Scope       string `json:"scope"`
+	ProjectPath string `json:"projectPath"`
+	Enabled     bool   `json:"enabled"`
+}
+
+func claudePluginMatches(root string, p claudePluginEntry) bool {
+	if !strings.HasPrefix(p.ID, "vloop@") || p.Version == "" {
+		return false
 	}
-	if err := runPluginList("claude", root, &list); err != nil {
-		return "plugin", resWarning, "cannot read claude plugin list --json: " + err.Error()
+	if p.Scope == "" || p.Scope == "user" {
+		return true
 	}
 	keys := []string{root}
 	if real, err := filepath.EvalSymlinks(root); err == nil {
 		keys = append(keys, real)
 	}
+	for _, key := range keys {
+		if p.ProjectPath != "" && trustKeyMatch(hostOS, p.ProjectPath, key) {
+			return true
+		}
+	}
+	return false
+}
+
+type copilotPluginEntry struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Enabled bool   `json:"enabled"`
+}
+
+func copilotPluginMatches(p copilotPluginEntry) bool {
+	return p.Name == "vloop"
+}
+
+func doctorPlugin(b Build, root string) (string, string, string) {
+	var list []claudePluginEntry
+	if err := runPluginList("claude", root, &list); err != nil {
+		return "plugin", resWarning, "cannot read claude plugin list --json: " + err.Error()
+	}
 	optedOut := pluginOptedOut(root)
 	counted, found := false, ""
 	for _, p := range list {
-		if !strings.HasPrefix(p.ID, "vloop@") || p.Version == "" {
-			continue
-		}
-		mine := p.Scope == "" || p.Scope == "user"
-		if !mine {
-			for _, k := range keys {
-				if p.ProjectPath != "" && trustKeyMatch(hostOS, p.ProjectPath, k) {
-					mine = true
-					break
-				}
-			}
-		}
-		if !mine {
+		if !claudePluginMatches(root, p) {
 			continue
 		}
 		counted = true
@@ -834,7 +849,7 @@ func doctorPlugin(b Build, root string) (string, string, string) {
 	}
 	switch {
 	case found != "":
-		return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — vloop run is unaffected; claude plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind", found, b.Version)
+		return "plugin", resWarning, fmt.Sprintf("the vloop plugin is %s but this binary is %s — vloop run is unaffected; vloop self-update updates the binary and the plugin", found, b.Version)
 	case counted:
 		return "plugin", resWarning, `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, claude plugin enable vloop@vloop --scope project (or with --scope user, if you disabled it for every repository), or start claude --plugin-dir "$(vloop plugin path)"`
 	}
@@ -844,17 +859,13 @@ func doctorPlugin(b Build, root string) (string, string, string) {
 // doctorCopilotPlugin is the copilot plugin row: copilot plugin list --json,
 // run in the root, for the entries named vloop.
 func doctorCopilotPlugin(b Build, root string) (string, string, string) {
-	var list []struct {
-		Name    string `json:"name"`
-		Version string `json:"version"`
-		Enabled bool   `json:"enabled"`
-	}
+	var list []copilotPluginEntry
 	if err := runPluginList("copilot", root, &list); err != nil {
 		return "copilot plugin", resWarning, "cannot read copilot plugin list --json: " + err.Error()
 	}
 	counted, found := false, ""
 	for _, p := range list {
-		if p.Name != "vloop" {
+		if !copilotPluginMatches(p) {
 			continue
 		}
 		counted = true
@@ -870,7 +881,7 @@ func doctorCopilotPlugin(b Build, root string) (string, string, string) {
 	}
 	switch {
 	case found != "":
-		return "copilot plugin", resWarning, fmt.Sprintf("the vloop plugin for copilot is %s but this binary is %s — vloop run is unaffected; copilot plugin update vloop@vloop updates the plugin, or update the binary if it is the one behind", found, b.Version)
+		return "copilot plugin", resWarning, fmt.Sprintf("the vloop plugin for copilot is %s but this binary is %s — vloop run is unaffected; vloop self-update updates the binary and the plugin", found, b.Version)
 	case counted:
 		return "copilot plugin", resWarning, `installed but not enabled for this repository — vloop run is unaffected (its sessions load the plugin with --plugin-dir); for /vloop:operate here, set enabledPlugins["vloop@vloop"] to true in .claude/settings.json and trust this folder in copilot, or start copilot --plugin-dir "$(vloop plugin path)"`
 	}

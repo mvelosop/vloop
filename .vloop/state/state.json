@@ -1,13 +1,13 @@
 {
   "schema": "state/v2",
-  "run_id": "B20261126-1034-b43-i162-pwsh-gates-utf8",
-  "brief": "docs/briefs/B20261126-1034-b43-i162-pwsh-gates-utf8.loop-brief.md",
-  "base": "acfa8dc01f72688c17ea28dc6997768236398cd3",
-  "branch": "B20261126-1034-b43-i162-pwsh-gates-utf8",
+  "run_id": "B20261126-1036-b44-i98-self-update",
+  "brief": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md",
+  "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
+  "branch": "B20261126-1036-b44-i98-self-update",
   "status": "complete",
-  "iteration": 4,
-  "created": "2026-11-26T13:39:18Z",
-  "updated": "2026-11-26T14:11:30Z",
+  "iteration": 9,
+  "created": "2026-11-26T14:23:56Z",
+  "updated": "2026-11-26T15:58:05Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -20,64 +20,104 @@
   ],
   "gate_scratch": [],
   "gate_review": {
-    "rounds": 1,
+    "rounds": 2,
     "verdict": "PASS"
   },
   "tasks": [
     {
       "id": "T1",
-      "title": "Make PowerShell gate processes UTF-8",
-      "goal": "Set UTF-8 encodings inside every pwsh and powershell process that the shared gate runner starts. This gives gates and checks correct native-input and native-output decoding without changing their recorded commands or exit codes.",
-      "kind": "fix",
-      "fixtures": "9a22249d6f07d6e13d9c8ff265d2a91a93f1b9717f2365ac3a4805783f3674db",
+      "title": "Implement self-update target decisions and check mode",
+      "goal": "Introduce the self-update command so a released vloop can safely choose and report its target from any directory. This establishes the refusal, version-selection and machine-readable contract that installation and plugin updates build on.",
+      "kind": "feature",
+      "fixtures": "2cda958ac01522591754753edf558ea2ced29ea1019fa8cce9ac2b797d3d28ef",
       "references": [
         {
           "path": "docs/domain/domain-model.md",
-          "why": "P-5 requires the setup to remain inside the plan's PowerShell gate shell and to change no machine-wide state."
+          "why": "C-2 and C-3 govern the displayed install paths and the required self-update/v1 JSON document"
         },
         {
-          "path": "docs/domain/execution/task.md",
-          "why": "Defines GateCommand as the one gate runner and requires the gate to remain outside implementation-owned tests."
-        },
-        {
-          "path": "internal/state/gate.go",
-          "why": "GateArgs and GateCommand are the implementation surface used by gates, checks, task gate, and release commands."
-        }
-      ],
-      "depends_on": [],
-      "acceptance": [
-        "GateCommand configures [Console]::OutputEncoding, [Console]::InputEncoding, and $OutputEncoding as BOM-free UTF-8 before the recorded command runs for both pwsh and powershell, while attempting setup failures silently and continuing to the recorded command.",
-        "The shared runner preserves the recorded command's stdout, stderr, and exit code; an exit 3 remains 3 and the setup itself prints nothing.",
-        "Native git output containing café reaches a PowerShell Select-String assertion intact, and café sent through a PowerShell pipeline to git hash-object has the expected UTF-8 bytes and platform line ending.",
-        "The invocation arguments for sh, bash, and cmd are unchanged, and shown, recorded, or logged gate command text contains only the recorded command, never the encoding setup.",
-        "Committed tests run by the go check cover native output, native stdin, emitted bytes, all three BOM-free encodings, setup silence, exit-code preservation, and the unchanged non-PowerShell argument lists; the planner-owned oracle is not used as that test suite."
-      ],
-      "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
-      "status": "done",
-      "attempts": 0,
-      "notes": ""
-    },
-    {
-      "id": "T2",
-      "title": "Document UTF-8 behavior for PowerShell users",
-      "goal": "Explain where vloop supplies UTF-8 and where an interactive PowerShell terminal still needs profile setup. The distinction prevents the new runner behavior from being mistaken for a machine-wide encoding change.",
-      "kind": "docs",
-      "fixtures": "951ff2da30047dbf5ac0854d057c484fa0804ce71b06c5c1bfa30aa8acb80403",
-      "references": [
-        {
-          "path": "docs/guide/configuration.md",
-          "why": "The Mixed teams section is the required location for the vloop-versus-terminal UTF-8 explanation and profile line."
+          "path": "docs/domain/platform/platform-context.md",
+          "why": "The command must retain the global CLI exit-code, JSON and path conventions while adding the outside-repository path exception"
         },
         {
           "path": "docs/guide/concepts.md",
-          "why": "Gates and the gate shell constrains how the documentation describes the shell invocation."
+          "why": "The existing go install destination rules define GOBIN and GOPATH fallback behaviour"
+        },
+        {
+          "path": "internal/cli/buildinfo.go",
+          "why": "The current module version distinguishes a released build from a checkout build"
+        },
+        {
+          "path": "tools/release/publish.go",
+          "why": "waitProxy and installCheck define the repository's existing go list -m and go install invocation patterns"
         }
       ],
       "depends_on": [],
       "acceptance": [
-        "The Mixed teams section says vloop runs pwsh gates and checks with UTF-8 input and output so native tool output remains correct on Windows.",
-        "The paragraph distinguishes vloop's behavior from a person's own PowerShell terminal and includes the exact profile line [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new().",
-        "The paragraph explains that the profile line makes vloop run output remain correct through Tee-Object and similar terminal pipes, without claiming that vloop changes the profile or machine code page."
+        "vloop self-update is a top-level command runnable without a repository and accepts only the exact --check and --version <v> flag contract in the brief.",
+        "No go on PATH and a checkout build produce the two exact S1 refusal lines and exit 1, before any target lookup or install-location check.",
+        "A valid --version target is used exactly without a latest-release lookup; a value that does not start with v and parse as semver produces the exact usage message and exits 2.",
+        "Without --version, go list -m -json github.com/mvelosop/vloop@latest runs outside a module in a temporary directory, a failure uses its first error line, and only a semantically newer target is selected.",
+        "--check prints the exact current/latest or current/target two-line report, exits 0, never installs, never asks go for its install directory and leaves plugins empty.",
+        "With no install needed, the exact up-to-date line is printed; pre-releases newer than latest are not downgraded.",
+        "The install-location calculation queries GOBIN then GOPATH/bin only when installation is about to happen, uses exact resolved-path comparison (case-insensitive on Windows), and emits the specified refusal when it differs.",
+        "Global --json emits only one self-update/v1 document for successful runs, with no human lines; refusals remain one vloop: stderr line, and the embedded schemas/self-update.v1.json validates every documented field.",
+        "Committed Go tests use temporary Go fake programs for go, cover all target/refusal/check/JSON branches above, never call the real go install or the network, and are run by the repository's go check.",
+        "docs/guide/commands.md is regenerated from the command tree and documents the new command and flags rather than being hand-maintained.",
+        "No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted."
+      ],
+      "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
+      "status": "done",
+      "attempts": 2,
+      "notes": "",
+      "gate_history": [
+        {
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
+          "replaced_at": "2026-11-26T14:55:11Z",
+          "reason": "Gate defect the work session disputed correctly: harness.ps1 assigned $home, which in PowerShell is the read-only automatic $HOME (names ignore case), so the gate failed before any assertion; renamed to $homeDir",
+          "by": "operator",
+          "fixtures": "cdf27de34245623ccfab483abefa494eb6b199177b037d794964f1a6624ed2f6"
+        },
+        {
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
+          "replaced_at": "2026-11-26T15:37:33Z",
+          "reason": "The shared fake agent now answers --version, which doctor's copilot preflight calls (needed by T4's gate); T1-T3's gates still pass",
+          "by": "operator",
+          "fixtures": "b92b8762a8ce1e73be47dfa28dd9ebfd370ef063d5c7fbd9bd638ab5dab06f0f"
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "title": "Install self-update targets safely",
+      "goal": "Replace the released binary at the Go install location while preserving the old executable on every failure. Windows move-aside and restoration make the update safe even though the running executable cannot be overwritten in place.",
+      "kind": "feature",
+      "fixtures": "50ec0b8b164cb4960e845a787173ee74c58813fc33d69395ae7cbfcfde854cd5",
+      "references": [
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "C-2 governs the running executable and install-directory paths in install failures"
+        },
+        {
+          "path": "internal/cli/buildinfo.go",
+          "why": "The running module version supplies the from-version in install output and is part of the install decision"
+        },
+        {
+          "path": "tools/release/publish.go",
+          "why": "The repository's installCheck call is the existing source for the go install command and failure handling"
+        }
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "acceptance": [
+        "A necessary install prints the exact installing line, runs go install github.com/mvelosop/vloop/cmd/vloop@<target>, then prints the exact installed line on success.",
+        "A go install failure prints its last error line, exits 1, leaves no partially replaced running binary and does not continue to plugins.",
+        "On Windows, a stale vloop.exe.old is removed before moving the running vloop.exe aside; remove and move failures use the exact brief messages and install nothing.",
+        "On Windows, a failed install moves vloop.exe.old back; if restoration also fails, the exact combined failure line tells the operator to rename it by hand.",
+        "A successful --version request installs exactly that version even when it is older or a pre-release, and installed/newer/dir fields in self-update/v1 reflect what happened.",
+        "Committed Go tests build a temporary Go fake for go and cover success, failure, explicit older installation and the Windows old-file/restore paths without invoking the real go install or network.",
+        "The implementation does not install, downgrade or re-exec a binary outside the exact T1 decision and install-location checks."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1",
       "status": "done",
@@ -86,42 +126,128 @@
     },
     {
       "id": "T3",
-      "title": "Verify PowerShell UTF-8 through the built CLI",
-      "goal": "Prove the completed runner and documentation together through the built vloop CLI in an isolated repository. This catches integration breaks that either task's focused oracle could miss.",
-      "kind": "test",
-      "fixtures": "48d5efa13b515e88ee7f9c98aa64f4c816ea9aeb0698146da86cba9ca57ae716",
+      "title": "Update installed agent plugins",
+      "goal": "Complete self-update by updating each locally discoverable vloop plugin after the binary step. Plugin discovery and failures remain per-agent and non-fatal, with the same scope rules doctor already uses.",
+      "kind": "feature",
+      "fixtures": "b29d05d0c40b4632c101534131a9473fe4aecdc1c2e198c827606651e0533703",
       "references": [
         {
-          "path": "docs/domain/execution/task.md",
-          "why": "The close gate must exercise the same shared gate runner used by task gate and must remain an independent planner-owned oracle."
+          "path": "docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md",
+          "why": "It defines the exact claude and copilot plugin-list shapes, names and repository-scope matching self-update must reuse"
         },
         {
-          "path": "internal/state/gate.go",
-          "why": "The integration assertions target GateCommand's public gate-running behavior without changing recorded commands."
+          "path": "internal/cli/doctor.go",
+          "why": "runPluginList and doctorPlugin are the existing plugin discovery rules that self-update must not duplicate inconsistently"
+        },
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "C-3 governs self-update/v1 plugin entries, including per-installation scope"
         }
       ],
       "depends_on": [
-        "T1",
         "T2"
       ],
       "acceptance": [
-        "A built CLI in a temporary git repository runs the worked example's native git read and café output gates successfully and reports the exit-3 gate as a failure while vloop task gate itself exits 1.",
-        "vloop task show prints each recorded verify command unchanged, including the café assertion, and never prints the implementation's encoding setup.",
-        "The close gate runs the T1 and T2 oracles together, uses only temporary repositories and build outputs, and leaves the repository tree unchanged."
+        "After an installed or up-to-date binary, self-update checks claude then copilot only when each executable is on PATH and runs each plugin-list command from the current directory.",
+        "Claude counts the exact doctor rule: id starts with vloop@, version present, scope user or empty, or another scope whose project path matches the current directory; Copilot counts name vloop.",
+        "Claude refreshes the vloop marketplace first, then runs one scoped update per matching entry; Copilot runs one update, with all command, success and failure text exactly as the brief specifies.",
+        "Agent absence prints nothing; not installed, malformed or failed list, marketplace failure and update failure each produce their specified line, with plugin failures never changing exit 0.",
+        "With --version, the human output carries the exact latest-may-differ warning before plugin work; self-update/v1 carries no warning and instead records each installed/not-installed/failed plugin structurally.",
+        "A plugin updated or a binary installed produces the exact next line, while --check never inspects or updates plugins and leaves JSON plugins empty.",
+        "Committed Go tests build temporary fake claude and copilot programs, cover scope filtering, ordering, malformed/failing tools, JSON and non-fatal failures, and never run real agent CLIs or the network.",
+        "The implementation reuses doctor's plugin-list/discovery behaviour rather than adding divergent matching rules, and no command other than self-update calls plugin update or marketplace update."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
+    },
+    {
+      "id": "T4",
+      "title": "Point existing commands and guides to self-update",
+      "goal": "Make machine-wide self-update discoverable from the repository upgrade workflow and doctor without changing those commands' offline behaviour. This also records the intentional path exception and the release handoff.",
+      "kind": "docs",
+      "fixtures": "825b05669146c15299337f2ace0512daea642287ace729ae9005e7831aa8d9f7",
+      "references": [
+        {
+          "path": "docs/domain/domain-model.md",
+          "why": "The C-2 amendment must preserve relative in-repository paths while specifying slash-separated ~/ paths outside a repository"
+        },
+        {
+          "path": "docs/domain/platform/platform-context.md",
+          "why": "The same outside-repository path and platform-context exception must be documented alongside the global CLI conventions"
+        },
+        {
+          "path": "docs/guide/concepts.md",
+          "why": "The install and upgrade guide is the named user-facing location extended with self-update and its refusals"
+        },
+        {
+          "path": "internal/cli/doctor.go",
+          "why": "Only the two existing plugin-version warning suffixes change; doctor's other messages and offline calls stay unchanged"
+        },
+        {
+          "path": "tools/release/publish.go",
+          "why": "The release tool's existing final plugin/install guidance becomes the specified self-update and per-repository handoff"
+        }
+      ],
+      "depends_on": [
+        "T3"
+      ],
+      "acceptance": [
+        "vloop upgrade --help includes exactly: To update the vloop binary and its plugins, run vloop self-update first.",
+        "Doctor's Claude and Copilot plugin-version warnings alone end with exactly — vloop run is unaffected; vloop self-update updates the binary and the plugin; doctor performs no new network or update call.",
+        "docs/guide/concepts.md explains self-update beside go install and vloop upgrade, including the checkout, missing-go and install-location refusals in a sentence, and docs/guide/commands.md is regenerated.",
+        "The C-2 line in docs/domain/domain-model.md and the platform context say that self-update outside any repository prints external paths with / and ~ for the home directory.",
+        "go run ./tools/release publish reports the final handoff as one line: then: vloop self-update, and vloop upgrade in each repository.",
+        "No text or output elsewhere changes except the explicitly listed help, two doctor warnings, guide/domain additions, generated command reference and release handoff.",
+        "Any committed tests for the new help and doctor wording use the CLI and fake agent programs rather than real agents or network access."
+      ],
+      "verify": "pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1",
       "status": "done",
       "attempts": 0,
       "notes": "",
       "gate_history": [
         {
-          "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
-          "replaced_at": "2026-11-26T14:00:32Z",
-          "reason": "Gate defect the work session disputed correctly: the nested vloop runs inherited the driver's VLOOP_PLAN_SHA256 and refused the scratch repository's plan; the gate now clears it before them",
+          "verify": "pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1",
+          "replaced_at": "2026-11-26T15:37:33Z",
+          "reason": "Gate defect the work session disputed correctly: doctor ran under this repository's local config (every session on copilot), so it built no claude plugin row, and the fake copilot rejected --version; the gate now names one claude and one copilot session through the environment, which beats the local file (C-1)",
           "by": "operator",
-          "fixtures": "292df7533b84168b5350aad71fc418e665d793b0aa469b547df91e8c2544155d"
+          "fixtures": "8c7508071a2255d310c5032bc9fbb0715f3443353269a9b365bc332b1599e3be"
         }
       ]
+    },
+    {
+      "id": "T5",
+      "title": "Verify the complete self-update workflow",
+      "goal": "Prove the binary and plugin paths work together through the worked example after every earlier task is present. This final task closes gaps that isolated gates or task-local tests could miss.",
+      "kind": "test",
+      "fixtures": "a8a8dd97ecd5717ff7ed445ad0a6a548cb77bcd276f75e6df9ef70dbe1221f10",
+      "references": [
+        {
+          "path": "docs/domain/platform/platform-context.md",
+          "why": "The integrated human and JSON outputs must retain one-document JSON and the established global exit conventions"
+        },
+        {
+          "path": "docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md",
+          "why": "The integrated plugin flow must use the established per-agent list shapes and scope behaviour"
+        }
+      ],
+      "depends_on": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "acceptance": [
+        "A committed cross-platform Go integration test runs the complete worked example with temporary fake go and claude programs and verifies each output line and exit code in order.",
+        "The integrated run verifies successful installation, plugin update and the exact next line, and it never calls the real go install, agent CLIs or network.",
+        "All earlier contract gates pass together on the final tree, including embedded self-update/v1 validation, Windows install restoration and pointer text.",
+        "The integration test does not replace or weaken the task-specific committed tests; every new behaviour remains covered by the repository's go check."
+      ],
+      "verify": "pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1",
+      "status": "done",
+      "attempts": 0,
+      "notes": ""
     }
   ]
 }

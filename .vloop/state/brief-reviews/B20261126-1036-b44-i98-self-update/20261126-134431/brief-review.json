@@ -1,0 +1,18 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "PASS",
+  "findings": [],
+  "decisions": [
+    "Keep `vloop self-update` for the binary and installed agent plugins, while `vloop upgrade` remains repository-local; this preserves the operator's naming decision.",
+    "Use the Go module toolchain (`go list -m -json ...@latest` and `go install ...@<version>`) as the release channel.",
+    "Install automatically only strictly newer releases; allow `--version` to request an exact older version or prerelease.",
+    "Refuse unsafe or ambiguous installs, including a checkout build, missing Go, or a binary outside the directory where `go install` writes.",
+    "Keep release discovery out of doctor and repository upgrade; update plugins only from `self-update`, with plugin failures reported but non-fatal.",
+    "Amend C-2 for this repository-independent command so install and executable paths outside a repository print with `/` and the home directory as `~`.",
+    "Fake `go`, `claude`, and `copilot` in cross-platform Go test programs; compare versions with the existing `golang.org/x/mod/semver` dependency; and define `--check --version` as a comparison."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: PASS, 0 findings"
+}
+

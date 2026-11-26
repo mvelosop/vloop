@@ -334,6 +334,11 @@ rewrites the stamp. It refuses a repository set up by a newer vloop, and a
 breaking jump (a new major version, or a new minor while 0.x) or a pre-release
 needs `--yes`.
 
+Before upgrading repositories, run `vloop self-update` to update the released
+vloop binary and every installed vloop plugin. It refuses a checkout build,
+when `go` is not on `PATH`, or when the running binary is not at the install
+location where `go install` writes.
+
 `go install` writes the binary to `$GOBIN`, or `$(go env GOPATH)/bin`
 (`~/go/bin` by default), and never touches `PATH`; if `vloop` is not found, add
 that directory:

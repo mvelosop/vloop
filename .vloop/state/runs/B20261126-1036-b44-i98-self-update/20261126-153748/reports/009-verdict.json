@@ -1,0 +1,29 @@
+{
+  "schema": "verdict/v1",
+  "task": "T5",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "A committed cross-platform Go integration test runs the complete worked example with temporary fake go and claude programs and verifies each output line and exit code in order.",
+      "met": true,
+      "evidence": "cmd/vloop/b44_selfupdate_e2e_test.go:111-169 builds temporary fake go and claude executables and invokes --check followed by self-update, with exact ordered stdout, stderr, and exit-code assertions."
+    },
+    {
+      "criterion": "The integrated run verifies successful installation, plugin update and the exact next line, and it never calls the real go install, agent CLIs or network.",
+      "met": true,
+      "evidence": "cmd/vloop/b44_selfupdate_e2e_test.go:145-165 expects installation, Claude update, and the exact next line; PATH contains only the temporary fake directory, while lines 1-109 provide fake go and claude implementations that log every command."
+    },
+    {
+      "criterion": "All earlier contract gates pass together on the final tree, including embedded self-update/v1 validation, Windows install restoration and pointer text.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T5/gate.ps1:3-7 runs T1-T4 together; those gates contain embedded self-update/v1 validation, executable restoration checks, and pointer-text checks. .vloop/tmp/checks.json records the final go check with exit 0."
+    },
+    {
+      "criterion": "The integration test does not replace or weaken the task-specific committed tests; every new behaviour remains covered by the repository's go check.",
+      "met": true,
+      "evidence": "git diff HEAD adds only cmd/vloop/b44_selfupdate_e2e_test.go outside .vloop records, without changing prior tests; the recorded go check in .vloop/tmp/checks.json exits 0 and runs the new cmd/vloop test."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

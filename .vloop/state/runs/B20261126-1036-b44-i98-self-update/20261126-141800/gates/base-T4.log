@@ -1,0 +1,6 @@
+[31;1mException: [0m~\source\personal\vloop\.vloop\state\gates\T1\harness.ps1:8
+[36;1mLine |[0m
+[36;1m[36;1m   8 | [0m     if (-not $Condition) { [36;1mthrow $Message[0m }
+[36;1m     | [31;1m                            ~~~~~~~~~~~~~~[0m
+[36;1m[31;1m[31;1m[36;1m     | [31;1mupgrade help points to self-update[0m
+[36;1m[31;1m[31;1m[36;1m[31;1m[0m

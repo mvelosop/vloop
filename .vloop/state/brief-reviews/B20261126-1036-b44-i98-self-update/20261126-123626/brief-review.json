@@ -1,0 +1,42 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / S2 — the plugins",
+      "summary": "The stated Claude plugin predicate is not doctor's rule and can count a vloop installation from another repository.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:156-164 says any Claude entry whose id starts with `vloop@` is found, while claiming to reuse doctor and saying another repository's project plugin is not updated. B36 defines the reused rule at docs/briefs/B20261103-0528-b36-i96-i97-plugin-per-repo-and-agent.loop-brief.md:295-304: user/absent scope counts, but project/local scope counts only when `projectPath` matches this repository root. internal/cli/doctor.go:791-818 implements that filter; docs/design-notes/copilot-cli-experiments.md:817-819 records that the same id can appear once per project.",
+      "fix": "State the full finding predicate, including the project/root and trustKeyMatch comparison, and state what `self-update` uses as the root when it runs in a subdirectory or outside a repository. Add a worked example with a foreign `projectPath` that prints `plugin claude: not installed` and does not call either update command."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / S2 — the plugins and Worked example",
+      "summary": "A failed Claude marketplace refresh has no literal message, despite the brief declaring every message exact.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:103 says every message is exact, but lines 165-167 only say a marketplace-update failure “is the failure line, with that command”. Lines 169-172 literally specify update and list failures, and the worked example at lines 271-272 covers only a plugin update failure. The `--json` contract does not define the `message` for this branch either.",
+      "fix": "Pin the complete stdout line, retry command, exit behavior and JSON `message` for a `claude plugin marketplace update vloop` failure, and add that branch to the worked example and S2 gate."
+    },
+    {
+      "kind": "fact",
+      "section": "Behaviour contract / --json",
+      "summary": "The stated schema location conflicts with the repository's embedded-schema layout.",
+      "evidence": "docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md:191 places self-update.v1.json “next to internal/schema/schema.go”; docs/domain/platform/platform-context.md:39 says schemas live in `schemas/`, and embed.go:15 embeds `schemas/*.json`.",
+      "fix": "Name the file as `schemas/self-update.v1.json` and describe `internal/schema/schema.go` as its consumer, not as its directory."
+    }
+  ],
+  "decisions": [
+    "Use `vloop self-update` for machine-wide binary/plugin updates and keep `vloop upgrade` for repositories; this cleanly preserves the existing command meaning.",
+    "Use the Go module toolchain (`go list -m -json ...@latest` and `go install ...@<version>`) rather than a second release channel; appropriate for the documented install method.",
+    "Install automatically only a strictly newer stable target; allow an exact older or prerelease target with `--version`.",
+    "Refuse when Go is absent, the build has no module version, or the running executable is outside Go's install directory; safer than a successful install that is not on PATH.",
+    "Keep doctor and `vloop upgrade` network-free and point them to `self-update`.",
+    "Treat plugin failures as non-fatal after the binary step and report a hand-run retry; reasonable for an already-replaced binary.",
+    "Add the C-2 exception for paths outside a repository, rendering them with `/` and `~`; the exception is necessary for this repository-independent command and is explicitly amended in the same run.",
+    "Use temporary fake Go/Claude/Copilot executables in tests, and use `golang.org/x/mod/semver`; both preserve Windows and offline testability.",
+    "Make `--check --version` compare against the explicit target; consistent with the other version semantics."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 3 findings"
+}
+

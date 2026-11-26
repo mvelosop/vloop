@@ -1,0 +1,34 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "rule",
+      "section": "Behaviour contract — paths",
+      "summary": "The self-update path display contradicts the binding C-2 path convention.",
+      "evidence": "The brief is runnable anywhere at lines 102-103 and says machine paths are printed with the home directory as '~' (line 104), while the cited docs/domain/platform/platform-context.md lines 10-13 says every path vloop prints is relative to the repo/start root, with '/' on every OS. The brief explicitly binds that document at line 93 but does not amend C-2 for this command.",
+      "fix": "Ask the operator to either amend C-2 for machine-wide executable/install paths and cite the exception here, or specify the exact root-relative rendering of every path in self-update output and its JSON."
+    },
+    {
+      "kind": "consistency",
+      "section": "S1 — the binary, Windows move-aside",
+      "summary": "The Windows rollback contract does not define failures of the move-aside or restore operations and therefore cannot promise that the running binary is left in place.",
+      "evidence": "Lines 137-142 promise that a failed go install leaves the binary in place and says the running vloop.exe is moved to vloop.exe.old and moved back on failure. The only pinned filesystem error is failure to remove an earlier .old file at lines 141-145; rename/move-back failure and a partially written vloop.exe at restore time have no specified ordering, literal message, exit result, or gate case. The worked example at lines 262-264 tests only the successful rollback after a failure that prints 'no matching versions'.",
+      "fix": "Specify the exact safe sequence for move-aside and rollback (including an existing/partial target), literal refusal messages for rename and restore failures, and fake-go cases that exercise each failure while proving the executable can still be run."
+    }
+  ],
+  "decisions": [
+    "The operator chose `vloop self-update` for machine-wide binary/plugin updates while `vloop upgrade` retains repository-only meaning; this is coherent and should remain explicit.",
+    "The Go toolchain is the release channel (`go list -m -json ...@latest` and `go install ...@<version>`); the brief needs no second channel.",
+    "Automatic selection installs only a strictly newer semver, while explicit `--version` permits an older version or pre-release; I agree.",
+    "Unsafe installs refuse rather than write somewhere the running PATH will not use; I agree, subject to the C-2 exception above.",
+    "Doctor and `vloop upgrade` stay offline; only self-update performs network-capable work.",
+    "A plugin update failure is reported but does not fail the command after the binary step; this is an intentional operator choice.",
+    "Tests use temporary Go fakes for go/claude/copilot, use x/mod/semver, and define `--check --version` by comparison; these choices fit the repository toolchain.",
+    "The operator must now resolve how self-update renders machine paths under C-2."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 2 findings"
+}
+

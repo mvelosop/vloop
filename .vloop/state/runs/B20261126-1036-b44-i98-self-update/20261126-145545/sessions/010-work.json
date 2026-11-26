@@ -1,0 +1,45 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.14734540000000002,
+  "credits": 14.73454,
+  "duration_ms": 245324,
+  "effort": null,
+  "ended": "2026-11-26T15:35:32Z",
+  "is_error": false,
+  "iteration": 7,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.14734540000000002,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: script blocks cannot be judged — use Where-Object \u003cProperty\u003e -like \u003cvalue\u003e, ForEach-Object -MemberName \u003cProperty\u003e or Select-Object -ExpandProperty \u003cProperty\u003e",
+      "tool_name": "powershell",
+      "tool_use_id": "call_0rbZkfC7wvHv01okuvopS2mw"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty",
+      "tool_name": "powershell",
+      "tool_use_id": "call_VO4X1VVfSEUNjjzIrjFlohAM"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: pwsh: runs a script, stdin or an encoded command, not a literal -Command string",
+      "tool_name": "powershell",
+      "tool_use_id": "call_d4oN9exGs8IMSstTTBTR01fI"
+    }
+  ],
+  "phase": "work",
+  "run_id": "B20261126-1036-b44-i98-self-update",
+  "schema": "session/v4",
+  "started": "2026-11-26T15:31:25Z",
+  "task": "T4",
+  "turns": 30,
+  "wall_ms": 247375
+}

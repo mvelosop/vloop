@@ -1,0 +1,55 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
+  "verdict": "ASK",
+  "findings": [
+    {
+      "kind": "decision",
+      "section": "Why this shape / S1 / S2 / S3",
+      "summary": "`--version` can deliberately install an older binary, but S2's unversioned plugin update commands can leave or install newer plugins, contradicting the promise that self-update updates the binary and plugin together.",
+      "evidence": "The brief explicitly permits `--version <v>` to install an older version at lines 69-74, then requires every found plugin to run its unversioned latest-marketplace update at lines 155-178; S3 line 213 says self-update updates \"the binary and the plugin\". For example, `--version v0.14.0` from v0.15.0 can roll the binary back while the plugin remains or updates to v0.15.0.",
+      "fix": "The operator must choose and pin the semantics: skip plugin updates with `--version`, update plugins independently and disclose a possible version mismatch, or support a version-pinning mechanism for each agent. Then align S1/S2, the S3 doctor wording, the JSON contract, the worked downgrade example, and acceptance."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / S1 / --check / --json",
+      "summary": "`--check` exits before the contract has resolved `dir`, although the JSON document always requires a `dir` and the safety contract says a binary outside the Go install directory is refused.",
+      "evidence": "S1 step 4 at lines 121-129 prints and exits for `--check`; S1 step 6 at lines 132-137 resolves the install directory and checks the executable path. The `--json` contract at lines 194-205 still requires `dir` in the one document.",
+      "fix": "Define the `--check` order explicitly. If it performs the normal safety checks, resolve and validate the install directory before the step-4 exit and pin the refusal outputs; otherwise define a literal `dir` value for an unqueried or unavailable install location and amend the safety claim."
+    },
+    {
+      "kind": "fact",
+      "section": "S2 / The update commands / Binding references",
+      "summary": "The Claude update command's scoped syntax relies on external CLI help that is neither captured in the repository nor cited by a repository-relative binding reference.",
+      "evidence": "Lines 166-168 prescribe `claude plugin update vloop@vloop --scope <scope>` and attribute it to `claude plugin update --help` on 2026-11-26. The binding references contain no in-repository record of that help output, while `.vloop/repo-guidelines.md` requires external formats and flags to be taken from the tool or its docs.",
+      "fix": "Record the relevant help output and plugin-list fixture in `docs/design-notes/copilot-cli-experiments.md` or another cited repository document, then bind this brief to that entry. Do the same for Copilot's update syntax if it is not already covered by the cited predecessor."
+    },
+    {
+      "kind": "consistency",
+      "section": "Behaviour contract / --json",
+      "summary": "The `message` value for failed plugin list, marketplace, and update cases is not literal, so a JSON gate cannot know whether it should compare the last tool-output line or the full prefixed human-readable warning.",
+      "evidence": "Lines 172-184 define several different exact human lines for failures, while lines 201-205 say only that `message` carries \"the failure's line\". The worked example includes the human line at lines 281-282 but no `--json` failure document.",
+      "fix": "Pin one JSON object for each distinct failed case, including the exact `message` string, or state and demonstrate that `message` is exactly the corresponding human line without its severity prefix; add those objects to the worked example."
+    },
+    {
+      "kind": "rule",
+      "section": "Handover / scope",
+      "summary": "The B44 roadmap row required at brief handover is absent.",
+      "evidence": "The brief names itself B44 at line 10, but `docs/design-notes/vloop-roadmap-b18-b21.md` ends its rows at B41 at line 48. `.claude/skills/vloop-architect/SKILL.md` lines 17-19 requires the roadmap row to point at the brief at handover.",
+      "fix": "Add B44 with its owned slice and dependency to the applicable roadmap, or update the roadmap heading/range and ownership row in the same ready commit."
+    }
+  ],
+  "decisions": [
+    "The command is `vloop self-update`; `vloop upgrade` continues to mean repository upgrade. This separation is sound.",
+    "Go's module tool is the release channel: `go list -m -json ...@latest` outside a module, then `go install .../cmd/vloop@<version>`. This avoids a second release channel.",
+    "Without `--version`, only strictly newer releases are installed; `--version` explicitly allows an older or pre-release target. The plugin consequence of this override is not settled.",
+    "The command refuses when Go is absent, the module version is devel, or the executable is not in Go's install directory. Sound as a safety boundary; `--check` ordering still needs definition.",
+    "Doctor and `vloop upgrade` remain offline. Sound.",
+    "A plugin update failure is reported but non-fatal after the binary step. Sound, provided the final status is explicit in JSON and prose.",
+    "Add the C-2 path exception for machine-wide binaries and install directories, rendering them with `/` and `~`. Sound, but the implementation must also normalize tool-derived path text where it is printed.",
+    "Tests use temporary Go-program fakes for Go and both agents, use `x/mod/semver`, and `--check` with `--version` compares the exact target. These are sound test mechanics."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: ASK, 5 findings"
+}
+

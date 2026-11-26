@@ -1,0 +1,47 @@
+{
+  "schema": "gate-verdict/v2",
+  "verdict": "FAIL",
+  "tasks": [
+    {
+      "task": "T1",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T2",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T3",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "the final JSON assertion requires two plugin entries after the fixture is reset to one Claude user installation and Copilot has been removed, so the specified implementation cannot pass",
+          "kind": "unpassable"
+        },
+        {
+          "summary": "the gate removes copilot.exe even on macOS, where its own harness installs the fake agent as copilot, causing a missing-file failure after the behaviour is implemented rather than a product assertion failure",
+          "kind": "wrong-reason"
+        }
+      ]
+    },
+    {
+      "task": "T4",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "task": "T5",
+      "verdict": "FAIL",
+      "findings": [
+        {
+          "summary": "the T5 gate runs T3's gate first, so the one-entry fixture assertion expecting two entries makes a correct final implementation fail before T5's own worked example runs",
+          "kind": "unpassable"
+        }
+      ]
+    }
+  ],
+  "notes": "All five gates were rerun with vloop task gate; on the base each failed at the expected missing behaviour assertion. Criterion judges by acceptance order: T1 1 gate; 2 gate; 3 gate plus review for absence of lookup; 4 gate; 5 gate; 6 gate plus review; 7 gate; 8 gate plus review; 9 go check and review; 10 T4 gate and review; 11 review and go check. T2 1 gate; 2 gate; 3 gate plus review for both Windows failures; 4 review of committed failure-path tests; 5 gate; 6 go check and review; 7 review. T3 1 gate and review; 2 gate; 3 gate and review; 4 gate and review; 5 gate; 6 gate; 7 go check and review; 8 review. T4 1 gate; 2 gate and review; 3 gate; 4 gate; 5 gate; 6 review; 7 go check and review. T5 1 go check and review; 2 go check and review; 3 T5 gate; 4 go check and review. The T3 count was checked against the literal fixture and is 1, while the assertion expects 2. The plan declares macOS and Windows; the T3 copilot.exe removal is host-specific and is therefore unpassable there."
+}
+

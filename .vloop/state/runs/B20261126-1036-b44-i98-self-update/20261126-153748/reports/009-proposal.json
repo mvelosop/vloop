@@ -1,0 +1,11 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Added a cross-platform binary-level integration test for the complete self-update worked example, covering check output, installation, Claude plugin update, and the final next line with temporary fake programs.",
+  "files": [
+    "cmd/vloop/b44_selfupdate_e2e_test.go"
+  ],
+  "verified": "vloop task gate T5 exited 0: gate T5: pass (14.321s).",
+  "notes": "The test uses a Go overlay to stamp the binary as a v0.14.0 installed release, builds temporary fake go and claude executables, and asserts exact exit codes, output lines, and command ordering; neither real go install nor real agent CLIs are reached."
+}

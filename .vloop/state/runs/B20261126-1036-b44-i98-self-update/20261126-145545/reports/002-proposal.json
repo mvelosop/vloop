@@ -1,0 +1,17 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Implemented self-update target selection, check mode, checkout and install-location refusals, exact JSON output, the embedded schema, generated command reference, and isolated Go tests.",
+  "files": [
+    "docs/guide/commands.md",
+    "internal/cli/root.go",
+    "internal/cli/schema_test.go",
+    "internal/cli/selfupdate.go",
+    "internal/cli/selfupdate_test.go",
+    "internal/schema/schema_test.go",
+    "schemas/self-update.v1.json"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed \"gate T1: pass (3.914s)\".",
+  "notes": "Latest-release lookup runs in a temporary non-module directory; install-directory queries occur only when installation is about to happen, and missing expected executables are resolved through their existing parent directory for an exact path comparison."
+}

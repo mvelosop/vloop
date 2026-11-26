@@ -1,0 +1,12 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Self-update now installs the selected target, reports exact human or JSON results, and preserves the running executable through Windows move-aside and restoration failures.",
+  "files": [
+    "internal/cli/selfupdate.go",
+    "internal/cli/selfupdate_test.go"
+  ],
+  "verified": "vloop task gate T2 exited 0: gate T2: pass (5.222s).",
+  "notes": "Windows removes a stale .old before moving the running executable, removes any partial install before restoring on failure, and reports a combined manual-rename error when restoration fails. Tests use the existing temporary Go fake and injectable file operations; no real go install or network is used."
+}

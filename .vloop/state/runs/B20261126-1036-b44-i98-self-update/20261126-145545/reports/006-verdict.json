@@ -1,0 +1,49 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "After an installed or up-to-date binary, self-update checks claude then copilot only when each executable is on PATH and runs each plugin-list command from the current directory.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:187-207 uses LookPath in claude-then-copilot order; doctor.go:785-789 runs each list command with root as Dir; selfupdate_test.go:500-507 asserts order and working directory."
+    },
+    {
+      "criterion": "Claude counts the exact doctor rule: id starts with vloop@, version present, scope user or empty, or another scope whose project path matches the current directory; Copilot counts name vloop.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go:800-843 implements the shared claudePluginMatches and copilotPluginMatches rules, and selfupdate.go:212-291 uses them for both agents."
+    },
+    {
+      "criterion": "Claude refreshes the vloop marketplace first, then runs one scoped update per matching entry; Copilot runs one update, with all command, success and failure text exactly as the brief specifies.",
+      "met": true,
+      "evidence": "selfupdate.go:231-312 emits the specified marketplace, per-entry scoped Claude update, Copilot update, success and failure lines; selfupdate_test.go:500-507 verifies command ordering and scope arguments."
+    },
+    {
+      "criterion": "Agent absence prints nothing; not installed, malformed or failed list, marketplace failure and update failure each produce their specified line, with plugin failures never changing exit 0.",
+      "met": true,
+      "evidence": "selfupdate.go:187-207 skips absent tools and selfupdate.go:212-312 reports each failure without returning a plugin command error; selfupdate_test.go:511-577 asserts non-fatal update, malformed list, marketplace failure and not-installed cases."
+    },
+    {
+      "criterion": "With --version, the human output carries the exact latest-may-differ warning before plugin work; self-update/v1 carries no warning and instead records each installed/not-installed/failed plugin structurally.",
+      "met": true,
+      "evidence": "selfupdate.go:159-176 prints the exact warning only for human --version output, then attaches plugin results to selfUpdateDocument; selfupdate_test.go:511-543 validates structured failed results and suppresses human plugin lines in JSON."
+    },
+    {
+      "criterion": "A plugin updated or a binary installed produces the exact next line, while --check never inspects or updates plugins and leaves JSON plugins empty.",
+      "met": true,
+      "evidence": "selfupdate.go:74-110 returns from --check with plugins initialized empty, and selfupdate.go:177-182 prints the exact next line when installation or a plugin update occurred; selfupdate_test.go:575-583 proves --check does not touch the agent log."
+    },
+    {
+      "criterion": "Committed Go tests build temporary fake claude and copilot programs, cover scope filtering, ordering, malformed/failing tools, JSON and non-fatal failures, and never run real agent CLIs or the network.",
+      "met": true,
+      "evidence": "selfupdate_test.go:82-137 builds the fake agent, :468-577 covers filtering, command order, malformed input, marketplace and update failures, JSON and exit 0; :596-665 restricts PATH to the temporary fake directory."
+    },
+    {
+      "criterion": "The implementation reuses doctor's plugin-list/discovery behaviour rather than adding divergent matching rules, and no command other than self-update calls plugin update or marketplace update.",
+      "met": true,
+      "evidence": "doctor.go:788-843 hosts runPluginList and the shared match helpers consumed by selfupdate.go; repository search finds plugin update and marketplace update execution only in selfupdate.go and doctor.go contains only list execution."
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}

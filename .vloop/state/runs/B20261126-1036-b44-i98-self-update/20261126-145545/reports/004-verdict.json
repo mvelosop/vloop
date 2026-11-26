@@ -1,0 +1,64 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "vloop self-update is a top-level command runnable without a repository and accepts only the exact --check and --version <v> flag contract in the brief.",
+      "met": true,
+      "evidence": "internal/cli/root.go:189 registers newSelfUpdate at the top level; internal/cli/selfupdate.go:38-53 defines cobra.NoArgs and only the command-local --check and --version flags, without repository access; docs/guide/commands.md:388-397 documents the generated usage."
+    },
+    {
+      "criterion": "No go on PATH and a checkout build produce the two exact S1 refusal lines and exit 1, before any target lookup or install-location check.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:57-63 checks LookPath and the module version before target lookup or install-directory calculation; internal/cli/selfupdate_test.go:107-124 asserts both exact refusal lines and exit 1."
+    },
+    {
+      "criterion": "A valid --version target is used exactly without a latest-release lookup; a value that does not start with v and parse as semver produces the exact usage message and exits 2.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:65-74 validates and uses the explicit value directly; internal/cli/selfupdate_test.go:102-120 pins the exact exit-2 message and proves an explicit equal target succeeds while the fake latest lookup is set to fail."
+    },
+    {
+      "criterion": "Without --version, go list -m -json github.com/mvelosop/vloop@latest runs outside a module in a temporary directory, a failure uses its first error line, and only a semantically newer target is selected.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:152-183 creates a temporary directory, runs the exact command there, selects its Version, and takes the first line on failure; lines 76 and 116 use semver.Compare to gate installation. internal/cli/selfupdate_test.go:112-115 and 212-225 pin failure text and the outside-module invocation."
+    },
+    {
+      "criterion": "--check prints the exact current/latest or current/target two-line report, exits 0, never installs, never asks go for its install directory and leaves plugins empty.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:85-105 returns from the check branch before selfUpdateInstallDir; internal/cli/selfupdate_test.go:52-90 pins all three report forms and an empty plugins array, while lines 155-160 set go env to fail and confirm it is not queried."
+    },
+    {
+      "criterion": "With no install needed, the exact up-to-date line is printed; pre-releases newer than latest are not downgraded.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:106-115 installs only when the explicit target differs or the latest version is semantically newer, and otherwise emits the contract line; internal/cli/selfupdate_test.go:161-164 pins the prerelease-versus-latest result with go env forbidden."
+    },
+    {
+      "criterion": "The install-location calculation queries GOBIN then GOPATH/bin only when installation is about to happen, uses exact resolved-path comparison (case-insensitive on Windows), and emits the specified refusal when it differs.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:117-147 calls selfUpdateInstallDir only after installNeeded, lines 185-198 implement the GOBIN/GOPATH fallback, and lines 210-255 resolve and compare exact paths with EqualFold on Windows. internal/cli/selfupdate_test.go:166-209 pins the full refusal plus fallback and failure cases."
+    },
+    {
+      "criterion": "Global --json emits only one self-update/v1 document for successful runs, with no human lines; refusals remain one vloop: stderr line, and the embedded schemas/self-update.v1.json validates every documented field.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate.go:77-115 emits JSON instead of human output in every successful branch; schemas/self-update.v1.json defines all required document and plugin fields. internal/cli/selfupdate_test.go:78-90, 104-106, and 127-149 assert one valid document, no human text, and no stdout document on an --json refusal."
+    },
+    {
+      "criterion": "Committed Go tests use temporary Go fake programs for go, cover all target/refusal/check/JSON branches above, never call the real go install or the network, and are run by the repository's go check.",
+      "met": true,
+      "evidence": "internal/cli/selfupdate_test.go:14-47 supplies a fake go built into a temporary directory, lines 52-225 cover check, target, refusals, install-location decisions, exact JSON success/refusal branches and schema validation without an install path, and .vloop/tmp/checks.json records the repository go check at exit 0."
+    },
+    {
+      "criterion": "docs/guide/commands.md is regenerated from the command tree and documents the new command and flags rather than being hand-maintained.",
+      "met": true,
+      "evidence": "docs/guide/commands.md:388-397 contains the generated vloop self-update usage and the --check and --version entries matching internal/cli/selfupdate.go:38-53."
+    },
+    {
+      "criterion": "No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted.",
+      "met": true,
+      "evidence": "The full product diff from the pinned base contains new go execution only in internal/cli/selfupdate.go; root.go only registers the command. Existing schema-list/output tests were updated solely for self-update/v1, and the recorded go check passed."
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}

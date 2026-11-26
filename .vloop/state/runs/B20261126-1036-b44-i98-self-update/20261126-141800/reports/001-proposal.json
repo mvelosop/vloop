@@ -1,0 +1,21 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "blocked",
+  "summary": "Implemented self-update target selection, check mode, refusals, install-location validation, JSON output and the embedded schema; the T1 gate cannot start because its PowerShell harness overwrites the read-only $HOME variable.",
+  "files": [
+    "docs/guide/commands.md",
+    "internal/cli/root.go",
+    "internal/cli/schema_test.go",
+    "internal/cli/selfupdate.go",
+    "internal/cli/selfupdate_test.go",
+    "internal/schema/schema_test.go",
+    "schemas/self-update.v1.json"
+  ],
+  "verified": "vloop task gate T1 exited 1: harness.ps1 line 21 cannot overwrite read-only HOME; focused CLI tests exited 0.",
+  "notes": "The command resolves an uncreated install executable through its existing parent directory, so a binary outside GOBIN still receives the specified refusal. The gate harness must use a different variable name, such as $homePath, in its Format-GatePath function.",
+  "gate_dispute": {
+    "reason": "The T1 gate fails inside its own PowerShell harness before it invokes the command because $HOME is a read-only automatic variable on PowerShell.",
+    "evidence": "Harness line 21 is '$home = [IO.Path]::GetFullPath(...)'. Running vloop task gate T1 exits 1 with 'Cannot overwrite variable HOME because it is read-only or constant.' and never reaches an assertion."
+  }
+}

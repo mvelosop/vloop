@@ -302,7 +302,6 @@ func publish(dir string, args []string, stdout, stderr io.Writer) int {
 	}
 	fmt.Fprintf(stdout, "published %s: %s\n", version, url)
 	fmt.Fprintf(stdout, "install: go install %s/cmd/vloop@%s\n", module, version)
-	fmt.Fprintln(stdout, "then, in each repository: vloop upgrade")
-	fmt.Fprintln(stdout, "and for the plugin: claude plugin marketplace update vloop && claude plugin update vloop@vloop")
+	fmt.Fprintln(stdout, "then: vloop self-update, and vloop upgrade in each repository")
 	return 0
 }

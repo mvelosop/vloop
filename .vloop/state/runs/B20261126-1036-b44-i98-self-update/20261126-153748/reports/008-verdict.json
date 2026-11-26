@@ -1,0 +1,44 @@
+{
+  "schema": "verdict/v1",
+  "task": "T4",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "vloop upgrade --help includes exactly: To update the vloop binary and its plugins, run vloop self-update first.",
+      "met": true,
+      "evidence": "internal/cli/upgrade.go:21-23 places the exact sentence in Long; docs/guide/commands.md:493-495 is the generated result."
+    },
+    {
+      "criterion": "Doctor's Claude and Copilot plugin-version warnings alone end with exactly — vloop run is unaffected; vloop self-update updates the binary and the plugin; doctor performs no new network or update call.",
+      "met": true,
+      "evidence": "internal/cli/doctor.go:852 and :884 change only the two mismatched-plugin messages to the exact suffix; their discovery paths still only call plugin list."
+    },
+    {
+      "criterion": "docs/guide/concepts.md explains self-update beside go install and vloop upgrade, including the checkout, missing-go and install-location refusals in a sentence, and docs/guide/commands.md is regenerated.",
+      "met": true,
+      "evidence": "docs/guide/concepts.md:337-340 names all three refusals beside the upgrade/install guidance; docs/guide/commands.md:388-399 and :490-502 reflects the regenerated command help."
+    },
+    {
+      "criterion": "The C-2 line in docs/domain/domain-model.md and the platform context say that self-update outside any repository prints external paths with / and ~ for the home directory.",
+      "met": true,
+      "evidence": "docs/domain/domain-model.md:272-277 and docs/domain/platform/platform-context.md:9-16 explicitly describe outside-repository paths with / and ~/."
+    },
+    {
+      "criterion": "go run ./tools/release publish reports the final handoff as one line: then: vloop self-update, and vloop upgrade in each repository.",
+      "met": true,
+      "evidence": "tools/release/publish.go:303-305 emits that exact single final line; tools/release/publish_test.go:95-97 and tools/release/e2e_test.go:96-99 pin the tail."
+    },
+    {
+      "criterion": "No text or output elsewhere changes except the explicitly listed help, two doctor warnings, guide/domain additions, generated command reference and release handoff.",
+      "met": true,
+      "evidence": "The T4 product change in 66f82379 and the current diff touch only upgrade help, doctor warning text, the named guides/domain references, release handoff, and their expectations."
+    },
+    {
+      "criterion": "Any committed tests for the new help and doctor wording use the CLI and fake agent programs rather than real agents or network access.",
+      "met": true,
+      "evidence": "internal/cli/commands_doc_test.go:12-22 checks the CLI-generated reference; internal/cli/doctor_test.go:61-107 installs stub agents and :118-143 runs doctor through runPluginCLI with the exact warning expectations."
+    }
+  ],
+  "findings": [],
+  "notes": "The prior T4 attempt supplied the command, doctor, guide, generated-reference and release changes; this iteration completed the C-2 wording with an explicit slash-separated home-relative example."
+}

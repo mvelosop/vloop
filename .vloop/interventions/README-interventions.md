@@ -141,6 +141,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | halt | verification-finding | no | recommended | [I20261102-112835-t2-s-gate-disputed-its-loop-variable-was](I20261102-112835-t2-s-gate-disputed-its-loop-variable-was.md) |
 | halt | verification-finding | partly | no-options | [I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi](I20261103-005740-t2-s-gate-compared-an-unrounded-score-wi.md) |
 | halt | verification-finding | no | no-options | [I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh](I20261103-045334-t2-s-gate-wanted-the-any-text-message-wh.md) |
+| halt | verification-finding | partly | recommended | [I20261126-145532-b44-s-t1-gate-harness-assigned-home-powe](I20261126-145532-b44-s-t1-gate-harness-assigned-home-powe.md) |
+| halt | verification-finding | partly | recommended | [I20261126-153734-b44-s-t4-gate-asserted-both-doctor-plugi](I20261126-153734-b44-s-t4-gate-asserted-both-doctor-plugi.md) |
 | verify | ceremony | partly | no-options | [I20261031-144254-acceptance-on-the-real-cli-the-url-short](I20261031-144254-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261101-230340-acceptance-on-the-real-cli-the-url-short](I20261101-230340-acceptance-on-the-real-cli-the-url-short.md) |
 | verify | ceremony | partly | no-options | [I20261102-004526-acceptance-on-the-real-cli-the-url-short](I20261102-004526-acceptance-on-the-real-cli-the-url-short.md) |
@@ -223,6 +225,8 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261126-133232-two-routes-past-the-new-pwsh-judging-tha](I20261126-133232-two-routes-past-the-new-pwsh-judging-tha.md) |
 | verify | verification-finding | partly | no-options | [I20261126-141648-t3-s-close-gate-ran-vloop-in-its-own-scr](I20261126-141648-t3-s-close-gate-ran-vloop-in-its-own-scr.md) |
 | verify | verification-finding | partly | no-options | [I20261126-141649-the-encoding-setup-the-contract-required](I20261126-141649-the-encoding-setup-the-contract-required.md) |
+| verify | verification-finding | partly | no-options | [I20261126-161111-s3-changed-doctor-s-plugin-warnings-but](I20261126-161111-s3-changed-doctor-s-plugin-warnings-but.md) |
+| verify | verification-finding | partly | no-options | [I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on](I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |

@@ -92,8 +92,7 @@ func TestPublish(t *testing.T) {
 	}
 	if !strings.HasSuffix(out, "published v0.12.0: https://github.example/releases/tag/v0.12.0\n"+
 		"install: go install github.com/mvelosop/vloop/cmd/vloop@v0.12.0\n"+
-		"then, in each repository: vloop upgrade\n"+
-		"and for the plugin: claude plugin marketplace update vloop && claude plugin update vloop@vloop\n") {
+		"then: vloop self-update, and vloop upgrade in each repository\n") {
 		t.Errorf("stdout %q", out)
 	}
 	if g(origin, "rev-parse", "refs/tags/v0.12.0^{commit}") != rc {

@@ -1,0 +1,44 @@
+── iteration 2 (1 this run) · T1 · 0/5 done ──
+   Implement self-update target decisions and check mode
+   work T1 · 1m16s · $0.04 · run $0.04 / $40.00
+   check go
+   CHECK FAIL T1 — check go failed — see .vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-145545/checks/002-go.fail.log; review skipped
+── iteration 3 (2 this run) · T1 · 0/5 done ──
+   Implement self-update target decisions and check mode
+   work T1 · 1m52s · $0.05 · run $0.10 / $40.00
+   check go
+   review T1 · 2m43s · $0.06 · run $0.16 / $40.00
+   review: FAIL
+── iteration 4 (3 this run) · T1 · 0/5 done ──
+   Implement self-update target decisions and check mode
+   work T1 · 2m11s · $0.06 · run $0.22 / $40.00
+   check go
+   review T1 · 2m17s · $0.08 · run $0.30 / $40.00
+   review: PASS
+   T1 done
+── iteration 5 (4 this run) · T2 · 1/5 done ──
+   Install self-update targets safely
+   work T2 · 4m14s · $0.14 · run $0.44 / $40.00
+   check go
+   review T2 · 1m33s · $0.05 · run $0.49 / $40.00
+   review: PASS
+   T2 done
+── iteration 6 (5 this run) · T3 · 2/5 done ──
+   Update installed agent plugins
+   work T3 · 6m31s · $0.13 · run $0.61 / $40.00
+   check go
+   review T3 · 1m48s · $0.05 · run $0.67 / $40.00
+   review: PASS
+   T3 done
+── iteration 7 (6 this run) · T4 · 3/5 done ──
+   Point existing commands and guides to self-update
+   work T4 · 4m07s · $0.15 · run $0.82 / $40.00
+   GATE DISPUTE T4 — blocked for the operator; no review, no attempt charged
+   T4 blocked — the operator resolves the disputed gate with vloop task verify
+   no recorded progress (1/2)
+1 task(s) pending but none are ready — dependencies cannot be satisfied
+
+═══ blocked ═══
+run:    B20261126-1036-b44-i98-self-update/20261126-145545  (6 iteration(s) this run)
+plan:   3/5 done, 1 blocked
+a human is needed. read the blocked task's notes: vloop status

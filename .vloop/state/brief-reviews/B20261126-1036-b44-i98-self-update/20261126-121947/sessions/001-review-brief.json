@@ -1,0 +1,39 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.1951032,
+  "credits": 19.51032,
+  "duration_ms": 275085,
+  "effort": null,
+  "ended": "2026-11-26T12:24:25Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.1951032,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged",
+      "tool_name": "powershell",
+      "tool_use_id": "call_yuTajDGeg48JTtA48pLgbf9g"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: subshells and process substitution cannot be judged",
+      "tool_name": "powershell",
+      "tool_use_id": "call_WjIRa5okTseDPnzgy5H2HcMQ"
+    }
+  ],
+  "phase": "review-brief",
+  "run_id": "B20261126-1036-b44-i98-self-update",
+  "schema": "session/v5",
+  "started": "2026-11-26T12:19:47Z",
+  "turns": 21,
+  "wall_ms": 277358
+}
