@@ -95,49 +95,24 @@ platforms = ["macos", "windows"]
 shell = "pwsh"
 ```
 
-Neither a local file nor an environment variable can override either setting
-for a mixed team. vloop refuses a plan whose gates call a command from its fixed
-list of tools that some platforms lack, including `grep` and `sed`; use portable
-pwsh cmdlets and the project's own toolchain instead. vloop runs `pwsh` gates
-and checks in UTF-8. This repository is a mixed macOS and Windows team. See the
-full [mixed-team configuration rules](docs/guide/configuration.md#mixed-teams).
+Neither a local file nor an environment variable can override either setting for a mixed team. vloop refuses a plan whose gates call a command from its fixed list of tools that some platforms lack, including `grep` and `sed`; use portable pwsh cmdlets and the project's own toolchain instead. vloop runs `pwsh` gates and checks in UTF-8. This repository is a mixed macOS and Windows team. See the full [mixed-team configuration rules](docs/guide/configuration.md#mixed-teams).
 
 ## Running sessions on GitHub Copilot
 
-Each session kind can run on the GitHub Copilot CLI instead of Claude Code
-(experimental). Choose the agent and a Copilot model id per session kind:
+Each session kind can run on the GitHub Copilot CLI instead of Claude Code (experimental). Choose the agent and a Copilot model id per session kind:
 
 ```
 vloop config set agent.work copilot
 vloop config set model.work gpt-6.1-terra
 ```
 
-The keys are `agent.<kind>` and `model.<kind>` for `plan`, `gate-review`,
-`work`, `review`, `second-review`, `verify` and `review-brief`. A Copilot
-session needs a Copilot model id, never a Claude alias such as `sonnet`;
-`vloop run` refuses one. To list the ids your account can use, see
-[Copilot model ids](docs/guide/configuration.md#copilot-model-ids). So far `gpt-6.1-terra` is qualified for work, review,
-the second review and brief review; keep plan and gate review on Claude, and
-verify is not yet tried. `mai-code-2` has run every session kind but the second
-review (plan, gate review, work, review, verify and brief review) in the URL shortener acceptance
-run and in B40 to B44, which built vloop itself, and is not yet qualified by the
-[eval rule](docs/guide/evals.md#other-agents); see the [run evidence](docs/design-notes/copilot-cli-experiments.md#mai-code-2-in-the-loop-2026-11).
+The keys are `agent.<kind>` and `model.<kind>` for `plan`, `gate-review`, `work`, `review`, `second-review`, `verify` and `review-brief`. A Copilot session needs a Copilot model id, never a Claude alias such as `sonnet`; `vloop run` refuses one. To list the ids your account can use, see [Copilot model ids](docs/guide/configuration.md#copilot-model-ids). So far `gpt-6.1-terra` is qualified for work, review, the second review and brief review; keep plan and gate review on Claude, and verify is not yet tried. `mai-code-2` has run every session kind but the second review (plan, gate review, work, review, verify and brief review) in the URL shortener acceptance run and in B40 to B44, which built vloop itself, and is not yet qualified by the [eval rule](docs/guide/evals.md#other-agents); see the [run evidence](docs/design-notes/copilot-cli-experiments.md#mai-code-2-in-the-loop-2026-11).
 
-- **Requirements:** `copilot` on PATH, and a GitHub login its sessions can use
-  (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, else `gh auth login`).
-  `claude` is needed only while a session in use runs on Claude.
-- **Safety:** each session gets its own Copilot home under `.vloop/tmp/` with a
-  hook that runs vloop's fence before every tool call, and the driver re-judges
-  the calls afterwards.
+- **Requirements:** `copilot` on PATH, and a GitHub login its sessions can use (`COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, else `gh auth login`). `claude` is needed only while a session in use runs on Claude.
+- **Safety:** each session gets its own Copilot home under `.vloop/tmp/` with a hook that runs vloop's fence before every tool call, and the driver re-judges the calls afterwards.
 - **Cost** is estimated from Copilot credits at `copilot.credit-usd` dollars each.
-- **Windows:** the hook has a PowerShell form. Copilot runs on Windows were
-  used for B40 through B44; see
-  [Mixed macOS and Windows teams](#mixed-macos-and-windows-teams).
-- **Overriding locally:** `.vloop/config.local.toml` is git-ignored and beats
-  `.vloop/config.toml`. To run Claude while the shared file says `copilot`, run
-  `vloop config set --local agent.work claude` and `vloop config set --local
-  model.work sonnet` (likewise for each kind); `vloop config list` shows where
-  each value came from.
+- **Windows:** the hook has a PowerShell form. Copilot runs on Windows were used for B40 through B44; see [Mixed macOS and Windows teams](#mixed-macos-and-windows-teams).
+- **Overriding locally:** `.vloop/config.local.toml` is git-ignored and beats `.vloop/config.toml`. To run Claude while the shared file says `copilot`, run `vloop config set --local agent.work claude` and `vloop config set --local model.work sonnet` (likewise for each kind); `vloop config list` shows where each value came from.
 
 Every key and what `vloop doctor` checks are in
 [docs/guide/configuration.md](docs/guide/configuration.md).

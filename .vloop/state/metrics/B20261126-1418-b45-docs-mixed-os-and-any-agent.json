@@ -18,24 +18,24 @@
     "delivered": {
       "code": 0,
       "test": 0,
-      "docs": 53,
+      "docs": 72,
       "other": 0,
       "deleted": {
         "code": 0,
         "test": 0,
-        "docs": 22,
+        "docs": 27,
         "other": 0
       }
     },
     "churn": {
       "code": 0,
       "test": 0,
-      "docs": 77,
+      "docs": 96,
       "other": 0,
       "deleted": {
         "code": 0,
         "test": 0,
-        "docs": 46,
+        "docs": 51,
         "other": 0
       }
     },
@@ -43,12 +43,12 @@
     "rework": null
   },
   "time": {
-    "agent_ms": 424887,
-    "work_ms": 281987,
+    "agent_ms": 514790,
+    "work_ms": 371890,
     "review_ms": 142900,
     "plan_ms": 402830,
-    "gates_ms": 1673,
-    "checks_ms": 387865,
+    "gates_ms": 2157,
+    "checks_ms": 544326,
     "gate_review_ms": 112613,
     "wall_ms": null
   },
@@ -57,17 +57,17 @@
     "code_test_per_min": 0
   },
   "cost": {
-    "total_usd": 0.5794296,
+    "total_usd": 0.6252605999999999,
     "plan_usd": 0.2014817,
-    "work_usd": 0.1778165,
+    "work_usd": 0.2236475,
     "review_usd": 0.1358377,
     "gate_review_usd": 0.0642937,
     "per_1000_code_lines_usd": null
   },
   "credits": {
-    "total": 57.94296,
+    "total": 62.52606,
     "plan": 20.14817,
-    "work": 17.78165,
+    "work": 22.36475,
     "review": 13.58377,
     "gate_review": 6.42937
   },
@@ -122,10 +122,10 @@
     "gate-review": null
   },
   "defects": {
-    "in_loop": 1,
+    "in_loop": 2,
     "operator": 0,
     "escaped": 0,
-    "total": 1,
+    "total": 2,
     "removal_efficiency": 1
   },
   "interventions": {
@@ -153,8 +153,8 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 8,
-  "iterations": 3,
-  "iterations_per_closed": 1.5,
+  "iterations": 4,
+  "iterations_per_closed": 2,
   "by_task": [
     {
       "id": "T1",
@@ -210,22 +210,24 @@
       "id": "T3",
       "area": null,
       "kind": "docs",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
-        "docs": 0,
+        "docs": 19,
         "other": 0,
         "deleted": {
           "code": 0,
           "test": 0,
-          "docs": 0,
+          "docs": 5,
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 89903,
+      "cost_usd": 0.045831000000000004,
+      "models": [
+        "mai-code-2"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     },
@@ -468,6 +470,25 @@
           "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
         }
       ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829",
+      "seq": 8,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 4,
+      "task": "T3",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 89903,
+      "cost_usd": 0.045831000000000004,
+      "cost_source": "estimated",
+      "credits": 4.5831,
+      "turns": 14,
+      "permission_denials": 0,
+      "denials": [],
       "is_error": false
     }
   ]

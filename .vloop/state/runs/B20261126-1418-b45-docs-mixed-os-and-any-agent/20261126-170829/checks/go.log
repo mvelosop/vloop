@@ -4,10 +4,7 @@ ok  	github.com/mvelosop/vloop/cmd/vloop	(cached)
 ok  	github.com/mvelosop/vloop/internal/brief	(cached)
 ok  	github.com/mvelosop/vloop/internal/budget	(cached)
 ok  	github.com/mvelosop/vloop/internal/classify	(cached)
---- FAIL: TestReadmeMatchesCommandTree (0.00s)
-    readme_test.go:121: README.md is 217 lines; the cap is under 200
-FAIL
-FAIL	github.com/mvelosop/vloop/internal/cli	94.163s
+ok  	github.com/mvelosop/vloop/internal/cli	92.479s
 ok  	github.com/mvelosop/vloop/internal/closing	(cached)
 ok  	github.com/mvelosop/vloop/internal/config	(cached)
 ok  	github.com/mvelosop/vloop/internal/defect	(cached)
@@ -27,6 +24,3 @@ ok  	github.com/mvelosop/vloop/tools/agent-eval	(cached)
 ?   	github.com/mvelosop/vloop/tools/check	[no test files]
 ok  	github.com/mvelosop/vloop/tools/copilot-acceptance/kit	(cached)
 ok  	github.com/mvelosop/vloop/tools/release	(cached)
-FAIL
-check: test failed: exit status 1
-exit status 1

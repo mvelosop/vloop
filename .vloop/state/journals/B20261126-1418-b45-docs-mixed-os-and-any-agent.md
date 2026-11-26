@@ -34,3 +34,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** README.md now has a concise mixed macOS and Windows team section, Copilot-specific Windows evidence, and accurate PowerShell install and update guidance.
 - **Files:** README.md
 - **Notes for next iteration:** The mixed-team section uses the shared platforms and pwsh declarations, summarizes the fixed portability lint and UTF-8 execution, and links to the full configuration guide; the Copilot bullet now retains only its PowerShell hook and B40 through B44 evidence.
+
+## T3 — Explain mixed teams in the README
+
+- **Outcome:** done (review: PASS)
+- **Summary:** README.md now has a concise mixed macOS and Windows team entry point, Copilot-specific Windows evidence, and accurate PowerShell install and upgrade guidance while staying under the repository line cap.
+- **Files:** README.md
+- **Notes for next iteration:** The mixed-team prose remains consistent with the configuration guide and covers shared platforms and pwsh, rejected overrides, fixed-command linting, portable pwsh/toolchain commands, UTF-8, and this repository; prose was compacted without weakening T2's Copilot evidence to satisfy the README line cap.

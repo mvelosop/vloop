@@ -5,9 +5,9 @@
   "base": "16f54afef788a77ae268e6fe12189fbd53c435f3",
   "branch": "B20261126-1418-b45-docs-mixed-os-and-any-agent",
   "status": "running",
-  "iteration": 4,
+  "iteration": 5,
   "created": "2026-11-26T17:11:14Z",
-  "updated": "2026-11-26T17:37:45Z",
+  "updated": "2026-11-26T17:43:45Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -119,9 +119,9 @@
         "No mixed-team claim contradicts docs/guide/configuration.md."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 1,
-      "notes": "check go failed — see .vloop/state/runs/B20261126-1418-b45-docs-mixed-os-and-any-agent/20261126-170829/checks/004-go.fail.log"
+      "notes": ""
     },
     {
       "id": "T4",
