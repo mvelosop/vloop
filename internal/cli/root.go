@@ -186,6 +186,7 @@ Start with vloop init in your repository, then vloop brief new to draft a brief.
 	root.AddCommand(newPlugin(b, g))
 	root.AddCommand(newInit(b, g))
 	root.AddCommand(newUpgrade(b, g))
+	root.AddCommand(newSelfUpdate(b, g))
 	root.AddCommand(newDoctor(b, g))
 	root.AddCommand(newRun(b, g))
 	root.AddCommand(newFence(g))

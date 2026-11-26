@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "self-update/v1",
+  "description": "The result of vloop self-update",
+  "type": "object",
+  "required": ["schema", "current", "target", "newer", "installed", "dir", "plugins"],
+  "properties": {
+    "schema": { "const": "self-update/v1" },
+    "current": { "type": "string" },
+    "target": { "type": "string" },
+    "newer": { "type": "boolean" },
+    "installed": { "type": "boolean" },
+    "dir": { "type": "string" },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent", "result", "message"],
+        "properties": {
+          "agent": { "enum": ["claude", "copilot"] },
+          "scope": { "type": "string" },
+          "result": { "enum": ["updated", "not installed", "failed"] },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

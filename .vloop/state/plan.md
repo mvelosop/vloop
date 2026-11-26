@@ -2,13 +2,13 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **0/5 done** · iteration 0
+**Status:** running · **0/5 done** · iteration 1
 
-**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T14:44:16Z
+**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T14:54:38Z
 
 ## Progress
 
-- [ ] **T1** — Implement self-update target decisions and check mode
+- [ ] **T1** — Implement self-update target decisions and check mode · **blocked**
 - [ ] **T2** — Install self-update targets safely
 - [ ] **T3** — Update installed agent plugins
 - [ ] **T4** — Point existing commands and guides to self-update
@@ -18,7 +18,7 @@
 
 ### T1 — Implement self-update target decisions and check mode
 
-`pending` · depends on: none
+`blocked` · **blocked** · depends on: none
 
 Introduce the self-update command so a released vloop can safely choose and report its target from any directory. This establishes the refusal, version-selection and machine-readable contract that installation and plugin updates build on.
 
@@ -35,6 +35,8 @@ Introduce the self-update command so a released vloop can safely choose and repo
 - Committed Go tests use temporary Go fake programs for go, cover all target/refusal/check/JSON branches above, never call the real go install or the network, and are run by the repository's go check.
 - docs/guide/commands.md is regenerated from the command tree and documents the new command and flags rather than being hand-maintained.
 - No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted.
+
+**From the last attempt:** gate disputed: The T1 gate fails inside its own PowerShell harness before it invokes the command because $HOME is a read-only automatic variable on PowerShell. — Harness line 21 is '$home = [IO.Path]::GetFullPath(...)'. Running vloop task gate T1 exits 1 with 'Cannot overwrite variable HOME because it is read-only or constant.' and never reaches an assertion.
 
 <details><summary>verify command</summary>
 

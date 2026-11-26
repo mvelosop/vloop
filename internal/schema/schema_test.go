@@ -67,7 +67,7 @@ func fixture(t *testing.T, n string) []byte {
 }
 
 func TestNames(t *testing.T) {
-	want := []string{"brief-review/v1", "defect/v1", "export/v1", "gate-verdict/v1", "gate-verdict/v2", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "iteration/v3", "metrics/v1", "metrics/v2", "metrics/v3", "metrics/v4", "proposal/v1", "session/v1", "session/v2", "session/v3", "session/v4", "session/v5", "state/v1", "state/v2", "verdict/v1", "verify/v1", "verify/v2"}
+	want := []string{"brief-review/v1", "defect/v1", "export/v1", "gate-verdict/v1", "gate-verdict/v2", "install/v1", "intervention/v1", "intervention/v2", "iteration/v1", "iteration/v2", "iteration/v3", "metrics/v1", "metrics/v2", "metrics/v3", "metrics/v4", "proposal/v1", "self-update/v1", "session/v1", "session/v2", "session/v3", "session/v4", "session/v5", "state/v1", "state/v2", "verdict/v1", "verify/v1", "verify/v2"}
 	if got := Names(); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Names() = %v, want %v", got, want)
 	}

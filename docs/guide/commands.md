@@ -385,6 +385,17 @@ Validate a JSON file against a schema
 vloop schema validate <name> <file>
 ```
 
+## vloop self-update
+
+Update the vloop binary and installed plugins
+
+```
+vloop self-update [--check] [--version <v>] [flags]
+```
+
+- `--check`: report whether an update is available without installing
+- `--version version`: install the exact version instead of the latest release
+
 ## vloop status
 
 Show the plan's progress

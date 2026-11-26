@@ -5,9 +5,9 @@
   "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
   "branch": "B20261126-1036-b44-i98-self-update",
   "status": "running",
-  "iteration": 0,
+  "iteration": 1,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T14:44:16Z",
+  "updated": "2026-11-26T14:54:38Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -67,9 +67,9 @@
         "No command other than self-update gains a go or network call; invalid or changed output in unrelated commands is not accepted."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1",
-      "status": "pending",
+      "status": "blocked",
       "attempts": 0,
-      "notes": ""
+      "notes": "gate disputed: The T1 gate fails inside its own PowerShell harness before it invokes the command because $HOME is a read-only automatic variable on PowerShell. — Harness line 21 is '$home = [IO.Path]::GetFullPath(...)'. Running vloop task gate T1 exits 1 with 'Cannot overwrite variable HOME because it is read-only or constant.' and never reaches an assertion."
     },
     {
       "id": "T2",
