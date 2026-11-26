@@ -1,0 +1,7 @@
+── iteration 4 (1 this run) · T3 · 2/3 done ──
+   Verify PowerShell UTF-8 through the built CLI
+   work T3 · 0m57s · $0.02 · run $0.02 / $40.00
+   check go
+   review T3 · 1m32s · $0.06 · run $0.09 / $40.00
+   review: PASS
+   T3 done

@@ -1,0 +1,24 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "A built CLI in a temporary git repository runs the worked example's native git read and café output gates successfully and reports the exit-3 gate as a failure while vloop task gate itself exits 1.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T3/gate.ps1 builds ./cmd/vloop into a temporary directory, creates a temporary git repository, then asserts task gate T1 and T2 exit 0, café is emitted, T3's recorded exit 3 is reported, and the CLI exits 1."
+    },
+    {
+      "criterion": "vloop task show prints each recorded verify command unchanged, including the café assertion, and never prints the implementation's encoding setup.",
+      "met": true,
+      "evidence": "internal/cli/task.go prints t.Verify verbatim in showTask; .vloop/state/gates/T3/gate.ps1 invokes the built CLI and checks the café assertion is unchanged while all three encoding-setup fragments are absent."
+    },
+    {
+      "criterion": "The close gate runs the T1 and T2 oracles together, uses only temporary repositories and build outputs, and leaves the repository tree unchanged.",
+      "met": true,
+      "evidence": ".vloop/state/gates/T3/gate.ps1 runs both earlier gate scripts first, creates all fixture repositories and the binary below one temporary directory, and removes it in finally; the T1 oracle uses testing.T.TempDir for its git repository and the run completed with no product-tree diff."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}
