@@ -71,8 +71,10 @@ stateDiagram-v2
   command, a changed gate folder, or both, with `--reason`; both the old command
   and the old fixtures stamp go to `gate_history`. A change to the gate folder
   made any other way stops the run before it starts.
-- Gates must run on the host's tools. On macOS that means BSD `grep`, `sed`,
-  `awk`, `date` — B2 stalled on a GNU-only pattern.
+- Gates must run on the tools of every platform they run on. A mixed team's
+  gates are pwsh, with pwsh cmdlets and the project's own toolchain (C-5). A
+  plan whose shell is `sh` runs on the host's tools: on macOS, BSD `grep`,
+  `sed`, `awk`, `date` — B2 stalled on a GNU-only pattern.
 
 ## The second review
 
