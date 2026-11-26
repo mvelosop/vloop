@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T2",
+  "outcome": "done",
+  "summary": "Upgrade now reconciles .vloop/README.md from the resolved language and current binary version, including same-version repair and dry-run output, while preserving normal and breaking-upgrade write barriers.",
+  "files": [
+    "internal/cli/upgrade.go",
+    "internal/cli/upgrade_test.go",
+    "cmd/vloop/b5_e2e_test.go"
+  ],
+  "verified": "vloop task gate T2 exited 0: gate T2: pass (1.82s).",
+  "notes": "Upgrade reuses vloopReadme so init and upgrade emit byte-identical content; README changes are reported before same-version status, and participate in the existing dry-run and breaking-upgrade change list. Tests cover both languages, missing, edited, current, dry-run, same-version and breaking paths, plus updated exact-output assertions."
+}

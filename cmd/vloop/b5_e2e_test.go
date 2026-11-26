@@ -256,8 +256,8 @@ func TestWorkedExampleB5Session(t *testing.T) {
 	b5Expect(t, r.run("0.1.0", "doctor"), 0, []string{"✓ git", "✓ install", "✓ config", "! checks shell is not set in .vloop/config.toml, so each machine runs the checks in its own (sh here): set it there", "✓ claude", "✓ trust", "✓ gate shell",
 		"- plan", "- branch", "✓ plugin", "! gate edits no allow rule lets an interactive session edit .vloop/state/gates/ — add \"Edit(./.vloop/state/gates/**)\" to permissions.allow in .claude/settings.json", "✓ guidelines 0 rule(s)", "- self-hosting", "doctor: 0 problem(s), 2 warning(s)"}, "")
 
-	b5Expect(t, r.run("0.1.1", "upgrade"), 0, []string{"updated CLAUDE.md", "updated .vloop/install.json"}, "")
-	b5Expect(t, r.run("0.2.0", "upgrade"), 1, []string{"would update CLAUDE.md"},
+	b5Expect(t, r.run("0.1.1", "upgrade"), 0, []string{"updated .vloop/README.md", "updated CLAUDE.md", "updated .vloop/install.json"}, "")
+	b5Expect(t, r.run("0.2.0", "upgrade"), 1, []string{"would update .vloop/README.md", "would update CLAUDE.md"},
 		"vloop: 0.1.1 → 0.2.0 may break this repository's setup — review the changes above, then run vloop upgrade --yes\n")
 	b5Code(t, r.run("0.2.0", "upgrade", "--yes"), 0)
 	b5Expect(t, r.run("0.1.1", "upgrade"), 1, nil,

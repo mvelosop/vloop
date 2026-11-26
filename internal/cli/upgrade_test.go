@@ -51,7 +51,7 @@ func TestUpgradeRefusesDowngradeNumerically(t *testing.T) {
 func TestUpgradeApplies(t *testing.T) {
 	d := upgradeFixture(t, "0.1.0")
 	out, errs, code := runPluginCLI(t, Build{Version: "0.1.1", Commit: "c011"}, d, "upgrade")
-	if code != 0 || errs != "" || out != "updated CLAUDE.md\nupdated .vloop/install.json\n" {
+	if code != 0 || errs != "" || out != "updated .vloop/README.md\nupdated CLAUDE.md\nupdated .vloop/install.json\n" {
 		t.Fatalf("code %d out %q err %q", code, out, errs)
 	}
 	st := readFile(t, d, ".vloop/install.json")
@@ -69,7 +69,7 @@ func TestUpgradeBreakingNeedsYes(t *testing.T) {
 	before := readFile(t, d, "CLAUDE.md")
 	out, errs, code := runPluginCLI(t, b, d, "upgrade")
 	want := "vloop: 0.1.1 → 0.2.0 may break this repository's setup — review the changes above, then run vloop upgrade --yes\n"
-	if code != 1 || out != "would update CLAUDE.md\n" || errs != want {
+	if code != 1 || out != "would update .vloop/README.md\nwould update CLAUDE.md\n" || errs != want {
 		t.Fatalf("code %d out %q err %q", code, out, errs)
 	}
 	if readFile(t, d, "CLAUDE.md") != before || strings.Contains(readFile(t, d, ".vloop/install.json"), "0.2.0") {
@@ -117,11 +117,89 @@ func TestUpgradeDryRun(t *testing.T) {
 	d := upgradeFixture(t, "0.1.0")
 	before := readFile(t, d, ".vloop/install.json")
 	out, _, code := runPluginCLI(t, Build{Version: "0.1.1"}, d, "upgrade", "--dry-run")
-	if code != 0 || out != "would update CLAUDE.md\n" || readFile(t, d, ".vloop/install.json") != before {
+	if code != 0 || out != "would update .vloop/README.md\nwould update CLAUDE.md\n" || readFile(t, d, ".vloop/install.json") != before {
 		t.Errorf("code %d out %q", code, out)
 	}
 	if strings.Contains(readFile(t, d, "CLAUDE.md"), "0.1.1") {
 		t.Error("dry-run wrote")
+	}
+}
+
+func TestUpgradeReconcilesOwnedReadme(t *testing.T) {
+	for _, lang := range []string{"en", "es"} {
+		t.Run(lang, func(t *testing.T) {
+			d := initRepo(t, map[string]string{"go.mod": "module a\n"})
+			build := Build{Version: "0.1.0", Commit: "c010"}
+			if _, _, code := runPluginCLI(t, build, d, "init", "--language", lang); code != 0 {
+				t.Fatalf("init exit %d", code)
+			}
+			path := filepath.Join(d, ".vloop", "README.md")
+			want := vloopReadme(lang, build.Version)
+			if got := readFile(t, d, ".vloop/README.md"); got != want {
+				t.Fatalf("init and renderer differ:\n%s", got)
+			}
+
+			if err := os.Remove(path); err != nil {
+				t.Fatal(err)
+			}
+			out, errs, code := runPluginCLI(t, build, d, "upgrade")
+			if code != 0 || errs != "" || out != "updated .vloop/README.md\nalready at 0.1.0\n" {
+				t.Fatalf("missing: code %d out %q err %q", code, out, errs)
+			}
+			if got := readFile(t, d, ".vloop/README.md"); got != want {
+				t.Errorf("restored README differs from init:\n%s", got)
+			}
+
+			out, _, code = runPluginCLI(t, build, d, "upgrade")
+			if code != 0 || out != "already at 0.1.0\n" {
+				t.Errorf("current: code %d out %q", code, out)
+			}
+
+			edited := want + "local edit\n"
+			if err := os.WriteFile(path, []byte(edited), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			out, _, code = runPluginCLI(t, build, d, "upgrade", "--dry-run")
+			if code != 0 || out != "would update .vloop/README.md\nalready at 0.1.0\n" {
+				t.Errorf("dry run: code %d out %q", code, out)
+			}
+			if got := readFile(t, d, ".vloop/README.md"); got != edited {
+				t.Errorf("dry run changed README:\n%s", got)
+			}
+
+			out, _, code = runPluginCLI(t, build, d, "upgrade")
+			if code != 0 || out != "updated .vloop/README.md\nalready at 0.1.0\n" {
+				t.Errorf("edited: code %d out %q", code, out)
+			}
+			if got := readFile(t, d, ".vloop/README.md"); got != want {
+				t.Errorf("edited README not restored:\n%s", got)
+			}
+		})
+	}
+}
+
+func TestUpgradeBreakingReconcilesOwnedReadme(t *testing.T) {
+	d := upgradeFixture(t, "0.1.0")
+	readmePath := filepath.Join(d, ".vloop", "README.md")
+	edited := readFile(t, d, ".vloop/README.md") + "local edit\n"
+	if err := os.WriteFile(readmePath, []byte(edited), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	build := Build{Version: "0.2.0", Commit: "c020"}
+	out, _, code := runPluginCLI(t, build, d, "upgrade")
+	if code != 1 || !strings.HasPrefix(out, "would update .vloop/README.md\n") {
+		t.Fatalf("refused: code %d out %q", code, out)
+	}
+	if got := readFile(t, d, ".vloop/README.md"); got != edited {
+		t.Errorf("refused upgrade changed README:\n%s", got)
+	}
+
+	out, _, code = runPluginCLI(t, build, d, "upgrade", "--yes")
+	if code != 0 || !strings.HasPrefix(out, "updated .vloop/README.md\n") {
+		t.Fatalf("approved: code %d out %q", code, out)
+	}
+	if got := readFile(t, d, ".vloop/README.md"); got != vloopReadme("en", build.Version) {
+		t.Errorf("approved upgrade README differs from renderer:\n%s", got)
 	}
 }
 

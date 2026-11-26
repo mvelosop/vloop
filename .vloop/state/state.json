@@ -5,9 +5,9 @@
   "base": "6fbee5b7b53133af2f17e19317a3b203c904abe9",
   "branch": "B20261126-1843-b47-i160-vloop-folder-readme",
   "status": "running",
-  "iteration": 1,
+  "iteration": 2,
   "created": "2026-11-26T20:40:41Z",
-  "updated": "2026-11-26T20:53:20Z",
+  "updated": "2026-11-26T21:00:33Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -88,7 +88,7 @@
         "Committed Go tests cover missing, edited, current, dry-run, same-version, and breaking-upgrade cases in both language resolution and exact-output contexts, including earlier tests changed only by the new README line."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

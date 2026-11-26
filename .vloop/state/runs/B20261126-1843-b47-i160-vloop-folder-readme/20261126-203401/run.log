@@ -17,3 +17,10 @@ committing the plan
    review T1 · 1m06s · $0.04 · run $0.29 / $40.00
    review: PASS
    T1 done
+── iteration 2 (2 this run) · T2 · 1/4 done ──
+   Reconcile the owned README during upgrade
+   work T2 · 3m45s · $0.06 · run $0.35 / $40.00
+   check go
+   review T2 · 1m07s · $0.04 · run $0.39 / $40.00
+   review: PASS
+   T2 done

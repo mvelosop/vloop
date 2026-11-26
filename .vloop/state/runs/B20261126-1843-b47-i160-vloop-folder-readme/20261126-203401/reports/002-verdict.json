@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T2",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "At a normal, breaking, or same-version upgrade, a missing or non-identical .vloop/README.md is generated in the configured language using the current binary version; an identical file causes no README line.",
+      "met": true,
+      "evidence": "internal/cli/upgrade.go:63-78 resolves language, renders vloopReadme for the binary version, compares exact bytes, and emits no README change when identical; lines 79-94 repair same-version repositories, while lines 101-132 place README repair in the normal/breaking change list. upgrade_test.go:128-176 checks missing, edited and current files in en and es; lines 179-204 check breaking repair."
+    },
+    {
+      "criterion": "A real same-version repair prints updated .vloop/README.md before already at <version>; --dry-run prints would update .vloop/README.md before already at <version> and leaves the file byte-for-byte unchanged.",
+      "met": true,
+      "evidence": "internal/cli/upgrade.go:79-94 prints the README action and then the unchanged existing already-at line, with dry-run bypassing the write. upgrade_test.go:142-168 asserts both exact output sequences and exact preservation of the edited bytes on dry-run."
+    },
+    {
+      "criterion": "A breaking upgrade without --yes includes .vloop/README.md in the proposed changes when it needs repair and writes nothing; --yes or a normal upgrade applies the repair alongside the existing upgrade writes.",
+      "met": true,
+      "evidence": "internal/cli/upgrade.go:68-70 appends the README change to the shared change list; lines 115-143 list without writing for dry-run/refused breaking upgrades and apply all listed changes for approved upgrades. upgrade_test.go:58-81 and 117-124 cover normal and breaking output, while lines 179-204 assert a refused breaking upgrade preserves bytes and --yes repairs with the target version."
+    },
+    {
+      "criterion": "For the same language and version, init and upgrade produce byte-identical README content, and no other upgrade file's content or output changes.",
+      "met": true,
+      "evidence": "internal/cli/upgrade.go:67 uses the same vloopReadme renderer as init.go:113, and upgrade_test.go:134-151 compares restored bytes to init output. The remaining upgrade merge/write logic is unchanged; cmd/vloop/b5_e2e_test.go:259-260 and upgrade_test.go:52-123 change earlier exact expectations only by the new README line."
+    },
+    {
+      "criterion": "Committed Go tests cover missing, edited, current, dry-run, same-version, and breaking-upgrade cases in both language resolution and exact-output contexts, including earlier tests changed only by the new README line.",
+      "met": true,
+      "evidence": "internal/cli/upgrade_test.go:128-176 runs missing, current, edited, dry-run and same-version exact-output assertions for both en and es; lines 179-204 covers refused and approved breaking repair. Earlier exact assertions in lines 52-123 and cmd/vloop/b5_e2e_test.go:259-260 are changed solely to include the new README output line."
+    }
+  ],
+  "findings": [],
+  "notes": "The Go check log reports the repository test suite passing, including internal/cli and cmd/vloop."
+}

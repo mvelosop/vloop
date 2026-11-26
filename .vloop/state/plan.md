@@ -2,14 +2,14 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **1/4 done** · iteration 1
+**Status:** running · **2/4 done** · iteration 2
 
-**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T20:53:20Z
+**Brief:** `docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md` · **Updated:** 2026-11-26T21:00:33Z
 
 ## Progress
 
 - [x] **T1** — Generate the owned README during init
-- [ ] **T2** — Reconcile the owned README during upgrade
+- [x] **T2** — Reconcile the owned README during upgrade
 - [ ] **T3** — Document the owned README lifecycle
 - [ ] **T4** — Verify the README workflow end to end
 
@@ -39,7 +39,7 @@ pwsh -NoProfile -File .vloop/state/gates/T1/gate.ps1
 
 ### T2 — Reconcile the owned README during upgrade
 
-`pending` · depends on: T1
+`done` · depends on: T1
 
 Keep an initialized repository's README identical to what the current binary generates, even when the install version is already current. This adds restoration and dry-run reporting without changing upgrade's existing file or breaking-change behavior.
 

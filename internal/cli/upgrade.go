@@ -51,11 +51,7 @@ func runUpgrade(b Build, g *Globals, cmd *cobra.Command, dryRun, yes bool, now t
 	if err != nil {
 		return Problem(err)
 	}
-	switch rel {
-	case install.Same:
-		fmt.Fprintf(out, "already at %s\n", b.Version)
-		return nil
-	case install.FromNewer:
+	if rel == install.FromNewer {
 		return Problem(fmt.Errorf("this repository was set up by vloop %s, newer than this binary (%s) — upgrade the binary, not the repository", st.Version, b.Version))
 	}
 
@@ -64,7 +60,34 @@ func runUpgrade(b Build, g *Globals, cmd *cobra.Command, dryRun, yes bool, now t
 		content []byte
 	}
 	var changes []change
-	old, exists, err := readRepoFile(root, "CLAUDE.md")
+	lang, err := config.Get(root, "language")
+	if err != nil {
+		return Problem(err)
+	}
+	old, exists, err := readRepoFile(root, ".vloop/README.md")
+	if err != nil {
+		return Problem(err)
+	}
+	readme := []byte(vloopReadme(lang.Value, b.Version))
+	readmeChanged := !exists || string(readme) != string(old)
+	if readmeChanged {
+		changes = append(changes, change{".vloop/README.md", readme})
+	}
+	if rel == install.Same {
+		if readmeChanged {
+			if dryRun {
+				fmt.Fprintln(out, "would update .vloop/README.md")
+			} else {
+				if err := writeRepoFile(root, ".vloop/README.md", readme); err != nil {
+					return Problem(err)
+				}
+				fmt.Fprintln(out, "updated .vloop/README.md")
+			}
+		}
+		fmt.Fprintf(out, "already at %s\n", b.Version)
+		return nil
+	}
+	old, exists, err = readRepoFile(root, "CLAUDE.md")
 	if err != nil {
 		return Problem(err)
 	}
