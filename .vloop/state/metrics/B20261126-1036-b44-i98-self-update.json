@@ -2,12 +2,12 @@
   "schema": "metrics/v4",
   "brief": "B20261126-1036-b44-i98-self-update.loop-brief",
   "run_id": "B20261126-1036-b44-i98-self-update",
-  "status": "ready",
+  "status": "consumed",
   "merged": null,
   "tasks": {
     "planned": 5,
-    "done": 3,
-    "blocked": 1,
+    "done": 5,
+    "blocked": 0,
     "first_pass": 3,
     "estimate": {
       "min": 3,
@@ -17,8 +17,8 @@
   "size": {
     "delivered": {
       "code": 545,
-      "test": 678,
-      "docs": 18,
+      "test": 886,
+      "docs": 19,
       "other": 0,
       "deleted": {
         "code": 33,
@@ -29,17 +29,17 @@
     },
     "churn": {
       "code": 584,
-      "test": 684,
-      "docs": 18,
+      "test": 892,
+      "docs": 22,
       "other": 0,
       "deleted": {
         "code": 72,
         "test": 17,
-        "docs": 3,
+        "docs": 6,
         "other": 0
       }
     },
-    "test_code_ratio": 1.2440366972477064,
+    "test_code_ratio": 1.6256880733944954,
     "rework": 1.071559633027523
   },
   "time": {
@@ -50,26 +50,29 @@
     "gates_ms": 37356,
     "checks_ms": 836500,
     "gate_review_ms": 434527,
-    "wall_ms": 4317000
+    "verify_ms": 376379,
+    "wall_ms": 5653000
   },
   "rate": {
     "code_per_min": 11.368388994982263,
-    "code_test_per_min": 25.511082093327172
+    "code_test_per_min": 29.849843397834164
   },
   "cost": {
-    "total_usd": 1.7791881000000003,
+    "total_usd": 1.9409812000000004,
     "plan_usd": 0.3609682,
     "work_usd": 0.8837942000000001,
     "review_usd": 0.3589248,
     "gate_review_usd": 0.1755009,
-    "per_1000_code_lines_usd": 3.2645653211009176
+    "per_1000_code_lines_usd": 3.5614333944954133,
+    "verify_usd": 0.16179310000000002
   },
   "credits": {
-    "total": 177.91881,
+    "total": 194.09812,
     "plan": 36.09682,
     "work": 88.37942,
     "review": 35.89248,
-    "gate_review": 17.550089999999997
+    "gate_review": 17.550089999999997,
+    "verify": 16.17931
   },
   "tokens": {
     "input": 0,
@@ -90,6 +93,9 @@
     ],
     "gate-review": [
       "mai-code-2"
+    ],
+    "verify": [
+      "mai-code-2"
     ]
   },
   "agents": {
@@ -105,6 +111,9 @@
     "second-review": [],
     "gate-review": [
       "copilot"
+    ],
+    "verify": [
+      "copilot"
     ]
   },
   "second_review": {
@@ -119,23 +128,24 @@
     "plan": null,
     "work": null,
     "review": null,
-    "gate-review": null
+    "gate-review": null,
+    "verify": null
   },
   "defects": {
     "in_loop": 2,
-    "operator": 2,
+    "operator": 4,
     "escaped": 0,
-    "total": 4,
+    "total": 6,
     "removal_efficiency": 1
   },
   "interventions": {
-    "total": 2,
+    "total": 4,
     "by_agreement": {
       "recommended": 2,
       "other-option": 0,
       "adjusted": 0,
       "different": 0,
-      "no-options": 0
+      "no-options": 2
     }
   },
   "instructions": {
@@ -152,9 +162,9 @@
   "lead_time": {
     "plan_to_merge_ms": null
   },
-  "permission_denials": 12,
+  "permission_denials": 22,
   "iterations": 9,
-  "iterations_per_closed": 3,
+  "iterations_per_closed": 1.8,
   "by_task": [
     {
       "id": "T1",
@@ -239,12 +249,12 @@
       "churn": {
         "code": 9,
         "test": 4,
-        "docs": 11,
+        "docs": 15,
         "other": 0,
         "deleted": {
           "code": 5,
           "test": 6,
-          "docs": 3,
+          "docs": 6,
           "other": 0
         }
       },
@@ -263,7 +273,7 @@
       "attempts": 1,
       "churn": {
         "code": 0,
-        "test": 0,
+        "test": 208,
         "docs": 0,
         "other": 0,
         "deleted": {
@@ -696,6 +706,66 @@
       "turns": 10,
       "permission_denials": 0,
       "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-153748",
+      "seq": 5,
+      "schema": "session/v4",
+      "phase": "verify",
+      "iteration": 0,
+      "task": null,
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 376379,
+      "cost_usd": 0.16179310000000002,
+      "cost_source": "estimated",
+      "credits": 16.17931,
+      "turns": 30,
+      "permission_denials": 10,
+      "denials": [
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        },
+        {
+          "tool_name": "powershell",
+          "text": "Denied by preToolUse hook: vloop fence: parentheses cannot be judged here — (\u003ccommand\u003e).\u003cProperty\u003e is read; or pipe into Measure-Object or Select-Object -ExpandProperty"
+        }
+      ],
       "is_error": false
     }
   ]
