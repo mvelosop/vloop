@@ -8,7 +8,7 @@
     "planned": 5,
     "done": 0,
     "blocked": 1,
-    "first_pass": 0,
+    "first_pass": 1,
     "estimate": {
       "min": 3,
       "max": 5
@@ -43,32 +43,32 @@
     "rework": 1
   },
   "time": {
-    "agent_ms": 1239033,
-    "work_ms": 939012,
-    "review_ms": 300021,
+    "agent_ms": 1586186,
+    "work_ms": 1192700,
+    "review_ms": 393486,
     "plan_ms": 770089,
-    "gates_ms": 12664,
-    "checks_ms": 334512,
+    "gates_ms": 17589,
+    "checks_ms": 480615,
     "gate_review_ms": 434527,
     "wall_ms": 1847000
   },
   "rate": {
-    "code_per_min": 14.624307827152304,
-    "code_test_per_min": 26.82737263656416
+    "code_per_min": 11.423628754761422,
+    "code_test_per_min": 20.955928245489496
   },
   "cost": {
-    "total_usd": 0.9780502,
+    "total_usd": 1.1670955,
     "plan_usd": 0.3609682,
-    "work_usd": 0.29906130000000003,
-    "review_usd": 0.1425198,
+    "work_usd": 0.440064,
+    "review_usd": 0.19056240000000002,
     "gate_review_usd": 0.1755009,
-    "per_1000_code_lines_usd": 3.238576821192053
+    "per_1000_code_lines_usd": 3.8645546357615896
   },
   "credits": {
-    "total": 97.80502,
+    "total": 116.70955,
     "plan": 36.09682,
-    "work": 29.90613,
-    "review": 14.25198,
+    "work": 44.0064,
+    "review": 19.05624,
     "gate_review": 17.550089999999997
   },
   "tokens": {
@@ -153,7 +153,7 @@
     "plan_to_merge_ms": null
   },
   "permission_denials": 9,
-  "iterations": 4,
+  "iterations": 5,
   "iterations_per_closed": null,
   "by_task": [
     {
@@ -185,7 +185,7 @@
       "id": "T2",
       "area": null,
       "kind": "feature",
-      "attempts": 0,
+      "attempts": 1,
       "churn": {
         "code": 0,
         "test": 0,
@@ -198,9 +198,11 @@
           "other": 0
         }
       },
-      "agent_ms": 0,
-      "cost_usd": 0,
-      "models": [],
+      "agent_ms": 347153,
+      "cost_usd": 0.18904530000000003,
+      "models": [
+        "mai-code-2"
+      ],
       "test_code_ratio": null,
       "per_1000_code_lines_usd": null
     },
@@ -504,6 +506,44 @@
           "text": "Denied by preToolUse hook: vloop fence: git branch --show-current is denied by the review fence (Bash(git branch:*))"
         }
       ],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-145545",
+      "seq": 6,
+      "schema": "session/v4",
+      "phase": "work",
+      "iteration": 5,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 253688,
+      "cost_usd": 0.1410027,
+      "cost_source": "estimated",
+      "credits": 14.10027,
+      "turns": 21,
+      "permission_denials": 0,
+      "denials": [],
+      "is_error": false
+    },
+    {
+      "folder": ".vloop/state/runs/B20261126-1036-b44-i98-self-update/20261126-145545",
+      "seq": 7,
+      "schema": "session/v3",
+      "phase": "review",
+      "iteration": 5,
+      "task": "T2",
+      "agent": "copilot",
+      "model": "mai-code-2",
+      "effort": null,
+      "time_ms": 93465,
+      "cost_usd": 0.048042600000000005,
+      "cost_source": "estimated",
+      "credits": 4.80426,
+      "turns": 10,
+      "permission_denials": 0,
+      "denials": [],
       "is_error": false
     }
   ]

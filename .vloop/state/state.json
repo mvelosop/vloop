@@ -5,9 +5,9 @@
   "base": "18135b3f368aaad3256b5eb1ece8ee319d23567a",
   "branch": "B20261126-1036-b44-i98-self-update",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-26T14:23:56Z",
-  "updated": "2026-11-26T15:20:22Z",
+  "updated": "2026-11-26T15:31:24Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -151,7 +151,7 @@
         "The implementation reuses doctor's plugin-list/discovery behaviour rather than adding divergent matching rules, and no command other than self-update calls plugin update or marketplace update."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T3/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

@@ -1,0 +1,13 @@
+{
+  "schema": "proposal/v1",
+  "task": "T3",
+  "outcome": "done",
+  "summary": "Self-update now discovers and updates installed Claude and Copilot vloop plugins after the binary step, with exact human output and structured JSON results.",
+  "files": [
+    "internal/cli/doctor.go",
+    "internal/cli/selfupdate.go",
+    "internal/cli/selfupdate_test.go"
+  ],
+  "verified": "vloop task gate T3 exited 0 and printed gate T3: pass (3.042s).",
+  "notes": "Plugin discovery is shared with doctor through claudePluginMatches and copilotPluginMatches; command failures remain non-fatal, and --check returns before all agent discovery."
+}

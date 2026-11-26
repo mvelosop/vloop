@@ -109,60 +109,213 @@ func runSelfUpdate(b Build, g *Globals, check, explicit bool, requested string, 
 
 	installNeeded := (explicit && target != b.Module) || (!explicit && newer)
 	if !installNeeded {
-		if g.JSON {
-			return writeSelfUpdateJSON(out, doc)
+		if !g.JSON && !explicit {
+			if _, err = fmt.Fprintf(out, "vloop %s is up to date (latest release %s)\n", b.Module, target); err != nil {
+				return err
+			}
 		}
-		if !explicit {
-			_, err = fmt.Fprintf(out, "vloop %s is up to date (latest release %s)\n", b.Module, target)
+	} else {
+		dir, err := selfUpdateInstallDir(goPath)
+		if err != nil {
+			return Problem(err)
 		}
-		return err
+		exe, err := selfUpdateExecutable()
+		if err != nil {
+			return Problem(fmt.Errorf("cannot find running vloop: %s", err))
+		}
+		expected := filepath.Join(dir, "vloop")
+		if selfUpdateGOOS == "windows" {
+			expected += ".exe"
+		}
+		exeResolved, err := resolveSelfUpdatePath(exe)
+		if err != nil {
+			return Problem(fmt.Errorf("cannot resolve running vloop %s: %s", displaySelfUpdatePath(exe), err))
+		}
+		expectedResolved, err := resolveSelfUpdatePathAllowMissing(expected)
+		if err != nil {
+			return Problem(fmt.Errorf("cannot resolve go install path %s: %s", displaySelfUpdatePath(expected), err))
+		}
+		if !sameSelfUpdatePath(exeResolved, expectedResolved) {
+			return Problem(fmt.Errorf(
+				"this vloop runs from %s, but go install writes to %s — update it the way you installed it, or put %s first on PATH",
+				displaySelfUpdatePath(exe), displaySelfUpdatePath(dir), displaySelfUpdatePath(dir),
+			))
+		}
+
+		doc.Dir = displaySelfUpdatePath(dir)
+		if !g.JSON {
+			if _, err := fmt.Fprintf(out, "installing vloop %s (from %s)…\n", target, b.Module); err != nil {
+				return err
+			}
+		}
+		if err := installSelfUpdate(goPath, target, exe); err != nil {
+			return Problem(err)
+		}
+		doc.Installed = true
+		if !g.JSON {
+			if _, err = fmt.Fprintf(out, "installed vloop %s at %s\n", target, displaySelfUpdatePath(dir)); err != nil {
+				return err
+			}
+		}
 	}
 
-	dir, err := selfUpdateInstallDir(goPath)
-	if err != nil {
-		return Problem(err)
-	}
-	exe, err := selfUpdateExecutable()
-	if err != nil {
-		return Problem(fmt.Errorf("cannot find running vloop: %s", err))
-	}
-	expected := filepath.Join(dir, "vloop")
-	if selfUpdateGOOS == "windows" {
-		expected += ".exe"
-	}
-	exeResolved, err := resolveSelfUpdatePath(exe)
-	if err != nil {
-		return Problem(fmt.Errorf("cannot resolve running vloop %s: %s", displaySelfUpdatePath(exe), err))
-	}
-	expectedResolved, err := resolveSelfUpdatePathAllowMissing(expected)
-	if err != nil {
-		return Problem(fmt.Errorf("cannot resolve go install path %s: %s", displaySelfUpdatePath(expected), err))
-	}
-	if !sameSelfUpdatePath(exeResolved, expectedResolved) {
-		return Problem(fmt.Errorf(
-			"this vloop runs from %s, but go install writes to %s — update it the way you installed it, or put %s first on PATH",
-			displaySelfUpdatePath(exe), displaySelfUpdatePath(dir), displaySelfUpdatePath(dir),
-		))
-	}
-
-	doc.Dir = displaySelfUpdatePath(dir)
-	if !g.JSON {
-		if _, err := fmt.Fprintf(out, "installing vloop %s (from %s)…\n", target, b.Module); err != nil {
+	if explicit && !g.JSON {
+		if _, err := fmt.Fprintf(out, "! with --version, the plugins still update to their latest release, which may differ from vloop %s\n", target); err != nil {
 			return err
 		}
 	}
-	if err := installSelfUpdate(goPath, target, exe); err != nil {
-		return Problem(err)
-	}
-	doc.Installed = true
-	if g.JSON {
-		return writeSelfUpdateJSON(out, doc)
-	}
-	_, err = fmt.Fprintf(out, "installed vloop %s at %s\n", target, displaySelfUpdatePath(dir))
+
+	root, err := os.Getwd()
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprintln(out, "next: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository")
+	plugins, updated, err := updateSelfUpdatePlugins(root, out, g.JSON)
+	if err != nil {
+		return err
+	}
+	doc.Plugins = plugins
+	if g.JSON {
+		return writeSelfUpdateJSON(out, doc)
+	}
+	if doc.Installed || updated {
+		_, err = fmt.Fprintln(out, "next: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository")
+		return err
+	}
+	return nil
+}
+
+func updateSelfUpdatePlugins(root string, out interface{ Write([]byte) (int, error) }, jsonOutput bool) ([]selfUpdatePlugin, bool, error) {
+	var plugins []selfUpdatePlugin
+	updated := false
+	if tool, err := exec.LookPath("claude"); err == nil {
+		results, agentUpdated, err := updateSelfUpdateClaude(root, tool, out, jsonOutput)
+		if err != nil {
+			return plugins, updated, err
+		}
+		plugins = append(plugins, results...)
+		updated = updated || agentUpdated
+	}
+	if tool, err := exec.LookPath("copilot"); err == nil {
+		results, agentUpdated, err := updateSelfUpdateCopilot(root, tool, out, jsonOutput)
+		if err != nil {
+			return plugins, updated, err
+		}
+		plugins = append(plugins, results...)
+		updated = updated || agentUpdated
+	}
+	if plugins == nil {
+		plugins = []selfUpdatePlugin{}
+	}
+	return plugins, updated, nil
+}
+
+func updateSelfUpdateClaude(root, tool string, out interface{ Write([]byte) (int, error) }, jsonOutput bool) ([]selfUpdatePlugin, bool, error) {
+	var list []claudePluginEntry
+	if err := runPluginList(tool, root, &list); err != nil {
+		message := err.Error()
+		result := selfUpdatePlugin{Agent: "claude", Result: "failed", Message: message}
+		line := fmt.Sprintf("! plugin claude: cannot read claude plugin list --json: %s — run claude plugin update vloop@vloop by hand", message)
+		err := reportSelfUpdatePlugin(out, jsonOutput, line)
+		return []selfUpdatePlugin{result}, false, err
+	}
+	var found []claudePluginEntry
+	for _, entry := range list {
+		if claudePluginMatches(root, entry) {
+			found = append(found, entry)
+		}
+	}
+	if len(found) == 0 {
+		result := selfUpdatePlugin{Agent: "claude", Result: "not installed", Message: ""}
+		err := reportSelfUpdatePlugin(out, jsonOutput, "plugin claude: not installed")
+		return []selfUpdatePlugin{result}, false, err
+	}
+
+	raw, err := exec.Command(tool, "plugin", "marketplace", "update", "vloop").CombinedOutput()
+	if err != nil {
+		message := lastSelfUpdateLine(raw)
+		if message == "" {
+			message = err.Error()
+		}
+		result := selfUpdatePlugin{Agent: "claude", Result: "failed", Message: message}
+		line := fmt.Sprintf("! plugin claude: claude plugin marketplace update vloop failed: %s — run it by hand", message)
+		err = reportSelfUpdatePlugin(out, jsonOutput, line)
+		return []selfUpdatePlugin{result}, false, err
+	}
+
+	results := make([]selfUpdatePlugin, 0, len(found))
+	updated := false
+	for _, entry := range found {
+		scope := entry.Scope
+		if scope == "" {
+			scope = "user"
+		}
+		raw, updateErr := exec.Command(tool, "plugin", "update", "vloop@vloop", "--scope", scope).CombinedOutput()
+		result := selfUpdatePlugin{Agent: "claude", Scope: scope, Result: "updated", Message: ""}
+		line := fmt.Sprintf("plugin claude (%s): updated", scope)
+		if updateErr != nil {
+			message := lastSelfUpdateLine(raw)
+			if message == "" {
+				message = updateErr.Error()
+			}
+			result.Result = "failed"
+			result.Message = message
+			line = fmt.Sprintf("! plugin claude (%s): claude plugin update vloop@vloop --scope %s failed: %s — run it by hand", scope, scope, message)
+		} else {
+			updated = true
+		}
+		if err := reportSelfUpdatePlugin(out, jsonOutput, line); err != nil {
+			return results, updated, err
+		}
+		results = append(results, result)
+	}
+	return results, updated, nil
+}
+
+func updateSelfUpdateCopilot(root, tool string, out interface{ Write([]byte) (int, error) }, jsonOutput bool) ([]selfUpdatePlugin, bool, error) {
+	var list []copilotPluginEntry
+	if err := runPluginList(tool, root, &list); err != nil {
+		message := err.Error()
+		result := selfUpdatePlugin{Agent: "copilot", Result: "failed", Message: message}
+		line := fmt.Sprintf("! plugin copilot: cannot read copilot plugin list --json: %s — run copilot plugin update vloop@vloop by hand", message)
+		err := reportSelfUpdatePlugin(out, jsonOutput, line)
+		return []selfUpdatePlugin{result}, false, err
+	}
+	found := false
+	for _, entry := range list {
+		if copilotPluginMatches(entry) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		result := selfUpdatePlugin{Agent: "copilot", Result: "not installed", Message: ""}
+		err := reportSelfUpdatePlugin(out, jsonOutput, "plugin copilot: not installed")
+		return []selfUpdatePlugin{result}, false, err
+	}
+
+	raw, updateErr := exec.Command(tool, "plugin", "update", "vloop@vloop").CombinedOutput()
+	result := selfUpdatePlugin{Agent: "copilot", Result: "updated", Message: ""}
+	line := "plugin copilot: updated"
+	if updateErr != nil {
+		message := lastSelfUpdateLine(raw)
+		if message == "" {
+			message = updateErr.Error()
+		}
+		result.Result = "failed"
+		result.Message = message
+		line = fmt.Sprintf("! plugin copilot: copilot plugin update vloop@vloop failed: %s — run it by hand", message)
+	}
+	if err := reportSelfUpdatePlugin(out, jsonOutput, line); err != nil {
+		return nil, false, err
+	}
+	return []selfUpdatePlugin{result}, updateErr == nil, nil
+}
+
+func reportSelfUpdatePlugin(out interface{ Write([]byte) (int, error) }, jsonOutput bool, line string) error {
+	if jsonOutput {
+		return nil
+	}
+	_, err := fmt.Fprintln(out, line)
 	return err
 }
 

@@ -82,6 +82,56 @@ func main() {
 }
 `
 
+const fakeSelfUpdateAgent = `package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func main() {
+	agent := strings.TrimSuffix(filepath.Base(os.Args[0]), filepath.Ext(os.Args[0]))
+	args := os.Args[1:]
+	if log := os.Getenv("FAKE_AGENT_LOG"); log != "" {
+		f, _ := os.OpenFile(log, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o666)
+		if f != nil {
+			dir, _ := os.Getwd()
+			fmt.Fprintln(f, agent+"|"+filepath.ToSlash(dir)+"|"+strings.Join(args, " "))
+			_ = f.Close()
+		}
+	}
+	key := strings.ToUpper(agent)
+	if len(args) >= 3 && args[0] == "plugin" && args[1] == "list" && args[2] == "--json" {
+		if fail := os.Getenv("FAKE_" + key + "_LIST_FAIL"); fail != "" {
+			fmt.Fprintln(os.Stderr, fail)
+			os.Exit(1)
+		}
+		fmt.Println(os.Getenv("FAKE_" + key + "_LIST"))
+		return
+	}
+	if len(args) >= 3 && args[0] == "plugin" && args[1] == "marketplace" && args[2] == "update" {
+		if fail := os.Getenv("FAKE_" + key + "_MARKETPLACE_FAIL"); fail != "" {
+			fmt.Fprintln(os.Stderr, "marketplace detail")
+			fmt.Fprintln(os.Stderr, fail)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(args) >= 2 && args[0] == "plugin" && args[1] == "update" {
+		if fail := os.Getenv("FAKE_" + key + "_UPDATE_FAIL"); fail != "" {
+			fmt.Fprintln(os.Stderr, "update detail")
+			fmt.Fprintln(os.Stderr, fail)
+			os.Exit(1)
+		}
+		return
+	}
+	fmt.Fprintln(os.Stderr, "unexpected fake "+agent+" arguments:", strings.Join(args, " "))
+	os.Exit(1)
+}
+`
+
 func TestSelfUpdateCheckAndJSON(t *testing.T) {
 	h := newSelfUpdateHarness(t)
 	t.Cleanup(h.restoreExecutable)
@@ -418,8 +468,126 @@ func TestSelfUpdateRunsLatestLookupOutsideModule(t *testing.T) {
 	}
 }
 
+func TestSelfUpdatePluginsReuseDoctorDiscovery(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+	h.addAgents(t, "claude", "copilot")
+	root, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("FAKE_GO_LATEST", "v0.14.0")
+	t.Setenv("FAKE_CLAUDE_LIST", fmt.Sprintf(
+		`[{"id":"other@x","version":"1","scope":"user"},{"id":"vloop@vloop","version":"0.14.0","scope":""},{"id":"vloop@vloop","version":"0.14.0","scope":"project","projectPath":%q},{"id":"vloop@vloop","version":"","scope":"user"},{"id":"vloop@vloop","version":"0.14.0","scope":"local","projectPath":%q}]`,
+		filepath.ToSlash(root), filepath.ToSlash(filepath.Join(t.TempDir(), "other")),
+	))
+	t.Setenv("FAKE_COPILOT_LIST", `[{"name":"other"},{"name":"vloop"}]`)
+
+	code, out, errOut := h.run("self-update")
+	want := "vloop v0.14.0 is up to date (latest release v0.14.0)\n" +
+		"plugin claude (user): updated\n" +
+		"plugin claude (project): updated\n" +
+		"plugin copilot: updated\n" +
+		"next: vloop upgrade in each repository that uses vloop, and vloop self-update there for a plugin installed for that repository\n"
+	assertSelfUpdateResult(t, code, out, errOut, 0, want, "")
+
+	raw, err := os.ReadFile(h.agentLog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	prefix := filepath.ToSlash(root)
+	wantCommands := []string{
+		"claude|" + prefix + "|plugin list --json",
+		"claude|" + prefix + "|plugin marketplace update vloop",
+		"claude|" + prefix + "|plugin update vloop@vloop --scope user",
+		"claude|" + prefix + "|plugin update vloop@vloop --scope project",
+		"copilot|" + prefix + "|plugin list --json",
+		"copilot|" + prefix + "|plugin update vloop@vloop",
+	}
+	if strings.Join(lines, "\n") != strings.Join(wantCommands, "\n") {
+		t.Fatalf("agent order or working directory:\n%s", strings.Join(lines, "\n"))
+	}
+}
+
+func TestSelfUpdatePluginFailuresAreStructuredAndNonFatal(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+	h.addAgents(t, "claude", "copilot")
+	t.Setenv("FAKE_GO_LATEST", "v0.14.0")
+	t.Setenv("FAKE_CLAUDE_LIST", `[{"id":"vloop@vloop","version":"0.14.0","scope":"user"}]`)
+	t.Setenv("FAKE_CLAUDE_UPDATE_FAIL", "network down")
+	t.Setenv("FAKE_COPILOT_LIST", `not-json`)
+
+	code, out, errOut := h.run("--json", "self-update")
+	assertSelfUpdateResult(t, code, "", errOut, 0, "", "")
+	var doc selfUpdateDocument
+	if err := json.Unmarshal([]byte(out), &doc); err != nil {
+		t.Fatal(err)
+	}
+	assertSelfUpdateDocumentValid(t, out)
+	wantPlugins := []selfUpdatePlugin{
+		{Agent: "claude", Scope: "user", Result: "failed", Message: "network down"},
+		{Agent: "copilot", Result: "failed", Message: "invalid character 'o' in literal null (expecting 'u')"},
+	}
+	if len(doc.Plugins) != len(wantPlugins) {
+		t.Fatalf("plugins: %+v", doc.Plugins)
+	}
+	for i := range wantPlugins {
+		if doc.Plugins[i].Agent != wantPlugins[i].Agent || doc.Plugins[i].Scope != wantPlugins[i].Scope ||
+			doc.Plugins[i].Result != wantPlugins[i].Result || doc.Plugins[i].Message != wantPlugins[i].Message {
+			t.Fatalf("plugin %d: %+v; want %+v", i, doc.Plugins[i], wantPlugins[i])
+		}
+	}
+}
+
+func TestSelfUpdatePluginMarketplaceFailureAndCheckIsolation(t *testing.T) {
+	h := newSelfUpdateHarness(t)
+	t.Cleanup(h.restoreExecutable)
+	h.addAgents(t, "claude")
+	t.Setenv("FAKE_GO_LATEST", "v0.14.0")
+	t.Setenv("FAKE_CLAUDE_LIST", `[{"id":"vloop@vloop","version":"0.14.0","scope":"local","projectPath":"different"}]`)
+
+	code, out, errOut := h.run("self-update")
+	assertSelfUpdateResult(t, code, out, errOut, 0,
+		"vloop v0.14.0 is up to date (latest release v0.14.0)\nplugin claude: not installed\n", "")
+	if err := os.Remove(h.agentLog); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv("FAKE_CLAUDE_LIST", `[{"id":"vloop@vloop","version":"0.14.0","scope":"user"}]`)
+	t.Setenv("FAKE_CLAUDE_MARKETPLACE_FAIL", "market unavailable")
+	code, out, errOut = h.run("self-update")
+	assertSelfUpdateResult(t, code, out, errOut, 0,
+		"vloop v0.14.0 is up to date (latest release v0.14.0)\n"+
+			"! plugin claude: claude plugin marketplace update vloop failed: market unavailable — run it by hand\n",
+		"",
+	)
+	raw, err := os.ReadFile(h.agentLog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(raw), "plugin update vloop@vloop") {
+		t.Fatalf("plugin update ran after marketplace failure:\n%s", raw)
+	}
+	before := len(raw)
+
+	code, _, errOut = h.run("self-update", "--check")
+	if code != 0 || errOut != "" {
+		t.Fatalf("check: code=%d stderr=%q", code, errOut)
+	}
+	after, err := os.ReadFile(h.agentLog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(after) != before {
+		t.Fatal("--check inspected an agent plugin")
+	}
+}
+
 type selfUpdateHarness struct {
 	temp, gobin, log, executable string
+	agentLog, realGo             string
 	build                        Build
 	oldExecutable                func() (string, error)
 }
@@ -471,12 +639,45 @@ func newSelfUpdateHarness(t *testing.T) *selfUpdateHarness {
 	t.Setenv("FAKE_GO_INSTALL_PARTIAL", "")
 	t.Setenv("FAKE_GO_INSTALL_WINDOWS", "")
 	t.Setenv("FAKE_GO_LOG", log)
+	agentLog := filepath.Join(temp, "agent.log")
+	t.Setenv("FAKE_AGENT_LOG", agentLog)
 	oldExecutable := selfUpdateExecutable
 	selfUpdateExecutable = func() (string, error) { return executable, nil }
 	return &selfUpdateHarness{
 		temp: temp, gobin: gobin, log: log, executable: executable,
+		agentLog: agentLog, realGo: realGo,
 		build:         Build{Version: "0.14.0", Module: "v0.14.0"},
 		oldExecutable: oldExecutable,
+	}
+}
+
+func (h *selfUpdateHarness) addAgents(t *testing.T, agents ...string) {
+	t.Helper()
+	src := filepath.Join(h.temp, "fakeagent.go")
+	if err := os.WriteFile(src, []byte(fakeSelfUpdateAgent), 0o666); err != nil {
+		t.Fatal(err)
+	}
+	fake := filepath.Join(h.temp, "fake", "agent")
+	if runtime.GOOS == "windows" {
+		fake += ".exe"
+	}
+	build := exec.Command(h.realGo, "build", "-o", fake, src)
+	if raw, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build fake agent: %v: %s", err, raw)
+	}
+	for _, agent := range agents {
+		name := agent
+		if runtime.GOOS == "windows" {
+			name += ".exe"
+		}
+		dst := filepath.Join(h.temp, "fake", name)
+		raw, err := os.ReadFile(fake)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(dst, raw, 0o755); err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 

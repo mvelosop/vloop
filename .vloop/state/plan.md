@@ -2,15 +2,15 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **2/5 done** · iteration 5
+**Status:** running · **3/5 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:20:22Z
+**Brief:** `docs/briefs/B20261126-1036-b44-i98-self-update.loop-brief.md` · **Updated:** 2026-11-26T15:31:24Z
 
 ## Progress
 
 - [x] **T1** — Implement self-update target decisions and check mode · 2 attempt(s)
 - [x] **T2** — Install self-update targets safely
-- [ ] **T3** — Update installed agent plugins
+- [x] **T3** — Update installed agent plugins
 - [ ] **T4** — Point existing commands and guides to self-update
 - [ ] **T5** — Verify the complete self-update workflow
 
@@ -70,7 +70,7 @@ pwsh -NoProfile -File .vloop/state/gates/T2/gate.ps1
 
 ### T3 — Update installed agent plugins
 
-`pending` · depends on: T2
+`done` · depends on: T2
 
 Complete self-update by updating each locally discoverable vloop plugin after the binary step. Plugin discovery and failures remain per-agent and non-fatal, with the same scope rules doctor already uses.
 

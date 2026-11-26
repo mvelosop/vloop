@@ -23,3 +23,10 @@
    review T2 · 1m33s · $0.05 · run $0.49 / $40.00
    review: PASS
    T2 done
+── iteration 6 (5 this run) · T3 · 2/5 done ──
+   Update installed agent plugins
+   work T3 · 6m31s · $0.13 · run $0.61 / $40.00
+   check go
+   review T3 · 1m48s · $0.05 · run $0.67 / $40.00
+   review: PASS
+   T3 done

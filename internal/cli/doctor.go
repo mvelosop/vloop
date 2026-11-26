@@ -788,37 +788,52 @@ func runPluginList(tool, root string, out any) error {
 	return err
 }
 
-func doctorPlugin(b Build, root string) (string, string, string) {
-	var list []struct {
-		ID          string `json:"id"`
-		Version     string `json:"version"`
-		Scope       string `json:"scope"`
-		ProjectPath string `json:"projectPath"`
-		Enabled     bool   `json:"enabled"`
+type claudePluginEntry struct {
+	ID          string `json:"id"`
+	Version     string `json:"version"`
+	Scope       string `json:"scope"`
+	ProjectPath string `json:"projectPath"`
+	Enabled     bool   `json:"enabled"`
+}
+
+func claudePluginMatches(root string, p claudePluginEntry) bool {
+	if !strings.HasPrefix(p.ID, "vloop@") || p.Version == "" {
+		return false
 	}
-	if err := runPluginList("claude", root, &list); err != nil {
-		return "plugin", resWarning, "cannot read claude plugin list --json: " + err.Error()
+	if p.Scope == "" || p.Scope == "user" {
+		return true
 	}
 	keys := []string{root}
 	if real, err := filepath.EvalSymlinks(root); err == nil {
 		keys = append(keys, real)
 	}
+	for _, key := range keys {
+		if p.ProjectPath != "" && trustKeyMatch(hostOS, p.ProjectPath, key) {
+			return true
+		}
+	}
+	return false
+}
+
+type copilotPluginEntry struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Enabled bool   `json:"enabled"`
+}
+
+func copilotPluginMatches(p copilotPluginEntry) bool {
+	return p.Name == "vloop"
+}
+
+func doctorPlugin(b Build, root string) (string, string, string) {
+	var list []claudePluginEntry
+	if err := runPluginList("claude", root, &list); err != nil {
+		return "plugin", resWarning, "cannot read claude plugin list --json: " + err.Error()
+	}
 	optedOut := pluginOptedOut(root)
 	counted, found := false, ""
 	for _, p := range list {
-		if !strings.HasPrefix(p.ID, "vloop@") || p.Version == "" {
-			continue
-		}
-		mine := p.Scope == "" || p.Scope == "user"
-		if !mine {
-			for _, k := range keys {
-				if p.ProjectPath != "" && trustKeyMatch(hostOS, p.ProjectPath, k) {
-					mine = true
-					break
-				}
-			}
-		}
-		if !mine {
+		if !claudePluginMatches(root, p) {
 			continue
 		}
 		counted = true
@@ -844,17 +859,13 @@ func doctorPlugin(b Build, root string) (string, string, string) {
 // doctorCopilotPlugin is the copilot plugin row: copilot plugin list --json,
 // run in the root, for the entries named vloop.
 func doctorCopilotPlugin(b Build, root string) (string, string, string) {
-	var list []struct {
-		Name    string `json:"name"`
-		Version string `json:"version"`
-		Enabled bool   `json:"enabled"`
-	}
+	var list []copilotPluginEntry
 	if err := runPluginList("copilot", root, &list); err != nil {
 		return "copilot plugin", resWarning, "cannot read copilot plugin list --json: " + err.Error()
 	}
 	counted, found := false, ""
 	for _, p := range list {
-		if p.Name != "vloop" {
+		if !copilotPluginMatches(p) {
 			continue
 		}
 		counted = true
