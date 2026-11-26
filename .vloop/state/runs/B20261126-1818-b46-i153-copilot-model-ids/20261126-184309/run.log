@@ -45,3 +45,10 @@ committing the plan
    review T4 · 1m24s · $0.06 · run $1.25 / $40.00
    review: PASS
    T4 done
+── iteration 6 (6 this run) · T5 · 4/6 done ──
+   Document the Copilot model commands
+   work T5 · 1m22s · $0.04 · run $1.28 / $40.00
+   check go
+   review T5 · 1m04s · $0.03 · run $1.31 / $40.00
+   review: PASS
+   T5 done

@@ -5,9 +5,9 @@
   "base": "41d059d023c2fe35d5a754527a73390483943ea8",
   "branch": "B20261126-1818-b46-i153-copilot-model-ids",
   "status": "running",
-  "iteration": 5,
+  "iteration": 6,
   "created": "2026-11-26T18:54:54Z",
-  "updated": "2026-11-26T19:47:24Z",
+  "updated": "2026-11-26T19:53:12Z",
   "shell": "pwsh",
   "checks": [
     {
@@ -189,7 +189,7 @@
         "docs/guide/commands.md is regenerated from the completed CLI and includes vloop models copilot plus every --kinds, --agent, --model, and --effort surface."
       ],
       "verify": "pwsh -NoProfile -File .vloop/state/gates/T5/gate.ps1",
-      "status": "pending",
+      "status": "done",
       "attempts": 0,
       "notes": ""
     },

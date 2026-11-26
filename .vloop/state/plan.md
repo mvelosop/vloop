@@ -2,9 +2,9 @@
 
 <!-- Rendered from .vloop/state/state.json by vloop status --markdown. Do NOT edit. -->
 
-**Status:** running · **4/6 done** · iteration 5
+**Status:** running · **5/6 done** · iteration 6
 
-**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:47:24Z
+**Brief:** `docs/briefs/B20261126-1818-b46-i153-copilot-model-ids.loop-brief.md` · **Updated:** 2026-11-26T19:53:12Z
 
 ## Progress
 
@@ -12,7 +12,7 @@
 - [x] **T2** — Check Copilot model ids in config set
 - [x] **T3** — Check configured Copilot models in doctor
 - [x] **T4** — Set several session kinds in one config command
-- [ ] **T5** — Document the Copilot model commands
+- [x] **T5** — Document the Copilot model commands
 - [ ] **T6** — Verify the Copilot model workflow end to end
 
 ## Tasks
@@ -108,7 +108,7 @@ pwsh -NoProfile -File .vloop/state/gates/T4/gate.ps1
 
 ### T5 — Document the Copilot model commands
 
-`pending` · depends on: T1, T4
+`done` · depends on: T1, T4
 
 Replace the operator's manual API recipes with the supported vloop command and document how the new validation and multi-kind write affect configuration. Regenerate the command reference so the new command and flag are discoverable together.
 

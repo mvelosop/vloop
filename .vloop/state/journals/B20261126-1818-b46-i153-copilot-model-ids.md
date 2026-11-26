@@ -41,3 +41,10 @@ Append-only narrative of this plan. Rendered state lives in .vloop/state/plan.md
 - **Summary:** Added atomic `vloop config set --kinds` updates for agent, model, and effort, with one C-1-aware Copilot validation per invocation and shared/local targeting.
 - **Files:** internal/cli/config.go, internal/cli/config_test.go, internal/config/config.go, docs/guide/commands.md
 - **Notes for next iteration:** Batch candidates are previewed against environment/local/shared/default precedence and all assignments are written in one file operation. Removing agent alone intentionally skips pair validation; model removals are checked against the value that C-1 resolves.
+
+## T5 — Document the Copilot model commands
+
+- **Outcome:** done (review: PASS)
+- **Summary:** Replaced the manual Copilot API recipes with vloop models copilot guidance covering picker filtering, policies, plan output, config validation, doctor checks, and atomic --kinds setup; regenerated the command reference.
+- **Files:** docs/guide/configuration.md
+- **Notes for next iteration:** go generate ./... confirmed docs/guide/commands.md is already current from the completed CLI; it includes vloop models copilot and all --kinds, --agent, --model, and --effort surfaces.

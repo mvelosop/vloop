@@ -1,0 +1,9 @@
+{
+  "schema": "proposal/v1",
+  "task": "T5",
+  "outcome": "done",
+  "summary": "Replaced the manual Copilot API recipes with vloop models copilot guidance covering picker filtering, policies, plan output, config validation, doctor checks, and atomic --kinds setup; regenerated the command reference.",
+  "files": ["docs/guide/configuration.md"],
+  "verified": "vloop task gate T5 exited 0 and printed gate T5: pass.",
+  "notes": "go generate ./... confirmed docs/guide/commands.md is already current from the completed CLI; it includes vloop models copilot and all --kinds, --agent, --model, and --effort surfaces."
+}

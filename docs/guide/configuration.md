@@ -216,29 +216,34 @@ Microsoft's PowerShell package for the distribution and ensure `pwsh` is on
 
 A Copilot session's `model.<kind>` takes the exact id Copilot's `--model` takes.
 The Copilot CLI does not list them, and an unknown id fails with only
-`Model "<id>" from --model flag is not available.` The list comes from the
-Copilot API, which answers your `gh` login:
+`Model "<id>" from --model flag is not available.` List the ids available to
+your Copilot account with:
 
-```
-curl -s -H "Authorization: Bearer $(gh auth token)" \
-     -H "Copilot-Integration-Id: copilot-developer-cli" \
-     https://api.githubcopilot.com/models \
-  | jq -r '.data[] | select(.model_picker_enabled) | [.id, (.policy.state // "-")] | @tsv'
+```console
+vloop models copilot
 ```
 
-In PowerShell:
+The first line is the account's Copilot `plan` (`plan unknown` when the plan
+could not be read). The remaining lines are picker-enabled models, sorted by
+id; pass `--all` to include models hidden from Copilot's model picker. The
+second column is your account's policy for the model: `enabled`, `disabled`
+(the model exists but the policy blocks it), or `-` (the response has no
+policy; such a model can still run).
 
-```powershell
-$h = @{ Authorization = "Bearer $(gh auth token)"; 'Copilot-Integration-Id' = 'copilot-developer-cli' }
-(Invoke-RestMethod https://api.githubcopilot.com/models -Headers $h).data |
-  Where-Object model_picker_enabled |
-  Select-Object id, @{ n = 'policy'; e = { $_.policy.state ?? '-' } }
+When a session kind resolves to `agent.<kind> = "copilot"`, `vloop config set`
+validates a new model id before writing it, and `vloop doctor` checks every
+resolved Copilot model and reports the account plan. Aliases such as `sonnet`,
+missing ids, and disabled ids are refused; an unavailable model-list request
+is warning-only for config writes and doctor.
+
+Set the same Copilot configuration for several session kinds atomically:
+
+```console
+vloop config set --kinds work,review --agent copilot --model mai-code-2
 ```
 
-The first column is the id. The second is your account's policy for the model:
-`enabled`, `disabled` (the model exists and the policy blocks it) or `-` (no
-policy applies; such a model can still run). The list carries no prices: cost is
-estimated from the credits each session uses (`copilot.credit-usd`). The ids
+The list carries no prices: cost is estimated from the credits each session
+uses (`copilot.credit-usd`). The ids
 vloop has qualified for each session kind are in the README; how they were
 found is in `docs/design-notes/copilot-cli-experiments.md`.
 
