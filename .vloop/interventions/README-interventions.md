@@ -231,6 +231,9 @@ Generated — regenerate with `tools/interventions-index.sh --write`;
 | verify | verification-finding | partly | no-options | [I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on](I20261126-161112-s1-step-2-took-a-checkout-build-to-be-on.md) |
 | verify | verification-finding | partly | no-options | [I20261126-181649-docs-domain-execution-task-md-still-said](I20261126-181649-docs-domain-execution-task-md-still-said.md) |
 | verify | verification-finding | partly | no-options | [I20261126-203317-the-new-model-check-made-existing-cmd-vl](I20261126-203317-the-new-model-check-made-existing-cmd-vl.md) |
+| verify | verification-finding | partly | no-options | [I20261127-202947-verify-found-the-guide-s-vloop-layout-li](I20261127-202947-verify-found-the-guide-s-vloop-layout-li.md) |
+| verify | verification-finding | partly | no-options | [I20261127-202948-verify-noted-upgrade-s-help-still-says-i](I20261127-202948-verify-noted-upgrade-s-help-still-says-i.md) |
+| verify | verification-finding | partly | no-options | [I20261127-202949-the-verify-fence-denies-vloop-init-so-al](I20261127-202949-the-verify-fence-denies-vloop-init-so-al.md) |
 | close | carry-forward | partly | no-options | [I20260929-2325-the-bsd-tools-lesson-into-later-briefs](I20260929-2325-the-bsd-tools-lesson-into-later-briefs.md) |
 | close | carry-forward | partly | no-options | [I20260930-0809-the-six-known-defects-of-b1-b3-recorded](I20260930-0809-the-six-known-defects-of-b1-b3-recorded.md) |
 | close | ceremony | yes | no-options | [I20260929-2046-manual-close-run-record-consumed-status](I20260929-2046-manual-close-run-record-consumed-status.md) |
