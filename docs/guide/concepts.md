@@ -439,6 +439,7 @@ vloop keeps its files under `.vloop/` in the repository root:
 
 - `.vloop/config.toml`: the settings, written by `vloop config set`.
 - `.vloop/install.json`: the install stamp, written by `vloop init` and `vloop upgrade`.
+- `.vloop/README.md`: what vloop and this folder are, for anyone who opens it; vloop owns it, so `vloop upgrade` rewrites or restores it.
 - `.vloop/config.local.toml`: your own overrides of the settings, git-ignored.
 - `.vloop/tmp/`: scratch space, git-ignored.
 - `.vloop/state/state.json`: the plan.
