@@ -1,0 +1,19 @@
+{
+  "schema": "verdict/v1",
+  "task": "T3",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "The Setting up a repository section says: `init` writes `.vloop/README.md`, and `upgrade` rewrites or restores it.",
+      "met": true,
+      "evidence": "docs/guide/concepts.md:339 adds exactly: \"`init` writes `.vloop/README.md`, and `upgrade` rewrites or restores it.\""
+    },
+    {
+      "criterion": "The guide change is limited to that lifecycle sentence and does not alter the documented behavior of any other file init or upgrade writes.",
+      "met": true,
+      "evidence": "git diff HEAD for docs/guide/concepts.md contains only the new lifecycle sentence under \"Setting up a repository\"; the surrounding descriptions of init and upgrade remain unchanged."
+    }
+  ],
+  "findings": [],
+  "notes": "None."
+}

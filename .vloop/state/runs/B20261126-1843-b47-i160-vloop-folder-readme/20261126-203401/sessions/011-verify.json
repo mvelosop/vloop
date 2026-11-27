@@ -1,0 +1,39 @@
+{
+  "agent": "copilot",
+  "cost_source": "estimated",
+  "cost_usd": 0.0972054,
+  "credits": 9.72054,
+  "duration_ms": 172547,
+  "effort": null,
+  "ended": "2026-11-26T21:11:40Z",
+  "is_error": false,
+  "iteration": 0,
+  "model": "mai-code-2",
+  "models_used": {
+    "mai-code-2": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cost_usd": 0.0972054,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  },
+  "permission_denials": [
+    {
+      "message": "Denied by preToolUse hook: vloop fence: vloop init --help is denied by the verify fence (Bash(vloop init:*))",
+      "tool_name": "powershell",
+      "tool_use_id": "call_C8OozhXnDlslypCGsqUK2dOs"
+    },
+    {
+      "message": "Denied by preToolUse hook: vloop fence: vloop upgrade --help is denied by the verify fence (Bash(vloop upgrade:*))",
+      "tool_name": "powershell",
+      "tool_use_id": "call_yOn83T5DtrU9moLD4fZgUTl0"
+    }
+  ],
+  "phase": "verify",
+  "run_id": "B20261126-1843-b47-i160-vloop-folder-readme",
+  "schema": "session/v4",
+  "started": "2026-11-26T21:08:45Z",
+  "turns": 19,
+  "wall_ms": 174948
+}

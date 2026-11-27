@@ -102,26 +102,28 @@ func runInit(b Build, g *Globals, cmd *cobra.Command, o initOpts, now time.Time)
 	} else if !exists {
 		steps = append(steps, initStep{path: guidelinesPath, verb: "wrote", content: []byte(guidelinesTemplate(lang))})
 	}
-	// 3. starter brief
+	// 3. owned folder README
+	steps = append(steps, initStep{path: ".vloop/README.md", verb: "wrote", content: []byte(vloopReadme(lang, b.Version))})
+	// 4. starter brief
 	briefStep, err := starterBriefStep(root, lang, now)
 	if err != nil {
 		return Problem(err)
 	}
 	steps = append(steps, briefStep)
-	// 4. .gitignore
+	// 5. .gitignore
 	old, exists, err := readRepoFile(root, ".gitignore")
 	if err != nil {
 		return Problem(err)
 	}
 	steps = append(steps, mergedStep(".gitignore", old, exists, func() ([]byte, bool) { return install.MergeGitignore(old) }))
-	// 5. CLAUDE.md
+	// 6. CLAUDE.md
 	old, exists, err = readRepoFile(root, "CLAUDE.md")
 	if err != nil {
 		return Problem(err)
 	}
 	claude := install.MergeClaudeMD(old, exists, b.Version)
 	steps = append(steps, mergedStep("CLAUDE.md", old, exists, func() ([]byte, bool) { return claude, string(claude) != string(old) }))
-	// 6. .claude/settings.json: the plugin's declaration
+	// 7. .claude/settings.json: the plugin's declaration
 	old, exists, err = readRepoFile(root, install.SettingsPath)
 	if err != nil {
 		return Problem(err)

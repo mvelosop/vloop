@@ -1,0 +1,14 @@
+{
+  "schema": "proposal/v1",
+  "task": "T1",
+  "outcome": "done",
+  "summary": "Init now writes a versioned, language-specific, owned .vloop/README.md with the required workflow, folder inventory, commands and project link, while preserving the documented output order and overwriting existing local text.",
+  "files": [
+    "cmd/vloop/b5_e2e_test.go",
+    "internal/cli/init.go",
+    "internal/cli/init_test.go",
+    "internal/cli/vloop_readme.go"
+  ],
+  "verified": "vloop task gate T1 exited 0 and printed gate T1: pass (2.167s).",
+  "notes": "The reusable vloopReadme renderer is shared by language and returns LF-only text; init places its write step after the stamp and optional guidelines line, before the starter brief. Go tests cover both languages, version insertion, overwrite behavior, inventory and output assertions."
+}

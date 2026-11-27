@@ -40,7 +40,7 @@ func TestInitWritesEverything(t *testing.T) {
 	if code != 0 || errs != "" {
 		t.Fatalf("code %d, stderr %q", code, errs)
 	}
-	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "wrote .vloop/install.json\nwrote .vloop/repo-guidelines.md\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  vloop doctor\n  get /vloop:operate for your Claude Code sessions in this repository, once:\n    claude plugin marketplace add mvelosop/vloop\n    claude plugin install vloop@vloop --scope project\n  or, for one session: claude --plugin-dir \"$(vloop plugin path)\"\n  for Copilot CLI: trust this folder in copilot (the plugin is declared in .claude/settings.json), or once:\n    copilot plugin marketplace add mvelosop/vloop\n    copilot plugin install vloop@vloop\n  or, for one session: copilot --plugin-dir \"$(vloop plugin path)\"\n  then ask Claude Code for what you want (\"run the brief docs/briefs/<name>\"); /vloop:operate drives vloop\n"} {
+	for _, want := range []string{"detected stacks: go\n", "wrote .vloop/config.toml\n", "wrote .vloop/install.json\n", "wrote .vloop/install.json\nwrote .vloop/repo-guidelines.md\nwrote .vloop/README.md\n", "-primeros-pasos.loop-brief.md\n", "updated .gitignore\n", "wrote CLAUDE.md\n", "next:\n  vloop doctor\n  get /vloop:operate for your Claude Code sessions in this repository, once:\n    claude plugin marketplace add mvelosop/vloop\n    claude plugin install vloop@vloop --scope project\n  or, for one session: claude --plugin-dir \"$(vloop plugin path)\"\n  for Copilot CLI: trust this folder in copilot (the plugin is declared in .claude/settings.json), or once:\n    copilot plugin marketplace add mvelosop/vloop\n    copilot plugin install vloop@vloop\n  or, for one session: copilot --plugin-dir \"$(vloop plugin path)\"\n  then ask Claude Code for what you want (\"run the brief docs/briefs/<name>\"); /vloop:operate drives vloop\n"} {
 		if !strings.Contains(out, want) {
 			t.Errorf("output lacks %q:\n%s", want, out)
 		}
@@ -133,7 +133,7 @@ func TestInitDryRun(t *testing.T) {
 	if code != 0 {
 		t.Fatal(code)
 	}
-	for _, want := range []string{"would write .vloop/config.toml\n", "would write .vloop/install.json\n", "would write .vloop/repo-guidelines.md\n", "would write .gitignore\n", "would write CLAUDE.md\n"} {
+	for _, want := range []string{"would write .vloop/config.toml\n", "would write .vloop/install.json\n", "would write .vloop/repo-guidelines.md\n", "would write .vloop/README.md\n", "would write .gitignore\n", "would write CLAUDE.md\n"} {
 		if !strings.Contains(out, want) {
 			t.Errorf("lacks %q:\n%s", want, out)
 		}
@@ -241,6 +241,46 @@ func TestInitKeepsExistingGuidelines(t *testing.T) {
 	}
 	if strings.Contains(out, "repo-guidelines.md") {
 		t.Errorf("init printed a line for the kept file:\n%s", out)
+	}
+}
+
+func TestInitWritesOwnedReadme(t *testing.T) {
+	headings := map[string][]string{
+		"en": {"## What vloop is", "## How to use it", "## What is in this folder", "## More"},
+		"es": {"## Qué es vloop", "## Cómo se usa", "## Qué hay en esta carpeta", "## Más"},
+	}
+	entries := []string{
+		"`config.toml`", "`config.local.toml`", "`install.json`",
+		"`repo-guidelines.md`", "`README.md`", "`defects/`",
+		"`interventions/`", "`state/`", "`tmp/`",
+	}
+	for lang, langHeadings := range headings {
+		t.Run(lang, func(t *testing.T) {
+			d := initRepo(t, map[string]string{".vloop/README.md": "local text\n"})
+			out, errs, code := runPluginCLI(t, initBuild, d, "init", "--language", lang)
+			if code != 0 || errs != "" {
+				t.Fatalf("code %d, stderr %q", code, errs)
+			}
+			got := readFile(t, d, ".vloop/README.md")
+			wantOwnership := "Written by vloop 0.1.0. vloop owns this file:"
+			if lang == "es" {
+				wantOwnership = "Escrito por vloop 0.1.0. Este archivo es de vloop:"
+			}
+			for _, want := range append([]string{"# vloop", wantOwnership, "https://github.com/mvelosop/vloop"}, append(langHeadings, entries...)...) {
+				if !strings.Contains(got, want) {
+					t.Errorf("README lacks %q:\n%s", want, got)
+				}
+			}
+			if strings.Contains(got, "local text") || strings.Contains(got, "\r") {
+				t.Errorf("README was not overwritten with LF text: %q", got)
+			}
+			if n := len(strings.Fields(got)); n > 400 {
+				t.Errorf("README has %d words", n)
+			}
+			if !strings.Contains(out, "wrote .vloop/README.md\n") {
+				t.Errorf("init output lacks README line:\n%s", out)
+			}
+		})
 	}
 }
 

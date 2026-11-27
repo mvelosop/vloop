@@ -1,0 +1,38 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1843-b47-i160-vloop-folder-readme.loop-brief",
+  "verdict": "FIX",
+  "findings": [
+    {
+      "kind": "runnability",
+      "section": "Worked example and Shape",
+      "summary": "The worked example is illustrative where the brief says the final gate will run it line by line: `vloop init` expects `… wrote .vloop/README.md …`, while the version is still a placeholder.",
+      "evidence": "docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md:169-181 uses `…`; lines 232-242 call task 4 a line-by-line gate. The create-brief standard requires literal worked-example values, and the current example gives no exact command/result assertion for the `init` line.",
+      "fix": "Make the relevant init output assertion literal (for example, filter the command to the one exact output line) and instantiate the example version as 0.15.0-rc.4, so the final gate can execute and compare the example rather than interpret ellipses."
+    },
+    {
+      "kind": "fact",
+      "section": "Constraints — Earlier tests",
+      "summary": "The brief incorrectly attributes the old exact-output pins to B43 and B44.",
+      "evidence": "docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md:220-223 says each left one such test. The output pins are in cmd/vloop/b5_e2e_test.go:214-259 (init, normal upgrade and breaking upgrade) and cmd/vloop/b44_selfupdate_e2e_test.go:100-150 only pins self-update output; internal/state/gate_test.go:15-82 is B43's UTF-8/gate coverage and contains no init or upgrade output assertion.",
+      "fix": "Remove the B43/B44 attribution and name the actual output-pinning locations, while retaining the instruction to update Windows-skipped tests such as the B5 end-to-end test."
+    },
+    {
+      "kind": "fact",
+      "section": "Binding references",
+      "summary": "The stated reason for binding the platform-context document is not supported by that document.",
+      "evidence": "docs/briefs/B20261126-1843-b47-i160-vloop-folder-readme.loop-brief.md:75 cites docs/domain/platform/platform-context.md for init, upgrade, the install stamp and what they write. That file discusses repo/config/schemas/CLI conventions; its only `language` occurrence is at docs/domain/platform/platform-context.md:29 and it has no init, upgrade or install-stamp section.",
+      "fix": "Remove this reference, or replace its reason with a rule actually present there and needed by the feature; retain docs/guide/concepts.md and the two CLI files for what init and upgrade write."
+    }
+  ],
+  "decisions": [
+    "vloop wholly owns `.vloop/README.md`, regenerates it on upgrade, and discards edits; sound and already operator-decided.",
+    "Upgrade always restores or rewrites the file, including same-version repositories, with no opt-out; sound and already operator-decided.",
+    "The README is descriptive rather than promotional, is at most 400 words, and links the repository; sound.",
+    "The configured language resolves README prose, English when unset; the brief also decides LF line endings and the exact guide sentence.",
+    "The brief proposes a 3-to-4-task shape with init, upgrade, guide and final end-to-end coverage."
+  ],
+  "checked": "facts, consistency, rules, runnability",
+  "header": "Reviewed 2026-11-26: FIX, 3 findings"
+}
+

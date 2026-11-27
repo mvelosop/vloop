@@ -336,6 +336,8 @@ scoped to it, like `csharp@services/api`), the **stamp** `.vloop/install.json`
 is kept; it also declares the plugin in `.claude/settings.json` (a marketplace
 entry and an enabled plugin, merged into what is there). It refuses a repository already set up. `--dry-run` writes nothing.
 
+`init` writes `.vloop/README.md`, and `upgrade` rewrites or restores it.
+
 `vloop upgrade` refreshes that `CLAUDE.md` section and the `.gitignore` lines, adds
 what is missing of the plugin's declaration in `.claude/settings.json`, and
 rewrites the stamp. It refuses a repository set up by a newer vloop, and a
@@ -437,6 +439,7 @@ vloop keeps its files under `.vloop/` in the repository root:
 
 - `.vloop/config.toml`: the settings, written by `vloop config set`.
 - `.vloop/install.json`: the install stamp, written by `vloop init` and `vloop upgrade`.
+- `.vloop/README.md`: what vloop and this folder are, for anyone who opens it; vloop owns it, so `vloop upgrade` rewrites or restores it.
 - `.vloop/config.local.toml`: your own overrides of the settings, git-ignored.
 - `.vloop/tmp/`: scratch space, git-ignored.
 - `.vloop/state/state.json`: the plan.

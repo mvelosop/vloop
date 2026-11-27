@@ -1,0 +1,18 @@
+{
+  "schema": "brief-review/v1",
+  "brief": "B20261126-1843-b47-i160-vloop-folder-readme.loop-brief",
+  "verdict": "PASS",
+  "findings": [],
+  "decisions": [
+    "vloop owns the whole .vloop/README.md; upgrade regenerates it rather than merging local edits. I agree: the explicit restore and current-version behavior matches a generated owned file.",
+    "vloop upgrade always restores a missing README, and there is no opt-out. I agree: this is the operator-approved ownership decision.",
+    "vloop self-update does not write repositories; each repository is refreshed by vloop upgrade. I agree: it preserves B44's boundary.",
+    "The README is descriptive, stays within 400 words, and covers four content sections plus the ownership notice. I agree.",
+    "init uses the selected/init-resolved language; upgrade uses the resolved language config, defaulting to en. I agree: this follows existing generated-file language behavior.",
+    "Generated files use LF line endings. I agree: this matches existing file writes.",
+    "The setup guide gains a sentence naming init's write and upgrade's rewrite-or-restore behavior. I agree: the existing setup section is the right documentation surface."
+  ],
+  "checked": "facts, consistency, rules, runnability; brief check on a ready copy and the repository base check",
+  "header": "Reviewed 2026-11-26: PASS, 0 findings"
+}
+

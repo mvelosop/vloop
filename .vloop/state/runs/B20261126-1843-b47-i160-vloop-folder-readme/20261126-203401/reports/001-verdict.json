@@ -1,0 +1,34 @@
+{
+  "schema": "verdict/v1",
+  "task": "T1",
+  "verdict": "PASS",
+  "criteria": [
+    {
+      "criterion": "vloop init writes .vloop/README.md in English or Spanish according to the same language selection as the other generated prose, using the binary's vloop version and LF line endings.",
+      "met": true,
+      "evidence": "internal/cli/init.go:116 appends the README step using vloopReadme(lang, b.Version); internal/cli/vloop_readme.go provides both language templates, interpolates version, and emits LF-only text; internal/cli/init_test.go:247 checks both languages, the version warning, and rejects CR bytes."
+    },
+    {
+      "criterion": "The README has only the four brief-named sections, stays within 400 words, describes vloop's workflow and three supported operating systems without quality claims or comparisons, gives the install, doctor, brief and maintenance commands, lists every named .vloop entry on its own line, and links to https://github.com/mvelosop/vloop.",
+      "met": true,
+      "evidence": "internal/cli/vloop_readme.go defines exactly the four required localized section headings and includes the workflow, macOS/Linux/Windows, all required commands, nine named entries as separate bullets, and the repository URL; internal/cli/init_test.go:247 checks headings, entries, URL and the 400-word limit."
+    },
+    {
+      "criterion": "The file begins with the ownership warning in the selected language, and init overwrites an existing .vloop/README.md rather than merging or keeping local edits.",
+      "met": true,
+      "evidence": "internal/cli/vloop_readme.go places the localized ownership warning at the opening; internal/cli/init.go:116 always adds a write step, and internal/cli/init_test.go:260 seeds local text then verifies its removal by init."
+    },
+    {
+      "criterion": "Init prints wrote .vloop/README.md after the install stamp and any newly written guidelines line, and before the starter brief; existing guidelines remain silent, and no other init file or output changes.",
+      "met": true,
+      "evidence": "internal/cli/init.go:102-122 orders the stamp, optional guidelines, README and starter brief steps; cmd/vloop/b5_e2e_test.go:226-250 updates the exact output by only the README line at the required position; internal/cli/init_test.go:231 verifies an existing guidelines file is unchanged and unreported."
+    },
+    {
+      "criterion": "Committed Go tests exercise both languages, version insertion, the folder inventory, overwrite behavior, output ordering, and the existing-guidelines case, including any earlier exact-output assertions that only gain the README line.",
+      "met": true,
+      "evidence": "internal/cli/init_test.go:231-283 covers silent existing guidelines and README behavior in English and Spanish, including version, inventory, overwrite and LF assertions; cmd/vloop/b5_e2e_test.go:226-250 covers exact ordered output with only the README line added, and the recorded go check passed."
+    }
+  ],
+  "findings": [],
+  "notes": "none"
+}
